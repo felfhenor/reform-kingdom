@@ -4,109 +4,42 @@ import {
   pickSkillFromCombatOrders,
   resolveFamilyToSkill,
 } from '@helpers/combat/combat-order-evaluation';
-import { defaultCombatStats } from '@helpers/defaults';
 import type {
-  Combat,
+  CharacterId,
   Combatant,
+  CombatOrderClauseId,
   CombatOrderCondition,
-  EquipmentSkill,
   EquipmentSkillContentTechnique,
+  EquipmentSkillId,
+  StatusEffectId,
 } from '@interfaces';
+import { ensureEquipmentSkillTechnique } from '@helpers/content/ensure-skill';
+import {
+  buildCombat,
+  buildEquipmentSkill,
+  buildStatusEffect,
+  buildTestCombatant,
+} from '@/testing/builders';
 import { describe, expect, it } from 'vitest';
-
-function buildCombat(overrides: Partial<Combat> = {}): Combat {
-  return {
-    id: 'combat-1' as never,
-    locationName: 'Field Ruins',
-    locationPosition: { x: 0, y: 0 },
-    rounds: 1,
-    heroes: [],
-    helpers: [],
-    guardians: [],
-    ...overrides,
-  };
-}
-
-function buildCombatant(overrides: Partial<Combatant> = {}): Combatant {
-  return {
-    id: 'combatant-1',
-    name: 'Combatant',
-    isEnemy: false,
-    level: 1,
-    hp: 100,
-    ep: 10,
-    sprite: '0000',
-    frames: 4,
-    targetting: [{ type: 'Random' }],
-    baseStats: {} as never,
-    statBoosts: {} as never,
-    totalStats: {
-      Agility: 0,
-      Energy: 100,
-      Health: 100,
-      Intelligence: 0,
-      Luck: 0,
-      Resistance: 0,
-      Strength: 0,
-      Vitality: 0,
-      Constitution: 0,
-      Spirit: 0,
-    },
-    combatStats: defaultCombatStats(),
-    resistance: {} as never,
-    affinity: { Fire: 0, Water: 0, Earth: 0, Air: 0 },
-    tagResistance: {} as never,
-    skillIds: [],
-    skillRefs: [],
-    skillWeights: {},
-    combatOrders: [],
-    skillUses: {},
-    statusEffects: [],
-    statusEffectData: {},
-    ...overrides,
-  };
-}
-
-function buildSkill(overrides: Partial<EquipmentSkill> = {}): EquipmentSkill {
-  return {
-    id: 'skill-1' as never,
-    name: 'Test Skill',
-    __type: 'skill',
-    description: '',
-    sprite: '0000',
-    rarity: 'Common',
-    epCost: 0,
-    usesPerCombat: -1,
-    statusEffectDurationBoost: {} as never,
-    statusEffectChanceBoost: {} as never,
-    techniques: [],
-    requiredWeaponTypes: [],
-    family: 'Test Skill',
-    ...overrides,
-  };
-}
 
 function buildTechnique(
   overrides: Partial<EquipmentSkillContentTechnique> = {},
 ): EquipmentSkillContentTechnique {
-  return {
-    targets: 1,
+  return ensureEquipmentSkillTechnique({
     targetType: 'Allies',
     targetBehaviors: [{ behavior: 'Always' }],
-    damageScaling: {} as never,
-    elements: [],
-    attributes: [],
-    statusEffects: [],
-    combatMessage: '',
     ...overrides,
-  };
+  });
 }
 
 describe('resolveFamilyToSkill', () => {
   it('finds the available skill matching the given family', () => {
-    const cure = buildSkill({ id: 'cure' as never, family: 'Cure' });
-    const fireball = buildSkill({
-      id: 'fireball' as never,
+    const cure = buildEquipmentSkill({
+      id: 'cure' as EquipmentSkillId,
+      family: 'Cure',
+    });
+    const fireball = buildEquipmentSkill({
+      id: 'fireball' as EquipmentSkillId,
       family: 'Fireball',
     });
 
@@ -114,7 +47,10 @@ describe('resolveFamilyToSkill', () => {
   });
 
   it('returns undefined when no available skill matches the family', () => {
-    const cure = buildSkill({ id: 'cure' as never, family: 'Cure' });
+    const cure = buildEquipmentSkill({
+      id: 'cure' as EquipmentSkillId,
+      family: 'Cure',
+    });
 
     expect(resolveFamilyToSkill('Fireball', [cure])).toBeUndefined();
   });
@@ -125,14 +61,17 @@ describe('combatOrderConditionMatches', () => {
 
   it('Always always matches', () => {
     expect(
-      combatOrderConditionMatches({ type: 'Always' }, combat, buildCombatant()),
+      combatOrderConditionMatches(
+        { type: 'Always' },
+        combat,
+        buildTestCombatant(),
+      ),
     ).toBe(true);
   });
 
   it('SelfHealthPercent compares current HP% against the threshold', () => {
-    const combatant = buildCombatant({
+    const combatant = buildTestCombatant({
       hp: 50,
-      totalStats: { ...buildCombatant().totalStats, Health: 100 },
     });
     const condition: CombatOrderCondition = {
       type: 'SelfHealthPercent',
@@ -160,9 +99,8 @@ describe('combatOrderConditionMatches', () => {
   });
 
   it('SelfEnergyPercent compares current EP% against the threshold', () => {
-    const combatant = buildCombatant({
+    const combatant = buildTestCombatant({
       ep: 25,
-      totalStats: { ...buildCombatant().totalStats, Energy: 100 },
     });
 
     expect(
@@ -182,10 +120,10 @@ describe('combatOrderConditionMatches', () => {
   });
 
   it('AllyCountHealthPercent (Below) counts the caster as its own ally and excludes the dead', () => {
-    const caster = buildCombatant({ id: 'caster', hp: 40 });
-    const lowHpAlly = buildCombatant({ id: 'low', hp: 10 });
-    const deadAlly = buildCombatant({ id: 'dead', hp: 0 });
-    const healthyAlly = buildCombatant({ id: 'healthy', hp: 100 });
+    const caster = buildTestCombatant({ id: 'caster', hp: 40 });
+    const lowHpAlly = buildTestCombatant({ id: 'low', hp: 10 });
+    const deadAlly = buildTestCombatant({ id: 'dead', hp: 0 });
+    const healthyAlly = buildTestCombatant({ id: 'healthy', hp: 100 });
 
     const combatWithAllies = buildCombat({
       heroes: [caster, lowHpAlly, deadAlly, healthyAlly],
@@ -221,8 +159,8 @@ describe('combatOrderConditionMatches', () => {
   });
 
   it('AllyCountHealthPercent counts town-guardian helpers as allies, alongside heroes', () => {
-    const caster = buildCombatant({ id: 'caster', hp: 40 });
-    const lowHpHelper = buildCombatant({ id: 'helper-1', hp: 10 });
+    const caster = buildTestCombatant({ id: 'caster', hp: 40 });
+    const lowHpHelper = buildTestCombatant({ id: 'helper-1', hp: 10 });
 
     const combatWithHelper = buildCombat({
       heroes: [caster],
@@ -245,9 +183,9 @@ describe('combatOrderConditionMatches', () => {
   });
 
   it('AllyCountHealthPercent (Above) counts allies strictly above the threshold', () => {
-    const caster = buildCombatant({ id: 'caster', hp: 40 });
-    const lowHpAlly = buildCombatant({ id: 'low', hp: 10 });
-    const healthyAlly = buildCombatant({ id: 'healthy', hp: 100 });
+    const caster = buildTestCombatant({ id: 'caster', hp: 40 });
+    const lowHpAlly = buildTestCombatant({ id: 'low', hp: 10 });
+    const healthyAlly = buildTestCombatant({ id: 'healthy', hp: 100 });
 
     const combatWithAllies = buildCombat({
       heroes: [caster, lowHpAlly, healthyAlly],
@@ -270,15 +208,15 @@ describe('combatOrderConditionMatches', () => {
   });
 
   it('SpecificHeroHealthPercent compares the named hero (not the caster) against the threshold', () => {
-    const caster = buildCombatant({ id: 'caster', hp: 100 });
-    const target = buildCombatant({ id: 'target', hp: 20 });
+    const caster = buildTestCombatant({ id: 'caster', hp: 100 });
+    const target = buildTestCombatant({ id: 'target', hp: 20 });
     const combatWithAllies = buildCombat({ heroes: [caster, target] });
 
     expect(
       combatOrderConditionMatches(
         {
           type: 'SpecificHeroHealthPercent',
-          characterId: 'target' as never,
+          characterId: 'target' as CharacterId,
           comparator: 'LessThan',
           value: 50,
         },
@@ -290,7 +228,7 @@ describe('combatOrderConditionMatches', () => {
       combatOrderConditionMatches(
         {
           type: 'SpecificHeroHealthPercent',
-          characterId: 'target' as never,
+          characterId: 'target' as CharacterId,
           comparator: 'GreaterThan',
           value: 50,
         },
@@ -301,12 +239,12 @@ describe('combatOrderConditionMatches', () => {
   });
 
   it('SpecificHeroHealthPercent is false when the named hero is dead or missing from the party', () => {
-    const caster = buildCombatant({ id: 'caster', hp: 100 });
-    const deadTarget = buildCombatant({ id: 'dead-target', hp: 0 });
+    const caster = buildTestCombatant({ id: 'caster', hp: 100 });
+    const deadTarget = buildTestCombatant({ id: 'dead-target', hp: 0 });
     const combatWithAllies = buildCombat({ heroes: [caster, deadTarget] });
     const condition: CombatOrderCondition = {
       type: 'SpecificHeroHealthPercent',
-      characterId: 'dead-target' as never,
+      characterId: 'dead-target' as CharacterId,
       comparator: 'LessThanOrEqual',
       value: 100,
     };
@@ -316,7 +254,7 @@ describe('combatOrderConditionMatches', () => {
     ).toBe(false);
     expect(
       combatOrderConditionMatches(
-        { ...condition, characterId: 'not-in-party' as never },
+        { ...condition, characterId: 'not-in-party' as CharacterId },
         combatWithAllies,
         caster,
       ),
@@ -324,9 +262,13 @@ describe('combatOrderConditionMatches', () => {
   });
 
   it('EnemyCount counts only living guardians against the given comparator', () => {
-    const hero = buildCombatant({ id: 'hero', isEnemy: false });
-    const aliveGuardian = buildCombatant({ id: 'g1', isEnemy: true, hp: 10 });
-    const deadGuardian = buildCombatant({ id: 'g2', isEnemy: true, hp: 0 });
+    const hero = buildTestCombatant({ id: 'hero', isEnemy: false });
+    const aliveGuardian = buildTestCombatant({
+      id: 'g1',
+      isEnemy: true,
+      hp: 10,
+    });
+    const deadGuardian = buildTestCombatant({ id: 'g2', isEnemy: true, hp: 0 });
 
     const combatWithGuardians = buildCombat({
       heroes: [hero],
@@ -350,14 +292,14 @@ describe('combatOrderConditionMatches', () => {
   });
 
   it('EnemyCountHealthPercent counts only living enemies on the matching side of the threshold', () => {
-    const hero = buildCombatant({ id: 'hero', hp: 10 });
-    const lowGuardian = buildCombatant({ id: 'g1', isEnemy: true, hp: 20 });
-    const healthyGuardian = buildCombatant({
+    const hero = buildTestCombatant({ id: 'hero', hp: 10 });
+    const lowGuardian = buildTestCombatant({ id: 'g1', isEnemy: true, hp: 20 });
+    const healthyGuardian = buildTestCombatant({
       id: 'g2',
       isEnemy: true,
       hp: 90,
     });
-    const deadGuardian = buildCombatant({ id: 'g3', isEnemy: true, hp: 0 });
+    const deadGuardian = buildTestCombatant({ id: 'g3', isEnemy: true, hp: 0 });
 
     const combatWithGuardians = buildCombat({
       heroes: [hero],
@@ -392,9 +334,9 @@ describe('combatOrderConditionMatches', () => {
   });
 
   it('EnemyCountHealthPercent from an enemy caster counts heroes and helpers', () => {
-    const guardian = buildCombatant({ id: 'g1', isEnemy: true, hp: 10 });
-    const lowHero = buildCombatant({ id: 'hero', hp: 20 });
-    const lowHelper = buildCombatant({ id: 'helper', hp: 30 });
+    const guardian = buildTestCombatant({ id: 'g1', isEnemy: true, hp: 10 });
+    const lowHero = buildTestCombatant({ id: 'hero', hp: 20 });
+    const lowHelper = buildTestCombatant({ id: 'helper', hp: 30 });
 
     expect(
       combatOrderConditionMatches(
@@ -418,12 +360,12 @@ describe('combatOrderConditionMatches', () => {
 
 describe('matchingCombatantsForCondition', () => {
   it('orders matches by HP %, not raw HP', () => {
-    const warrior = buildCombatant({
+    const warrior = buildTestCombatant({
       id: 'warrior',
       hp: 400,
-      totalStats: { ...buildCombatant().totalStats, Health: 1000 },
+      totalStats: { ...buildTestCombatant().totalStats, Health: 1000 },
     });
-    const mage = buildCombatant({ id: 'mage', hp: 45 });
+    const mage = buildTestCombatant({ id: 'mage', hp: 45 });
     const combat = buildCombat({ heroes: [mage, warrior] });
 
     expect(
@@ -439,7 +381,7 @@ describe('matchingCombatantsForCondition', () => {
 
   it('is undefined for conditions without a matched set', () => {
     expect(
-      matchingCombatantsForCondition(buildCombat(), buildCombatant(), {
+      matchingCombatantsForCondition(buildCombat(), buildTestCombatant(), {
         type: 'EnemyCount',
         comparator: 'Equal',
         count: 1,
@@ -452,18 +394,18 @@ describe('pickSkillFromCombatOrders', () => {
   const combat = buildCombat();
 
   it('returns undefined when there are no clauses configured', () => {
-    const combatant = buildCombatant({ combatOrders: [] });
+    const combatant = buildTestCombatant({ combatOrders: [] });
 
     expect(
-      pickSkillFromCombatOrders(combat, combatant, [buildSkill()]),
+      pickSkillFromCombatOrders(combat, combatant, [buildEquipmentSkill()]),
     ).toBeUndefined();
   });
 
   it('skips disabled clauses', () => {
-    const combatant = buildCombatant({
+    const combatant = buildTestCombatant({
       combatOrders: [
         {
-          id: 'c1' as never,
+          id: 'c1' as CombatOrderClauseId,
           enabled: false,
           condition: { type: 'Always' },
           action: { type: 'CastSkillFamily', family: 'Fireball' },
@@ -473,22 +415,25 @@ describe('pickSkillFromCombatOrders', () => {
 
     expect(
       pickSkillFromCombatOrders(combat, combatant, [
-        buildSkill({ family: 'Fireball' }),
+        buildEquipmentSkill({ family: 'Fireball' }),
       ]),
     ).toBeUndefined();
   });
 
   it('picks the first clause whose family resolves and whose condition matches', () => {
-    const cure = buildSkill({ id: 'cure' as never, family: 'Cure' });
-    const fireball = buildSkill({
-      id: 'fireball' as never,
+    const cure = buildEquipmentSkill({
+      id: 'cure' as EquipmentSkillId,
+      family: 'Cure',
+    });
+    const fireball = buildEquipmentSkill({
+      id: 'fireball' as EquipmentSkillId,
       family: 'Fireball',
     });
-    const combatant = buildCombatant({
+    const combatant = buildTestCombatant({
       hp: 100,
       combatOrders: [
         {
-          id: 'c1' as never,
+          id: 'c1' as CombatOrderClauseId,
           enabled: true,
           condition: {
             type: 'SelfHealthPercent',
@@ -498,7 +443,7 @@ describe('pickSkillFromCombatOrders', () => {
           action: { type: 'CastSkillFamily', family: 'Cure' },
         },
         {
-          id: 'c2' as never,
+          id: 'c2' as CombatOrderClauseId,
           enabled: true,
           condition: { type: 'Always' },
           action: { type: 'CastSkillFamily', family: 'Fireball' },
@@ -513,20 +458,20 @@ describe('pickSkillFromCombatOrders', () => {
   });
 
   it('falls through a matching clause whose skill is currently unavailable', () => {
-    const fireball = buildSkill({
-      id: 'fireball' as never,
+    const fireball = buildEquipmentSkill({
+      id: 'fireball' as EquipmentSkillId,
       family: 'Fireball',
     });
-    const combatant = buildCombatant({
+    const combatant = buildTestCombatant({
       combatOrders: [
         {
-          id: 'c1' as never,
+          id: 'c1' as CombatOrderClauseId,
           enabled: true,
           condition: { type: 'Always' },
           action: { type: 'CastSkillFamily', family: 'Cure' },
         },
         {
-          id: 'c2' as never,
+          id: 'c2' as CombatOrderClauseId,
           enabled: true,
           condition: { type: 'Always' },
           action: { type: 'CastSkillFamily', family: 'Fireball' },
@@ -542,14 +487,14 @@ describe('pickSkillFromCombatOrders', () => {
   });
 
   it('threads the target-mode override from the matched clause', () => {
-    const fireball = buildSkill({
-      id: 'fireball' as never,
+    const fireball = buildEquipmentSkill({
+      id: 'fireball' as EquipmentSkillId,
       family: 'Fireball',
     });
-    const combatant = buildCombatant({
+    const combatant = buildTestCombatant({
       combatOrders: [
         {
-          id: 'c1' as never,
+          id: 'c1' as CombatOrderClauseId,
           enabled: true,
           condition: { type: 'Always' },
           action: {
@@ -569,8 +514,8 @@ describe('pickSkillFromCombatOrders', () => {
 
   it('falls through to the next clause when a Self override resolves to zero targets', () => {
     // Mirrors "target self with Fortify, skip if already buffed" - falls through instead of wasting the turn.
-    const fortify = buildSkill({
-      id: 'fortify' as never,
+    const fortify = buildEquipmentSkill({
+      id: 'fortify' as EquipmentSkillId,
       family: 'Fortify',
       techniques: [
         buildTechnique({
@@ -578,24 +523,26 @@ describe('pickSkillFromCombatOrders', () => {
           targetBehaviors: [
             {
               behavior: 'IfNotStatusEffect',
-              statusEffectId: 'Invigorated' as never,
+              statusEffectId: 'Invigorated' as StatusEffectId,
             },
           ],
         }),
       ],
     });
-    const fireball = buildSkill({
-      id: 'fireball' as never,
+    const fireball = buildEquipmentSkill({
+      id: 'fireball' as EquipmentSkillId,
       family: 'Fireball',
       techniques: [buildTechnique({ targetType: 'Enemies' })],
     });
 
-    const combatant = buildCombatant({
+    const combatant = buildTestCombatant({
       id: 'caster',
-      statusEffects: [{ id: 'Invigorated', duration: 2 } as never],
+      statusEffects: [
+        buildStatusEffect({ id: 'Invigorated' as StatusEffectId, duration: 2 }),
+      ],
       combatOrders: [
         {
-          id: 'c1' as never,
+          id: 'c1' as CombatOrderClauseId,
           enabled: true,
           condition: { type: 'Always' },
           action: {
@@ -605,7 +552,7 @@ describe('pickSkillFromCombatOrders', () => {
           },
         },
         {
-          id: 'c2' as never,
+          id: 'c2' as CombatOrderClauseId,
           enabled: true,
           condition: { type: 'Always' },
           action: { type: 'CastSkillFamily', family: 'Fireball' },
@@ -624,24 +571,28 @@ describe('pickSkillFromCombatOrders', () => {
   });
 
   describe('MatchingEnemies', () => {
-    const lowGuardian = buildCombatant({ id: 'low', isEnemy: true, hp: 20 });
-    const lowerGuardian = buildCombatant({
+    const lowGuardian = buildTestCombatant({
+      id: 'low',
+      isEnemy: true,
+      hp: 20,
+    });
+    const lowerGuardian = buildTestCombatant({
       id: 'lower',
       isEnemy: true,
       hp: 10,
     });
-    const healthyGuardian = buildCombatant({
+    const healthyGuardian = buildTestCombatant({
       id: 'healthy',
       isEnemy: true,
       hp: 90,
     });
 
     function casterWithFamily(family: string): Combatant {
-      return buildCombatant({
+      return buildTestCombatant({
         id: 'caster',
         combatOrders: [
           {
-            id: 'c1' as never,
+            id: 'c1' as CombatOrderClauseId,
             enabled: true,
             condition: {
               type: 'EnemyCountHealthPercent',
@@ -661,8 +612,8 @@ describe('pickSkillFromCombatOrders', () => {
     }
 
     it('resolves the matching enemies, lowest HP first', () => {
-      const execute = buildSkill({
-        id: 'execute' as never,
+      const execute = buildEquipmentSkill({
+        id: 'execute' as EquipmentSkillId,
         family: 'Execute',
         techniques: [buildTechnique({ targetType: 'Enemies' })],
       });
@@ -681,8 +632,8 @@ describe('pickSkillFromCombatOrders', () => {
     });
 
     it('falls through when the skill cannot target enemies', () => {
-      const cure = buildSkill({
-        id: 'cure' as never,
+      const cure = buildEquipmentSkill({
+        id: 'cure' as EquipmentSkillId,
         family: 'Cure',
         techniques: [buildTechnique({ targetType: 'Allies' })],
       });
@@ -697,11 +648,14 @@ describe('pickSkillFromCombatOrders', () => {
   });
 
   it('RandomSkill always matches and stops, uniformly picking an available skill', () => {
-    const cure = buildSkill({ id: 'cure' as never, family: 'Cure' });
-    const combatant = buildCombatant({
+    const cure = buildEquipmentSkill({
+      id: 'cure' as EquipmentSkillId,
+      family: 'Cure',
+    });
+    const combatant = buildTestCombatant({
       combatOrders: [
         {
-          id: 'c1' as never,
+          id: 'c1' as CombatOrderClauseId,
           enabled: true,
           condition: { type: 'Always' },
           action: { type: 'RandomSkill' },
@@ -715,10 +669,10 @@ describe('pickSkillFromCombatOrders', () => {
   });
 
   it('RandomSkill returns undefined when nothing is currently available', () => {
-    const combatant = buildCombatant({
+    const combatant = buildTestCombatant({
       combatOrders: [
         {
-          id: 'c1' as never,
+          id: 'c1' as CombatOrderClauseId,
           enabled: true,
           condition: { type: 'Always' },
           action: { type: 'RandomSkill' },

@@ -1,176 +1,165 @@
+import type * as RngHelper from '@helpers/rng';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntriesByType: vi.fn(),
-}));
+vi.mock('@helpers/town/crafting/town-craft-eligibility');
+vi.mock('@helpers/rng', async (importOriginal) => {
+  const actual = await importOriginal<typeof RngHelper>();
+  return {
+    ...actual,
+    rngChoiceWeighted: vi.fn(actual.rngChoiceWeighted),
+  };
+});
 
-vi.mock('@helpers/rng', () => ({
-  rngChoiceWeighted: vi.fn(),
-}));
-
-vi.mock('@helpers/town/crafting/town-craft-eligibility', () => ({
-  isRecipeCraftableByTown: vi.fn(),
-}));
-
-vi.mock('@helpers/town/crafting/town-craft-priority-state', () => ({
-  townSpecialtyPriority: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/town/crafting/town-craft-priority-weight', () => ({
-  townItemPriorityMap: vi.fn(() => ({
-    weightByItem: {},
-    reservedByItem: {},
-    heldByItem: {},
-  })),
-  townItemPriorityWeightFromMap: vi.fn(() => 1),
-  townRecipeRespectsReservationsFromMap: vi.fn(() => true),
-  townFailureHoldWeightFromMap: vi.fn(() => 1),
-}));
-
-import { getEntriesByType } from '@helpers/content/content';
+import {
+  SPECIALTY_RECIPE_WEIGHT,
+  TOWN_PRIORITY_MAX_FAILURES_FOR_WEIGHT,
+  TOWN_PRIORITY_WEIGHT_PER_FAILURE,
+  TOWN_SPECIALTY_FAILURE_HOLD_THRESHOLD,
+  TOWN_SPECIALTY_FAILURE_HOLD_WEIGHT_PENALTY,
+} from '@helpers/config';
+import { ensureRecipe } from '@helpers/content/ensure-recipe';
+import { ensureTown } from '@helpers/content/ensure-town';
 import { rngChoiceWeighted } from '@helpers/rng';
 import { isRecipeCraftableByTown } from '@helpers/town/crafting/town-craft-eligibility';
 import { townPickRecipeToQueue } from '@helpers/town/crafting/town-craft-pick';
-import {
-  townFailureHoldWeightFromMap,
-  townRecipeRespectsReservationsFromMap,
-} from '@helpers/town/crafting/town-craft-priority-weight';
 import type {
+  ItemId,
   RecipeContent,
   RecipeId,
-  TownContent,
   TownId,
+  TownSpecialtyPriorityEntry,
   TradeskillId,
 } from '@interfaces';
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 
-const townId = 'larsia' as TownId;
-const blacksmithingId = 'blacksmithing' as TradeskillId;
-const woodworkingId = 'woodworking' as TradeskillId;
+const smithing = 'smithing' as TradeskillId;
+const woodworking = 'woodworking' as TradeskillId;
+const cactspine = 'cactspine' as ItemId;
+const petrifiwood = 'petrifiwood' as ItemId;
 
-function buildRecipe(
+function recipe(
   id: string,
-  tradeskillId = blacksmithingId,
+  tradeskillId: TradeskillId,
+  ...itemIds: ItemId[]
 ): RecipeContent {
-  return {
+  return ensureRecipe({
     id: id as RecipeId,
+    name: id,
     tradeskillId,
-    requirements: [],
-  } as unknown as RecipeContent;
+    requirements: itemIds.map((itemId) => ({ itemId, quantity: 2 })),
+  });
 }
 
-function buildTown(specialtyTradeskillId: TradeskillId): TownContent {
-  return {
-    id: townId,
-    crafting: { specialtyTradeskillId },
-  } as unknown as TownContent;
+const ring = recipe('ring', smithing, cactspine);
+const staff = recipe('staff', woodworking, petrifiwood);
+const blade = recipe('blade', smithing, petrifiwood);
+const town = ensureTown({
+  id: 'larsia' as TownId,
+  name: 'Larsia',
+  crafting: { specialtyTradeskillId: woodworking },
+});
+
+function seedTown(
+  specialtyPriority: TownSpecialtyPriorityEntry[] = [],
+  materials: Partial<Record<ItemId, number>> = {},
+): void {
+  seedGamestate((state) => {
+    state.world.towns[town.id] = buildTownNodeState({
+      specialtyPriority,
+      materials,
+    });
+  });
+}
+
+// What the weighted pick was offered, with each recipe's weight resolved.
+function offered(): Record<string, number> {
+  const [recipes, weightOf] = vi.mocked(rngChoiceWeighted).mock.lastCall!;
+  return Object.fromEntries(
+    (recipes as RecipeContent[]).map((r) => [r.id, weightOf(r)]),
+  );
 }
 
 beforeEach(() => {
-  vi.clearAllMocks();
+  vi.mocked(rngChoiceWeighted).mockClear();
+  vi.mocked(isRecipeCraftableByTown).mockReturnValue(true);
+  seedContent([ring, staff, blade, town]);
+  seedTown();
 });
 
 describe('townPickRecipeToQueue', () => {
-  it('returns undefined when no recipe is eligible', () => {
-    vi.mocked(getEntriesByType).mockReturnValue([buildRecipe('a')]);
+  it('picks among every craftable recipe across tradeskills, favoring the town’s specialty', () => {
+    vi.mocked(isRecipeCraftableByTown).mockImplementation(
+      (candidate) => candidate.id !== blade.id,
+    );
+
+    const pick = townPickRecipeToQueue(town);
+
+    expect(offered()).toEqual({ ring: 1, staff: SPECIALTY_RECIPE_WEIGHT });
+    expect([ring, staff]).toContain(pick?.recipe);
+    expect(pick?.tradeskillId).toBe(pick?.recipe.tradeskillId);
+  });
+
+  it('only offers recipes the caller accepts', () => {
+    townPickRecipeToQueue(town, (candidate) => candidate.id === ring.id);
+
+    expect(offered()).toEqual({ ring: 1 });
+  });
+
+  it('picks nothing when no recipe is craftable', () => {
     vi.mocked(isRecipeCraftableByTown).mockReturnValue(false);
 
-    expect(townPickRecipeToQueue(buildTown(blacksmithingId))).toBeUndefined();
+    expect(townPickRecipeToQueue(town)).toBeUndefined();
     expect(rngChoiceWeighted).not.toHaveBeenCalled();
   });
 
-  it('filters to recipes eligible across all tradeskills, then weight-picks one', () => {
-    const eligible = buildRecipe('b', woodworkingId);
-    vi.mocked(getEntriesByType).mockReturnValue([
-      buildRecipe('a', blacksmithingId),
-      eligible,
-    ]);
-    vi.mocked(isRecipeCraftableByTown).mockImplementation(
-      (recipe) => recipe.id === eligible.id,
-    );
-    vi.mocked(rngChoiceWeighted).mockImplementation((choices) => choices[0]);
-
-    const town = buildTown(blacksmithingId);
-    const result = townPickRecipeToQueue(town);
-
-    expect(isRecipeCraftableByTown).toHaveBeenCalledWith(eligible, town);
-    expect(rngChoiceWeighted).toHaveBeenCalledWith(
-      [eligible],
-      expect.any(Function),
-    );
-    expect(result).toEqual({ tradeskillId: woodworkingId, recipe: eligible });
-  });
-
-  it('skips recipes the accept filter rejects', () => {
-    const kept = buildRecipe('b');
-    vi.mocked(getEntriesByType).mockReturnValue([buildRecipe('a'), kept]);
-    vi.mocked(isRecipeCraftableByTown).mockReturnValue(true);
-    vi.mocked(rngChoiceWeighted).mockImplementation((choices) => choices[0]);
-
-    townPickRecipeToQueue(buildTown(blacksmithingId), (r) => r.id === kept.id);
-
-    expect(rngChoiceWeighted).toHaveBeenCalledWith(
-      [kept],
-      expect.any(Function),
-    );
-  });
-
-  it('returns undefined if rngChoiceWeighted has nothing to pick from (zero total weight)', () => {
-    vi.mocked(getEntriesByType).mockReturnValue([buildRecipe('a')]);
-    vi.mocked(isRecipeCraftableByTown).mockReturnValue(true);
-    vi.mocked(rngChoiceWeighted).mockReturnValue(undefined);
-
-    expect(townPickRecipeToQueue(buildTown(blacksmithingId))).toBeUndefined();
-  });
-
-  it('weights a specialty-tradeskill recipe higher than a non-specialty one', () => {
-    const specialtyRecipe = buildRecipe('a', woodworkingId);
-    const otherRecipe = buildRecipe('b', blacksmithingId);
-    vi.mocked(getEntriesByType).mockReturnValue([specialtyRecipe, otherRecipe]);
-    vi.mocked(isRecipeCraftableByTown).mockReturnValue(true);
-    let weightFn: (recipe: RecipeContent) => number = () => 0;
-    vi.mocked(rngChoiceWeighted).mockImplementation((choices, fn) => {
-      weightFn = fn;
-      return choices[0];
+  it('boosts recipes using materials a struggling specialty recipe needs', () => {
+    const struggling = recipe('struggling', woodworking, cactspine);
+    seedContent([ring, staff, blade, struggling, town]);
+    seedTown([{ recipeId: struggling.id, failureCount: 2 }], {
+      [cactspine]: 10,
     });
 
-    townPickRecipeToQueue(buildTown(woodworkingId));
+    townPickRecipeToQueue(town, (candidate) => candidate.id === ring.id);
 
-    expect(weightFn(specialtyRecipe)).toBeGreaterThan(weightFn(otherRecipe));
+    expect(offered()).toEqual({
+      ring: 1 + TOWN_PRIORITY_WEIGHT_PER_FAILURE * 2,
+    });
   });
 
-  it('excludes a craftable recipe that would violate a priority reservation', () => {
-    const reserved = buildRecipe('a');
-    const free = buildRecipe('b');
-    vi.mocked(getEntriesByType).mockReturnValue([reserved, free]);
-    vi.mocked(isRecipeCraftableByTown).mockReturnValue(true);
-    vi.mocked(townRecipeRespectsReservationsFromMap).mockImplementation(
-      (_map, _town, recipe) => recipe.id === free.id,
-    );
-    vi.mocked(rngChoiceWeighted).mockImplementation((choices) => choices[0]);
-
-    townPickRecipeToQueue(buildTown(blacksmithingId));
-
-    expect(rngChoiceWeighted).toHaveBeenCalledWith(
-      [free],
-      expect.any(Function),
-    );
-  });
-
-  it('deprioritizes rather than excludes a recipe held back by a failing specialty recipe', () => {
-    const held = buildRecipe('a', woodworkingId);
-    vi.mocked(getEntriesByType).mockReturnValue([held]);
-    vi.mocked(isRecipeCraftableByTown).mockReturnValue(true);
-    vi.mocked(townRecipeRespectsReservationsFromMap).mockReturnValue(true);
-    vi.mocked(townFailureHoldWeightFromMap).mockReturnValue(0.1);
-    let weightFn: (recipe: RecipeContent) => number = () => 0;
-    vi.mocked(rngChoiceWeighted).mockImplementation((choices, fn) => {
-      weightFn = fn;
-      return choices[0];
+  it('skips recipes that would eat into materials reserved for a struggling recipe', () => {
+    const struggling = recipe('struggling', woodworking, cactspine);
+    seedContent([ring, staff, blade, struggling, town]);
+    seedTown([{ recipeId: struggling.id, failureCount: 1 }], {
+      [cactspine]: 3,
     });
 
-    const result = townPickRecipeToQueue(buildTown(blacksmithingId));
+    townPickRecipeToQueue(town, (candidate) => candidate.id !== struggling.id);
 
-    expect(weightFn(held)).toBe(0.1);
-    expect(result).toEqual({ tradeskillId: woodworkingId, recipe: held });
+    expect(Object.keys(offered())).toEqual([staff.id, blade.id]);
+  });
+
+  it('deprioritizes, without excluding, recipes needing a material held for a long-failing recipe', () => {
+    const struggling = recipe('struggling', woodworking, petrifiwood);
+    seedContent([ring, staff, blade, struggling, town]);
+    seedTown(
+      [
+        {
+          recipeId: struggling.id,
+          failureCount: TOWN_SPECIALTY_FAILURE_HOLD_THRESHOLD + 1,
+        },
+      ],
+      { [petrifiwood]: 100 },
+    );
+
+    townPickRecipeToQueue(town, (candidate) => candidate.id === blade.id);
+
+    const materialBoost =
+      1 +
+      TOWN_PRIORITY_WEIGHT_PER_FAILURE * TOWN_PRIORITY_MAX_FAILURES_FOR_WEIGHT;
+    expect(offered()['blade']).toBeCloseTo(
+      materialBoost * TOWN_SPECIALTY_FAILURE_HOLD_WEIGHT_PENALTY,
+    );
   });
 });

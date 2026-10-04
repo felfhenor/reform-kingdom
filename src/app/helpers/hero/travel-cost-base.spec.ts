@@ -1,123 +1,108 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/pathfinding/pathfinding', () => ({
-  tileIsOnPath: vi.fn(() => false),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodeAt: vi.fn(() => undefined),
-}));
-
+import {
+  TICKS_PER_STEP_MIN_DIFF,
+  TICKS_PER_STEP_OFF_PATH,
+  TICKS_PER_STEP_ON_PATH,
+} from '@helpers/config';
 import {
   travelPathBaseTotalTicks,
   travelPathSumTicks,
   travelStepBaseTicksCost,
   travelStepTicksCostWithBonus,
 } from '@helpers/hero/travel-cost-base';
-import { tileIsOnPath } from '@helpers/pathfinding/pathfinding';
-import { worldNodeAt } from '@helpers/world-node/world-nodes';
-import type { CurrentLocation, TravelStep, WorldNodeEntry } from '@interfaces';
+import type { CurrentLocation, TravelStep } from '@interfaces';
+import { locationOf, seedWorldNodes } from '@/testing/world';
 
-const origin: CurrentLocation = { mapName: 'Carrina', x: 0, y: 0 };
-const offPathStep: TravelStep = {
+const MAP = 'TestMap';
+const at = (x: number, y = 0): CurrentLocation => ({ mapName: MAP, x, y });
+const moveTo = (x: number, y = 0): TravelStep => ({
   kind: 'Move',
-  mapName: 'Carrina',
-  x: 1,
-  y: 0,
-};
-
-beforeEach(() => {
-  vi.clearAllMocks();
-  vi.mocked(tileIsOnPath).mockReturnValue(false);
-  vi.mocked(worldNodeAt).mockReturnValue(undefined);
+  ...at(x, y),
 });
+
+let nodeTile: CurrentLocation;
+
+// Open ground, a path tile at x=5, and a node somewhere off the path.
+beforeEach(() => {
+  const { Ruins } = seedWorldNodes(
+    [{ name: 'Ruins', type: 'ExploreNode', x: 8, y: 3 }],
+    [{ x: 5, y: 0 }],
+  );
+  nodeTile = locationOf(Ruins);
+});
+
+const offPath = moveTo(1);
+const onPath = moveTo(5);
 
 describe('travelStepBaseTicksCost', () => {
   it('is instant for a teleport step', () => {
     expect(
-      travelStepBaseTicksCost(
-        { kind: 'Teleport', mapName: 'Carrina', x: 1, y: 1 },
-        origin,
-      ),
+      travelStepBaseTicksCost({ kind: 'Teleport', ...at(1, 1) }, at(0)),
     ).toBe(0);
   });
 
-  it('costs 1 tick entering an on-path tile', () => {
-    vi.mocked(tileIsOnPath).mockReturnValue(true);
-    expect(travelStepBaseTicksCost(offPathStep, origin)).toBe(1);
-  });
-
-  it('costs 1 tick entering a node tile that is not on a path', () => {
-    vi.mocked(worldNodeAt).mockImplementation((_mapName, x) =>
-      x === offPathStep.x ? ({} as WorldNodeEntry) : undefined,
+  it('charges the on-path cost entering a path or node tile, or leaving a node tile', () => {
+    expect(travelStepBaseTicksCost(onPath, at(4))).toBe(TICKS_PER_STEP_ON_PATH);
+    expect(travelStepBaseTicksCost({ kind: 'Move', ...nodeTile }, at(0))).toBe(
+      TICKS_PER_STEP_ON_PATH,
     );
-    expect(travelStepBaseTicksCost(offPathStep, origin)).toBe(1);
-  });
-
-  it('costs 1 tick leaving a node tile, even onto an off-path tile', () => {
-    vi.mocked(worldNodeAt).mockImplementation((_mapName, x, y) =>
-      x === origin.x && y === origin.y ? ({} as WorldNodeEntry) : undefined,
+    expect(travelStepBaseTicksCost(offPath, nodeTile)).toBe(
+      TICKS_PER_STEP_ON_PATH,
     );
-    expect(travelStepBaseTicksCost(offPathStep, origin)).toBe(1);
   });
 
-  it('costs 3 ticks entering an off-path tile', () => {
-    expect(travelStepBaseTicksCost(offPathStep, origin)).toBe(3);
+  it('charges the off-path cost entering open ground, even from a path tile', () => {
+    expect(travelStepBaseTicksCost(offPath, at(0))).toBe(
+      TICKS_PER_STEP_OFF_PATH,
+    );
+    expect(travelStepBaseTicksCost(moveTo(6), at(5))).toBe(
+      TICKS_PER_STEP_OFF_PATH,
+    );
   });
 });
 
 describe('travelStepTicksCostWithBonus', () => {
-  it('reduces the off-path cost by the off-path bonus only', () => {
-    expect(
-      travelStepTicksCostWithBonus(offPathStep, origin, 0.5, 0.1),
-    ).toBeCloseTo(2.7);
+  it('applies the off-path bonus off the path and the on-path bonus on it', () => {
+    expect(travelStepTicksCostWithBonus(offPath, at(0), 0.5, 0.1)).toBeCloseTo(
+      TICKS_PER_STEP_OFF_PATH * 0.9,
+    );
+    expect(travelStepTicksCostWithBonus(onPath, at(4), 0.05, 0.5)).toBeCloseTo(
+      TICKS_PER_STEP_ON_PATH * 0.95,
+    );
   });
 
-  it('reduces the on-path cost by the on-path bonus only', () => {
-    vi.mocked(tileIsOnPath).mockReturnValue(true);
-    expect(
-      travelStepTicksCostWithBonus(offPathStep, origin, 0.05, 0.5),
-    ).toBeCloseTo(0.95);
-  });
-
-  it('never drops off-path travel below the on-path cost plus the min diff', () => {
-    expect(travelStepTicksCostWithBonus(offPathStep, origin, 0, 5)).toBe(1.25);
-  });
-
-  it('never drops on-path travel below the min diff', () => {
-    vi.mocked(tileIsOnPath).mockReturnValue(true);
-    expect(travelStepTicksCostWithBonus(offPathStep, origin, 5, 0)).toBe(0.25);
+  it('keeps off-path travel above on-path travel, and both above zero', () => {
+    expect(travelStepTicksCostWithBonus(offPath, at(0), 0, 5)).toBe(
+      TICKS_PER_STEP_ON_PATH + TICKS_PER_STEP_MIN_DIFF,
+    );
+    expect(travelStepTicksCostWithBonus(onPath, at(4), 5, 0)).toBe(
+      TICKS_PER_STEP_MIN_DIFF,
+    );
   });
 });
 
 describe('travelPathSumTicks', () => {
   it('threads each completed step in as the next origin', () => {
-    const path: TravelStep[] = [
-      offPathStep,
-      { kind: 'Move', mapName: 'Carrina', x: 2, y: 0 },
-    ];
     const origins: CurrentLocation[] = [];
 
-    travelPathSumTicks(path, origin, (_step, originTile) => {
+    travelPathSumTicks([offPath, moveTo(2)], at(0), (_step, originTile) => {
       origins.push(originTile);
       return 1;
     });
 
-    expect(origins).toEqual([origin, { mapName: 'Carrina', x: 1, y: 0 }]);
+    expect(origins).toEqual([at(0), at(1)]);
   });
 
   it('is zero for an empty path', () => {
-    expect(travelPathSumTicks([], origin, () => 9)).toBe(0);
+    expect(travelPathSumTicks([], at(0), () => 9)).toBe(0);
   });
 });
 
 describe('travelPathBaseTotalTicks', () => {
   it('sums the unboosted cost of every step', () => {
-    const path: TravelStep[] = [
-      offPathStep,
-      { kind: 'Move', mapName: 'Carrina', x: 2, y: 0 },
-    ];
-
-    expect(travelPathBaseTotalTicks(path, origin)).toBe(6);
+    expect(travelPathBaseTotalTicks([offPath, moveTo(2)], at(0))).toBe(
+      TICKS_PER_STEP_OFF_PATH * 2,
+    );
   });
 });

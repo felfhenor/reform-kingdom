@@ -15,18 +15,16 @@ const TILE_SIZE = 16;
 const MAP_SIZE = 100;
 const DEFAULT_MAP = 'TestMap';
 
-function pathTileLayer(tiles: { x: number; y: number }[]): TiledLayer {
-  const data = new Array<number>(MAP_SIZE * MAP_SIZE).fill(0);
-  tiles.forEach(({ x, y }) => (data[y * MAP_SIZE + x] = 1));
-  return {
-    id: 2,
-    name: 'Path Tiles',
-    type: 'tilelayer',
-    visible: true,
-    width: MAP_SIZE,
-    height: MAP_SIZE,
-    data,
-  };
+function tileLayer(
+  id: number,
+  name: string,
+  tiles: { x: number; y: number }[],
+  width: number,
+  height: number,
+): TiledLayer {
+  const data = new Array<number>(width * height).fill(0);
+  tiles.forEach(({ x, y }) => (data[y * width + x] = 1));
+  return { id, name, type: 'tilelayer', visible: true, width, height, data };
 }
 
 // Replaces all maps with minimal Tiled maps so the real node lookups (by name, position and type) and path-tile checks resolve.
@@ -40,6 +38,10 @@ export function seedWorldNodes(
     properties?: TiledObject['properties'];
   }[],
   pathTiles: { mapName?: string; x: number; y: number }[] = [],
+  mapShapes: Record<
+    string,
+    { width?: number; height?: number; denseTiles?: { x: number; y: number }[] }
+  > = {},
 ): Record<string, WorldNodeEntry> {
   const objectsByMap = new Map<string, TiledObject[]>();
   const pathsByMap = new Map<string, { x: number; y: number }[]>();
@@ -70,12 +72,21 @@ export function seedWorldNodes(
     pathsByMap.set(mapName, [...(pathsByMap.get(mapName) ?? []), { x, y }]);
   });
 
-  const mapNames = new Set([...objectsByMap.keys(), ...pathsByMap.keys()]);
+  const mapNames = new Set([
+    ...objectsByMap.keys(),
+    ...pathsByMap.keys(),
+    ...Object.keys(mapShapes),
+  ]);
   const maps = new Map<string, GameMap>();
   mapNames.forEach((mapName) => {
+    const {
+      width = MAP_SIZE,
+      height = MAP_SIZE,
+      denseTiles = [],
+    } = mapShapes[mapName] ?? {};
     const data: TiledMap = {
-      width: MAP_SIZE,
-      height: MAP_SIZE,
+      width,
+      height,
       tilewidth: TILE_SIZE,
       tileheight: TILE_SIZE,
       tilesets: [],
@@ -87,7 +98,14 @@ export function seedWorldNodes(
           visible: true,
           objects: objectsByMap.get(mapName) ?? [],
         },
-        pathTileLayer(pathsByMap.get(mapName) ?? []),
+        tileLayer(
+          2,
+          'Path Tiles',
+          pathsByMap.get(mapName) ?? [],
+          width,
+          height,
+        ),
+        tileLayer(3, 'Dense Tiles', denseTiles, width, height),
       ],
     };
     maps.set(mapName, { name: mapName, data });

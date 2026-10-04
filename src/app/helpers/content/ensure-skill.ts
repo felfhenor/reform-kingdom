@@ -43,7 +43,7 @@ function ensureEquipmentSkillTechniqueStatusEffectApplication(
   };
 }
 
-function ensureEquipmentSkillTechnique(
+export function ensureEquipmentSkillTechnique(
   technique: Partial<EquipmentSkillContentTechnique> = {},
 ): EquipmentSkillContentTechnique {
   return {

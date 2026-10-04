@@ -1,3 +1,4 @@
+import { rangeLabel } from '@helpers/engine/leveled-range';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { BarTownReputationComponent } from '@components/bar-town-reputation/bar-town-reputation.component';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
@@ -63,10 +64,7 @@ import {
   shrineLevelUp,
   shrinePray,
 } from '@helpers/world-node/world-node-shrine.ui';
-import {
-  worldNodeLevelLabel,
-  worldNodeLevelRange,
-} from '@helpers/world-node/world-node-status';
+import { worldNodeLevelRange } from '@helpers/world-node/world-node-status';
 import {
   worldNodeCaravan,
   worldNodeEncounter,
@@ -145,7 +143,7 @@ export class PanelMapNodeComponent {
   public levelLabel = computed(() => {
     const entry = this.node();
     const levelRange = entry ? worldNodeLevelRange(entry) : undefined;
-    return levelRange ? worldNodeLevelLabel(levelRange) : '-';
+    return levelRange ? rangeLabel(levelRange) : '-';
   });
 
   public description = computed(() => {

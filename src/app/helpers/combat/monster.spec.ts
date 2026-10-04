@@ -7,49 +7,32 @@ import {
   xpForOverLevel,
 } from '@helpers/combat/monster';
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
-import { ensureMonsterSkill } from '@helpers/content/ensure-monster';
-import { setAllContentById, setAllIdsByName } from '@helpers/content/content';
-import { defaultCombatStats } from '@helpers/defaults';
-import type { EquipmentSkillId, ItemId, MonsterContent } from '@interfaces';
+import {
+  OVERLEVEL_XP_DEGRADE_PER_LEVEL,
+  OVERLEVEL_XP_HARD_CAP_AMOUNT,
+  OVERLEVEL_XP_HARD_CAP_LEVELS,
+} from '@helpers/config';
+import { ensureStats } from '@helpers/content/ensure-helpers-stats';
+import {
+  ensureMonster,
+  ensureMonsterSkill,
+} from '@helpers/content/ensure-monster';
+import type {
+  EquipmentSkillId,
+  ItemId,
+  MonsterContent,
+  MonsterId,
+} from '@interfaces';
 import { describe, expect, it } from 'vitest';
+import { seedContent } from '@/testing/content';
 
 describe('Monster Helper Functions', () => {
   const goldCoinId = 'gold-coin' as ItemId;
 
-  const mockMonster: MonsterContent = {
-    id: 'monster-1' as MonsterContent['id'],
+  const mockMonster = ensureMonster({
+    id: 'monster-1' as MonsterId,
     name: 'Goblin',
-    __type: 'monster',
-    description: '',
-    sprite: '0000',
-    frames: 4,
-    rarity: 'Common',
-    baseStats: {
-      Health: 10,
-      Energy: 0,
-      Luck: 0,
-      Intelligence: 0,
-      Strength: 1,
-      Vitality: 0,
-      Resistance: 0,
-      Agility: 1,
-      Constitution: 0,
-      Spirit: 0,
-    },
-    statsPerLevel: {
-      Health: 0,
-      Energy: 0,
-      Luck: 0,
-      Intelligence: 0,
-      Strength: 0,
-      Vitality: 0,
-      Resistance: 0,
-      Agility: 0,
-      Constitution: 0,
-      Spirit: 0,
-    },
-    combatStats: defaultCombatStats(),
-    targetting: [{ type: 'Random' }],
+    baseStats: ensureStats({ Health: 10, Strength: 1, Agility: 1 }),
     xp: { min: 3, max: 5, bonusPerLevel: 1 },
     drops: [
       ensureDroppedReward({
@@ -61,8 +44,7 @@ describe('Monster Helper Functions', () => {
       }),
     ],
     skills: [ensureMonsterSkill({ skillId: 'Attack' as EquipmentSkillId })],
-    types: [],
-  };
+  });
 
   describe('monsterStatsAtLevel', () => {
     it('returns baseStats unchanged at level 1', () => {
@@ -140,69 +122,75 @@ describe('Monster Helper Functions', () => {
   });
 
   describe('xpForOverLevel', () => {
-    it('should return full xp at or below the node max level', () => {
+    const capLevel = 5 + OVERLEVEL_XP_HARD_CAP_LEVELS;
+
+    it('returns full xp at or below the node max level', () => {
       expect(xpForOverLevel(100, 4, 5)).toBe(100);
       expect(xpForOverLevel(100, 5, 5)).toBe(100);
     });
 
-    it('should degrade xp by 25% per level over the node max', () => {
-      expect(xpForOverLevel(100, 6, 5)).toBe(75);
-      expect(xpForOverLevel(100, 7, 5)).toBe(50);
-      expect(xpForOverLevel(100, 8, 5)).toBe(25);
+    it('degrades xp further for each level over the node max', () => {
+      expect(xpForOverLevel(100, 6, 5)).toBe(
+        Math.round(100 * (1 - OVERLEVEL_XP_DEGRADE_PER_LEVEL)),
+      );
+      expect(xpForOverLevel(100, 7, 5)).toBe(
+        Math.round(100 * (1 - 2 * OVERLEVEL_XP_DEGRADE_PER_LEVEL)),
+      );
     });
 
-    it('should hard-cap xp at 1 once 4+ levels over the node max', () => {
-      expect(xpForOverLevel(100, 9, 5)).toBe(1);
-      expect(xpForOverLevel(100, 20, 5)).toBe(1);
+    it('hard-caps xp once far enough over the node max', () => {
+      expect(xpForOverLevel(100, capLevel, 5)).toBe(
+        OVERLEVEL_XP_HARD_CAP_AMOUNT,
+      );
+      expect(xpForOverLevel(100, capLevel + 10, 5)).toBe(
+        OVERLEVEL_XP_HARD_CAP_AMOUNT,
+      );
     });
 
-    it('should never degrade below 1 xp even for small raw amounts', () => {
-      expect(xpForOverLevel(2, 8, 5)).toBe(1);
+    it('never degrades below the hard-cap amount, even for small raw amounts', () => {
+      expect(xpForOverLevel(1, capLevel - 1, 5)).toBeGreaterThanOrEqual(
+        OVERLEVEL_XP_HARD_CAP_AMOUNT,
+      );
     });
   });
 
   describe('isXpTrivialAtOverLevel', () => {
+    const capLevel = 5 + OVERLEVEL_XP_HARD_CAP_LEVELS;
+
     it('is false at or below the node max level', () => {
       expect(isXpTrivialAtOverLevel(4, 5)).toBe(false);
       expect(isXpTrivialAtOverLevel(5, 5)).toBe(false);
     });
 
     it('is false while still within the degrade range', () => {
-      expect(isXpTrivialAtOverLevel(8, 5)).toBe(false);
+      expect(isXpTrivialAtOverLevel(capLevel - 1, 5)).toBe(false);
     });
 
-    it('is true once 4+ levels over the node max, matching the xpForOverLevel hard cap', () => {
-      expect(isXpTrivialAtOverLevel(9, 5)).toBe(true);
-      expect(isXpTrivialAtOverLevel(20, 5)).toBe(true);
+    it('is true from the xp hard cap onward', () => {
+      expect(isXpTrivialAtOverLevel(capLevel, 5)).toBe(true);
+      expect(isXpTrivialAtOverLevel(capLevel + 10, 5)).toBe(true);
     });
   });
 
   describe('monstersFromFights', () => {
     const goblin: MonsterContent = {
       ...mockMonster,
-      id: 'goblin' as MonsterContent['id'],
+      id: 'goblin' as MonsterId,
       name: 'Goblin',
     };
     const wolf: MonsterContent = {
       ...mockMonster,
-      id: 'wolf' as MonsterContent['id'],
+      id: 'wolf' as MonsterId,
       name: 'Wolf',
     };
     const ant: MonsterContent = {
       ...mockMonster,
-      id: 'ant' as MonsterContent['id'],
+      id: 'ant' as MonsterId,
       name: 'Ant',
     };
 
     it('resolves and sorts the monsters referenced across every fight alphabetically', () => {
-      setAllIdsByName(new Map());
-      setAllContentById(
-        new Map([
-          [goblin.id, goblin],
-          [wolf.id, wolf],
-          [ant.id, ant],
-        ]),
-      );
+      seedContent([goblin, wolf, ant]);
 
       const fights = [
         { monsters: [{ monsterId: wolf.id }, { monsterId: goblin.id }] },
@@ -215,8 +203,7 @@ describe('Monster Helper Functions', () => {
     });
 
     it('de-dupes monsters that appear in multiple fights', () => {
-      setAllIdsByName(new Map());
-      setAllContentById(new Map([[goblin.id, goblin]]));
+      seedContent([goblin]);
 
       const fights = [
         { monsters: [{ monsterId: goblin.id }] },
@@ -227,9 +214,6 @@ describe('Monster Helper Functions', () => {
     });
 
     it('skips monster ids with no matching content', () => {
-      setAllIdsByName(new Map());
-      setAllContentById(new Map());
-
       expect(
         monstersFromFights([{ monsters: [{ monsterId: goblin.id }] }]),
       ).toEqual([]);

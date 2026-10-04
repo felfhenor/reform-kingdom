@@ -1,4 +1,8 @@
-import { setAllContentById } from '@helpers/content/content';
+import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
+import { ensureJob } from '@helpers/content/ensure-job';
+import { ensureSkill } from '@helpers/content/ensure-skill';
+import { ensureTrainerTeaching } from '@helpers/content/ensure-trainer';
+import { defaultEquipment } from '@helpers/defaults';
 import {
   characterSkills,
   getUnlockedJobs,
@@ -6,48 +10,20 @@ import {
   heroSkillsWithEquipment,
 } from '@helpers/hero/job';
 import type {
-  EquipmentBlock,
-  EquipmentContent,
   EquipmentId,
-  EquipmentItemId,
-  EquipmentSkillContent,
   EquipmentSkillId,
-  IsContentItem,
-  JobContent,
+  ItemId,
   JobId,
-  TrainerTeachingContent,
   TrainerTeachingId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { buildEquipmentItem } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
 
 describe('Job Helper Functions', () => {
-  const mockJobExplorer: JobContent = {
-    id: 'job-explorer',
+  const mockJobExplorer = ensureJob({
+    id: 'job-explorer' as JobId,
     name: 'Explorer',
-    __type: 'job',
-    description: 'A person who seeks out new lands and experiences.',
-    sprite: '0000',
-    frames: 4,
-    baseStats: {
-      Health: 100,
-      Energy: 25,
-      Luck: 5,
-      Intelligence: 5,
-      Strength: 5,
-      Vitality: 5,
-      Resistance: 5,
-      Agility: 10,
-    },
-    statsPerLevel: {
-      Health: 10,
-      Energy: 5,
-      Luck: 0.01,
-      Intelligence: 0.2,
-      Strength: 0.5,
-      Vitality: 0.3,
-      Resistance: 0.4,
-      Agility: 0.7,
-    },
     skillPath: [
       {
         pathName: 'Attack',
@@ -65,26 +41,11 @@ describe('Job Helper Functions', () => {
         levels: [{ level: 4, skillId: 'Sweep I' as EquipmentSkillId }],
       },
     ],
-  } as JobContent;
-
-  const mockItem: IsContentItem = {
-    id: 'item-1',
-    name: 'Rock',
-    __type: 'item',
-  };
-
-  beforeEach(() => {
-    setAllContentById(new Map());
   });
 
   describe('getUnlockedJobs', () => {
     it('should return every job in content, since all jobs are currently unlocked', () => {
-      setAllContentById(
-        new Map<string, IsContentItem>([
-          ['job-explorer', mockJobExplorer],
-          ['item-1', mockItem],
-        ]),
-      );
+      seedContent([mockJobExplorer, ensureItem({ id: 'item-1' as ItemId })]);
 
       const jobs = getUnlockedJobs();
 
@@ -129,109 +90,47 @@ describe('Job Helper Functions', () => {
   });
 
   describe('heroSkillsWithEquipment', () => {
-    const emptyEquipment: EquipmentBlock = {
-      Armor: undefined,
-      Helmet: undefined,
-      Weapon: undefined,
-      Offhand: undefined,
-      Ring: undefined,
-      Accessory: undefined,
-      Artifact: undefined,
-      Ammo: undefined,
-    };
-
-    function mockSkill(
-      overrides: Partial<EquipmentSkillContent>,
-    ): EquipmentSkillContent {
-      return {
-        id: 'skill' as EquipmentSkillId,
-        name: 'Skill',
-        __type: 'skill',
-        description: '',
-        sprite: '0000',
-        rarity: 'Common',
-        epCost: 0,
-        usesPerCombat: -1,
-        statusEffectDurationBoost: {},
-        statusEffectChanceBoost: {},
-        techniques: [],
-        requiredWeaponTypes: [],
-        family: 'Skill',
-        ...overrides,
-      };
-    }
-
-    function mockEquipmentGranting(
-      id: EquipmentId,
-      grantedSkillIds: EquipmentSkillId[],
-    ): EquipmentContent {
-      return {
-        id,
-        name: id,
-        __type: 'equipment',
-        description: '',
-        sprite: '0000',
-        rarity: 'Common',
-        levelRequirement: 1,
-        baseStats: {} as never,
+    const skill = (name: string) =>
+      ensureSkill({ id: name as EquipmentSkillId, name });
+    const equipmentGranting = (id: string, grantedSkillId: EquipmentSkillId) =>
+      ensureEquipment({
+        id: id as EquipmentId,
         type: 'Staff',
-        slots: 0,
-        grantedSkillIds,
-      };
-    }
+        grantedSkillIds: [grantedSkillId],
+      });
 
-    const attack = mockSkill({
-      id: 'Attack' as EquipmentSkillId,
-      name: 'Attack',
-    });
-    const doubleStrike1 = mockSkill({
-      id: 'Double Strike I' as EquipmentSkillId,
-      name: 'Double Strike I',
-    });
-    const doubleStrike2 = mockSkill({
-      id: 'Double Strike II' as EquipmentSkillId,
-      name: 'Double Strike II',
-    });
-    const sweep1 = mockSkill({
-      id: 'Sweep I' as EquipmentSkillId,
-      name: 'Sweep I',
-    });
-    const starshine2 = mockSkill({
-      id: 'Starshine II' as EquipmentSkillId,
-      name: 'Starshine II',
-    });
+    const attack = skill('Attack');
+    const doubleStrike1 = skill('Double Strike I');
+    const doubleStrike2 = skill('Double Strike II');
+    const sweep1 = skill('Sweep I');
+    const starshine2 = skill('Starshine II');
 
-    const wergenStaff = mockEquipmentGranting('wergen-staff' as EquipmentId, [
-      starshine2.id,
-    ]);
-    const ringOfDoubleStrike2 = mockEquipmentGranting(
-      'ring-double-strike-2' as EquipmentId,
-      [doubleStrike2.id],
+    const wergenStaff = equipmentGranting('wergen-staff', starshine2.id);
+    const ringOfDoubleStrike2 = equipmentGranting(
+      'ring-double-strike-2',
+      doubleStrike2.id,
     );
-    const ringOfDoubleStrike1 = mockEquipmentGranting(
-      'ring-double-strike-1' as EquipmentId,
-      [doubleStrike1.id],
+    const ringOfDoubleStrike1 = equipmentGranting(
+      'ring-double-strike-1',
+      doubleStrike1.id,
     );
-    const sweepTeaching = {
+    const sweepTeaching = ensureTrainerTeaching({
       id: 'teach-sweep' as TrainerTeachingId,
-      __type: 'trainerteaching',
       effects: [{ kind: 'GrantSkill', skillId: sweep1.id }],
-    } as TrainerTeachingContent;
+    });
 
     beforeEach(() => {
-      setAllContentById(
-        new Map<string, IsContentItem>([
-          ['Attack', attack],
-          ['Double Strike I', doubleStrike1],
-          ['Double Strike II', doubleStrike2],
-          ['Sweep I', sweep1],
-          ['Starshine II', starshine2],
-          ['wergen-staff', wergenStaff],
-          ['ring-double-strike-2', ringOfDoubleStrike2],
-          ['ring-double-strike-1', ringOfDoubleStrike1],
-          ['teach-sweep', sweepTeaching],
-        ]),
-      );
+      seedContent([
+        attack,
+        doubleStrike1,
+        doubleStrike2,
+        sweep1,
+        starshine2,
+        wergenStaff,
+        ringOfDoubleStrike2,
+        ringOfDoubleStrike1,
+        sweepTeaching,
+      ]);
     });
 
     it("returns nothing for a hero whose job doesn't resolve", () => {
@@ -239,17 +138,30 @@ describe('Job Helper Functions', () => {
         characterSkills({
           jobId: 'job-missing' as JobId,
           level: 1,
-          equipment: emptyEquipment,
+          equipment: defaultEquipment(),
           teachings: {},
         }),
       ).toEqual([]);
+    });
+
+    it("resolves a hero's job to its skills at their level", () => {
+      seedContent([mockJobExplorer, attack, doubleStrike1, sweep1]);
+
+      expect(
+        characterSkills({
+          jobId: mockJobExplorer.id,
+          level: 4,
+          equipment: defaultEquipment(),
+          teachings: {},
+        }).map((skill) => skill.id),
+      ).toEqual(['Attack', 'Double Strike I', 'Sweep I']);
     });
 
     it('merges teaching-granted skills alongside equipment grants', () => {
       const skills = heroSkillsWithEquipment(
         mockJobExplorer,
         1,
-        emptyEquipment,
+        defaultEquipment(),
         [sweepTeaching.id],
       );
 
@@ -257,14 +169,9 @@ describe('Job Helper Functions', () => {
     });
 
     it('appends a granted skill the hero has no matching family for', () => {
-      const equipment: EquipmentBlock = {
-        ...emptyEquipment,
-        Weapon: {
-          id: 'staff-item' as EquipmentItemId,
-          equipmentId: wergenStaff.id,
-          infusedItemIds: [],
-          affixIds: [],
-        },
+      const equipment = {
+        ...defaultEquipment(),
+        Weapon: buildEquipmentItem(wergenStaff.id),
       };
 
       const skills = heroSkillsWithEquipment(mockJobExplorer, 1, equipment, []);
@@ -277,14 +184,9 @@ describe('Job Helper Functions', () => {
     });
 
     it('upgrades a known lower-tier skill in place', () => {
-      const equipment: EquipmentBlock = {
-        ...emptyEquipment,
-        Ring: {
-          id: 'ring-item' as EquipmentItemId,
-          equipmentId: ringOfDoubleStrike2.id,
-          infusedItemIds: [],
-          affixIds: [],
-        },
+      const equipment = {
+        ...defaultEquipment(),
+        Ring: buildEquipmentItem(ringOfDoubleStrike2.id),
       };
 
       const skills = heroSkillsWithEquipment(mockJobExplorer, 1, equipment, []);
@@ -296,14 +198,9 @@ describe('Job Helper Functions', () => {
     });
 
     it('ignores a granted skill when a same-or-higher tier is already known', () => {
-      const equipment: EquipmentBlock = {
-        ...emptyEquipment,
-        Ring: {
-          id: 'ring-item' as EquipmentItemId,
-          equipmentId: ringOfDoubleStrike1.id,
-          infusedItemIds: [],
-          affixIds: [],
-        },
+      const equipment = {
+        ...defaultEquipment(),
+        Ring: buildEquipmentItem(ringOfDoubleStrike1.id),
       };
 
       const skills = heroSkillsWithEquipment(mockJobExplorer, 6, equipment, []);

@@ -1,148 +1,112 @@
-import type {
-  GameState,
-  GlobalEffectContent,
-  GlobalEffectId,
-} from '@interfaces';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
+import {
+  ARMORY_CAP,
+  ARMORY_ENCUMBERED_THRESHOLD,
+  ARMORY_OVERFLOW_MULTIPLIER,
+} from '@helpers/config';
+import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
+import { defaultGameState } from '@helpers/defaults';
+import { applyGlobalEffectAdd } from '@helpers/hero/global-effect-state';
+import {
+  armoryCapForBoost,
+  syncArmoryGlobalEffects,
+} from '@helpers/kingdom/armory-global-effects';
+import type { EquipmentId, GameState, GlobalEffectId } from '@interfaces';
+import { buildEquipmentItem } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
 
-vi.mock('@helpers/engine/timer', () => ({
-  timerTicksElapsed: vi.fn(() => 1000),
-}));
+// Looked up by name, so each stored id differs from it on purpose.
+const tier = (name: string) =>
+  ensureGlobalEffect({ id: `${name}-id` as GlobalEffectId, name });
+const encumbered = tier('Encumbered');
+const overburdened = tier('Overburdened');
+const overCapacity = tier('Over Capacity');
 
-import { getEntry } from '@helpers/content/content';
-import { syncArmoryGlobalEffects } from '@helpers/kingdom/armory-global-effects';
+// Smallest armory size at or above `ratio` of the cap.
+const sizeAt = (ratio: number, boost = 0) =>
+  Math.ceil(armoryCapForBoost(boost) * ratio);
 
-function contentFor(name: string): GlobalEffectContent {
-  return {
-    id: `${name}-id` as GlobalEffectId,
-    name,
-    __type: 'globaleffect',
-    description: name,
-    sprite: '0000',
-    effects: [],
-    hideDuration: true,
-  };
-}
-
-const encumbered = contentFor('Encumbered');
-const overburdened = contentFor('Overburdened');
-const overCapacity = contentFor('Over Capacity');
-const encumberedId = encumbered.id;
-const overburdenedId = overburdened.id;
-const overCapacityId = overCapacity.id;
-
-// `applyGlobalEffectAdd` re-resolves the id via `getEntry` itself, so the mock
-// must answer consistently whether called with a name or an id.
-const CONTENT_BY_KEY: Record<string, GlobalEffectContent> = {
-  Encumbered: encumbered,
-  [encumbered.id]: encumbered,
-  Overburdened: overburdened,
-  [overburdened.id]: overburdened,
-  'Over Capacity': overCapacity,
-  [overCapacity.id]: overCapacity,
-};
-
-function buildState(
+function stateWith(
   armorySize: number,
-  activeIds: GlobalEffectId[] = [],
+  active: GlobalEffectId[] = [],
   armorySizeBoost = 0,
 ): GameState {
-  return {
-    armory: Array.from({ length: armorySize }),
-    collectibles: {},
-    globalEffects: activeIds.map((id) => ({
-      id,
-      effects: [],
-      startTick: 0,
-      expiresAtTick: 999999,
-    })),
-    globalEffectSums: { armorySizeBoost },
-  } as unknown as GameState;
+  const state = defaultGameState();
+  state.armory = Array.from({ length: armorySize }, () =>
+    buildEquipmentItem('gear' as EquipmentId),
+  );
+  state.globalEffectSums.armorySizeBoost = armorySizeBoost;
+  active.forEach((id) => applyGlobalEffectAdd(state, id, 1000, 0));
+  return state;
 }
 
+function syncedTiers(state: GameState): GlobalEffectId[] {
+  syncArmoryGlobalEffects(state);
+  return state.globalEffects.map((effect) => effect.id);
+}
+
+beforeEach(() => {
+  seedContent([encumbered, overburdened, overCapacity]);
+});
+
 describe('syncArmoryGlobalEffects', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(getEntry).mockImplementation(
-      (key) => CONTENT_BY_KEY[key] as never,
+  it('shows the tier for how full the armory is, from each threshold up', () => {
+    expect(
+      syncedTiers(stateWith(sizeAt(ARMORY_ENCUMBERED_THRESHOLD) - 1)),
+    ).toEqual([]);
+    expect(syncedTiers(stateWith(sizeAt(ARMORY_ENCUMBERED_THRESHOLD)))).toEqual(
+      [encumbered.id],
+    );
+    expect(syncedTiers(stateWith(ARMORY_CAP - 1))).toEqual([encumbered.id]);
+    expect(syncedTiers(stateWith(ARMORY_CAP))).toEqual([overburdened.id]);
+    expect(syncedTiers(stateWith(sizeAt(ARMORY_OVERFLOW_MULTIPLIER)))).toEqual([
+      overCapacity.id,
+    ]);
+  });
+
+  it('keeps an already-shown tier, swaps a stale one, and clears once back under', () => {
+    expect(syncedTiers(stateWith(ARMORY_CAP, [overburdened.id]))).toEqual([
+      overburdened.id,
+    ]);
+    expect(
+      syncedTiers(
+        stateWith(sizeAt(ARMORY_OVERFLOW_MULTIPLIER), [overburdened.id]),
+      ),
+    ).toEqual([overCapacity.id]);
+    expect(syncedTiers(stateWith(1, [encumbered.id]))).toEqual([]);
+  });
+
+  it('switches tier at exactly each threshold', () => {
+    // A cap boost where the threshold lands on a whole item count.
+    const exactly = (ratio: number) => {
+      const boost = Array.from({ length: 100 }, (_, i) => i).find((b) =>
+        Number.isInteger(armoryCapForBoost(b) * ratio),
+      )!;
+      return stateWith(armoryCapForBoost(boost) * ratio, [], boost);
+    };
+
+    expect(syncedTiers(exactly(ARMORY_ENCUMBERED_THRESHOLD))).toEqual([
+      encumbered.id,
+    ]);
+    expect(syncedTiers(exactly(ARMORY_OVERFLOW_MULTIPLIER))).toEqual([
+      overCapacity.id,
+    ]);
+  });
+
+  it('measures fullness against a boosted cap', () => {
+    const size = sizeAt(ARMORY_ENCUMBERED_THRESHOLD);
+    const boost = ARMORY_CAP;
+
+    expect(syncedTiers(stateWith(size, [], boost))).toEqual([]);
+    expect(syncedTiers(stateWith(armoryCapForBoost(boost), [], boost))).toEqual(
+      [overburdened.id],
     );
   });
 
-  it('activates nothing under the 75% Encumbered threshold', () => {
-    const state = buildState(37); // 74%
+  it('skips a tier with no content', () => {
+    seedContent([encumbered, overCapacity]);
 
-    syncArmoryGlobalEffects(state);
-
-    expect(state.globalEffects).toEqual([]);
-  });
-
-  it('activates Encumbered at exactly 75%', () => {
-    const state = buildState(38); // 76%
-
-    syncArmoryGlobalEffects(state);
-
-    expect(state.globalEffects.map((e) => e.id)).toEqual([encumberedId]);
-  });
-
-  it('activates Overburdened at exactly 100%, not Encumbered', () => {
-    const state = buildState(50);
-
-    syncArmoryGlobalEffects(state);
-
-    expect(state.globalEffects.map((e) => e.id)).toEqual([overburdenedId]);
-  });
-
-  it('activates Over Capacity at exactly 125%', () => {
-    const state = buildState(63); // 126%
-
-    syncArmoryGlobalEffects(state);
-
-    expect(state.globalEffects.map((e) => e.id)).toEqual([overCapacityId]);
-  });
-
-  it('leaves an already-active tier untouched', () => {
-    const state = buildState(50, [overburdenedId]);
-
-    syncArmoryGlobalEffects(state);
-
-    expect(state.globalEffects.map((e) => e.id)).toEqual([overburdenedId]);
-  });
-
-  it('swaps tiers: removes the previous tier and adds the new one', () => {
-    const state = buildState(63, [overburdenedId]); // now Over Capacity
-
-    syncArmoryGlobalEffects(state);
-
-    expect(state.globalEffects.map((e) => e.id)).toEqual([overCapacityId]);
-  });
-
-  it('deactivates every tier once the armory drops back under 75%', () => {
-    const state = buildState(10, [encumberedId]);
-
-    syncArmoryGlobalEffects(state);
-
-    expect(state.globalEffects).toEqual([]);
-  });
-
-  it('shifts the tier thresholds when an armory size boost is active', () => {
-    // 38/50 is already Encumbered (76%) at the base cap, but a +10 boost
-    // (38/60 = 63%) puts the ratio back under the Encumbered threshold.
-    const state = buildState(38, [], 10);
-
-    syncArmoryGlobalEffects(state);
-
-    expect(state.globalEffects).toEqual([]);
-  });
-
-  it('still activates a tier past a boosted cap', () => {
-    const state = buildState(60, [], 10); // 60/60 = 100%
-
-    syncArmoryGlobalEffects(state);
-
-    expect(state.globalEffects.map((e) => e.id)).toEqual([overburdenedId]);
+    expect(syncedTiers(stateWith(ARMORY_CAP))).toEqual([]);
   });
 });

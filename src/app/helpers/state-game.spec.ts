@@ -4,20 +4,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 // test-setup.ts fakes `computed` with a non-memoizing function, which can't verify reactivity.
 vi.unmock('@angular/core');
 
-vi.mock('@helpers/engine/signal', () => ({
-  indexedDbSignal: vi.fn(() => ({ set: vi.fn() })),
-}));
+vi.mock('@helpers/engine/logging');
 
-vi.mock('@helpers/engine/scheduler', () => ({
-  schedulerYield: vi.fn(() => Promise.resolve()),
-}));
-
-vi.mock('@helpers/engine/logging', () => ({
-  debug: vi.fn(),
-  error: vi.fn(),
-}));
-
-import { defaultGameState } from '@helpers/defaults';
 import {
   gamestate,
   activeAstralProjectorSpellsState,
@@ -41,7 +29,6 @@ import {
   globalEffectSumsState,
   globalEffectsState,
   materialsState,
-  setGameState,
   tradeskillsState,
   updateGamestate,
   workersState,
@@ -57,34 +44,22 @@ import {
   worldTownsState,
   worldTravelState,
 } from '@helpers/state-game';
-import type { GameState, WorkerId, WorkerState } from '@interfaces';
+import { defaultWorkerState } from '@helpers/worker/worker-progression';
+import type { GameState, WorkerId } from '@interfaces';
+import { seedGamestate, storedSave } from '@/testing/gamestate';
 
 const WORKER_ID = 'weaver-nell' as WorkerId;
 
-function buildWorker(level: number): WorkerState {
-  return {
-    level,
-    xp: { current: 0, maximum: 10 },
-    location: { mapName: 'Carrina', x: 0, y: 0 },
-    status: { kind: 'AtDuchy' },
-    assignment: null,
-  };
-}
-
 function seedState(): GameState {
-  const state = defaultGameState();
-  state.workers = { [WORKER_ID]: buildWorker(1) };
-  setGameState(state, false);
-  return state;
+  return seedGamestate(
+    (state) => (state.workers = { [WORKER_ID]: defaultWorkerState() }),
+  );
 }
 
 function setLevelViaTick(level: number): void {
   gamestateTickStart();
   updateGamestate((state) => {
-    state.workers = {
-      ...state.workers,
-      [WORKER_ID]: { ...state.workers[WORKER_ID], level },
-    };
+    state.workers[WORKER_ID].level = level;
     return state;
   });
   gamestateTickEnd();
@@ -100,7 +75,7 @@ describe('a tick left open by a failed subsystem', () => {
 
     gamestateTickStart();
     await updateGamestate((state) => {
-      state.workers = { ...state.workers, [WORKER_ID]: buildWorker(3) };
+      state.workers[WORKER_ID].level = 3;
       return state;
     });
     expect(level()).toBe(1);
@@ -116,7 +91,7 @@ describe('a tick left open by a failed subsystem', () => {
 
     gamestateTickStart();
     updateGamestate((state) => {
-      state.workers = { ...state.workers, [WORKER_ID]: buildWorker(9) };
+      state.workers[WORKER_ID].level = 9;
       return state;
     });
     gamestateTickEnd();
@@ -132,7 +107,7 @@ describe('a tick left open by a failed subsystem', () => {
 
     gamestateTickStart();
     updateGamestate((state) => {
-      state.workers = { ...state.workers, [WORKER_ID]: buildWorker(4) };
+      state.workers[WORKER_ID].level = 4;
       return state;
     });
     await expect(
@@ -154,7 +129,7 @@ describe('a tick left open by a failed subsystem', () => {
     gamestateTickStart();
     gamestateTickEnd();
     await updateGamestate((state) => {
-      state.workers = { ...state.workers, [WORKER_ID]: buildWorker(3) };
+      state.workers[WORKER_ID].level = 3;
       return state;
     });
 
@@ -177,7 +152,7 @@ describe('workersState', () => {
     expect(level()).toBe(1);
 
     await updateGamestate((state) => {
-      state.workers = { ...state.workers, [WORKER_ID]: buildWorker(3) };
+      state.workers[WORKER_ID].level = 3;
       return state;
     });
 
@@ -221,7 +196,7 @@ describe('workersState', () => {
 
     gamestateTickStart();
     updateGamestate((state) => {
-      state.workers = { ...state.workers, [WORKER_ID]: buildWorker(9) };
+      state.workers[WORKER_ID].level = 9;
       return state;
     });
 
@@ -245,7 +220,7 @@ describe('workersState', () => {
     const level = computed(() => workersState()[WORKER_ID].level);
     expect(level()).toBe(1);
     updateGamestate((state) => {
-      state.workers = { ...state.workers, [WORKER_ID]: buildWorker(4) };
+      state.workers[WORKER_ID].level = 4;
       return state;
     });
     gamestateTickEnd();
@@ -266,7 +241,7 @@ describe('workersState', () => {
 
     gamestateTickStart();
     updateGamestate((state) => {
-      state.clock = { ...state.clock, numTicks: state.clock.numTicks + 1 };
+      state.clock.numTicks += 1;
       return state;
     });
     gamestateTickEnd();
@@ -277,9 +252,9 @@ describe('workersState', () => {
   });
 
   it('exposes the discoveredWorkers slice', () => {
-    const state = seedState();
-    state.discoveredWorkers = { [WORKER_ID]: { foundAt: 1 } };
-    setGameState(state, false);
+    const state = seedGamestate(
+      (state) => (state.discoveredWorkers = { [WORKER_ID]: { foundAt: 1 } }),
+    );
 
     expect(discoveredWorkersState()).toBe(state.discoveredWorkers);
   });
@@ -361,7 +336,7 @@ describe('workersState', () => {
 
     gamestateTickStart();
     updateGamestate((state) => {
-      state.world.gathering = { ...state.world.gathering, ticksIntoGather: 9 };
+      state.world.gathering.ticksIntoGather = 9;
       return state;
     });
     gamestateTickEnd();
@@ -431,6 +406,30 @@ describe('updateGamestate with Immer drafts', () => {
     gamestateTickEnd();
 
     expect(gamestate().workers[WORKER_ID].level).toBe(4);
+  });
+
+  it('saves a non-tick update', async () => {
+    seedState();
+
+    await updateGamestate((draft) => {
+      draft.workers[WORKER_ID].level = 6;
+      return draft;
+    });
+
+    expect(storedSave().workers[WORKER_ID].level).toBe(6);
+  });
+
+  it('defers a non-tick update until the scheduler yields', async () => {
+    seedState();
+
+    const pending = updateGamestate((draft) => {
+      draft.workers[WORKER_ID].level = 6;
+      return draft;
+    });
+    expect(gamestate().workers[WORKER_ID].level).toBe(1);
+
+    await pending;
+    expect(gamestate().workers[WORKER_ID].level).toBe(6);
   });
 
   it('applies a non-tick update that resumes after a tick opened to that tick', async () => {

@@ -1,19 +1,11 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    outpostsState: () => gamestate().outposts,
-  };
-});
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  isWorldNodeVisible: vi.fn(() => true),
-  worldNodesOfType: vi.fn(() => []),
-}));
-
-import { gamestate } from '@helpers/state-game';
+import {
+  OUTPOST_DEATH_PENALTY_MAX_LEVEL,
+  OUTPOST_DEATH_PENALTY_REDUCTION_PER_LEVEL,
+  OUTPOST_TELEPORT_LEVEL,
+} from '@helpers/config';
+import { ensureOutpost } from '@helpers/content/ensure-outpost';
 import {
   isOutpostBuilt,
   isOutpostTeleportListed,
@@ -22,144 +14,127 @@ import {
   outpostsWithTeleportUnlocked,
   worldNodeOutpostLevel,
 } from '@helpers/world-node/world-node-outpost';
-import {
-  isWorldNodeVisible,
-  worldNodesOfType,
-} from '@helpers/world-node/world-nodes';
-import type { GameState, WorldNodeEntry } from '@interfaces';
+import type { GameState, OutpostId } from '@interfaces';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 
-function outpostEntry(nodeName: string): WorldNodeEntry {
-  return { nodeName, mapName: nodeName, x: 0, y: 0 } as WorldNodeEntry;
+const carrina = 'Carrina Outpost';
+
+function atLevels(levels: Record<string, number>): void {
+  seedGamestate((state) => {
+    Object.entries(levels).forEach(
+      ([nodeName, level]) => (state.outposts[nodeName] = { level }),
+    );
+  });
 }
 
-function mockOutpostLevels(levels: Record<string, number>): void {
-  vi.mocked(gamestate).mockReturnValue({
-    outposts: Object.fromEntries(
-      Object.entries(levels).map(([nodeName, level]) => [nodeName, { level }]),
-    ),
-  } as unknown as GameState);
-}
-
-function mockOutpostLevel(level: number | undefined): void {
-  vi.mocked(gamestate).mockReturnValue({
-    outposts: level === undefined ? {} : { 'Carrina Outpost': { level } },
-  } as unknown as GameState);
-}
-
-beforeEach(() => {
-  vi.clearAllMocks();
-  vi.mocked(isWorldNodeVisible).mockReturnValue(true);
-});
+const atLevel = (level?: number) =>
+  atLevels(level === undefined ? {} : { [carrina]: level });
 
 describe('worldNodeOutpostLevel', () => {
-  it('defaults to 0 when the node has no stored level', () => {
-    mockOutpostLevel(undefined);
+  it('reads the stored level, 0 when unbuilt or on a save from before outposts', () => {
+    atLevel(3);
+    expect(worldNodeOutpostLevel(carrina)).toBe(3);
 
-    expect(worldNodeOutpostLevel('Carrina Outpost')).toBe(0);
-  });
+    atLevel();
+    expect(worldNodeOutpostLevel(carrina)).toBe(0);
 
-  it('defaults to 0 when the outposts slice itself is missing (pre-outpost save)', () => {
-    vi.mocked(gamestate).mockReturnValue({} as unknown as GameState);
-
-    expect(worldNodeOutpostLevel('Carrina Outpost')).toBe(0);
-  });
-
-  it('returns the stored level', () => {
-    mockOutpostLevel(3);
-
-    expect(worldNodeOutpostLevel('Carrina Outpost')).toBe(3);
+    seedGamestate((state) => delete (state as Partial<GameState>).outposts);
+    expect(worldNodeOutpostLevel(carrina)).toBe(0);
   });
 });
 
 describe('isOutpostBuilt', () => {
-  it('is false at level 0', () => {
-    mockOutpostLevel(0);
+  it('counts an outpost as built from level 1', () => {
+    atLevel(0);
+    expect(isOutpostBuilt(carrina)).toBe(false);
 
-    expect(isOutpostBuilt('Carrina Outpost')).toBe(false);
-  });
-
-  it('is true from level 1', () => {
-    mockOutpostLevel(1);
-
-    expect(isOutpostBuilt('Carrina Outpost')).toBe(true);
+    atLevel(1);
+    expect(isOutpostBuilt(carrina)).toBe(true);
   });
 });
 
 describe('outpostDeathPenaltyMultiplier', () => {
-  it.each([
-    [undefined, 1],
-    [0, 1],
-    [1, 1],
-    [2, 0.75],
-    [3, 0.5],
-    [4, 0.25],
-  ])('at level %s is %s', (level, multiplier) => {
-    mockOutpostLevel(level);
+  const reducedBy = (upgrades: number) =>
+    1 - upgrades * OUTPOST_DEATH_PENALTY_REDUCTION_PER_LEVEL;
 
-    expect(outpostDeathPenaltyMultiplier('Carrina Outpost')).toBe(multiplier);
+  it('shrinks with each upgrade past the build, down to the cap', () => {
+    for (const level of [undefined, 0, 1]) {
+      atLevel(level);
+      expect(outpostDeathPenaltyMultiplier(carrina)).toBe(1);
+    }
+
+    atLevel(2);
+    expect(outpostDeathPenaltyMultiplier(carrina)).toBe(reducedBy(1));
+
+    const capped = reducedBy(OUTPOST_DEATH_PENALTY_MAX_LEVEL - 1);
+    atLevel(OUTPOST_DEATH_PENALTY_MAX_LEVEL);
+    expect(outpostDeathPenaltyMultiplier(carrina)).toBe(capped);
+
+    atLevel(OUTPOST_DEATH_PENALTY_MAX_LEVEL + 5);
+    expect(outpostDeathPenaltyMultiplier(carrina)).toBe(capped);
   });
 
-  it.each([5, 10])(
-    'stops shrinking past the death penalty cap (level %s)',
-    (level) => {
-      mockOutpostLevel(level);
-
-      expect(outpostDeathPenaltyMultiplier('Carrina Outpost')).toBe(0.25);
-    },
-  );
-
-  it('is 1 for a node that is not an outpost', () => {
-    mockOutpostLevel(4);
+  it('is 1 for a node that isn’t an outpost', () => {
+    atLevel(OUTPOST_DEATH_PENALTY_MAX_LEVEL);
 
     expect(outpostDeathPenaltyMultiplier('Duchy of Carrina')).toBe(1);
   });
 });
 
 describe('isOutpostTeleportUnlocked', () => {
-  it.each([
-    [undefined, false],
-    [4, false],
-    [5, true],
-  ])('at level %s is %s', (level, unlocked) => {
-    mockOutpostLevel(level);
+  it('unlocks the teleport at its level', () => {
+    atLevel();
+    expect(isOutpostTeleportUnlocked(carrina)).toBe(false);
 
-    expect(isOutpostTeleportUnlocked('Carrina Outpost')).toBe(unlocked);
+    atLevel(OUTPOST_TELEPORT_LEVEL - 1);
+    expect(isOutpostTeleportUnlocked(carrina)).toBe(false);
+
+    atLevel(OUTPOST_TELEPORT_LEVEL);
+    expect(isOutpostTeleportUnlocked(carrina)).toBe(true);
   });
 });
 
-describe('isOutpostTeleportListed', () => {
-  it('lists a visible, built outpost', () => {
-    mockOutpostLevel(1);
+describe('teleport listings', () => {
+  const outposts = [
+    'Carrina Outpost',
+    'Larsian Outpost',
+    'Mire Outpost',
+    'Hidden Outpost',
+  ];
 
-    expect(isOutpostTeleportListed(outpostEntry('Carrina Outpost'))).toBe(true);
-  });
-
-  it('hides an unbuilt outpost', () => {
-    mockOutpostLevel(0);
-
-    expect(isOutpostTeleportListed(outpostEntry('Carrina Outpost'))).toBe(
-      false,
+  function seedOutposts(levels: Record<string, number>) {
+    seedContent(
+      outposts.map((name) =>
+        ensureOutpost({
+          id: name as OutpostId,
+          name,
+          hidden: name === 'Hidden Outpost',
+        }),
+      ),
     );
-  });
-
-  it('hides an outpost that is not visible', () => {
-    mockOutpostLevel(1);
-    vi.mocked(isWorldNodeVisible).mockReturnValue(false);
-
-    expect(isOutpostTeleportListed(outpostEntry('Carrina Outpost'))).toBe(
-      false,
+    const nodes = seedWorldNodes(
+      outposts.map((name) => ({ name, type: 'Outpost' })),
     );
-  });
-});
+    atLevels(levels);
+    return nodes;
+  }
 
-describe('outpostsWithTeleportUnlocked', () => {
-  it('keeps only visible outposts at +5', () => {
-    vi.mocked(worldNodesOfType).mockReturnValue([
-      outpostEntry('Carrina Outpost'),
-      outpostEntry('Larsian Outpost'),
-      outpostEntry('Mire Outpost'),
-    ]);
-    mockOutpostLevels({ 'Carrina Outpost': 5, 'Larsian Outpost': 4 });
+  it('list built outposts the player can see', () => {
+    const nodes = seedOutposts({ 'Carrina Outpost': 1, 'Hidden Outpost': 1 });
+
+    expect(isOutpostTeleportListed(nodes['Carrina Outpost'])).toBe(true);
+    expect(isOutpostTeleportListed(nodes['Larsian Outpost'])).toBe(false);
+    expect(isOutpostTeleportListed(nodes['Hidden Outpost'])).toBe(false);
+  });
+
+  it('offer only listed outposts with the teleport unlocked', () => {
+    seedOutposts({
+      'Carrina Outpost': OUTPOST_TELEPORT_LEVEL,
+      'Larsian Outpost': OUTPOST_TELEPORT_LEVEL - 1,
+      'Hidden Outpost': OUTPOST_TELEPORT_LEVEL,
+    });
 
     expect(
       outpostsWithTeleportUnlocked().map((entry) => entry.nodeName),

@@ -5,6 +5,7 @@ import { ensureRecipe } from '@helpers/content/ensure-recipe';
 import { ensureTown } from '@helpers/content/ensure-town';
 import { isRecipeCraftableByTown } from '@helpers/town/crafting/town-craft-eligibility';
 import type {
+  CollectibleId,
   CraftQueueEntryId,
   EquipmentId,
   ItemId,
@@ -92,7 +93,9 @@ describe('isRecipeCraftableByTown', () => {
     ).toBe(false);
     expect(
       isRecipeCraftableByTown(
-        recipe({ requirements: [{ collectibleId: 'trophy' as never }] }),
+        recipe({
+          requirements: [{ collectibleId: 'trophy' as CollectibleId }],
+        }),
         town(),
       ),
     ).toBe(false);
@@ -105,7 +108,7 @@ describe('isRecipeCraftableByTown', () => {
       isRecipeCraftableByTown(
         recipe({
           requirements: [],
-          result: { collectibleId: 'trophy' as never },
+          result: { collectibleId: 'trophy' as CollectibleId },
         }),
         town(),
       ),

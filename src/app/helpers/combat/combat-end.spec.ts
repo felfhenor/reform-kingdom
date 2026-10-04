@@ -44,6 +44,7 @@ import type {
   Combatant,
   EncounterContent,
   EncounterId,
+  EncounterRandomId,
   ItemId,
   MonsterId,
   TownId,
@@ -230,7 +231,7 @@ describe('combatCheckIfOver', () => {
 
     it('hands a random encounter to its own victory handler, keeping combat when it continues', () => {
       vi.mocked(encounterRandomHandleVictory).mockReturnValue(true);
-      const combat = fight({ encounterRandomId: 'wilds' as never });
+      const combat = fight({ encounterRandomId: 'wilds' as EncounterRandomId });
 
       endFight(combat);
 

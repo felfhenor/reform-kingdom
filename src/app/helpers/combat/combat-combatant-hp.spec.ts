@@ -6,14 +6,10 @@ import {
   combatCombatantTakeDamage,
 } from '@helpers/combat/combat-combatant-hp';
 import { combatantDamageEvents } from '@helpers/combat/combat-damage-events';
+import { buildTestCombatant } from '@/testing/builders';
 
 function buildCombatant(hp: number, isEnemy = false): Combatant {
-  return {
-    id: 'combatant-1',
-    isEnemy,
-    hp,
-    totalStats: { Health: 100 },
-  } as unknown as Combatant;
+  return buildTestCombatant({ isEnemy, hp });
 }
 
 describe('combatantIsDead', () => {

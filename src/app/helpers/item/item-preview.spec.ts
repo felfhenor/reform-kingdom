@@ -1,277 +1,234 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/state-game', async (importOriginal) => ({
-  ...(await importOriginal<Record<string, unknown>>()),
-  worldPartyState: vi.fn(),
-}));
-
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-  getEntriesByType: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/crafting/recipes', () => ({
-  recipeBackdropSprite: vi.fn(() => 'recipe-backdrop'),
-  recipeResultContent: vi.fn(),
-  recipeResultSpritesheet: vi.fn(() => 'equipment'),
-  recipeStylizedName: vi.fn(),
-}));
-
-import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { ensureAffix } from '@helpers/content/ensure-affix';
-import { ensureEquipment } from '@helpers/content/ensure-item';
+import {
+  ensureCollectible,
+  ensureEquipment,
+  ensureItem,
+} from '@helpers/content/ensure-item';
+import { ensureJob } from '@helpers/content/ensure-job';
+import { ensureRecipe } from '@helpers/content/ensure-recipe';
+import { ensureSkill } from '@helpers/content/ensure-skill';
+import { ensureTradeskill } from '@helpers/content/ensure-tradeskill';
+import { ensureWorker } from '@helpers/content/ensure-worker';
+import {
+  recipeBackdropSprite,
+  recipeStylizedName,
+} from '@helpers/crafting/recipes';
 import { defaultStats } from '@helpers/defaults';
 import {
   itemPreviewDisplay,
   resolveRewardDisplay,
 } from '@helpers/item/item-preview';
-import { worldPartyState } from '@helpers/state-game';
 import type {
   AffixId,
-  CollectibleContent,
-  EquipmentItemId,
   CollectibleId,
-  EquipmentContent,
   EquipmentId,
-  ItemContent,
+  EquipmentSkillId,
   ItemId,
-  JobContent,
   JobId,
+  RecipeId,
+  TradeskillId,
+  WorkerId,
 } from '@interfaces';
+import { buildEquipmentItem } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+
+const ore = ensureItem({
+  id: 'ore' as ItemId,
+  name: 'Copper Ore',
+  description: 'Shiny.',
+  sprite: '0001',
+  infusionStats: { ...defaultStats(), Strength: 1 },
+});
+const sword = ensureEquipment({
+  id: 'sword' as EquipmentId,
+  name: 'Sword',
+  description: 'Sharp.',
+  sprite: '0002',
+  rarity: 'Rare',
+  levelRequirement: 4,
+  baseStats: { ...defaultStats(), Strength: 5 },
+  type: 'Sword',
+});
+const trinket = ensureCollectible({
+  id: 'trinket' as CollectibleId,
+  name: 'Trinket',
+  description: 'Curious.',
+  sprite: '0003',
+  rarity: 'Legendary',
+});
 
 describe('itemPreviewDisplay', () => {
-  it('uses the affixed name when previewing a rolled instance', () => {
-    const spear = ensureEquipment({
-      id: 'spear' as EquipmentId,
-      name: 'Spear',
-    });
-    const prefix = ensureAffix({
-      id: 'sharp' as AffixId,
-      name: 'Sharp',
-      position: 'Prefix',
-    });
-    vi.mocked(getEntry).mockImplementation(
-      (id: unknown) => [spear, prefix].find((e) => e.id === id) as never,
-    );
-    vi.mocked(worldPartyState).mockReturnValue([]);
-
-    const display = itemPreviewDisplay('equipment', spear, {
-      id: 'spear-1' as EquipmentItemId,
-      equipmentId: spear.id,
-      infusedItemIds: [],
-      affixIds: [prefix.id],
-    });
-
-    expect(display.name).toBe('Sharp Spear');
-  });
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('surfaces infusion stats for an item', () => {
-    const item: ItemContent = {
-      id: 'ore' as ItemId,
-      __type: 'item',
-      name: 'Copper Ore',
-      description: 'Shiny.',
-      sprite: '0001',
-      rarity: 'Common',
-      infusionStats: { Strength: 1 },
-    } as ItemContent;
-
-    expect(itemPreviewDisplay('item', item)).toEqual({
+  it('shows an item’s infusion stats', () => {
+    expect(itemPreviewDisplay('item', ore)).toMatchObject({
       name: 'Copper Ore',
       description: 'Shiny.',
       sprite: '0001',
       spritesheet: 'item',
       rarity: 'Common',
-      stats: { Strength: 1 },
+      stats: ore.infusionStats,
       skills: [],
     });
+    expect(itemPreviewDisplay('item', ore)).not.toHaveProperty(
+      'levelRequirement',
+    );
   });
 
-  it('surfaces base stats, level requirement', () => {
-    const equipment: EquipmentContent = {
-      id: 'sword' as EquipmentId,
-      __type: 'equipment',
-      name: 'Sword',
-      description: 'Sharp.',
-      sprite: '0002',
-      rarity: 'Rare',
-      levelRequirement: 4,
-      baseStats: { Strength: 5 },
-      type: 'Sword',
-    } as EquipmentContent;
-    const warriorJob = { equippableTypes: ['Sword'] } as JobContent;
-    vi.mocked(getEntry).mockReturnValue(warriorJob);
-    vi.mocked(worldPartyState).mockReturnValue([
-      { name: 'Alice', jobId: 'warrior' as JobId } as never,
+  it('shows equipment stats, level requirement and the jobs that can use it', () => {
+    seedContent([
+      ensureJob({
+        id: 'warrior' as JobId,
+        shorthand: 'WAR',
+        equippableTypes: ['Sword'],
+      }),
+      ensureJob({
+        id: 'mage' as JobId,
+        shorthand: 'MAG',
+        equippableTypes: ['Staff'],
+      }),
     ]);
 
-    expect(itemPreviewDisplay('equipment', equipment)).toEqual({
+    expect(itemPreviewDisplay('equipment', sword)).toMatchObject({
       name: 'Sword',
       description: 'Sharp.',
       sprite: '0002',
       spritesheet: 'equipment',
       rarity: 'Rare',
       type: 'Sword',
-      stats: { Strength: 5 },
+      stats: sword.baseStats,
       levelRequirement: 4,
-      equippableHeroNames: [],
+      equippableHeroNames: ['WAR'],
       skills: [],
     });
   });
 
-  it('resolves gatherYieldBonuses to their tradeskill display name and sprite', () => {
-    const equipment: EquipmentContent = {
-      id: 'trinket' as EquipmentId,
-      __type: 'equipment',
-      name: 'Trinket',
-      description: 'Handy.',
-      sprite: '0002',
-      rarity: 'Uncommon',
-      levelRequirement: 1,
-      baseStats: defaultStats(),
-      type: 'Trinket',
-      slots: 1,
-      grantedSkillIds: [],
-      gatherYieldBonuses: [{ tradeskillId: 'woodworking' as never, value: 1 }],
-    } as EquipmentContent;
-    vi.mocked(getEntry).mockImplementation((id: unknown) =>
-      id === 'woodworking'
-        ? ({ name: 'Woodworking', sprite: '0009' } as never)
-        : undefined,
-    );
-    vi.mocked(worldPartyState).mockReturnValue([]);
+  it('names a rolled instance by its affixes', () => {
+    const sharp = ensureAffix({
+      id: 'sharp' as AffixId,
+      name: 'Sharp',
+      position: 'Prefix',
+    });
+    seedContent([sword, sharp]);
 
     expect(
-      itemPreviewDisplay('equipment', equipment).gatherYieldBonuses,
-    ).toEqual([
+      itemPreviewDisplay(
+        'equipment',
+        sword,
+        buildEquipmentItem(sword.id, { affixIds: [sharp.id] }),
+      ).name,
+    ).toBe('Sharp Sword');
+  });
+
+  it('names gather yield bonuses by their tradeskill', () => {
+    seedContent([
+      ensureTradeskill({
+        id: 'woodworking' as TradeskillId,
+        name: 'Woodworking',
+        sprite: '0009',
+      }),
+    ]);
+    const axe = ensureEquipment({
+      ...sword,
+      gatherYieldBonuses: [
+        { tradeskillId: 'woodworking' as TradeskillId, value: 1 },
+      ],
+    });
+
+    expect(itemPreviewDisplay('equipment', axe).gatherYieldBonuses).toEqual([
       { tradeskillName: 'Woodworking', tradeskillSprite: '0009', value: 1 },
     ]);
   });
 
-  it('surfaces skillStatBonuses for an infusion material', () => {
-    const item = {
+  it('names an infusion material’s skill stat bonuses by their skill', () => {
+    seedContent([
+      ensureSkill({
+        id: 'snipe-1' as EquipmentSkillId,
+        family: 'Snipe',
+        sprite: '0004',
+      }),
+    ]);
+    const shard = ensureItem({
       id: 'shard' as ItemId,
-      __type: 'item',
-      name: 'Shard',
-      description: '',
-      sprite: '0001',
-      rarity: 'Common',
-      infusionStats: {},
       infusionSkillStatBonuses: [
         { skillFamily: 'Snipe', stat: 'Agility', value: 0.5 },
       ],
-    } as ItemContent;
-    vi.mocked(getEntriesByType).mockReturnValue([
-      { family: 'Snipe', sprite: '0004' },
-    ] as never);
+    });
 
-    expect(itemPreviewDisplay('item', item).skillStatBonuses).toEqual([
+    expect(itemPreviewDisplay('item', shard).skillStatBonuses).toEqual([
       { skillName: 'Snipe', skillSprite: '0004', stat: 'Agility', value: 0.5 },
     ]);
   });
 
-  it('carries neither stats nor a level requirement for a collectible', () => {
-    const collectible: CollectibleContent = {
-      id: 'trinket' as CollectibleId,
-      __type: 'collectible',
-      name: 'Trinket',
-      description: 'Curious.',
-      sprite: '0003',
-      rarity: 'Legendary',
-      effects: [],
-    };
-
-    expect(itemPreviewDisplay('collectible', collectible)).toEqual({
+  it('shows a collectible’s effects, without stats or a level requirement', () => {
+    expect(itemPreviewDisplay('collectible', trinket)).toEqual({
       name: 'Trinket',
       description: 'Curious.',
       sprite: '0003',
       spritesheet: 'collectible',
       rarity: 'Legendary',
       skills: [],
+      collectibleEffects: undefined,
     });
-  });
 
-  it('carries a collectible effects list when the collectible has one', () => {
-    const collectible: CollectibleContent = {
-      id: 'trinket' as CollectibleId,
-      __type: 'collectible',
-      name: 'Trinket',
-      description: 'Curious.',
-      sprite: '0003',
-      rarity: 'Legendary',
+    const charm = ensureCollectible({
+      ...trinket,
       effects: [{ effectType: 'GainStats', stat: 'Health', value: 5 }],
-    };
-
-    expect(
-      itemPreviewDisplay('collectible', collectible).collectibleEffects,
-    ).toEqual([{ effectType: 'GainStats', stat: 'Health', value: 5 }]);
+    });
+    expect(itemPreviewDisplay('collectible', charm).collectibleEffects).toEqual(
+      charm.effects,
+    );
   });
 });
 
 describe('resolveRewardDisplay', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  it('previews an item, equipment, collectible or worker reward', () => {
+    const worker = ensureWorker({ id: 'nell' as WorkerId, name: 'Nell' });
+    seedContent([ore, sword, trinket, worker]);
 
-  it('resolves an itemId to its display', () => {
-    const item = {
-      id: 'ore' as ItemId,
-      name: 'Copper Ore',
-      description: 'Shiny.',
-      sprite: '0001',
-      rarity: 'Common',
-    } as ItemContent;
-    vi.mocked(getEntry).mockReturnValue(item);
-
-    expect(resolveRewardDisplay({ itemId: item.id })?.name).toBe('Copper Ore');
-  });
-
-  it('resolves an equipmentId to its display', () => {
-    const equipment = {
-      id: 'sword' as EquipmentId,
-      name: 'Sword',
-      description: 'Sharp.',
-      sprite: '0002',
-      rarity: 'Rare',
-    } as EquipmentContent;
-    vi.mocked(getEntry).mockReturnValue(equipment);
-    vi.mocked(worldPartyState).mockReturnValue([]);
-
-    expect(resolveRewardDisplay({ equipmentId: equipment.id })?.name).toBe(
-      'Sword',
-    );
-  });
-
-  it('resolves a collectibleId to its display', () => {
-    const collectible = {
-      id: 'trinket' as CollectibleId,
-      __type: 'collectible',
-      name: 'Trinket',
-      description: 'Curious.',
-      sprite: '0003',
-      rarity: 'Legendary',
-      effects: [],
-    } as CollectibleContent;
-    vi.mocked(getEntry).mockReturnValue(collectible);
-
-    expect(resolveRewardDisplay({ collectibleId: collectible.id })?.name).toBe(
+    expect(resolveRewardDisplay({ itemId: ore.id })?.name).toBe('Copper Ore');
+    expect(resolveRewardDisplay({ equipmentId: sword.id })?.name).toBe('Sword');
+    expect(resolveRewardDisplay({ collectibleId: trinket.id })?.name).toBe(
       'Trinket',
     );
+    expect(resolveRewardDisplay({ workerId: worker.id })).toEqual({
+      name: 'Nell',
+      description: worker.description,
+      sprite: worker.sprite,
+      spritesheet: 'worker',
+      rarity: worker.rarity,
+      skills: [],
+    });
   });
 
-  it('returns undefined when no id is set', () => {
+  it('previews a recipe reward as what it crafts, under the recipe’s own name', () => {
+    const smithing = ensureTradeskill({
+      id: 'smithing' as TradeskillId,
+      name: 'Smithing',
+    });
+    const recipe = ensureRecipe({
+      id: 'sword-recipe' as RecipeId,
+      name: 'Equipment: Sword',
+      tradeskillId: smithing.id,
+      result: { equipmentId: sword.id },
+    });
+    seedContent([sword, smithing, recipe]);
+
+    expect(resolveRewardDisplay({ recipeId: recipe.id })).toMatchObject({
+      name: recipeStylizedName(recipe),
+      spritesheet: 'equipment',
+      sprite: sword.sprite,
+      backdropSprite: recipeBackdropSprite(),
+    });
+  });
+
+  it('is undefined with no reward, or one gone from content', () => {
+    seedContent([]);
+
     expect(resolveRewardDisplay({})).toBeUndefined();
-  });
-
-  it('returns undefined when the referenced id no longer resolves to content', () => {
-    vi.mocked(getEntry).mockReturnValue(undefined);
-
+    expect(resolveRewardDisplay({ itemId: ore.id })).toBeUndefined();
     expect(
-      resolveRewardDisplay({ itemId: 'missing' as ItemId }),
+      resolveRewardDisplay({ recipeId: 'gone' as RecipeId }),
     ).toBeUndefined();
   });
 });

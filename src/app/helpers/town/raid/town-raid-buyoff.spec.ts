@@ -1,156 +1,136 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/item/materials', () => ({
-  goldCoinId: vi.fn(() => 'gold-coin'),
-}));
-
-vi.mock('@helpers/state-game', () => ({
-  worldTownsState: vi.fn(() => ({})),
-}));
-
-vi.mock('@helpers/town/raid/town-raid-defense', () => ({
-  raidTelegraphClear: vi.fn(),
-}));
-
-vi.mock('@helpers/commission/commission-turn-in', () => ({
-  spendCommissionRequirements: vi.fn(),
-}));
-
-import { spendCommissionRequirements } from '@helpers/commission/commission-turn-in';
+import { ensureItem } from '@helpers/content/ensure-item';
 import { ensureTown } from '@helpers/content/ensure-town';
-import { worldTownsState } from '@helpers/state-game';
+import { applyMaterialDelta } from '@helpers/item/materials';
 import {
   applyRaidBuyoff,
   raidBuyoffCost,
 } from '@helpers/town/raid/town-raid-buyoff';
-import { raidTelegraphClear } from '@helpers/town/raid/town-raid-defense';
-import type {
-  GameState,
-  ItemId,
-  MonsterId,
-  TownId,
-  TownNodeState,
-} from '@interfaces';
+import type { GameState, ItemId, MonsterId, TownId } from '@interfaces';
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 
-const townId = 'larsia' as TownId;
+const goldCoin = ensureItem({ id: 'gold-coin' as ItemId, name: 'Gold Coin' });
+const wood = 'wood' as ItemId;
+const amber = 'amber' as ItemId;
 
-function buildTown(
+function town(
   tributeGoldScalar = 30,
   fortifyMaterials = [
-    { itemId: 'wood' as ItemId, quantityPerAssaulter: 5 },
-    { itemId: 'amber' as ItemId, quantityPerAssaulter: 0.5 },
+    { itemId: wood, quantityPerAssaulter: 5 },
+    { itemId: amber, quantityPerAssaulter: 0.5 },
   ],
 ) {
   return ensureTown({
-    id: townId,
+    id: 'larsia' as TownId,
     name: 'Larsia',
     defense: {
-      rewards: [],
-      guardian: { reputationTiers: [] },
-      assaulter: {
-        numMonsters: 12,
-        monsterIds: [],
-        level: { min: 15, max: 22 },
-      },
-      quests: { commissions: [] },
+      assaulter: { numMonsters: 12, level: { min: 15, max: 22 } },
       buyoff: { tributeGoldScalar, fortifyMaterials },
     },
   });
 }
 
-function buildState(assaulterCount: number | undefined): GameState {
-  const raidTelegraphedAssaulterIds =
-    assaulterCount === undefined
-      ? undefined
-      : Array.from({ length: assaulterCount }, () => 'Bloodmoth' as MonsterId);
-
-  return {
-    world: {
-      towns: {
-        [townId]: {
-          raidTelegraphedAtTick: 100,
-          raidEngageWindowExpiresAtTick: 500,
-          raidTelegraphedAssaulterIds,
-        } as TownNodeState,
-      },
-    },
-  } as unknown as GameState;
+// A raid telegraphed with `assaulters` monsters; undefined = no raid pending.
+function seedRaid(
+  assaulters: number | undefined,
+  edit?: (state: GameState) => void,
+): GameState {
+  return seedGamestate((state) => {
+    state.world.towns[town().id] = buildTownNodeState({
+      raidTelegraphedAtTick: assaulters === undefined ? undefined : 100,
+      raidEngageWindowExpiresAtTick: assaulters === undefined ? undefined : 500,
+      raidTelegraphedAssaulterIds:
+        assaulters === undefined
+          ? undefined
+          : Array.from({ length: assaulters }, () => 'moth' as MonsterId),
+    });
+    edit?.(state);
+  });
 }
 
 beforeEach(() => {
-  vi.clearAllMocks();
+  seedContent([goldCoin, town()]);
 });
 
 describe('raidBuyoffCost', () => {
-  it('scales tribute gold by assaulter count and assaulter level', () => {
-    expect(raidBuyoffCost(buildTown(), 'Tribute', buildState(4))).toEqual([
-      { itemId: 'gold-coin', quantity: 30 * 4 * 22 },
+  it('prices tribute gold by telegraphed assaulters and their top level, rounding up', () => {
+    seedRaid(4);
+    expect(raidBuyoffCost(town(), 'Tribute')).toEqual([
+      { itemId: goldCoin.id, quantity: 30 * 4 * 22 },
+    ]);
+
+    seedRaid(3);
+    expect(raidBuyoffCost(town(0.3), 'Tribute')).toEqual([
+      { itemId: goldCoin.id, quantity: 20 },
     ]);
   });
 
-  it('rounds fractional tribute gold up', () => {
-    expect(raidBuyoffCost(buildTown(0.3), 'Tribute', buildState(3))).toEqual([
-      { itemId: 'gold-coin', quantity: 20 },
+  it('prices fortify materials per telegraphed assaulter, rounding up and skipping free ones', () => {
+    seedRaid(3);
+    const withFreeMaterial = town(30, [
+      { itemId: wood, quantityPerAssaulter: 5 },
+      { itemId: 'free' as ItemId, quantityPerAssaulter: 0 },
+      { itemId: amber, quantityPerAssaulter: 0.5 },
+    ]);
+
+    expect(raidBuyoffCost(withFreeMaterial, 'Fortify')).toEqual([
+      { itemId: wood, quantity: 15 },
+      { itemId: amber, quantity: 2 },
     ]);
   });
 
-  it('scales fortify materials by assaulter count, rounding up', () => {
-    expect(raidBuyoffCost(buildTown(), 'Fortify', buildState(3))).toEqual([
-      { itemId: 'wood', quantity: 15 },
-      { itemId: 'amber', quantity: 2 },
+  it('reads a given state over live state', () => {
+    const twoAssaulters = seedRaid(2);
+    seedRaid(4);
+
+    expect(raidBuyoffCost(town(), 'Tribute', twoAssaulters)).toEqual([
+      { itemId: goldCoin.id, quantity: 30 * 2 * 22 },
     ]);
   });
 
-  it('uses the telegraphed assaulters, not the configured numMonsters', () => {
-    const [tribute] = raidBuyoffCost(buildTown(), 'Tribute', buildState(1));
+  it('is unavailable with no raid pending, or no such option in the town', () => {
+    seedRaid(undefined);
+    expect(raidBuyoffCost(town(), 'Tribute')).toEqual([]);
 
-    expect(tribute.quantity).toBe(30 * 22);
-  });
+    seedRaid(0);
+    expect(raidBuyoffCost(town(), 'Fortify')).toEqual([]);
 
-  it('costs nothing (so is unavailable) when no raid is telegraphed', () => {
-    expect(
-      raidBuyoffCost(buildTown(), 'Tribute', buildState(undefined)),
-    ).toEqual([]);
-    expect(raidBuyoffCost(buildTown(), 'Fortify', buildState(0))).toEqual([]);
-  });
-
-  it('is unavailable when the town configures no such option', () => {
-    const town = buildTown(0, []);
-
-    expect(raidBuyoffCost(town, 'Tribute', buildState(4))).toEqual([]);
-    expect(raidBuyoffCost(town, 'Fortify', buildState(4))).toEqual([]);
-  });
-
-  it('reads the live selector when no state is passed', () => {
-    vi.mocked(worldTownsState).mockReturnValue(buildState(2).world.towns);
-
-    expect(raidBuyoffCost(buildTown(), 'Tribute')).toEqual([
-      { itemId: 'gold-coin', quantity: 30 * 2 * 22 },
-    ]);
+    seedRaid(4);
+    expect(raidBuyoffCost(town(0, []), 'Tribute')).toEqual([]);
+    expect(raidBuyoffCost(town(0, []), 'Fortify')).toEqual([]);
   });
 });
 
 describe('applyRaidBuyoff', () => {
-  it('spends the cost, starts the cooldown, and clears the telegraph', () => {
-    const state = buildState(4);
-    const cost = [{ itemId: 'wood' as ItemId, quantity: 20 }];
-
-    applyRaidBuyoff(state, townId, cost, 1000);
-
-    expect(spendCommissionRequirements).toHaveBeenCalledWith(state, cost);
-    expect(state.world.towns[townId].lastRaidResolvedAtTick).toBe(1000);
-    expect(state.world.towns[townId].craftSpeedDebuffExpiresAtTick).toBe(
-      undefined,
+  it('spends the cost, starts the raid cooldown and ends the raid', () => {
+    const state = structuredClone(
+      seedRaid(4, (draft) => applyMaterialDelta(draft, wood, 25)),
     );
-    expect(raidTelegraphClear).toHaveBeenCalledWith(state, townId, 1000);
+
+    applyRaidBuyoff(state, town().id, [{ itemId: wood, quantity: 20 }], 1000);
+
+    expect(state.materials[wood]?.quantity).toBe(5);
+    expect(state.world.towns[town().id]).toMatchObject({
+      lastRaidResolvedAtTick: 1000,
+      raidTelegraphedAtTick: undefined,
+      raidTelegraphedAssaulterIds: undefined,
+    });
+    expect(
+      state.world.towns[town().id].craftSpeedDebuffExpiresAtTick,
+    ).toBeUndefined();
   });
 
-  it('does nothing for a town with no state', () => {
-    const state = { world: { towns: {} } } as unknown as GameState;
+  it('does nothing for a town without state', () => {
+    const state = structuredClone(
+      seedGamestate((draft) => applyMaterialDelta(draft, wood, 25)),
+    );
 
-    applyRaidBuyoff(state, townId, [], 1000);
+    applyRaidBuyoff(state, town().id, [{ itemId: wood, quantity: 20 }], 1000);
 
-    expect(spendCommissionRequirements).not.toHaveBeenCalled();
-    expect(raidTelegraphClear).not.toHaveBeenCalled();
+    expect(state.materials[wood]?.quantity).toBe(25);
+    expect(state.world.towns[town().id]).toBeUndefined();
   });
 });

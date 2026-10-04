@@ -1,10 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-vi.mock('@helpers/crafting/recipes', () => ({
-  recipeStylizedName: vi.fn(
-    (recipe: { name: string }) => `Stylized: ${recipe.name}`,
-  ),
-}));
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import {
   adventureLogMessageHtml,
@@ -22,179 +16,126 @@ import {
   recipeDropHtml,
   recipeNameHtml,
 } from '@helpers/combat/combat-log';
+import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
+import { recipeStylizedName } from '@helpers/crafting/recipes';
+import { ensureMonster } from '@helpers/content/ensure-monster';
+import { ensureRecipe } from '@helpers/content/ensure-recipe';
+import { ensureTradeskill } from '@helpers/content/ensure-tradeskill';
 import type {
-  Combat,
   Combatant,
-  EquipmentContent,
-  ItemContent,
-  RecipeContent,
+  EquipmentId,
+  ItemId,
+  MonsterId,
+  RecipeId,
+  TradeskillId,
 } from '@interfaces';
+import {
+  buildCharacter,
+  buildCombat,
+  buildHeroCombatant,
+  buildMonsterCombatant,
+} from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+
+const withHealth = (combatant: Combatant, hp: number, maxHp: number) => ({
+  ...combatant,
+  hp,
+  totalStats: { ...combatant.totalStats, Health: maxHp },
+});
+
+const jala = withHealth(
+  buildHeroCombatant(buildCharacter({ name: 'Jala' }), { sprite: '0000' }),
+  12,
+  20,
+);
+const goblin = withHealth(
+  buildMonsterCombatant(
+    ensureMonster({ id: 'goblin' as MonsterId, name: 'Goblin' }),
+    { sprite: '0011' },
+  ),
+  2,
+  10,
+);
+
+const copperOre = ensureItem({
+  id: 'copper-ore' as ItemId,
+  name: 'Copper Ore',
+  rarity: 'Uncommon',
+});
+const goblinSkull = ensureEquipment({
+  id: 'goblin-skull' as EquipmentId,
+  name: 'Goblin Skull',
+  rarity: 'Uncommon',
+});
+const tailoring = ensureTradeskill({
+  id: 'tailoring' as TradeskillId,
+  name: 'Tailoring',
+});
+const cloakRecipe = ensureRecipe({
+  id: 'cloak' as RecipeId,
+  name: 'Equipment: Bone-Hewn Cloak',
+  tradeskillId: tailoring.id,
+});
+
+const snapshotOf = (combatant: Combatant, spritesheet: string) => ({
+  id: combatant.id,
+  name: combatant.name,
+  hp: combatant.hp,
+  maxHp: combatant.totalStats.Health,
+  sprite: combatant.sprite,
+  spritesheet,
+});
+
+function logOne(...args: Parameters<typeof combatMessageLog>) {
+  beginCombatLogCommits();
+  combatMessageLog(...args);
+  endCombatLogCommits();
+  return combatLog()[0];
+}
 
 describe('combatMessageLog', () => {
   beforeEach(() => {
     combatLogReset();
   });
 
-  it('snapshots every hero/guardian id+name+hp+maxHp+sprite onto the entry, not just the actor', () => {
-    const hero = {
-      id: 'hero-1',
-      name: 'Jala',
-      isEnemy: false,
-      sprite: '0000',
-      hp: 12,
-      totalStats: { Health: 20 },
-    } as unknown as Combatant;
-    const guardian = {
-      id: 'guardian-1',
-      name: 'Goblin',
-      isEnemy: true,
-      monsterId: 'goblin-monster',
-      sprite: '0011',
-      hp: 2,
-      totalStats: { Health: 10 },
-    } as unknown as Combatant;
-    const combat = {
-      id: 'combat-1',
-      locationName: 'Field Ruins',
-      heroes: [hero],
-      guardians: [guardian],
-    } as unknown as Combat;
+  it('snapshots every hero and guardian onto the entry, not just the actor', () => {
+    const combat = buildCombat({ heroes: [jala], guardians: [goblin] });
 
-    beginCombatLogCommits();
-    combatMessageLog(combat, '**Jala** attacks **Goblin**.', hero);
-    endCombatLogCommits();
-
-    expect(combatLog()[0]).toMatchObject({
+    expect(logOne(combat, '**Jala** attacks **Goblin**.', jala)).toMatchObject({
       spritesheet: 'hero',
-      combatants: [
-        {
-          id: 'hero-1',
-          name: 'Jala',
-          hp: 12,
-          maxHp: 20,
-          sprite: '0000',
-          spritesheet: 'job',
-        },
-        {
-          id: 'guardian-1',
-          name: 'Goblin',
-          hp: 2,
-          maxHp: 10,
-          sprite: '0011',
-          spritesheet: 'monster',
-        },
-      ],
+      combatants: [snapshotOf(jala, 'job'), snapshotOf(goblin, 'monster')],
     });
-  });
-
-  it('hoists an icon token in front of every bolded `@@id@@` name token in the message', () => {
-    const hero = {
-      id: 'hero-1',
-      name: 'Jala',
-      totalStats: { Health: 20 },
-    } as unknown as Combatant;
-    const guardian = {
-      id: 'guardian-1',
-      name: 'Goblin',
-      totalStats: { Health: 10 },
-    } as unknown as Combatant;
-    const combat = {
-      id: 'combat-1',
-      locationName: 'Field Ruins',
-      heroes: [hero],
-      guardians: [guardian],
-    } as unknown as Combat;
-
-    beginCombatLogCommits();
-    combatMessageLog(
-      combat,
-      `**${combatantMessageToken(hero)}** attacks **${combatantMessageToken(guardian)}** for 8 damage.`,
-    );
-    endCombatLogCommits();
-
-    expect(combatLog()[0].message).toBe(
-      '@@icon-hero-1@@**@@hero-1@@** attacks @@icon-guardian-1@@**@@guardian-1@@** for 8 damage.',
-    );
-  });
-
-  it('leaves a non-tokenized bold segment (e.g. a skill name) untouched by the icon hoist', () => {
-    const combat = {
-      id: 'combat-1',
-      locationName: 'Field Ruins',
-      heroes: [],
-      guardians: [],
-    } as unknown as Combat;
-
-    beginCombatLogCommits();
-    combatMessageLog(combat, '**Slash** strikes again!');
-    endCombatLogCommits();
-
-    expect(combatLog()[0].message).toBe('**Slash** strikes again!');
-  });
-
-  it('still snapshots the roster when there is no actor', () => {
-    const hero = {
-      id: 'hero-1',
-      name: 'Jala',
-      hp: 12,
-      totalStats: { Health: 20 },
-    } as unknown as Combatant;
-    const combat = {
-      id: 'combat-1',
-      locationName: 'Field Ruins',
-      heroes: [hero],
-      guardians: [],
-    } as unknown as Combat;
-
-    beginCombatLogCommits();
-    combatMessageLog(combat, 'Combat is over.');
-    endCombatLogCommits();
-
-    expect(combatLog()[0].combatants).toEqual([
-      {
-        id: 'hero-1',
-        name: 'Jala',
-        hp: 12,
-        maxHp: 20,
-        sprite: '',
-        spritesheet: 'job',
-      },
+    expect(logOne(combat, 'Combat is over.').combatants).toEqual([
+      snapshotOf(jala, 'job'),
+      snapshotOf(goblin, 'monster'),
     ]);
   });
 
-  it('stores the icon sprite/spritesheet onto the entry when given', () => {
-    const combat = {
-      id: 'combat-1',
-      locationName: 'Field Ruins',
-      heroes: [],
-      guardians: [],
-    } as unknown as Combat;
+  it('puts an icon token in front of every bolded combatant token, leaving other bold text alone', () => {
+    const combat = buildCombat({ heroes: [jala], guardians: [goblin] });
 
-    beginCombatLogCommits();
-    combatMessageLog(combat, 'The party found copper ore!', undefined, {
-      sprite: 'copper-ore',
-      spritesheet: 'item',
-    });
-    endCombatLogCommits();
-
-    expect(combatLog()[0].itemIcons).toEqual([
-      { sprite: 'copper-ore', spritesheet: 'item' },
-    ]);
+    expect(
+      logOne(
+        combat,
+        `**${combatantMessageToken(jala)}** uses **Slash** on **${combatantMessageToken(goblin)}**.`,
+      ).message,
+    ).toBe(
+      `@@icon-${jala.id}@@**@@${jala.id}@@** uses **Slash** on @@icon-${goblin.id}@@**@@${goblin.id}@@**.`,
+    );
   });
 
-  it('leaves the icon fields undefined without one', () => {
-    const combat = {
-      id: 'combat-1',
-      locationName: 'Field Ruins',
-      heroes: [],
-      guardians: [],
-    } as unknown as Combat;
+  it('stores item icons only when given', () => {
+    const combat = buildCombat();
 
-    beginCombatLogCommits();
-    combatMessageLog(combat, 'Combat is over.');
-    endCombatLogCommits();
+    expect(
+      logOne(combat, 'The party found copper ore!', undefined, {
+        sprite: 'copper-ore',
+        spritesheet: 'item',
+      }).itemIcons,
+    ).toEqual([{ sprite: 'copper-ore', spritesheet: 'item' }]);
 
-    expect(combatLog()[0].itemIcons).toBeUndefined();
+    combatLogReset();
+    expect(logOne(combat, 'Combat is over.').itemIcons).toBeUndefined();
   });
 });
 
@@ -233,8 +174,7 @@ describe('categoryMessageLog', () => {
 
 describe('combatantMessageToken', () => {
   it('embeds the combatant id in an opaque, id-addressable token', () => {
-    const combatant = { id: 'hero-1' } as unknown as Combatant;
-    expect(combatantMessageToken(combatant)).toBe('@@hero-1@@');
+    expect(combatantMessageToken(jala)).toBe(`@@${jala.id}@@`);
   });
 });
 
@@ -260,7 +200,7 @@ describe('adventureLogMessageHtml', () => {
 
 describe('itemNameHtml', () => {
   it('wraps the item name in a rarity-colored span', () => {
-    const item = { name: 'Copper Ore', rarity: 'Uncommon' } as ItemContent;
+    const item = copperOre;
 
     expect(itemNameHtml(item)).toBe(
       '<span class="text-Uncommon type-entity-name">Copper Ore</span>',
@@ -268,7 +208,7 @@ describe('itemNameHtml', () => {
   });
 
   it('uses the given display name instead of the item name when provided', () => {
-    const item = { name: 'Copper Ore', rarity: 'Uncommon' } as ItemContent;
+    const item = copperOre;
 
     expect(itemNameHtml(item, 'copper ores')).toBe(
       '<span class="text-Uncommon type-entity-name">copper ores</span>',
@@ -278,7 +218,7 @@ describe('itemNameHtml', () => {
 
 describe('itemDropHtml', () => {
   it('keeps the singular form for a quantity of 1', () => {
-    const item = { name: 'Copper Ore', rarity: 'Uncommon' } as ItemContent;
+    const item = copperOre;
 
     expect(itemDropHtml(item, 1)).toBe(
       '1 <span class="text-Uncommon type-entity-name">copper ore</span>',
@@ -286,7 +226,7 @@ describe('itemDropHtml', () => {
   });
 
   it('pluralizes the name for quantities greater than 1', () => {
-    const item = { name: 'Copper Ore', rarity: 'Uncommon' } as ItemContent;
+    const item = copperOre;
 
     expect(itemDropHtml(item, 3)).toBe(
       '3 <span class="text-Uncommon type-entity-name">copper ores</span>',
@@ -296,10 +236,7 @@ describe('itemDropHtml', () => {
 
 describe('equipmentNameHtml', () => {
   it('wraps the equipment name in a rarity-colored span', () => {
-    const equipment = {
-      name: 'Goblin Skull',
-      rarity: 'Uncommon',
-    } as EquipmentContent;
+    const equipment = goblinSkull;
 
     expect(equipmentNameHtml(equipment)).toBe(
       '<span class="text-Uncommon type-entity-name">Goblin Skull</span>',
@@ -309,10 +246,7 @@ describe('equipmentNameHtml', () => {
 
 describe('equipmentDropHtml', () => {
   it('renders the same rarity-colored span as equipmentNameHtml, with no quantity', () => {
-    const equipment = {
-      name: 'Goblin Skull',
-      rarity: 'Uncommon',
-    } as EquipmentContent;
+    const equipment = goblinSkull;
 
     expect(equipmentDropHtml(equipment)).toBe(
       '<span class="text-Uncommon type-entity-name">Goblin Skull</span>',
@@ -322,20 +256,18 @@ describe('equipmentDropHtml', () => {
 
 describe('recipeNameHtml', () => {
   it('wraps the recipe stylized name in a plain span, with no rarity color', () => {
-    const recipe = { name: 'Equipment: Bone-Hewn Cloak' } as RecipeContent;
+    seedContent([tailoring]);
 
-    expect(recipeNameHtml(recipe)).toBe(
-      '<span class="type-entity-name">Stylized: Equipment: Bone-Hewn Cloak</span>',
+    expect(recipeNameHtml(cloakRecipe)).toBe(
+      `<span class="type-entity-name">${recipeStylizedName(cloakRecipe)}</span>`,
     );
   });
 });
 
 describe('recipeDropHtml', () => {
   it('renders the same span as recipeNameHtml, with no quantity', () => {
-    const recipe = { name: 'Equipment: Bone-Hewn Cloak' } as RecipeContent;
+    seedContent([tailoring]);
 
-    expect(recipeDropHtml(recipe)).toBe(
-      '<span class="type-entity-name">Stylized: Equipment: Bone-Hewn Cloak</span>',
-    );
+    expect(recipeDropHtml(cloakRecipe)).toBe(recipeNameHtml(cloakRecipe));
   });
 });

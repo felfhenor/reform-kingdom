@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { setAllContentById } from '@helpers/content/content';
 import { ensureTrainer } from '@helpers/content/ensure-trainer';
 import { defaultEquipment, defaultGameState } from '@helpers/defaults';
 import { taskStateRequirementSatisfied } from '@helpers/task/task-requirement-state';
@@ -9,19 +8,23 @@ import type {
   CollectibleId,
   EquipmentId,
   EquipmentItem,
-  EquipmentItemId,
   GameState,
   IsContentItem,
   ItemId,
   JobId,
   MonsterId,
   TownId,
-  TownNodeState,
   TradeskillId,
   TrainerId,
   TrainerTeachingId,
   WorkerId,
 } from '@interfaces';
+import { seedContent } from '@/testing/content';
+import {
+  buildCharacter,
+  buildEquipmentItem,
+  buildTownNodeState,
+} from '@/testing/builders';
 
 const TRAINER = 'trainer-reyn' as TrainerId;
 const TEACHING = 'teaching-health' as TrainerTeachingId;
@@ -39,23 +42,18 @@ function hero(
   teachings: TrainerTeachingId[] = [],
   overrides: Partial<Character> = {},
 ): Character {
-  return {
+  return buildCharacter({
     jobId: WARRIOR,
     level,
-    jobProgress: {},
     teachings: { [WARRIOR]: teachings },
-    equipment: defaultEquipment(),
     ...overrides,
-  } as unknown as Character;
+  });
 }
 
 function equipmentItem(infusedItemIds: (ItemId | null)[]): EquipmentItem {
-  return {
-    id: 'armory-1' as EquipmentItemId,
-    equipmentId: 'equipment-sword' as EquipmentId,
+  return buildEquipmentItem('equipment-sword' as EquipmentId, {
     infusedItemIds,
-    affixIds: [],
-  };
+  });
 }
 
 function withTradeskillLevel(state: GameState, level: number): GameState {
@@ -75,7 +73,7 @@ beforeEach(() => {
       trainerTeachingIds: [TEACHING],
     }),
   ];
-  setAllContentById(new Map(content.map((entry) => [entry.id, entry])));
+  seedContent(content);
 });
 
 describe('taskStateRequirementSatisfied', () => {
@@ -189,10 +187,10 @@ describe('taskStateRequirementSatisfied', () => {
       tier: 2,
     };
 
-    state.world.towns[TOWN] = { reputation: 599 } as unknown as TownNodeState;
+    state.world.towns[TOWN] = buildTownNodeState({ reputation: 599 });
     expect(taskStateRequirementSatisfied(state, requirement)).toBe(false);
 
-    state.world.towns[TOWN] = { reputation: 600 } as unknown as TownNodeState;
+    state.world.towns[TOWN] = buildTownNodeState({ reputation: 600 });
     expect(taskStateRequirementSatisfied(state, requirement)).toBe(true);
   });
 
@@ -200,13 +198,13 @@ describe('taskStateRequirementSatisfied', () => {
     const state = defaultGameState();
     const requirement = { kind: 'VisitTown' as const, townId: TOWN };
 
-    state.world.towns[TOWN] = { reputation: 0 } as unknown as TownNodeState;
+    state.world.towns[TOWN] = buildTownNodeState({ reputation: 0 });
     expect(taskStateRequirementSatisfied(state, requirement)).toBe(false);
 
-    state.world.towns[TOWN] = {
+    state.world.towns[TOWN] = buildTownNodeState({
       reputation: 0,
       firstVisitedAtTick: 0,
-    } as unknown as TownNodeState;
+    });
     expect(taskStateRequirementSatisfied(state, requirement)).toBe(true);
   });
 

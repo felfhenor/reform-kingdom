@@ -1,20 +1,8 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    worldTownsState: () => gamestate().world.towns,
-  };
-});
-
-import { getEntry } from '@helpers/content/content';
+import { ensureItem } from '@helpers/content/ensure-item';
 import { ensureTown } from '@helpers/content/ensure-town';
-import { gamestate } from '@helpers/state-game';
+import { defaultGameState } from '@helpers/defaults';
 import {
   applyTownMaterialDelta,
   depositCommissionRequirementsToTown,
@@ -22,117 +10,98 @@ import {
   townDefaultMaterials,
   townMaterialQuantity,
 } from '@helpers/town/town-materials';
-import type { EquipmentId, GameState, ItemId, TownId } from '@interfaces';
+import type {
+  EquipmentId,
+  GameState,
+  ItemId,
+  MonsterId,
+  TownId,
+  TownMaterials,
+} from '@interfaces';
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 
 const townId = 'larsia' as TownId;
-const oreId = 'copper-ore' as ItemId;
+const ore = 'copper-ore' as ItemId;
 
-function buildState(materials: Partial<Record<ItemId, number>>): GameState {
-  const state = {
-    world: { towns: { [townId]: { materials } } },
-  } as unknown as GameState;
+function stateWith(materials: TownMaterials): GameState {
+  const state = defaultGameState();
+  state.world.towns[townId] = buildTownNodeState({ materials });
   return state;
 }
 
-beforeEach(() => {
-  vi.clearAllMocks();
-});
+const materialsOf = (state: GameState) => state.world.towns[townId].materials;
 
 describe('applyTownMaterialDelta', () => {
-  it('adds a new material entry', () => {
-    const state = buildState({});
+  it('adds to the stash, dropping an entry once it runs out', () => {
+    const state = stateWith({});
 
-    applyTownMaterialDelta(state, townId, oreId, 5);
+    applyTownMaterialDelta(state, townId, ore, 5);
+    applyTownMaterialDelta(state, townId, ore, 3);
+    expect(materialsOf(state)).toEqual({ [ore]: 8 });
 
-    expect(state.world.towns[townId].materials).toEqual({ [oreId]: 5 });
+    applyTownMaterialDelta(state, townId, ore, -10);
+    expect(materialsOf(state)).toEqual({});
   });
 
-  it('adds to an existing material entry', () => {
-    const state = buildState({ [oreId]: 3 });
+  it('ignores a town with no state yet', () => {
+    const state = defaultGameState();
 
-    applyTownMaterialDelta(state, townId, oreId, 5);
+    applyTownMaterialDelta(state, townId, ore, 5);
 
-    expect(state.world.towns[townId].materials).toEqual({ [oreId]: 8 });
-  });
-
-  it('clamps at 0 and drops the entry once depleted', () => {
-    const state = buildState({ [oreId]: 3 });
-
-    applyTownMaterialDelta(state, townId, oreId, -10);
-
-    expect(state.world.towns[townId].materials).toEqual({});
-  });
-
-  it('does nothing when the town has no state entry', () => {
-    const state = { world: { towns: {} } } as unknown as GameState;
-
-    expect(() => applyTownMaterialDelta(state, townId, oreId, 5)).not.toThrow();
     expect(state.world.towns[townId]).toBeUndefined();
   });
 });
 
 describe('townMaterialQuantity', () => {
-  it('returns the stored quantity', () => {
-    vi.mocked(gamestate).mockReturnValue(buildState({ [oreId]: 12 }));
+  it('reads the stash, 0 for anything not held', () => {
+    seedGamestate(
+      (state) =>
+        (state.world.towns[townId] = buildTownNodeState({
+          materials: { [ore]: 12 },
+        })),
+    );
 
-    expect(townMaterialQuantity(townId, oreId)).toBe(12);
-  });
-
-  it('returns 0 when the town or item has no entry', () => {
-    vi.mocked(gamestate).mockReturnValue(buildState({}));
-
-    expect(townMaterialQuantity(townId, oreId)).toBe(0);
+    expect(townMaterialQuantity(townId, ore)).toBe(12);
+    expect(townMaterialQuantity(townId, 'amber' as ItemId)).toBe(0);
+    expect(townMaterialQuantity('unvisited' as TownId, ore)).toBe(0);
   });
 });
 
 describe('depositCommissionRequirementsToTown', () => {
-  it('adds each item requirement to the town materials stash', () => {
-    const state = buildState({ [oreId]: 3 });
+  it('stashes item requirements only', () => {
+    const state = stateWith({ [ore]: 3 });
 
     depositCommissionRequirementsToTown(state, townId, [
-      { itemId: oreId, quantity: 5 },
-    ]);
-
-    expect(state.world.towns[townId].materials).toEqual({ [oreId]: 8 });
-  });
-
-  it('skips equipment and monster-kill requirements', () => {
-    const state = buildState({});
-
-    depositCommissionRequirementsToTown(state, townId, [
+      { itemId: ore, quantity: 5 },
       { equipmentId: 'sword' as EquipmentId, quantity: 1 },
-      { monsterId: 'wolf' as never, quantity: 1, progress: 1 },
+      { monsterId: 'wolf' as MonsterId, quantity: 1, progress: 1 },
     ]);
 
-    expect(state.world.towns[townId].materials).toEqual({});
+    expect(materialsOf(state)).toEqual({ [ore]: 8 });
   });
 });
 
 describe('pruneInvalidTownMaterials', () => {
-  it('keeps entries that resolve to real content', () => {
-    vi.mocked(getEntry).mockReturnValue({} as never);
+  it('drops materials gone from content', () => {
+    seedContent([ensureItem({ id: ore, name: 'Copper Ore' })]);
 
-    expect(pruneInvalidTownMaterials({ [oreId]: 5 })).toEqual({
-      [oreId]: 5,
-    });
-  });
-
-  it('drops entries whose itemId no longer resolves', () => {
-    vi.mocked(getEntry).mockReturnValue(undefined);
-
-    expect(pruneInvalidTownMaterials({ [oreId]: 5 })).toEqual({});
+    expect(
+      pruneInvalidTownMaterials({ [ore]: 5, ['gone' as ItemId]: 2 }),
+    ).toEqual({ [ore]: 5 });
   });
 });
 
 describe('townDefaultMaterials', () => {
-  it('maps each threshold with a positive default and skips the rest', () => {
+  it('starts the stash from each threshold with a positive default', () => {
     const town = ensureTown({
       materialThresholds: [
-        { itemId: oreId, default: 30 },
+        { itemId: ore, default: 30 },
         { itemId: 'amber' as ItemId },
       ],
     });
 
-    expect(townDefaultMaterials(town)).toEqual({ [oreId]: 30 });
+    expect(townDefaultMaterials(town)).toEqual({ [ore]: 30 });
   });
 });

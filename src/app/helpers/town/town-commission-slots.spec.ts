@@ -1,43 +1,25 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
+import { ensureCommissionOffer } from '@helpers/content/ensure-commission';
 import { pruneInvalidTownCommissionSlots } from '@helpers/town/town-commission-slots';
-import { getEntry } from '@helpers/content/content';
-import type {
-  CommissionOfferContent,
-  CommissionOfferId,
-  TownCommissionSlotId,
-} from '@interfaces';
+import type { CommissionOfferId, TownCommissionSlotId } from '@interfaces';
+import { seedContent } from '@/testing/content';
+
+const slotFor = (offerId: string) => ({
+  id: `slot-${offerId}` as TownCommissionSlotId,
+  commissionOfferId: offerId as CommissionOfferId,
+  requirements: [],
+  generatedAtTick: 0,
+});
 
 describe('pruneInvalidTownCommissionSlots', () => {
-  it('keeps a slot whose commissionOfferId still resolves to real content', () => {
-    vi.mocked(getEntry).mockReturnValue({} as CommissionOfferContent);
-    const slots = [
-      {
-        id: 'slot-1' as TownCommissionSlotId,
-        commissionOfferId: 'offer-a' as CommissionOfferId,
-        requirements: [],
-        generatedAtTick: 0,
-      },
-    ];
+  it('drops slots whose offer is gone from content', () => {
+    seedContent([
+      ensureCommissionOffer({ id: 'offer-a' as CommissionOfferId }),
+    ]);
 
-    expect(pruneInvalidTownCommissionSlots(slots)).toEqual(slots);
-  });
-
-  it('drops a slot whose commissionOfferId no longer resolves to real content', () => {
-    vi.mocked(getEntry).mockReturnValue(undefined);
-    const slots = [
-      {
-        id: 'slot-1' as TownCommissionSlotId,
-        commissionOfferId: 'offer-a' as CommissionOfferId,
-        requirements: [],
-        generatedAtTick: 0,
-      },
-    ];
-
-    expect(pruneInvalidTownCommissionSlots(slots)).toEqual([]);
+    expect(
+      pruneInvalidTownCommissionSlots([slotFor('offer-a'), slotFor('gone')]),
+    ).toEqual([slotFor('offer-a')]);
   });
 });

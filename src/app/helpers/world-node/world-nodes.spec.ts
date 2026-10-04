@@ -3,7 +3,6 @@ import type {
   CaravanId,
   EncounterContent,
   GameMap,
-  GlobalEffectId,
   NodeOverrideContent,
   NodeOverrideId,
   TiledLayer,
@@ -15,25 +14,20 @@ import type {
   TownId,
   WorldNodeEntry,
   CollectibleId,
+  EncounterId,
+  TownContentInput,
 } from '@interfaces';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/world-node/world-node-discovery', () => ({
-  isWorldNodeDiscovered: vi.fn(() => false),
-  worldNodeDiscover: vi.fn(),
-}));
-
-vi.mock('@helpers/item/collectibles', () => ({
-  isCollectibleDiscovered: vi.fn(() => true),
-}));
-
-import { setAllContentById, setAllIdsByName } from '@helpers/content/content';
-import { isCollectibleDiscovered } from '@helpers/item/collectibles';
-import { setAllMaps } from '@helpers/maps';
-import {
-  isWorldNodeDiscovered,
-  worldNodeDiscover,
-} from '@helpers/world-node/world-node-discovery';
+import { ensureCaravan } from '@helpers/content/ensure-caravan';
+import { ensureEncounter } from '@helpers/content/ensure-encounternode';
+import { ensureNodeOverride } from '@helpers/content/ensure-nodeoverride';
+import { ensureTown } from '@helpers/content/ensure-town';
+import { ensureTrainer } from '@helpers/content/ensure-trainer';
+import { seedContent } from '@/testing/content';
+import { applyCollectibleGrant } from '@helpers/item/collectibles';
+import { seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 import {
   isWorldNodeCollectibleGateMet,
   isWorldNodeHidden,
@@ -44,6 +38,18 @@ import {
   worldNodeTown,
   worldNodeTrainer,
 } from '@helpers/world-node/world-nodes';
+
+function found({
+  node = false,
+  collectibles = [],
+}: { node?: boolean; collectibles?: string[] } = {}): void {
+  seedGamestate((state) => {
+    if (node) state.worldDiscoveries['Forest Ruins'] = { foundAt: 1 };
+    collectibles.forEach((id) =>
+      applyCollectibleGrant(state, id as CollectibleId, 1),
+    );
+  });
+}
 
 function buildObject(overrides: Partial<TiledObject>): TiledObject {
   return {
@@ -160,133 +166,60 @@ describe('worldNodeMapsBuild', () => {
   });
 });
 
-function buildEntry(nodeData: Partial<TiledObject> = {}): WorldNodeEntry {
-  return {
-    mapName: 'Carrina',
-    x: 24,
-    y: 24,
-    nodeName: 'Forest Ruins',
-    nodeData: buildObject(nodeData),
-  };
+function buildEntry(): WorldNodeEntry {
+  return seedWorldNodes([{ name: 'Forest Ruins', type: 'ExploreNode' }])[
+    'Forest Ruins'
+  ];
 }
 
 function buildEncounter(
   overrides: Partial<EncounterContent> = {},
 ): EncounterContent {
-  return {
-    id: 'encounter-forest-ruins',
+  return ensureEncounter({
+    id: 'encounter-forest-ruins' as EncounterId,
     name: 'Forest Ruins',
-    __type: 'encounter',
-    description: 'A crumbling ruin at the edge of the forest.',
     levelRange: { min: 1, max: 3 },
-    fights: [],
-    invisibleUntilCollectibleIdsFound: [],
     ...overrides,
-  } as EncounterContent;
-}
-
-function seedEncounter(encounter: EncounterContent): void {
-  setAllIdsByName(new Map([[encounter.name, encounter.id]]));
-  setAllContentById(new Map([[encounter.id, encounter]]));
-}
-
-function seedContent(
-  entries: Array<{ id: string; name: string } & Record<string, unknown>>,
-): void {
-  setAllIdsByName(new Map(entries.map((entry) => [entry.name, entry.id])));
-  setAllContentById(
-    new Map(entries.map((entry) => [entry.id, entry as never])),
-  );
+  });
 }
 
 function buildNodeOverride(
   overrides: Partial<NodeOverrideContent> = {},
 ): NodeOverrideContent {
-  return {
+  return ensureNodeOverride({
     id: 'override-forest-ruins' as NodeOverrideId,
     name: 'Forest Ruins',
-    __type: 'nodeoverride',
-    description: 'A hand-authored blurb for this node.',
     ...overrides,
-  };
+  });
 }
 
 function buildCaravan(overrides: Partial<CaravanContent> = {}): CaravanContent {
-  return {
+  return ensureCaravan({
     id: 'caravan-forest-ruins' as CaravanId,
     name: 'Forest Ruins',
-    __type: 'caravan',
-    description: 'A caravan camped at the edge of the forest.',
-    traderResetTime: 3600,
-    level: { min: 1, max: 3 },
-    markupPercentages: { sell: 0, buy: 0 },
-    traderCategories: [],
-    commissionOffers: [],
     ...overrides,
-  };
+  });
 }
 
-function buildTown(overrides: Partial<TownContent> = {}): TownContent {
-  return {
+function buildTown(overrides: TownContentInput = {}): TownContent {
+  return ensureTown({
     id: 'town-forest-ruins' as TownId,
     name: 'Forest Ruins',
-    __type: 'town',
-    description: 'A town at the edge of the forest.',
-    scaleType: 'Outpost',
     level: 5,
-    materialThresholds: [],
-    crafting: {
-      maxQueueSize: [{ tier: 0, value: 1 }],
-      specialtyTradeskillId: 'UNKNOWN' as never,
-      craftingDurationMultiplier: 1,
-      craftingChanceOnTick: 100,
-      craftingChanceItemThreshold: 1,
-      tradeskillLevels: [],
-      uniqueRecipeIds: [],
-      bannedRecipeIds: [],
-    },
-    traders: {
-      sellItemCount: [{ tier: 0, value: 0 }],
-      itemExpirationTimer: 0,
-      markupPercentages: { sell: 0, buy: 0 },
-    },
-    gathering: {
-      gatherRateMultiplier: 1,
-      goldGatheredPerMaterial: 0,
-      workers: [],
-    },
-    reputation: {
-      buff: { globalEffectId: 'UNKNOWN' as GlobalEffectId, tiers: [] },
-    },
-    defense: {
-      rewards: [],
-      guardian: { reputationTiers: [] },
-      assaulter: { numMonsters: 0, monsterIds: [], level: { min: 1, max: 1 } },
-      quests: { commissions: [] },
-      buyoff: { tributeGoldScalar: 0, fortifyMaterials: [] },
-    },
     ...overrides,
-  };
+  });
 }
 
 describe('encounter-backed node accessors', () => {
-  beforeEach(() => {
-    setAllIdsByName(new Map());
-    setAllContentById(new Map());
-    vi.mocked(isWorldNodeDiscovered).mockReturnValue(false);
-    vi.mocked(isCollectibleDiscovered).mockReset().mockReturnValue(true);
-    vi.mocked(worldNodeDiscover).mockClear();
-  });
-
   describe('isWorldNodeHidden', () => {
-    it('is true when the matching encounter is authored hidden', () => {
-      seedEncounter(buildEncounter({ hidden: true }));
+    it('is true when the matching encounter is marked hidden', () => {
+      seedContent([buildEncounter({ hidden: true })]);
 
       expect(isWorldNodeHidden(buildEntry())).toBe(true);
     });
 
     it('is false when the matching encounter is not hidden', () => {
-      seedEncounter(buildEncounter({ hidden: false }));
+      seedContent([buildEncounter({ hidden: false })]);
 
       expect(isWorldNodeHidden(buildEntry())).toBe(false);
     });
@@ -295,7 +228,7 @@ describe('encounter-backed node accessors', () => {
       expect(isWorldNodeHidden(buildEntry())).toBe(false);
     });
 
-    it('is true when the matching town is authored hidden', () => {
+    it('is true when the matching town is marked hidden', () => {
       seedContent([buildTown({ hidden: true })]);
 
       expect(isWorldNodeHidden(buildEntry())).toBe(true);
@@ -304,45 +237,43 @@ describe('encounter-backed node accessors', () => {
 
   describe('isWorldNodeVisible', () => {
     it('is true for a non-hidden node', () => {
-      seedEncounter(buildEncounter({ hidden: false }));
+      seedContent([buildEncounter({ hidden: false })]);
 
       expect(isWorldNodeVisible(buildEntry())).toBe(true);
     });
 
     it('is false for a hidden node that has not been discovered', () => {
-      seedEncounter(buildEncounter({ hidden: true }));
-      vi.mocked(isWorldNodeDiscovered).mockReturnValue(false);
+      seedContent([buildEncounter({ hidden: true })]);
 
       expect(isWorldNodeVisible(buildEntry())).toBe(false);
     });
 
     it('is true for a hidden node that has been discovered', () => {
-      seedEncounter(buildEncounter({ hidden: true }));
-      vi.mocked(isWorldNodeDiscovered).mockReturnValue(true);
+      seedContent([buildEncounter({ hidden: true })]);
+      found({ node: true });
 
       expect(isWorldNodeVisible(buildEntry())).toBe(true);
     });
 
     it('is false for a collectible-gated node whose gate is unmet, even though it is not hidden', () => {
-      seedEncounter(
+      seedContent([
         buildEncounter({
           hidden: false,
           invisibleUntilCollectibleIdsFound: ['Gobweb' as CollectibleId],
         }),
-      );
-      vi.mocked(isCollectibleDiscovered).mockReturnValue(false);
+      ]);
 
       expect(isWorldNodeVisible(buildEntry())).toBe(false);
     });
 
     it('is true for a collectible-gated node once every required collectible is found', () => {
-      seedEncounter(
+      seedContent([
         buildEncounter({
           hidden: false,
           invisibleUntilCollectibleIdsFound: ['Gobweb' as CollectibleId],
         }),
-      );
-      vi.mocked(isCollectibleDiscovered).mockReturnValue(true);
+      ]);
+      found({ collectibles: ['Gobweb', 'ruby'] });
 
       expect(isWorldNodeVisible(buildEntry())).toBe(true);
     });
@@ -350,35 +281,32 @@ describe('encounter-backed node accessors', () => {
 
   describe('isWorldNodeCollectibleGateMet', () => {
     it('is vacuously true for a node with no gate', () => {
-      seedEncounter(buildEncounter());
+      seedContent([buildEncounter()]);
 
       expect(isWorldNodeCollectibleGateMet(buildEntry())).toBe(true);
-      expect(isCollectibleDiscovered).not.toHaveBeenCalled();
     });
 
     it('is false when any required collectible has not been found', () => {
-      seedEncounter(
+      seedContent([
         buildEncounter({
           invisibleUntilCollectibleIdsFound: [
             'Gobweb' as CollectibleId,
             'Venom Orb' as CollectibleId,
           ],
         }),
-      );
-      vi.mocked(isCollectibleDiscovered).mockImplementation(
-        (id) => id === 'Gobweb',
-      );
+      ]);
+      found({ collectibles: ['Gobweb'] });
 
       expect(isWorldNodeCollectibleGateMet(buildEntry())).toBe(false);
     });
 
     it('is true once every required collectible has been found', () => {
-      seedEncounter(
+      seedContent([
         buildEncounter({
           invisibleUntilCollectibleIdsFound: ['Gobweb' as CollectibleId],
         }),
-      );
-      vi.mocked(isCollectibleDiscovered).mockReturnValue(true);
+      ]);
+      found({ collectibles: ['Gobweb', 'ruby'] });
 
       expect(isWorldNodeCollectibleGateMet(buildEntry())).toBe(true);
     });
@@ -389,11 +317,10 @@ describe('encounter-backed node accessors', () => {
           invisibleUntilCollectibleIdsFound: ['Gobweb' as CollectibleId],
         }),
       ]);
-      vi.mocked(isCollectibleDiscovered).mockReturnValue(false);
 
       expect(isWorldNodeCollectibleGateMet(buildEntry())).toBe(false);
 
-      vi.mocked(isCollectibleDiscovered).mockReturnValue(true);
+      found({ collectibles: ['Gobweb', 'ruby'] });
 
       expect(isWorldNodeCollectibleGateMet(buildEntry())).toBe(true);
     });
@@ -404,11 +331,10 @@ describe('encounter-backed node accessors', () => {
           invisibleUntilCollectibleIdsFound: ['Gobweb' as CollectibleId],
         }),
       ]);
-      vi.mocked(isCollectibleDiscovered).mockReturnValue(false);
 
       expect(isWorldNodeCollectibleGateMet(buildEntry())).toBe(false);
 
-      vi.mocked(isCollectibleDiscovered).mockReturnValue(true);
+      found({ collectibles: ['Gobweb', 'ruby'] });
 
       expect(isWorldNodeCollectibleGateMet(buildEntry())).toBe(true);
     });
@@ -417,11 +343,11 @@ describe('encounter-backed node accessors', () => {
   describe('worldNodeOverride', () => {
     it('reads the matching node override', () => {
       seedContent([
-        buildNodeOverride({ description: 'A hand-authored blurb.' }),
+        buildNodeOverride({ description: 'A hand-written blurb.' }),
       ]);
 
       expect(worldNodeOverride(buildEntry())?.description).toBe(
-        'A hand-authored blurb.',
+        'A hand-written blurb.',
       );
     });
 
@@ -442,7 +368,7 @@ describe('encounter-backed node accessors', () => {
     });
 
     it('returns undefined for a same-name node backed by a different content type', () => {
-      seedEncounter(buildEncounter());
+      seedContent([buildEncounter()]);
 
       expect(worldNodeTown(buildEntry())).toBeUndefined();
     });
@@ -450,23 +376,12 @@ describe('encounter-backed node accessors', () => {
 });
 
 describe('trainer-backed node accessors', () => {
-  const trainer = (
-    overrides: Partial<TrainerContent> = {},
-  ): TrainerContent => ({
-    id: 'trainer-forest-ruins' as TrainerId,
-    name: 'Forest Ruins',
-    __type: 'trainer',
-    description: '',
-    trainerTeachingIds: [],
-    ...overrides,
-  });
-
-  beforeEach(() => {
-    setAllIdsByName(new Map());
-    setAllContentById(new Map());
-    vi.mocked(isWorldNodeDiscovered).mockReturnValue(false);
-    vi.mocked(isCollectibleDiscovered).mockReset().mockReturnValue(true);
-  });
+  const trainer = (overrides: Partial<TrainerContent> = {}) =>
+    ensureTrainer({
+      id: 'trainer-forest-ruins' as TrainerId,
+      name: 'Forest Ruins',
+      ...overrides,
+    });
 
   it('reads the matching trainer', () => {
     seedContent([trainer()]);
@@ -474,7 +389,7 @@ describe('trainer-backed node accessors', () => {
     expect(worldNodeTrainer(buildEntry())?.id).toBe('trainer-forest-ruins');
   });
 
-  it('hides a trainer authored hidden until discovered', () => {
+  it('hides a trainer marked hidden until discovered', () => {
     seedContent([trainer({ hidden: true })]);
 
     expect(isWorldNodeHidden(buildEntry())).toBe(true);
@@ -487,59 +402,35 @@ describe('trainer-backed node accessors', () => {
         invisibleUntilCollectibleIdsFound: ['ruby' as CollectibleId],
       }),
     ]);
-    vi.mocked(isCollectibleDiscovered).mockReturnValue(false);
 
     expect(isWorldNodeCollectibleGateMet(buildEntry())).toBe(false);
   });
 });
 
 describe('worldNodeDisplayName', () => {
-  beforeEach(() => {
-    setAllIdsByName(new Map());
-    setAllContentById(new Map());
-  });
-
   it('returns the real name for a visible node', () => {
-    seedEncounter(buildEncounter({ hidden: false }));
-    const map = buildMap({
-      exploreNodes: [
-        buildObject({ name: 'Forest Ruins', type: 'ExploreNode' }),
-      ],
-    });
-    setAllMaps(new Map([['Carrina', { name: 'Carrina', data: map }]]));
+    seedContent([buildEncounter({ hidden: false })]);
+    seedWorldNodes([{ name: 'Forest Ruins', type: 'ExploreNode' }]);
 
     expect(worldNodeDisplayName('Forest Ruins')).toBe('Forest Ruins');
   });
 
   it('masks a hidden, undiscovered node as "???"', () => {
-    seedEncounter(buildEncounter({ hidden: true }));
-    const map = buildMap({
-      exploreNodes: [
-        buildObject({ name: 'Forest Ruins', type: 'ExploreNode' }),
-      ],
-    });
-    setAllMaps(new Map([['Carrina', { name: 'Carrina', data: map }]]));
-    vi.mocked(isWorldNodeDiscovered).mockReturnValue(false);
+    seedContent([buildEncounter({ hidden: true })]);
+    seedWorldNodes([{ name: 'Forest Ruins', type: 'ExploreNode' }]);
 
     expect(worldNodeDisplayName('Forest Ruins')).toBe('???');
   });
 
   it('returns the real name for a hidden node once discovered', () => {
-    seedEncounter(buildEncounter({ hidden: true }));
-    const map = buildMap({
-      exploreNodes: [
-        buildObject({ name: 'Forest Ruins', type: 'ExploreNode' }),
-      ],
-    });
-    setAllMaps(new Map([['Carrina', { name: 'Carrina', data: map }]]));
-    vi.mocked(isWorldNodeDiscovered).mockReturnValue(true);
+    seedContent([buildEncounter({ hidden: true })]);
+    seedWorldNodes([{ name: 'Forest Ruins', type: 'ExploreNode' }]);
+    found({ node: true });
 
     expect(worldNodeDisplayName('Forest Ruins')).toBe('Forest Ruins');
   });
 
   it('falls back to the raw name when the node no longer resolves', () => {
-    setAllMaps(new Map());
-
     expect(worldNodeDisplayName('Ghost Node')).toBe('Ghost Node');
   });
 });

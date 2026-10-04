@@ -1,3 +1,4 @@
+import { rangeLabel } from '@helpers/engine/leveled-range';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -42,7 +43,6 @@ import {
 import { workerTravelRemainingTicks } from '@helpers/worker/worker-travel.ui';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
-import { worldNodeLevelLabel } from '@helpers/world-node/world-node-status';
 import {
   kingdomNodeGet,
   worldNodeByName,
@@ -274,7 +274,7 @@ export class PlayKingdomWorkersComponent {
           staminaCost: workerStaminaCostToNode(node.nodeName, allowTeleport),
           maxLevel: gathering?.workerLevelRange.max ?? WORKER_MAX_LEVEL,
           levelRangeLabel: gathering
-            ? worldNodeLevelLabel(gathering.workerLevelRange)
+            ? rangeLabel(gathering.workerLevelRange)
             : '?',
           disabled:
             !canWorkerReachNode(node.nodeName, stamina, allowTeleport) ||

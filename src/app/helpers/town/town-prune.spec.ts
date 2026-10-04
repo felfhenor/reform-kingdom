@@ -102,7 +102,7 @@ describe('pruneInvalidTowns', () => {
     expect(tradeskills).toEqual({ [blacksmithingId]: { level: 1 } });
   });
 
-  it('drops workers no longer on the roster and adds newly-authored ones', () => {
+  it('drops workers no longer on the roster and adds newly-added ones', () => {
     seedTown([darwinId, newHireId]);
     const darwin = { level: 4 } as never;
 

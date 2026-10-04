@@ -120,7 +120,7 @@ describe('isTownCraftDebuffActive', () => {
 });
 
 describe('raidAssaulterMonsterIds', () => {
-  it('draws numMonsters random picks from the authored monster ids', () => {
+  it('draws numMonsters random picks from the configured monster ids', () => {
     const result = raidAssaulterMonsterIds({
       numMonsters: 20,
       monsterIds: [citizenId, guardId],
@@ -131,7 +131,7 @@ describe('raidAssaulterMonsterIds', () => {
     expect(new Set(result)).toEqual(new Set([citizenId, guardId]));
   });
 
-  it('returns nothing when no monster ids are authored', () => {
+  it('returns nothing when no monster ids are configured', () => {
     expect(
       raidAssaulterMonsterIds({
         numMonsters: 5,

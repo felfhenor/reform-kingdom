@@ -33,6 +33,7 @@ import { taskRecordCraft } from '@helpers/task/task-progress';
 import type {
   CollectibleId,
   CraftQueueEntry,
+  CraftQueueEntryId,
   EquipmentId,
   EquipmentItem,
   EquipmentItemId,
@@ -378,8 +379,11 @@ describe('craftQueueStart', () => {
     seedBlacksmithing(
       {
         queue: [
-          entry({ id: 'capped' as never, quantityTotal: MAX_CRAFTABLE_CAP }),
-          entry({ id: 'open' as never, quantityTotal: 1 }),
+          entry({
+            id: 'capped' as CraftQueueEntryId,
+            quantityTotal: MAX_CRAFTABLE_CAP,
+          }),
+          entry({ id: 'open' as CraftQueueEntryId, quantityTotal: 1 }),
         ],
       },
       (state) => {

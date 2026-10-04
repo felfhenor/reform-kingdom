@@ -1,119 +1,75 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, onTestFinished } from 'vitest';
 
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    tasksState: () => gamestate().tasks,
-  };
+import { ensureTask } from '@helpers/content/ensure-task';
+import { tasksState } from '@helpers/state-game';
+import { tasksCompleted$ } from '@helpers/task/task-completed';
+import { tasksRecord } from '@helpers/task/task-record';
+import type { TaskContent, TaskId } from '@interfaces';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
+
+const levelTask = ensureTask({
+  id: 'task-level' as TaskId,
+  order: 10,
+  requirement: { kind: 'ReachLevel', level: 3 },
 });
 
-vi.mock('@helpers/task/task-completed', () => ({
-  tasksCompletedEmit: vi.fn(),
-}));
+const reachedLevel = () =>
+  tasksRecord((requirement) => requirement.kind === 'ReachLevel');
 
-import { setAllContentById } from '@helpers/content/content';
-import { ensureTask } from '@helpers/content/ensure-task';
-import { defaultGameState } from '@helpers/defaults';
-import { gamestate, updateGamestate } from '@helpers/state-game';
-import { tasksCompletedEmit } from '@helpers/task/task-completed';
-import { tasksRecord } from '@helpers/task/task-record';
-import type { GameState, IsContentItem, TaskId } from '@interfaces';
-
-const LEVEL_TASK = 'task-level' as TaskId;
-
-let state: GameState;
+function captureAnnouncements(): TaskContent[][] {
+  const announced: TaskContent[][] = [];
+  const subscription = tasksCompleted$.subscribe((tasks) =>
+    announced.push(tasks),
+  );
+  onTestFinished(() => subscription.unsubscribe());
+  return announced;
+}
 
 beforeEach(() => {
-  vi.clearAllMocks();
-
-  const content: IsContentItem[] = [
-    ensureTask({
-      id: LEVEL_TASK,
-      order: 10,
-      requirement: { kind: 'ReachLevel', level: 3 },
-    }),
-  ];
-  setAllContentById(new Map(content.map((entry) => [entry.id, entry])));
-
-  state = defaultGameState();
-  state.tasks = { [LEVEL_TASK]: { progress: 0 } };
-  vi.mocked(gamestate).mockImplementation(() => state);
+  seedContent([levelTask]);
+  seedGamestate((state) => (state.tasks = { [levelTask.id]: { progress: 0 } }));
 });
 
 describe('tasksRecord', () => {
-  it('announces before returning when the write runs inside a tick', () => {
-    vi.mocked(updateGamestate).mockImplementation((update) => {
-      state = update(state);
-      return Promise.resolve();
-    });
+  it('completes the task and announces it before returning inside a tick', () => {
+    const announced = captureAnnouncements();
 
-    void tasksRecord((requirement) => requirement.kind === 'ReachLevel');
+    void inTick(() => reachedLevel());
 
-    expect(state.tasks[LEVEL_TASK].completedAt).toBeDefined();
-    expect(tasksCompletedEmit).toHaveBeenCalledWith([
-      expect.objectContaining({ id: LEVEL_TASK }),
-    ]);
+    expect(tasksState()[levelTask.id].completedAt).toEqual(expect.any(Number));
+    expect(announced).toEqual([[levelTask]]);
   });
 
   it('holds the announcement until a deferred write lands', async () => {
-    let flush: () => void = () => undefined;
-    vi.mocked(updateGamestate).mockImplementation(
-      (update) =>
-        new Promise<void>((resolve) => {
-          flush = () => {
-            state = update(state);
-            resolve();
-          };
-        }),
-    );
+    const announced = captureAnnouncements();
 
-    const recording = tasksRecord(
-      (requirement) => requirement.kind === 'ReachLevel',
-    );
-    expect(tasksCompletedEmit).not.toHaveBeenCalled();
+    const recording = reachedLevel();
+    expect(announced).toEqual([]);
 
-    flush();
     await recording;
-
-    expect(tasksCompletedEmit).toHaveBeenCalledWith([
-      expect.objectContaining({ id: LEVEL_TASK }),
-    ]);
+    expect(tasksState()[levelTask.id].completedAt).toEqual(expect.any(Number));
+    expect(announced).toEqual([[levelTask]]);
   });
 
-  it('announces a task only once when two records race for it', async () => {
-    const pending: (() => void)[] = [];
-    vi.mocked(updateGamestate).mockImplementation(
-      (update) =>
-        new Promise<void>((resolve) => {
-          pending.push(() => {
-            state = update(state);
-            resolve();
-          });
-        }),
-    );
+  it('announces a task only once when two deferred records race for it', async () => {
+    const announced = captureAnnouncements();
 
-    const first = tasksRecord(
-      (requirement) => requirement.kind === 'ReachLevel',
-    );
-    const second = tasksRecord(
-      (requirement) => requirement.kind === 'ReachLevel',
-    );
-    pending.forEach((run) => run());
-    await Promise.all([first, second]);
+    await Promise.all([reachedLevel(), reachedLevel()]);
 
-    const announced = vi
-      .mocked(tasksCompletedEmit)
-      .mock.calls.flatMap(([tasks]) => tasks);
-    expect(announced).toHaveLength(1);
+    expect(announced.flat()).toEqual([levelTask]);
   });
 
-  it('skips the write when no incomplete task matches', async () => {
-    state.tasks[LEVEL_TASK] = { progress: 0, completedAt: 1 };
+  it('does nothing when no incomplete task matches', async () => {
+    seedGamestate(
+      (state) =>
+        (state.tasks = { [levelTask.id]: { progress: 0, completedAt: 1 } }),
+    );
+    const announced = captureAnnouncements();
 
-    await tasksRecord((requirement) => requirement.kind === 'ReachLevel');
+    await reachedLevel();
 
-    expect(updateGamestate).not.toHaveBeenCalled();
+    expect(tasksState()[levelTask.id].completedAt).toBe(1);
+    expect(announced).toEqual([]);
   });
 });

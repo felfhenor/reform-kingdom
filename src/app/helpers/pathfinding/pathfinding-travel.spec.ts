@@ -1,143 +1,96 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/state-game', async (importOriginal) => ({
-  ...(await importOriginal<Record<string, unknown>>()),
-  worldCurrentLocationState: vi.fn(),
-}));
+vi.mock('@helpers/hero/travel-cost');
 
-// Route selection must use unboosted costs so cached routes never swing with a timed buff.
-vi.mock('@helpers/hero/travel-cost', () => {
-  const boostedCostUsed = vi.fn(() => {
-    throw new Error('route selection used a buff-aware travel cost');
-  });
-  return {
-    travelStepTicksCost: boostedCostUsed,
-    travelPathTotalTicks: boostedCostUsed,
-  };
-});
-
-vi.mock('@helpers/item/collectibles', () => ({
-  discoveredCollectibleCount: vi.fn(() => 0),
-}));
-
-vi.mock('@helpers/maps', async (importOriginal) => ({
-  ...(await importOriginal<Record<string, unknown>>()),
-  allMaps: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  isWorldNodeCollectibleGateMet: vi.fn(() => true),
-  isWorldNodeVisible: vi.fn(() => true),
-  worldNodeAt: vi.fn(() => undefined),
-  worldNodeByName: vi.fn(),
-  worldNodeLookup: vi.fn(),
-  worldNodesOfType: vi.fn(),
-}));
-
-import { seedGamestate } from '@/testing/gamestate';
-import { discoveredCollectibleCount } from '@helpers/item/collectibles';
-import { allMaps } from '@helpers/maps';
+import { OUTPOST_TELEPORT_LEVEL } from '@helpers/config';
+import { ensureNodeOverride } from '@helpers/content/ensure-nodeoverride';
+import {
+  travelPathTotalTicks,
+  travelStepTicksCost,
+} from '@helpers/hero/travel-cost';
+import { applyCollectibleGrant } from '@helpers/item/collectibles';
 import {
   travelPathFrom,
   travelPathThroughNodesTo,
   travelPathTo,
 } from '@helpers/pathfinding/pathfinding-travel';
-import { worldCurrentLocationState } from '@helpers/state-game';
-import {
-  isWorldNodeCollectibleGateMet,
-  worldNodeByName,
-  worldNodeLookup,
-  worldNodesOfType,
-} from '@helpers/world-node/world-nodes';
 import type {
-  GameMap,
-  TiledMap,
-  TiledObject,
-  WorldNodeEntry,
-  WorldNodeLookup,
+  CollectibleId,
+  CurrentLocation,
+  NodeOverrideId,
+  WorldNodeType,
 } from '@interfaces';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 
-function buildEmptyLookup(): WorldNodeLookup {
-  return { byPosition: {}, byName: {} };
-}
-
-function buildObject(overrides: Partial<TiledObject>): TiledObject {
-  return {
-    id: 1,
-    name: 'Unnamed',
-    type: '',
-    x: 0,
-    y: 0,
-    width: 64,
-    height: 64,
-    visible: true,
-    ...overrides,
+// Route selection must never use buff-aware costs, so any call fails the test.
+beforeEach(() => {
+  vi.resetAllMocks();
+  const boostedCostUsed = () => {
+    throw new Error('route selection used a buff-aware travel cost');
   };
-}
+  vi.mocked(travelStepTicksCost).mockImplementation(boostedCostUsed);
+  vi.mocked(travelPathTotalTicks).mockImplementation(boostedCostUsed);
+});
 
-function buildOpenMap(width: number, height: number): TiledMap {
-  return {
-    width,
-    height,
-    tilewidth: 64,
-    tileheight: 64,
-    tilesets: [],
-    layers: [],
-  };
-}
+const standAt = (location: CurrentLocation) =>
+  seedGamestate((state) => (state.world.currentLocation = location));
 
-function buildEntry(overrides: Partial<WorldNodeEntry>): WorldNodeEntry {
-  return {
-    mapName: 'Carrina',
-    x: 0,
-    y: 0,
-    nodeName: 'Unnamed',
-    nodeData: buildObject({}),
-    ...overrides,
-  };
+const carrina = (x: number, y: number) => ({ mapName: 'Carrina', x, y });
+
+const node = (
+  name: string,
+  mapName: string,
+  x: number,
+  y: number,
+  type: WorldNodeType = 'ExploreNode',
+) => ({ name, type, mapName, x, y });
+
+const teleportOut = (
+  name: string,
+  mapName: string,
+  x: number,
+  toTag: string,
+) => ({
+  ...node(name, mapName, x, 0, 'TeleportNode'),
+  properties: [{ name: 'toTag', type: 'string', value: toTag }],
+});
+
+const teleportIn = (name: string, mapName: string, x: number, tag: string) => ({
+  ...node(name, mapName, x, 0, 'TeleportNode'),
+  properties: [{ name: 'tag', type: 'string', value: tag }],
+});
+
+const fiveByFive = { width: 5, height: 5 };
+
+function lockBehindCollectible(...names: string[]): void {
+  seedContent(
+    names.map((name) =>
+      ensureNodeOverride({
+        id: name as NodeOverrideId,
+        name,
+        invisibleUntilCollectibleIdsFound: ['key' as CollectibleId],
+      }),
+    ),
+  );
 }
 
 describe('travelPathTo', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(worldNodeLookup).mockReturnValue(buildEmptyLookup());
-    vi.mocked(isWorldNodeCollectibleGateMet).mockReturnValue(true);
-    vi.mocked(worldNodesOfType).mockReturnValue([]);
-    seedGamestate();
-  });
-
   it('returns an empty path when already at the destination', () => {
-    vi.mocked(worldCurrentLocationState).mockReturnValue({
-      mapName: 'Carrina',
-      x: 2,
-      y: 2,
+    seedWorldNodes([node('Field Ruins', 'Carrina', 2, 2)], [], {
+      Carrina: fiveByFive,
     });
-    vi.mocked(worldNodeByName).mockReturnValue(
-      buildEntry({ mapName: 'Carrina', x: 2, y: 2, nodeName: 'Field Ruins' }),
-    );
-    vi.mocked(allMaps).mockReturnValue(
-      new Map<string, GameMap>([
-        ['Carrina', { name: 'Carrina', data: buildOpenMap(5, 5) }],
-      ]),
-    );
+    standAt(carrina(2, 2));
 
     expect(travelPathTo('Field Ruins')).toEqual([]);
   });
 
   it('returns an in-map Move path on an open grid', () => {
-    vi.mocked(worldCurrentLocationState).mockReturnValue({
-      mapName: 'Carrina',
-      x: 0,
-      y: 0,
+    seedWorldNodes([node('Field Ruins', 'Carrina', 2, 0)], [], {
+      Carrina: fiveByFive,
     });
-    vi.mocked(worldNodeByName).mockReturnValue(
-      buildEntry({ mapName: 'Carrina', x: 2, y: 0, nodeName: 'Field Ruins' }),
-    );
-    vi.mocked(allMaps).mockReturnValue(
-      new Map<string, GameMap>([
-        ['Carrina', { name: 'Carrina', data: buildOpenMap(5, 5) }],
-      ]),
-    );
+    standAt(carrina(0, 0));
 
     expect(travelPathTo('Field Ruins')).toEqual([
       { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
@@ -146,80 +99,36 @@ describe('travelPathTo', () => {
   });
 
   it('returns undefined when no path exists on the current map', () => {
-    const wallLayer = {
-      id: 1,
-      name: 'Dense Tiles',
-      type: 'tilelayer' as const,
-      visible: true,
-      width: 3,
-      height: 3,
-      data: [0, 1, 0, 0, 1, 0, 0, 1, 0],
-    };
-    const walledMap: TiledMap = { ...buildOpenMap(3, 3), layers: [wallLayer] };
-
-    vi.mocked(worldCurrentLocationState).mockReturnValue({
-      mapName: 'Carrina',
-      x: 0,
-      y: 1,
+    seedWorldNodes([node('Field Ruins', 'Carrina', 2, 1)], [], {
+      Carrina: {
+        width: 3,
+        height: 3,
+        denseTiles: [carrina(1, 0), carrina(1, 1), carrina(1, 2)],
+      },
     });
-    vi.mocked(worldNodeByName).mockReturnValue(
-      buildEntry({ mapName: 'Carrina', x: 2, y: 1, nodeName: 'Field Ruins' }),
-    );
-    vi.mocked(allMaps).mockReturnValue(
-      new Map<string, GameMap>([
-        ['Carrina', { name: 'Carrina', data: walledMap }],
-      ]),
-    );
+    standAt(carrina(0, 1));
 
     expect(travelPathTo('Field Ruins')).toBeUndefined();
   });
 
   describe('a node walled in behind another node', () => {
-    const gate = buildEntry({ x: 1, y: 1, nodeName: 'Gate' });
-
-    function mockGatedMap(wall: number[]): void {
-      const wallLayer = {
-        id: 1,
-        name: 'Dense Tiles',
-        type: 'tilelayer' as const,
-        visible: true,
-        width: 3,
-        height: 3,
-        data: wall,
-      };
-      vi.mocked(worldCurrentLocationState).mockReturnValue({
-        mapName: 'Carrina',
-        x: 0,
-        y: 1,
-      });
-      vi.mocked(worldNodeByName).mockReturnValue(
-        buildEntry({ x: 2, y: 1, nodeName: 'Behind' }),
+    function seedGatedMap(walls: { x: number; y: number }[]): void {
+      seedWorldNodes(
+        [node('Gate', 'Carrina', 1, 1), node('Behind', 'Carrina', 2, 1)],
+        [],
+        { Carrina: { width: 3, height: 3, denseTiles: walls } },
       );
-      vi.mocked(worldNodeLookup).mockReturnValue({
-        byPosition: { Carrina: { 1: { 1: gate } } },
-        byName: { Gate: gate },
-      });
-      vi.mocked(allMaps).mockReturnValue(
-        new Map<string, GameMap>([
-          [
-            'Carrina',
-            {
-              name: 'Carrina',
-              data: { ...buildOpenMap(3, 3), layers: [wallLayer] },
-            },
-          ],
-        ]),
-      );
+      standAt(carrina(0, 1));
     }
 
     it('has no normal route past the gate node', () => {
-      mockGatedMap([0, 1, 0, 0, 0, 0, 0, 1, 0]);
+      seedGatedMap([carrina(1, 0), carrina(1, 2)]);
 
       expect(travelPathTo('Behind')).toBeUndefined();
     });
 
     it('crosses the gate node when passing through nodes is allowed', () => {
-      mockGatedMap([0, 1, 0, 0, 0, 0, 0, 1, 0]);
+      seedGatedMap([carrina(1, 0), carrina(1, 2)]);
       travelPathTo('Behind');
 
       expect(travelPathThroughNodesTo('Behind')).toEqual([
@@ -229,7 +138,7 @@ describe('travelPathTo', () => {
     });
 
     it('still walks around a node when a route around it exists', () => {
-      mockGatedMap([0, 0, 0, 0, 0, 0, 0, 1, 0]);
+      seedGatedMap([carrina(1, 2)]);
 
       expect(travelPathThroughNodesTo('Behind')).not.toContainEqual({
         kind: 'Move',
@@ -241,378 +150,88 @@ describe('travelPathTo', () => {
   });
 
   it('returns undefined when the destination node does not exist', () => {
-    vi.mocked(worldNodeByName).mockReturnValue(undefined);
+    seedWorldNodes([node('Field Ruins', 'Carrina', 2, 0)]);
+    standAt(carrina(0, 0));
 
     expect(travelPathTo('Nowhere')).toBeUndefined();
   });
 
-  it('composes a cross-map path through a matching TeleportNode pair', () => {
-    vi.mocked(worldCurrentLocationState).mockReturnValue({
-      mapName: 'Carrina',
-      x: 0,
-      y: 0,
+  describe('through a TeleportNode pair', () => {
+    beforeEach(() => {
+      seedWorldNodes(
+        [
+          teleportOut('To Craggled Mire', 'Carrina', 2, 'from-carrina'),
+          teleportIn('To Carrina', 'CraggledMire', 0, 'from-carrina'),
+          node('Forest Ruins', 'CraggledMire', 2, 0),
+        ],
+        [],
+        { Carrina: fiveByFive, CraggledMire: fiveByFive },
+      );
+      standAt(carrina(0, 0));
     });
 
-    const teleportOut = buildEntry({
-      mapName: 'Carrina',
-      x: 2,
-      y: 0,
-      nodeName: 'To Craggled Mire',
-      nodeData: buildObject({
-        name: 'To Craggled Mire',
-        type: 'TeleportNode',
-        properties: [{ name: 'toTag', type: 'string', value: 'from-carrina' }],
-      }),
-    });
-
-    const teleportIn = buildEntry({
-      mapName: 'CraggledMire',
-      x: 0,
-      y: 0,
-      nodeName: 'To Carrina',
-      nodeData: buildObject({
-        name: 'To Carrina',
-        type: 'TeleportNode',
-        properties: [{ name: 'tag', type: 'string', value: 'from-carrina' }],
-      }),
-    });
-
-    vi.mocked(worldNodesOfType).mockImplementation((type) =>
-      type === 'TeleportNode' ? [teleportOut, teleportIn] : [],
-    );
-
-    vi.mocked(worldNodeByName).mockReturnValue(
-      buildEntry({
-        mapName: 'CraggledMire',
-        x: 2,
-        y: 0,
-        nodeName: 'Forest Ruins',
-      }),
-    );
-
-    vi.mocked(allMaps).mockReturnValue(
-      new Map<string, GameMap>([
-        ['Carrina', { name: 'Carrina', data: buildOpenMap(5, 5) }],
-        ['CraggledMire', { name: 'CraggledMire', data: buildOpenMap(5, 5) }],
-      ]),
-    );
-
-    expect(travelPathTo('Forest Ruins')).toEqual([
+    const crossing = [
       { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
       { kind: 'Move', mapName: 'Carrina', x: 2, y: 0 },
       { kind: 'Teleport', mapName: 'CraggledMire', x: 0, y: 0 },
+    ];
+    const onToRuins = [
+      ...crossing,
       { kind: 'Move', mapName: 'CraggledMire', x: 1, y: 0 },
       { kind: 'Move', mapName: 'CraggledMire', x: 2, y: 0 },
-    ]);
-  });
+    ];
 
-  it('refuses to cross maps at all when allowTeleport is false, even through an unlocked pair', () => {
-    vi.mocked(worldCurrentLocationState).mockReturnValue({
-      mapName: 'Carrina',
-      x: 0,
-      y: 0,
+    it('composes a cross-map path', () => {
+      expect(travelPathTo('Forest Ruins')).toEqual(onToRuins);
     });
 
-    const teleportOut = buildEntry({
-      mapName: 'Carrina',
-      x: 2,
-      y: 0,
-      nodeName: 'To Craggled Mire',
-      nodeData: buildObject({
-        name: 'To Craggled Mire',
-        type: 'TeleportNode',
-        properties: [{ name: 'toTag', type: 'string', value: 'from-carrina' }],
-      }),
-    });
-    const teleportIn = buildEntry({
-      mapName: 'CraggledMire',
-      x: 0,
-      y: 0,
-      nodeName: 'To Carrina',
-      nodeData: buildObject({
-        name: 'To Carrina',
-        type: 'TeleportNode',
-        properties: [{ name: 'tag', type: 'string', value: 'from-carrina' }],
-      }),
+    it('refuses to cross maps at all when allowTeleport is false, even through an unlocked pair', () => {
+      expect(travelPathTo('Forest Ruins', false)).toBeUndefined();
     });
 
-    vi.mocked(worldNodesOfType).mockImplementation((type) =>
-      type === 'TeleportNode' ? [teleportOut, teleportIn] : [],
-    );
-    vi.mocked(worldNodeByName).mockReturnValue(
-      buildEntry({
-        mapName: 'CraggledMire',
-        x: 2,
-        y: 0,
-        nodeName: 'Forest Ruins',
-      }),
-    );
-    vi.mocked(allMaps).mockReturnValue(
-      new Map<string, GameMap>([
-        ['Carrina', { name: 'Carrina', data: buildOpenMap(5, 5) }],
-        ['CraggledMire', { name: 'CraggledMire', data: buildOpenMap(5, 5) }],
-      ]),
-    );
+    it('does not route through a pair still locked behind a collectible gate', () => {
+      lockBehindCollectible('To Craggled Mire', 'To Carrina');
 
-    expect(travelPathTo('Forest Ruins', false)).toBeUndefined();
-  });
-
-  it('does not route through a TeleportNode pair that is still locked behind a collectible gate', () => {
-    vi.mocked(worldCurrentLocationState).mockReturnValue({
-      mapName: 'Carrina',
-      x: 0,
-      y: 0,
+      expect(travelPathTo('Forest Ruins')).toBeUndefined();
     });
 
-    const teleportOut = buildEntry({
-      mapName: 'Carrina',
-      x: 2,
-      y: 0,
-      nodeName: 'To Craggled Mire',
-      nodeData: buildObject({
-        name: 'To Craggled Mire',
-        type: 'TeleportNode',
-        properties: [{ name: 'toTag', type: 'string', value: 'from-carrina' }],
-      }),
+    it('routes through a locked pair when ignoreCollectibleGate is set', () => {
+      lockBehindCollectible('To Craggled Mire', 'To Carrina');
+
+      expect(travelPathTo('Forest Ruins', true, true)).toEqual(onToRuins);
     });
 
-    const teleportIn = buildEntry({
-      mapName: 'CraggledMire',
-      x: 0,
-      y: 0,
-      nodeName: 'To Carrina',
-      nodeData: buildObject({
-        name: 'To Carrina',
-        type: 'TeleportNode',
-        properties: [{ name: 'tag', type: 'string', value: 'from-carrina' }],
-      }),
+    it('travels through a TeleportNode when it is the destination itself, not just a waypoint', () => {
+      expect(travelPathTo('To Craggled Mire')).toEqual(crossing);
     });
 
-    vi.mocked(worldNodesOfType).mockImplementation((type) =>
-      type === 'TeleportNode' ? [teleportOut, teleportIn] : [],
-    );
-    vi.mocked(isWorldNodeCollectibleGateMet).mockReturnValue(false);
+    it('has no route to a TeleportNode on another map', () => {
+      standAt({ mapName: 'CraggledMire', x: 4, y: 4 });
 
-    vi.mocked(worldNodeByName).mockReturnValue(
-      buildEntry({
-        mapName: 'CraggledMire',
-        x: 2,
-        y: 0,
-        nodeName: 'Forest Ruins',
-      }),
-    );
-
-    vi.mocked(allMaps).mockReturnValue(
-      new Map<string, GameMap>([
-        ['Carrina', { name: 'Carrina', data: buildOpenMap(5, 5) }],
-        ['CraggledMire', { name: 'CraggledMire', data: buildOpenMap(5, 5) }],
-      ]),
-    );
-
-    expect(travelPathTo('Forest Ruins')).toBeUndefined();
-  });
-
-  it('routes through a locked TeleportNode pair when ignoreCollectibleGate is set', () => {
-    vi.mocked(worldCurrentLocationState).mockReturnValue({
-      mapName: 'Carrina',
-      x: 0,
-      y: 0,
+      expect(travelPathTo('To Craggled Mire')).toBeUndefined();
     });
 
-    const teleportOut = buildEntry({
-      mapName: 'Carrina',
-      x: 2,
-      y: 0,
-      nodeName: 'To Craggled Mire',
-      nodeData: buildObject({
-        name: 'To Craggled Mire',
-        type: 'TeleportNode',
-        properties: [{ name: 'toTag', type: 'string', value: 'from-carrina' }],
-      }),
-    });
-    const teleportIn = buildEntry({
-      mapName: 'CraggledMire',
-      x: 0,
-      y: 0,
-      nodeName: 'To Carrina',
-      nodeData: buildObject({
-        name: 'To Carrina',
-        type: 'TeleportNode',
-        properties: [{ name: 'tag', type: 'string', value: 'from-carrina' }],
-      }),
+    it('refuses to travel directly to a TeleportNode at all when allowTeleport is false', () => {
+      expect(travelPathTo('To Craggled Mire', false)).toBeUndefined();
     });
 
-    vi.mocked(worldNodesOfType).mockImplementation((type) =>
-      type === 'TeleportNode' ? [teleportOut, teleportIn] : [],
-    );
-    vi.mocked(isWorldNodeCollectibleGateMet).mockReturnValue(false);
-    vi.mocked(worldNodeByName).mockReturnValue(
-      buildEntry({
-        mapName: 'CraggledMire',
-        x: 2,
-        y: 0,
-        nodeName: 'Forest Ruins',
-      }),
-    );
-    vi.mocked(allMaps).mockReturnValue(
-      new Map<string, GameMap>([
-        ['Carrina', { name: 'Carrina', data: buildOpenMap(5, 5) }],
-        ['CraggledMire', { name: 'CraggledMire', data: buildOpenMap(5, 5) }],
-      ]),
-    );
+    it('refuses to travel directly to a TeleportNode still locked behind a collectible gate', () => {
+      lockBehindCollectible('To Craggled Mire');
 
-    expect(travelPathTo('Forest Ruins', true, true)).toEqual([
-      { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
-      { kind: 'Move', mapName: 'Carrina', x: 2, y: 0 },
-      { kind: 'Teleport', mapName: 'CraggledMire', x: 0, y: 0 },
-      { kind: 'Move', mapName: 'CraggledMire', x: 1, y: 0 },
-      { kind: 'Move', mapName: 'CraggledMire', x: 2, y: 0 },
-    ]);
-  });
-
-  it('travels through a TeleportNode when it is the destination itself, not just a waypoint', () => {
-    vi.mocked(worldCurrentLocationState).mockReturnValue({
-      mapName: 'Carrina',
-      x: 0,
-      y: 0,
+      expect(travelPathTo('To Craggled Mire')).toBeUndefined();
     });
-
-    const teleportOut = buildEntry({
-      mapName: 'Carrina',
-      x: 2,
-      y: 0,
-      nodeName: 'To Craggled Mire',
-      nodeData: buildObject({
-        name: 'To Craggled Mire',
-        type: 'TeleportNode',
-        properties: [{ name: 'toTag', type: 'string', value: 'from-carrina' }],
-      }),
-    });
-
-    const teleportIn = buildEntry({
-      mapName: 'CraggledMire',
-      x: 0,
-      y: 0,
-      nodeName: 'To Carrina',
-      nodeData: buildObject({
-        name: 'To Carrina',
-        type: 'TeleportNode',
-        properties: [{ name: 'tag', type: 'string', value: 'from-carrina' }],
-      }),
-    });
-
-    vi.mocked(worldNodesOfType).mockImplementation((type) =>
-      type === 'TeleportNode' ? [teleportOut, teleportIn] : [],
-    );
-    vi.mocked(worldNodeByName).mockReturnValue(teleportOut);
-    vi.mocked(allMaps).mockReturnValue(
-      new Map<string, GameMap>([
-        ['Carrina', { name: 'Carrina', data: buildOpenMap(5, 5) }],
-        ['CraggledMire', { name: 'CraggledMire', data: buildOpenMap(5, 5) }],
-      ]),
-    );
-
-    expect(travelPathTo('To Craggled Mire')).toEqual([
-      { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
-      { kind: 'Move', mapName: 'Carrina', x: 2, y: 0 },
-      { kind: 'Teleport', mapName: 'CraggledMire', x: 0, y: 0 },
-    ]);
-  });
-
-  it('refuses to travel directly to a TeleportNode at all when allowTeleport is false', () => {
-    vi.mocked(worldCurrentLocationState).mockReturnValue({
-      mapName: 'Carrina',
-      x: 0,
-      y: 0,
-    });
-
-    const teleportOut = buildEntry({
-      mapName: 'Carrina',
-      x: 2,
-      y: 0,
-      nodeName: 'To Craggled Mire',
-      nodeData: buildObject({
-        name: 'To Craggled Mire',
-        type: 'TeleportNode',
-        properties: [{ name: 'toTag', type: 'string', value: 'from-carrina' }],
-      }),
-    });
-
-    vi.mocked(worldNodesOfType).mockImplementation((type) =>
-      type === 'TeleportNode' ? [teleportOut] : [],
-    );
-    vi.mocked(worldNodeByName).mockReturnValue(teleportOut);
-    vi.mocked(allMaps).mockReturnValue(
-      new Map<string, GameMap>([
-        ['Carrina', { name: 'Carrina', data: buildOpenMap(5, 5) }],
-      ]),
-    );
-
-    expect(travelPathTo('To Craggled Mire', false)).toBeUndefined();
-  });
-
-  it('refuses to travel directly to a TeleportNode that is still locked behind a collectible gate', () => {
-    vi.mocked(worldCurrentLocationState).mockReturnValue({
-      mapName: 'Carrina',
-      x: 0,
-      y: 0,
-    });
-
-    const teleportOut = buildEntry({
-      mapName: 'Carrina',
-      x: 2,
-      y: 0,
-      nodeName: 'To Craggled Mire',
-      nodeData: buildObject({
-        name: 'To Craggled Mire',
-        type: 'TeleportNode',
-        properties: [{ name: 'toTag', type: 'string', value: 'from-carrina' }],
-      }),
-    });
-
-    vi.mocked(worldNodesOfType).mockImplementation((type) =>
-      type === 'TeleportNode' ? [teleportOut] : [],
-    );
-    vi.mocked(worldNodeByName).mockReturnValue(teleportOut);
-    vi.mocked(isWorldNodeCollectibleGateMet).mockReturnValue(false);
-    vi.mocked(allMaps).mockReturnValue(
-      new Map<string, GameMap>([
-        ['Carrina', { name: 'Carrina', data: buildOpenMap(5, 5) }],
-      ]),
-    );
-
-    expect(travelPathTo('To Craggled Mire')).toBeUndefined();
   });
 
   it('routes around a node tile that is not the destination', () => {
-    vi.mocked(worldCurrentLocationState).mockReturnValue({
-      mapName: 'Carrina',
-      x: 0,
-      y: 1,
-    });
-    vi.mocked(worldNodeByName).mockReturnValue(
-      buildEntry({ mapName: 'Carrina', x: 2, y: 1, nodeName: 'Field Ruins' }),
+    seedWorldNodes(
+      [
+        node('Some Other Node', 'Carrina', 1, 1),
+        node('Field Ruins', 'Carrina', 2, 1),
+      ],
+      [],
+      { Carrina: { width: 3, height: 3 } },
     );
-    vi.mocked(allMaps).mockReturnValue(
-      new Map<string, GameMap>([
-        ['Carrina', { name: 'Carrina', data: buildOpenMap(3, 3) }],
-      ]),
-    );
-    vi.mocked(worldNodeLookup).mockReturnValue({
-      byPosition: {
-        Carrina: {
-          1: {
-            1: buildEntry({
-              mapName: 'Carrina',
-              x: 1,
-              y: 1,
-              nodeName: 'Some Other Node',
-            }),
-          },
-        },
-      },
-      byName: {},
-    });
+    standAt(carrina(0, 1));
 
     const path = travelPathTo('Field Ruins');
 
@@ -621,32 +240,14 @@ describe('travelPathTo', () => {
   });
 
   it('detours onto a longer Path Tiles route instead of the shortest off-road one', () => {
-    // Row 0 is an authored path; the shorter off-road diagonal route costs more than the longer on-path one.
-    const pathTilesLayer = {
-      id: 1,
-      name: 'Path Tiles',
-      type: 'tilelayer' as const,
-      visible: true,
-      width: 5,
-      height: 5,
-      data: [
-        7, 7, 7, 7, 7, 0, 0, 0, 0, 7, 0, 0, 0, 0, 7, 0, 0, 0, 0, 7, 0, 0, 0, 0,
-        7,
-      ],
-    };
-    const map: TiledMap = { ...buildOpenMap(5, 5), layers: [pathTilesLayer] };
-
-    vi.mocked(worldCurrentLocationState).mockReturnValue({
-      mapName: 'Carrina',
-      x: 0,
-      y: 0,
+    // Row 0 and column 4 are path; the shorter off-road diagonal costs more than the longer on-path route.
+    const pathTiles = [0, 1, 2, 3, 4]
+      .map((x) => carrina(x, 0))
+      .concat([1, 2, 3, 4].map((y) => carrina(4, y)));
+    seedWorldNodes([node('Field Ruins', 'Carrina', 4, 4)], pathTiles, {
+      Carrina: fiveByFive,
     });
-    vi.mocked(worldNodeByName).mockReturnValue(
-      buildEntry({ mapName: 'Carrina', x: 4, y: 4, nodeName: 'Field Ruins' }),
-    );
-    vi.mocked(allMaps).mockReturnValue(
-      new Map<string, GameMap>([['Carrina', { name: 'Carrina', data: map }]]),
-    );
+    standAt(carrina(0, 0));
 
     const path = travelPathTo('Field Ruins');
 
@@ -655,81 +256,19 @@ describe('travelPathTo', () => {
   });
 
   it('chains through two teleport hops when no single hop reaches the destination', () => {
-    // Mirrors the real Carrina -> CraggledMire -> Larsian Desert route: Larsian Desert only
-    // pairs with CraggledMire, not with the Kingdom's own map, so this needs two hops.
-    vi.mocked(worldCurrentLocationState).mockReturnValue({
-      mapName: 'Carrina',
-      x: 0,
-      y: 0,
-    });
-
-    const toMire = buildEntry({
-      mapName: 'Carrina',
-      x: 2,
-      y: 0,
-      nodeName: 'To Mire',
-      nodeData: buildObject({
-        type: 'TeleportNode',
-        properties: [
-          { name: 'toTag', type: 'string', value: 'mire-from-carrina' },
-        ],
-      }),
-    });
-    const fromCarrina = buildEntry({
-      mapName: 'CraggledMire',
-      x: 0,
-      y: 0,
-      nodeName: 'From Carrina',
-      nodeData: buildObject({
-        type: 'TeleportNode',
-        properties: [
-          { name: 'tag', type: 'string', value: 'mire-from-carrina' },
-        ],
-      }),
-    });
-    const toLarsia = buildEntry({
-      mapName: 'CraggledMire',
-      x: 3,
-      y: 0,
-      nodeName: 'To Larsia',
-      nodeData: buildObject({
-        type: 'TeleportNode',
-        properties: [
-          { name: 'toTag', type: 'string', value: 'larsia-from-mire' },
-        ],
-      }),
-    });
-    const fromMire = buildEntry({
-      mapName: 'Larsia',
-      x: 0,
-      y: 0,
-      nodeName: 'From Mire',
-      nodeData: buildObject({
-        type: 'TeleportNode',
-        properties: [
-          { name: 'tag', type: 'string', value: 'larsia-from-mire' },
-        ],
-      }),
-    });
-
-    vi.mocked(worldNodesOfType).mockImplementation((type) =>
-      type === 'TeleportNode' ? [toMire, fromCarrina, toLarsia, fromMire] : [],
+    // Larsia only pairs with CraggledMire, not with the Kingdom's own map, so this needs two hops.
+    seedWorldNodes(
+      [
+        teleportOut('To Mire', 'Carrina', 2, 'mire-from-carrina'),
+        teleportIn('From Carrina', 'CraggledMire', 0, 'mire-from-carrina'),
+        teleportOut('To Larsia', 'CraggledMire', 3, 'larsia-from-mire'),
+        teleportIn('From Mire', 'Larsia', 0, 'larsia-from-mire'),
+        node('Mescalin Expanse', 'Larsia', 2, 0),
+      ],
+      [],
+      { Carrina: fiveByFive, CraggledMire: fiveByFive, Larsia: fiveByFive },
     );
-    vi.mocked(worldNodeByName).mockReturnValue(
-      buildEntry({
-        mapName: 'Larsia',
-        x: 2,
-        y: 0,
-        nodeName: 'Mescalin Expanse',
-      }),
-    );
-    vi.mocked(allMaps).mockReturnValue(
-      new Map<string, GameMap>([
-        ['Carrina', { name: 'Carrina', data: buildOpenMap(5, 5) }],
-        ['CraggledMire', { name: 'CraggledMire', data: buildOpenMap(5, 5) }],
-        ['Larsia', { name: 'Larsia', data: buildOpenMap(5, 5) }],
-      ]),
-    );
+    standAt(carrina(0, 0));
 
     expect(travelPathTo('Mescalin Expanse')).toEqual([
       { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
@@ -745,61 +284,18 @@ describe('travelPathTo', () => {
   });
 
   it('picks the cheaper of two competing teleport routes, not just the first one found', () => {
-    vi.mocked(worldCurrentLocationState).mockReturnValue({
-      mapName: 'Carrina',
-      x: 0,
-      y: 0,
-    });
-
-    // Listed before the cheaper exit, so a "first match wins" router would pick this one instead.
-    const farExit = buildEntry({
-      mapName: 'Carrina',
-      x: 4,
-      y: 0,
-      nodeName: 'Far Exit',
-      nodeData: buildObject({
-        type: 'TeleportNode',
-        properties: [{ name: 'toTag', type: 'string', value: 'to-cm' }],
-      }),
-    });
-    const nearExit = buildEntry({
-      mapName: 'Carrina',
-      x: 1,
-      y: 0,
-      nodeName: 'Near Exit',
-      nodeData: buildObject({
-        type: 'TeleportNode',
-        properties: [{ name: 'toTag', type: 'string', value: 'to-cm' }],
-      }),
-    });
-    const arrival = buildEntry({
-      mapName: 'CraggledMire',
-      x: 0,
-      y: 0,
-      nodeName: 'CM Entrance',
-      nodeData: buildObject({
-        type: 'TeleportNode',
-        properties: [{ name: 'tag', type: 'string', value: 'to-cm' }],
-      }),
-    });
-
-    vi.mocked(worldNodesOfType).mockImplementation((type) =>
-      type === 'TeleportNode' ? [farExit, nearExit, arrival] : [],
+    // Seeded before the cheaper exit, so a "first match wins" router would pick it.
+    seedWorldNodes(
+      [
+        teleportOut('Far Exit', 'Carrina', 4, 'to-cm'),
+        teleportOut('Near Exit', 'Carrina', 1, 'to-cm'),
+        teleportIn('CM Entrance', 'CraggledMire', 0, 'to-cm'),
+        node('Some Place', 'CraggledMire', 0, 2),
+      ],
+      [],
+      { Carrina: fiveByFive, CraggledMire: fiveByFive },
     );
-    vi.mocked(worldNodeByName).mockReturnValue(
-      buildEntry({
-        mapName: 'CraggledMire',
-        x: 0,
-        y: 2,
-        nodeName: 'Some Place',
-      }),
-    );
-    vi.mocked(allMaps).mockReturnValue(
-      new Map<string, GameMap>([
-        ['Carrina', { name: 'Carrina', data: buildOpenMap(5, 5) }],
-        ['CraggledMire', { name: 'CraggledMire', data: buildOpenMap(5, 5) }],
-      ]),
-    );
+    standAt(carrina(0, 0));
 
     expect(travelPathTo('Some Place')).toEqual([
       { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
@@ -810,56 +306,16 @@ describe('travelPathTo', () => {
   });
 
   it('returns undefined when no teleport chain connects to the destination map at all', () => {
-    vi.mocked(worldCurrentLocationState).mockReturnValue({
-      mapName: 'Carrina',
-      x: 0,
-      y: 0,
-    });
-
-    // A teleport node exists, but it leads to a map with no further connection to Larsia.
-    const toMire = buildEntry({
-      mapName: 'Carrina',
-      x: 2,
-      y: 0,
-      nodeName: 'To Mire',
-      nodeData: buildObject({
-        type: 'TeleportNode',
-        properties: [
-          { name: 'toTag', type: 'string', value: 'mire-from-carrina' },
-        ],
-      }),
-    });
-    const fromCarrina = buildEntry({
-      mapName: 'CraggledMire',
-      x: 0,
-      y: 0,
-      nodeName: 'From Carrina',
-      nodeData: buildObject({
-        type: 'TeleportNode',
-        properties: [
-          { name: 'tag', type: 'string', value: 'mire-from-carrina' },
-        ],
-      }),
-    });
-
-    vi.mocked(worldNodesOfType).mockImplementation((type) =>
-      type === 'TeleportNode' ? [toMire, fromCarrina] : [],
+    seedWorldNodes(
+      [
+        teleportOut('To Mire', 'Carrina', 2, 'mire-from-carrina'),
+        teleportIn('From Carrina', 'CraggledMire', 0, 'mire-from-carrina'),
+        node('Mescalin Expanse', 'Larsia', 2, 0),
+      ],
+      [],
+      { Carrina: fiveByFive, CraggledMire: fiveByFive, Larsia: fiveByFive },
     );
-    vi.mocked(worldNodeByName).mockReturnValue(
-      buildEntry({
-        mapName: 'Larsia',
-        x: 2,
-        y: 0,
-        nodeName: 'Mescalin Expanse',
-      }),
-    );
-    vi.mocked(allMaps).mockReturnValue(
-      new Map<string, GameMap>([
-        ['Carrina', { name: 'Carrina', data: buildOpenMap(5, 5) }],
-        ['CraggledMire', { name: 'CraggledMire', data: buildOpenMap(5, 5) }],
-        ['Larsia', { name: 'Larsia', data: buildOpenMap(5, 5) }],
-      ]),
-    );
+    standAt(carrina(0, 0));
 
     expect(travelPathTo('Mescalin Expanse')).toBeUndefined();
   });
@@ -867,184 +323,105 @@ describe('travelPathTo', () => {
 
 describe('travelPathFrom', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(worldNodeLookup).mockReturnValue(buildEmptyLookup());
-    vi.mocked(isWorldNodeCollectibleGateMet).mockReturnValue(true);
-    vi.mocked(worldNodesOfType).mockReturnValue([]);
-    seedGamestate();
+    seedWorldNodes([node('Field Ruins', 'Carrina', 2, 0)], [], {
+      Carrina: fiveByFive,
+    });
   });
 
-  // Confirms a non-party origin works too, which is what worker travel relies on.
+  // Worker travel relies on paths from a non-party origin.
   it('paths from an arbitrary origin, not just the current location', () => {
-    vi.mocked(worldNodeByName).mockReturnValue(
-      buildEntry({ mapName: 'Carrina', x: 2, y: 0, nodeName: 'Field Ruins' }),
-    );
-    vi.mocked(allMaps).mockReturnValue(
-      new Map<string, GameMap>([
-        ['Carrina', { name: 'Carrina', data: buildOpenMap(5, 5) }],
-      ]),
-    );
+    standAt(carrina(4, 4));
 
-    expect(
-      travelPathFrom({ mapName: 'Carrina', x: 0, y: 0 }, 'Field Ruins'),
-    ).toEqual([
+    expect(travelPathFrom(carrina(0, 0), 'Field Ruins')).toEqual([
       { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
       { kind: 'Move', mapName: 'Carrina', x: 2, y: 0 },
     ]);
-    expect(worldCurrentLocationState).not.toHaveBeenCalled();
   });
 
   it('returns undefined when the destination node does not exist', () => {
-    vi.mocked(worldNodeByName).mockReturnValue(undefined);
-
-    expect(
-      travelPathFrom({ mapName: 'Carrina', x: 0, y: 0 }, 'Nowhere'),
-    ).toBeUndefined();
+    expect(travelPathFrom(carrina(0, 0), 'Nowhere')).toBeUndefined();
   });
 
-  it('caches by (origin, destination) - a repeat query does not re-resolve the destination node', () => {
-    vi.mocked(worldNodeByName).mockReturnValue(
-      buildEntry({ mapName: 'Carrina', x: 2, y: 0, nodeName: 'Field Ruins' }),
-    );
-    const maps = new Map<string, GameMap>([
-      ['Carrina', { name: 'Carrina', data: buildOpenMap(5, 5) }],
-    ]);
-    vi.mocked(allMaps).mockReturnValue(maps);
+  it('caches by (origin, destination)', () => {
+    const first = travelPathFrom(carrina(0, 0), 'Field Ruins');
 
-    const first = travelPathFrom(
-      { mapName: 'Carrina', x: 0, y: 0 },
-      'Field Ruins',
-    );
-    const callsAfterFirst = vi.mocked(worldNodeByName).mock.calls.length;
-    const second = travelPathFrom(
-      { mapName: 'Carrina', x: 0, y: 0 },
-      'Field Ruins',
-    );
-
-    expect(second).toBe(first);
-    expect(vi.mocked(worldNodeByName).mock.calls.length).toBe(callsAfterFirst);
+    expect(travelPathFrom(carrina(0, 0), 'Field Ruins')).toBe(first);
   });
 
-  it('invalidates the cache once allMaps() actually changes', () => {
-    vi.mocked(worldNodeByName).mockReturnValue(
-      buildEntry({ mapName: 'Carrina', x: 2, y: 0, nodeName: 'Field Ruins' }),
-    );
-    vi.mocked(allMaps).mockReturnValue(
-      new Map<string, GameMap>([
-        ['Carrina', { name: 'Carrina', data: buildOpenMap(5, 5) }],
-      ]),
-    );
-    travelPathFrom({ mapName: 'Carrina', x: 0, y: 0 }, 'Field Ruins');
-    const callsAfterFirst = vi.mocked(worldNodeByName).mock.calls.length;
+  it('invalidates the cache once the maps reload', () => {
+    const first = travelPathFrom(carrina(0, 0), 'Field Ruins');
 
-    vi.mocked(allMaps).mockReturnValue(
-      new Map<string, GameMap>([
-        ['Carrina', { name: 'Carrina', data: buildOpenMap(5, 5) }],
-      ]),
-    );
-    travelPathFrom({ mapName: 'Carrina', x: 0, y: 0 }, 'Field Ruins');
+    seedWorldNodes([node('Field Ruins', 'Carrina', 2, 0)], [], {
+      Carrina: fiveByFive,
+    });
+    const second = travelPathFrom(carrina(0, 0), 'Field Ruins');
 
-    expect(vi.mocked(worldNodeByName).mock.calls.length).toBeGreaterThan(
-      callsAfterFirst,
-    );
+    expect(second).not.toBe(first);
+    expect(second).toEqual(first);
   });
 
+  // A newly-found collectible can unlock a gated TeleportNode, so a cached route must not outlive it.
   it('invalidates the cache once a new collectible is discovered', () => {
-    vi.mocked(worldNodeByName).mockReturnValue(
-      buildEntry({ mapName: 'Carrina', x: 2, y: 0, nodeName: 'Field Ruins' }),
-    );
-    vi.mocked(allMaps).mockReturnValue(
-      new Map<string, GameMap>([
-        ['Carrina', { name: 'Carrina', data: buildOpenMap(5, 5) }],
-      ]),
-    );
-    vi.mocked(discoveredCollectibleCount).mockReturnValue(0);
-    travelPathFrom({ mapName: 'Carrina', x: 0, y: 0 }, 'Field Ruins');
-    const callsAfterFirst = vi.mocked(worldNodeByName).mock.calls.length;
+    const first = travelPathFrom(carrina(0, 0), 'Field Ruins');
 
-    // A newly-found collectible can flip a gated TeleportNode's usability, so a stale
-    // cached route must not survive it - see unlockedTeleportNodes.
-    vi.mocked(discoveredCollectibleCount).mockReturnValue(1);
-    travelPathFrom({ mapName: 'Carrina', x: 0, y: 0 }, 'Field Ruins');
-
-    expect(vi.mocked(worldNodeByName).mock.calls.length).toBeGreaterThan(
-      callsAfterFirst,
+    seedGamestate((state) =>
+      applyCollectibleGrant(state, 'relic' as CollectibleId, 1),
     );
+    const second = travelPathFrom(carrina(0, 0), 'Field Ruins');
+
+    expect(second).not.toBe(first);
+    expect(second).toEqual(first);
   });
 });
 
-describe('travelPathFrom via +5 outposts', () => {
-  const carrinaOutpost = buildEntry({
-    mapName: 'Carrina',
-    x: 1,
-    y: 0,
-    nodeName: 'Carrina Outpost',
-    nodeData: buildObject({ name: 'Carrina Outpost', type: 'Outpost' }),
-  });
-  const mireOutpost = buildEntry({
-    mapName: 'CraggledMire',
-    x: 1,
-    y: 0,
-    nodeName: 'Mire Outpost',
-    nodeData: buildObject({ name: 'Mire Outpost', type: 'Outpost' }),
-  });
+describe('travelPathFrom via teleport-level outposts', () => {
+  const ready = OUTPOST_TELEPORT_LEVEL;
+  const notReady = OUTPOST_TELEPORT_LEVEL - 1;
 
-  function seedOutpostLevels(carrina: number, mire: number): void {
+  const twentyByThree = { width: 20, height: 3 };
+  const origin = carrina(0, 0);
+
+  function seedOutposts(levels: Record<string, number>): void {
     seedGamestate((state) => {
-      state.outposts = {
-        'Carrina Outpost': { level: carrina },
-        'Mire Outpost': { level: mire },
-      };
+      state.outposts = Object.fromEntries(
+        Object.entries(levels).map(([name, level]) => [name, { level }]),
+      );
     });
   }
 
   beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(worldNodeLookup).mockReturnValue(buildEmptyLookup());
-    vi.mocked(isWorldNodeCollectibleGateMet).mockReturnValue(true);
-    vi.mocked(worldNodesOfType).mockImplementation((type) =>
-      type === 'Outpost' ? [carrinaOutpost, mireOutpost] : [],
-    );
-    vi.mocked(allMaps).mockReturnValue(
-      new Map<string, GameMap>([
-        ['Carrina', { name: 'Carrina', data: buildOpenMap(20, 3) }],
-        ['CraggledMire', { name: 'CraggledMire', data: buildOpenMap(20, 3) }],
-      ]),
+    seedWorldNodes(
+      [
+        node('Carrina Outpost', 'Carrina', 1, 0, 'Outpost'),
+        node('Mire Outpost', 'CraggledMire', 1, 0, 'Outpost'),
+        node('Bog', 'CraggledMire', 2, 0),
+      ],
+      [],
+      { Carrina: twentyByThree, CraggledMire: twentyByThree },
     );
   });
 
-  it('hops between maps through two +5 outposts with no TeleportNode pair', () => {
-    seedOutpostLevels(5, 5);
-    vi.mocked(worldNodeByName).mockReturnValue(
-      buildEntry({ mapName: 'CraggledMire', x: 2, y: 0, nodeName: 'Bog' }),
-    );
+  it('hops between maps through two teleport-level outposts with no TeleportNode pair', () => {
+    seedOutposts({ 'Carrina Outpost': ready, 'Mire Outpost': ready });
 
-    expect(travelPathFrom({ mapName: 'Carrina', x: 0, y: 0 }, 'Bog')).toEqual([
+    expect(travelPathFrom(origin, 'Bog')).toEqual([
       { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
       { kind: 'Teleport', mapName: 'CraggledMire', x: 1, y: 0 },
       { kind: 'Move', mapName: 'CraggledMire', x: 2, y: 0 },
     ]);
   });
 
-  it('ignores an outpost below +5, and the cache picks it up once it levels', () => {
-    seedOutpostLevels(5, 4);
-    vi.mocked(worldNodeByName).mockReturnValue(
-      buildEntry({ mapName: 'CraggledMire', x: 2, y: 0, nodeName: 'Bog' }),
-    );
-    const origin = { mapName: 'Carrina', x: 0, y: 0 };
+  it('ignores an outpost below teleport level, and the cache picks it up once it levels', () => {
+    seedOutposts({ 'Carrina Outpost': ready, 'Mire Outpost': notReady });
 
     expect(travelPathFrom(origin, 'Bog')).toBeUndefined();
 
-    seedOutpostLevels(5, 5);
+    seedOutposts({ 'Carrina Outpost': ready, 'Mire Outpost': ready });
     expect(travelPathFrom(origin, 'Bog')).toHaveLength(3);
   });
 
   it('never hops when teleports are disallowed, for content-only tooling, or with useOutposts off', () => {
-    seedOutpostLevels(5, 5);
-    vi.mocked(worldNodeByName).mockReturnValue(
-      buildEntry({ mapName: 'CraggledMire', x: 2, y: 0, nodeName: 'Bog' }),
-    );
-    const origin = { mapName: 'Carrina', x: 0, y: 0 };
+    seedOutposts({ 'Carrina Outpost': ready, 'Mire Outpost': ready });
 
     expect(travelPathFrom(origin, 'Bog', false)).toBeUndefined();
     expect(travelPathFrom(origin, 'Bog', true, true)).toBeUndefined();
@@ -1054,32 +431,21 @@ describe('travelPathFrom via +5 outposts', () => {
   });
 
   it('takes an outpost hop within one map when it beats walking', () => {
-    const farOutpost = buildEntry({
-      mapName: 'Carrina',
-      x: 18,
-      y: 0,
-      nodeName: 'Far Outpost',
-      nodeData: buildObject({ name: 'Far Outpost', type: 'Outpost' }),
-    });
-    vi.mocked(worldNodesOfType).mockImplementation((type) =>
-      type === 'Outpost' ? [carrinaOutpost, farOutpost] : [],
-    );
-    seedGamestate((state) => {
-      state.outposts = {
-        'Carrina Outpost': { level: 5 },
-        'Far Outpost': { level: 5 },
-      };
-    });
-    vi.mocked(worldNodeByName).mockReturnValue(
-      buildEntry({ mapName: 'Carrina', x: 19, y: 0, nodeName: 'Cliff' }),
-    );
-
-    expect(travelPathFrom({ mapName: 'Carrina', x: 0, y: 0 }, 'Cliff')).toEqual(
+    seedWorldNodes(
       [
-        { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
-        { kind: 'Teleport', mapName: 'Carrina', x: 18, y: 0 },
-        { kind: 'Move', mapName: 'Carrina', x: 19, y: 0 },
+        node('Carrina Outpost', 'Carrina', 1, 0, 'Outpost'),
+        node('Far Outpost', 'Carrina', 18, 0, 'Outpost'),
+        node('Cliff', 'Carrina', 19, 0),
       ],
+      [],
+      { Carrina: twentyByThree },
     );
+    seedOutposts({ 'Carrina Outpost': ready, 'Far Outpost': ready });
+
+    expect(travelPathFrom(origin, 'Cliff')).toEqual([
+      { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
+      { kind: 'Teleport', mapName: 'Carrina', x: 18, y: 0 },
+      { kind: 'Move', mapName: 'Carrina', x: 19, y: 0 },
+    ]);
   });
 });

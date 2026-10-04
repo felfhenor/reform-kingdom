@@ -49,10 +49,15 @@ import {
 import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation-buff';
 import { outpostDeathPenaltyMultiplier } from '@helpers/world-node/world-node-outpost';
 import type {
+  CaravanId,
+  CollectibleId,
   Combat,
   CurrentLocation,
+  EncounterId,
   GameState,
+  GatheringId,
   GlobalEffectId,
+  OutpostId,
   TravelState,
   TravelStep,
   WorldNodeEntry,
@@ -136,17 +141,20 @@ beforeEach(() => {
   vi.mocked(mapHopsBetween).mockReturnValue(0);
   seedWorld();
   seedContent([
-    ensureGlobalEffect({ id: 'Deaths Door' as never, name: 'Deaths Door' }),
-    ensureGlobalEffect({ id: 'Healing' as never, name: 'Healing' }),
-    ensureEncounter({ id: 'field-ruins' as never, name: 'Field Ruins' }),
-    ensureEncounter({
-      id: 'spider-tower' as never,
-      name: 'Spider Tower',
-      invisibleUntilCollectibleIdsFound: ['spider-key' as never],
+    ensureGlobalEffect({
+      id: 'Deaths Door' as GlobalEffectId,
+      name: 'Deaths Door',
     }),
-    ensureGathering({ id: 'wergen' as never, name: 'Wergen Woods' }),
-    ensureCaravan({ id: 'duchy-caravan' as never, name: 'Caravan' }),
-    ensureOutpost({ id: 'outpost' as never, name: 'Carrina Outpost' }),
+    ensureGlobalEffect({ id: 'Healing' as GlobalEffectId, name: 'Healing' }),
+    ensureEncounter({ id: 'field-ruins' as EncounterId, name: 'Field Ruins' }),
+    ensureEncounter({
+      id: 'spider-tower' as EncounterId,
+      name: 'Spider Tower',
+      invisibleUntilCollectibleIdsFound: ['spider-key' as CollectibleId],
+    }),
+    ensureGathering({ id: 'wergen' as GatheringId, name: 'Wergen Woods' }),
+    ensureCaravan({ id: 'duchy-caravan' as CaravanId, name: 'Caravan' }),
+    ensureOutpost({ id: 'outpost' as OutpostId, name: 'Carrina Outpost' }),
   ]);
 });
 

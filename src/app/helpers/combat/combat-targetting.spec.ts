@@ -5,98 +5,46 @@ import {
   combatSkillHasValidTargetsForMode,
 } from '@helpers/combat/combat-targetting';
 import type {
-  Combat,
-  Combatant,
+  CharacterId,
   CombatTargetModeContext,
-  EquipmentSkill,
   EquipmentSkillContentTechnique,
+  EquipmentSkillId,
+  JobId,
+  StatusEffectId,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
+import { ensureEquipmentSkillTechnique } from '@helpers/content/ensure-skill';
+import { defaultCombatStats } from '@helpers/defaults';
+import {
+  buildCombat,
+  buildEquipmentSkill,
+  buildStatusEffect,
+  buildTestCombatant,
+} from '@/testing/builders';
 import { describe, expect, it } from 'vitest';
-
-function buildSkill(overrides: Partial<EquipmentSkill> = {}): EquipmentSkill {
-  return {
-    id: 'skill-1' as never,
-    name: 'Test Skill',
-    __type: 'skill',
-    description: '',
-    sprite: '0000',
-    rarity: 'Common',
-    epCost: 0,
-    usesPerCombat: -1,
-    statusEffectDurationBoost: {} as never,
-    statusEffectChanceBoost: {} as never,
-    techniques: [],
-    requiredWeaponTypes: [],
-    family: 'Test Skill',
-    ...overrides,
-  };
-}
 
 function buildTechnique(
   overrides: Partial<EquipmentSkillContentTechnique> = {},
 ): EquipmentSkillContentTechnique {
-  return {
-    targets: 1,
+  return ensureEquipmentSkillTechnique({
     targetType: 'Allies',
     targetBehaviors: [{ behavior: 'Always' }],
-    damageScaling: {} as never,
-    elements: [],
-    attributes: [],
-    statusEffects: [],
-    combatMessage: '',
     ...overrides,
-  };
-}
-
-function buildCombat(overrides: Partial<Combat> = {}): Combat {
-  return {
-    id: 'combat-1' as never,
-    locationName: 'Field Ruins',
-    locationPosition: { x: 0, y: 0 },
-    rounds: 1,
-    heroes: [],
-    helpers: [],
-    guardians: [],
-    ...overrides,
-  };
-}
-
-function buildCombatant(overrides: Partial<Combatant> = {}): Combatant {
-  return {
-    id: 'combatant-1',
-    name: 'Combatant',
-    isEnemy: false,
-    level: 1,
-    hp: 10,
-    ep: 10,
-    sprite: '0000',
-    frames: 4,
-    targetting: [{ type: 'Random' }],
-    baseStats: {} as never,
-    statBoosts: {} as never,
-    totalStats: {} as never,
-    combatStats: { agroValue: 0 } as never,
-    resistance: {} as never,
-    affinity: {} as never,
-    tagResistance: {} as never,
-    skillIds: [],
-    skillRefs: [],
-    skillWeights: {},
-    combatOrders: [],
-    skillUses: {},
-    statusEffects: [],
-    statusEffectData: {},
-    ...overrides,
-  };
+  });
 }
 
 describe('combatAvailableSkillsForCombatant', () => {
   it('excludes skills whose epCost exceeds the combatant current ep', () => {
-    const affordable = buildSkill({ id: 'cheap' as never, epCost: 5 });
-    const tooExpensive = buildSkill({ id: 'expensive' as never, epCost: 15 });
+    const affordable = buildEquipmentSkill({
+      id: 'cheap' as EquipmentSkillId,
+      epCost: 5,
+    });
+    const tooExpensive = buildEquipmentSkill({
+      id: 'expensive' as EquipmentSkillId,
+      epCost: 15,
+    });
 
-    const combatant = buildCombatant({
+    const combatant = buildTestCombatant({
       ep: 10,
       skillRefs: [affordable, tooExpensive],
     });
@@ -107,22 +55,22 @@ describe('combatAvailableSkillsForCombatant', () => {
   });
 
   it('includes a skill whose epCost exactly matches the combatant current ep', () => {
-    const skill = buildSkill({ epCost: 10 });
-    const combatant = buildCombatant({ ep: 10, skillRefs: [skill] });
+    const skill = buildEquipmentSkill({ epCost: 10 });
+    const combatant = buildTestCombatant({ ep: 10, skillRefs: [skill] });
 
     expect(combatAvailableSkillsForCombatant(combatant)).toEqual([skill]);
   });
 
   it('still excludes skills that are out of uses even if ep is available', () => {
-    const skill = buildSkill({
-      id: 'limited' as never,
+    const skill = buildEquipmentSkill({
+      id: 'limited' as EquipmentSkillId,
       epCost: 0,
       usesPerCombat: 1,
     });
-    const combatant = buildCombatant({
+    const combatant = buildTestCombatant({
       ep: 10,
       skillRefs: [skill],
-      skillUses: { ['limited' as never]: 1 },
+      skillUses: { ['limited' as EquipmentSkillId]: 1 },
     });
 
     expect(combatAvailableSkillsForCombatant(combatant)).toEqual([]);
@@ -131,8 +79,8 @@ describe('combatAvailableSkillsForCombatant', () => {
 
 describe('combatGetTargetsFromListBasedOnType', () => {
   it('Self returns only the caster from the given list', () => {
-    const caster = buildCombatant({ id: 'caster' });
-    const ally = buildCombatant({ id: 'ally' });
+    const caster = buildTestCombatant({ id: 'caster' });
+    const ally = buildTestCombatant({ id: 'ally' });
     const context: CombatTargetModeContext = { combatant: caster };
 
     expect(
@@ -141,8 +89,8 @@ describe('combatGetTargetsFromListBasedOnType', () => {
   });
 
   it('Self returns nothing when the caster is not in the given list', () => {
-    const caster = buildCombatant({ id: 'caster' });
-    const ally = buildCombatant({ id: 'ally' });
+    const caster = buildTestCombatant({ id: 'caster' });
+    const ally = buildTestCombatant({ id: 'ally' });
     const context: CombatTargetModeContext = { combatant: caster };
 
     expect(
@@ -151,11 +99,11 @@ describe('combatGetTargetsFromListBasedOnType', () => {
   });
 
   it('SpecificHero returns only the combatant matching the target character id', () => {
-    const target = buildCombatant({ id: 'target-hero' });
-    const other = buildCombatant({ id: 'other-hero' });
+    const target = buildTestCombatant({ id: 'target-hero' });
+    const other = buildTestCombatant({ id: 'other-hero' });
     const context: CombatTargetModeContext = {
       combatant: other,
-      targetCharacterId: 'target-hero' as never,
+      targetCharacterId: 'target-hero' as CharacterId,
     };
 
     expect(
@@ -169,10 +117,10 @@ describe('combatGetTargetsFromListBasedOnType', () => {
   });
 
   it('SpecificHero returns nothing when the target character is not in the given list', () => {
-    const other = buildCombatant({ id: 'other-hero' });
+    const other = buildTestCombatant({ id: 'other-hero' });
     const context: CombatTargetModeContext = {
       combatant: other,
-      targetCharacterId: 'missing-hero' as never,
+      targetCharacterId: 'missing-hero' as CharacterId,
     };
 
     expect(
@@ -181,9 +129,9 @@ describe('combatGetTargetsFromListBasedOnType', () => {
   });
 
   it('MatchingAllies only selects from combatants present in both matchingCombatants and the pool', () => {
-    const caster = buildCombatant({ id: 'caster' });
-    const critical = buildCombatant({ id: 'critical', hp: 5 });
-    const wounded = buildCombatant({ id: 'wounded', hp: 40 });
+    const caster = buildTestCombatant({ id: 'caster' });
+    const critical = buildTestCombatant({ id: 'critical', hp: 5 });
+    const wounded = buildTestCombatant({ id: 'wounded', hp: 40 });
 
     const context: CombatTargetModeContext = {
       combatant: caster,
@@ -201,9 +149,9 @@ describe('combatGetTargetsFromListBasedOnType', () => {
   });
 
   it('MatchingAllies excludes matches no longer present in the base target pool', () => {
-    const caster = buildCombatant({ id: 'caster' });
-    const critical = buildCombatant({ id: 'critical', hp: 5 });
-    const noLongerValid = buildCombatant({ id: 'no-longer-valid', hp: 1 });
+    const caster = buildTestCombatant({ id: 'caster' });
+    const critical = buildTestCombatant({ id: 'critical', hp: 5 });
+    const noLongerValid = buildTestCombatant({ id: 'no-longer-valid', hp: 1 });
 
     const context: CombatTargetModeContext = {
       combatant: caster,
@@ -221,9 +169,13 @@ describe('combatGetTargetsFromListBasedOnType', () => {
   });
 
   it('MatchingEnemies selects from the same matched list as MatchingAllies', () => {
-    const caster = buildCombatant({ id: 'caster' });
-    const lowEnemy = buildCombatant({ id: 'low', isEnemy: true, hp: 5 });
-    const otherEnemy = buildCombatant({ id: 'other', isEnemy: true, hp: 90 });
+    const caster = buildTestCombatant({ id: 'caster' });
+    const lowEnemy = buildTestCombatant({ id: 'low', isEnemy: true, hp: 5 });
+    const otherEnemy = buildTestCombatant({
+      id: 'other',
+      isEnemy: true,
+      hp: 90,
+    });
 
     expect(
       combatGetTargetsFromListBasedOnType(
@@ -236,9 +188,9 @@ describe('combatGetTargetsFromListBasedOnType', () => {
   });
 
   it('Matching modes keep the matched order when there are more matches than targets', () => {
-    const caster = buildCombatant({ id: 'caster' });
-    const lowest = buildCombatant({ id: 'lowest', hp: 5 });
-    const low = buildCombatant({ id: 'low', hp: 20 });
+    const caster = buildTestCombatant({ id: 'caster' });
+    const lowest = buildTestCombatant({ id: 'lowest', hp: 5 });
+    const low = buildTestCombatant({ id: 'low', hp: 20 });
     const context = { combatant: caster, matchingCombatants: [lowest, low] };
 
     expect(
@@ -260,13 +212,13 @@ describe('combatGetTargetsFromListBasedOnType', () => {
   });
 
   it('MatchingEnemies still hits a taunting enemy first, even one outside the matches', () => {
-    const caster = buildCombatant({ id: 'caster' });
-    const lowEnemy = buildCombatant({ id: 'low', isEnemy: true, hp: 5 });
-    const taunter = buildCombatant({
+    const caster = buildTestCombatant({ id: 'caster' });
+    const lowEnemy = buildTestCombatant({ id: 'low', isEnemy: true, hp: 5 });
+    const taunter = buildTestCombatant({
       id: 'taunter',
       isEnemy: true,
       hp: 100,
-      combatStats: { agroValue: 10 } as never,
+      combatStats: { ...defaultCombatStats(), agroValue: 10 },
     });
 
     expect(
@@ -280,12 +232,12 @@ describe('combatGetTargetsFromListBasedOnType', () => {
   });
 
   it('MatchingAllies ignores agro so heals stay on the matched allies', () => {
-    const caster = buildCombatant({ id: 'caster' });
-    const wounded = buildCombatant({ id: 'wounded', hp: 5 });
-    const tank = buildCombatant({
+    const caster = buildTestCombatant({ id: 'caster' });
+    const wounded = buildTestCombatant({ id: 'wounded', hp: 5 });
+    const tank = buildTestCombatant({
       id: 'tank',
       hp: 100,
-      combatStats: { agroValue: 10 } as never,
+      combatStats: { ...defaultCombatStats(), agroValue: 10 },
     });
 
     expect(
@@ -299,13 +251,13 @@ describe('combatGetTargetsFromListBasedOnType', () => {
   });
 
   it("always includes an agro'd combatant in a partial AoE selection, even if hp ordering would exclude them", () => {
-    const agroed = buildCombatant({
+    const agroed = buildTestCombatant({
       id: 'agroed',
       hp: 100,
-      combatStats: { agroValue: 10 } as never,
+      combatStats: { ...defaultCombatStats(), agroValue: 10 },
     });
-    const weakest = buildCombatant({ id: 'weakest', hp: 1 });
-    const other = buildCombatant({ id: 'other', hp: 5 });
+    const weakest = buildTestCombatant({ id: 'weakest', hp: 1 });
+    const other = buildTestCombatant({ id: 'other', hp: 5 });
 
     const result = combatGetTargetsFromListBasedOnType(
       [agroed, weakest, other],
@@ -317,17 +269,17 @@ describe('combatGetTargetsFromListBasedOnType', () => {
   });
 
   it('picks the highest-agro combatant as the sole target for a single-target skill, ignoring hp ordering', () => {
-    const lowAgro = buildCombatant({
+    const lowAgro = buildTestCombatant({
       id: 'low-agro',
       hp: 1,
-      combatStats: { agroValue: 10 } as never,
+      combatStats: { ...defaultCombatStats(), agroValue: 10 },
     });
-    const highAgro = buildCombatant({
+    const highAgro = buildTestCombatant({
       id: 'high-agro',
       hp: 100,
-      combatStats: { agroValue: 50 } as never,
+      combatStats: { ...defaultCombatStats(), agroValue: 50 },
     });
-    const noAgro = buildCombatant({ id: 'no-agro', hp: 1 });
+    const noAgro = buildTestCombatant({ id: 'no-agro', hp: 1 });
 
     const result = combatGetTargetsFromListBasedOnType(
       [lowAgro, highAgro, noAgro],
@@ -341,17 +293,20 @@ describe('combatGetTargetsFromListBasedOnType', () => {
 
 describe('combatGetTargetsFromPriorityList', () => {
   it('returns targets from the first entry that resolves a non-empty result', () => {
-    const caster = buildCombatant({ id: 'caster' });
-    const healer = buildCombatant({ id: 'healer', jobId: 'healer' as never });
-    const warrior = buildCombatant({
+    const caster = buildTestCombatant({ id: 'caster' });
+    const healer = buildTestCombatant({
+      id: 'healer',
+      jobId: 'healer' as JobId,
+    });
+    const warrior = buildTestCombatant({
       id: 'warrior',
-      jobId: 'warrior' as never,
+      jobId: 'warrior' as JobId,
     });
     const context: CombatTargetModeContext = { combatant: caster };
 
     const result = combatGetTargetsFromPriorityList(
       [warrior, healer],
-      [{ type: 'Random', jobId: 'healer' as never }, { type: 'Random' }],
+      [{ type: 'Random', jobId: 'healer' as JobId }, { type: 'Random' }],
       1,
       context,
     );
@@ -360,27 +315,27 @@ describe('combatGetTargetsFromPriorityList', () => {
   });
 
   it("narrows to jobId before applying the entry's mode, e.g. the weakest combatant of that job rather than the weakest overall", () => {
-    const caster = buildCombatant({ id: 'caster' });
-    const frailHealer = buildCombatant({
+    const caster = buildTestCombatant({ id: 'caster' });
+    const frailHealer = buildTestCombatant({
       id: 'frail-healer',
       hp: 5,
-      jobId: 'healer' as never,
+      jobId: 'healer' as JobId,
     });
-    const sturdyHealer = buildCombatant({
+    const sturdyHealer = buildTestCombatant({
       id: 'sturdy-healer',
       hp: 50,
-      jobId: 'healer' as never,
+      jobId: 'healer' as JobId,
     });
-    const frailWarrior = buildCombatant({
+    const frailWarrior = buildTestCombatant({
       id: 'frail-warrior',
       hp: 1,
-      jobId: 'warrior' as never,
+      jobId: 'warrior' as JobId,
     });
     const context: CombatTargetModeContext = { combatant: caster };
 
     const result = combatGetTargetsFromPriorityList(
       [frailWarrior, sturdyHealer, frailHealer],
-      [{ type: 'Weakest', jobId: 'healer' as never }],
+      [{ type: 'Weakest', jobId: 'healer' as JobId }],
       1,
       context,
     );
@@ -389,16 +344,16 @@ describe('combatGetTargetsFromPriorityList', () => {
   });
 
   it('falls through to the next entry when the first resolves no targets', () => {
-    const caster = buildCombatant({ id: 'caster' });
-    const warrior = buildCombatant({
+    const caster = buildTestCombatant({ id: 'caster' });
+    const warrior = buildTestCombatant({
       id: 'warrior',
-      jobId: 'warrior' as never,
+      jobId: 'warrior' as JobId,
     });
     const context: CombatTargetModeContext = { combatant: caster };
 
     const result = combatGetTargetsFromPriorityList(
       [warrior],
-      [{ type: 'Random', jobId: 'healer' as never }, { type: 'Random' }],
+      [{ type: 'Random', jobId: 'healer' as JobId }, { type: 'Random' }],
       1,
       context,
     );
@@ -407,12 +362,12 @@ describe('combatGetTargetsFromPriorityList', () => {
   });
 
   it('returns an empty list when every entry resolves no targets', () => {
-    const caster = buildCombatant({ id: 'caster' });
+    const caster = buildTestCombatant({ id: 'caster' });
     const context: CombatTargetModeContext = { combatant: caster };
 
     const result = combatGetTargetsFromPriorityList(
       [],
-      [{ type: 'Random', jobId: 'healer' as never }],
+      [{ type: 'Random', jobId: 'healer' as JobId }],
       1,
       context,
     );
@@ -423,10 +378,10 @@ describe('combatGetTargetsFromPriorityList', () => {
 
 describe('combatSkillHasValidTargetsForMode', () => {
   it('treats a town-guardian helper as an ally, alongside heroes', () => {
-    const caster = buildCombatant({ id: 'caster' });
-    const helper = buildCombatant({ id: 'helper-1', hp: 5 });
+    const caster = buildTestCombatant({ id: 'caster' });
+    const helper = buildTestCombatant({ id: 'helper-1', hp: 5 });
     const combat = buildCombat({ heroes: [caster], helpers: [helper] });
-    const skill = buildSkill({
+    const skill = buildEquipmentSkill({
       techniques: [buildTechnique({ targetType: 'Allies' })],
     });
     const context: CombatTargetModeContext = { combatant: caster };
@@ -434,15 +389,15 @@ describe('combatSkillHasValidTargetsForMode', () => {
     expect(
       combatSkillHasValidTargetsForMode(combat, caster, skill, 'SpecificHero', {
         ...context,
-        targetCharacterId: helper.id as never,
+        targetCharacterId: helper.id as CharacterId,
       }),
     ).toBe(true);
   });
 
   it('is true when a technique pool can resolve the override mode', () => {
-    const caster = buildCombatant({ id: 'caster' });
+    const caster = buildTestCombatant({ id: 'caster' });
     const combat = buildCombat({ heroes: [caster] });
-    const skill = buildSkill({
+    const skill = buildEquipmentSkill({
       techniques: [buildTechnique({ targetType: 'Self' })],
     });
     const context: CombatTargetModeContext = { combatant: caster };
@@ -453,19 +408,21 @@ describe('combatSkillHasValidTargetsForMode', () => {
   });
 
   it('treats an effect in its final turn as absent, so a self-buff can be refreshed', () => {
-    const caster = buildCombatant({
+    const caster = buildTestCombatant({
       id: 'caster',
-      statusEffects: [{ id: 'Invigorated', duration: 0 } as never],
+      statusEffects: [
+        buildStatusEffect({ id: 'Invigorated' as StatusEffectId, duration: 0 }),
+      ],
     });
     const combat = buildCombat({ heroes: [caster] });
-    const skill = buildSkill({
+    const skill = buildEquipmentSkill({
       techniques: [
         buildTechnique({
           targetType: 'Allies',
           targetBehaviors: [
             {
               behavior: 'IfNotStatusEffect',
-              statusEffectId: 'Invigorated' as never,
+              statusEffectId: 'Invigorated' as StatusEffectId,
             },
           ],
         }),
@@ -480,19 +437,21 @@ describe('combatSkillHasValidTargetsForMode', () => {
 
   // Mirrors "target self with Fortify, skip if already buffed" via IfNotStatusEffect.
   it('is false when the caster has been filtered out of every technique pool', () => {
-    const caster = buildCombatant({
+    const caster = buildTestCombatant({
       id: 'caster',
-      statusEffects: [{ id: 'Invigorated', duration: 2 } as never],
+      statusEffects: [
+        buildStatusEffect({ id: 'Invigorated' as StatusEffectId, duration: 2 }),
+      ],
     });
     const combat = buildCombat({ heroes: [caster] });
-    const skill = buildSkill({
+    const skill = buildEquipmentSkill({
       techniques: [
         buildTechnique({
           targetType: 'Allies',
           targetBehaviors: [
             {
               behavior: 'IfNotStatusEffect',
-              statusEffectId: 'Invigorated' as never,
+              statusEffectId: 'Invigorated' as StatusEffectId,
             },
           ],
         }),
@@ -505,14 +464,33 @@ describe('combatSkillHasValidTargetsForMode', () => {
     ).toBe(false);
   });
 
-  it('ignores confusion, which is handled at cast time instead', () => {
-    const caster = buildCombatant({
-      id: 'caster',
-      combatStats: { agroValue: 0, redirectionChance: 100 } as never,
+  it('is false when the only candidate is dead and the technique needs a living target', () => {
+    const caster = buildTestCombatant({ id: 'caster', hp: 0 });
+    const combat = buildCombat({ heroes: [caster] });
+    const skill = buildEquipmentSkill({
+      techniques: [
+        buildTechnique({ targetBehaviors: [{ behavior: 'NotZeroHealth' }] }),
+      ],
     });
-    const lowEnemy = buildCombatant({ id: 'low', isEnemy: true, hp: 5 });
+    const context: CombatTargetModeContext = { combatant: caster };
+
+    expect(
+      combatSkillHasValidTargetsForMode(combat, caster, skill, 'Self', context),
+    ).toBe(false);
+  });
+
+  it('ignores confusion, which is handled at cast time instead', () => {
+    const caster = buildTestCombatant({
+      id: 'caster',
+      combatStats: {
+        ...defaultCombatStats(),
+        agroValue: 0,
+        redirectionChance: 100,
+      },
+    });
+    const lowEnemy = buildTestCombatant({ id: 'low', isEnemy: true, hp: 5 });
     const combat = buildCombat({ heroes: [caster], guardians: [lowEnemy] });
-    const skill = buildSkill({
+    const skill = buildEquipmentSkill({
       techniques: [buildTechnique({ targetType: 'Enemies' })],
     });
 
@@ -528,18 +506,18 @@ describe('combatSkillHasValidTargetsForMode', () => {
   });
 
   it('MatchingEnemies with an ally-only skill is false even when an ally is taunting', () => {
-    const caster = buildCombatant({ id: 'caster' });
-    const taunter = buildCombatant({
+    const caster = buildTestCombatant({ id: 'caster' });
+    const taunter = buildTestCombatant({
       id: 'taunter',
       hp: 50,
-      combatStats: { agroValue: 10 } as never,
+      combatStats: { ...defaultCombatStats(), agroValue: 10 },
     });
-    const lowEnemy = buildCombatant({ id: 'low', isEnemy: true, hp: 5 });
+    const lowEnemy = buildTestCombatant({ id: 'low', isEnemy: true, hp: 5 });
     const combat = buildCombat({
       heroes: [caster, taunter],
       guardians: [lowEnemy],
     });
-    const skill = buildSkill({
+    const skill = buildEquipmentSkill({
       techniques: [buildTechnique({ targetType: 'Allies' })],
     });
 

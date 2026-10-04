@@ -10,7 +10,7 @@ import {
   isPlayerAtHome,
   pruneInvalidHomeNode,
 } from '@helpers/town/town-spawn';
-import type { GameState, TownId, WorldNodeEntry } from '@interfaces';
+import type { GameState, OutpostId, TownId, WorldNodeEntry } from '@interfaces';
 import { buildTownNodeState } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
@@ -24,7 +24,10 @@ let nodes: Record<string, WorldNodeEntry>;
 beforeEach(() => {
   seedContent([
     ensureTown({ id: townId, name: 'Larsia' }),
-    ensureOutpost({ id: 'carrina-outpost' as never, name: 'Carrina Outpost' }),
+    ensureOutpost({
+      id: 'carrina-outpost' as OutpostId,
+      name: 'Carrina Outpost',
+    }),
   ]);
   nodes = seedWorldNodes([
     { name: 'Duchy', type: 'Kingdom' },

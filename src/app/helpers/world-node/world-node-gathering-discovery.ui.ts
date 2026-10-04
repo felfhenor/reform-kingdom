@@ -1,10 +1,8 @@
+import { rangeLabel } from '@helpers/engine/leveled-range';
 import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
 import { isMaterialDiscovered } from '@helpers/item/materials';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
-import {
-  worldNodeLevelLabel,
-  worldNodeLevelRange,
-} from '@helpers/world-node/world-node-status';
+import { worldNodeLevelRange } from '@helpers/world-node/world-node-status';
 import {
   isWorldNodeVisible,
   worldNodeByName,
@@ -37,7 +35,7 @@ export function gatherNodeFarmOptions(): ExploreNodeFarmOption[] {
       const levelRange = worldNodeLevelRange(entry);
       return {
         nodeName: entry.nodeName,
-        levelLabel: levelRange ? worldNodeLevelLabel(levelRange) : '?',
+        levelLabel: levelRange ? rangeLabel(levelRange) : '?',
         entry,
       };
     }),

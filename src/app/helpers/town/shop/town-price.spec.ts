@@ -1,66 +1,45 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/kingdom/armory', () => ({
-  equipmentSellValue: vi.fn(),
-}));
-
-import { getEntry } from '@helpers/content/content';
+import { ensureEquipment } from '@helpers/content/ensure-item';
+import { ensureTown } from '@helpers/content/ensure-town';
+import { defaultStats } from '@helpers/defaults';
 import { equipmentSellValue } from '@helpers/kingdom/armory';
 import { townStockPrice } from '@helpers/town/shop/town-price';
-import type {
-  EquipmentContent,
-  EquipmentId,
-  TownContent,
-  TownStockEntry,
-} from '@interfaces';
+import type { EquipmentId, TownId } from '@interfaces';
+import { buildTownStockEntry } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
 
-function buildTown(sellMarkup: number): TownContent {
-  return {
-    traders: {
-      sellItemCount: [{ tier: 0, value: 10 }],
-      markupPercentages: { sell: sellMarkup, buy: 0 },
-    },
-  } as unknown as TownContent;
-}
-
-beforeEach(() => {
-  vi.clearAllMocks();
+const sword = ensureEquipment({
+  id: 'sword' as EquipmentId,
+  name: 'Sword',
+  baseStats: { ...defaultStats(), Strength: 40 },
 });
+const townWithMarkup = (sell: number) =>
+  ensureTown({
+    id: 'larsia' as TownId,
+    traders: { markupPercentages: { sell, buy: 0 } },
+  });
 
 describe('townStockPrice', () => {
-  it('prices an equipment entry via the shared equipmentSellValue formula, marked up', () => {
-    vi.mocked(getEntry).mockReturnValue({} as EquipmentContent);
-    vi.mocked(equipmentSellValue).mockReturnValue(100);
-    const entry: TownStockEntry = {
-      equipmentItem: { equipmentId: 'sword' as EquipmentId } as never,
-      addedAtTick: 0,
-    };
+  it('marks up the item’s sell value by the town’s sell markup, never below 1 gold', () => {
+    seedContent([sword]);
+    const entry = buildTownStockEntry(sword.id);
+    const value = equipmentSellValue({
+      item: entry.equipmentItem,
+      content: sword,
+    });
 
-    expect(townStockPrice(buildTown(25), entry)).toBe(125);
+    expect(townStockPrice(townWithMarkup(25), entry)).toBe(
+      Math.round(value * 1.25),
+    );
+    expect(townStockPrice(townWithMarkup(-100), entry)).toBe(1);
   });
 
-  it('returns undefined when the equipment content no longer resolves', () => {
-    vi.mocked(getEntry).mockReturnValue(undefined);
-    const entry: TownStockEntry = {
-      equipmentItem: { equipmentId: 'removed' as EquipmentId } as never,
-      addedAtTick: 0,
-    };
+  it('has no price for stock whose content is gone', () => {
+    seedContent([]);
 
-    expect(townStockPrice(buildTown(0), entry)).toBeUndefined();
-  });
-
-  it('never prices below 1 gold', () => {
-    vi.mocked(getEntry).mockReturnValue({} as EquipmentContent);
-    vi.mocked(equipmentSellValue).mockReturnValue(5);
-    const entry: TownStockEntry = {
-      equipmentItem: { equipmentId: 'sword' as EquipmentId } as never,
-      addedAtTick: 0,
-    };
-
-    expect(townStockPrice(buildTown(-100), entry)).toBe(1);
+    expect(
+      townStockPrice(townWithMarkup(0), buildTownStockEntry(sword.id)),
+    ).toBeUndefined();
   });
 });

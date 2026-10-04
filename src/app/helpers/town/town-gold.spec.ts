@@ -1,62 +1,48 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(() => ({ id: goldCoinItemId })),
-}));
-
+import { ensureItem } from '@helpers/content/ensure-item';
+import { ensureTown } from '@helpers/content/ensure-town';
+import { defaultGameState } from '@helpers/defaults';
 import { applyTownAccrueHiddenGold } from '@helpers/town/town-gold';
-import type { GameState, ItemId, TownContent, TownId } from '@interfaces';
+import type { GameState, ItemId, TownId } from '@interfaces';
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
 
-const townId = 'larsia' as TownId;
-const goldCoinItemId = 'gold-coin' as ItemId;
+const goldCoin = ensureItem({ id: 'gold-coin' as ItemId, name: 'Gold Coin' });
+const town = ensureTown({
+  id: 'larsia' as TownId,
+  materialThresholds: [{ itemId: goldCoin.id, maxQuantity: 1000 }],
+});
 
-function buildTown(goldRequiredBeforeCutoff = 1000): TownContent {
-  return {
-    materialThresholds: [
-      { itemId: goldCoinItemId, maxQuantity: goldRequiredBeforeCutoff },
-    ],
-  } as unknown as TownContent;
-}
-
-function buildState(hiddenGold: number): GameState {
-  const state = {
-    world: { towns: { [townId]: { hiddenGold } } },
-  } as unknown as GameState;
+function stateWith(hiddenGold: number): GameState {
+  seedContent([goldCoin, town]);
+  const state = defaultGameState();
+  state.world.towns[town.id] = buildTownNodeState({ hiddenGold });
   return state;
 }
 
+const hiddenGold = (state: GameState) => state.world.towns[town.id].hiddenGold;
+
 describe('applyTownAccrueHiddenGold', () => {
-  it('adds the amount to the town hiddenGold total', () => {
-    const state = buildState(100);
+  it('adds to the town’s hidden gold up to its gold cap', () => {
+    const state = stateWith(100);
 
-    applyTownAccrueHiddenGold(state, buildTown(), townId, 50);
+    applyTownAccrueHiddenGold(state, town, town.id, 50);
+    expect(hiddenGold(state)).toBe(150);
 
-    expect(state.world.towns[townId].hiddenGold).toBe(150);
+    applyTownAccrueHiddenGold(state, town, town.id, 5000);
+    expect(hiddenGold(state)).toBe(1000);
   });
 
-  it('clamps at goldRequiredBeforeCutoff', () => {
-    const state = buildState(950);
+  it('ignores non-positive amounts and towns without state', () => {
+    const state = stateWith(100);
 
-    applyTownAccrueHiddenGold(state, buildTown(1000), townId, 500);
+    applyTownAccrueHiddenGold(state, town, town.id, 0);
+    applyTownAccrueHiddenGold(state, town, town.id, -10);
+    expect(hiddenGold(state)).toBe(100);
 
-    expect(state.world.towns[townId].hiddenGold).toBe(1000);
-  });
-
-  it('does nothing for a non-positive amount', () => {
-    const state = buildState(100);
-
-    applyTownAccrueHiddenGold(state, buildTown(), townId, 0);
-    applyTownAccrueHiddenGold(state, buildTown(), townId, -10);
-
-    expect(state.world.towns[townId].hiddenGold).toBe(100);
-  });
-
-  it('does nothing when the town has no state entry', () => {
-    const state = { world: { towns: {} } } as unknown as GameState;
-
-    expect(() =>
-      applyTownAccrueHiddenGold(state, buildTown(), townId, 50),
-    ).not.toThrow();
-    expect(state.world.towns[townId]).toBeUndefined();
+    const fresh = defaultGameState();
+    applyTownAccrueHiddenGold(fresh, town, town.id, 50);
+    expect(fresh.world.towns[town.id]).toBeUndefined();
   });
 });

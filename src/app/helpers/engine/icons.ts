@@ -1,8 +1,8 @@
 import type { IconSize } from '@interfaces/icon-size';
 import {
   gameAges,
-  gameAnvilImpact,
   gameAngelWings,
+  gameAnvilImpact,
   gameArmorDowngrade,
   gameBallGlow,
   gameBleedingWound,
@@ -77,6 +77,7 @@ import {
   gameWorld,
 } from '@ng-icons/game-icons';
 import {
+  tablerArrowLeft,
   tablerCheck,
   tablerChecklist,
   tablerChevronLeft,
@@ -183,6 +184,7 @@ export const ALL_ICONS = {
   tablerSquare,
   tablerSquareCheck,
   tablerList,
+  tablerArrowLeft,
 };
 
 export const ICON_SIZE_VALUES: Record<IconSize, string> = {

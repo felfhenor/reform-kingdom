@@ -1,318 +1,281 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
+vi.mock('@helpers/hero/travel-cost-base');
+vi.mock('@helpers/pathfinding/pathfinding-travel');
 
-vi.mock('@helpers/hero/travel-cost-base', () => ({
-  travelPathBaseTotalTicks: vi.fn(),
-}));
-
-vi.mock('@helpers/pathfinding/pathfinding-travel', () => ({
-  travelPathFrom: vi.fn(),
-}));
-
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-}));
-
-vi.mock('@helpers/worker/worker-progression', () => ({
-  workerStatsForLevel: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-node-gathering', () => ({
-  gatheringResultsAtLevel: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-node-level', () => ({
-  worldNodeLevel: vi.fn(() => 1),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodeByName: vi.fn(),
-  worldNodeGathering: vi.fn(),
-}));
-
-import { getEntry } from '@helpers/content/content';
+import {
+  ensureGatherResult,
+  ensureGathering,
+} from '@helpers/content/ensure-gathernode';
+import { ensureTown } from '@helpers/content/ensure-town';
+import { ensureWorker } from '@helpers/content/ensure-worker';
 import { travelPathBaseTotalTicks } from '@helpers/hero/travel-cost-base';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
-import { updateGamestate } from '@helpers/state-game';
-import { workerStatsForLevel } from '@helpers/worker/worker-progression';
+import { worldTownsState } from '@helpers/state-game';
 import {
   townWorkerAssignmentIsValid,
   townWorkerBeginOutboundTrip,
   townWorkerBeginReturnTrip,
   townWorkerStaminaCostToNode,
 } from '@helpers/town/worker/town-worker-travel';
-import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
-import {
-  worldNodeByName,
-  worldNodeGathering,
-} from '@helpers/world-node/world-nodes';
+import { defaultTownWorkerState } from '@helpers/town/worker/town-worker-progression';
 import type {
-  GameState,
+  GatheringId,
   ItemId,
-  TownContent,
   TownId,
+  TownWorkerState,
+  TravelStep,
   WorkerId,
-  WorldNodeEntry,
 } from '@interfaces';
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
+import { locationOf, seedWorldNodes } from '@/testing/world';
 
-const townId = 'larsia' as TownId;
-const workerId = 'darwin' as WorkerId;
-const oreId = 'copper-ore' as ItemId;
+const ore = 'copper-ore' as ItemId;
+const town = ensureTown({ id: 'larsia' as TownId, name: 'Larsia' });
+const mine = ensureGathering({
+  id: 'mine' as GatheringId,
+  name: 'Copper Mine',
+  gatherResults: [
+    ensureGatherResult({ chance: 1, items: [{ itemId: ore, quantity: 1 }] }),
+  ],
+});
+const worker = ensureWorker({
+  id: 'darwin' as WorkerId,
+  name: 'Darwin',
+  baseStats: { capacity: 5, gatherSpeed: 1, stamina: 20 },
+  statsPerLevel: { capacity: 0, gatherSpeed: 0, stamina: 5 },
+});
+const grounded = ensureWorker({
+  ...worker,
+  id: 'grounded' as WorkerId,
+  canUseTeleports: false,
+});
+const assignment = { nodeName: mine.name, itemId: ore };
+const path: TravelStep[] = [{ kind: 'Move', mapName: 'TestMap', x: 1, y: 1 }];
 
-function applyLastUpdate(state: GameState): GameState {
-  const calls = vi.mocked(updateGamestate).mock.calls;
-  const updateFn = calls[calls.length - 1][0];
-  return updateFn(state);
+function seedTown(workerState: Partial<TownWorkerState> = {}) {
+  const nodes = seedWorldNodes([
+    { name: town.name, type: 'NonPlayerKingdom' },
+    { name: mine.name, type: 'GatherNode' },
+  ]);
+  seedGamestate((state) => {
+    state.world.towns[town.id] = buildTownNodeState({
+      workers: {
+        [worker.id]: { ...defaultTownWorkerState(town, 1), ...workerState },
+        [grounded.id]: defaultTownWorkerState(town, 1),
+      },
+    });
+  });
+  return nodes;
 }
 
-function buildTown(): TownContent {
-  return { id: townId, name: 'Larsia' } as TownContent;
+const workerState = (id: WorkerId = worker.id) =>
+  worldTownsState()[town.id].workers[id];
+
+// Town workers never take collectible-gated shortcuts, walk through nodes, or use the player's outposts.
+const noOutpostRoute = (allowTeleport: boolean) => [
+  allowTeleport,
+  false,
+  false,
+  false,
+];
+
+// The real route lookup has its own spec; here every route from the town costs `cost` ticks.
+function routesCost(cost: number | undefined): void {
+  vi.mocked(travelPathFrom).mockReturnValue(
+    cost === undefined ? undefined : path,
+  );
+  vi.mocked(travelPathBaseTotalTicks).mockReturnValue(cost ?? 0);
 }
 
 beforeEach(() => {
   vi.clearAllMocks();
+  seedContent([town, mine, worker, grounded]);
 });
 
 describe('townWorkerStaminaCostToNode', () => {
-  it('returns undefined when the town has no world node', () => {
-    vi.mocked(worldNodeByName).mockReturnValue(undefined);
+  it('costs the route from the town’s own node', () => {
+    const nodes = seedTown();
+    routesCost(12);
 
-    expect(townWorkerStaminaCostToNode(buildTown(), 'Wergen Woods')).toBe(
-      undefined,
-    );
+    expect(townWorkerStaminaCostToNode(town, mine.name)).toBe(12);
+    expect(vi.mocked(travelPathFrom).mock.calls[0]).toEqual([
+      nodes[town.name],
+      mine.name,
+      ...noOutpostRoute(true),
+    ]);
   });
 
-  it('returns undefined when no path resolves', () => {
-    vi.mocked(worldNodeByName).mockReturnValue({
-      mapName: 'Carrina',
-      x: 5,
-      y: 5,
-    } as WorldNodeEntry);
-    vi.mocked(travelPathFrom).mockReturnValue(undefined);
+  it('is undefined without a route, or without a town node', () => {
+    seedTown();
+    routesCost(undefined);
+    expect(townWorkerStaminaCostToNode(town, mine.name)).toBeUndefined();
 
-    expect(townWorkerStaminaCostToNode(buildTown(), 'Wergen Woods')).toBe(
-      undefined,
-    );
-  });
-
-  it('returns the total tick cost of the resolved path', () => {
-    vi.mocked(worldNodeByName).mockReturnValue({
-      mapName: 'Carrina',
-      x: 5,
-      y: 5,
-    } as WorldNodeEntry);
-    vi.mocked(travelPathFrom).mockReturnValue([
-      { kind: 'Move', mapName: 'Carrina', x: 6, y: 5 },
-    ] as never);
-    vi.mocked(travelPathBaseTotalTicks).mockReturnValue(12);
-
-    expect(townWorkerStaminaCostToNode(buildTown(), 'Wergen Woods')).toBe(12);
+    routesCost(12);
+    seedWorldNodes([{ name: mine.name, type: 'GatherNode' }]);
+    expect(townWorkerStaminaCostToNode(town, mine.name)).toBeUndefined();
   });
 });
 
 describe('townWorkerAssignmentIsValid', () => {
-  const assignment = { nodeName: 'Wergen Woods', itemId: oreId };
+  it('needs the node to yield the item within the worker’s stamina at its level', () => {
+    seedTown();
 
-  beforeEach(() => {
-    vi.mocked(getEntry).mockReturnValue({} as never);
-    vi.mocked(workerStatsForLevel).mockReturnValue({
-      capacity: 5,
-      gatherSpeed: 1,
-      stamina: 20,
-    });
-    vi.mocked(worldNodeByName).mockReturnValue({
-      mapName: 'Carrina',
-      x: 5,
-      y: 5,
-    } as WorldNodeEntry);
-    vi.mocked(worldNodeGathering).mockReturnValue({} as never);
-    vi.mocked(gatheringResultsAtLevel).mockReturnValue([
-      { chance: 10, items: [{ itemId: oreId, quantity: 1 }] },
-    ] as never);
-    vi.mocked(travelPathFrom).mockReturnValue([
-      { kind: 'Move', mapName: 'Carrina', x: 6, y: 5 },
-    ] as never);
-    vi.mocked(travelPathBaseTotalTicks).mockReturnValue(10);
+    routesCost(20);
+    expect(townWorkerAssignmentIsValid(town, worker.id, 1, assignment)).toBe(
+      true,
+    );
+
+    routesCost(21);
+    expect(townWorkerAssignmentIsValid(town, worker.id, 1, assignment)).toBe(
+      false,
+    );
+    expect(townWorkerAssignmentIsValid(town, worker.id, 2, assignment)).toBe(
+      true,
+    );
+
+    routesCost(undefined);
+    expect(townWorkerAssignmentIsValid(town, worker.id, 9, assignment)).toBe(
+      false,
+    );
   });
 
-  it('is valid when the node has the item and stamina covers the trip', () => {
-    expect(
-      townWorkerAssignmentIsValid(buildTown(), workerId, 1, assignment),
-    ).toBe(true);
-  });
-
-  it('is invalid when the worker content cannot be found', () => {
-    vi.mocked(getEntry).mockReturnValue(undefined);
+  it('rejects an item the node doesn’t yield, or a worker gone from content', () => {
+    seedTown();
+    routesCost(1);
 
     expect(
-      townWorkerAssignmentIsValid(buildTown(), workerId, 1, assignment),
+      townWorkerAssignmentIsValid(town, worker.id, 1, {
+        ...assignment,
+        itemId: 'iron-ore' as ItemId,
+      }),
+    ).toBe(false);
+    expect(
+      townWorkerAssignmentIsValid(town, 'gone' as WorkerId, 1, assignment),
     ).toBe(false);
   });
 
-  it('is invalid when the node does not gather the assigned item', () => {
-    vi.mocked(gatheringResultsAtLevel).mockReturnValue([
-      { chance: 10, items: [{ itemId: 'iron-ore' as ItemId, quantity: 1 }] },
-    ] as never);
+  it('routes without teleports for a worker that can’t use them', () => {
+    seedTown();
+    routesCost(1);
 
-    expect(
-      townWorkerAssignmentIsValid(buildTown(), workerId, 1, assignment),
-    ).toBe(false);
-  });
+    townWorkerAssignmentIsValid(town, grounded.id, 1, assignment);
 
-  it('is invalid when the trip cost exceeds stamina', () => {
-    vi.mocked(travelPathBaseTotalTicks).mockReturnValue(999);
-
-    expect(
-      townWorkerAssignmentIsValid(buildTown(), workerId, 1, assignment),
-    ).toBe(false);
-  });
-
-  it("routes with the worker content's canUseTeleports flag", () => {
-    vi.mocked(getEntry).mockReturnValue({ canUseTeleports: false } as never);
-
-    townWorkerAssignmentIsValid(buildTown(), workerId, 1, assignment);
-
-    expect(travelPathFrom).toHaveBeenCalledWith(
-      expect.anything(),
-      assignment.nodeName,
-      false,
-      false,
-      false,
-      false,
+    expect(vi.mocked(travelPathFrom).mock.calls[0].slice(2)).toEqual(
+      noOutpostRoute(false),
     );
   });
 });
 
 describe('townWorkerBeginOutboundTrip', () => {
-  it('no-ops when the town has no world node', () => {
-    vi.mocked(worldNodeByName).mockReturnValue(undefined);
+  it('sends the worker toward its assignment along the route', () => {
+    const nodes = seedTown();
+    routesCost(5);
 
-    townWorkerBeginOutboundTrip(townId, buildTown(), workerId, {
-      nodeName: 'Wergen Woods',
-      itemId: oreId,
-    });
+    inTick(() =>
+      townWorkerBeginOutboundTrip(town.id, town, worker.id, assignment),
+    );
 
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('no-ops when no path resolves', () => {
-    vi.mocked(worldNodeByName).mockReturnValue({
-      mapName: 'Carrina',
-      x: 5,
-      y: 5,
-    } as WorldNodeEntry);
-    vi.mocked(travelPathFrom).mockReturnValue(undefined);
-
-    townWorkerBeginOutboundTrip(townId, buildTown(), workerId, {
-      nodeName: 'Wergen Woods',
-      itemId: oreId,
-    });
-
-    expect(updateGamestate).not.toHaveBeenCalled();
-  });
-
-  it('sets the TravelingTo status with the resolved path', () => {
-    vi.mocked(worldNodeByName).mockReturnValue({
-      mapName: 'Carrina',
-      x: 5,
-      y: 5,
-    } as WorldNodeEntry);
-    const path = [{ kind: 'Move', mapName: 'Carrina', x: 6, y: 5 }];
-    vi.mocked(travelPathFrom).mockReturnValue(path as never);
-
-    townWorkerBeginOutboundTrip(townId, buildTown(), workerId, {
-      nodeName: 'Wergen Woods',
-      itemId: oreId,
-    });
-
-    const state = applyLastUpdate({
-      world: { towns: { [townId]: { workers: { [workerId]: {} } } } },
-    } as unknown as GameState);
-    expect(state.world.towns[townId].workers[workerId].status).toMatchObject({
-      kind: 'TravelingTo',
-      nodeName: 'Wergen Woods',
-      itemId: oreId,
-      path,
-      ticksIntoStep: 0,
-    });
-    expect(state.world.towns[townId].workers[workerId].assignment).toEqual({
-      nodeName: 'Wergen Woods',
-      itemId: oreId,
+    expect(vi.mocked(travelPathFrom).mock.calls[0]).toEqual([
+      nodes[town.name],
+      mine.name,
+      ...noOutpostRoute(true),
+    ]);
+    expect(workerState()).toMatchObject({
+      assignment,
+      status: {
+        kind: 'TravelingTo',
+        nodeName: mine.name,
+        itemId: ore,
+        path,
+        ticksIntoStep: 0,
+      },
     });
   });
 
-  it('blocks the trip from crossing a teleport when the worker cannot use them', () => {
-    vi.mocked(getEntry).mockReturnValue({ canUseTeleports: false } as never);
-    vi.mocked(worldNodeByName).mockReturnValue({
-      mapName: 'Carrina',
-      x: 5,
-      y: 5,
-    } as WorldNodeEntry);
-
-    townWorkerBeginOutboundTrip(townId, buildTown(), workerId, {
-      nodeName: 'Wergen Woods',
-      itemId: oreId,
+  it('leaves the worker at town with no route or no town node', () => {
+    seedTown();
+    routesCost(undefined);
+    inTick(() =>
+      townWorkerBeginOutboundTrip(town.id, town, worker.id, assignment),
+    );
+    expect(workerState()).toMatchObject({
+      assignment: null,
+      status: { kind: 'AtTown' },
     });
 
-    expect(travelPathFrom).toHaveBeenCalledWith(
-      expect.anything(),
-      'Wergen Woods',
-      false,
-      false,
-      false,
-      false,
+    routesCost(5);
+    seedWorldNodes([{ name: mine.name, type: 'GatherNode' }]);
+    inTick(() =>
+      townWorkerBeginOutboundTrip(town.id, town, worker.id, assignment),
+    );
+    expect(workerState().status.kind).toBe('AtTown');
+  });
+
+  it('routes without teleports for a worker that can’t use them', () => {
+    seedTown();
+    routesCost(5);
+
+    inTick(() =>
+      townWorkerBeginOutboundTrip(town.id, town, grounded.id, assignment),
+    );
+
+    expect(vi.mocked(travelPathFrom).mock.calls[0].slice(2)).toEqual(
+      noOutpostRoute(false),
     );
   });
 });
 
 describe('townWorkerBeginReturnTrip', () => {
-  it('starts the TravelingBack status when a path home resolves', () => {
-    const path = [{ kind: 'Move', mapName: 'Carrina', x: 4, y: 5 }];
-    vi.mocked(travelPathFrom).mockReturnValue(path as never);
-
-    townWorkerBeginReturnTrip(townId, buildTown(), workerId, oreId, 5);
-
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            workers: {
-              [workerId]: { location: { mapName: 'Carrina', x: 6, y: 5 } },
-            },
-          },
+  it('heads home from where the worker stands, carrying its haul', () => {
+    const nodes = seedTown();
+    const atMine = locationOf(nodes[mine.name]);
+    seedGamestate((state) => {
+      state.world.towns[town.id] = buildTownNodeState({
+        workers: {
+          [worker.id]: { ...defaultTownWorkerState(town, 1), location: atMine },
         },
-      },
-    } as unknown as GameState);
-    expect(state.world.towns[townId].workers[workerId].status).toMatchObject({
+      });
+    });
+    routesCost(5);
+    // Called on the update draft, which is revoked afterward, so copy the start out.
+    let routedFrom: unknown;
+    vi.mocked(travelPathFrom).mockImplementation((from) => {
+      routedFrom = { ...from };
+      return path;
+    });
+
+    inTick(() => townWorkerBeginReturnTrip(town.id, town, worker.id, ore, 5));
+
+    expect(workerState().status).toEqual({
       kind: 'TravelingBack',
       path,
-      carriedItemId: oreId,
+      ticksIntoStep: 0,
+      carriedItemId: ore,
       carriedQuantity: 5,
     });
+    expect(routedFrom).toEqual(atMine);
+    expect(vi.mocked(travelPathFrom).mock.calls[0].slice(1)).toEqual([
+      town.name,
+      ...noOutpostRoute(true),
+    ]);
   });
 
-  it('parks AtTown with cargo discarded when no path home resolves', () => {
-    vi.mocked(travelPathFrom).mockReturnValue(undefined);
-
-    townWorkerBeginReturnTrip(townId, buildTown(), workerId, oreId, 5);
-
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            workers: {
-              [workerId]: { location: { mapName: 'Carrina', x: 6, y: 5 } },
-            },
-          },
-        },
+  it('parks the worker at town, dropping its haul, when no route home resolves', () => {
+    seedTown({
+      status: {
+        kind: 'Gathering',
+        ...assignment,
+        itemsGathered: 3,
+        ticksIntoGather: 0,
       },
-    } as unknown as GameState);
-    expect(state.world.towns[townId].workers[workerId].status).toEqual({
-      kind: 'AtTown',
     });
+    routesCost(undefined);
+
+    inTick(() => townWorkerBeginReturnTrip(town.id, town, worker.id, ore, 5));
+
+    expect(workerState().status).toEqual({ kind: 'AtTown' });
   });
 });

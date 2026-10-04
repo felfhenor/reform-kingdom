@@ -1,3 +1,4 @@
+import { rangeLabel } from '@helpers/engine/leveled-range';
 import { caravanBrandName } from '@helpers/caravan/caravan';
 import { worldNodeCaravanTimerText } from '@helpers/world-node/world-node-caravan';
 import { worldNodeCaravanVisitedTraderName } from '@helpers/world-node/world-node-caravan.ui';
@@ -9,7 +10,6 @@ import { worldNodeOutpostLevel } from '@helpers/world-node/world-node-outpost';
 import { worldNodeShrineLevel } from '@helpers/world-node/world-node-shrine';
 import {
   worldNodeInteractionKind,
-  worldNodeLevelLabel,
   worldNodeLevelRange,
 } from '@helpers/world-node/world-node-status';
 import type {
@@ -55,7 +55,7 @@ export function worldNodeLabelInfo(
     kind === 'Trade' ? [caravanBrandName(entry.nodeName)] : [nodeNameLine];
   // Caravan level range shows in the node panel instead; the floating label stays name + timer only.
   if (levelRange && kind !== 'Trade') {
-    lines.push(`Lv.${worldNodeLevelLabel(levelRange)}`);
+    lines.push(`Lv.${rangeLabel(levelRange)}`);
   }
 
   if (kind === 'ExploreRandom') {

@@ -1,15 +1,7 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/maps', () => ({
-  allMaps: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  isWorldNodeCollectibleGateMet: vi.fn(() => true),
-  worldNodesOfType: vi.fn(),
-}));
-
-import { allMaps } from '@helpers/maps';
+import { ensureNodeOverride } from '@helpers/content/ensure-nodeoverride';
+import { setAllMaps } from '@helpers/maps';
 import {
   mapHopsBetween,
   repairUnwalkableCurrentLocation,
@@ -18,16 +10,15 @@ import {
   tiledMapWalkabilityMatrix,
   tileIsOnPath,
 } from '@helpers/pathfinding/pathfinding';
-import {
-  isWorldNodeCollectibleGateMet,
-  worldNodesOfType,
-} from '@helpers/world-node/world-nodes';
+import { seedContent } from '@/testing/content';
+import { seedWorldNodes } from '@/testing/world';
 import type {
   GameMap,
   TiledLayer,
   TiledMap,
   TiledObject,
-  WorldNodeEntry,
+  CollectibleId,
+  NodeOverrideId,
 } from '@interfaces';
 
 function buildObject(overrides: Partial<TiledObject>): TiledObject {
@@ -52,17 +43,6 @@ function buildOpenMap(width: number, height: number): TiledMap {
     tileheight: 64,
     tilesets: [],
     layers: [],
-  };
-}
-
-function buildEntry(overrides: Partial<WorldNodeEntry>): WorldNodeEntry {
-  return {
-    mapName: 'Carrina',
-    x: 0,
-    y: 0,
-    nodeName: 'Unnamed',
-    nodeData: buildObject({}),
-    ...overrides,
   };
 }
 
@@ -223,72 +203,44 @@ describe('tiledMapMoveCostMatrix', () => {
   });
 });
 
+function setMapWithKingdom(denseTiles: { x: number; y: number }[] = []) {
+  seedWorldNodes(
+    [
+      {
+        name: 'Duchy of Carrina',
+        type: 'Kingdom',
+        mapName: 'Carrina',
+        x: 2,
+        y: 2,
+      },
+    ],
+    [],
+    { Carrina: { width: 3, height: 3, denseTiles } },
+  );
+}
+
 describe('repairUnwalkableCurrentLocation', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   it('leaves a walkable location untouched', () => {
-    vi.mocked(allMaps).mockReturnValue(
-      new Map<string, GameMap>([
-        ['Carrina', { name: 'Carrina', data: buildOpenMap(3, 3) }],
-      ]),
-    );
-
+    setMapWithKingdom();
     const location = { mapName: 'Carrina', x: 1, y: 1 };
 
     expect(repairUnwalkableCurrentLocation(location)).toEqual(location);
   });
 
-  it('relocates to the kingdom when standing on a blocked tile', () => {
-    const denseTilesLayer: TiledLayer = {
-      id: 1,
-      name: 'Dense Tiles',
-      type: 'tilelayer',
-      visible: true,
-      width: 3,
-      height: 3,
-      data: [0, 0, 0, 0, 5, 0, 0, 0, 0],
-    };
-    const map: TiledMap = { ...buildOpenMap(3, 3), layers: [denseTilesLayer] };
-
-    vi.mocked(allMaps).mockReturnValue(
-      new Map<string, GameMap>([['Carrina', { name: 'Carrina', data: map }]]),
-    );
-    vi.mocked(worldNodesOfType).mockReturnValue([
-      buildEntry({
-        mapName: 'Carrina',
-        x: 26,
-        y: 24,
-        nodeName: 'Duchy of Carrina',
-      }),
-    ]);
+  it('relocates to the kingdom when standing on a blocked tile or an unknown map', () => {
+    setMapWithKingdom([{ x: 1, y: 1 }]);
+    const kingdom = { mapName: 'Carrina', x: 2, y: 2 };
 
     expect(
       repairUnwalkableCurrentLocation({ mapName: 'Carrina', x: 1, y: 1 }),
-    ).toEqual({ mapName: 'Carrina', x: 26, y: 24 });
-  });
-
-  it('relocates to the kingdom when the map is unknown', () => {
-    vi.mocked(allMaps).mockReturnValue(new Map<string, GameMap>());
-    vi.mocked(worldNodesOfType).mockReturnValue([
-      buildEntry({
-        mapName: 'Carrina',
-        x: 26,
-        y: 24,
-        nodeName: 'Duchy of Carrina',
-      }),
-    ]);
-
+    ).toEqual(kingdom);
     expect(
       repairUnwalkableCurrentLocation({ mapName: 'Nowhere', x: 0, y: 0 }),
-    ).toEqual({ mapName: 'Carrina', x: 26, y: 24 });
+    ).toEqual(kingdom);
   });
 
   it('leaves the location untouched when blocked and no kingdom node exists', () => {
-    vi.mocked(allMaps).mockReturnValue(new Map<string, GameMap>());
-    vi.mocked(worldNodesOfType).mockReturnValue([]);
-
+    setAllMaps(new Map<string, GameMap>());
     const location = { mapName: 'Nowhere', x: 0, y: 0 };
 
     expect(repairUnwalkableCurrentLocation(location)).toEqual(location);
@@ -296,11 +248,7 @@ describe('repairUnwalkableCurrentLocation', () => {
 });
 
 describe('tileIsOnPath', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('is true for a tile covered by the Path Tiles layer', () => {
+  it('is true only for a tile covered by the Path Tiles layer of a loaded map', () => {
     const pathTilesLayer: TiledLayer = {
       id: 1,
       name: 'Path Tiles',
@@ -310,123 +258,75 @@ describe('tileIsOnPath', () => {
       height: 3,
       data: [0, 0, 0, 0, 5, 0, 0, 0, 0],
     };
-    const map: TiledMap = { ...buildOpenMap(3, 3), layers: [pathTilesLayer] };
-    vi.mocked(allMaps).mockReturnValue(
-      new Map<string, GameMap>([['Carrina', { name: 'Carrina', data: map }]]),
+    setAllMaps(
+      new Map<string, GameMap>([
+        [
+          'Carrina',
+          {
+            name: 'Carrina',
+            data: { ...buildOpenMap(3, 3), layers: [pathTilesLayer] },
+          },
+        ],
+      ]),
     );
 
     expect(tileIsOnPath('Carrina', 1, 1)).toBe(true);
     expect(tileIsOnPath('Carrina', 0, 0)).toBe(false);
-  });
-
-  it('is false for a map that has not been loaded', () => {
-    vi.mocked(allMaps).mockReturnValue(new Map<string, GameMap>());
-
     expect(tileIsOnPath('Unknown', 0, 0)).toBe(false);
   });
 });
 
 describe('mapHopsBetween', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  const teleport = (
+    from: string,
+    fromMap: string,
+    to: string,
+    toMap: string,
+  ) => [
+    {
+      name: from,
+      type: 'TeleportNode' as const,
+      mapName: fromMap,
+      properties: [{ name: 'toTag', type: 'string', value: to }],
+    },
+    {
+      name: to,
+      type: 'TeleportNode' as const,
+      mapName: toMap,
+      properties: [{ name: 'tag', type: 'string', value: to }],
+    },
+  ];
 
-  it('returns 0 for the same map', () => {
-    expect(mapHopsBetween('Carrina', 'Carrina')).toBe(0);
-  });
-
-  it('returns 1 for a directly teleport-connected map', () => {
-    const teleportOut = buildEntry({
-      mapName: 'Carrina',
-      nodeName: 'To Craggled Mire',
-      nodeData: buildObject({
-        type: 'TeleportNode',
-        properties: [{ name: 'toTag', type: 'string', value: 'tag-a' }],
-      }),
-    });
-    const teleportIn = buildEntry({
-      mapName: 'CraggledMire',
-      nodeName: 'To Carrina',
-      nodeData: buildObject({
-        type: 'TeleportNode',
-        properties: [{ name: 'tag', type: 'string', value: 'tag-a' }],
-      }),
-    });
-
-    vi.mocked(worldNodesOfType).mockImplementation((type) =>
-      type === 'TeleportNode' ? [teleportOut, teleportIn] : [],
+  it('is 0 for the same map and 1 for a directly linked one', () => {
+    seedWorldNodes(
+      teleport('To Mire', 'Carrina', 'To Carrina', 'CraggledMire'),
     );
 
+    expect(mapHopsBetween('Carrina', 'Carrina')).toBe(0);
     expect(mapHopsBetween('Carrina', 'CraggledMire')).toBe(1);
   });
 
   it('terminates with no connection between the maps', () => {
-    vi.mocked(worldNodesOfType).mockReturnValue([]);
+    seedWorldNodes([{ name: 'Field', type: 'ExploreNode' }]);
 
     expect(mapHopsBetween('Carrina', 'Nowhere')).toBeGreaterThan(0);
   });
 
   it('routes around a locked teleport pair instead of counting it as a hop', () => {
-    // A direct (but locked) pair plus a longer unlocked detour through a third map -
-    // if the lock is respected, the detour's 2 hops win over the direct pair's 1.
-    const directOut = buildEntry({
-      mapName: 'Carrina',
-      nodeName: 'Direct Out',
-      nodeData: buildObject({
-        type: 'TeleportNode',
-        properties: [{ name: 'toTag', type: 'string', value: 'direct-in' }],
-      }),
-    });
-    const directIn = buildEntry({
-      mapName: 'CraggledMire',
-      nodeName: 'Direct In',
-      nodeData: buildObject({
-        type: 'TeleportNode',
-        properties: [{ name: 'tag', type: 'string', value: 'direct-in' }],
-      }),
-    });
-    const detourOut = buildEntry({
-      mapName: 'Carrina',
-      nodeName: 'Detour Out',
-      nodeData: buildObject({
-        type: 'TeleportNode',
-        properties: [{ name: 'toTag', type: 'string', value: 'waypoint-in' }],
-      }),
-    });
-    const waypointIn = buildEntry({
-      mapName: 'Waypoint',
-      nodeName: 'Waypoint In',
-      nodeData: buildObject({
-        type: 'TeleportNode',
-        properties: [{ name: 'tag', type: 'string', value: 'waypoint-in' }],
-      }),
-    });
-    const waypointOut = buildEntry({
-      mapName: 'Waypoint',
-      nodeName: 'Waypoint Out',
-      nodeData: buildObject({
-        type: 'TeleportNode',
-        properties: [{ name: 'toTag', type: 'string', value: 'detour-in' }],
-      }),
-    });
-    const detourIn = buildEntry({
-      mapName: 'CraggledMire',
-      nodeName: 'Detour In',
-      nodeData: buildObject({
-        type: 'TeleportNode',
-        properties: [{ name: 'tag', type: 'string', value: 'detour-in' }],
-      }),
-    });
-
-    vi.mocked(worldNodesOfType).mockImplementation((type) =>
-      type === 'TeleportNode'
-        ? [directOut, directIn, detourOut, waypointIn, waypointOut, detourIn]
-        : [],
+    seedContent(
+      ['Direct Out', 'Direct In'].map((name) =>
+        ensureNodeOverride({
+          id: name as NodeOverrideId,
+          name,
+          invisibleUntilCollectibleIdsFound: ['key' as CollectibleId],
+        }),
+      ),
     );
-    vi.mocked(isWorldNodeCollectibleGateMet).mockImplementation(
-      (entry) =>
-        entry.nodeName !== 'Direct Out' && entry.nodeName !== 'Direct In',
-    );
+    seedWorldNodes([
+      ...teleport('Direct Out', 'Carrina', 'Direct In', 'CraggledMire'),
+      ...teleport('Detour Out', 'Carrina', 'Waypoint In', 'Waypoint'),
+      ...teleport('Waypoint Out', 'Waypoint', 'Detour In', 'CraggledMire'),
+    ]);
 
     expect(mapHopsBetween('Carrina', 'CraggledMire')).toBe(2);
   });

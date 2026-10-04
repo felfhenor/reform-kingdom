@@ -1,9 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { setAllContentById, setAllIdsByName } from '@helpers/content/content';
 import { ensureEncounter } from '@helpers/content/ensure-encounternode';
 import { ensureRecipe } from '@helpers/content/ensure-recipe';
-import { defaultGameState } from '@helpers/defaults';
+import { defaultGameState, defaultTradeskillBuilding } from '@helpers/defaults';
 import { taskCounterRequirementHasEvidence } from '@helpers/task/task-requirement';
 import type {
   AstralProjectorId,
@@ -16,6 +15,7 @@ import type {
   RecipeId,
   TradeskillId,
 } from '@interfaces';
+import { seedContent } from '@/testing/content';
 
 const RECIPE = 'recipe-ingot' as RecipeId;
 const BLACKSMITHING = 'tradeskill-blacksmithing' as TradeskillId;
@@ -25,11 +25,7 @@ const LOTUS = 'collectible-lotus' as CollectibleId;
 const FOREST_RUINS = 'encounter-forest-ruins' as EncounterId;
 
 function withTradeskillLevel(state: GameState, level: number): GameState {
-  state.tradeskills[BLACKSMITHING] = {
-    level,
-    xp: { current: 0, maximum: 10 },
-    queue: [],
-  };
+  state.tradeskills[BLACKSMITHING] = { ...defaultTradeskillBuilding(), level };
   return state;
 }
 
@@ -56,8 +52,7 @@ beforeEach(() => {
       result: { itemId: INGOT },
     }),
   ];
-  setAllContentById(new Map(content.map((entry) => [entry.id, entry])));
-  setAllIdsByName(new Map([['Forest Ruins', FOREST_RUINS]]));
+  seedContent(content);
 });
 
 describe('taskCounterRequirementHasEvidence', () => {

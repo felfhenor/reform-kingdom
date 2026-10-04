@@ -51,6 +51,8 @@ import type {
   CombatStat,
   EquipmentSkill,
   EquipmentSkillContentTechnique,
+  EquipmentSkillId,
+  JobId,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
 import { buildCombat, buildMonsterCombatant } from '@/testing/builders';
@@ -69,7 +71,7 @@ const castFireball: CombatOrderClause = {
 
 function skill(id: string, overrides: Partial<EquipmentSkill> = {}) {
   return ensureSkill({
-    id: id as never,
+    id: id as EquipmentSkillId,
     name: id,
     techniques: [{ targets: 1 } as EquipmentSkillContentTechnique],
     ...overrides,
@@ -175,7 +177,7 @@ describe('combatantTakeTurn skill selection', () => {
 
     combatantTakeTurn(buildCombat(), combatant);
 
-    expect(combatant.skillUses['fireball' as never]).toBe(1);
+    expect(combatant.skillUses['fireball' as EquipmentSkillId]).toBe(1);
     expect(combatantSkillCastEvents()).toMatchObject([
       { combatantId: 'caster-1', skillName: 'Fireball', skillSprite: '0042' },
     ]);
@@ -232,7 +234,7 @@ describe('combatantTakeTurn targeting', () => {
   it("targets by the combatant's own priority list without an order override", () => {
     available(skill('weighted'));
     const priority = [
-      { type: 'Random' as const, jobId: 'healer' as never },
+      { type: 'Random' as const, jobId: 'healer' as JobId },
       { type: 'Random' as const },
     ];
 

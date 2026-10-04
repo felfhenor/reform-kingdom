@@ -1,75 +1,31 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    worldPartyState: () => gamestate().world.party,
-  };
-});
+import { describe, expect, it } from 'vitest';
 
 import { combatOrderClauses } from '@helpers/combat/combat-order';
-import { gamestate } from '@helpers/state-game';
 import type {
-  Character,
   CharacterId,
   CombatOrderClause,
   CombatOrderClauseId,
-  GameState,
   JobId,
 } from '@interfaces';
+import { buildCharacter } from '@/testing/builders';
+import { seedGamestate } from '@/testing/gamestate';
 
-const characterId = 'char-1' as CharacterId;
-const jobId = 'job-1' as JobId;
-
-function buildClause(
-  overrides: Partial<CombatOrderClause> = {},
-): CombatOrderClause {
-  return {
-    id: 'clause-1' as CombatOrderClauseId,
-    enabled: true,
-    condition: { type: 'Always' },
-    action: { type: 'RandomSkill' },
-    ...overrides,
-  };
-}
-
-function buildCharacter(overrides: Partial<Character> = {}): Character {
-  return {
-    id: characterId,
-    jobId,
-    combatOrders: {},
-    ...overrides,
-  } as Character;
-}
-
-function stateWithParty(party: Character[]): GameState {
-  return { world: { party } } as unknown as GameState;
-}
-
-beforeEach(() => {
-  vi.clearAllMocks();
-});
+const warrior = 'warrior' as JobId;
+const ranger = 'ranger' as JobId;
+const clause: CombatOrderClause = {
+  id: 'clause-1' as CombatOrderClauseId,
+  enabled: true,
+  condition: { type: 'Always' },
+  action: { type: 'RandomSkill' },
+};
 
 describe('combatOrderClauses', () => {
-  it('returns the stored clause list for the given character and job', () => {
-    const clauses = [buildClause()];
-    vi.mocked(gamestate).mockReturnValue(
-      stateWithParty([buildCharacter({ combatOrders: { [jobId]: clauses } })]),
-    );
+  it('reads a party member’s orders for a job, empty for another job or a missing hero', () => {
+    const hero = buildCharacter({ combatOrders: { [warrior]: [clause] } });
+    seedGamestate((state) => (state.world.party = [hero]));
 
-    expect(combatOrderClauses(characterId, jobId)).toBe(clauses);
-  });
-
-  it('returns an empty array when the character has no orders for the job', () => {
-    vi.mocked(gamestate).mockReturnValue(stateWithParty([buildCharacter()]));
-
-    expect(combatOrderClauses(characterId, jobId)).toEqual([]);
-  });
-
-  it('returns an empty array when the character does not exist', () => {
-    vi.mocked(gamestate).mockReturnValue(stateWithParty([]));
-
-    expect(combatOrderClauses(characterId, jobId)).toEqual([]);
+    expect(combatOrderClauses(hero.id, warrior)).toEqual([clause]);
+    expect(combatOrderClauses(hero.id, ranger)).toEqual([]);
+    expect(combatOrderClauses('missing' as CharacterId, warrior)).toEqual([]);
   });
 });

@@ -41,9 +41,11 @@ import type {
   EquipmentId,
   EquipmentItem,
   EquipmentItemId,
+  EquipmentSkillId,
   IsContentItem,
   ItemId,
   JobId,
+  TradeskillId,
   TrainerTeachingId,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
@@ -90,8 +92,10 @@ const staff = ensureEquipment({
   id: staffId,
   name: 'Staff',
   type: 'Staff',
-  grantedSkillIds: ['starshine-2' as never],
-  gatherYieldBonuses: [{ tradeskillId: 'woodworking' as never, value: 1 }],
+  grantedSkillIds: ['starshine-2' as EquipmentSkillId],
+  gatherYieldBonuses: [
+    { tradeskillId: 'woodworking' as TradeskillId, value: 1 },
+  ],
 });
 
 const strengthAffix: AffixContent = ensureAffix({
@@ -108,7 +112,7 @@ const baseContent: IsContentItem[] = [
   strengthAffix,
   ensureAffix({
     id: grantAffixId,
-    effects: [{ kind: 'GrantSkill', skillId: 'attack' as never }],
+    effects: [{ kind: 'GrantSkill', skillId: 'attack' as EquipmentSkillId }],
   }),
   ensureItem({
     id: crystalId,

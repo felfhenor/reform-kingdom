@@ -11,29 +11,11 @@ import type {
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-  getEntriesByType: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    armoryState: () => gamestate().armory,
-    globalEffectSumsState: () => gamestate().globalEffectSums,
-    worldPartyState: () => gamestate().world.party,
-    worldCombatState: vi.fn(),
-  };
-});
-
 vi.mock('@helpers/item/affix', async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   rollAffixIds: vi.fn(),
 }));
 
-import { getEntry } from '@helpers/content/content';
 import { ensureAffix } from '@helpers/content/ensure-affix';
 import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
 import { ensureJob } from '@helpers/content/ensure-job';
@@ -49,6 +31,8 @@ import {
   isReforgeable,
   reforgedEquipmentItem,
 } from '@helpers/item/reforge';
+import { buildCombat, buildEquipmentItem } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
 
 describe('reforge', () => {
   const gold = ensureItem({ id: 'gold' as ItemId, name: 'Gold Coin' });
@@ -103,13 +87,10 @@ describe('reforge', () => {
 
   let itemCounter = 0;
   function spearItem(overrides: Partial<EquipmentItem> = {}): EquipmentItem {
-    return {
+    return buildEquipmentItem(rareSpear.id, {
       id: `item-${itemCounter++}` as EquipmentItemId,
-      equipmentId: rareSpear.id,
-      infusedItemIds: [],
-      affixIds: [],
       ...overrides,
-    };
+    });
   }
 
   function stateWith(
@@ -130,12 +111,7 @@ describe('reforge', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(getEntry).mockImplementation(
-      (idOrName) =>
-        content.find(
-          (entry) => entry.id === idOrName || entry.name === idOrName,
-        ) as never,
-    );
+    seedContent(content);
     vi.mocked(rollAffixIds).mockReturnValue([strengthAffix.id]);
   });
 
@@ -236,7 +212,7 @@ describe('reforge', () => {
       hero.equipment.Offhand = equipped;
       const stored = spearItem();
       const state = stateWith([stored], [hero], spearCost * 2, spearFlux * 2);
-      state.world.combat = {} as GameState['world']['combat'];
+      state.world.combat = buildCombat();
 
       expect(applyEquipmentReforge(state, equipped.id)).toBe('in-combat');
       expect(applyEquipmentReforge(state, stored.id)).toBe('ok');

@@ -35,7 +35,7 @@ describe('townReputationTierValueResolve', () => {
     expect(townReputationTierValueResolve(townId, tiers)).toBe(expected);
   });
 
-  it('falls back to the highest authored tier at or below the current one when a tier is missing', () => {
+  it('falls back to the highest defined tier at or below the current one when a tier is missing', () => {
     vi.mocked(townReputationTier).mockReturnValue(2);
     expect(
       townReputationTierValueResolve(townId, [
@@ -45,7 +45,7 @@ describe('townReputationTierValueResolve', () => {
     ).toBe(5);
   });
 
-  it('is 0 when no tier at or below the current one is authored', () => {
+  it('is 0 when no tier at or below the current one is defined', () => {
     vi.mocked(townReputationTier).mockReturnValue(2);
     expect(townReputationTierValueResolve(townId, [])).toBe(0);
   });

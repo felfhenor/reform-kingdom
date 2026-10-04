@@ -1,169 +1,98 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-vi.mock('@helpers/kingdom/armory', () => ({
-  armoryGet: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/item/collectibles', () => ({
-  getCollectibleQuantity: vi.fn(() => 0),
-}));
-
-vi.mock('@helpers/item/materials', () => ({
-  getMaterialQuantity: vi.fn(() => 0),
-}));
-
-vi.mock('@helpers/crafting/recipes', () => ({
-  isRecipeDiscovered: vi.fn(() => false),
-}));
-
-vi.mock('@helpers/world-node/world-node-rewards', () => ({
-  isRewardDiscovered: vi.fn(() => false),
-  worldNodeCompletionRewardProgress: vi.fn(() => ({ obtained: 0, total: 0 })),
-  worldNodeCompletionRewards: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodesOfType: vi.fn(() => []),
-}));
+import { describe, expect, it } from 'vitest';
 
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
-import { isRecipeDiscovered } from '@helpers/crafting/recipes';
 import {
   farmableExploreNodes,
   farmNodeRewardQuantity,
 } from '@helpers/decree/decree-farm-node';
-import { getCollectibleQuantity } from '@helpers/item/collectibles';
-import { getMaterialQuantity } from '@helpers/item/materials';
-import { armoryGet } from '@helpers/kingdom/armory';
-import {
-  isRewardDiscovered,
-  worldNodeCompletionRewardProgress,
-  worldNodeCompletionRewards,
-} from '@helpers/world-node/world-node-rewards';
-import { worldNodesOfType } from '@helpers/world-node/world-nodes';
+import { applyCollectibleGrant } from '@helpers/item/collectibles';
+import { applyMaterialDelta } from '@helpers/item/materials';
 import type {
   CollectibleId,
   EquipmentId,
-  EquipmentItem,
-  EquipmentItemId,
   ItemId,
-  WorldNodeEntry,
+  RecipeId,
+  WorkerId,
 } from '@interfaces';
+import { buildEquipmentItem } from '@/testing/builders';
+import { explore, mystical, seedDecreeWorld } from '@/testing/decree';
+import { seedGamestate } from '@/testing/gamestate';
 
-function buildNode(nodeName: string): WorldNodeEntry {
-  return {
-    mapName: 'Carrina',
-    x: 0,
-    y: 0,
-    nodeName,
-    nodeData: { type: 'ExploreNode' } as never,
-  };
-}
+const relic = 'shrine-relic' as CollectibleId;
+const lotus = 'lotus' as CollectibleId;
+const flux = 'flux' as ItemId;
 
-beforeEach(() => {
-  vi.clearAllMocks();
-  vi.mocked(armoryGet).mockReturnValue([]);
-  vi.mocked(getCollectibleQuantity).mockReturnValue(0);
-  vi.mocked(getMaterialQuantity).mockReturnValue(0);
-  vi.mocked(isRecipeDiscovered).mockReturnValue(false);
-  vi.mocked(worldNodesOfType).mockReturnValue([]);
-  vi.mocked(worldNodeCompletionRewardProgress).mockReturnValue({
-    obtained: 0,
-    total: 0,
-  });
-});
+const guaranteed = {
+  relic: ensureDroppedReward({ collectibleId: relic, chance: 100 }),
+  lotus: ensureDroppedReward({ collectibleId: lotus, chance: 100 }),
+  flux: ensureDroppedReward({ itemId: flux, chance: 100 }),
+  maybeRelic: ensureDroppedReward({ collectibleId: relic, chance: 50 }),
+};
 
 describe('farmableExploreNodes', () => {
-  it('only includes ExploreNodes with at least one obtained reward', () => {
-    const beaten = buildNode('Beaten');
-    const untouched = buildNode('Untouched');
-    vi.mocked(worldNodesOfType).mockImplementation((type) =>
-      type === 'ExploreNode' ? [beaten, untouched] : [],
-    );
-    vi.mocked(worldNodeCompletionRewardProgress).mockImplementation((entry) =>
-      entry.nodeName === 'Beaten'
-        ? { obtained: 1, total: 2 }
-        : { obtained: 0, total: 2 },
+  it('lists explore nodes with any reward found, and mystical nodes whose guaranteed unique reward was found', () => {
+    const nodes = seedDecreeWorld(
+      [
+        {
+          content: explore('Beaten', 1, 1, {
+            completionRewards: [guaranteed.flux, guaranteed.lotus],
+          }),
+        },
+        {
+          content: explore('Untouched', 1, 1, {
+            completionRewards: [guaranteed.lotus],
+          }),
+        },
+        {
+          content: mystical('Cleared Shrine', 1, {
+            completionRewards: [guaranteed.flux, guaranteed.relic],
+          }),
+        },
+        {
+          content: mystical('Flux Shrine', 1, {
+            completionRewards: [guaranteed.flux],
+          }),
+        },
+        {
+          content: mystical('Lucky Shrine', 1, {
+            completionRewards: [guaranteed.maybeRelic],
+          }),
+        },
+      ],
+      (state) => {
+        applyCollectibleGrant(state, relic, 1);
+        applyMaterialDelta(state, flux, 1);
+      },
     );
 
-    expect(farmableExploreNodes()).toEqual([beaten]);
-  });
-
-  it('only includes mystical nodes whose guaranteed collectible/worker was found', () => {
-    const shared = ensureDroppedReward({
-      itemId: 'flux' as ItemId,
-      chance: 100,
-    });
-    const unique = ensureDroppedReward({
-      collectibleId: 'shrine-relic' as CollectibleId,
-      chance: 100,
-    });
-    const cleared = buildNode('Cleared Shrine');
-    const sharedOnly = buildNode('Flux Shrine');
-    vi.mocked(worldNodesOfType).mockImplementation((type) =>
-      type === 'ExploreRandomNode' ? [cleared, sharedOnly] : [],
-    );
-    vi.mocked(worldNodeCompletionRewards).mockImplementation((entry) =>
-      entry.nodeName === 'Cleared Shrine' ? [shared, unique] : [shared],
-    );
-    vi.mocked(isRewardDiscovered).mockReturnValue(true);
-
-    expect(farmableExploreNodes()).toEqual([cleared]);
+    expect(farmableExploreNodes()).toEqual([
+      nodes['Beaten'],
+      nodes['Cleared Shrine'],
+    ]);
   });
 });
 
 describe('farmNodeRewardQuantity', () => {
-  it('reads item rewards from material storage', () => {
-    vi.mocked(getMaterialQuantity).mockReturnValue(7);
+  it('counts what the player holds of each kind of reward', () => {
+    const cloak = 'cloak' as EquipmentId;
+    seedGamestate((state) => {
+      applyMaterialDelta(state, flux, 7);
+      applyCollectibleGrant(state, relic, 3);
+      state.armory = [
+        buildEquipmentItem(cloak),
+        buildEquipmentItem('other' as EquipmentId),
+        buildEquipmentItem(cloak),
+      ];
+      state.discoveredRecipes['known' as RecipeId] = { foundAt: 1 };
+      state.discoveredWorkers['rescued' as WorkerId] = { foundAt: 1 };
+    });
 
-    expect(farmNodeRewardQuantity({ itemId: 'bone' as ItemId })).toBe(7);
-    expect(getMaterialQuantity).toHaveBeenCalledWith('bone');
-  });
-
-  it('counts owned armory entries for equipment rewards', () => {
-    const cloak = 'bone-hewn-cloak' as EquipmentId;
-    const owned: EquipmentItem[] = [
-      {
-        id: 'a' as EquipmentItemId,
-        equipmentId: cloak,
-        infusedItemIds: [],
-        affixIds: [],
-      },
-      {
-        id: 'b' as EquipmentItemId,
-        equipmentId: 'other' as EquipmentId,
-        infusedItemIds: [],
-        affixIds: [],
-      },
-      {
-        id: 'c' as EquipmentItemId,
-        equipmentId: cloak,
-        infusedItemIds: [],
-        affixIds: [],
-      },
-    ];
-    vi.mocked(armoryGet).mockReturnValue(owned);
-
+    expect(farmNodeRewardQuantity({ itemId: flux })).toBe(7);
+    expect(farmNodeRewardQuantity({ collectibleId: relic })).toBe(3);
     expect(farmNodeRewardQuantity({ equipmentId: cloak })).toBe(2);
-  });
-
-  it('reads collectible rewards from collectible storage', () => {
-    vi.mocked(getCollectibleQuantity).mockReturnValue(3);
-
-    expect(
-      farmNodeRewardQuantity({ collectibleId: 'swamp-clam' as never }),
-    ).toBe(3);
-  });
-
-  it('reads a recipe reward as 1 once discovered and 0 otherwise', () => {
-    vi.mocked(isRecipeDiscovered).mockReturnValue(false);
-    expect(
-      farmNodeRewardQuantity({ recipeId: 'equipment-cloak' as never }),
-    ).toBe(0);
-
-    vi.mocked(isRecipeDiscovered).mockReturnValue(true);
-    expect(
-      farmNodeRewardQuantity({ recipeId: 'equipment-cloak' as never }),
-    ).toBe(1);
+    expect(farmNodeRewardQuantity({ recipeId: 'known' as RecipeId })).toBe(1);
+    expect(farmNodeRewardQuantity({ recipeId: 'unknown' as RecipeId })).toBe(0);
+    expect(farmNodeRewardQuantity({ workerId: 'rescued' as WorkerId })).toBe(1);
+    expect(farmNodeRewardQuantity({ workerId: 'lost' as WorkerId })).toBe(0);
   });
 });

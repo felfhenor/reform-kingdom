@@ -1,61 +1,41 @@
-import type * as TownReputationHelper from '@helpers/town/reputation/town-reputation';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/town/reputation/town-reputation', async (importOriginal) => {
-  const actual = await importOriginal<typeof TownReputationHelper>();
-  return {
-    ...actual,
-    townReputationTier: vi.fn(),
-  };
-});
-
-import { townReputationTier } from '@helpers/town/reputation/town-reputation';
+import { ensureTown } from '@helpers/content/ensure-town';
 import { townCraftQueueSize } from '@helpers/town/crafting/town-craft-queue-size';
-import type { TownContent, TownId } from '@interfaces';
+import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
+import type { TownId } from '@interfaces';
+import { buildTownNodeState } from '@/testing/builders';
+import { seedGamestate } from '@/testing/gamestate';
 
-function buildTown(
-  maxQueueSize: TownContent['crafting']['maxQueueSize'],
-): TownContent {
-  return {
-    id: 'larsia' as TownId,
-    crafting: { maxQueueSize } as never,
-  } as unknown as TownContent;
-}
+const townId = 'larsia' as TownId;
+const town = (maxQueueSize: { tier: number; value: number }[]) =>
+  ensureTown({ id: townId, crafting: { maxQueueSize } });
+
+const atTier = (tier: number) =>
+  seedGamestate(
+    (state) =>
+      (state.world.towns[townId] = buildTownNodeState({
+        reputation: TOWN_REPUTATION_THRESHOLDS[tier],
+      })),
+  );
 
 describe('townCraftQueueSize', () => {
-  const town = buildTown([
-    { tier: 0, value: 12 },
-    { tier: 1, value: 14 },
-    { tier: 2, value: 16 },
-    { tier: 3, value: 18 },
-    { tier: 4, value: 20 },
-  ]);
-
-  it.each([
-    [0, 12],
-    [1, 14],
-    [2, 16],
-    [3, 18],
-    [4, 20],
-  ])('resolves tier %i to a queue size of %i', (tier, expected) => {
-    vi.mocked(townReputationTier).mockReturnValue(tier);
-    expect(townCraftQueueSize(town)).toBe(expected);
-  });
-
-  it('falls back to the highest authored tier at or below the current one when a tier is missing', () => {
-    const sparseTown = buildTown([
+  it('uses the size of the reputation tier, or the nearest listed tier below it', () => {
+    const sizes = town([
       { tier: 0, value: 10 },
       { tier: 3, value: 15 },
     ]);
-    vi.mocked(townReputationTier).mockReturnValue(2);
 
-    expect(townCraftQueueSize(sparseTown)).toBe(10);
+    atTier(3);
+    expect(townCraftQueueSize(sizes)).toBe(15);
+
+    atTier(2);
+    expect(townCraftQueueSize(sizes)).toBe(10);
   });
 
-  it('is 0 when no tier at or below the current one is authored', () => {
-    const emptyTown = buildTown([]);
-    vi.mocked(townReputationTier).mockReturnValue(2);
+  it('is 0 with no size at or below the tier', () => {
+    atTier(2);
 
-    expect(townCraftQueueSize(emptyTown)).toBe(0);
+    expect(townCraftQueueSize(town([]))).toBe(0);
   });
 });

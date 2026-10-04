@@ -1,269 +1,165 @@
-import type {
-  CaravanId,
-  CaravanTraderContent,
-  CaravanTraderId,
-  Character,
-  CharacterId,
-  Combat,
-  CombatId,
-  GameState,
-  JobContent,
-  JobId,
-  WorldNodeEntry,
-} from '@interfaces';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    worldTravelState: () => gamestate().world.travel,
-    worldGatheringState: () => gamestate().world.gathering,
-    worldPartyState: vi.fn(() => []),
-    worldCombatState: vi.fn(() => undefined),
-  };
-});
-
-vi.mock('@helpers/world', () => ({
-  worldNodeAtCurrentLocation: vi.fn(() => undefined),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodeCaravan: vi.fn(() => undefined),
-}));
-
-vi.mock('@helpers/caravan/caravan', () => ({
-  caravanState: vi.fn(() => undefined),
-  caravanBrandName: vi.fn((name: string) => name.split(' - ')[0]),
-}));
-
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(() => undefined),
-}));
-
-import { caravanBrandName, caravanState } from '@helpers/caravan/caravan';
-import { getEntry } from '@helpers/content/content';
+import {
+  ensureCaravan,
+  ensureCaravanTrader,
+} from '@helpers/content/ensure-caravan';
+import { ensureJob } from '@helpers/content/ensure-job';
 import {
   discordSetMainStatus,
   discordUpdateStatus,
   isInElectron,
 } from '@helpers/engine/discord';
+import type { CaravanId, CaravanTraderId, GameState, JobId } from '@interfaces';
 import {
-  gamestate,
-  worldPartyState,
-  worldCombatState,
-} from '@helpers/state-game';
-import { worldNodeAtCurrentLocation } from '@helpers/world';
-import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
+  buildCaravanNodeState,
+  buildCharacter,
+  buildCombat,
+} from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
+import { locationOf, seedWorldNodes } from '@/testing/world';
 
-function mockElectron(isElectron: boolean): void {
+type DiscordWindow = Window & {
+  discordRPCStatus?: { state?: string; details?: string };
+};
+
+const caravanNodeName = 'Goblin Group Company - Carrina';
+const caravan = ensureCaravan({
+  id: 'caravan-1' as CaravanId,
+  name: caravanNodeName,
+});
+const trader = ensureCaravanTrader({
+  id: 'trader-1' as CaravanTraderId,
+  name: 'Grix the Merchant',
+});
+const warrior = ensureJob({ id: 'warrior' as JobId, name: 'Warrior' });
+const magician = ensureJob({ id: 'magician' as JobId, name: 'Magician' });
+
+function runningInElectron(isElectron: boolean): void {
   Object.defineProperty(navigator, 'userAgent', {
     value: isElectron ? 'Mozilla/5.0 electron/30.0.0' : 'Mozilla/5.0',
     configurable: true,
   });
 }
 
-function mockGamestate(
-  travel: Partial<GameState['world']['travel']> = {},
-  gathering: Partial<GameState['world']['gathering']> = {},
-): void {
-  vi.mocked(gamestate).mockReturnValue({
-    world: {
-      travel: { status: 'Idle', path: [], ticksIntoStep: 0, ...travel },
-      gathering: { status: 'Idle', ticksIntoGather: 0, ...gathering },
-    },
-  } as unknown as GameState);
+const status = () => (window as DiscordWindow).discordRPCStatus ?? {};
+
+// Updates the presence for a game seeded by `edit`, standing at `standingAt` (or off any node).
+function presenceFor(
+  edit: (state: GameState) => void = () => {},
+  standingAt?: string,
+) {
+  const nodes = seedWorldNodes([
+    { name: caravanNodeName, type: 'CaravanNode' },
+    { name: 'Carrina - Old Mill', type: 'Kingdom' },
+  ]);
+  seedGamestate((state) => {
+    state.world.currentLocation = standingAt
+      ? locationOf(nodes[standingAt])
+      : { mapName: 'TestMap', x: 50, y: 50 };
+    edit(state);
+  });
+  discordUpdateStatus();
+  return status();
 }
 
-function buildCombat(overrides: Partial<Combat> = {}): Combat {
-  return {
-    id: 'combat-1' as CombatId,
-    locationName: 'Field Ruins',
-    locationPosition: { x: 0, y: 0 },
-    rounds: 0,
-    heroes: [],
-    helpers: [],
-    guardians: [],
-    ...overrides,
-  } as Combat;
-}
+beforeEach(() => {
+  delete (window as DiscordWindow).discordRPCStatus;
+  discordSetMainStatus('');
+  runningInElectron(true);
+  seedContent([caravan, trader, warrior, magician]);
+});
 
-function buildNode(type: string, nodeName: string): WorldNodeEntry {
-  return {
-    mapName: 'map-1',
-    x: 0,
-    y: 0,
-    nodeName,
-    nodeData: {
-      id: 1,
-      name: nodeName,
-      type,
-      x: 0,
-      y: 0,
-      width: 1,
-      height: 1,
-      visible: true,
-    },
-  };
-}
+describe('isInElectron', () => {
+  it('detects electron from the user agent', () => {
+    expect(isInElectron()).toBe(true);
 
-function buildCharacter(overrides: Partial<Character> = {}): Character {
-  return {
-    id: 'char-1' as CharacterId,
-    name: 'Hero',
-    level: 1,
-    xp: { current: 0, maximum: 100 },
-    jobId: 'job-1' as JobId,
-    jobProgress: {},
-    combatOrders: {},
-    hp: 50,
-    ep: 20,
-    stats: {} as Character['stats'],
-    equipment: {} as Character['equipment'],
-    traitIds: [],
-    ...overrides,
-  } as Character;
-}
+    runningInElectron(false);
+    expect(isInElectron()).toBe(false);
+  });
+});
 
-function currentState(): { state?: string; details?: string } {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (window as any).discordRPCStatus ?? {};
-}
+describe('discordUpdateStatus', () => {
+  it('does nothing outside electron', () => {
+    runningInElectron(false);
 
-describe('discord status', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    discordSetMainStatus('');
-    mockElectron(true);
-    vi.mocked(worldCombatState).mockReturnValue(undefined);
-    vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(undefined);
-    vi.mocked(worldNodeCaravan).mockReturnValue(undefined);
-    vi.mocked(caravanState).mockReturnValue(undefined);
-    vi.mocked(worldPartyState).mockReturnValue([]);
-    mockGamestate();
+    presenceFor((state) => (state.world.combat = buildCombat()));
+
+    expect((window as DiscordWindow).discordRPCStatus).toBeUndefined();
   });
 
-  describe('isInElectron', () => {
-    it('is true when the user agent contains electron/', () => {
-      mockElectron(true);
-      expect(isInElectron()).toBe(true);
-    });
+  it('shows combat first, then travel, then gathering', () => {
+    const traveling = (state: GameState) =>
+      (state.world.travel = {
+        status: 'Traveling',
+        destinationNodeName: 'Carrina',
+        path: [],
+        ticksIntoStep: 0,
+      });
+    const gathering = (state: GameState) =>
+      (state.world.gathering = {
+        status: 'Gathering',
+        nodeName: 'Iron Vein',
+        ticksIntoGather: 0,
+      });
 
-    it('is false otherwise', () => {
-      mockElectron(false);
-      expect(isInElectron()).toBe(false);
-    });
+    expect(
+      presenceFor((state) => {
+        traveling(state);
+        state.world.combat = buildCombat({ locationName: 'Whispering Woods' });
+      }).state,
+    ).toBe('Exploring Whispering Woods');
+    expect(
+      presenceFor((state) => {
+        traveling(state);
+        gathering(state);
+      }).state,
+    ).toBe('Traveling to Carrina');
+    expect(presenceFor(gathering).state).toBe('Gathering in Iron Vein');
   });
 
-  describe('discordUpdateStatus', () => {
-    it('does nothing outside electron', () => {
-      mockElectron(false);
-      vi.mocked(worldCombatState).mockReturnValue(buildCombat());
+  it('shows trading with a caravan’s current trader, or resting at its brand name without one', () => {
+    expect(
+      presenceFor(
+        (state) =>
+          (state.world.caravans[caravan.id] = buildCaravanNodeState({
+            traderId: trader.id,
+          })),
+        caravanNodeName,
+      ).state,
+    ).toBe('Trading with Grix the Merchant');
+    expect(presenceFor(undefined, caravanNodeName).state).toBe(
+      'Resting at Goblin Group Company',
+    );
+  });
 
-      discordUpdateStatus();
+  it('ignores a leftover destination or gather node once idle', () => {
+    expect(
+      presenceFor((state) => {
+        state.world.travel.destinationNodeName = 'Carrina';
+        state.world.gathering.nodeName = 'Iron Vein';
+      }).state,
+    ).toBe('Traveling');
+  });
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      expect((window as any).discordRPCStatus).toBeUndefined();
-    });
+  it('shows resting at any other node, and traveling off every node', () => {
+    expect(presenceFor(undefined, 'Carrina - Old Mill').state).toBe(
+      'Resting at Carrina - Old Mill',
+    );
+    expect(presenceFor().state).toBe('Traveling');
+  });
 
-    it('shows Exploring when in combat, regardless of other state', () => {
-      vi.mocked(worldCombatState).mockReturnValue(
-        buildCombat({ locationName: 'Whispering Woods' }),
-      );
-      mockGamestate({ status: 'Traveling', destinationNodeName: 'Elsewhere' });
-
-      discordUpdateStatus();
-
-      expect(currentState().state).toBe('Exploring Whispering Woods');
-    });
-
-    it('shows Traveling to the destination while traveling', () => {
-      mockGamestate({ status: 'Traveling', destinationNodeName: 'Carrina' });
-
-      discordUpdateStatus();
-
-      expect(currentState().state).toBe('Traveling to Carrina');
-    });
-
-    it('shows Gathering while gathering', () => {
-      mockGamestate({}, { status: 'Gathering', nodeName: 'Iron Vein' });
-
-      discordUpdateStatus();
-
-      expect(currentState().state).toBe('Gathering in Iron Vein');
-    });
-
-    it('shows Trading with the assigned trader at an idle CaravanNode', () => {
-      const node = buildNode('CaravanNode', 'Goblin Group Company - Carrina');
-      vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(node);
-      vi.mocked(worldNodeCaravan).mockReturnValue({
-        id: 'caravan-1' as CaravanId,
-      } as never);
-      vi.mocked(caravanState).mockReturnValue({
-        traderId: 'trader-1' as CaravanTraderId,
-        activeTradeIndices: [],
-        tradeCounts: {},
-        generatedAtTick: 0,
-      });
-      vi.mocked(getEntry).mockReturnValue({
-        name: 'Grix the Merchant',
-      } as CaravanTraderContent);
-
-      discordUpdateStatus();
-
-      expect(currentState().state).toBe('Trading with Grix the Merchant');
-    });
-
-    it('shows Resting at the brand name for a CaravanNode with no trader', () => {
-      const node = buildNode('CaravanNode', 'Goblin Group Company - Carrina');
-      vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(node);
-      vi.mocked(worldNodeCaravan).mockReturnValue({
-        id: 'caravan-1' as CaravanId,
-      } as never);
-      vi.mocked(caravanState).mockReturnValue(undefined);
-
-      discordUpdateStatus();
-
-      expect(currentState().state).toBe('Resting at Goblin Group Company');
-      expect(caravanBrandName).toHaveBeenCalledWith(
-        'Goblin Group Company - Carrina',
-      );
-    });
-
-    it('shows Resting at a non-caravan node', () => {
-      vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(
-        buildNode('Kingdom', 'Duchy of Carrina'),
-      );
-
-      discordUpdateStatus();
-
-      expect(currentState().state).toBe('Resting at Duchy of Carrina');
-    });
-
-    it('shows Traveling when idle with no node underfoot', () => {
-      vi.mocked(worldNodeAtCurrentLocation).mockReturnValue(undefined);
-
-      discordUpdateStatus();
-
-      expect(currentState().state).toBe('Traveling');
-    });
-
-    it('sets the party roster as the persistent details line', () => {
-      vi.mocked(worldPartyState).mockReturnValue([
-        buildCharacter({ jobId: 'warrior' as JobId, level: 5 }),
-        buildCharacter({ jobId: 'magician' as JobId, level: 3 }),
-      ]);
-      vi.mocked(getEntry).mockImplementation((id) => {
-        const names: Record<string, string> = {
-          warrior: 'Warrior',
-          magician: 'Magician',
-        };
-        return { name: names[id as string] } as JobContent;
-      });
-
-      discordUpdateStatus();
-
-      expect(currentState().details).toBe('Warrior Lv5, Magician Lv3');
-    });
+  it('lists the party’s jobs and levels as the details line', () => {
+    expect(
+      presenceFor(
+        (state) =>
+          (state.world.party = [
+            buildCharacter({ jobId: warrior.id, level: 5 }),
+            buildCharacter({ jobId: magician.id, level: 3 }),
+            buildCharacter({ jobId: 'gone' as JobId, level: 1 }),
+          ]),
+      ).details,
+    ).toBe('Warrior Lv5, Magician Lv3, Adventurer Lv1');
   });
 });

@@ -1,23 +1,8 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, onTestFinished } from 'vitest';
 
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    tasksState: () => gamestate().tasks,
-  };
-});
-
-vi.mock('@helpers/task/task-completed', () => ({
-  tasksCompletedEmit: vi.fn(),
-}));
-
-import { setAllContentById } from '@helpers/content/content';
 import { ensureTask } from '@helpers/content/ensure-task';
-import { defaultGameState } from '@helpers/defaults';
-import { gamestate, updateGamestate } from '@helpers/state-game';
-import { tasksCompletedEmit } from '@helpers/task/task-completed';
+import { tasksState } from '@helpers/state-game';
+import { tasksCompleted$ } from '@helpers/task/task-completed';
 import {
   taskRecordAstralCast,
   taskRecordCraft,
@@ -26,12 +11,15 @@ import {
 } from '@helpers/task/task-progress';
 import type {
   AstralProjectorId,
-  GameState,
+  GameStateTasks,
   IsContentItem,
   ItemId,
   RecipeId,
+  TaskContent,
   TaskId,
 } from '@interfaces';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 
 const GATHER_TASK = 'task-gather' as TaskId;
 const CRAFT_TASK = 'task-craft' as TaskId;
@@ -41,11 +29,21 @@ const DUCHY_SPELL = 'spell-duchy' as AstralProjectorId;
 const STICK = 'item-stick' as ItemId;
 const INGOT_RECIPE = 'recipe-ingot' as RecipeId;
 
-let state: GameState;
+const fresh = { progress: 0 };
+const startingTasks: GameStateTasks = {
+  [GATHER_TASK]: fresh,
+  [CRAFT_TASK]: fresh,
+  [CLEAR_TASK]: fresh,
+  [CAST_TASK]: fresh,
+};
+
+function seedTasks(overrides: GameStateTasks = {}) {
+  seedGamestate((state) => (state.tasks = { ...startingTasks, ...overrides }));
+}
+
+let announced: TaskContent[][];
 
 beforeEach(() => {
-  vi.clearAllMocks();
-
   const content: IsContentItem[] = [
     ensureTask({
       id: GATHER_TASK,
@@ -81,107 +79,92 @@ beforeEach(() => {
       },
     }),
   ];
-  setAllContentById(new Map(content.map((entry) => [entry.id, entry])));
+  seedContent(content);
+  seedTasks();
 
-  state = defaultGameState();
-  state.tasks = {
-    [GATHER_TASK]: { progress: 0 },
-    [CRAFT_TASK]: { progress: 0 },
-    [CLEAR_TASK]: { progress: 0 },
-    [CAST_TASK]: { progress: 0 },
-  };
-  vi.mocked(gamestate).mockImplementation(() => state);
-  // Mirrors an in-tick write: the callback runs synchronously.
-  vi.mocked(updateGamestate).mockImplementation((update) => {
-    state = update(state);
-    return Promise.resolve();
-  });
+  announced = [];
+  const subscription = tasksCompleted$.subscribe((tasks) =>
+    announced.push(tasks),
+  );
+  onTestFinished(() => subscription.unsubscribe());
 });
 
-describe('taskRecordGather', () => {
-  it('skips the state write when no task matches the node and item', () => {
-    taskRecordGather('Carrina Copper Mines', STICK, 3);
-    taskRecordGather('Wergen Woods', 'item-wood' as ItemId, 3);
+const task = (id: TaskId) => tasksState()[id];
 
-    expect(updateGamestate).not.toHaveBeenCalled();
+describe('taskRecordGather', () => {
+  it('ignores a node or item no task asks for', () => {
+    inTick(() => {
+      taskRecordGather('Carrina Copper Mines', STICK, 3);
+      taskRecordGather('Wergen Woods', 'item-wood' as ItemId, 3);
+    });
+
+    expect(task(GATHER_TASK)).toEqual(fresh);
   });
 
   it('adds progress without completing below the target', () => {
-    taskRecordGather('Wergen Woods', STICK, 3);
+    inTick(() => taskRecordGather('Wergen Woods', STICK, 3));
 
-    expect(state.tasks[GATHER_TASK]).toEqual({ progress: 3 });
-    expect(tasksCompletedEmit).toHaveBeenCalledWith([]);
+    expect(task(GATHER_TASK)).toEqual({ progress: 3 });
+    expect(announced.flat()).toEqual([]);
   });
 
-  it('caps progress at the target, latches, and announces', () => {
-    state.tasks[GATHER_TASK] = { progress: 4 };
+  it('caps progress at the target, completes and announces', () => {
+    seedTasks({ [GATHER_TASK]: { progress: 4 } });
 
-    taskRecordGather('Wergen Woods', STICK, 3);
+    inTick(() => taskRecordGather('Wergen Woods', STICK, 3));
 
-    expect(state.tasks[GATHER_TASK].progress).toBe(5);
-    expect(state.tasks[GATHER_TASK].completedAt).toBeDefined();
-    expect(tasksCompletedEmit).toHaveBeenCalledWith([
-      expect.objectContaining({ id: GATHER_TASK }),
-    ]);
+    expect(task(GATHER_TASK)).toEqual({
+      progress: 5,
+      completedAt: expect.any(Number),
+    });
+    expect(announced.flat().map((t) => t.id)).toEqual([GATHER_TASK]);
   });
 
-  it('ignores tasks that are already complete', () => {
-    state.tasks[GATHER_TASK] = { progress: 5, completedAt: 1 };
+  it('leaves a completed task alone', () => {
+    seedTasks({ [GATHER_TASK]: { progress: 5, completedAt: 1 } });
 
-    taskRecordGather('Wergen Woods', STICK, 3);
+    inTick(() => taskRecordGather('Wergen Woods', STICK, 3));
 
-    expect(updateGamestate).not.toHaveBeenCalled();
+    expect(task(GATHER_TASK)).toEqual({ progress: 5, completedAt: 1 });
+    expect(announced.flat()).toEqual([]);
   });
 });
 
 describe('taskRecordCraft', () => {
-  it('completes the matching craft task', () => {
-    taskRecordCraft(INGOT_RECIPE);
+  it('completes the matching craft task only', () => {
+    inTick(() => taskRecordCraft('recipe-sword' as RecipeId));
+    expect(task(CRAFT_TASK)).toEqual(fresh);
 
-    expect(state.tasks[CRAFT_TASK].completedAt).toBeDefined();
-  });
-
-  it('skips the state write for an unrelated recipe', () => {
-    taskRecordCraft('recipe-sword' as RecipeId);
-
-    expect(updateGamestate).not.toHaveBeenCalled();
+    inTick(() => taskRecordCraft(INGOT_RECIPE));
+    expect(task(CRAFT_TASK).completedAt).toEqual(expect.any(Number));
   });
 });
 
 describe('taskRecordEncounterClear', () => {
-  it('counts one clear per call', () => {
-    taskRecordEncounterClear('Forest Ruins');
+  it('counts one clear per call, creating an entry a save lacks', () => {
+    inTick(() => taskRecordEncounterClear('Forest Ruins'));
+    expect(task(CLEAR_TASK)).toEqual({ progress: 1 });
 
-    expect(state.tasks[CLEAR_TASK]).toEqual({ progress: 1 });
-  });
-
-  it('creates the entry when a save somehow lacks one', () => {
-    delete state.tasks[CLEAR_TASK];
-
-    taskRecordEncounterClear('Forest Ruins');
-
-    expect(state.tasks[CLEAR_TASK]).toEqual({ progress: 1 });
+    seedGamestate((state) => {
+      state.tasks = { ...startingTasks };
+      delete state.tasks[CLEAR_TASK];
+    });
+    inTick(() => taskRecordEncounterClear('Forest Ruins'));
+    expect(task(CLEAR_TASK)).toEqual({ progress: 1 });
   });
 });
 
 describe('taskRecordAstralCast', () => {
-  it('waits for the deferred write before announcing the completed cast', async () => {
-    vi.mocked(updateGamestate).mockImplementation(async (update) => {
-      await Promise.resolve();
-      state = update(state);
-    });
-
+  it('announces the completed cast once the deferred write lands', async () => {
     await taskRecordAstralCast(DUCHY_SPELL);
 
-    expect(state.tasks[CAST_TASK].completedAt).toBeDefined();
-    expect(tasksCompletedEmit).toHaveBeenCalledWith([
-      expect.objectContaining({ id: CAST_TASK }),
-    ]);
+    expect(task(CAST_TASK).completedAt).toEqual(expect.any(Number));
+    expect(announced.flat().map((t) => t.id)).toEqual([CAST_TASK]);
   });
 
-  it('skips the state write for a spell no task asks for', async () => {
+  it('ignores a spell no task asks for', async () => {
     await taskRecordAstralCast('spell-other' as AstralProjectorId);
 
-    expect(updateGamestate).not.toHaveBeenCalled();
+    expect(task(CAST_TASK)).toEqual(fresh);
   });
 });

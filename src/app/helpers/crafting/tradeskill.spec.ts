@@ -40,6 +40,7 @@ import type {
   GameState,
   TradeskillBuildingState,
   TradeskillId,
+  TradeskillLevelRequirementId,
 } from '@interfaces';
 import { captureAnalyticsEvents } from '@/testing/analytics';
 import { seedContent } from '@/testing/content';
@@ -51,7 +52,7 @@ const effigyId = 'effigy' as CollectibleId;
 const GATED_LEVEL = 5;
 
 const gate = ensureTradeskillLevelRequirement({
-  id: 'gate-1' as never,
+  id: 'gate-1' as TradeskillLevelRequirementId,
   name: 'Blacksmithing 5',
   tradeskillId: BLACKSMITHING_ID,
   level: GATED_LEVEL,
@@ -276,7 +277,7 @@ describe('tradeskillLevelGateSatisfied / tradeskillActiveGate', () => {
       ensureTradeskill({ id: BLACKSMITHING_ID, name: 'Blacksmithing' }),
       ensureTradeskillLevelRequirement({
         ...gate,
-        id: 'gate-2' as never,
+        id: 'gate-2' as TradeskillLevelRequirementId,
         tradeskillId: WOODWORKING_ID,
         level: GATED_LEVEL + 1,
       }),

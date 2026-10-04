@@ -1,38 +1,35 @@
 import type {
   Character,
-  CharacterId,
   EquipmentArmoryEntry,
+  EquipmentContent,
   EquipmentId,
   EquipmentItem,
   EquipmentItemId,
   EquipmentItemType,
   EquipmentSlot,
-  JobContent,
   JobId,
 } from '@interfaces';
 import { EquipmentTypeToSlot } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-  getEntriesByType: vi.fn(),
-}));
-
-import { getEntry } from '@helpers/content/content';
 import { ensureEquipment } from '@helpers/content/ensure-item';
 import { ensureStats } from '@helpers/content/ensure-helpers-stats';
 import { defaultEquipment } from '@helpers/defaults';
 import { equippedItems } from '@helpers/item/equipment';
 import { planEquipmentOptimization } from '@helpers/item/equipment-optimize';
+import { ensureJob } from '@helpers/content/ensure-job';
+import { getEntry } from '@helpers/content/content';
+import {
+  buildCharacter as buildHero,
+  buildEquipmentItem,
+} from '@/testing/builders';
+import { seedContent } from '@/testing/content';
 
 function mockEquipmentItem(equipmentId: EquipmentId): EquipmentItem {
-  return {
-    id: equipmentId as unknown as EquipmentItemId,
-    equipmentId,
-    infusedItemIds: [],
-    affixIds: [],
-  };
+  return buildEquipmentItem(equipmentId, {
+    id: `${equipmentId}-item` as EquipmentItemId,
+  });
 }
 
 const sword = ensureEquipment({
@@ -49,32 +46,24 @@ const spear = ensureEquipment({
 
 const emptyEquipment = defaultEquipment();
 
-beforeEach(() => {
-  vi.clearAllMocks();
-});
-
 describe('planEquipmentOptimization', () => {
-  const job: JobContent = {
+  const job = ensureJob({
+    id: 'job-warrior' as JobId,
     name: 'Warrior',
     equippableTypes: ['Sword', 'Spear', 'Shield', 'Hat'],
-  } as JobContent;
+  });
 
   function buildCharacter(overrides: Partial<Character> = {}): Character {
-    return {
-      id: 'char-1' as CharacterId,
+    return buildHero({
       level: 5,
       jobId: 'job-warrior' as JobId,
       equipment: emptyEquipment,
       ...overrides,
-    } as Character;
+    });
   }
 
-  function mockContentEntries(...entries: { id: string }[]): void {
-    const known = new Map(entries.map((entry) => [entry.id, entry]));
-    known.set('job-warrior', job);
-    vi.mocked(getEntry).mockImplementation(
-      (id) => known.get(id as string) as never,
-    );
+  function mockContentEntries(...entries: EquipmentContent[]): void {
+    seedContent([job, ...entries]);
   }
 
   it('prefers the candidate ranked higher by statPriority over one with a higher level requirement', () => {
@@ -414,17 +403,12 @@ describe('planEquipmentOptimization', () => {
     }
 
     function setupHealer(gear: ReturnType<typeof healerGear>) {
-      const healer = {
+      const healer = ensureJob({
+        id: 'job-healer' as JobId,
         name: 'Healer',
         equippableTypes: ['Mace', 'Staff', 'Shield'],
-      } as JobContent;
-      const known = new Map<string, unknown>([
-        ['job-healer', healer],
-        ...Object.values(gear).map((g) => [g.id, g] as [string, unknown]),
-      ]);
-      vi.mocked(getEntry).mockImplementation(
-        (id) => known.get(id as string) as never,
-      );
+      });
+      seedContent([healer, ...Object.values(gear)]);
 
       return {
         hammer: mockEquipmentItem(gear.hammer.id),
@@ -529,10 +513,11 @@ describe('planEquipmentOptimization', () => {
     });
 
     it('picks a two-hander plus ammo for a job with no offhand types', () => {
-      const ranger = {
+      const ranger = ensureJob({
+        id: 'job-ranger' as JobId,
         name: 'Ranger',
         equippableTypes: ['Dagger', 'Bow', 'Arrow'],
-      } as JobContent;
+      });
       const dagger = ensureEquipment({
         id: 'dagger' as EquipmentId,
         type: 'Dagger',
@@ -548,15 +533,7 @@ describe('planEquipmentOptimization', () => {
         type: 'Arrow',
         baseStats: ensureStats({ Intelligence: 1 }),
       });
-      const known = new Map<string, unknown>([
-        ['job-ranger', ranger],
-        [dagger.id, dagger],
-        [bow.id, bow],
-        [arrow.id, arrow],
-      ]);
-      vi.mocked(getEntry).mockImplementation(
-        (id) => known.get(id as string) as never,
-      );
+      seedContent([ranger, dagger, bow, arrow]);
       const daggerItem = mockEquipmentItem(dagger.id);
       const bowItem = mockEquipmentItem(bow.id);
       const arrowItem = mockEquipmentItem(arrow.id);
@@ -633,17 +610,16 @@ describe('planEquipmentOptimization', () => {
           baseStats: ensureStats({ Intelligence: hatInt }),
         }),
       ];
+      // The test-only robe type isn't a real enum value, so set it after ensureJob would drop it.
       const job = {
-        name: 'Sage',
-        equippableTypes: [robeType, 'Cloth Armor', 'Hat'],
-      } as JobContent;
-      const known = new Map<string, unknown>([
-        ['job-sage', job],
-        ...gear.map((g) => [g.id, g] as [string, unknown]),
-      ]);
-      vi.mocked(getEntry).mockImplementation(
-        (id) => known.get(id as string) as never,
-      );
+        ...ensureJob({ id: 'job-sage' as JobId, name: 'Sage' }),
+        equippableTypes: [
+          robeType,
+          'Cloth Armor',
+          'Hat',
+        ] as EquipmentItemType[],
+      };
+      seedContent([job, ...gear]);
 
       const [robe, armor, hat] = gear.map((g) => mockEquipmentItem(g.id));
       return { robe, armor, hat };
@@ -725,26 +701,23 @@ describe('planEquipmentOptimization', () => {
         baseStats: ensureStats({ Intelligence: 3 }),
       });
       const job = {
-        name: 'Sage',
+        ...ensureJob({ id: 'job-sage' as JobId, name: 'Sage' }),
         equippableTypes: [
           robeType,
           mantleType,
           'Cloth Armor',
           'Hat',
           'Trinket',
-        ],
-      } as JobContent;
-      const known = new Map<string, unknown>([
-        ['job-sage', job],
-        [mantle.id, mantle],
-        [trinket.id, trinket],
-        ...[items.robe, items.armor, items.hat].map(
-          (i) => [i.equipmentId, getEntry(i.equipmentId)] as [string, unknown],
+        ] as EquipmentItemType[],
+      };
+      seedContent([
+        job,
+        mantle,
+        trinket,
+        ...[items.robe, items.armor, items.hat].map((item) =>
+          getEntry<EquipmentContent>(item.equipmentId)!,
         ),
       ]);
-      vi.mocked(getEntry).mockImplementation(
-        (id) => known.get(id as string) as never,
-      );
       const mantleItem = mockEquipmentItem(mantle.id);
       const trinketItem = mockEquipmentItem(trinket.id);
 

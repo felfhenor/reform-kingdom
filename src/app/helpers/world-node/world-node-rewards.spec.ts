@@ -1,250 +1,150 @@
 import type {
-  CollectibleContent,
   CollectibleId,
-  EncounterContent,
-  EquipmentContent,
+  DroppedReward,
+  IsContentItem,
   EquipmentId,
-  ItemContent,
   ItemId,
-  RecipeContent,
   RecipeId,
-  TiledObject,
   TradeskillId,
   WorldNodeEntry,
 } from '@interfaces';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { ensureEncounter } from '@helpers/content/ensure-encounternode';
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
-import { setAllContentById, setAllIdsByName } from '@helpers/content/content';
+import {
+  ensureCollectible,
+  ensureEquipment,
+  ensureItem,
+} from '@helpers/content/ensure-item';
 import { ensureRecipe } from '@helpers/content/ensure-recipe';
-import { defaultGameState } from '@helpers/defaults';
-import { setGameState } from '@helpers/state-game';
+import { ensureTradeskill } from '@helpers/content/ensure-tradeskill';
+import { recipeStylizedName } from '@helpers/crafting/recipes';
+import { defaultTradeskillBuilding } from '@helpers/defaults';
 import {
   rewardContentInfo,
   worldNodeCompletionRewardProgress,
   worldNodeCompletionRewards,
   worldNodeObtainableMissingRewards,
 } from '@helpers/world-node/world-node-rewards';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 
-function buildObject(overrides: Partial<TiledObject>): TiledObject {
-  return {
-    id: 1,
-    name: 'Unnamed',
-    type: '',
-    x: 0,
-    y: 0,
-    width: 64,
-    height: 64,
-    visible: true,
-    ...overrides,
-  };
+const nodeName = 'Forest Ruins';
+
+const bone = ensureItem({ id: 'bone' as ItemId, name: 'Bone', sprite: '0001' });
+const clam = ensureCollectible({
+  id: 'swamp-clam' as CollectibleId,
+  name: 'Swamp Clam',
+  sprite: '0003',
+});
+const cloak = ensureEquipment({
+  id: 'bone-hewn-cloak' as EquipmentId,
+  name: 'Bone-Hewn Cloak',
+  sprite: '0002',
+});
+const tradeskillId = 'tailoring-id' as TradeskillId;
+const cloakRecipe = ensureRecipe({
+  id: 'equipment-bone-hewn-cloak' as RecipeId,
+  name: 'Equipment: Bone-Hewn Cloak',
+  tradeskillId,
+  minTradeskillLevel: 5,
+  result: { equipmentId: cloak.id },
+});
+
+function node(): WorldNodeEntry {
+  return seedWorldNodes([{ name: nodeName, type: 'ExploreNode' }])[nodeName];
 }
 
-function buildEntry(nodeData: Partial<TiledObject> = {}): WorldNodeEntry {
-  return {
-    mapName: 'Carrina',
-    x: 24,
-    y: 24,
-    nodeName: 'Forest Ruins',
-    nodeData: buildObject(nodeData),
-  };
-}
-
-function buildEncounter(
-  overrides: Partial<EncounterContent> = {},
-): EncounterContent {
-  return {
-    id: 'encounter-forest-ruins',
-    name: 'Forest Ruins',
-    __type: 'encounter',
-    description: 'A crumbling ruin at the edge of the forest.',
-    levelRange: { min: 1, max: 3 },
-    fights: [],
-    ...overrides,
-  } as EncounterContent;
-}
-
-function seedContent(
-  entries: Array<{ id: string; name: string } & Record<string, unknown>>,
+function seedEncounterWith(
+  completionRewards: DroppedReward[],
+  content: IsContentItem[] = [],
 ): void {
-  setAllIdsByName(new Map(entries.map((entry) => [entry.name, entry.id])));
-  setAllContentById(
-    new Map(entries.map((entry) => [entry.id, entry as never])),
-  );
+  seedContent([
+    ...content,
+    ensureEncounter({ name: nodeName, completionRewards }),
+  ]);
 }
 
 describe('worldNodeCompletionRewards', () => {
-  beforeEach(() => {
-    setAllIdsByName(new Map());
-    setAllContentById(new Map());
-  });
-
   it('excludes Gold Coin and de-dupes rewards by identity', () => {
-    const goldCoin: ItemContent = {
+    const goldCoin = ensureItem({
       id: 'gold-coin' as ItemId,
       name: 'Gold Coin',
-      __type: 'item',
-      description: 'Currency.',
-      sprite: '0000',
-      rarity: 'Common',
-    };
-    const bone: ItemContent = {
-      id: 'bone' as ItemId,
-      name: 'Bone',
-      __type: 'item',
-      description: 'A bone.',
-      sprite: '0001',
-      rarity: 'Common',
-    };
-    const clam: CollectibleContent = {
-      id: 'swamp-clam' as CollectibleId,
-      name: 'Swamp Clam',
-      __type: 'collectible',
-      description: 'A clam.',
-      sprite: '0003',
-      rarity: 'Uncommon',
-      effects: [],
-    };
-
-    const encounter = buildEncounter({
-      completionRewards: [
-        ensureDroppedReward({
-          itemId: goldCoin.id,
-          min: 1,
-          max: 1,
-          chance: 100,
-        }),
-        ensureDroppedReward({
-          itemId: bone.id,
-          min: 1,
-          max: 1,
-          chance: 100,
-        }),
-        ensureDroppedReward({
-          itemId: bone.id,
-          min: 1,
-          max: 1,
-          chance: 50,
-        }),
-        ensureDroppedReward({
-          collectibleId: clam.id,
-          chance: 50,
-        }),
-      ],
     });
+    const boneReward = ensureDroppedReward({ itemId: bone.id, chance: 100 });
+    const clamReward = ensureDroppedReward({
+      collectibleId: clam.id,
+      chance: 50,
+    });
+    seedEncounterWith(
+      [
+        ensureDroppedReward({ itemId: goldCoin.id, chance: 100 }),
+        boneReward,
+        ensureDroppedReward({ itemId: bone.id, chance: 50 }),
+        clamReward,
+      ],
+      [goldCoin, bone, clam],
+    );
 
-    // seedContent replaces the whole content map, so the encounter must be
-    // seeded together with the items/collectible it references, not via a
-    // separate seedEncounter() call afterward.
-    seedContent([goldCoin, bone, clam, encounter]);
-
-    expect(worldNodeCompletionRewards(buildEntry())).toEqual([
-      ensureDroppedReward({
-        itemId: bone.id,
-        min: 1,
-        max: 1,
-        chance: 100,
-      }),
-      ensureDroppedReward({
-        collectibleId: clam.id,
-        chance: 50,
-      }),
+    expect(worldNodeCompletionRewards(node())).toEqual([
+      boneReward,
+      clamReward,
     ]);
   });
 
   it('returns an empty array when there is no matching encounter', () => {
-    expect(worldNodeCompletionRewards(buildEntry())).toEqual([]);
+    expect(worldNodeCompletionRewards(node())).toEqual([]);
   });
 
   it('includes recipe rewards alongside the other reward types', () => {
-    const recipe: RecipeContent = {
-      id: 'equipment-bone-hewn-cloak' as RecipeId,
-      name: 'Equipment: Bone-Hewn Cloak',
-      __type: 'recipe',
-      result: { equipmentId: 'bone-hewn-cloak' as never },
-      requirements: [],
-      tradeskillId: 'tailoring-id' as never,
-      minTradeskillLevel: 2,
-      maxTradeskillLevel: 5,
-      tradeskillXP: 1,
-      craftTime: 60,
-      tokenUnlockCost: 0,
-    };
-
-    const encounter = buildEncounter({
-      completionRewards: [
-        ensureDroppedReward({
-          recipeId: recipe.id,
-          chance: 25,
-        }),
-      ],
+    const recipeReward = ensureDroppedReward({
+      recipeId: cloakRecipe.id,
+      chance: 25,
     });
+    seedEncounterWith([recipeReward], [cloakRecipe]);
 
-    seedContent([recipe, encounter]);
-
-    expect(worldNodeCompletionRewards(buildEntry())).toEqual([
-      ensureDroppedReward({
-        recipeId: recipe.id,
-        chance: 25,
-      }),
-    ]);
+    expect(worldNodeCompletionRewards(node())).toEqual([recipeReward]);
   });
 });
 
 describe('worldNodeCompletionRewardProgress', () => {
-  beforeEach(() => {
-    setAllIdsByName(new Map());
-    setAllContentById(new Map());
-  });
-
   it('reports 0/total when nothing has been discovered yet', () => {
-    const bone: ItemContent = {
-      id: 'bone' as ItemId,
-      name: 'Bone',
-      __type: 'item',
-      description: 'A bone.',
-      sprite: '0001',
-      rarity: 'Common',
-    };
-    const equipment: EquipmentContent = {
-      id: 'goblin-skull' as EquipmentId,
-      name: 'Goblin Skull',
-      __type: 'equipment',
-      description: 'A skull.',
-      sprite: '0000',
-      rarity: 'Common',
-      levelRequirement: 1,
-      type: 'Artifact',
-      baseStats: {} as never,
-      slots: 0,
-      grantedSkillIds: [],
-    };
-
-    const encounter = buildEncounter({
-      completionRewards: [
-        ensureDroppedReward({
-          itemId: bone.id,
-          min: 1,
-          max: 1,
-          chance: 100,
-        }),
-        ensureDroppedReward({
-          equipmentId: equipment.id,
-          chance: 10,
-        }),
+    seedEncounterWith(
+      [
+        ensureDroppedReward({ itemId: bone.id, chance: 100 }),
+        ensureDroppedReward({ equipmentId: cloak.id, chance: 10 }),
       ],
-    });
+      [bone, cloak],
+    );
 
-    seedContent([bone, equipment, encounter]);
-
-    expect(worldNodeCompletionRewardProgress(buildEntry())).toEqual({
+    expect(worldNodeCompletionRewardProgress(node())).toEqual({
       obtained: 0,
       total: 2,
     });
   });
 
+  it('counts the rewards already discovered', () => {
+    seedEncounterWith(
+      [
+        ensureDroppedReward({ itemId: bone.id, chance: 100 }),
+        ensureDroppedReward({ equipmentId: cloak.id, chance: 10 }),
+      ],
+      [bone, cloak],
+    );
+    seedGamestate(
+      (state) => (state.discoveredMaterials[bone.id] = { foundAt: 1 }),
+    );
+
+    expect(worldNodeCompletionRewardProgress(node())).toEqual({
+      obtained: 1,
+      total: 2,
+    });
+  });
+
   it('reports 0/0 when there is no matching encounter', () => {
-    expect(worldNodeCompletionRewardProgress(buildEntry())).toEqual({
+    expect(worldNodeCompletionRewardProgress(node())).toEqual({
       obtained: 0,
       total: 0,
     });
@@ -252,164 +152,91 @@ describe('worldNodeCompletionRewardProgress', () => {
 });
 
 describe('worldNodeObtainableMissingRewards', () => {
-  const tradeskillId = 'tailoring-id' as TradeskillId;
-  const recipe = ensureRecipe({
-    id: 'recipe-cloak' as RecipeId,
-    name: 'Equipment: Cloak',
-    tradeskillId,
-    minTradeskillLevel: 5,
+  const clamReward = ensureDroppedReward({
+    collectibleId: clam.id,
+    chance: 10,
   });
-  const clam = {
-    id: 'swamp-clam' as CollectibleId,
-    name: 'Swamp Clam',
-    __type: 'collectible',
-  };
 
   function withTailoringLevel(level: number, recipeFound = false): void {
-    const state = defaultGameState();
-    state.tradeskills[tradeskillId] = {
-      level,
-      xp: { current: 0, maximum: 10 },
-      queue: [],
-    };
-    if (recipeFound) state.discoveredRecipes[recipe.id] = { foundAt: 1 };
-    setGameState(state, false);
+    seedGamestate((state) => {
+      state.tradeskills[tradeskillId] = {
+        ...defaultTradeskillBuilding(),
+        level,
+      };
+      if (recipeFound) state.discoveredRecipes[cloakRecipe.id] = { foundAt: 1 };
+    });
   }
 
   beforeEach(() => {
-    seedContent([
-      recipe,
-      clam,
-      buildEncounter({
-        completionRewards: [
-          ensureDroppedReward({ recipeId: recipe.id, chance: 10 }),
-          ensureDroppedReward({ collectibleId: clam.id, chance: 10 }),
-        ],
-      }),
-    ]);
+    seedEncounterWith(
+      [
+        ensureDroppedReward({ recipeId: cloakRecipe.id, chance: 10 }),
+        clamReward,
+      ],
+      [cloakRecipe, clam],
+    );
   });
 
   it('skips a recipe the tradeskill is too low to drop', () => {
-    withTailoringLevel(4);
+    withTailoringLevel(cloakRecipe.minTradeskillLevel - 1);
 
-    expect(worldNodeObtainableMissingRewards(buildEntry())).toEqual([
-      ensureDroppedReward({ collectibleId: clam.id, chance: 10 }),
-    ]);
+    expect(worldNodeObtainableMissingRewards(node())).toEqual([clamReward]);
   });
 
   it('includes the recipe once the tradeskill level is met', () => {
-    withTailoringLevel(5);
+    withTailoringLevel(cloakRecipe.minTradeskillLevel);
 
-    expect(worldNodeObtainableMissingRewards(buildEntry())).toHaveLength(2);
+    expect(worldNodeObtainableMissingRewards(node())).toHaveLength(2);
   });
 
   it('skips rewards already discovered', () => {
-    withTailoringLevel(5, true);
+    withTailoringLevel(cloakRecipe.minTradeskillLevel, true);
 
-    expect(worldNodeObtainableMissingRewards(buildEntry())).toEqual([
-      ensureDroppedReward({ collectibleId: clam.id, chance: 10 }),
-    ]);
+    expect(worldNodeObtainableMissingRewards(node())).toEqual([clamReward]);
   });
 });
 
 describe('rewardContentInfo', () => {
-  beforeEach(() => {
-    setAllIdsByName(new Map());
-    setAllContentById(new Map());
-  });
-
   it('resolves an item reward', () => {
-    const bone: ItemContent = {
-      id: 'bone' as ItemId,
-      name: 'Bone',
-      __type: 'item',
-      description: 'A bone.',
-      sprite: '0001',
-      rarity: 'Common',
-    };
     seedContent([bone]);
 
     expect(rewardContentInfo({ itemId: bone.id })).toEqual({
-      name: 'Bone',
-      sprite: '0001',
+      name: bone.name,
+      sprite: bone.sprite,
       spritesheet: 'item',
     });
   });
 
   it('resolves an equipment reward', () => {
-    const cloak: EquipmentContent = {
-      id: 'bone-hewn-cloak' as EquipmentId,
-      name: 'Bone-Hewn Cloak',
-      __type: 'equipment',
-      description: 'A cloak.',
-      sprite: '0002',
-      rarity: 'Uncommon',
-      levelRequirement: 3,
-      type: 'Artifact',
-      baseStats: {} as never,
-      slots: 1,
-      grantedSkillIds: [],
-    };
     seedContent([cloak]);
 
     expect(rewardContentInfo({ equipmentId: cloak.id })).toEqual({
-      name: 'Bone-Hewn Cloak',
-      sprite: '0002',
+      name: cloak.name,
+      sprite: cloak.sprite,
       spritesheet: 'equipment',
     });
   });
 
   it('resolves a collectible reward', () => {
-    const clam: CollectibleContent = {
-      id: 'swamp-clam' as CollectibleId,
-      name: 'Swamp Clam',
-      __type: 'collectible',
-      description: 'A clam.',
-      sprite: '0003',
-      rarity: 'Uncommon',
-      effects: [],
-    };
     seedContent([clam]);
 
     expect(rewardContentInfo({ collectibleId: clam.id })).toEqual({
-      name: 'Swamp Clam',
-      sprite: '0003',
+      name: clam.name,
+      sprite: clam.sprite,
       spritesheet: 'collectible',
     });
   });
 
   it("resolves a recipe reward using the recipe's own name, but the crafted result's icon", () => {
-    const cloak: EquipmentContent = {
-      id: 'bone-hewn-cloak' as EquipmentId,
-      name: 'Bone-Hewn Cloak',
-      __type: 'equipment',
-      description: 'A cloak.',
-      sprite: '0002',
-      rarity: 'Uncommon',
-      levelRequirement: 3,
-      type: 'Artifact',
-      baseStats: {} as never,
-      slots: 1,
-      grantedSkillIds: [],
-    };
-    const recipe: RecipeContent = {
-      id: 'equipment-bone-hewn-cloak' as RecipeId,
-      name: 'Equipment: Bone-Hewn Cloak',
-      __type: 'recipe',
-      result: { equipmentId: cloak.id },
-      requirements: [],
-      tradeskillId: 'tailoring-id' as never,
-      minTradeskillLevel: 2,
-      maxTradeskillLevel: 5,
-      tradeskillXP: 1,
-      craftTime: 60,
-      tokenUnlockCost: 3,
-    };
-    seedContent([cloak, recipe]);
+    seedContent([
+      cloak,
+      cloakRecipe,
+      ensureTradeskill({ id: tradeskillId, name: 'Tailoring' }),
+    ]);
 
-    expect(rewardContentInfo({ recipeId: recipe.id })).toEqual({
-      name: 'Equipment: Bone-Hewn Cloak',
-      sprite: '0002',
+    expect(rewardContentInfo({ recipeId: cloakRecipe.id })).toEqual({
+      name: recipeStylizedName(cloakRecipe),
+      sprite: cloak.sprite,
       spritesheet: 'equipment',
     });
   });

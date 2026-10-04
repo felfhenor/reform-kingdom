@@ -1,44 +1,30 @@
-vi.mock('@helpers/content/content', () => ({ getEntry: vi.fn() }));
-
-import { getEntry } from '@helpers/content/content';
+import { seedContent } from '@/testing/content';
+import { buildEquipmentItem } from '@/testing/builders';
+import { defaultEquipment } from '@helpers/defaults';
+import { ensureEquipment } from '@helpers/content/ensure-item';
 import { equipmentSkillStatBonuses } from '@helpers/item/equipment-skill-bonus';
 import type {
   EquipmentBlock,
   EquipmentContent,
   EquipmentId,
-  EquipmentItem,
-  EquipmentItemId,
 } from '@interfaces';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 function buildContent(
   id: string,
   skillStatBonuses: EquipmentContent['skillStatBonuses'],
 ): EquipmentContent {
-  return {
+  return ensureEquipment({
     id: id as EquipmentId,
-    name: id,
-    __type: 'equipment',
-    description: '',
-    sprite: '0000',
-    rarity: 'Common',
-    levelRequirement: 1,
-    baseStats: {} as never,
     type: 'Staff',
-    slots: 0,
-    grantedSkillIds: [],
     skillStatBonuses,
-  };
+  });
 }
 
-function buildItem(id: string, equipmentId: string): EquipmentItem {
-  return {
-    id: id as EquipmentItemId,
-    equipmentId: equipmentId as EquipmentId,
-    infusedItemIds: [],
-    affixIds: [],
-  };
-}
+const buildItem = (equipmentId: string) =>
+  buildEquipmentItem(equipmentId as EquipmentId);
+
+const emptyEquipment = defaultEquipment();
 
 describe('equipmentSkillStatBonuses', () => {
   const staff = buildContent('staff', [
@@ -49,16 +35,15 @@ describe('equipmentSkillStatBonuses', () => {
   ]);
 
   beforeEach(() => {
-    vi.mocked(getEntry).mockImplementation(
-      (id) => [staff, ring].find((entry) => entry.id === id) as never,
-    );
+    seedContent([staff, ring]);
   });
 
   it('collects the bonuses of every equipped item', () => {
-    const equipment = {
-      Weapon: buildItem('a', 'staff'),
-      Ring: buildItem('b', 'ring'),
-    } as EquipmentBlock;
+    const equipment: EquipmentBlock = {
+      ...emptyEquipment,
+      Weapon: buildItem('staff'),
+      Ring: buildItem('ring'),
+    };
 
     expect(equipmentSkillStatBonuses(equipment)).toEqual([
       { skillFamily: 'Fireball', stat: 'Vitality', value: 2 },
@@ -67,11 +52,12 @@ describe('equipmentSkillStatBonuses', () => {
   });
 
   it('counts a two-handed item once even though it fills two slots', () => {
-    const twoHander = buildItem('a', 'staff');
-    const equipment = {
+    const twoHander = buildItem('staff');
+    const equipment: EquipmentBlock = {
+      ...emptyEquipment,
       Weapon: twoHander,
       Offhand: twoHander,
-    } as EquipmentBlock;
+    };
 
     expect(equipmentSkillStatBonuses(equipment)).toEqual([
       { skillFamily: 'Fireball', stat: 'Vitality', value: 2 },
@@ -79,6 +65,6 @@ describe('equipmentSkillStatBonuses', () => {
   });
 
   it('returns nothing for an empty equipment block', () => {
-    expect(equipmentSkillStatBonuses({} as EquipmentBlock)).toEqual([]);
+    expect(equipmentSkillStatBonuses(emptyEquipment)).toEqual([]);
   });
 });

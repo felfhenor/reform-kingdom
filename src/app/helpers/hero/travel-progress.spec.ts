@@ -1,17 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/hero/travel-cost', () => ({
-  travelStepTicksCost: vi.fn(),
-}));
+// Step costs come from travel-cost (its own spec); each test sets the costs it walks through.
+vi.mock('@helpers/hero/travel-cost');
 
-vi.mock('@helpers/pathfinding/pathfinding', () => ({
-  tileIsOnPath: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodeAt: vi.fn(),
-}));
-
+import { TRAVEL_UNITS_PER_TICK } from '@helpers/config';
 import { travelStepTicksCost } from '@helpers/hero/travel-cost';
 import {
   travelPathAdvanceTick,
@@ -60,17 +52,17 @@ function ticksToArrive(path: TravelStep[], maxTicks = 100): number {
 
 describe('travelTicksToUnits / travelUnitsToTicks', () => {
   it('scales ticks to whole sub-ticks', () => {
-    expect(travelTicksToUnits(2.7)).toBe(270);
-    expect(travelTicksToUnits(3)).toBe(300);
+    expect(travelTicksToUnits(3)).toBe(3 * TRAVEL_UNITS_PER_TICK);
+    expect(Number.isInteger(travelTicksToUnits(2.7))).toBe(true);
   });
 
   it('snaps float noise to the exact sub-tick', () => {
-    expect(travelTicksToUnits(0.1 + 0.2)).toBe(30);
+    expect(travelTicksToUnits(0.1 + 0.2)).toBe(travelTicksToUnits(0.3));
   });
 
   it('round-trips a saved progress value exactly', () => {
     expect(travelUnitsToTicks(travelTicksToUnits(0.3))).toBe(0.3);
-    expect(travelUnitsToTicks(30)).toBe(0.3);
+    expect(travelUnitsToTicks(3 * TRAVEL_UNITS_PER_TICK)).toBe(3);
   });
 });
 
@@ -78,7 +70,9 @@ describe('travelStepUnitsCost', () => {
   it('is the step tick cost in whole sub-ticks', () => {
     vi.mocked(travelStepTicksCost).mockReturnValue(2.7);
 
-    expect(travelStepUnitsCost(moveSteps(1)[0], origin)).toBe(270);
+    expect(travelStepUnitsCost(moveSteps(1)[0], origin)).toBe(
+      travelTicksToUnits(2.7),
+    );
   });
 
   it('is 0 for an instant step', () => {

@@ -21,6 +21,7 @@ import { applyMaterialDelta } from '@helpers/item/materials';
 import type {
   CollectibleId,
   CraftQueueEntry,
+  EncounterId,
   EquipmentId,
   GameState,
   GameStateTradeskills,
@@ -93,7 +94,9 @@ describe('getCraftableRecipeEntries', () => {
       ...baseContent,
       recipe('low', { minTradeskillLevel: 1 }),
       recipe('high', { minTradeskillLevel: 3 }),
-      recipe('other-tradeskill', { tradeskillId: 'woodworking' as never }),
+      recipe('other-tradeskill', {
+        tradeskillId: 'woodworking' as TradeskillId,
+      }),
     ]);
     seedBlacksmithing(2);
 
@@ -107,7 +110,7 @@ describe('getCraftableRecipeEntries', () => {
       gated,
       recipe('open'),
       ensureEncounter({
-        id: 'ruins' as never,
+        id: 'ruins' as EncounterId,
         completionRewards: [ensureDroppedReward({ recipeId: gated.id })],
       }),
     ]);

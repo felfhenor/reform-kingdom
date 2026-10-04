@@ -14,67 +14,50 @@ import type {
   EquipmentItemId,
   GameState,
   ItemId,
-  RecipeContent,
   RecipeId,
   TradeskillId,
 } from '@interfaces';
+import { ensureRecipe } from '@helpers/content/ensure-recipe';
+import { defaultGameState } from '@helpers/defaults';
+import { buildCraftQueueEntry, buildEquipmentItem } from '@/testing/builders';
 
-const infusedDagger = {
+const infusedDagger = buildEquipmentItem('dagger' as EquipmentId, {
   id: 'dagger-1' as EquipmentItemId,
-  equipmentId: 'dagger' as EquipmentId,
   infusedItemIds: ['ember' as ItemId],
   affixIds: ['sharp' as AffixId],
-};
-const plainDagger = {
+});
+const plainDagger = buildEquipmentItem('dagger' as EquipmentId, {
   id: 'dagger-2' as EquipmentItemId,
-  equipmentId: 'dagger' as EquipmentId,
-  infusedItemIds: [],
-  affixIds: [],
-};
-const sword = {
+});
+const sword = buildEquipmentItem('sword' as EquipmentId, {
   id: 'sword-1' as EquipmentItemId,
-  equipmentId: 'sword' as EquipmentId,
-  infusedItemIds: [],
-  affixIds: [],
-};
+});
 
-const upgradeRecipe: RecipeContent = {
+const upgradeRecipe = ensureRecipe({
   id: 'recipe-1' as RecipeId,
   name: 'Weapon: Steel Dagger',
-  __type: 'recipe',
   result: { equipmentId: 'steel-dagger' as EquipmentId },
   requirements: [
     { equipmentId: 'dagger' as EquipmentId },
     { itemId: 'ore' as ItemId, quantity: 2 },
   ],
   tradeskillId: 'blacksmithing-id' as TradeskillId,
-  minTradeskillLevel: 1,
-  maxTradeskillLevel: 10,
-  tradeskillXP: 1,
-  craftTime: 5,
-  tokenUnlockCost: 3,
-};
+});
 
 function buildQueueEntry(
   overrides: Partial<CraftQueueEntry> = {},
 ): CraftQueueEntry {
-  return {
+  return buildCraftQueueEntry({
     id: 'queue-entry-1' as CraftQueueEntryId,
     recipeId: 'recipe-1' as RecipeId,
-    quantityTotal: 1,
-    quantityCompleted: 0,
-    ticksIntoCraft: 0,
-    reservedEquipment: [],
     ...overrides,
-  };
+  });
 }
 
 function buildState(armory: GameState['armory'] = []): GameState {
-  return {
-    armory,
-    materials: {},
-    discoveredMaterials: {},
-  } as unknown as GameState;
+  const state = defaultGameState();
+  state.armory = armory;
+  return state;
 }
 
 describe('refundQueueEntry', () => {

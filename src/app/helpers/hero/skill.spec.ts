@@ -5,108 +5,84 @@ import {
   skillTechniqueStatScaling,
   skillTechniqueWithStatBonuses,
 } from '@helpers/hero/skill';
+import { ensureStats } from '@helpers/content/ensure-helpers-stats';
+import {
+  ensureEquipmentSkillTechnique,
+  ensureSkill,
+} from '@helpers/content/ensure-skill';
+import { buildEquipmentSkill } from '@/testing/builders';
 import type {
-  EquipmentSkill,
-  EquipmentSkillContent,
   EquipmentSkillContentTechnique,
+  EquipmentSkillId,
   StatBlock,
 } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 
-function buildSkill(overrides: Partial<EquipmentSkill> = {}): EquipmentSkill {
-  return {
-    id: 'skill-1' as never,
-    name: 'Test Skill',
-    __type: 'skill',
-    description: '',
-    sprite: '0000',
-    rarity: 'Common',
-    epCost: 0,
-    usesPerCombat: -1,
-    statusEffectDurationBoost: {} as never,
-    statusEffectChanceBoost: {} as never,
-    techniques: [],
-    requiredWeaponTypes: [],
-    family: 'Test Skill',
-    ...overrides,
-  };
-}
-
-function buildSkillContent(
-  overrides: Partial<EquipmentSkillContent> = {},
-): EquipmentSkillContent {
-  return buildSkill(overrides) as EquipmentSkillContent;
+function namedSkill(name: string) {
+  return ensureSkill({ id: name as EquipmentSkillId, name });
 }
 
 function buildTechnique(
   damageScaling: Partial<StatBlock>,
   overrides: Partial<EquipmentSkillContentTechnique> = {},
 ): EquipmentSkillContentTechnique {
-  return {
-    targets: 1,
-    targetType: 'Enemies',
-    targetBehaviors: [],
-    damageScaling: damageScaling as StatBlock,
-    elements: [],
-    attributes: [],
-    statusEffects: [],
-    combatMessage: '',
+  return ensureEquipmentSkillTechnique({
     ...overrides,
-  };
+    damageScaling: ensureStats(damageScaling),
+  });
 }
 
 describe('skillEpCost', () => {
   it('returns the base epCost when there are no mods', () => {
-    expect(skillEpCost(buildSkill({ epCost: 5 }))).toBe(5);
+    expect(skillEpCost(buildEquipmentSkill({ epCost: 5 }))).toBe(5);
   });
 
   it('adds the mods epCost boost on top of the base epCost', () => {
-    const skill = buildSkill({ epCost: 5, mods: { epCost: 3 } });
+    const skill = buildEquipmentSkill({ epCost: 5, mods: { epCost: 3 } });
     expect(skillEpCost(skill)).toBe(8);
   });
 
   it('treats a missing mods epCost as zero', () => {
-    const skill = buildSkill({ epCost: 5, mods: {} });
+    const skill = buildEquipmentSkill({ epCost: 5, mods: {} });
     expect(skillEpCost(skill)).toBe(5);
   });
 });
 
 describe('skillIsUsableWithEquippedWeapons', () => {
   it('is usable when the skill has no weapon requirement', () => {
-    const skill = buildSkill({ requiredWeaponTypes: [] });
+    const skill = buildEquipmentSkill({ requiredWeaponTypes: [] });
     expect(skillIsUsableWithEquippedWeapons(skill, [])).toBe(true);
   });
 
   it('is usable when one of the equipped weapon types matches', () => {
-    const skill = buildSkill({ requiredWeaponTypes: ['Bow'] });
+    const skill = buildEquipmentSkill({ requiredWeaponTypes: ['Bow'] });
     expect(skillIsUsableWithEquippedWeapons(skill, ['Sword', 'Bow'])).toBe(
       true,
     );
   });
 
   it('is not usable when none of the equipped weapon types match', () => {
-    const skill = buildSkill({ requiredWeaponTypes: ['Bow'] });
+    const skill = buildEquipmentSkill({ requiredWeaponTypes: ['Bow'] });
     expect(skillIsUsableWithEquippedWeapons(skill, ['Sword'])).toBe(false);
   });
 
   it('is not usable when nothing is equipped and a weapon is required', () => {
-    const skill = buildSkill({ requiredWeaponTypes: ['Bow'] });
+    const skill = buildEquipmentSkill({ requiredWeaponTypes: ['Bow'] });
     expect(skillIsUsableWithEquippedWeapons(skill, [])).toBe(false);
   });
 
   it('is usable when any one of multiple required weapon types is equipped', () => {
-    const skill = buildSkill({ requiredWeaponTypes: ['Bow', 'Staff'] });
+    const skill = buildEquipmentSkill({
+      requiredWeaponTypes: ['Bow', 'Staff'],
+    });
     expect(skillIsUsableWithEquippedWeapons(skill, ['Staff'])).toBe(true);
   });
 });
 
 describe('mergeGrantedSkills', () => {
   it('appends a granted skill the hero does not already know', () => {
-    const attack = buildSkillContent({ id: 'attack' as never, name: 'Attack' });
-    const starshine2 = buildSkillContent({
-      id: 'starshine-2' as never,
-      name: 'Starshine II',
-    });
+    const attack = namedSkill('Attack');
+    const starshine2 = namedSkill('Starshine II');
 
     expect(mergeGrantedSkills([attack], [starshine2])).toEqual([
       attack,
@@ -115,14 +91,8 @@ describe('mergeGrantedSkills', () => {
   });
 
   it('upgrades a known lower-tier skill of the same family in place', () => {
-    const starshine1 = buildSkillContent({
-      id: 'starshine-1' as never,
-      name: 'Starshine I',
-    });
-    const starshine2 = buildSkillContent({
-      id: 'starshine-2' as never,
-      name: 'Starshine II',
-    });
+    const starshine1 = namedSkill('Starshine I');
+    const starshine2 = namedSkill('Starshine II');
 
     expect(mergeGrantedSkills([starshine1], [starshine2])).toEqual([
       starshine2,
@@ -130,29 +100,23 @@ describe('mergeGrantedSkills', () => {
   });
 
   it('ignores a granted skill when a same-or-higher tier is already known', () => {
-    const starshine2 = buildSkillContent({
-      id: 'starshine-2' as never,
-      name: 'Starshine II',
-    });
-    const starshine1 = buildSkillContent({
-      id: 'starshine-1' as never,
-      name: 'Starshine I',
-    });
+    const starshine2 = namedSkill('Starshine II');
+    const starshine1 = namedSkill('Starshine I');
 
     expect(mergeGrantedSkills([starshine2], [starshine1])).toEqual([
       starshine2,
     ]);
-    expect(mergeGrantedSkills([starshine2], [starshine2])).toEqual([
-      starshine2,
-    ]);
+    expect(
+      mergeGrantedSkills(
+        [starshine2],
+        [{ ...starshine2, id: 'starshine-2-gear' as EquipmentSkillId }],
+      ),
+    ).toEqual([starshine2]);
   });
 
   it('treats skills without a matching name family as unrelated', () => {
-    const cure = buildSkillContent({ id: 'cure' as never, name: 'Cure' });
-    const fireball = buildSkillContent({
-      id: 'fireball' as never,
-      name: 'Fireball',
-    });
+    const cure = namedSkill('Cure');
+    const fireball = namedSkill('Fireball');
 
     expect(mergeGrantedSkills([cure], [fireball])).toEqual([cure, fireball]);
   });
@@ -188,7 +152,7 @@ describe('skillTechniqueStatScaling', () => {
 });
 
 describe('skillTechniqueWithStatBonuses', () => {
-  const fireball = buildSkill({ family: 'Fireball' });
+  const fireball = buildEquipmentSkill({ family: 'Fireball' });
 
   it('adds the bonus onto the matching stat of a scaling technique', () => {
     const technique = buildTechnique({ Intelligence: 0.85 });
@@ -209,7 +173,7 @@ describe('skillTechniqueWithStatBonuses', () => {
       { skillFamily: 'Fireball', stat: 'Vitality', value: 2 },
     ]);
 
-    expect(technique.damageScaling.Vitality).toBeUndefined();
+    expect(technique.damageScaling.Vitality).toBe(0);
   });
 
   it('ignores bonuses for other skill families', () => {

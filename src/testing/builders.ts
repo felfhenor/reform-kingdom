@@ -3,6 +3,9 @@ import {
   combatantFromMonster,
   combatCreateForEncounter,
 } from '@helpers/combat/combat-create';
+import { ensureSkill } from '@helpers/content/ensure-skill';
+import { ensureStatusEffect } from '@helpers/content/ensure-statuseffect';
+import { defaultStats } from '@helpers/defaults';
 import {
   characterStatsForLevel,
   characterXpForLevel,
@@ -20,9 +23,11 @@ import type {
   CraftQueueEntryId,
   EquipmentId,
   EquipmentItem,
+  EquipmentSkill,
   JobId,
   MonsterContent,
   RecipeId,
+  StatusEffect,
   TownCraftQueueEntry,
   TownNodeState,
   TownStockEntry,
@@ -150,6 +155,37 @@ export function buildMonsterCombatant(
   };
 }
 
+// No job skills, and 100 Health/Energy so hp and ep read directly as percentages.
+export function buildTestCombatant(
+  overrides: Partial<Combatant> = {},
+): Combatant {
+  return buildHeroCombatant(buildCharacter(), {
+    id: 'combatant-1',
+    skillIds: [],
+    hp: 100,
+    ep: 10,
+    totalStats: { ...defaultStats(), Health: 100, Energy: 100 },
+    ...overrides,
+  });
+}
+
 export function buildCombat(overrides: Partial<Combat> = {}): Combat {
   return { ...combatCreateForEncounter([], [], 1), ...overrides };
+}
+
+export function buildEquipmentSkill(
+  overrides: Partial<EquipmentSkill> = {},
+): EquipmentSkill {
+  return { ...ensureSkill(overrides), mods: overrides.mods };
+}
+
+export function buildStatusEffect(
+  overrides: Partial<StatusEffect> = {},
+): StatusEffect {
+  return {
+    ...ensureStatusEffect(overrides),
+    duration: overrides.duration ?? 1,
+    creatorStats: overrides.creatorStats ?? defaultStats(),
+    targetStats: overrides.targetStats ?? defaultStats(),
+  };
 }

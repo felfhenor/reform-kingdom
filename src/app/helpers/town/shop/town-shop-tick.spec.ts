@@ -1,121 +1,67 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntriesByType: vi.fn(),
-}));
-
-vi.mock('@helpers/engine/timer', () => ({
-  timerTicksElapsed: vi.fn(),
-}));
-
-vi.mock('@helpers/state-game', () => ({
-  updateGamestate: vi.fn(),
-}));
-
-vi.mock('@helpers/town/town-tick', () => ({
-  isTownDueForUpdate: vi.fn(),
-  markTownSubsystemProcessed: vi.fn(),
-}));
-
-import { getEntriesByType } from '@helpers/content/content';
-import { timerTicksElapsed } from '@helpers/engine/timer';
-import { updateGamestate } from '@helpers/state-game';
+import { ensureTown } from '@helpers/content/ensure-town';
+import { worldTownsState } from '@helpers/state-game';
 import { townShopProcessTick } from '@helpers/town/shop/town-shop-tick';
-import {
-  isTownDueForUpdate,
-  markTownSubsystemProcessed,
-} from '@helpers/town/town-tick';
-import type { GameState, TownContent, TownId } from '@interfaces';
+import type { EquipmentId, TownId, TownNodeState } from '@interfaces';
+import { buildTownNodeState, buildTownStockEntry } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 
-const townId = 'larsia' as TownId;
-
-function buildTown(itemExpirationTimer: number): TownContent {
-  return {
-    id: townId,
+const now = 500;
+const town = (itemExpirationTimer: number) =>
+  ensureTown({
+    id: 'larsia' as TownId,
+    name: 'Larsia',
     traders: { itemExpirationTimer },
-  } as unknown as TownContent;
+  });
+
+// One entry per age, named by how many ticks old it is.
+function seedStock(
+  expirationTimer: number,
+  ages: number[],
+  townState: Partial<TownNodeState> = {},
+): void {
+  const content = town(expirationTimer);
+  seedContent([content]);
+  seedGamestate((state) => {
+    state.clock.numTicks = now;
+    state.world.towns[content.id] = buildTownNodeState({
+      ...townState,
+      stock: ages.map((age) =>
+        buildTownStockEntry(`aged-${age}` as EquipmentId, now - age),
+      ),
+    });
+  });
 }
 
-function applyLastUpdate(state: GameState): GameState {
-  const calls = vi.mocked(updateGamestate).mock.calls;
-  const updateFn = calls[calls.length - 1][0];
-  return updateFn(state);
-}
-
-beforeEach(() => {
-  vi.clearAllMocks();
-  vi.mocked(isTownDueForUpdate).mockReturnValue(true);
-});
+const stockAges = () =>
+  worldTownsState()['larsia' as TownId].stock.map((entry) =>
+    Number(entry.equipmentItem.equipmentId.replace('aged-', '')),
+  );
 
 describe('townShopProcessTick', () => {
-  it('skips a town that is not due for the shop subsystem', () => {
-    vi.mocked(isTownDueForUpdate).mockReturnValue(false);
-    vi.mocked(getEntriesByType).mockReturnValue([buildTown(100)]);
+  it('expires stock once it reaches the town’s expiration age', () => {
+    seedStock(100, [50, 99, 100, 200]);
 
-    townShopProcessTick();
+    inTick(() => townShopProcessTick());
 
-    expect(updateGamestate).not.toHaveBeenCalled();
-    expect(markTownSubsystemProcessed).not.toHaveBeenCalled();
+    expect(stockAges()).toEqual([50, 99]);
   });
 
-  it('does nothing for a town with expiration disabled (itemExpirationTimer <= 0)', () => {
-    vi.mocked(getEntriesByType).mockReturnValue([buildTown(0)]);
+  it('keeps stock forever in a town with expiration turned off', () => {
+    seedStock(0, [50, 10_000]);
 
-    townShopProcessTick();
+    inTick(() => townShopProcessTick());
 
-    expect(updateGamestate).not.toHaveBeenCalled();
-    expect(markTownSubsystemProcessed).toHaveBeenCalledWith(
-      townId,
-      'shop',
-      expect.any(Number),
-    );
+    expect(stockAges()).toEqual([50, 10_000]);
   });
 
-  it('drops stock entries that have aged past itemExpirationTimer', () => {
-    vi.mocked(getEntriesByType).mockReturnValue([buildTown(100)]);
-    vi.mocked(timerTicksElapsed).mockReturnValue(500);
+  it('waits until the town is due for a shop update', () => {
+    seedStock(100, [200], { lastProcessedTick: { shop: now } });
 
-    townShopProcessTick();
+    inTick(() => townShopProcessTick());
 
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            stock: [
-              { itemId: 'fresh', quantity: 1, addedAtTick: 450 }, // 50 old, under 100 - kept
-              { itemId: 'stale', quantity: 1, addedAtTick: 300 }, // 200 old, over 100 - expired
-            ],
-          },
-        },
-      },
-    } as unknown as GameState);
-
-    expect(state.world.towns[townId].stock).toEqual([
-      { itemId: 'fresh', quantity: 1, addedAtTick: 450 },
-    ]);
-    expect(markTownSubsystemProcessed).toHaveBeenCalledWith(
-      townId,
-      'shop',
-      expect.any(Number),
-    );
-  });
-
-  it('keeps an entry exactly at the boundary (age strictly less than the timer to survive)', () => {
-    vi.mocked(getEntriesByType).mockReturnValue([buildTown(100)]);
-    vi.mocked(timerTicksElapsed).mockReturnValue(400);
-
-    townShopProcessTick();
-
-    const state = applyLastUpdate({
-      world: {
-        towns: {
-          [townId]: {
-            stock: [{ itemId: 'boundary', quantity: 1, addedAtTick: 300 }], // exactly 100 old
-          },
-        },
-      },
-    } as unknown as GameState);
-
-    expect(state.world.towns[townId].stock).toEqual([]);
+    expect(stockAges()).toEqual([200]);
   });
 });

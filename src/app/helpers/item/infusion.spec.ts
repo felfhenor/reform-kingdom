@@ -1,33 +1,17 @@
-import type * as MaterialsHelper from '@helpers/item/materials';
 import type {
-  EquipmentContent,
+  AffixId,
   EquipmentId,
   EquipmentItem,
   EquipmentItemId,
-  ItemContent,
   ItemId,
   TradeskillId,
 } from '@interfaces';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/item/materials', async (importOriginal) => {
-  const actual = await importOriginal<typeof MaterialsHelper>();
-  return {
-    ...actual,
-    getMaterialQuantity: vi.fn(),
-    getGoldQuantity: vi.fn(),
-  };
-});
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import {
   GOLD_PER_SKILL_STAT_BONUS_POINT,
   VALUE_MULTIPLIER_PER_STAT,
 } from '@helpers/config';
-import { getEntry } from '@helpers/content/content';
 import {
   canInfuseEquipmentItem,
   equipmentItemInfusionBonus,
@@ -37,169 +21,129 @@ import {
   infusionMaterialCost,
   isInfusionMaterial,
 } from '@helpers/item/infusion';
-import { getGoldQuantity, getMaterialQuantity } from '@helpers/item/materials';
+import { applyMaterialDelta } from '@helpers/item/materials';
+import { ensureAffix } from '@helpers/content/ensure-affix';
+import { buildEquipmentItem } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
+import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
+import {
+  defaultStats,
+  defaultCombatStats,
+  defaultTagResistances,
+  defaultMonsterTypeDamageBonus,
+} from '@helpers/defaults';
 
-const crystal: ItemContent = {
+const crystal = ensureItem({
   id: 'crystal' as ItemId,
   name: 'Minor Crystal',
-  __type: 'item',
   description: '',
   sprite: '0000',
   rarity: 'Common',
-  infusionStats: {
-    Agility: 0,
-    Energy: 0,
-    Health: 0,
-    Intelligence: 0,
-    Luck: 0,
-    Resistance: 0,
-    Strength: 1,
-    Vitality: 0,
-    Constitution: 0,
-    Spirit: 0,
-  },
-};
+  infusionStats: { ...defaultStats(), Strength: 1 },
+});
 
-const goldCoin: ItemContent = {
+const goldCoin = ensureItem({
   id: 'gold-coin' as ItemId,
   name: 'Gold Coin',
-  __type: 'item',
   description: '',
   sprite: '0001',
   rarity: 'Common',
-};
+});
 
-const plainMaterial: ItemContent = {
+const plainMaterial = ensureItem({
   id: 'plain' as ItemId,
   name: 'Plain Material',
-  __type: 'item',
   description: '',
   sprite: '0002',
   rarity: 'Common',
-};
+});
 
 // Resistance-only material - no infusionStats at all, only infusionDebuffResistances.
-const spiritFlesh: ItemContent = {
+const spiritFlesh = ensureItem({
   id: 'spirit-flesh' as ItemId,
   name: 'Spirit Flesh',
-  __type: 'item',
   description: '',
   sprite: '0031',
   rarity: 'Common',
-  infusionDebuffResistances: {
-    Stun: 0,
-    StatDown: 2,
-    Accuracy: 0,
-    DamageOverTime: 0,
-    Poison: 0,
-    Burn: 0,
-    Bleed: 0,
-  },
-};
+  infusionDebuffResistances: { ...defaultTagResistances(), StatDown: 2 },
+});
 
 // Combat-stat-only material - no infusionStats at all, only infusionCombatStats.
-const vengeanceShard: ItemContent = {
+const vengeanceShard = ensureItem({
   id: 'vengeance-shard' as ItemId,
   name: 'Vengeance Shard',
-  __type: 'item',
   description: '',
   sprite: '0032',
   rarity: 'Common',
-  infusionCombatStats: {
-    repeatActionChance: 0,
-    skillStrikeAgainChance: 0,
-    redirectionChance: 0,
-    missChance: 0,
-    debuffIgnoreChance: 0,
-    damageReflectPercent: 3,
-    healingIgnorePercent: 0,
-    reviveChance: 0,
-    stunChance: 0,
-    agroValue: 0,
-  },
-};
+  infusionCombatStats: { ...defaultCombatStats(), damageReflectPercent: 3 },
+});
 
 // MonsterTypeDamage-only material - no infusionStats at all, only infusionMonsterTypeDamage.
-const fangShard: ItemContent = {
+const fangShard = ensureItem({
   id: 'fang-shard' as ItemId,
   name: 'Fang Shard',
-  __type: 'item',
   description: '',
   sprite: '0033',
   rarity: 'Common',
-  infusionMonsterTypeDamage: {
-    Humanoid: 0,
-    Demon: 0,
-    Amalgamation: 0,
-    Insect: 0,
-    Beast: 10,
-    Spirit: 0,
-  },
-};
+  infusionMonsterTypeDamage: { ...defaultMonsterTypeDamageBonus(), Beast: 10 },
+});
 
 // GatherYield-only material - no infusionStats at all, only infusionGatherYieldBonuses.
-const woodShard: ItemContent = {
+const woodShard = ensureItem({
   id: 'wood-shard' as ItemId,
   name: 'Wood Shard',
-  __type: 'item',
   description: '',
   sprite: '0034',
   rarity: 'Common',
   infusionGatherYieldBonuses: [
     { tradeskillId: 'Woodworking' as TradeskillId, value: 1 },
   ],
-};
+});
 
-const sword: EquipmentContent = {
+const sword = ensureEquipment({
   id: 'sword' as EquipmentId,
   name: 'Sword',
-  __type: 'equipment',
   description: '',
   sprite: '0000',
   rarity: 'Common',
   levelRequirement: 1,
-  baseStats: {
-    Agility: 0,
-    Energy: 0,
-    Health: 0,
-    Intelligence: 0,
-    Luck: 0,
-    Resistance: 0,
-    Strength: 5,
-    Vitality: 0,
-    Constitution: 0,
-    Spirit: 0,
-  },
+  baseStats: { ...defaultStats(), Strength: 5 },
   type: 'Sword',
   slots: 2,
   grantedSkillIds: [],
-};
+});
 
-const swordItem: EquipmentItem = {
+const swordItem = buildEquipmentItem(sword.id, {
   id: 'sword-1' as EquipmentItemId,
-  equipmentId: sword.id,
-  infusedItemIds: [],
-  affixIds: [],
-};
+});
 
-function mockContentEntry(id: string) {
-  if (id === crystal.id) return crystal;
-  if (id === goldCoin.id || id === goldCoin.name) return goldCoin;
-  if (id === plainMaterial.id) return plainMaterial;
-  if (id === spiritFlesh.id) return spiritFlesh;
-  if (id === vengeanceShard.id) return vengeanceShard;
-  if (id === fangShard.id) return fangShard;
-  if (id === woodShard.id) return woodShard;
-  if (id === sword.id) return sword;
-  return undefined;
+const allContent = [
+  crystal,
+  goldCoin,
+  plainMaterial,
+  spiritFlesh,
+  vengeanceShard,
+  fangShard,
+  woodShard,
+  sword,
+];
+
+// Every non-gold item at `materialQty`, plus `goldQty` gold.
+function stock(materialQty: number, goldQty: number): void {
+  seedGamestate((state) => {
+    allContent
+      .filter((entry) => entry.__type === 'item' && entry !== goldCoin)
+      .forEach((entry) =>
+        applyMaterialDelta(state, entry.id as ItemId, materialQty),
+      );
+    applyMaterialDelta(state, goldCoin.id, goldQty);
+  });
 }
 
 describe('Infusion Helper Functions', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(getEntry).mockImplementation(
-      (id) => mockContentEntry(id) as never,
-    );
+    seedContent(allContent);
   });
 
   describe('equipmentItemInfusionBonus', () => {
@@ -303,21 +247,17 @@ describe('Infusion Helper Functions', () => {
     });
 
     it('adds an InfusionSlot affix bonus on top of the base slot count', () => {
-      vi.mocked(getEntry).mockImplementation((id) => {
-        if (id === 'affix-slot') {
-          return {
-            id: 'affix-slot',
-            rarity: 'Rare',
-            family: 'InfusionSlot',
-            effects: [{ kind: 'InfusionSlot', value: 1 }],
-          } as never;
-        }
-        return mockContentEntry(id) as never;
+      const slotAffix = ensureAffix({
+        id: 'affix-slot' as AffixId,
+        rarity: 'Rare',
+        family: 'InfusionSlot',
+        effects: [{ kind: 'InfusionSlot', value: 1 }],
       });
+      seedContent([...allContent, slotAffix]);
 
       const withAffix: EquipmentItem = {
         ...swordItem,
-        affixIds: ['affix-slot' as never],
+        affixIds: [slotAffix.id],
       };
       expect(equipmentItemSlotCount(withAffix)).toBe(3);
     });
@@ -336,18 +276,7 @@ describe('Infusion Helper Functions', () => {
       expect(
         isInfusionMaterial({
           ...plainMaterial,
-          infusionStats: {
-            Agility: 0,
-            Energy: 0,
-            Health: 0,
-            Intelligence: 0,
-            Luck: 0,
-            Resistance: 0,
-            Strength: 0,
-            Vitality: 0,
-            Constitution: 0,
-            Spirit: 0,
-          },
+          infusionStats: { ...defaultStats() },
         }),
       ).toBe(false);
     });
@@ -364,15 +293,7 @@ describe('Infusion Helper Functions', () => {
       expect(
         isInfusionMaterial({
           ...plainMaterial,
-          infusionDebuffResistances: {
-            Stun: 0,
-            StatDown: 0,
-            Accuracy: 0,
-            DamageOverTime: 0,
-            Poison: 0,
-            Burn: 0,
-            Bleed: 0,
-          },
+          infusionDebuffResistances: { ...defaultTagResistances() },
         }),
       ).toBe(false);
     });
@@ -385,14 +306,7 @@ describe('Infusion Helper Functions', () => {
       expect(
         isInfusionMaterial({
           ...plainMaterial,
-          infusionMonsterTypeDamage: {
-            Humanoid: 0,
-            Demon: 0,
-            Amalgamation: 0,
-            Insect: 0,
-            Beast: 0,
-            Spirit: 0,
-          },
+          infusionMonsterTypeDamage: { ...defaultMonsterTypeDamageBonus() },
         }),
       ).toBe(false);
     });
@@ -442,31 +356,37 @@ describe('Infusion Helper Functions', () => {
     });
 
     it('scales up to 1500g for +10 total', () => {
-      vi.mocked(getEntry).mockReturnValue({
-        ...crystal,
-        infusionStats: { ...crystal.infusionStats, Strength: 10 },
-      } as never);
+      seedContent([
+        ensureItem({
+          ...crystal,
+          infusionStats: { ...crystal.infusionStats, Strength: 10 },
+        }),
+      ]);
 
       expect(infusionMaterialCost(crystal.id)).toBe(1500);
     });
 
     // Strength (x5) + Luck (x10): 30g * (1*5 + 2*10) = 30g * 25 = 750g.
     it('weights each stat independently when a material grants more than one', () => {
-      vi.mocked(getEntry).mockReturnValue({
-        ...crystal,
-        infusionStats: { ...crystal.infusionStats, Strength: 1, Luck: 2 },
-      } as never);
+      seedContent([
+        ensureItem({
+          ...crystal,
+          infusionStats: { ...crystal.infusionStats, Strength: 1, Luck: 2 },
+        }),
+      ]);
 
       expect(infusionMaterialCost(crystal.id)).toBe(750);
     });
 
     it('costs GOLD_PER_SKILL_STAT_BONUS_POINT per 1.0x of scaling, weighted by the boosted stat', () => {
-      vi.mocked(getEntry).mockReturnValue({
-        ...plainMaterial,
-        infusionSkillStatBonuses: [
-          { skillFamily: 'Fireball', stat: 'Vitality', value: 0.5 },
-        ],
-      } as never);
+      seedContent([
+        ensureItem({
+          ...plainMaterial,
+          infusionSkillStatBonuses: [
+            { skillFamily: 'Fireball', stat: 'Vitality', value: 0.5 },
+          ],
+        }),
+      ]);
 
       expect(infusionMaterialCost(plainMaterial.id)).toBe(
         GOLD_PER_SKILL_STAT_BONUS_POINT *
@@ -492,8 +412,7 @@ describe('Infusion Helper Functions', () => {
 
   describe('canInfuseEquipmentItem', () => {
     beforeEach(() => {
-      vi.mocked(getMaterialQuantity).mockReturnValue(1000);
-      vi.mocked(getGoldQuantity).mockReturnValue(6600);
+      stock(1000, 6600);
     });
 
     it('allows infusing an empty slot when material and gold are available', () => {
@@ -541,14 +460,12 @@ describe('Infusion Helper Functions', () => {
     });
 
     it('rejects when the player does not own the material', () => {
-      vi.mocked(getMaterialQuantity).mockImplementation((id) =>
-        id === crystal.id ? 0 : 1000,
-      );
+      stock(0, 6600);
       expect(canInfuseEquipmentItem(swordItem, 0, crystal.id)).toBe(false);
     });
 
     it('rejects when the player cannot afford the gold cost', () => {
-      vi.mocked(getGoldQuantity).mockReturnValue(0);
+      stock(1000, 0);
       expect(canInfuseEquipmentItem(swordItem, 0, crystal.id)).toBe(false);
     });
   });

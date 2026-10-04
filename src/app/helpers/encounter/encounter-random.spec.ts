@@ -1,133 +1,92 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    worldExploreRandomState: () => gamestate().world.exploreRandom,
-  };
-});
-
-vi.mock('@helpers/engine/timer', () => ({
-  formatDuration: vi.fn((ticks: number) => `formatted:${ticks}`),
-  timerTicksElapsed: vi.fn(),
-}));
-
+import { ensureEncounterRandom } from '@helpers/content/ensure-encounternode';
 import {
   encounterRandomIsAvailable,
   encounterRandomState,
   encounterRandomTicksUntilReset,
   encounterRandomTimerLabel,
 } from '@helpers/encounter/encounter-random';
-import { timerTicksElapsed } from '@helpers/engine/timer';
-import { gamestate } from '@helpers/state-game';
-import type {
-  EncounterRandomContent,
-  EncounterRandomId,
-  EncounterRandomNodeState,
-  GameState,
-} from '@interfaces';
+import { formatDuration } from '@helpers/engine/timer';
+import type { EncounterRandomId, EncounterRandomNodeState } from '@interfaces';
+import { seedGamestate } from '@/testing/gamestate';
 
-function buildContent(resetTime = 3600): EncounterRandomContent {
-  return {
-    id: 'gobslime-shrine' as EncounterRandomId,
-    resetTime,
-  } as unknown as EncounterRandomContent;
-}
+const shrineId = 'gobslime-shrine' as EncounterRandomId;
+const shrine = (resetTime = 3600) =>
+  ensureEncounterRandom({ id: shrineId, resetTime });
+
+const nodeState = (
+  overrides: Partial<EncounterRandomNodeState> = {},
+): EncounterRandomNodeState => ({
+  fights: [{ level: 1, monsters: [] }],
+  generatedAtTick: 0,
+  completedThisCycle: false,
+  ...overrides,
+});
+
+const atTick = (numTicks: number) =>
+  seedGamestate((state) => (state.clock.numTicks = numTicks));
 
 describe('encounterRandomState', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  it('reads the node’s state, if it has any', () => {
+    const rolled = nodeState();
+    seedGamestate((state) => (state.world.exploreRandom[shrineId] = rolled));
 
-  it('reads the node state for the given id from game state', () => {
-    const nodeState = {
-      fights: [],
-      generatedAtTick: 0,
-      completedThisCycle: false,
-    };
-    vi.mocked(gamestate).mockReturnValue({
-      world: { exploreRandom: { 'gobslime-shrine': nodeState } },
-    } as unknown as GameState);
-
-    expect(encounterRandomState('gobslime-shrine' as EncounterRandomId)).toBe(
-      nodeState,
-    );
+    expect(encounterRandomState(shrineId)).toEqual(rolled);
+    expect(encounterRandomState('other' as EncounterRandomId)).toBeUndefined();
   });
 });
 
 describe('encounterRandomTicksUntilReset', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  it('counts down from generation, between 0 and the full reset time', () => {
+    atTick(100);
+    expect(
+      encounterRandomTicksUntilReset(
+        shrine(100),
+        nodeState({ generatedAtTick: 40 }),
+      ),
+    ).toBe(40);
 
-  it('returns the full resetTime when there is no state yet', () => {
-    expect(encounterRandomTicksUntilReset(buildContent(1800), undefined)).toBe(
-      1800,
-    );
-  });
+    atTick(500);
+    expect(encounterRandomTicksUntilReset(shrine(100), nodeState())).toBe(0);
 
-  it('returns the remaining ticks since generation, clamped to resetTime', () => {
-    vi.mocked(timerTicksElapsed).mockReturnValue(100);
-    const state = {
-      fights: [],
-      generatedAtTick: 40,
-      completedThisCycle: false,
-    } as EncounterRandomNodeState;
+    atTick(0);
+    expect(
+      encounterRandomTicksUntilReset(
+        shrine(100),
+        nodeState({ generatedAtTick: 50 }),
+      ),
+    ).toBe(100);
 
-    expect(encounterRandomTicksUntilReset(buildContent(100), state)).toBe(40);
-  });
-
-  it('clamps to 0 once past the reset time', () => {
-    vi.mocked(timerTicksElapsed).mockReturnValue(500);
-    const state = {
-      fights: [],
-      generatedAtTick: 0,
-      completedThisCycle: false,
-    } as EncounterRandomNodeState;
-
-    expect(encounterRandomTicksUntilReset(buildContent(100), state)).toBe(0);
+    expect(encounterRandomTicksUntilReset(shrine(1800), undefined)).toBe(1800);
   });
 });
 
 describe('encounterRandomIsAvailable', () => {
-  it('is false with no state', () => {
-    expect(encounterRandomIsAvailable(buildContent(), undefined)).toBe(false);
-  });
-
-  it('is false when there are no generated fights', () => {
-    const state = {
-      fights: [],
-      generatedAtTick: 0,
-      completedThisCycle: false,
-    } as EncounterRandomNodeState;
-    expect(encounterRandomIsAvailable(buildContent(), state)).toBe(false);
-  });
-
-  it('is false once completed this cycle', () => {
-    const state = {
-      fights: [{ level: 1, monsters: [] }],
-      generatedAtTick: 0,
-      completedThisCycle: true,
-    } as EncounterRandomNodeState;
-    expect(encounterRandomIsAvailable(buildContent(), state)).toBe(false);
-  });
-
-  it('is true with generated fights and not yet completed', () => {
-    const state = {
-      fights: [{ level: 1, monsters: [] }],
-      generatedAtTick: 0,
-      completedThisCycle: false,
-    } as EncounterRandomNodeState;
-    expect(encounterRandomIsAvailable(buildContent(), state)).toBe(true);
+  it('needs rolled fights not yet cleared this cycle', () => {
+    expect(encounterRandomIsAvailable(shrine(), nodeState())).toBe(true);
+    expect(encounterRandomIsAvailable(shrine(), undefined)).toBe(false);
+    expect(
+      encounterRandomIsAvailable(shrine(), nodeState({ fights: [] })),
+    ).toBe(false);
+    expect(
+      encounterRandomIsAvailable(
+        shrine(),
+        nodeState({ completedThisCycle: true }),
+      ),
+    ).toBe(false);
   });
 });
 
 describe('encounterRandomTimerLabel', () => {
-  it('formats the ticks remaining until reset', () => {
-    vi.mocked(timerTicksElapsed).mockReturnValue(0);
-    expect(encounterRandomTimerLabel(buildContent(1800), undefined)).toBe(
-      'formatted:1800',
-    );
+  it('formats the time left until the reset', () => {
+    atTick(100);
+
+    expect(
+      encounterRandomTimerLabel(
+        shrine(1800),
+        nodeState({ generatedAtTick: 40 }),
+      ),
+    ).toBe(formatDuration(1800 - 60));
   });
 });

@@ -1,9 +1,8 @@
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-import { getEntry } from '@helpers/content/content';
-import { defaultCombatStats } from '@helpers/defaults';
+import {
+  defaultCombatStats,
+  defaultMonsterTypeDamageBonus,
+  defaultStats,
+} from '@helpers/defaults';
 import {
   affixEffectsAddToBlock,
   COMBAT_STAT_BONUS,
@@ -16,72 +15,46 @@ import {
   weightedBlockTotal,
 } from '@helpers/item/equipment-bonus';
 import type {
-  AffixContent,
   AffixId,
-  EquipmentContent,
   EquipmentId,
   EquipmentItem,
-  EquipmentItemId,
-  ItemContent,
   ItemId,
   TradeskillId,
 } from '@interfaces';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { ensureAffix } from '@helpers/content/ensure-affix';
+import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
 
-function mockContent(...entries: (AffixContent | ItemContent)[]): void {
-  vi.mocked(getEntry).mockImplementation(
-    (id) => entries.find((entry) => entry.id === id) as never,
-  );
-}
+import { seedContent } from '@/testing/content';
+import { buildEquipmentItem } from '@/testing/builders';
 
-const reflectShard: ItemContent = {
+const reflectShard = ensureItem({
   id: 'reflect-shard' as ItemId,
   name: 'Reflect Shard',
-  __type: 'item',
   description: '',
   sprite: '0000',
   rarity: 'Common',
-  infusionCombatStats: {
-    repeatActionChance: 0,
-    skillStrikeAgainChance: 0,
-    redirectionChance: 0,
-    missChance: 0,
-    debuffIgnoreChance: 0,
-    damageReflectPercent: 2,
-    healingIgnorePercent: 0,
-    reviveChance: 0,
-    stunChance: 0,
-    agroValue: 0,
-  },
-};
+  infusionCombatStats: { ...defaultCombatStats(), damageReflectPercent: 2 },
+});
 
-const reflectAffix: AffixContent = {
+const reflectAffix = ensureAffix({
   id: 'affix-reflect' as AffixId,
   name: 'of Reflection',
-  __type: 'affix',
   levelRequirement: 1,
   description: '',
   rarity: 'Rare',
   family: 'DamageReflect',
   position: 'Suffix',
   effects: [{ kind: 'CombatStat', stat: 'damageReflectPercent', value: 5 }],
-};
+});
 
 function buildItem(overrides: Partial<EquipmentItem> = {}): EquipmentItem {
-  return {
-    id: 'item-1' as EquipmentItemId,
-    equipmentId: 'sword' as EquipmentId,
-    infusedItemIds: [],
-    affixIds: [],
-    ...overrides,
-  };
+  return buildEquipmentItem('sword' as EquipmentId, overrides);
 }
 
 describe('equipmentItemInfusionTotals', () => {
   beforeEach(() => {
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === reflectShard.id ? reflectShard : undefined) as never,
-    );
+    seedContent([reflectShard]);
   });
 
   it('sums the dimension block of every non-null slot', () => {
@@ -116,11 +89,7 @@ describe('equipmentItemInfusionTotals', () => {
 
 describe('equipmentItemBonusTotals', () => {
   it('combines infusion and affix bonuses for the same dimension', () => {
-    vi.mocked(getEntry).mockImplementation((id) => {
-      if (id === reflectShard.id) return reflectShard as never;
-      if (id === reflectAffix.id) return reflectAffix as never;
-      return undefined as never;
-    });
+    seedContent([reflectShard, reflectAffix]);
 
     const bonus = equipmentItemBonusTotals(
       buildItem({
@@ -133,7 +102,7 @@ describe('equipmentItemBonusTotals', () => {
   });
 
   it('is zeroed when the item has no infusions or affixes', () => {
-    vi.mocked(getEntry).mockReturnValue(undefined);
+    seedContent([]);
 
     const bonus = equipmentItemBonusTotals(buildItem(), COMBAT_STAT_BONUS);
     expect(bonus.damageReflectPercent).toBe(0);
@@ -142,34 +111,36 @@ describe('equipmentItemBonusTotals', () => {
 
 describe('MONSTER_TYPE_DAMAGE_BONUS.infusionBlock', () => {
   it("reads the item's infusionMonsterTypeDamage block", () => {
-    const fangShard: ItemContent = {
+    const fangShard = ensureItem({
       id: 'fang-shard' as ItemId,
       name: 'Fang Shard',
-      __type: 'item',
       description: '',
       sprite: '0000',
       rarity: 'Common',
-      infusionMonsterTypeDamage: { Beast: 10 } as never,
-    };
-
-    expect(MONSTER_TYPE_DAMAGE_BONUS.infusionBlock(fangShard)).toEqual({
-      Beast: 10,
+      infusionMonsterTypeDamage: {
+        ...defaultMonsterTypeDamageBonus(),
+        Beast: 10,
+      },
     });
+
+    expect(MONSTER_TYPE_DAMAGE_BONUS.infusionBlock(fangShard)).toEqual(
+      fangShard.infusionMonsterTypeDamage,
+    );
   });
 
   it('sums into equipmentItemInfusionTotals like any other dimension', () => {
-    const fangShard: ItemContent = {
+    const fangShard = ensureItem({
       id: 'fang-shard' as ItemId,
       name: 'Fang Shard',
-      __type: 'item',
       description: '',
       sprite: '0000',
       rarity: 'Common',
-      infusionMonsterTypeDamage: { Beast: 10 } as never,
-    };
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === fangShard.id ? fangShard : undefined) as never,
-    );
+      infusionMonsterTypeDamage: {
+        ...defaultMonsterTypeDamageBonus(),
+        Beast: 10,
+      },
+    });
+    seedContent([fangShard]);
 
     const bonus = equipmentItemInfusionTotals(
       [fangShard.id, fangShard.id],
@@ -180,22 +151,19 @@ describe('MONSTER_TYPE_DAMAGE_BONUS.infusionBlock', () => {
 });
 
 describe('equipmentItemInfusionGatherYieldBonuses', () => {
-  const woodShard: ItemContent = {
+  const woodShard = ensureItem({
     id: 'wood-shard' as ItemId,
     name: 'Wood Shard',
-    __type: 'item',
     description: '',
     sprite: '0000',
     rarity: 'Common',
     infusionGatherYieldBonuses: [
       { tradeskillId: 'Woodworking' as TradeskillId, value: 1 },
     ],
-  };
+  });
 
   beforeEach(() => {
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === woodShard.id ? woodShard : undefined) as never,
-    );
+    seedContent([woodShard]);
   });
 
   it('sums infusionGatherYieldBonuses of every non-null slot', () => {
@@ -224,10 +192,9 @@ describe('equipmentItemInfusionGatherYieldBonuses', () => {
   });
 });
 
-const woodworkingYieldAffix: AffixContent = {
+const woodworkingYieldAffix = ensureAffix({
   id: 'affix-woodworking-yield' as AffixId,
   name: 'of the Wooden',
-  __type: 'affix',
   levelRequirement: 1,
   description: '',
   rarity: 'Uncommon',
@@ -240,29 +207,17 @@ const woodworkingYieldAffix: AffixContent = {
       value: 1,
     },
   ],
-};
+});
 
 describe('equipmentItemGatherYieldBonuses', () => {
-  const woodworkingTrinket: EquipmentContent = {
+  const woodworkingTrinket = ensureEquipment({
     id: 'trinket' as EquipmentId,
     name: 'Trinket',
-    __type: 'equipment',
     description: '',
     sprite: '0000',
     rarity: 'Common',
     levelRequirement: 1,
-    baseStats: {
-      Agility: 0,
-      Energy: 0,
-      Health: 0,
-      Intelligence: 0,
-      Luck: 0,
-      Resistance: 0,
-      Strength: 0,
-      Vitality: 0,
-      Constitution: 0,
-      Spirit: 0,
-    },
+    baseStats: { ...defaultStats() },
     type: 'Trinket',
     slots: 0,
     grantedSkillIds: [],
@@ -270,10 +225,6 @@ describe('equipmentItemGatherYieldBonuses', () => {
       { tradeskillId: 'Woodworking' as TradeskillId, value: 1 },
       { tradeskillId: 'Blacksmithing' as TradeskillId, value: 1 },
     ],
-  };
-
-  beforeEach(() => {
-    vi.clearAllMocks();
   });
 
   it('returns just the base bonuses when the item has no rolled affixes', () => {
@@ -293,7 +244,7 @@ describe('equipmentItemGatherYieldBonuses', () => {
   });
 
   it('merges a rolled GatherYield affix into the matching base tradeskill', () => {
-    mockContent(woodworkingYieldAffix);
+    seedContent([woodworkingYieldAffix]);
 
     const bonuses = equipmentItemGatherYieldBonuses(
       woodworkingTrinket,
@@ -316,18 +267,17 @@ describe('equipmentItemGatherYieldBonuses', () => {
   });
 
   it('merges an infused GatherYield material into the matching base tradeskill', () => {
-    const woodShard: ItemContent = {
+    const woodShard = ensureItem({
       id: 'wood-shard' as ItemId,
       name: 'Wood Shard',
-      __type: 'item',
       description: '',
       sprite: '0000',
       rarity: 'Common',
       infusionGatherYieldBonuses: [
         { tradeskillId: 'Woodworking' as TradeskillId, value: 3 },
       ],
-    };
-    mockContent(woodShard);
+    });
+    seedContent([woodShard]);
 
     const bonuses = equipmentItemGatherYieldBonuses(
       woodworkingTrinket,
@@ -341,18 +291,17 @@ describe('equipmentItemGatherYieldBonuses', () => {
   });
 
   it('combines base, infusion, and affix bonuses for the same tradeskill', () => {
-    const woodShard: ItemContent = {
+    const woodShard = ensureItem({
       id: 'wood-shard' as ItemId,
       name: 'Wood Shard',
-      __type: 'item',
       description: '',
       sprite: '0000',
       rarity: 'Common',
       infusionGatherYieldBonuses: [
         { tradeskillId: 'Woodworking' as TradeskillId, value: 3 },
       ],
-    };
-    mockContent(woodShard, woodworkingYieldAffix);
+    });
+    seedContent([woodShard, woodworkingYieldAffix]);
 
     const bonuses = equipmentItemGatherYieldBonuses(
       woodworkingTrinket,
@@ -396,25 +345,22 @@ describe('weightedBlockTotal', () => {
 });
 
 describe('equipmentItemSkillStatBonuses', () => {
-  const fireballStaff: EquipmentContent = {
+  const fireballStaff = ensureEquipment({
     id: 'staff' as EquipmentId,
     name: 'Staff',
-    __type: 'equipment',
     description: '',
     sprite: '0000',
     rarity: 'Common',
     levelRequirement: 1,
-    baseStats: {} as never,
     type: 'Staff',
     slots: 1,
     grantedSkillIds: [],
     skillStatBonuses: [{ skillFamily: 'Fireball', stat: 'Vitality', value: 2 }],
-  };
+  });
 
-  const fireballAffix: AffixContent = {
+  const fireballAffix = ensureAffix({
     id: 'affix-fireball' as AffixId,
     name: 'Blazing',
-    __type: 'affix',
     levelRequirement: 1,
     description: '',
     rarity: 'Uncommon',
@@ -434,35 +380,24 @@ describe('equipmentItemSkillStatBonuses', () => {
         value: 0.25,
       },
     ],
-  };
+  });
 
-  const fireballShard: ItemContent = {
+  const fireballShard = ensureItem({
     id: 'fireball-shard' as ItemId,
     name: 'Fireball Shard',
-    __type: 'item',
     description: '',
     sprite: '0000',
     rarity: 'Common',
     infusionSkillStatBonuses: [
       { skillFamily: 'Fireball', stat: 'Vitality', value: 1 },
     ],
-  };
+  });
 
   function buildStaffItem(
     overrides: Partial<EquipmentItem> = {},
   ): EquipmentItem {
-    return {
-      id: 'item-1' as EquipmentItemId,
-      equipmentId: fireballStaff.id,
-      infusedItemIds: [],
-      affixIds: [],
-      ...overrides,
-    };
+    return buildEquipmentItem(fireballStaff.id, overrides);
   }
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
 
   it('returns just the base bonuses for a bare content entry', () => {
     expect(equipmentItemSkillStatBonuses(fireballStaff)).toEqual([
@@ -471,7 +406,7 @@ describe('equipmentItemSkillStatBonuses', () => {
   });
 
   it('merges base, infusion and affix grants of the same family and stat into one entry', () => {
-    mockContent(fireballShard, fireballAffix);
+    seedContent([fireballShard, fireballAffix]);
 
     const bonuses = equipmentItemSkillStatBonuses(
       fireballStaff,
@@ -488,7 +423,7 @@ describe('equipmentItemSkillStatBonuses', () => {
   });
 
   it('keeps different stats of one family as separate entries', () => {
-    mockContent(fireballAffix);
+    seedContent([fireballAffix]);
 
     const bonuses = equipmentItemSkillStatBonuses(
       { ...fireballStaff, skillStatBonuses: [] },

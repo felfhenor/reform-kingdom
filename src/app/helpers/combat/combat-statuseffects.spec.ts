@@ -12,56 +12,46 @@ import {
   statusEffectTagResistance,
 } from '@helpers/combat/combat-statuseffects';
 import { ensureStatusEffect } from '@helpers/content/ensure-statuseffect';
+import { defaultStats, defaultTagResistances } from '@helpers/defaults';
 import type {
-  Combat,
   Combatant,
   StatusEffect,
   StatusEffectBlock,
   StatusEffectId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { buildCombat, buildTestCombatant } from '@/testing/builders';
 
-function buildTagResistance(
-  overrides: Partial<StatusEffectBlock> = {},
-): StatusEffectBlock {
-  return {
-    Stun: 0,
-    StatDown: 0,
-    Accuracy: 0,
-    DamageOverTime: 0,
-    Poison: 0,
-    Burn: 0,
-    Bleed: 0,
-    ...overrides,
-  };
+// Fixed hp and zeroed combat stats, so effect math starts from a known baseline.
+function buildCombatant(overrides: Partial<Combatant> = {}): Combatant {
+  return buildTestCombatant({ name: 'Ashen', ...overrides });
 }
+
+const withTagResistance = (resistances: Partial<StatusEffectBlock>) =>
+  buildCombatant({
+    tagResistance: { ...defaultTagResistances(), ...resistances },
+  });
 
 describe('statusEffectTagResistance', () => {
   it('returns 0 when the effect has no tags', () => {
-    const combatant = {
-      tagResistance: buildTagResistance({ Stun: 50 }),
-    } as Combatant;
+    const combatant = withTagResistance({ Stun: 50 });
     expect(statusEffectTagResistance(combatant, [])).toBe(0);
   });
 
   it('returns the matching resistance for a single-tag effect', () => {
-    const combatant = {
-      tagResistance: buildTagResistance({ Poison: 6 }),
-    } as Combatant;
+    const combatant = withTagResistance({ Poison: 6 });
     expect(statusEffectTagResistance(combatant, ['Poison'])).toBe(6);
   });
 
   it('returns the highest resistance across a multi-tag effect, not the sum', () => {
-    const combatant = {
-      tagResistance: buildTagResistance({ StatDown: 3, Accuracy: 8 }),
-    } as Combatant;
+    const combatant = withTagResistance({ StatDown: 3, Accuracy: 8 });
     expect(statusEffectTagResistance(combatant, ['StatDown', 'Accuracy'])).toBe(
       8,
     );
   });
 
   it('returns 0 for a tag the combatant has no resistance to', () => {
-    const combatant = { tagResistance: buildTagResistance() } as Combatant;
+    const combatant = withTagResistance({});
     expect(statusEffectTagResistance(combatant, ['Stun'])).toBe(0);
   });
 });
@@ -72,38 +62,26 @@ describe('combatApplyStatusEffectToTarget combat message rendering', () => {
   });
 
   it('embeds the combatant id token (not the raw name) and reflects post-effect HP', () => {
-    const combatant = {
-      id: 'combatant-1',
-      name: 'Ashen',
-      hp: 100,
-      totalStats: { Health: 100 },
-      combatStats: { debuffIgnoreChance: 0 },
-      statusEffects: [],
-      statusEffectData: {},
-    } as unknown as Combatant;
-    const combat = {
-      id: 'combat-1',
-      heroes: [combatant],
-      guardians: [],
-    } as unknown as Combat;
-    const statusEffect = {
-      id: 'burn',
-      name: 'Burn',
-      effectType: 'Debuff',
-      onApply: [
-        {
-          type: 'TakeDamage',
-          combatMessage:
-            '**{{ combatant.name }}** is burning for {{ damage }} damage ({{ combatant.hp }}/{{ combatant.totalStats.Health }} HP remaining).',
-        },
-      ],
-      onTick: [],
-      onUnapply: [],
-      statScaling: { Strength: 1 },
-      useTargetStats: false,
-      creatorStats: { Strength: 10 },
-      targetStats: {},
-    } as unknown as StatusEffect;
+    const combatant = buildCombatant();
+    const combat = buildCombat({ heroes: [combatant] });
+    const statusEffect: StatusEffect = {
+      ...ensureStatusEffect({
+        id: 'burn' as StatusEffectId,
+        name: 'Burn',
+        effectType: 'Debuff',
+        onApply: [
+          {
+            type: 'TakeDamage',
+            combatMessage:
+              '**{{ combatant.name }}** is burning for {{ damage }} damage ({{ combatant.hp }}/{{ combatant.totalStats.Health }} HP remaining).',
+          },
+        ],
+        statScaling: { ...defaultStats(), Strength: 1 },
+      }),
+      duration: 1,
+      creatorStats: { ...defaultStats(), Strength: 10 },
+      targetStats: defaultStats(),
+    };
 
     combatApplyStatusEffectToTarget(combat, combatant, statusEffect);
 
@@ -135,28 +113,12 @@ describe('status effect ticking and expiry', () => {
         ],
       }),
       duration,
-      creatorStats: {} as StatusEffect['creatorStats'],
-      targetStats: {} as StatusEffect['targetStats'],
+      creatorStats: defaultStats(),
+      targetStats: defaultStats(),
     };
   }
 
-  function buildCombatant(): Combatant {
-    return {
-      id: 'combatant-1',
-      name: 'Ashen',
-      hp: 100,
-      totalStats: { Health: 100 },
-      combatStats: { debuffIgnoreChance: 0, stunChance: 0 },
-      statusEffects: [],
-      statusEffectData: {},
-    } as unknown as Combatant;
-  }
-
-  const combat = {
-    id: 'combat-1',
-    heroes: [],
-    guardians: [],
-  } as unknown as Combat;
+  const combat = buildCombat();
 
   it('keeps a 1-turn effect applied through its final turn until it expires', () => {
     const combatant = buildCombatant();

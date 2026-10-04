@@ -1,11 +1,4 @@
-vi.mock('@helpers/town/town-visit', () => ({
-  townMarkVisited: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodeCaravan: vi.fn(),
-  worldNodeTown: vi.fn(),
-}));
+vi.mock('@helpers/town/town-visit');
 
 import { modalCloseAll, modalOpen } from '@helpers/engine/modal-stack';
 import {
@@ -19,12 +12,28 @@ import {
   townOpen,
 } from '@helpers/engine/ui';
 import { townMarkVisited } from '@helpers/town/town-visit';
-import { worldNodeTown } from '@helpers/world-node/world-nodes';
-import type { TownContent, WorldNodeEntry } from '@interfaces';
+import { ensureTown } from '@helpers/content/ensure-town';
+import type { TownId, WorldNodeEntry } from '@interfaces';
+import { seedContent } from '@/testing/content';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 function node(nodeName: string): WorldNodeEntry {
-  return { mapName: 'Carrina', x: 0, y: 0, nodeName, nodeData: {} as never };
+  return {
+    mapName: 'Carrina',
+    x: 0,
+    y: 0,
+    nodeName,
+    nodeData: {
+      id: 1,
+      name: nodeName,
+      type: 'NonPlayerKingdom',
+      x: 0,
+      y: 0,
+      width: 16,
+      height: 16,
+      visible: true,
+    },
+  };
 }
 
 describe('mapNodeAutoShowOnArrival', () => {
@@ -57,6 +66,8 @@ describe('mapNodeAutoShowOnArrival', () => {
 });
 
 describe('townOpen', () => {
+  const larsia = ensureTown({ id: 'larsia' as TownId, name: 'Larsia' });
+
   beforeEach(() => {
     modalCloseAll();
     setGamePlayView('world');
@@ -64,7 +75,7 @@ describe('townOpen', () => {
   });
 
   it('sets the active town node and switches to the town view', () => {
-    vi.mocked(worldNodeTown).mockReturnValue({ id: 'larsia' } as TownContent);
+    seedContent([larsia]);
 
     townOpen(node('Larsia'));
 
@@ -73,7 +84,7 @@ describe('townOpen', () => {
   });
 
   it('marks the town visited when the node resolves to a town', () => {
-    vi.mocked(worldNodeTown).mockReturnValue({ id: 'larsia' } as TownContent);
+    seedContent([larsia]);
 
     townOpen(node('Larsia'));
 
@@ -81,7 +92,7 @@ describe('townOpen', () => {
   });
 
   it('does not mark a visit when the node has no town content', () => {
-    vi.mocked(worldNodeTown).mockReturnValue(undefined);
+    seedContent([larsia]);
 
     townOpen(node('Field Ruins'));
 

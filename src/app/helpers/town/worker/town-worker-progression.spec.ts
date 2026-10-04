@@ -1,48 +1,32 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodeByName: vi.fn(),
-}));
-
+import { ensureTown } from '@helpers/content/ensure-town';
 import { defaultTownWorkerState } from '@helpers/town/worker/town-worker-progression';
-import { worldNodeByName } from '@helpers/world-node/world-nodes';
-import type { TownContent, WorldNodeEntry } from '@interfaces';
+import type { TownId } from '@interfaces';
+import { locationOf, seedWorldNodes } from '@/testing/world';
 
-beforeEach(() => {
-  vi.clearAllMocks();
-});
+const town = ensureTown({ id: 'larsia' as TownId, name: 'Larsia' });
 
 describe('defaultTownWorkerState', () => {
-  const town = { name: 'Larsia' } as TownContent;
+  it('starts idle at the town’s own node, at the given level', () => {
+    const nodes = seedWorldNodes([
+      { name: 'Elsewhere', type: 'ExploreNode' },
+      { name: town.name, type: 'NonPlayerKingdom' },
+    ]);
 
-  it("resolves the town's node location", () => {
-    vi.mocked(worldNodeByName).mockReturnValue({
-      mapName: 'LarsianDesert',
-      x: 5,
-      y: 9,
-    } as WorldNodeEntry);
-
-    expect(defaultTownWorkerState(town, 1)).toEqual({
-      level: 1,
-      location: { mapName: 'LarsianDesert', x: 5, y: 9 },
+    expect(defaultTownWorkerState(town, 4)).toEqual({
+      level: 4,
+      location: locationOf(nodes[town.name]),
       status: { kind: 'AtTown' },
       assignment: null,
     });
   });
 
   it('falls back to an empty location when the town has no map node', () => {
-    vi.mocked(worldNodeByName).mockReturnValue(undefined);
-
     expect(defaultTownWorkerState(town, 1).location).toEqual({
       mapName: '',
       x: 0,
       y: 0,
     });
-  });
-
-  it('seeds the given level', () => {
-    vi.mocked(worldNodeByName).mockReturnValue(undefined);
-
-    expect(defaultTownWorkerState(town, 4).level).toBe(4);
   });
 });

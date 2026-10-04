@@ -31,12 +31,15 @@ import { applyCollectibleGrant } from '@helpers/item/collectibles';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import { discoveredRecipesState } from '@helpers/state-game';
 import type {
+  CaravanTraderId,
   CollectibleId,
+  EncounterId,
   EquipmentId,
   GameState,
   IsContentItem,
   ItemId,
   RecipeId,
+  TownId,
   TradeskillId,
 } from '@interfaces';
 import { buildCharacter, buildEquipmentItem } from '@/testing/builders';
@@ -84,14 +87,14 @@ const baseContent: IsContentItem[] = [
   equipmentRecipe,
   collectibleRecipe,
   ensureEncounter({
-    id: 'forest-ruins' as never,
+    id: 'forest-ruins' as EncounterId,
     name: 'Forest Ruins',
     completionRewards: [
       ensureDroppedReward({ recipeId: equipmentRecipe.id, chance: 0.25 }),
     ],
   }),
   ensureCaravanTrader({
-    id: 'alekia' as never,
+    id: 'alekia' as CaravanTraderId,
     name: 'Alekia Figaro',
     trades: [
       { type: 'sell', value: 25000, recipeId: collectibleRecipe.id, weight: 1 },
@@ -103,7 +106,7 @@ function seedTownUnique(recipeId: RecipeId): void {
   seedContent([
     ...baseContent,
     ensureTown({
-      id: 'larsia' as never,
+      id: 'larsia' as TownId,
       name: 'Larsia',
       crafting: { uniqueRecipeIds: [recipeId] },
     }),

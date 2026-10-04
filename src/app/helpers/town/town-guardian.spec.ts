@@ -1,132 +1,85 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/content/content', () => ({
-  getEntriesByType: vi.fn(),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    worldTownsState: () => gamestate().world.towns,
-  };
-});
-
-import { getEntriesByType } from '@helpers/content/content';
-import { gamestate } from '@helpers/state-game';
+import { ensureTown } from '@helpers/content/ensure-town';
 import {
   townGuardianMonsterIds,
   townGuardiansForCurrentReputation,
 } from '@helpers/town/town-guardian';
-import type { GameState, MonsterId, TownContent, TownId } from '@interfaces';
+import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
+import type { MonsterId, TownId } from '@interfaces';
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 
 const citizenId = 'larsian-citizen' as MonsterId;
 const guardId = 'larsian-guard' as MonsterId;
-const townId = 'larsia' as TownId;
+const scoutId = 'vesper-scout' as MonsterId;
 
-function buildTown(overrides: Partial<TownContent> = {}): TownContent {
-  return {
-    id: townId,
-    name: 'Larsia',
-    __type: 'town',
-    description: 'A desert town.',
-    hidden: false,
-    invisibleUntilCollectibleIdsFound: [],
-    scaleType: 'City',
-    level: 25,
-    materialThresholds: [],
-    crafting: {
-      maxQueueSize: [{ tier: 0, value: 1 }],
-      specialtyTradeskillId: 'jewelcrafting' as never,
-      craftingDurationMultiplier: 1,
-      craftingChanceOnTick: 1,
-      craftingChanceItemThreshold: 1,
-      tradeskillLevels: [],
-      uniqueRecipeIds: [],
-      bannedRecipeIds: [],
+const larsia = ensureTown({
+  id: 'larsia' as TownId,
+  name: 'Larsia',
+  defense: {
+    guardian: {
+      reputationTiers: [
+        { tier: 0, guardians: [{ monsterId: citizenId, quantity: 3 }] },
+        {
+          tier: 2,
+          guardians: [
+            { monsterId: citizenId, quantity: 2 },
+            { monsterId: guardId, quantity: 1 },
+          ],
+        },
+      ],
     },
-    traders: {
-      sellItemCount: [{ tier: 0, value: 0 }],
-      itemExpirationTimer: 0,
-      markupPercentages: { sell: 0, buy: 0 },
+  },
+});
+const vesper = ensureTown({
+  id: 'vesper' as TownId,
+  name: 'Vesper',
+  defense: {
+    guardian: {
+      reputationTiers: [
+        { tier: 0, guardians: [{ monsterId: scoutId, quantity: 1 }] },
+      ],
     },
-    gathering: {
-      gatherRateMultiplier: 1,
-      goldGatheredPerMaterial: 0,
-      workers: [],
-    },
-    reputation: { buff: { globalEffectId: 'unknown' as never, tiers: [] } },
-    defense: {
-      rewards: [],
-      guardian: {
-        reputationTiers: [
-          { tier: 0, guardians: [{ monsterId: citizenId, quantity: 3 }] },
-          {
-            tier: 1,
-            guardians: [
-              { monsterId: citizenId, quantity: 2 },
-              { monsterId: guardId, quantity: 1 },
-            ],
-          },
-        ],
-      },
-      assaulter: { numMonsters: 0, monsterIds: [], level: { min: 1, max: 1 } },
-      quests: { commissions: [] },
-      buyoff: { tributeGoldScalar: 0, fortifyMaterials: [] },
-    },
-    ...overrides,
-  };
-}
-
-beforeEach(() => {
-  vi.clearAllMocks();
+  },
 });
 
 describe('townGuardianMonsterIds', () => {
-  it('collects every distinct monster id across all towns and tiers', () => {
-    vi.mocked(getEntriesByType).mockReturnValue([buildTown()] as never);
+  it('lists every distinct guardian across all towns and tiers', () => {
+    seedContent([larsia, vesper]);
+    expect(townGuardianMonsterIds()).toEqual([citizenId, guardId, scoutId]);
 
-    expect(townGuardianMonsterIds()).toEqual([citizenId, guardId]);
-  });
-
-  it('returns an empty list when no towns are authored', () => {
-    vi.mocked(getEntriesByType).mockReturnValue([]);
-
+    seedContent([]);
     expect(townGuardianMonsterIds()).toEqual([]);
   });
 });
 
 describe('townGuardiansForCurrentReputation', () => {
-  it("resolves the tier matching the town's current reputation", () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: { [townId]: { reputation: 100 } } },
-    } as unknown as GameState);
+  const atTier = (tier: number) =>
+    seedGamestate(
+      (state) =>
+        (state.world.towns[larsia.id] = buildTownNodeState({
+          reputation: TOWN_REPUTATION_THRESHOLDS[tier],
+        })),
+    );
 
-    expect(townGuardiansForCurrentReputation(buildTown())).toEqual([
+  it('uses the guardians of exactly the town’s current reputation tier', () => {
+    atTier(2);
+    expect(townGuardiansForCurrentReputation(larsia)).toEqual([
       { monsterId: citizenId, quantity: 2 },
       { monsterId: guardId, quantity: 1 },
     ]);
+
+    atTier(0);
+    expect(townGuardiansForCurrentReputation(larsia)).toEqual([
+      { monsterId: citizenId, quantity: 3 },
+    ]);
   });
 
-  it('returns an empty list when no tier is authored at the current reputation', () => {
-    vi.mocked(gamestate).mockReturnValue({
-      world: { towns: { [townId]: { reputation: 100 } } },
-    } as unknown as GameState);
+  it('has no guardians at a tier with none listed', () => {
+    atTier(1);
 
-    const town = buildTown({
-      defense: {
-        rewards: [],
-        guardian: { reputationTiers: [] },
-        assaulter: {
-          numMonsters: 0,
-          monsterIds: [],
-          level: { min: 1, max: 1 },
-        },
-        quests: { commissions: [] },
-        buyoff: { tributeGoldScalar: 0, fortifyMaterials: [] },
-      },
-    });
-
-    expect(townGuardiansForCurrentReputation(town)).toEqual([]);
+    expect(townGuardiansForCurrentReputation(larsia)).toEqual([]);
   });
 });

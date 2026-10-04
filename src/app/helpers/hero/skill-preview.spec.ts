@@ -1,4 +1,6 @@
-import { getEntry } from '@helpers/content/content';
+import { ensureEquipmentSkillTechnique } from '@helpers/content/ensure-skill';
+import { ensureStatusEffect } from '@helpers/content/ensure-statuseffect';
+import { defaultStats } from '@helpers/defaults';
 import {
   skillDescriptionWithPreview,
   skillTechniqueKind,
@@ -11,137 +13,50 @@ import type {
   EquipmentSkillContent,
   EquipmentSkillContentTechnique,
   StatBlock,
+  StatusEffectId,
 } from '@interfaces';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import { buildEquipmentSkill, buildTestCombatant } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
 
-vi.mock('@helpers/content/content', () => ({ getEntry: vi.fn() }));
-
+// Fixed hp and zeroed stats so previewed numbers come only from each test's own setup.
 function buildCombatant(overrides: Partial<Combatant> = {}): Combatant {
-  return {
-    id: 'combatant-1',
-    name: 'Test Combatant',
-    isEnemy: false,
-    level: 1,
-    hp: 100,
-    ep: 10,
-    sprite: '0000',
-    frames: 4,
-    targetting: [{ type: 'Random' }],
-    baseStats: {} as never,
-    statBoosts: {} as never,
-    totalStats: {
-      Agility: 0,
-      Energy: 0,
-      Health: 100,
-      Intelligence: 0,
-      Luck: 0,
-      Resistance: 0,
-      Strength: 0,
-      Vitality: 0,
-      Constitution: 0,
-      Spirit: 0,
-    } as StatBlock,
-    combatStats: {} as never,
-    resistance: { Fire: 0, Water: 0, Earth: 0, Air: 0 },
-    affinity: { Fire: 0, Water: 0, Earth: 0, Air: 0 },
-    tagResistance: {
-      Stun: 0,
-      StatDown: 0,
-      Accuracy: 0,
-      DamageOverTime: 0,
-      Poison: 0,
-      Burn: 0,
-      Bleed: 0,
-    },
-    skillIds: [],
-    skillRefs: [],
-    skillWeights: {},
-    combatOrders: [],
-    skillUses: {},
-    statusEffects: [],
-    statusEffectData: {},
-    ...overrides,
-  };
+  return buildTestCombatant({ name: 'Test Combatant', ...overrides });
 }
 
 function buildSkill(
   overrides: Partial<EquipmentSkillContent> = {},
 ): EquipmentSkillContent {
-  return {
-    id: 'skill-1' as never,
+  return buildEquipmentSkill({
     name: 'Test Skill',
-    __type: 'skill',
-    description: '',
-    sprite: '0000',
-    rarity: 'Common',
-    epCost: 0,
-    usesPerCombat: -1,
-    statusEffectDurationBoost: {} as never,
-    statusEffectChanceBoost: {} as never,
-    techniques: [],
-    requiredWeaponTypes: [],
     family: 'Test Skill',
     ...overrides,
-  };
+  });
 }
 
 function buildTechnique(
   overrides: Partial<EquipmentSkillContentTechnique> = {},
 ): EquipmentSkillContentTechnique {
-  return {
-    targets: 1,
-    targetType: 'Enemies',
-    targetBehaviors: [],
-    damageScaling: {
-      Agility: 0,
-      Energy: 0,
-      Health: 0,
-      Intelligence: 0,
-      Luck: 0,
-      Resistance: 0,
-      Strength: 0,
-      Vitality: 0,
-      Constitution: 0,
-      Spirit: 0,
-    },
-    elements: [],
+  return ensureEquipmentSkillTechnique({
     attributes: ['DamagesTarget'],
-    statusEffects: [],
     combatMessage: '',
     ...overrides,
-  };
+  });
 }
 
 describe('skillTechniquePreviewValue', () => {
   it('sums each scaled stat using the same formula as live combat', () => {
     const combatant = buildCombatant({
       totalStats: {
-        Agility: 0,
-        Energy: 0,
+        ...defaultStats(),
         Health: 100,
         Intelligence: 100,
-        Luck: 0,
-        Resistance: 0,
-        Strength: 0,
         Vitality: 40,
-        Constitution: 0,
-        Spirit: 0,
       },
     });
     const skill = buildSkill();
     const technique = buildTechnique({
-      damageScaling: {
-        Agility: 0,
-        Energy: 0,
-        Health: 0,
-        Intelligence: 0.5,
-        Luck: 0,
-        Resistance: 0,
-        Strength: 0,
-        Vitality: 0.25,
-        Constitution: 0,
-        Spirit: 0,
-      },
+      damageScaling: { ...defaultStats(), Intelligence: 0.5, Vitality: 0.25 },
     });
 
     // Intelligence(100)*0.5 = 50; Vitality(40)*0.25 = 10.
@@ -150,33 +65,11 @@ describe('skillTechniquePreviewValue', () => {
 
   it('floors a fractional result', () => {
     const combatant = buildCombatant({
-      totalStats: {
-        Agility: 0,
-        Energy: 0,
-        Health: 100,
-        Intelligence: 101,
-        Luck: 0,
-        Resistance: 0,
-        Strength: 0,
-        Vitality: 0,
-        Constitution: 0,
-        Spirit: 0,
-      },
+      totalStats: { ...defaultStats(), Health: 100, Intelligence: 101 },
     });
     const skill = buildSkill();
     const technique = buildTechnique({
-      damageScaling: {
-        Agility: 0,
-        Energy: 0,
-        Health: 0,
-        Intelligence: 0.5,
-        Luck: 0,
-        Resistance: 0,
-        Strength: 0,
-        Vitality: 0,
-        Constitution: 0,
-        Spirit: 0,
-      },
+      damageScaling: { ...defaultStats(), Intelligence: 0.5 },
     });
 
     // 101*0.5 = 50.5 -> floored to 50.
@@ -195,35 +88,13 @@ describe('skillTechniquePreviewValue', () => {
 describe('skillDescriptionWithPreview', () => {
   it('substitutes {{ value }} with the previewed amount', () => {
     const combatant = buildCombatant({
-      totalStats: {
-        Agility: 0,
-        Energy: 0,
-        Health: 100,
-        Intelligence: 100,
-        Luck: 0,
-        Resistance: 0,
-        Strength: 0,
-        Vitality: 0,
-        Constitution: 0,
-        Spirit: 0,
-      },
+      totalStats: { ...defaultStats(), Health: 100, Intelligence: 100 },
     });
     const skill = buildSkill({
       description: 'Heal a living ally for {{ value }} HP.',
       techniques: [
         buildTechnique({
-          damageScaling: {
-            Agility: 0,
-            Energy: 0,
-            Health: 0,
-            Intelligence: 0.5,
-            Luck: 0,
-            Resistance: 0,
-            Strength: 0,
-            Vitality: 0,
-            Constitution: 0,
-            Spirit: 0,
-          },
+          damageScaling: { ...defaultStats(), Intelligence: 0.5 },
         }),
       ],
     });
@@ -366,12 +237,18 @@ describe('skillTechniquePreviews', () => {
   });
 
   it('resolves status effect names with chance and duration', () => {
-    vi.mocked(getEntry).mockReturnValue({ name: 'Burning' } as never);
+    seedContent([
+      ensureStatusEffect({ id: 'burning' as StatusEffectId, name: 'Burning' }),
+    ]);
     const skill = buildSkill({
       techniques: [
         buildTechnique({
           statusEffects: [
-            { statusEffectId: 'burning' as never, chance: 40, duration: 3 },
+            {
+              statusEffectId: 'burning' as StatusEffectId,
+              chance: 40,
+              duration: 3,
+            },
           ],
         }),
       ],
@@ -383,7 +260,12 @@ describe('skillTechniquePreviews', () => {
   });
 
   it('describes target-status conditions by status effect name', () => {
-    vi.mocked(getEntry).mockReturnValue({ name: 'Weakspot' } as never);
+    seedContent([
+      ensureStatusEffect({
+        id: 'weakspot' as StatusEffectId,
+        name: 'Weakspot',
+      }),
+    ]);
     const skill = buildSkill({
       techniques: [
         buildTechnique({
@@ -392,7 +274,7 @@ describe('skillTechniquePreviews', () => {
             { behavior: 'NotZeroHealth' },
             {
               behavior: 'IfNotStatusEffect',
-              statusEffectId: 'weakspot' as never,
+              statusEffectId: 'weakspot' as StatusEffectId,
             },
           ],
         }),

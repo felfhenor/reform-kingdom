@@ -1,48 +1,35 @@
 import { describe, expect, it } from 'vitest';
 
+import { TRADESKILL_MAX_LEVEL } from '@helpers/config';
+import { ensureRecipe } from '@helpers/content/ensure-recipe';
+import { ensureTown } from '@helpers/content/ensure-town';
 import { townCraftTimeFor } from '@helpers/town/crafting/town-craft-time';
-import type { RecipeContent, TownContent } from '@interfaces';
 
-function buildTown(craftingDurationMultiplier = 1): TownContent {
-  return {
-    crafting: { craftingDurationMultiplier },
-  } as unknown as TownContent;
-}
-
-function buildRecipe(craftTime: number): RecipeContent {
-  return { craftTime } as unknown as RecipeContent;
-}
+const recipe = (craftTime: number) => ensureRecipe({ craftTime });
+const town = (craftingDurationMultiplier = 1) =>
+  ensureTown({ crafting: { craftingDurationMultiplier } });
 
 describe('townCraftTimeFor', () => {
-  it('reduces craft time by 1% per level', () => {
-    expect(townCraftTimeFor(buildRecipe(100), buildTown(), 25)).toBe(75);
+  it('takes 1% off per tradeskill level', () => {
+    expect(townCraftTimeFor(recipe(100), town(), 25)).toBe(75);
   });
 
-  it('applies the town craftingDurationMultiplier before the level reduction', () => {
-    expect(townCraftTimeFor(buildRecipe(100), buildTown(2), 25)).toBe(150);
+  it('scales by the town’s duration multiplier and any debuff', () => {
+    expect(townCraftTimeFor(recipe(100), town(2), 25)).toBe(150);
+    expect(townCraftTimeFor(recipe(100), town(), 25, 2)).toBe(150);
   });
 
-  it('applies an extra debuff multiplier on top', () => {
-    expect(townCraftTimeFor(buildRecipe(100), buildTown(), 25, 2)).toBe(150);
-  });
-
-  it('never goes below 1 tick even at max level with a tiny craft time', () => {
-    expect(townCraftTimeFor(buildRecipe(1), buildTown(), 50)).toBe(1);
-  });
-
-  it('clamps a level above TRADESKILL_MAX_LEVEL to the cap', () => {
-    expect(townCraftTimeFor(buildRecipe(100), buildTown(), 999)).toBe(
-      townCraftTimeFor(buildRecipe(100), buildTown(), 50),
+  it('rounds to whole ticks, never below 1', () => {
+    expect(townCraftTimeFor(recipe(10), town(), 3)).toBe(10);
+    expect(townCraftTimeFor(recipe(1), town(), TRADESKILL_MAX_LEVEL, 0.1)).toBe(
+      1,
     );
   });
 
-  it('clamps a level below 1 up to 1', () => {
-    expect(townCraftTimeFor(buildRecipe(100), buildTown(), 0)).toBe(
-      townCraftTimeFor(buildRecipe(100), buildTown(), 1),
-    );
-  });
+  it('treats levels outside 1..max as the nearest bound', () => {
+    const at = (level: number) => townCraftTimeFor(recipe(100), town(), level);
 
-  it('rounds to the nearest tick', () => {
-    expect(townCraftTimeFor(buildRecipe(10), buildTown(), 3)).toBe(10);
+    expect(at(999)).toBe(at(TRADESKILL_MAX_LEVEL));
+    expect(at(0)).toBe(at(1));
   });
 });

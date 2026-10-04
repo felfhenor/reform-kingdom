@@ -22,6 +22,7 @@ import {
 } from '@helpers/worker/worker-travel';
 import type {
   GameState,
+  GatheringId,
   ItemId,
   TravelStep,
   WorkerContent,
@@ -49,7 +50,7 @@ function seedWorker(overrides: Partial<WorkerContent> = {}): void {
   seedContent([
     ensureWorker({ id: workerId, name: 'Weaver Nell', ...overrides }),
     ensureGathering({
-      id: 'woods' as never,
+      id: 'woods' as GatheringId,
       name: woods,
       gatherResults: [
         ensureGatherResult({

@@ -1,17 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-vi.mock('@helpers/engine/analytics', () => ({
-  analyticsSendDesignEvent: vi.fn(),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    updateGamestate: vi.fn(),
-    worldAutoModeState: () => gamestate().world.autoMode,
-  };
-});
+import { describe, expect, it, onTestFinished } from 'vitest';
+import { analyticsEvent$ } from '@helpers/engine/analytics';
 
 import {
   autoModeIsEnabled,
@@ -23,192 +11,117 @@ import {
   autoModeSetActiveClause,
   autoModeToggle,
 } from '@helpers/decree/auto-mode-state';
-import { gamestate, updateGamestate } from '@helpers/state-game';
-import type { DecreeClause, DecreeClauseId, GameState } from '@interfaces';
+import { worldAutoModeState } from '@helpers/state-game';
+import type { AutoModeState, DecreeClauseId } from '@interfaces';
+import { decreeClause } from '@/testing/decree';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 
-function buildClause(overrides: Partial<DecreeClause> = {}): DecreeClause {
-  return {
-    id: 'clause-1' as DecreeClauseId,
-    type: 'FinishUnfinishedAreas',
-    enabled: true,
-    failureCount: 0,
-    riskTolerance: 'Medium',
-    ...overrides,
-  } as DecreeClause;
+const clauseA = decreeClause(
+  { type: 'ReturnToKingdom' },
+  { id: 'a' as DecreeClauseId },
+);
+const clauseB = decreeClause(
+  { type: 'LevelUpParty', riskTolerance: 'Low' },
+  { id: 'b' as DecreeClauseId },
+);
+
+function seedAutoMode(autoMode: Partial<AutoModeState>): void {
+  seedGamestate((state) => Object.assign(state.world.autoMode, autoMode));
 }
 
-function buildState(overrides: {
-  enabled?: boolean;
-  clauses?: DecreeClause[];
-  activeClauseId?: DecreeClauseId;
-  nodeFailureCounts?: Partial<Record<string, number>>;
-}): GameState {
-  return {
-    world: {
-      autoMode: {
-        enabled: overrides.enabled ?? true,
-        clauses: overrides.clauses ?? [],
-        activeClauseId: overrides.activeClauseId,
-        nodeFailureCounts: overrides.nodeFailureCounts ?? {},
-      },
-    },
-  } as unknown as GameState;
-}
+const failureCounts = () =>
+  worldAutoModeState().clauses.map((clause) => clause.failureCount);
 
-function applyLastUpdate(state: GameState): GameState {
-  const calls = vi.mocked(updateGamestate).mock.calls;
-  const updateFn = calls[calls.length - 1][0];
-  return updateFn(state);
-}
+describe('autoModeToggle', () => {
+  it('turns Auto Mode on, and off again dropping the active clause', () => {
+    seedAutoMode({ enabled: false, activeClauseId: clauseA.id });
 
-beforeEach(() => {
-  vi.clearAllMocks();
-});
-
-describe('autoModeIsEnabled / autoModeToggle', () => {
-  it('reads the enabled flag from state', () => {
-    vi.mocked(gamestate).mockReturnValue(buildState({ enabled: true }));
+    inTick(() => autoModeToggle(true));
     expect(autoModeIsEnabled()).toBe(true);
-  });
+    expect(worldAutoModeState().activeClauseId).toBe(clauseA.id);
 
-  it('turning off clears the active clause', () => {
-    vi.mocked(gamestate).mockReturnValue(buildState({}));
-
-    autoModeToggle(false);
-
-    const result = applyLastUpdate(
-      buildState({ activeClauseId: 'clause-1' as DecreeClauseId }),
-    );
-    expect(result.world.autoMode.enabled).toBe(false);
-    expect(result.world.autoMode.activeClauseId).toBeUndefined();
+    inTick(() => autoModeToggle(false));
+    expect(autoModeIsEnabled()).toBe(false);
+    expect(worldAutoModeState().activeClauseId).toBeUndefined();
   });
 });
 
 describe('autoModeSetActiveClause', () => {
-  it('sets the active clause', () => {
-    autoModeSetActiveClause('b' as DecreeClauseId);
+  it('sets or clears the active clause', () => {
+    seedAutoMode({});
 
-    const result = applyLastUpdate(buildState({}));
-    expect(result.world.autoMode.activeClauseId).toBe('b');
-  });
+    inTick(() => autoModeSetActiveClause(clauseB.id));
+    expect(worldAutoModeState().activeClauseId).toBe(clauseB.id);
 
-  it('clears the active clause when given no id', () => {
-    autoModeSetActiveClause(undefined);
-
-    const result = applyLastUpdate(
-      buildState({ activeClauseId: 'a' as DecreeClauseId }),
-    );
-    expect(result.world.autoMode.activeClauseId).toBeUndefined();
+    inTick(() => autoModeSetActiveClause(undefined));
+    expect(worldAutoModeState().activeClauseId).toBeUndefined();
   });
 });
 
-describe('autoModeRecordClauseFailure', () => {
-  it('does nothing when no clause is active', () => {
-    vi.mocked(gamestate).mockReturnValue(buildState({}));
+describe('the active clause’s failure streak', () => {
+  const clauses = [
+    { ...clauseA, failureCount: 4 },
+    { ...clauseB, failureCount: 2 },
+  ];
 
-    autoModeRecordClauseFailure();
+  it('grows on each failure, for the active clause only', () => {
+    seedAutoMode({ clauses, activeClauseId: clauseB.id });
 
-    expect(updateGamestate).not.toHaveBeenCalled();
+    inTick(() => autoModeRecordClauseFailure());
+
+    expect(failureCounts()).toEqual([4, 3]);
   });
 
-  it('increments only the active clause', () => {
-    const clauses = [
-      buildClause({ id: 'a' as DecreeClauseId, failureCount: 0 }),
-      buildClause({ id: 'b' as DecreeClauseId, failureCount: 2 }),
-    ];
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({ clauses, activeClauseId: 'b' as DecreeClauseId }),
-    );
+  it('resets on a success, for the active clause only', () => {
+    seedAutoMode({ clauses, activeClauseId: clauseB.id });
 
-    autoModeRecordClauseFailure();
+    inTick(() => autoModeRecordClauseSuccess());
 
-    const result = applyLastUpdate(
-      buildState({ clauses, activeClauseId: 'b' as DecreeClauseId }),
-    );
-    expect(
-      result.world.autoMode.clauses.find((c) => c.id === 'a')?.failureCount,
-    ).toBe(0);
-    expect(
-      result.world.autoMode.clauses.find((c) => c.id === 'b')?.failureCount,
-    ).toBe(3);
-  });
-});
-
-describe('autoModeRecordClauseSuccess', () => {
-  it('does nothing when no clause is active', () => {
-    vi.mocked(gamestate).mockReturnValue(buildState({}));
-
-    autoModeRecordClauseSuccess();
-
-    expect(updateGamestate).not.toHaveBeenCalled();
+    expect(failureCounts()).toEqual([4, 0]);
   });
 
-  it('resets only the active clause failure count to zero', () => {
-    const clauses = [
-      buildClause({ id: 'a' as DecreeClauseId, failureCount: 4 }),
-      buildClause({ id: 'b' as DecreeClauseId, failureCount: 2 }),
-    ];
-    vi.mocked(gamestate).mockReturnValue(
-      buildState({ clauses, activeClauseId: 'b' as DecreeClauseId }),
-    );
+  it('is left alone with no active clause', () => {
+    seedAutoMode({ clauses });
 
-    autoModeRecordClauseSuccess();
+    inTick(() => {
+      autoModeRecordClauseFailure();
+      autoModeRecordClauseSuccess();
+    });
 
-    const result = applyLastUpdate(
-      buildState({ clauses, activeClauseId: 'b' as DecreeClauseId }),
-    );
-    expect(
-      result.world.autoMode.clauses.find((c) => c.id === 'a')?.failureCount,
-    ).toBe(4);
-    expect(
-      result.world.autoMode.clauses.find((c) => c.id === 'b')?.failureCount,
-    ).toBe(0);
+    expect(failureCounts()).toEqual([4, 2]);
   });
 });
 
-describe('autoModeRecordNodeFailure', () => {
-  it('increments only the named node, leaving others untouched', () => {
-    const nodeFailureCounts = { A: 1, B: 4 };
-    vi.mocked(gamestate).mockReturnValue(buildState({ nodeFailureCounts }));
+describe('per-node failure streaks', () => {
+  it('count up per failed node and report the new streak', () => {
+    seedAutoMode({ nodeFailureCounts: { A: 1, B: 4 } });
+    const reported: { event: string; value: number }[] = [];
+    const subscription = analyticsEvent$.subscribe((e) => reported.push(e));
+    onTestFinished(() => subscription.unsubscribe());
 
-    autoModeRecordNodeFailure('A');
+    inTick(() => {
+      autoModeRecordNodeFailure('A');
+      autoModeRecordNodeFailure('New');
+    });
 
-    const result = applyLastUpdate(buildState({ nodeFailureCounts }));
-    expect(result.world.autoMode.nodeFailureCounts['A']).toBe(2);
-    expect(result.world.autoMode.nodeFailureCounts['B']).toBe(4);
+    expect(worldAutoModeState().nodeFailureCounts).toEqual({
+      A: 2,
+      B: 4,
+      New: 1,
+    });
+    expect(reported).toEqual([
+      { event: 'World:Node:Fail', value: 2 },
+      { event: 'World:Node:Fail', value: 1 },
+    ]);
   });
 
-  it('starts a node at 1 the first time it fails', () => {
-    vi.mocked(gamestate).mockReturnValue(buildState({}));
+  it('reset for a node on a win, and for every node on request', () => {
+    seedAutoMode({ nodeFailureCounts: { A: 3, B: 4 } });
 
-    autoModeRecordNodeFailure('New');
+    inTick(() => autoModeRecordNodeSuccess('A'));
+    expect(worldAutoModeState().nodeFailureCounts).toEqual({ A: 0, B: 4 });
 
-    const result = applyLastUpdate(buildState({}));
-    expect(result.world.autoMode.nodeFailureCounts['New']).toBe(1);
-  });
-});
-
-describe('autoModeRecordNodeSuccess', () => {
-  it('resets only the named node back to zero', () => {
-    const nodeFailureCounts = { A: 3, B: 4 };
-    vi.mocked(gamestate).mockReturnValue(buildState({ nodeFailureCounts }));
-
-    autoModeRecordNodeSuccess('A');
-
-    const result = applyLastUpdate(buildState({ nodeFailureCounts }));
-    expect(result.world.autoMode.nodeFailureCounts['A']).toBe(0);
-    expect(result.world.autoMode.nodeFailureCounts['B']).toBe(4);
-  });
-});
-
-describe('autoModeResetNodeFailureCounts', () => {
-  it('wipes every recorded node failure count', () => {
-    const nodeFailureCounts = { A: 3, B: 4 };
-    vi.mocked(gamestate).mockReturnValue(buildState({ nodeFailureCounts }));
-
-    autoModeResetNodeFailureCounts();
-
-    const result = applyLastUpdate(buildState({ nodeFailureCounts }));
-    expect(result.world.autoMode.nodeFailureCounts).toEqual({});
+    inTick(() => autoModeResetNodeFailureCounts());
+    expect(worldAutoModeState().nodeFailureCounts).toEqual({});
   });
 });

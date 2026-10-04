@@ -1,155 +1,110 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/commission/commission-requirement', () => ({
-  buildCommissionRequirementEntries: vi.fn(() => []),
-  commissionRequirementsSatisfied: vi.fn(),
-  commissionOfferReputationReward: vi.fn(
-    (offer: { townReputationReward: number }) => offer.townReputationReward,
-  ),
-}));
-
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-vi.mock('@helpers/combat/combat-log', () => ({
-  categoryMessageLog: vi.fn(),
-}));
-
-vi.mock('@helpers/state-game', () => {
-  const gamestate = vi.fn();
-  return {
-    gamestate,
-    worldTownsState: () => gamestate().world.towns,
-  };
-});
-
-import {
-  buildCommissionRequirementEntries,
-  commissionRequirementsSatisfied,
-} from '@helpers/commission/commission-requirement';
-import { getEntry } from '@helpers/content/content';
-import { gamestate } from '@helpers/state-game';
+import { ensureCommissionOffer } from '@helpers/content/ensure-commission';
+import { ensureItem } from '@helpers/content/ensure-item';
+import { applyMaterialDelta } from '@helpers/item/materials';
 import {
   townCommissionCanFulfill,
   townCommissionReputationReward,
   townCommissionRequirementEntries,
 } from '@helpers/town/town-commission-fulfill';
 import type {
-  CommissionOfferContent,
   CommissionOfferId,
   GameState,
   ItemId,
-  RecipeId,
   TownCommissionSlotId,
   TownId,
 } from '@interfaces';
+import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 
 const townId = 'larsia' as TownId;
 const slotId = 'slot-1' as TownCommissionSlotId;
-
-const offer: CommissionOfferContent = {
+const stick = ensureItem({
+  id: 'wergen-stick' as ItemId,
+  name: 'Wergen Stick',
+});
+const offer = ensureCommissionOffer({
   id: 'offer-a' as CommissionOfferId,
-  name: 'Commission - Bundle of Wergen Sticks',
-  __type: 'commissionoffer',
-  description: 'A commission.',
-  requirements: [
-    { itemId: 'wergen-stick' as ItemId, quantityMin: 100, quantityMax: 100 },
-  ],
-  rewards: [],
+  name: 'Bundle of Wergen Sticks',
   townReputationReward: 25,
-  specialtyForRecipeId: 'UNKNOWN' as RecipeId,
-  reputationTierMultipliers: [],
-};
+});
 
-function withTownState(state: unknown): void {
-  vi.mocked(gamestate).mockReturnValue({
-    world: { towns: { [townId]: state } },
-  } as unknown as GameState);
+function seedSlot(edit?: (state: GameState) => void): GameState {
+  seedContent([stick, offer]);
+  return seedGamestate((state) => {
+    state.world.towns[townId] = buildTownNodeState({
+      commissionSlots: [
+        {
+          id: slotId,
+          commissionOfferId: offer.id,
+          requirements: [{ itemId: stick.id, quantity: 100 }],
+          generatedAtTick: 0,
+        },
+      ],
+    });
+    edit?.(state);
+  });
 }
 
-describe('townCommissionRequirementEntries / townCommissionReputationReward', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+const missing = 'gone' as TownCommissionSlotId;
 
-  it('resolves requirement entries for an existing slot', () => {
-    withTownState({
-      commissionSlots: [
-        {
-          id: slotId,
-          commissionOfferId: offer.id,
-          requirements: [{ itemId: 'wergen-stick', quantity: 100 }],
-          generatedAtTick: 0,
-        },
-      ],
-    });
-    vi.mocked(buildCommissionRequirementEntries).mockReturnValue([
-      {
-        kind: 'item',
-        content: undefined,
-        spritesheet: 'item',
-        quantity: 100,
-        owned: 0,
-      },
+describe('townCommissionRequirementEntries', () => {
+  it('lists a slot’s requirements against what the player owns', () => {
+    seedSlot((state) => applyMaterialDelta(state, stick.id, 40));
+
+    expect(townCommissionRequirementEntries(townId, slotId)).toEqual([
+      expect.objectContaining({ content: stick, quantity: 100, owned: 40 }),
     ]);
-
-    expect(townCommissionRequirementEntries(townId, slotId)).toHaveLength(1);
+    expect(townCommissionRequirementEntries(townId, missing)).toEqual([]);
   });
+});
 
-  it('returns an empty list when the slot no longer exists', () => {
-    withTownState({ commissionSlots: [] });
-
-    expect(townCommissionRequirementEntries(townId, slotId)).toEqual([]);
-  });
-
-  it('resolves the offer reputation reward for an existing slot', () => {
-    withTownState({
-      commissionSlots: [
-        {
-          id: slotId,
-          commissionOfferId: offer.id,
-          requirements: [],
-          generatedAtTick: 0,
-        },
-      ],
-    });
-    vi.mocked(getEntry).mockReturnValue(offer);
+describe('townCommissionReputationReward', () => {
+  it('pays the slot’s offer reward, nothing for a missing slot or offer', () => {
+    seedSlot();
 
     expect(townCommissionReputationReward(townId, slotId)).toBe(25);
+    expect(townCommissionReputationReward(townId, missing)).toBe(0);
+
+    seedContent([stick]);
+    expect(townCommissionReputationReward(townId, slotId)).toBe(0);
   });
 
-  it('is 0 when the slot no longer exists', () => {
-    withTownState({ commissionSlots: [] });
+  it('scales the reward by the town’s reputation tier', () => {
+    seedSlot(
+      (state) =>
+        (state.world.towns[townId].reputation = TOWN_REPUTATION_THRESHOLDS[1]),
+    );
+    seedContent([
+      stick,
+      ensureCommissionOffer({
+        ...offer,
+        reputationTierMultipliers: [
+          { tier: 0, value: 1 },
+          { tier: 1, value: 2 },
+        ],
+      }),
+    ]);
 
-    expect(townCommissionReputationReward(townId, slotId)).toBe(0);
+    expect(townCommissionReputationReward(townId, slotId)).toBe(50);
   });
 });
 
 describe('townCommissionCanFulfill', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('is false when the slot does not exist', () => {
-    withTownState({ commissionSlots: [] });
-
+  it('needs every requirement covered, against live or given state', () => {
+    seedSlot((state) => applyMaterialDelta(state, stick.id, 99));
     expect(townCommissionCanFulfill(townId, slotId)).toBe(false);
-  });
 
-  it('defers to commissionRequirementsSatisfied for an existing slot', () => {
-    withTownState({
-      commissionSlots: [
-        {
-          id: slotId,
-          commissionOfferId: offer.id,
-          requirements: [],
-          generatedAtTick: 0,
-        },
-      ],
-    });
-    vi.mocked(commissionRequirementsSatisfied).mockReturnValue(true);
-
+    const covered = seedSlot((state) =>
+      applyMaterialDelta(state, stick.id, 100),
+    );
     expect(townCommissionCanFulfill(townId, slotId)).toBe(true);
+    expect(townCommissionCanFulfill(townId, missing)).toBe(false);
+
+    seedGamestate();
+    expect(townCommissionCanFulfill(townId, slotId, covered)).toBe(true);
   });
 });

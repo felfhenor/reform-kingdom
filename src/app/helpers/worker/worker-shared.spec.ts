@@ -1,21 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-vi.mock('@helpers/worker/worker-progression', () => ({
-  workerStatsForLevel: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodeByName: vi.fn(),
-  worldNodeGathering: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-node-gathering', () => ({
-  gatheringResultsAtLevel: vi.fn((gathering) => gathering.gatherResults),
-}));
-
-vi.mock('@helpers/world-node/world-node-level', () => ({
-  worldNodeLevel: vi.fn(() => 0),
-}));
+import { describe, expect, it } from 'vitest';
 
 import {
   ensureGatherResult,
@@ -32,26 +15,25 @@ import {
   workerGatherTickOutcome,
   workerGatheringStatusStart,
 } from '@helpers/worker/worker-shared';
-import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
-import { worldNodeLevel } from '@helpers/world-node/world-node-level';
-import {
-  worldNodeByName,
-  worldNodeGathering,
-} from '@helpers/world-node/world-nodes';
 import type {
   AnyWorkerState,
   GatheringContent,
+  GatheringId,
   ItemId,
   TravelStep,
   WorkerContent,
   WorkerId,
   WorkerStatusGathering,
-  WorldNodeEntry,
 } from '@interfaces';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 
 const WORKER_ID = 'weaver-nell' as WorkerId;
 const COPPER_ID = 'copper-ore' as ItemId;
 const MALACHITE_ID = 'malachite' as ItemId;
+// Only gatherable once the node is developed to level 2.
+const GOLD_VEIN_ID = 'gold-vein' as ItemId;
 
 const workerContent: WorkerContent = ensureWorker({
   id: WORKER_ID,
@@ -68,7 +50,7 @@ function buildGathering(
   overrides: Partial<GatheringContent> = {},
 ): GatheringContent {
   return ensureGathering({
-    id: 'gathering-1' as never,
+    id: 'Wergen Woods' as GatheringId,
     name: 'Wergen Woods',
     description: 'test',
     levelRange: { min: 1, max: 10 },
@@ -82,6 +64,11 @@ function buildGathering(
       ensureGatherResult({
         chance: 20,
         items: [{ itemId: MALACHITE_ID, quantity: 1 }],
+      }),
+      ensureGatherResult({
+        chance: 100,
+        items: [{ itemId: GOLD_VEIN_ID, quantity: 1 }],
+        levelRequirement: 2,
       }),
     ],
     hidden: false,
@@ -107,93 +94,66 @@ function buildWorkerState(status: AnyWorkerState['status']): AnyWorkerState {
   return { location: { mapName: 'A', x: 0, y: 0 }, status };
 }
 
-beforeEach(() => {
-  vi.clearAllMocks();
-});
-
 describe('workerGatherRate', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  const speedAt = (level: number) =>
+    workerStatsForLevel(workerContent, level).gatherSpeed;
 
-  it('scales gatherSpeed by the item share of the weighted table', () => {
-    vi.mocked(workerStatsForLevel).mockReturnValue({
-      capacity: 6,
-      gatherSpeed: 2,
-      stamina: 30,
-    });
-
+  it('scales the worker’s gather speed by the item’s share of the table at the node’s level', () => {
     const gathering = buildGathering();
 
-    // Copper is 80/100 of the table weight, so its rate is 80% of gatherSpeed.
     expect(workerGatherRate(workerContent, 1, gathering, COPPER_ID, 0)).toBe(
-      1.6,
+      speedAt(1) * (80 / 100),
     );
-    // Malachite is rarer (20/100), so it's gathered proportionally slower.
     expect(workerGatherRate(workerContent, 1, gathering, MALACHITE_ID, 0)).toBe(
-      0.4,
+      speedAt(1) * (20 / 100),
     );
+    expect(workerGatherRate(workerContent, 1, gathering, COPPER_ID, 2)).toBe(
+      speedAt(1) * (80 / 200),
+    );
+    expect(
+      workerGatherRate(workerContent, 11, gathering, COPPER_ID, 0),
+    ).toBeCloseTo(speedAt(11) * (80 / 100));
   });
 
-  it('is 0 for an item not present in the gather table', () => {
-    vi.mocked(workerStatsForLevel).mockReturnValue({
-      capacity: 6,
-      gatherSpeed: 2,
-      stamina: 30,
-    });
-
+  it('is 0 for an item the node can’t yield at its level', () => {
     const gathering = buildGathering();
 
     expect(
-      workerGatherRate(
-        workerContent,
-        1,
-        gathering,
-        'unknown-item' as ItemId,
-        0,
-      ),
+      workerGatherRate(workerContent, 1, gathering, 'unknown' as ItemId, 0),
     ).toBe(0);
-  });
-
-  it('restricts the weighted table to results available at the given node level', () => {
-    vi.mocked(workerStatsForLevel).mockReturnValue({
-      capacity: 6,
-      gatherSpeed: 2,
-      stamina: 30,
-    });
-    vi.mocked(gatheringResultsAtLevel).mockReturnValueOnce([
-      ensureGatherResult({
-        chance: 80,
-        items: [{ itemId: COPPER_ID, quantity: 1 }],
-      }),
-    ]);
-
-    const gathering = buildGathering();
-
-    expect(workerGatherRate(workerContent, 1, gathering, COPPER_ID, 2)).toBe(2);
-    expect(gatheringResultsAtLevel).toHaveBeenCalledWith(gathering, 2);
+    expect(workerGatherRate(workerContent, 1, gathering, GOLD_VEIN_ID, 0)).toBe(
+      0,
+    );
   });
 });
 
 describe('workerGatherNodeHasItem', () => {
-  it('is true when the node gathers the item at its current level', () => {
-    vi.mocked(worldNodeByName).mockReturnValue({} as WorldNodeEntry);
-    vi.mocked(worldNodeGathering).mockReturnValue(buildGathering());
+  function seedWoods(nodeLevel = 0): void {
+    seedContent([buildGathering()]);
+    seedWorldNodes([
+      { name: 'Wergen Woods', type: 'GatherNode' },
+      { name: 'Signpost', type: 'ExploreNode' },
+    ]);
+    seedGamestate(
+      (state) =>
+        (state.gatherNodeLevels['Wergen Woods'] = { level: nodeLevel }),
+    );
+  }
 
+  it('checks what the node yields at its current level', () => {
+    seedWoods();
     expect(workerGatherNodeHasItem('Wergen Woods', MALACHITE_ID)).toBe(true);
-    expect(worldNodeLevel).toHaveBeenCalledWith('Wergen Woods');
-  });
-
-  it('is false for an item the node does not yield', () => {
-    vi.mocked(worldNodeByName).mockReturnValue({} as WorldNodeEntry);
-    vi.mocked(worldNodeGathering).mockReturnValue(buildGathering());
-
+    expect(workerGatherNodeHasItem('Wergen Woods', GOLD_VEIN_ID)).toBe(false);
     expect(workerGatherNodeHasItem('Wergen Woods', 'x' as ItemId)).toBe(false);
+
+    seedWoods(2);
+    expect(workerGatherNodeHasItem('Wergen Woods', GOLD_VEIN_ID)).toBe(true);
   });
 
-  it('is false when the node is not a gather node', () => {
-    vi.mocked(worldNodeByName).mockReturnValue(undefined);
+  it('is false for a node that isn’t a gather node, or doesn’t exist', () => {
+    seedWoods();
 
+    expect(workerGatherNodeHasItem('Signpost', COPPER_ID)).toBe(false);
     expect(workerGatherNodeHasItem('Nowhere', COPPER_ID)).toBe(false);
   });
 });
@@ -252,7 +212,7 @@ describe('applyWorkerGatherProgress / applyWorkerGatherUnit', () => {
 });
 
 describe('applyWorkerTravelAdvance', () => {
-  const path = [{ x: 1, y: 1 }] as unknown as TravelStep[];
+  const path: TravelStep[] = [{ kind: 'Move', mapName: 'A', x: 1, y: 1 }];
   const location = { mapName: 'A', x: 1, y: 1 };
 
   it('moves the worker and stores the remaining path mid-trip', () => {

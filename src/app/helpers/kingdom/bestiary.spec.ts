@@ -19,7 +19,12 @@ import {
 } from '@helpers/kingdom/bestiary';
 import { bestiaryState } from '@helpers/state-game';
 import { taskEventMonsterKilled } from '@helpers/task/task-events';
-import type { GameStateBestiary, MonsterId } from '@interfaces';
+import type {
+  EncounterId,
+  EncounterRandomId,
+  GameStateBestiary,
+  MonsterId,
+} from '@interfaces';
 import { captureAnalyticsEvents } from '@/testing/analytics';
 import { seedContent } from '@/testing/content';
 import { inTick, seedGamestate } from '@/testing/gamestate';
@@ -196,17 +201,17 @@ describe('monsterSourceNodeNames', () => {
   it('lists static encounters that fight the monster and random nodes that pool it', () => {
     seedContent([
       ensureEncounter({
-        id: 'field-ruins' as never,
+        id: 'field-ruins' as EncounterId,
         name: 'Field Ruins',
         fights: [{ monsters: [{ monsterId: goblinId }] }],
       }),
       ensureEncounter({
-        id: 'swamp' as never,
+        id: 'swamp' as EncounterId,
         name: 'Swamp',
         fights: [{ monsters: [{ monsterId: staleId }] }],
       }),
       ensureEncounterRandom({
-        id: 'wilds' as never,
+        id: 'wilds' as EncounterRandomId,
         name: 'The Wilds',
         creaturePool: [{ monsterId: goblinId, weight: 1 }],
       }),
@@ -219,7 +224,9 @@ describe('monsterSourceNodeNames', () => {
   });
 
   it('is empty when the monster appears nowhere', () => {
-    seedContent([ensureEncounter({ id: 'swamp' as never, name: 'Swamp' })]);
+    seedContent([
+      ensureEncounter({ id: 'swamp' as EncounterId, name: 'Swamp' }),
+    ]);
 
     expect(monsterSourceNodeNames(goblinId)).toEqual([]);
   });

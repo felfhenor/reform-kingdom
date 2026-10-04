@@ -1,13 +1,11 @@
-vi.mock('@helpers/content/content', () => ({
-  getEntriesByType: vi.fn(),
-  getEntry: vi.fn(),
-}));
+import type * as RngHelper from '@helpers/rng';
 
-vi.mock('@helpers/rng', () => ({
-  rngChoiceRarity: vi.fn(),
-}));
+vi.mock('@helpers/rng', async (importOriginal) => {
+  const actual = await importOriginal<typeof RngHelper>();
+  return { ...actual, rngChoiceRarity: vi.fn(actual.rngChoiceRarity) };
+});
 
-import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { ensureAffix } from '@helpers/content/ensure-affix';
 import {
   affixEffectsOfKind,
   affixEffectSum,
@@ -19,71 +17,61 @@ import {
 } from '@helpers/item/affix';
 import { rngChoiceRarity } from '@helpers/rng';
 import type {
-  AffixContent,
   AffixEffect,
   AffixId,
+  EquipmentSkillId,
   EquipmentId,
   EquipmentItem,
-  EquipmentItemId,
   TradeskillId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { buildEquipmentItem } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
 
-const strengthAffix: AffixContent = {
+const strengthAffix = ensureAffix({
   id: 'affix-str' as AffixId,
   name: 'of Strength',
-  __type: 'affix',
   levelRequirement: 1,
-  description: '',
   rarity: 'Common',
   family: 'Strength',
   position: 'Suffix',
   effects: [{ kind: 'Stat', stat: 'Strength', value: 3 }],
-};
+});
 
-const luckAffix: AffixContent = {
+const luckAffix = ensureAffix({
   id: 'affix-luck' as AffixId,
   name: 'of Luck',
-  __type: 'affix',
   levelRequirement: 1,
-  description: '',
   rarity: 'Common',
   family: 'Luck',
   position: 'Suffix',
   effects: [{ kind: 'Stat', stat: 'Luck', value: 3 }],
-};
+});
 
-const weakeningAffix: AffixContent = {
+const weakeningAffix = ensureAffix({
   id: 'affix-weak' as AffixId,
   name: 'Weakening',
-  __type: 'affix',
   levelRequirement: 1,
-  description: '',
   rarity: 'Common',
   family: 'Strength',
   position: 'Prefix',
   effects: [{ kind: 'Stat', stat: 'Strength', value: -5 }],
-};
+});
 
-const agilityPrefixAffix: AffixContent = {
+const agilityPrefixAffix = ensureAffix({
   id: 'affix-agi' as AffixId,
   name: 'Swift',
-  __type: 'affix',
   levelRequirement: 1,
-  description: '',
   rarity: 'Common',
   family: 'Agility',
   position: 'Prefix',
   effects: [{ kind: 'Stat', stat: 'Agility', value: 3 }],
-};
+});
 
 describe('rollAffixIds', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(getEntriesByType).mockReturnValue([
-      strengthAffix,
-      luckAffix,
-    ] as never);
+    vi.mocked(rngChoiceRarity).mockReset();
+    seedContent([strengthAffix, luckAffix]);
   });
 
   it('rolls zero affixes for Common rarity', () => {
@@ -99,22 +87,16 @@ describe('rollAffixIds', () => {
   });
 
   it('excludes an already-rolled family from subsequent rolls', () => {
-    vi.mocked(getEntriesByType).mockReturnValue([
-      strengthAffix,
-      agilityPrefixAffix,
-    ] as never);
+    seedContent([agilityPrefixAffix, weakeningAffix, strengthAffix]);
     vi.mocked(rngChoiceRarity)
-      .mockReturnValueOnce(strengthAffix)
+      .mockReturnValueOnce(weakeningAffix)
       .mockReturnValueOnce(agilityPrefixAffix);
 
     expect(rollAffixIds('Rare', 1)).toEqual([
-      strengthAffix.id,
+      weakeningAffix.id,
       agilityPrefixAffix.id,
     ]);
-    expect(rngChoiceRarity).toHaveBeenNthCalledWith(1, [
-      strengthAffix,
-      agilityPrefixAffix,
-    ]);
+    // Weakening is a Prefix, so only the shared Strength family rules out the Strength suffix.
     expect(rngChoiceRarity).toHaveBeenNthCalledWith(2, [agilityPrefixAffix]);
   });
 
@@ -128,10 +110,7 @@ describe('rollAffixIds', () => {
   });
 
   it('never rolls more than one Suffix-position affix, excluding remaining suffixes from later rolls even across different families', () => {
-    vi.mocked(getEntriesByType).mockReturnValue([
-      strengthAffix,
-      luckAffix,
-    ] as never);
+    seedContent([strengthAffix, luckAffix]);
     vi.mocked(rngChoiceRarity)
       .mockReturnValueOnce(strengthAffix)
       .mockReturnValueOnce(undefined);
@@ -142,15 +121,12 @@ describe('rollAffixIds', () => {
   });
 
   it('leaves affixes gated above the item level out of the pool', () => {
-    const gatedAffix = {
+    const gatedAffix = ensureAffix({
       ...agilityPrefixAffix,
       id: 'affix-gated' as AffixId,
       levelRequirement: 10,
-    };
-    vi.mocked(getEntriesByType).mockReturnValue([
-      strengthAffix,
-      gatedAffix,
-    ] as never);
+    });
+    seedContent([strengthAffix, gatedAffix]);
     vi.mocked(rngChoiceRarity).mockReturnValue(strengthAffix);
 
     rollAffixIds('Uncommon', 9);
@@ -164,10 +140,7 @@ describe('rollAffixIds', () => {
   });
 
   it('keeps rolling Prefix affixes normally after the one Suffix slot is filled', () => {
-    vi.mocked(getEntriesByType).mockReturnValue([
-      strengthAffix,
-      agilityPrefixAffix,
-    ] as never);
+    seedContent([strengthAffix, agilityPrefixAffix]);
     vi.mocked(rngChoiceRarity)
       .mockReturnValueOnce(strengthAffix)
       .mockReturnValueOnce(agilityPrefixAffix);
@@ -181,23 +154,12 @@ describe('rollAffixIds', () => {
 });
 
 function buildItem(affixIds: AffixId[]): EquipmentItem {
-  return {
-    id: 'item-1' as EquipmentItemId,
-    equipmentId: 'sword' as EquipmentId,
-    infusedItemIds: [],
-    affixIds,
-  };
+  return buildEquipmentItem('sword' as EquipmentId, { affixIds });
 }
 
 describe('equipmentItemAffixEffects', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   it("resolves each affixId to its content's effects", () => {
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === strengthAffix.id ? strengthAffix : undefined) as never,
-    );
+    seedContent([strengthAffix]);
 
     expect(equipmentItemAffixEffects(buildItem([strengthAffix.id]))).toEqual(
       strengthAffix.effects,
@@ -205,17 +167,14 @@ describe('equipmentItemAffixEffects', () => {
   });
 
   it('flattens multiple effects from a single affix', () => {
-    const multiEffectAffix: AffixContent = {
+    const multiEffectAffix = ensureAffix({
       ...strengthAffix,
       effects: [
         { kind: 'Stat', stat: 'Strength', value: 3 },
         { kind: 'Resistance', tag: 'Stun', value: 5 },
       ],
-    };
-    vi.mocked(getEntry).mockImplementation(
-      (id) =>
-        (id === multiEffectAffix.id ? multiEffectAffix : undefined) as never,
-    );
+    });
+    seedContent([multiEffectAffix]);
 
     expect(equipmentItemAffixEffects(buildItem([multiEffectAffix.id]))).toEqual(
       multiEffectAffix.effects,
@@ -223,14 +182,7 @@ describe('equipmentItemAffixEffects', () => {
   });
 
   it('combines effects from multiple affixes on the same item', () => {
-    vi.mocked(getEntry).mockImplementation(
-      (id) =>
-        (id === strengthAffix.id
-          ? strengthAffix
-          : id === luckAffix.id
-            ? luckAffix
-            : undefined) as never,
-    );
+    seedContent([strengthAffix, luckAffix]);
 
     expect(
       equipmentItemAffixEffects(buildItem([strengthAffix.id, luckAffix.id])),
@@ -238,7 +190,7 @@ describe('equipmentItemAffixEffects', () => {
   });
 
   it('skips affixIds that resolve to no content', () => {
-    vi.mocked(getEntry).mockReturnValue(undefined);
+    seedContent([]);
 
     expect(
       equipmentItemAffixEffects(buildItem(['missing' as AffixId])),
@@ -251,18 +203,8 @@ describe('equipmentItemAffixEffects', () => {
 });
 
 describe('equipmentItemDisplayName', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  function mockAffixes(...affixes: AffixContent[]): void {
-    vi.mocked(getEntry).mockImplementation(
-      (id) => affixes.find((affix) => affix.id === id) as never,
-    );
-  }
-
   it('appends a suffix affix after the base name', () => {
-    mockAffixes(strengthAffix);
+    seedContent([strengthAffix]);
 
     expect(
       equipmentItemDisplayName(buildItem([strengthAffix.id]), 'Copper Ring'),
@@ -270,7 +212,7 @@ describe('equipmentItemDisplayName', () => {
   });
 
   it('prepends a prefix affix before the base name', () => {
-    mockAffixes(weakeningAffix);
+    seedContent([weakeningAffix]);
 
     expect(
       equipmentItemDisplayName(buildItem([weakeningAffix.id]), 'Copper Ring'),
@@ -278,7 +220,7 @@ describe('equipmentItemDisplayName', () => {
   });
 
   it('composes a prefix and a suffix on the same item around the base name', () => {
-    mockAffixes(weakeningAffix, luckAffix);
+    seedContent([weakeningAffix, luckAffix]);
 
     expect(
       equipmentItemDisplayName(
@@ -296,14 +238,8 @@ describe('equipmentItemDisplayName', () => {
 });
 
 describe('equipmentItemAffixes', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   it('resolves affixIds to their content, skipping ones that no longer exist', () => {
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === strengthAffix.id ? strengthAffix : undefined) as never,
-    );
+    seedContent([strengthAffix]);
 
     expect(
       equipmentItemAffixes(buildItem([strengthAffix.id, 'missing' as AffixId])),
@@ -328,7 +264,7 @@ const strengthStatEffect: AffixEffect = {
 };
 const grantSkillEffect: AffixEffect = {
   kind: 'GrantSkill',
-  skillId: 'skill-1' as never,
+  skillId: 'skill-1' as EquipmentSkillId,
 };
 
 describe('affixEffectsOfKind', () => {
@@ -380,20 +316,14 @@ describe('affixEffectSum', () => {
 });
 
 describe('equipmentItemMiscAffixDescriptions', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   it('includes the description of an affix whose effect has no dedicated display (CaravanBuyDiscount)', () => {
-    const discountAffix: AffixContent = {
+    const discountAffix = ensureAffix({
       ...strengthAffix,
       id: 'affix-discount' as AffixId,
       description: 'Discounts caravan purchases.',
       effects: [{ kind: 'CaravanBuyDiscount', value: 10 }],
-    };
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === discountAffix.id ? discountAffix : undefined) as never,
-    );
+    });
+    seedContent([discountAffix]);
 
     expect(
       equipmentItemMiscAffixDescriptions(buildItem([discountAffix.id])),
@@ -401,9 +331,7 @@ describe('equipmentItemMiscAffixDescriptions', () => {
   });
 
   it('excludes an affix whose only effects already have a dedicated display (Stat)', () => {
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === strengthAffix.id ? strengthAffix : undefined) as never,
-    );
+    seedContent([strengthAffix]);
 
     expect(
       equipmentItemMiscAffixDescriptions(buildItem([strengthAffix.id])),
@@ -411,7 +339,7 @@ describe('equipmentItemMiscAffixDescriptions', () => {
   });
 
   it('excludes an affix whose only effect now has a dedicated display (GatherYield)', () => {
-    const gatherAffix: AffixContent = {
+    const gatherAffix = ensureAffix({
       ...strengthAffix,
       id: 'affix-gather' as AffixId,
       description: 'Yields more Woodworking materials when gathering.',
@@ -422,10 +350,8 @@ describe('equipmentItemMiscAffixDescriptions', () => {
           value: 1,
         },
       ],
-    };
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === gatherAffix.id ? gatherAffix : undefined) as never,
-    );
+    });
+    seedContent([gatherAffix]);
 
     expect(
       equipmentItemMiscAffixDescriptions(buildItem([gatherAffix.id])),
@@ -433,15 +359,13 @@ describe('equipmentItemMiscAffixDescriptions', () => {
   });
 
   it('excludes an affix whose only effect now has a dedicated display (MonsterTypeDamage)', () => {
-    const slayingAffix: AffixContent = {
+    const slayingAffix = ensureAffix({
       ...strengthAffix,
       id: 'affix-slaying' as AffixId,
       description: 'Increases damage dealt to Demon enemies by 20%.',
       effects: [{ kind: 'MonsterTypeDamage', monsterType: 'Demon', value: 20 }],
-    };
-    vi.mocked(getEntry).mockImplementation(
-      (id) => (id === slayingAffix.id ? slayingAffix : undefined) as never,
-    );
+    });
+    seedContent([slayingAffix]);
 
     expect(
       equipmentItemMiscAffixDescriptions(buildItem([slayingAffix.id])),

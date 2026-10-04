@@ -19,6 +19,7 @@ import type {
   Combat,
   EncounterRandomFight,
   EncounterRandomId,
+  ItemId,
   MonsterId,
   ResolvedDrop,
   WorldNodeEntry,
@@ -39,7 +40,7 @@ const levelFlowerId = 'level-flower' as CollectibleId;
 const goblin = ensureMonster({ id: 'goblin' as MonsterId, name: 'Goblin' });
 const slime = ensureMonster({ id: 'slime' as MonsterId, name: 'Slime' });
 const killDrops: ResolvedDrop[] = [
-  { kind: 'Item', itemId: 'ore' as never, quantity: 2 },
+  { kind: 'Item', itemId: 'ore' as ItemId, quantity: 2 },
 ];
 
 const encounter = ensureEncounterRandom({

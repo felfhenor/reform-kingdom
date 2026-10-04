@@ -1,15 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { setAllContentById } from '@helpers/content/content';
 import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
 import { ensureRecipe } from '@helpers/content/ensure-recipe';
 import { ensureTown } from '@helpers/content/ensure-town';
-import { defaultGameState } from '@helpers/defaults';
-import {
-  setGameState,
-  updateGamestate,
-  worldTownsState,
-} from '@helpers/state-game';
+import { updateGamestate, worldTownsState } from '@helpers/state-game';
 import {
   townCompleteInitialCrafts,
   townQueueInitialCrafts,
@@ -22,6 +16,9 @@ import type {
   TownId,
   TradeskillId,
 } from '@interfaces';
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 
 const townId = 'larsia' as TownId;
 const tradeskillId = 'jewelcrafting' as TradeskillId;
@@ -55,33 +52,21 @@ describe('initial town crafts (unmocked)', () => {
       requirements: [{ itemId: oreId, quantity: 20 }],
       result: { equipmentId: ringId },
     });
-    setAllContentById(
-      new Map(
-        [
-          ensureItem({ id: oreId }),
-          ensureItem({ id: gemId }),
-          ensureEquipment({ id: ringId }),
-          recipe,
-          ringRecipe,
-          town,
-        ].map((entry) => [entry.id, entry as never]),
-      ),
+    seedContent([
+      ensureItem({ id: oreId }),
+      ensureItem({ id: gemId }),
+      ensureEquipment({ id: ringId }),
+      recipe,
+      ringRecipe,
+      town,
+    ]);
+    seedGamestate(
+      (state) =>
+        (state.world.towns[townId] = buildTownNodeState({
+          materials: { [oreId]: 30 },
+          tradeskills: { [tradeskillId]: { level: 1 } },
+        })),
     );
-
-    const state = defaultGameState();
-    state.world.towns[townId] = {
-      lastProcessedTick: {},
-      stock: [],
-      workers: {},
-      reputation: 0,
-      hiddenGold: 0,
-      materials: { [oreId]: 30 },
-      tradeskills: { [tradeskillId]: { level: 1 } },
-      craftQueue: [],
-      commissionSlots: [],
-      specialtyPriority: [],
-    } as never;
-    setGameState(state);
   });
 
   it('only queues what the materials cover', async () => {

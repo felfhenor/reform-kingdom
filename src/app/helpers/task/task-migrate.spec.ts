@@ -1,10 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { setAllContentById } from '@helpers/content/content';
 import { ensureTask } from '@helpers/content/ensure-task';
 import { defaultGameState } from '@helpers/defaults';
 import { pruneInvalidTasks, retrofitTasks } from '@helpers/task/task-migrate';
-import type { Character, IsContentItem, ItemId, TaskId } from '@interfaces';
+import type { IsContentItem, ItemId, TaskId } from '@interfaces';
+import { buildCharacter } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
 
 const LEVEL_TASK = 'task-level' as TaskId;
 const GATHER_TASK = 'task-gather' as TaskId;
@@ -27,7 +28,7 @@ beforeEach(() => {
       },
     }),
   ];
-  setAllContentById(new Map(content.map((entry) => [entry.id, entry])));
+  seedContent(content);
 });
 
 describe('pruneInvalidTasks', () => {
@@ -51,7 +52,7 @@ describe('retrofitTasks', () => {
 
   it('latches unclaimed tasks an older save already satisfies', () => {
     const state = defaultGameState();
-    state.world.party = [{ level: 4, teachings: {} } as unknown as Character];
+    state.world.party = [buildCharacter({ level: 4 })];
 
     const tasks = retrofitTasks(state);
 
@@ -62,7 +63,7 @@ describe('retrofitTasks', () => {
 
   it('re-checks an existing incomplete state-based entry, since only events latch it in play', () => {
     const state = defaultGameState();
-    state.world.party = [{ level: 4, teachings: {} } as unknown as Character];
+    state.world.party = [buildCharacter({ level: 4 })];
     state.tasks[LEVEL_TASK] = { progress: 0 };
 
     const tasks = retrofitTasks(state);

@@ -1,4 +1,3 @@
-import { rangeLabel } from '@helpers/engine/leveled-range';
 import {
   worldNodeCaravan,
   worldNodeEncounter,
@@ -24,10 +23,6 @@ export function worldNodeLevelRange(
     worldNodeCaravan(entry)?.level ??
     (townLevel !== undefined ? { min: townLevel, max: townLevel } : undefined)
   );
-}
-
-export function worldNodeLevelLabel(levelRange: LevelRange): string {
-  return rangeLabel(levelRange);
 }
 
 // What the always-on map label (`pixiIndicatorNodeLabelCreate`) shows so nodes are distinguishable at a glance.

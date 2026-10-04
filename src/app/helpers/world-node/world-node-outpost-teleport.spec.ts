@@ -1,86 +1,85 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-vi.mock('@helpers/hero/travel', () => ({
-  canPartyTravel: vi.fn(() => true),
-}));
-
-vi.mock('@helpers/world', () => ({
-  isPartyAtNode: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', async (importOriginal) => ({
-  ...(await importOriginal<Record<string, unknown>>()),
-  isWorldNodeVisible: vi.fn(() => true),
-}));
-
-import { seedGamestate } from '@/testing/gamestate';
-import { canPartyTravel } from '@helpers/hero/travel';
-import { isPartyAtNode } from '@helpers/world';
+import { OUTPOST_TELEPORT_LEVEL } from '@helpers/config';
+import { ensureOutpost } from '@helpers/content/ensure-outpost';
 import { outpostCanTeleport } from '@helpers/world-node/world-node-outpost-teleport';
-import { isWorldNodeVisible } from '@helpers/world-node/world-nodes';
-import type { WorldNodeEntry } from '@interfaces';
+import type { GameState, OutpostId, WorldNodeEntry } from '@interfaces';
+import { buildCombat } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
+import { locationOf, seedWorldNodes } from '@/testing/world';
 
-function outpostEntry(nodeName: string): WorldNodeEntry {
-  return { nodeName, mapName: nodeName, x: 0, y: 0 } as WorldNodeEntry;
-}
+const names = ['Carrina Outpost', 'Larsian Outpost', 'Hidden Outpost'];
+let carrina: WorldNodeEntry;
+let larsian: WorldNodeEntry;
+let hidden: WorldNodeEntry;
 
-const carrina = outpostEntry('Carrina Outpost');
-const larsian = outpostEntry('Larsian Outpost');
-
-function mockLevels(levels: Record<string, number>): void {
+function seedTeleports(edit?: (state: GameState) => void): void {
   seedGamestate((state) => {
-    state.outposts = Object.fromEntries(
-      Object.entries(levels).map(([nodeName, level]) => [nodeName, { level }]),
+    state.world.currentLocation = locationOf(carrina);
+    names.forEach(
+      (name) => (state.outposts[name] = { level: OUTPOST_TELEPORT_LEVEL }),
     );
+    edit?.(state);
   });
 }
 
 beforeEach(() => {
-  vi.clearAllMocks();
-  vi.mocked(canPartyTravel).mockReturnValue(true);
-  vi.mocked(isWorldNodeVisible).mockReturnValue(true);
-  vi.mocked(isPartyAtNode).mockImplementation(
-    (nodeName) => nodeName === carrina.nodeName,
+  seedContent(
+    names.map((name) =>
+      ensureOutpost({
+        id: name as OutpostId,
+        name,
+        hidden: name === 'Hidden Outpost',
+      }),
+    ),
   );
-  mockLevels({ 'Carrina Outpost': 5, 'Larsian Outpost': 5 });
+  ({
+    'Carrina Outpost': carrina,
+    'Larsian Outpost': larsian,
+    'Hidden Outpost': hidden,
+  } = seedWorldNodes(names.map((name) => ({ name, type: 'Outpost' }))));
 });
 
 describe('outpostCanTeleport', () => {
-  it('allows teleporting between two +5 outposts while standing at the source', () => {
+  it('allows a jump between two unlocked outposts while standing at the source', () => {
+    seedTeleports();
+
     expect(outpostCanTeleport(carrina, larsian)).toBe(true);
   });
 
-  it('blocks teleporting to the current outpost', () => {
+  it('refuses a jump to the outpost the party is at, or to one it can’t see', () => {
+    seedTeleports();
+
     expect(outpostCanTeleport(carrina, carrina)).toBe(false);
+    expect(outpostCanTeleport(carrina, hidden)).toBe(false);
   });
 
-  it('blocks a destination below +5', () => {
-    mockLevels({ 'Carrina Outpost': 5, 'Larsian Outpost': 4 });
+  it('needs the teleport unlocked at both ends', () => {
+    seedTeleports(
+      (state) =>
+        (state.outposts['Larsian Outpost'] = {
+          level: OUTPOST_TELEPORT_LEVEL - 1,
+        }),
+    );
+    expect(outpostCanTeleport(carrina, larsian)).toBe(false);
 
+    seedTeleports(
+      (state) =>
+        (state.outposts['Carrina Outpost'] = {
+          level: OUTPOST_TELEPORT_LEVEL - 1,
+        }),
+    );
     expect(outpostCanTeleport(carrina, larsian)).toBe(false);
   });
 
-  it('blocks a source below +5', () => {
-    mockLevels({ 'Carrina Outpost': 4, 'Larsian Outpost': 5 });
-
+  it('needs the party standing at the source and free to travel', () => {
+    seedTeleports(
+      (state) => (state.world.currentLocation = locationOf(larsian)),
+    );
     expect(outpostCanTeleport(carrina, larsian)).toBe(false);
-  });
 
-  it('blocks when the party is not at the source', () => {
-    vi.mocked(isPartyAtNode).mockReturnValue(false);
-
-    expect(outpostCanTeleport(carrina, larsian)).toBe(false);
-  });
-
-  it('blocks while the party cannot travel', () => {
-    vi.mocked(canPartyTravel).mockReturnValue(false);
-
-    expect(outpostCanTeleport(carrina, larsian)).toBe(false);
-  });
-
-  it('blocks a destination that is not visible', () => {
-    vi.mocked(isWorldNodeVisible).mockReturnValue(false);
-
+    seedTeleports((state) => (state.world.combat = buildCombat()));
     expect(outpostCanTeleport(carrina, larsian)).toBe(false);
   });
 });

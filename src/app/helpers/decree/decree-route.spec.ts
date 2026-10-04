@@ -1,96 +1,102 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/pathfinding/pathfinding-travel', () => ({
-  travelPathThroughNodesTo: vi.fn(),
-  travelPathTo: vi.fn(),
-}));
-
-vi.mock('@helpers/world-node/world-nodes', () => ({
-  worldNodeAt: vi.fn(),
-}));
+vi.mock('@helpers/pathfinding/pathfinding-travel');
 
 import { decreeRouteTo, firstCrossedNode } from '@helpers/decree/decree-route';
 import {
   travelPathThroughNodesTo,
   travelPathTo,
 } from '@helpers/pathfinding/pathfinding-travel';
-import { worldNodeAt } from '@helpers/world-node/world-nodes';
 import type { TravelStep, WorldNodeEntry } from '@interfaces';
+import { seedWorldNodes } from '@/testing/world';
 
-function buildNode(nodeName: string): WorldNodeEntry {
-  return { mapName: 'A', x: 0, y: 0, nodeName, nodeData: {} as never };
-}
+const MAP = 'TestMap';
 
-function move(x: number, mapName = 'A'): TravelStep {
+function move(x: number, mapName = MAP): TravelStep {
   return { kind: 'Move', mapName, x, y: 0 };
 }
 
-const gateway = buildNode('Gate');
-const target = buildNode('Target');
+let gateway: WorldNodeEntry;
+let target: WorldNodeEntry;
+let farGate: WorldNodeEntry;
 
 beforeEach(() => {
-  vi.clearAllMocks();
-  vi.mocked(travelPathTo).mockReturnValue(undefined);
-  vi.mocked(travelPathThroughNodesTo).mockReturnValue(undefined);
-  vi.mocked(worldNodeAt).mockImplementation((mapName, x) =>
-    mapName === 'A' && x === 2 ? gateway : undefined,
-  );
+  vi.resetAllMocks();
+  ({
+    Gate: gateway,
+    Target: target,
+    'Far Gate': farGate,
+  } = seedWorldNodes([
+    { name: 'Gate', type: 'ExploreNode', x: 2 },
+    { name: 'Target', type: 'ExploreNode', x: 3 },
+    { name: 'Far Gate', type: 'ExploreNode', mapName: 'Other', x: 0 },
+  ]));
+});
+
+const onto = (entry: WorldNodeEntry): TravelStep => ({
+  kind: 'Move',
+  mapName: entry.mapName,
+  x: entry.x,
+  y: entry.y,
 });
 
 describe('firstCrossedNode', () => {
   it('finds the first node tile walked through', () => {
-    expect(firstCrossedNode([move(1), move(2), move(3)])).toBe(gateway);
+    expect(firstCrossedNode([move(1), onto(gateway), onto(target)])).toEqual(
+      gateway,
+    );
   });
 
   it('ignores the destination tile', () => {
-    expect(firstCrossedNode([move(1), move(2)])).toBeUndefined();
+    expect(firstCrossedNode([move(1), onto(gateway)])).toBeUndefined();
   });
 
-  it('ignores a teleport node stepped onto right before its jump', () => {
-    const path: TravelStep[] = [
-      move(2),
-      { kind: 'Teleport', mapName: 'B', x: 0, y: 0 },
-      move(1, 'B'),
-    ];
-
-    expect(firstCrossedNode(path)).toBeUndefined();
+  it('ignores a teleport node stepped onto right before its jump, and the node it lands on', () => {
+    expect(
+      firstCrossedNode([
+        onto(gateway),
+        { ...onto(farGate), kind: 'Teleport' },
+        move(1, 'Other'),
+        move(2, 'Other'),
+      ]),
+    ).toBeUndefined();
   });
 });
 
 describe('decreeRouteTo', () => {
   it('goes straight to a directly reachable target', () => {
-    vi.mocked(travelPathTo).mockReturnValue([move(1)]);
+    vi.mocked(travelPathTo).mockReturnValue([move(1), onto(target)]);
 
     expect(decreeRouteTo(target, () => false)).toEqual({
       hop: target,
-      steps: 1,
+      steps: 2,
     });
   });
 
-  it('hops to the gateway when the target is walled in', () => {
+  it('hops to the gateway when the target is walled in, if the caller can stop there', () => {
     vi.mocked(travelPathThroughNodesTo).mockReturnValue([
       move(1),
-      move(2),
-      move(3),
+      onto(gateway),
+      onto(target),
     ]);
+    const canStopAt = vi.fn(() => true);
 
-    expect(decreeRouteTo(target, () => true)).toEqual({
+    expect(decreeRouteTo(target, canStopAt)).toEqual({
       hop: gateway,
       steps: 3,
     });
-  });
-
-  it('gives up when the gateway is not an acceptable stop', () => {
-    vi.mocked(travelPathThroughNodesTo).mockReturnValue([
-      move(1),
-      move(2),
-      move(3),
-    ]);
+    expect(canStopAt).toHaveBeenCalledWith(gateway);
 
     expect(decreeRouteTo(target, () => false)).toBeUndefined();
   });
 
-  it('gives up when there is no route at all', () => {
+  it('gives up with no route, or a route crossing no node', () => {
+    expect(decreeRouteTo(target, () => true)).toBeUndefined();
+
+    vi.mocked(travelPathThroughNodesTo).mockReturnValue([
+      move(1),
+      onto(target),
+    ]);
     expect(decreeRouteTo(target, () => true)).toBeUndefined();
   });
 });

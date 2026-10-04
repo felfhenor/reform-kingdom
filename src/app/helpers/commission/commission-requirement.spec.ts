@@ -99,7 +99,7 @@ describe('rollCommissionRequirements', () => {
     ]);
   });
 
-  it('rolls within the authored range', () => {
+  it('rolls within the content range', () => {
     const ranged = offer({
       requirements: [{ itemId: stick.id, quantityMin: 10, quantityMax: 20 }],
     });

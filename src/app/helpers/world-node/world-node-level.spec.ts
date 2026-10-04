@@ -47,7 +47,7 @@ describe('worldNodeLevel', () => {
 describe('leveling up a node', () => {
   const fiveTiers = gathering(5);
 
-  it('tops out one below the number of authored cost tiers', () => {
+  it('tops out one below the number of defined cost tiers', () => {
     expect(worldNodeMaxAchievableLevel(fiveTiers)).toBe(4);
 
     atLevel(3);
@@ -58,7 +58,7 @@ describe('leveling up a node', () => {
     expect(worldNodeIsMaxLevel(fiveTiers, mines)).toBe(true);
   });
 
-  it('costs whatever is authored at the current level, nothing past the last tier', () => {
+  it('costs whatever is defined at the current level, nothing past the last tier', () => {
     atLevel();
     expect(worldNodeLevelUpCost(fiveTiers, mines)).toEqual(goldCost(100).costs);
 
@@ -71,7 +71,7 @@ describe('leveling up a node', () => {
 });
 
 describe('pruneInvalidGatherNodeLevels', () => {
-  it('drops nodes no longer in content and clamps levels to the authored max', () => {
+  it('drops nodes no longer in content and clamps levels to the content max', () => {
     expect(
       pruneInvalidGatherNodeLevels(
         { [mines]: { level: 5 }, Removed: { level: 1 } },

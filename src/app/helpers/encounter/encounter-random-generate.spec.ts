@@ -1,103 +1,94 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type * as RngHelper from '@helpers/rng';
+import { sortBy } from 'es-toolkit/compat';
+import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/rng', () => ({
-  rngChoiceWeighted: vi.fn(),
-  rngNumberRange: vi.fn(),
-}));
+vi.mock('@helpers/rng', async (importOriginal) => {
+  const actual = await importOriginal<typeof RngHelper>();
+  return { ...actual, rngChoiceWeighted: vi.fn(actual.rngChoiceWeighted) };
+});
 
+import { ensureEncounterRandom } from '@helpers/content/ensure-encounternode';
 import { generateEncounterRandomFights } from '@helpers/encounter/encounter-random-generate';
-import { rngChoiceWeighted, rngNumberRange } from '@helpers/rng';
-import type { EncounterRandomContent } from '@interfaces';
+import { rngChoiceWeighted } from '@helpers/rng';
+import type {
+  EncounterRandomContent,
+  EncounterRandomId,
+  MonsterId,
+} from '@interfaces';
 
-function buildContent(
-  overrides: Partial<EncounterRandomContent> = {},
-): EncounterRandomContent {
-  return {
-    id: 'gobslime-shrine',
-    name: 'Mystical Gobslime Shrine',
-    __type: 'encounterrandom',
-    description: 'A shrine.',
-    resetTime: 3600,
+const slime = { monsterId: 'Slime' as MonsterId, weight: 3 };
+
+// Fixed ranges and a single-creature pool, so every roll is decided.
+const shrine = (overrides: Partial<EncounterRandomContent> = {}) =>
+  ensureEncounterRandom({
+    id: 'gobslime-shrine' as EncounterRandomId,
     levelRange: { min: 10, max: 20 },
     encounterRange: { min: 3, max: 3 },
     combatantRange: { min: 2, max: 6 },
-    creaturePool: [
-      { monsterId: 'Goblin', weight: 1 },
-      { monsterId: 'Slime', weight: 3 },
-    ],
-    fights: [],
-    completionRewards: [],
+    creaturePool: [slime],
     ...overrides,
-  } as unknown as EncounterRandomContent;
-}
+  });
 
 describe('generateEncounterRandomFights', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  it('rolls the fight count within the encounter range', () => {
+    expect(generateEncounterRandomFights(shrine())).toHaveLength(3);
 
-  it('generates a fight count from rngNumberRange bounded by encounterRange', () => {
-    vi.mocked(rngNumberRange).mockReturnValue(3);
-    vi.mocked(rngChoiceWeighted).mockReturnValue({
-      monsterId: 'Slime',
-      weight: 3,
-    } as never);
-
-    const content = buildContent();
-    const fights = generateEncounterRandomFights(content);
-
-    expect(fights).toHaveLength(3);
-    expect(rngNumberRange).toHaveBeenCalledWith(
-      content.encounterRange.min,
-      content.encounterRange.max,
+    const counts = new Set(
+      Array.from(
+        { length: 40 },
+        () =>
+          generateEncounterRandomFights(
+            shrine({ encounterRange: { min: 1, max: 2 } }),
+          ).length,
+      ),
     );
+    expect(sortBy([...counts])).toEqual([1, 2]);
   });
 
-  it('trends level and combatant count from levelRange.min/combatantRange.min up to .max across the sequence', () => {
-    vi.mocked(rngNumberRange).mockReturnValue(3);
-    vi.mocked(rngChoiceWeighted).mockReturnValue({
-      monsterId: 'Slime',
-      weight: 3,
-    } as never);
+  it('ramps level and combatant count from each range’s min to max across the fights', () => {
+    const fights = generateEncounterRandomFights(shrine());
 
-    const fights = generateEncounterRandomFights(buildContent());
-
-    expect(fights.map((f) => f.level)).toEqual([10, 15, 20]);
-    expect(fights.map((f) => f.monsters.length)).toEqual([2, 4, 6]);
+    expect(fights.map((fight) => fight.level)).toEqual([10, 15, 20]);
+    expect(fights.map((fight) => fight.monsters.length)).toEqual([2, 4, 6]);
   });
 
-  it('rolls each monster slot via rngChoiceWeighted using pool weight', () => {
-    vi.mocked(rngNumberRange).mockReturnValue(1);
-    const pool = buildContent().creaturePool;
-    vi.mocked(rngChoiceWeighted).mockReturnValue(pool[1] as never);
+  it('makes a lone fight the hardest of each range', () => {
+    const [fight] = generateEncounterRandomFights(
+      shrine({ encounterRange: { min: 1, max: 1 } }),
+    );
 
-    const content = buildContent({
+    expect(fight.level).toBe(20);
+    expect(fight.monsters).toHaveLength(6);
+  });
+
+  it('picks each monster from the pool by its weight', () => {
+    const goblin = { monsterId: 'Goblin' as MonsterId, weight: 1 };
+    const content = shrine({
       encounterRange: { min: 1, max: 1 },
       combatantRange: { min: 2, max: 2 },
+      creaturePool: [slime],
     });
-    const fights = generateEncounterRandomFights(content);
 
-    expect(fights[0].monsters).toEqual([
+    expect(generateEncounterRandomFights(content)[0].monsters).toEqual([
       { monsterId: 'Slime' },
       { monsterId: 'Slime' },
     ]);
 
-    const [items, weightFn] = vi.mocked(rngChoiceWeighted).mock.calls[0];
-    expect(items).toBe(content.creaturePool);
-    expect(weightFn(pool[1])).toBe(3);
+    generateEncounterRandomFights(shrine({ creaturePool: [goblin, slime] }));
+    const [pool, weightOf] = vi.mocked(rngChoiceWeighted).mock.lastCall!;
+    expect(pool).toEqual([goblin, slime]);
+    expect(weightOf(slime)).toBe(3);
   });
 
-  it('falls back to UNKNOWN when the pool is empty', () => {
-    vi.mocked(rngNumberRange).mockReturnValue(1);
-    vi.mocked(rngChoiceWeighted).mockReturnValue(undefined);
-
-    const content = buildContent({
+  it('fills slots with UNKNOWN when the pool is empty', () => {
+    const content = shrine({
       encounterRange: { min: 1, max: 1 },
       combatantRange: { min: 1, max: 1 },
       creaturePool: [],
     });
-    const fights = generateEncounterRandomFights(content);
 
-    expect(fights[0].monsters).toEqual([{ monsterId: 'UNKNOWN' }]);
+    expect(generateEncounterRandomFights(content)[0].monsters).toEqual([
+      { monsterId: 'UNKNOWN' },
+    ]);
   });
 });

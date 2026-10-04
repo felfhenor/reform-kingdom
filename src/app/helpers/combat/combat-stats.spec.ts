@@ -1,155 +1,93 @@
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
+import type * as RngHelper from '@helpers/rng';
+import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/kingdom/armory', () => ({
-  armoryGet: vi.fn(() => []),
-}));
-
-vi.mock('@helpers/state-game', () => ({
-  gamestate: vi.fn(),
-  updateGamestate: vi.fn(),
-  worldCombatState: vi.fn(),
-}));
+vi.mock('@helpers/rng', async (importOriginal) => {
+  const actual = await importOriginal<typeof RngHelper>();
+  return { ...actual, rngSucceedsChance: vi.fn(actual.rngSucceedsChance) };
+});
 
 import {
   combatCombatantCombatStatSucceedsChance,
   combatCombatantCombatStatValue,
   combatStatsForCharacter,
 } from '@helpers/combat/combat-stats';
-import { getEntry } from '@helpers/content/content';
+import { ensureEquipment } from '@helpers/content/ensure-item';
+import { ensureTrainerTeaching } from '@helpers/content/ensure-trainer';
 import { defaultCombatStats } from '@helpers/defaults';
 import { rngSucceedsChance } from '@helpers/rng';
 import type {
-  Character,
   Combatant,
-  EquipmentBlock,
-  EquipmentContent,
   EquipmentId,
-  EquipmentItemId,
   JobId,
-  TrainerTeachingContent,
   TrainerTeachingId,
 } from '@interfaces';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  buildCharacter,
+  buildEquipmentItem,
+  buildHeroCombatant,
+} from '@/testing/builders';
+import { seedContent } from '@/testing/content';
 
-vi.mock('@helpers/rng', () => ({
-  rngSucceedsChance: vi.fn(),
-}));
+const warrior = 'warrior' as JobId;
+const ranger = 'ranger' as JobId;
 
-const emptyEquipment: EquipmentBlock = {
-  Armor: undefined,
-  Helmet: undefined,
-  Weapon: undefined,
-  Offhand: undefined,
-  Ring: undefined,
-  Accessory: undefined,
-  Artifact: undefined,
-  Ammo: undefined,
-};
-
-beforeEach(() => {
-  vi.clearAllMocks();
+const reflectTeaching = ensureTrainerTeaching({
+  id: 'reflect' as TrainerTeachingId,
+  effects: [{ kind: 'CombatStat', stat: 'damageReflectPercent', value: 1 }],
+});
+const reflectiveSword = ensureEquipment({
+  id: 'sword' as EquipmentId,
+  type: 'Sword',
+  combatStats: { ...defaultCombatStats(), damageReflectPercent: 10 },
 });
 
-const WARRIOR = 'job-warrior' as JobId;
-
-function hero(
-  equipment: EquipmentBlock,
-  teachings: Character['teachings'] = {},
-): Character {
-  return { jobId: WARRIOR, equipment, teachings } as unknown as Character;
-}
-
 describe('combatStatsForCharacter', () => {
-  it('returns default combat stats when nothing is equipped', () => {
-    expect(combatStatsForCharacter(hero(emptyEquipment))).toEqual(
+  it('is the default combat stats for a hero with no gear or teachings', () => {
+    expect(combatStatsForCharacter(buildCharacter())).toEqual(
       defaultCombatStats(),
     );
   });
 
-  it('adds teaching combat stats learned under any job', () => {
-    const teaching = {
-      id: 'reflect' as TrainerTeachingId,
-      effects: [{ kind: 'CombatStat', stat: 'damageReflectPercent', value: 1 }],
-    } as TrainerTeachingContent;
-    vi.mocked(getEntry).mockReturnValue(teaching);
+  it('adds teaching bonuses learned under any job, and equipped gear bonuses', () => {
+    seedContent([reflectTeaching, reflectiveSword]);
+    const base = defaultCombatStats().damageReflectPercent;
 
-    const current = combatStatsForCharacter(
-      hero(emptyEquipment, { [WARRIOR]: [teaching.id] }),
-    );
-    const other = combatStatsForCharacter(
-      hero(emptyEquipment, { ['job-ranger' as JobId]: [teaching.id] }),
-    );
+    for (const jobId of [warrior, ranger]) {
+      expect(
+        combatStatsForCharacter(
+          buildCharacter({
+            jobId: warrior,
+            teachings: { [jobId]: [reflectTeaching.id] },
+          }),
+        ).damageReflectPercent,
+      ).toBe(base + 1);
+    }
 
-    expect(current.damageReflectPercent).toBe(1);
-    expect(other.damageReflectPercent).toBe(1);
-  });
-
-  it("adds an equipped item's combatStats bonus on top of the default value", () => {
-    const reflectiveSword: EquipmentContent = {
-      id: 'sword' as EquipmentId,
-      name: 'Sword',
-      __type: 'equipment',
-      description: '',
-      sprite: '0000',
-      rarity: 'Common',
-      levelRequirement: 1,
-      baseStats: {
-        Health: 0,
-        Energy: 0,
-        Luck: 0,
-        Intelligence: 0,
-        Strength: 0,
-        Vitality: 0,
-        Resistance: 0,
-        Agility: 0,
-        Constitution: 0,
-        Spirit: 0,
-      },
-      combatStats: { ...defaultCombatStats(), damageReflectPercent: 10 },
-      type: 'Sword',
-      slots: 0,
-      grantedSkillIds: [],
-    };
-    vi.mocked(getEntry).mockReturnValue(reflectiveSword);
-
-    const stats = combatStatsForCharacter(
-      hero({
-        ...emptyEquipment,
-        Weapon: {
-          id: 'sword-1' as EquipmentItemId,
-          equipmentId: reflectiveSword.id,
-          infusedItemIds: [],
-          affixIds: [],
-        },
-      }),
-    );
-
-    expect(stats.damageReflectPercent).toBe(10);
+    const armed = buildCharacter();
+    armed.equipment.Weapon = buildEquipmentItem(reflectiveSword.id);
+    expect(combatStatsForCharacter(armed).damageReflectPercent).toBe(base + 10);
   });
 });
 
-describe('combatCombatantCombatStatValue', () => {
-  it("returns the combatant's raw value for the given stat", () => {
-    const combatant = {
-      combatStats: { ...defaultCombatStats(), agroValue: 25 },
-    } as Combatant;
+describe('combatant combat stat rolls', () => {
+  const withStat = (stunChance: number): Combatant =>
+    buildHeroCombatant(buildCharacter(), {
+      combatStats: { ...defaultCombatStats(), stunChance },
+    });
 
-    expect(combatCombatantCombatStatValue(combatant, 'agroValue')).toBe(25);
+  it('reads the combatant’s value for a stat', () => {
+    expect(combatCombatantCombatStatValue(withStat(40), 'stunChance')).toBe(40);
   });
-});
 
-describe('combatCombatantCombatStatSucceedsChance', () => {
-  it("rolls the combatant's value for the given stat through rngSucceedsChance", () => {
-    vi.mocked(rngSucceedsChance).mockReturnValue(true);
-    const combatant = {
-      combatStats: { ...defaultCombatStats(), stunChance: 40 },
-    } as Combatant;
+  it('rolls the stat as a 0-100 percent chance', () => {
+    combatCombatantCombatStatSucceedsChance(withStat(40), 'stunChance');
+    expect(rngSucceedsChance).toHaveBeenLastCalledWith(40);
 
     expect(
-      combatCombatantCombatStatSucceedsChance(combatant, 'stunChance'),
+      combatCombatantCombatStatSucceedsChance(withStat(100), 'stunChance'),
     ).toBe(true);
-    expect(rngSucceedsChance).toHaveBeenCalledWith(40);
+    expect(
+      combatCombatantCombatStatSucceedsChance(withStat(-1), 'stunChance'),
+    ).toBe(false);
   });
 });

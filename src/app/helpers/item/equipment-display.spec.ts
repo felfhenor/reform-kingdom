@@ -1,8 +1,5 @@
-vi.mock('@helpers/content/content', () => ({
-  getEntry: vi.fn(),
-}));
-
-import { getEntry } from '@helpers/content/content';
+import { seedContent } from '@/testing/content';
+import { buildEquipmentItem } from '@/testing/builders';
 import {
   equipmentItemBonusCombatStats,
   equipmentItemBonusMonsterTypeDamage,
@@ -11,135 +8,90 @@ import {
   equipmentItemGrantedSkillIds,
 } from '@helpers/item/equipment-display';
 import type {
-  AffixContent,
   AffixId,
-  EquipmentContent,
   EquipmentId,
   EquipmentItem,
-  EquipmentItemId,
   EquipmentSkillId,
-  ItemContent,
   ItemId,
 } from '@interfaces';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import { ensureAffix } from '@helpers/content/ensure-affix';
+import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
+import { defaultStats, defaultCombatStats } from '@helpers/defaults';
 
-const strengthAffix: AffixContent = {
+const strengthAffix = ensureAffix({
   id: 'affix-str' as AffixId,
   name: 'of Strength',
-  __type: 'affix',
   levelRequirement: 1,
   description: '',
   rarity: 'Common',
   family: 'Strength',
   position: 'Suffix',
   effects: [{ kind: 'Stat', stat: 'Strength', value: 4 }],
-};
+});
 
-const stunAffix: AffixContent = {
+const stunAffix = ensureAffix({
   id: 'affix-stun' as AffixId,
   name: 'of Steadfastness',
-  __type: 'affix',
   levelRequirement: 1,
   description: '',
   rarity: 'Uncommon',
   family: 'StunResist',
   position: 'Suffix',
   effects: [{ kind: 'Resistance', tag: 'Stun', value: 10 }],
-};
+});
 
-const grantAffix: AffixContent = {
+const grantAffix = ensureAffix({
   id: 'affix-grant' as AffixId,
   name: 'of Aggression',
-  __type: 'affix',
   levelRequirement: 1,
   description: '',
   rarity: 'Mystical',
   family: 'GrantAttack',
   position: 'Suffix',
   effects: [{ kind: 'GrantSkill', skillId: 'attack' as EquipmentSkillId }],
-};
+});
 
-const reflectAffix: AffixContent = {
+const reflectAffix = ensureAffix({
   id: 'affix-reflect' as AffixId,
   name: 'of Reflection',
-  __type: 'affix',
   levelRequirement: 1,
   description: '',
   rarity: 'Rare',
   family: 'DamageReflect',
   position: 'Suffix',
   effects: [{ kind: 'CombatStat', stat: 'damageReflectPercent', value: 5 }],
-};
+});
 
-const vengeanceShard: ItemContent = {
+const vengeanceShard = ensureItem({
   id: 'vengeance-shard' as ItemId,
   name: 'Vengeance Shard',
-  __type: 'item',
   description: '',
   sprite: '0000',
   rarity: 'Common',
-  infusionCombatStats: {
-    repeatActionChance: 0,
-    skillStrikeAgainChance: 0,
-    redirectionChance: 0,
-    missChance: 0,
-    debuffIgnoreChance: 0,
-    damageReflectPercent: 3,
-    healingIgnorePercent: 0,
-    reviveChance: 0,
-    stunChance: 0,
-    agroValue: 0,
-  },
-};
+  infusionCombatStats: { ...defaultCombatStats(), damageReflectPercent: 3 },
+});
 
-const crystal: ItemContent = {
+const crystal = ensureItem({
   id: 'crystal' as ItemId,
   name: 'Minor Crystal',
-  __type: 'item',
   description: '',
   sprite: '0000',
   rarity: 'Common',
-  infusionStats: {
-    Agility: 0,
-    Energy: 0,
-    Health: 0,
-    Intelligence: 0,
-    Luck: 0,
-    Resistance: 0,
-    Strength: 2,
-    Vitality: 0,
-    Constitution: 0,
-    Spirit: 0,
-  },
-};
+  infusionStats: { ...defaultStats(), Strength: 2 },
+});
 
 function buildItem(overrides: Partial<EquipmentItem> = {}): EquipmentItem {
-  return {
-    id: 'item-1' as EquipmentItemId,
-    equipmentId: 'sword' as EquipmentId,
-    infusedItemIds: [],
-    affixIds: [],
-    ...overrides,
-  };
-}
-
-function mockContent(...entries: (AffixContent | ItemContent)[]): void {
-  vi.mocked(getEntry).mockImplementation(
-    (id) => entries.find((entry) => entry.id === id) as never,
-  );
+  return buildEquipmentItem('sword' as EquipmentId, overrides);
 }
 
 describe('equipmentItemBonusStats', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   it('is zeroed when the item has no infusions or affixes', () => {
     expect(equipmentItemBonusStats(buildItem()).Strength).toBe(0);
   });
 
   it('includes an affix Stat bonus', () => {
-    mockContent(strengthAffix);
+    seedContent([strengthAffix]);
 
     const bonus = equipmentItemBonusStats(
       buildItem({ affixIds: [strengthAffix.id] }),
@@ -148,7 +100,7 @@ describe('equipmentItemBonusStats', () => {
   });
 
   it('sums infusion and affix bonuses to the same stat', () => {
-    mockContent(strengthAffix, crystal);
+    seedContent([strengthAffix, crystal]);
 
     const bonus = equipmentItemBonusStats(
       buildItem({
@@ -161,16 +113,12 @@ describe('equipmentItemBonusStats', () => {
 });
 
 describe('equipmentItemBonusResistances', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   it('is zeroed when the item has no affixes', () => {
     expect(equipmentItemBonusResistances(buildItem()).Stun).toBe(0);
   });
 
   it('includes an affix Resistance bonus', () => {
-    mockContent(stunAffix);
+    seedContent([stunAffix]);
 
     const bonus = equipmentItemBonusResistances(
       buildItem({ affixIds: [stunAffix.id] }),
@@ -180,10 +128,6 @@ describe('equipmentItemBonusResistances', () => {
 });
 
 describe('equipmentItemBonusCombatStats', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   it('is zeroed when the item has no infusions or affixes', () => {
     expect(
       equipmentItemBonusCombatStats(buildItem()).damageReflectPercent,
@@ -191,7 +135,7 @@ describe('equipmentItemBonusCombatStats', () => {
   });
 
   it('includes an affix CombatStat bonus', () => {
-    mockContent(reflectAffix);
+    seedContent([reflectAffix]);
 
     const bonus = equipmentItemBonusCombatStats(
       buildItem({ affixIds: [reflectAffix.id] }),
@@ -200,7 +144,7 @@ describe('equipmentItemBonusCombatStats', () => {
   });
 
   it('sums infusion and affix bonuses to the same combat stat', () => {
-    mockContent(reflectAffix, vengeanceShard);
+    seedContent([reflectAffix, vengeanceShard]);
 
     const bonus = equipmentItemBonusCombatStats(
       buildItem({
@@ -212,29 +156,24 @@ describe('equipmentItemBonusCombatStats', () => {
   });
 });
 
-const demonSlayingAffix: AffixContent = {
+const demonSlayingAffix = ensureAffix({
   id: 'affix-demon-slaying' as AffixId,
   name: 'Demon-slaying',
-  __type: 'affix',
   levelRequirement: 1,
   description: '',
   rarity: 'Uncommon',
   family: 'DemonSlaying',
   position: 'Prefix',
   effects: [{ kind: 'MonsterTypeDamage', monsterType: 'Demon', value: 20 }],
-};
+});
 
 describe('equipmentItemBonusMonsterTypeDamage', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   it('is zeroed when the item has no affixes', () => {
     expect(equipmentItemBonusMonsterTypeDamage(buildItem()).Demon).toBe(0);
   });
 
   it('includes an affix MonsterTypeDamage bonus', () => {
-    mockContent(demonSlayingAffix);
+    seedContent([demonSlayingAffix]);
 
     const bonus = equipmentItemBonusMonsterTypeDamage(
       buildItem({ affixIds: [demonSlayingAffix.id] }),
@@ -244,37 +183,21 @@ describe('equipmentItemBonusMonsterTypeDamage', () => {
 });
 
 describe('equipmentItemGrantedSkillIds', () => {
-  const content: EquipmentContent = {
+  const content = ensureEquipment({
     id: 'sword' as EquipmentId,
     name: 'Sword',
-    __type: 'equipment',
     description: '',
     sprite: '0000',
     rarity: 'Common',
     levelRequirement: 1,
-    baseStats: {
-      Agility: 0,
-      Energy: 0,
-      Health: 0,
-      Intelligence: 0,
-      Luck: 0,
-      Resistance: 0,
-      Strength: 0,
-      Vitality: 0,
-      Constitution: 0,
-      Spirit: 0,
-    },
+    baseStats: { ...defaultStats() },
     type: 'Sword',
     slots: 0,
     grantedSkillIds: ['starshine-2' as EquipmentSkillId],
-  };
-
-  beforeEach(() => {
-    vi.clearAllMocks();
   });
 
   it('combines content-granted and affix-granted skills', () => {
-    mockContent(grantAffix);
+    seedContent([grantAffix]);
 
     const skillIds = equipmentItemGrantedSkillIds(
       buildItem({ affixIds: [grantAffix.id] }),
@@ -284,13 +207,13 @@ describe('equipmentItemGrantedSkillIds', () => {
   });
 
   it('dedupes a skill granted by both content and an affix', () => {
-    const duplicateGrantAffix: AffixContent = {
+    const duplicateGrantAffix = ensureAffix({
       ...grantAffix,
       effects: [
         { kind: 'GrantSkill', skillId: 'starshine-2' as EquipmentSkillId },
       ],
-    };
-    mockContent(duplicateGrantAffix);
+    });
+    seedContent([duplicateGrantAffix]);
 
     const skillIds = equipmentItemGrantedSkillIds(
       buildItem({ affixIds: [duplicateGrantAffix.id] }),

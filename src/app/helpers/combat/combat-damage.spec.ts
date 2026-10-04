@@ -1,15 +1,13 @@
 import type * as RngHelper from '@helpers/rng';
 import type {
-  Combat,
   Combatant,
   EquipmentSkill,
   EquipmentSkillContentTechnique,
+  MonsterId,
   StatusEffectContent,
   StatusEffectId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-vi.mock('@helpers/content/content', () => ({ getEntry: vi.fn() }));
 
 vi.mock('@helpers/rng', async (importOriginal) => {
   const actual = await importOriginal<typeof RngHelper>();
@@ -29,183 +27,63 @@ import {
   combatLog,
   combatLogReset,
 } from '@helpers/combat/combat-log';
-import { getEntry } from '@helpers/content/content';
+import { ensureMonster } from '@helpers/content/ensure-monster';
+import { ensureEquipmentSkillTechnique } from '@helpers/content/ensure-skill';
+import {
+  defaultCombatStats,
+  defaultStats,
+  defaultTagResistances,
+} from '@helpers/defaults';
+import {
+  buildCombat,
+  buildEquipmentSkill,
+  buildTestCombatant,
+} from '@/testing/builders';
+import { seedContent } from '@/testing/content';
 import { ensureStatusEffect } from '@helpers/content/ensure-statuseffect';
 import { rngSucceedsChance, rngUniform } from '@helpers/rng';
 
-function buildCombat(overrides: Partial<Combat> = {}): Combat {
-  return {
-    id: 'combat-1' as never,
-    locationName: 'Field Ruins',
-    locationPosition: { x: 0, y: 0 },
-    rounds: 1,
-    heroes: [],
-    helpers: [],
-    guardians: [],
-    ...overrides,
-  };
-}
-
+// Fixed id/name/hp and zeroed stats so damage math in each test starts from a clean slate.
 function buildCombatant(overrides: Partial<Combatant> = {}): Combatant {
-  return {
-    id: 'combatant-1',
-    name: 'Combatant',
-    isEnemy: false,
-    level: 1,
-    hp: 100,
-    ep: 10,
-    sprite: '0000',
-    frames: 4,
-    targetting: [{ type: 'Random' }],
-    baseStats: {} as never,
-    statBoosts: {} as never,
-    totalStats: {
-      Agility: 0,
-      Energy: 0,
-      Health: 100,
-      Intelligence: 0,
-      Luck: 0,
-      Resistance: 0,
-      Strength: 0,
-      Vitality: 0,
-      Constitution: 0,
-      Spirit: 0,
-    },
-    combatStats: {
-      repeatActionChance: 0,
-      skillStrikeAgainChance: 0,
-      redirectionChance: 0,
-      missChance: 0,
-      debuffIgnoreChance: 0,
-      damageReflectPercent: 0,
-      healingIgnorePercent: 0,
-      reviveChance: 0,
-      stunChance: 0,
-      agroValue: 0,
-    },
-    resistance: {} as never,
-    affinity: { Fire: 0, Water: 0, Earth: 0, Air: 0 },
-    tagResistance: {} as never,
-    skillIds: [],
-    skillRefs: [],
-    skillWeights: {},
-    combatOrders: [],
-    skillUses: {},
-    statusEffects: [],
-    statusEffectData: {},
-    ...overrides,
-  };
+  return buildTestCombatant({ name: 'Combatant', ...overrides });
 }
 
 function buildSkill(overrides: Partial<EquipmentSkill> = {}): EquipmentSkill {
-  return {
-    id: 'skill-1' as never,
+  return buildEquipmentSkill({
     name: 'Test Skill',
-    __type: 'skill',
-    description: '',
-    sprite: '0000',
-    rarity: 'Common',
-    epCost: 0,
-    usesPerCombat: -1,
-    statusEffectDurationBoost: {} as never,
-    statusEffectChanceBoost: {} as never,
-    techniques: [],
-    requiredWeaponTypes: [],
     family: 'Test Skill',
     ...overrides,
-  };
+  });
 }
 
 function buildTechnique(
   overrides: Partial<EquipmentSkillContentTechnique> = {},
 ): EquipmentSkillContentTechnique {
-  return {
-    targets: 1,
-    targetType: 'Enemies',
-    targetBehaviors: [],
-    damageScaling: {
-      Agility: 0,
-      Energy: 0,
-      Health: 0,
-      Intelligence: 0,
-      Luck: 0,
-      Resistance: 0,
-      Strength: 0,
-      Vitality: 0,
-      Constitution: 0,
-      Spirit: 0,
-    },
-    elements: [],
+  return ensureEquipmentSkillTechnique({
     attributes: ['DamagesTarget'],
-    statusEffects: [],
     combatMessage: '',
     ...overrides,
-  };
+  });
 }
 
 beforeEach(() => {
-  vi.mocked(rngSucceedsChance).mockClear();
-  vi.mocked(rngUniform).mockClear();
-  vi.mocked(getEntry).mockClear();
+  vi.mocked(rngSucceedsChance).mockClear().mockReturnValue(false);
+  vi.mocked(rngUniform).mockClear().mockReturnValue(1);
 });
 
 describe('combatApplySkillToTarget healing', () => {
   it("reduces a heal by the target's healingIgnorePercent, treated as a 0-100 percent (not a raw fraction)", () => {
     const attacker = buildCombatant({
-      totalStats: {
-        Agility: 0,
-        Energy: 0,
-        Health: 100,
-        Intelligence: 0,
-        Luck: 0,
-        Resistance: 0,
-        Strength: 100,
-        Vitality: 0,
-        Constitution: 0,
-        Spirit: 0,
-      },
+      totalStats: { ...defaultStats(), Health: 100, Strength: 100 },
     });
     const target = buildCombatant({
       hp: 0,
-      totalStats: {
-        Agility: 0,
-        Energy: 0,
-        Health: 10000,
-        Intelligence: 0,
-        Luck: 0,
-        Resistance: 0,
-        Strength: 0,
-        Vitality: 0,
-        Constitution: 0,
-        Spirit: 0,
-      },
-      combatStats: {
-        repeatActionChance: 0,
-        skillStrikeAgainChance: 0,
-        redirectionChance: 0,
-        missChance: 0,
-        debuffIgnoreChance: 0,
-        damageReflectPercent: 0,
-        healingIgnorePercent: 20,
-        reviveChance: 0,
-        stunChance: 0,
-        agroValue: 0,
-      },
+      totalStats: { ...defaultStats(), Health: 10000 },
+      combatStats: { ...defaultCombatStats(), healingIgnorePercent: 20 },
     });
     const skill = buildSkill();
     const technique = buildTechnique({
-      damageScaling: {
-        Agility: 0,
-        Energy: 0,
-        Health: 0,
-        Intelligence: 0,
-        Luck: 0,
-        Resistance: 0,
-        Strength: 1,
-        Vitality: 0,
-        Constitution: 0,
-        Spirit: 0,
-      },
+      damageScaling: { ...defaultStats(), Strength: 1 },
       attributes: ['HealsTarget', 'NeverMisses', 'BypassDefense'],
     });
 
@@ -225,48 +103,20 @@ describe('combatApplySkillToTarget healing', () => {
 describe('combatApplySkillToTarget defense', () => {
   it('mitigates a purely physical technique using only the target Vitality stat', () => {
     const attacker = buildCombatant({
-      totalStats: {
-        Agility: 0,
-        Energy: 0,
-        Health: 100,
-        Intelligence: 0,
-        Luck: 0,
-        Resistance: 0,
-        Strength: 100,
-        Vitality: 0,
-        Constitution: 0,
-        Spirit: 0,
-      },
+      totalStats: { ...defaultStats(), Health: 100, Strength: 100 },
     });
     const target = buildCombatant({
       hp: 1000,
       totalStats: {
-        Agility: 0,
-        Energy: 0,
+        ...defaultStats(),
         Health: 1000,
-        Intelligence: 0,
-        Luck: 0,
         Resistance: 100,
-        Strength: 0,
         Vitality: 20,
-        Constitution: 0,
-        Spirit: 0,
       },
     });
     const skill = buildSkill();
     const technique = buildTechnique({
-      damageScaling: {
-        Agility: 0,
-        Energy: 0,
-        Health: 0,
-        Intelligence: 0,
-        Luck: 0,
-        Resistance: 0,
-        Strength: 1,
-        Vitality: 0,
-        Constitution: 0,
-        Spirit: 0,
-      },
+      damageScaling: { ...defaultStats(), Strength: 1 },
     });
 
     combatApplySkillToTarget(
@@ -284,48 +134,20 @@ describe('combatApplySkillToTarget defense', () => {
 
   it('mitigates a purely magical technique using only the target Resistance stat', () => {
     const attacker = buildCombatant({
-      totalStats: {
-        Agility: 0,
-        Energy: 0,
-        Health: 100,
-        Intelligence: 100,
-        Luck: 0,
-        Resistance: 0,
-        Strength: 0,
-        Vitality: 0,
-        Constitution: 0,
-        Spirit: 0,
-      },
+      totalStats: { ...defaultStats(), Health: 100, Intelligence: 100 },
     });
     const target = buildCombatant({
       hp: 1000,
       totalStats: {
-        Agility: 0,
-        Energy: 0,
+        ...defaultStats(),
         Health: 1000,
-        Intelligence: 0,
-        Luck: 0,
         Resistance: 20,
-        Strength: 0,
         Vitality: 100,
-        Constitution: 0,
-        Spirit: 0,
       },
     });
     const skill = buildSkill();
     const technique = buildTechnique({
-      damageScaling: {
-        Agility: 0,
-        Energy: 0,
-        Health: 0,
-        Intelligence: 1,
-        Luck: 0,
-        Resistance: 0,
-        Strength: 0,
-        Vitality: 0,
-        Constitution: 0,
-        Spirit: 0,
-      },
+      damageScaling: { ...defaultStats(), Intelligence: 1 },
     });
 
     combatApplySkillToTarget(
@@ -344,48 +166,25 @@ describe('combatApplySkillToTarget defense', () => {
   it('splits mitigation between Resistance and Vitality proportional to the damageScaling weights', () => {
     const attacker = buildCombatant({
       totalStats: {
-        Agility: 0,
-        Energy: 0,
+        ...defaultStats(),
         Health: 100,
         Intelligence: 100,
-        Luck: 0,
-        Resistance: 0,
         Strength: 100,
-        Vitality: 0,
-        Constitution: 0,
-        Spirit: 0,
       },
     });
     const target = buildCombatant({
       totalStats: {
-        Agility: 0,
-        Energy: 0,
+        ...defaultStats(),
         Health: 100,
-        Intelligence: 0,
-        Luck: 0,
         Resistance: 100,
-        Strength: 0,
         Vitality: 300,
-        Constitution: 0,
-        Spirit: 0,
       },
     });
     const skill = buildSkill();
     // 75% Strength / 25% Intelligence -> defense should be
     // 0.75 * Vitality(300) + 0.25 * Resistance(100) = 250.
     const technique = buildTechnique({
-      damageScaling: {
-        Agility: 0,
-        Energy: 0,
-        Health: 0,
-        Intelligence: 0.25,
-        Luck: 0,
-        Resistance: 0,
-        Strength: 0.75,
-        Vitality: 0,
-        Constitution: 0,
-        Spirit: 0,
-      },
+      damageScaling: { ...defaultStats(), Intelligence: 0.25, Strength: 0.75 },
     });
 
     combatApplySkillToTarget(
@@ -405,48 +204,20 @@ describe('combatApplySkillToTarget defense', () => {
 describe('combatApplySkillToTarget mitigation roll', () => {
   function buildRollScenario(targetLuck: number) {
     const attacker = buildCombatant({
-      totalStats: {
-        Agility: 0,
-        Energy: 0,
-        Health: 100,
-        Intelligence: 0,
-        Luck: 0,
-        Resistance: 0,
-        Strength: 100,
-        Vitality: 0,
-        Constitution: 0,
-        Spirit: 0,
-      },
+      totalStats: { ...defaultStats(), Health: 100, Strength: 100 },
     });
     const target = buildCombatant({
       hp: 1000,
       totalStats: {
-        Agility: 0,
-        Energy: 0,
+        ...defaultStats(),
         Health: 1000,
-        Intelligence: 0,
         Luck: targetLuck,
-        Resistance: 0,
-        Strength: 0,
         Vitality: 40,
-        Constitution: 0,
-        Spirit: 0,
       },
     });
     const skill = buildSkill();
     const technique = buildTechnique({
-      damageScaling: {
-        Agility: 0,
-        Energy: 0,
-        Health: 0,
-        Intelligence: 0,
-        Luck: 0,
-        Resistance: 0,
-        Strength: 1,
-        Vitality: 0,
-        Constitution: 0,
-        Spirit: 0,
-      },
+      damageScaling: { ...defaultStats(), Strength: 1 },
     });
 
     combatApplySkillToTarget(
@@ -620,7 +391,7 @@ describe('combatApplySkillToTarget status effect resistance', () => {
   });
 
   beforeEach(() => {
-    vi.mocked(getEntry).mockReturnValue(stunEffect as never);
+    seedContent([stunEffect]);
   });
 
   function runWithStunTechnique(target: Combatant): Combatant {
@@ -664,7 +435,7 @@ describe('combatApplySkillToTarget status effect resistance', () => {
 
     const target = buildCombatant({
       id: 'target',
-      tagResistance: { Stun: 25 } as never,
+      tagResistance: { ...defaultTagResistances(), Stun: 25 },
     });
     runWithStunTechnique(target);
 
@@ -681,7 +452,7 @@ describe('combatApplySkillToTarget status effect resistance', () => {
 
     const target = buildCombatant({
       id: 'target',
-      tagResistance: { Stun: 25 } as never,
+      tagResistance: { ...defaultTagResistances(), Stun: 25 },
     });
     runWithStunTechnique(target);
 
@@ -699,7 +470,7 @@ describe('combatApplySkillToTarget status effect resistance', () => {
 
     const target = buildCombatant({
       id: 'target',
-      tagResistance: { Stun: 0 } as never,
+      tagResistance: { ...defaultTagResistances(), Stun: 0 },
     });
     runWithStunTechnique(target);
 
@@ -717,18 +488,7 @@ describe('combatApplySkillToTarget combat message rendering', () => {
   });
 
   it('embeds combatant/target id tokens (not raw names) and reflects post-damage HP', () => {
-    const zeroStats = {
-      Agility: 0,
-      Energy: 0,
-      Health: 0,
-      Intelligence: 0,
-      Luck: 0,
-      Resistance: 0,
-      Strength: 0,
-      Vitality: 0,
-      Constitution: 0,
-      Spirit: 0,
-    };
+    const zeroStats = defaultStats();
     const attacker = buildCombatant({
       id: 'attacker',
       name: 'Jala',
@@ -765,26 +525,12 @@ describe('combatApplySkillToTarget combat message rendering', () => {
 });
 
 describe('combatApplySkillToTarget monster type damage bonus', () => {
-  const zeroStats = {
-    Agility: 0,
-    Energy: 0,
-    Health: 0,
-    Intelligence: 0,
-    Luck: 0,
-    Resistance: 0,
-    Strength: 0,
-    Vitality: 0,
-    Constitution: 0,
-    Spirit: 0,
-  };
+  const zeroStats = defaultStats();
 
   it("boosts damage by the attacker's MonsterTypeDamage affix bonus when it matches one of the target's monster types", () => {
-    vi.mocked(getEntry).mockImplementation(
-      (id) =>
-        (id === 'demon-1'
-          ? { id: 'demon-1', types: ['Demon'] }
-          : undefined) as never,
-    );
+    seedContent([
+      ensureMonster({ id: 'demon-1' as MonsterId, types: ['Demon'] }),
+    ]);
 
     const attacker = buildCombatant({
       totalStats: { ...zeroStats, Strength: 100 },
@@ -814,12 +560,9 @@ describe('combatApplySkillToTarget monster type damage bonus', () => {
   });
 
   it('leaves damage unmodified when none of the bonus types match the target', () => {
-    vi.mocked(getEntry).mockImplementation(
-      (id) =>
-        (id === 'beast-1'
-          ? { id: 'beast-1', types: ['Beast'] }
-          : undefined) as never,
-    );
+    seedContent([
+      ensureMonster({ id: 'beast-1' as MonsterId, types: ['Beast'] }),
+    ]);
 
     const attacker = buildCombatant({
       totalStats: { ...zeroStats, Strength: 100 },
@@ -870,7 +613,6 @@ describe('combatApplySkillToTarget monster type damage bonus', () => {
       technique,
     );
 
-    expect(getEntry).not.toHaveBeenCalled();
     expect(target.hp).toBe(1000 - 100);
   });
 });
@@ -880,18 +622,7 @@ describe('combatApplySkillToTarget skill stat bonuses', () => {
     vi.mocked(rngUniform).mockReturnValue(1);
   });
 
-  const zeroStats = {
-    Agility: 0,
-    Energy: 0,
-    Health: 0,
-    Intelligence: 0,
-    Luck: 0,
-    Resistance: 0,
-    Strength: 0,
-    Vitality: 0,
-    Constitution: 0,
-    Spirit: 0,
-  };
+  const zeroStats = defaultStats();
 
   function castFireball(
     attacker: Combatant,
