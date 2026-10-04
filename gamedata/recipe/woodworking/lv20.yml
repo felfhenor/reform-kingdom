@@ -183,3 +183,21 @@
   maxTradeskillLevel: 26
   tradeskillXP: 165
   craftTime: 390
+
+- id: 439284dc-e7be-4d11-911c-50ecdbe47c5e
+  name: 'Material: Felwood Rod'
+  result:
+    itemId: Felwood Rod
+
+  requirements:
+    - itemId: Felwood
+      quantity: 1
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 25
+  tradeskillXP: 20
+  craftTime: 20

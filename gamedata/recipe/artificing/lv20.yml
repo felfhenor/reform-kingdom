@@ -211,10 +211,10 @@
       quantity: 3
 
   tradeskillId: Artificing
-  minTradeskillLevel: 24
-  maxTradeskillLevel: 27
-  tradeskillXP: 170
-  craftTime: 420
+  minTradeskillLevel: 23
+  maxTradeskillLevel: 26
+  tradeskillXP: 165
+  craftTime: 390
 
 - id: eeaa9c7d-df52-4ab2-ad80-489c96da363e
   name: 'Artifact: Animalistic Conglomeration'
@@ -241,7 +241,25 @@
       quantity: 5
 
   tradeskillId: Artificing
+  minTradeskillLevel: 23
+  maxTradeskillLevel: 26
+  tradeskillXP: 330
+  craftTime: 780
+
+- id: 3ab76fa8-8094-43b9-8794-39afdda043e7
+  name: 'Material: Elven Purity Water'
+  result:
+    itemId: Elven Purity Water
+
+  requirements:
+    - itemId: Firmwater
+      quantity: 1
+
+    - itemId: Elfsilk
+      quantity: 1
+
+  tradeskillId: Artificing
   minTradeskillLevel: 24
-  maxTradeskillLevel: 27
-  tradeskillXP: 340
-  craftTime: 840
+  maxTradeskillLevel: 25
+  tradeskillXP: 20
+  craftTime: 20

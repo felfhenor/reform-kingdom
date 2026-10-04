@@ -204,3 +204,37 @@
   maxTradeskillLevel: 26
   tradeskillXP: 165
   craftTime: 330
+
+- id: 24bbff4b-7e8f-4272-9c32-ddb3405c1086
+  name: 'Material: Copper Ore'
+  result:
+    itemId: Copper Ore
+    quantity: 3
+
+  requirements:
+    - itemId: Felrock
+      quantity: 1
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 25
+  tradeskillXP: 20
+  craftTime: 20
+
+- id: ca4f1531-028c-4509-bd8c-29cb6264af3b
+  name: 'Material: Fel Copper Ingot'
+  result:
+    itemId: Fel Copper Ingot
+
+  requirements:
+    - itemId: Copper Ingot
+      quantity: 1
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 25
+  tradeskillXP: 20
+  craftTime: 20

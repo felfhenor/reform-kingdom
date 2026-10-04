@@ -11,3 +11,10 @@
   rarity: Common
 
   sprite: '0076'
+
+- id: faef7b9e-01c5-4a64-90ae-15b430228646
+  name: Felwood Rod
+  description: A finely-milled rod of felwood.
+  rarity: Common
+
+  sprite: '0081'

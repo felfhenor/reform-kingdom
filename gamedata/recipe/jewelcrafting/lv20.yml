@@ -133,3 +133,19 @@
   maxTradeskillLevel: 26
   tradeskillXP: 165
   craftTime: 390
+
+- id: 06c647a6-c8b4-4d1f-8286-e088c24bfb28
+  name: 'Material: Morganite'
+  result:
+    itemId: Morganite
+    chance: 50
+
+  requirements:
+    - itemId: Felrock
+      quantity: 1
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 25
+  tradeskillXP: 20
+  craftTime: 20

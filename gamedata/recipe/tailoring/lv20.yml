@@ -171,3 +171,22 @@
   maxTradeskillLevel: 26
   tradeskillXP: 165
   craftTime: 390
+
+- id: 877650c1-6468-414e-a281-bc802e3ead2c
+  name: 'Material: Fel Fiber'
+  result:
+    itemId: Fel Fiber
+    quantity: 3
+
+  requirements:
+    - itemId: Felwood
+      quantity: 1
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 25
+  tradeskillXP: 20
+  craftTime: 20
