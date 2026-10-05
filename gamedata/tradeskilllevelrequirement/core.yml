@@ -59,3 +59,35 @@
   tradeskillId: Woodworking
   level: 16
   requiredCollectibleId: Ooze-filled Drawing Tool
+
+##
+
+- id: b83df91f-2dca-4bf3-9c71-9dea81bb9270
+  name: 'Tradeskill Level Requirement: Artificing 26'
+  tradeskillId: Artificing
+  level: 26
+  requiredCollectibleId: Fel Ancient Magic Helm
+
+- id: a7f54453-4d8b-4014-8426-43ed3d80fe4a
+  name: 'Tradeskill Level Requirement: Blacksmithing 26'
+  tradeskillId: Blacksmithing
+  level: 26
+  requiredCollectibleId: Fel Sword Prototype
+
+- id: cf10d4d7-467f-4eb6-b186-b1f7345b5280
+  name: 'Tradeskill Level Requirement: Jewelcrafting 26'
+  tradeskillId: Jewelcrafting
+  level: 26
+  requiredCollectibleId: Fel Crown
+
+- id: 5a377c07-a308-4707-b99d-25db40590f56
+  name: 'Tradeskill Level Requirement: Tailoring 26'
+  tradeskillId: Tailoring
+  level: 26
+  requiredCollectibleId: Fel Sewing Gloves
+
+- id: ba426357-d4e2-4c44-8328-53dd7e33e835
+  name: 'Tradeskill Level Requirement: Woodworking 26'
+  tradeskillId: Woodworking
+  level: 26
+  requiredCollectibleId: Fel Knightcrest Shield

@@ -1,0 +1,29 @@
+- id: 6121ce7d-d9ae-4354-ad23-61cce6ab1383
+  name: Fel Sewing Gloves
+  rarity: Uncommon
+  description: A pair of sewing gloves used to weave fel essence into every craft.
+  sprite: '0058'
+
+- id: 614a6bdb-05c3-41fd-97a4-9df251e0d860
+  name: Fel Sword Prototype
+  rarity: Uncommon
+  description: An ancient sword used by the first demons who waged war on the Duchy.
+  sprite: '0059'
+
+- id: 894b5048-50e8-4ce5-ba68-dc8706a4d209
+  name: Fel Ancient Magic Helm
+  rarity: Uncommon
+  description: A helm worn by ancient demon spellcasters. It didn't let them see very well, but fired potent magic from the center eye.
+  sprite: '0062'
+
+- id: 03373f3f-1e62-4578-ab71-2ef4ea8f9704
+  name: Fel Crown
+  rarity: Uncommon
+  description: A crown worn by the leader of the demons from the first war waged on the Duchy.
+  sprite: '0060'
+
+- id: 0cf0b77a-ad9a-414b-9b75-74ed73a712c0
+  name: Fel Knightcrest Shield
+  rarity: Uncommon
+  description: An ancient wooden shield used by the first demons who waged war on the Duchy.
+  sprite: '0061'
