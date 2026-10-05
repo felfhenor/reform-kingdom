@@ -1,6 +1,6 @@
 @if (stepView(); as view) {
   @if (isReadyToRender()) {
-    @let rect = targetRect()!;
+    @let rect = targetRect();
     @let position = calloutPosition();
 
     <div
@@ -8,47 +8,52 @@
       (animate.enter)="onBackdropEnter($event)"
       (animate.leave)="onBackdropLeave($event)"
     >
-      <div
-        class="spot-frame"
-        [style.top.px]="0"
-        [style.height.px]="rect.top"
-        [style.left.px]="0"
-        [style.right.px]="0"
-      ></div>
-      <div
-        class="spot-frame"
-        [style.top.px]="rect.bottom"
-        [style.bottom.px]="0"
-        [style.left.px]="0"
-        [style.right.px]="0"
-      ></div>
-      <div
-        class="spot-frame"
-        [style.top.px]="rect.top"
-        [style.height.px]="rect.height"
-        [style.left.px]="0"
-        [style.width.px]="rect.left"
-      ></div>
-      <div
-        class="spot-frame"
-        [style.top.px]="rect.top"
-        [style.height.px]="rect.height"
-        [style.left.px]="rect.right"
-        [style.right.px]="0"
-      ></div>
-      <div
-        class="spot-outline"
-        [style.top.px]="rect.top"
-        [style.left.px]="rect.left"
-        [style.width.px]="rect.width"
-        [style.height.px]="rect.height"
-      ></div>
+      @if (rect) {
+        <div
+          class="spot-frame"
+          [style.top.px]="0"
+          [style.height.px]="rect.top"
+          [style.left.px]="0"
+          [style.right.px]="0"
+        ></div>
+        <div
+          class="spot-frame"
+          [style.top.px]="rect.bottom"
+          [style.bottom.px]="0"
+          [style.left.px]="0"
+          [style.right.px]="0"
+        ></div>
+        <div
+          class="spot-frame"
+          [style.top.px]="rect.top"
+          [style.height.px]="rect.height"
+          [style.left.px]="0"
+          [style.width.px]="rect.left"
+        ></div>
+        <div
+          class="spot-frame"
+          [style.top.px]="rect.top"
+          [style.height.px]="rect.height"
+          [style.left.px]="rect.right"
+          [style.right.px]="0"
+        ></div>
+        <div
+          class="spot-outline"
+          [style.top.px]="rect.top"
+          [style.left.px]="rect.left"
+          [style.width.px]="rect.width"
+          [style.height.px]="rect.height"
+        ></div>
+      } @else {
+        <div class="spot-frame spot-full"></div>
+      }
 
       <div
         class="tutorial-callout"
         (animate.enter)="onCalloutEnter($event)"
-        [style.top.px]="position.top"
-        [style.left.px]="position.left"
+        [class.callout-centered]="!position"
+        [style.top.px]="position?.top"
+        [style.left.px]="position?.left"
       >
         <p class="type-label">{{ view.step.title }}</p>
         <p class="callout-body">{{ view.step.body }}</p>

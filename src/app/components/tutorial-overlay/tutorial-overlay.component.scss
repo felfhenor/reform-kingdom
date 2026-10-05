@@ -39,6 +39,13 @@
     left 150ms ease;
 }
 
+// `translate`, not `transform`, so it composes with the slide-in animation's inline transform.
+.callout-centered {
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+}
+
 .callout-body {
   @apply text-xs;
   margin-top: 6px;

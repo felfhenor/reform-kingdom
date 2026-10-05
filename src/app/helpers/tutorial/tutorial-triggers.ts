@@ -10,9 +10,11 @@ import {
   discoveredCaravansState,
   discoveredMaterialsState,
   discoveredWorkersState,
+  worldAutoModeState,
   worldTownsState,
 } from '@helpers/state-game';
 import type { ItemContent, ItemId, TutorialTrigger } from '@interfaces';
+import { sum } from 'es-toolkit';
 
 export function tutorialTriggerSatisfied(trigger: TutorialTrigger): boolean {
   switch (trigger.kind) {
@@ -37,5 +39,17 @@ export function tutorialTriggerSatisfied(trigger: TutorialTrigger): boolean {
       return Object.keys(discoveredCaravansState()).length > 0;
     case 'first-trainer-visit':
       return isAnyTrainerDiscovered();
+    case 'losing-streak':
+      return (
+        partyMaxLevel() < trigger.belowLevel &&
+        recentLossCount() >= trigger.losses
+      );
   }
+}
+
+// Node failure counts clear on a win there or on level-up, so this is losses since the party last made progress.
+function recentLossCount(): number {
+  return sum(
+    Object.values(worldAutoModeState().nodeFailureCounts).map((n) => n ?? 0),
+  );
 }

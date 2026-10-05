@@ -3,6 +3,8 @@ import {
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { tutorialsState, updateGamestate } from '@helpers/state-game';
+import { TUTORIAL_CATALOG } from '@helpers/tutorial/tutorial-catalog';
+import { tutorialTriggerSatisfied } from '@helpers/tutorial/tutorial-triggers';
 import type { GameStateTutorials, TutorialId } from '@interfaces';
 
 export function isTutorialSeen(tutorialId: TutorialId): boolean {
@@ -23,11 +25,18 @@ export async function tutorialMarkSeen(tutorialId: TutorialId): Promise<void> {
   analyticsSendDesignEvent(`Tutorial:Seen:${analyticsSafeSegment(tutorialId)}`);
 }
 
-// Debug tool: reverts a tutorial back to unseen.
 export function tutorialUnmarkSeen(tutorialId: TutorialId): void {
   updateGamestate((state) => {
     delete state.tutorials[tutorialId];
     return state;
+  });
+}
+
+export function tutorialRearmProcessTick(): void {
+  TUTORIAL_CATALOG.forEach((tutorial) => {
+    if (!tutorial.repeatable || !isTutorialSeen(tutorial.id)) return;
+    if (tutorialTriggerSatisfied(tutorial.trigger)) return;
+    tutorialUnmarkSeen(tutorial.id);
   });
 }
 

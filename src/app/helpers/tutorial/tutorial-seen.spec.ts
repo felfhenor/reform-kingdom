@@ -5,9 +5,10 @@ import {
   isTutorialSeen,
   pruneInvalidTutorials,
   tutorialMarkSeen,
+  tutorialRearmProcessTick,
 } from '@helpers/tutorial/tutorial-seen';
 import { captureAnalyticsEvents } from '@/testing/analytics';
-import { seedGamestate } from '@/testing/gamestate';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 
 describe('tutorialMarkSeen', () => {
   it('is seen as soon as the call resolves, outside a tick too', async () => {
@@ -42,5 +43,30 @@ describe('pruneInvalidTutorials', () => {
         (tutorialId) => tutorialId === 'main-ui',
       ),
     ).toEqual({ 'main-ui': { foundAt: 1000 } });
+  });
+});
+
+describe('tutorialRearmProcessTick', () => {
+  it('un-sees a repeatable tutorial once its trigger stops holding', () => {
+    seedGamestate((state) => {
+      state.tutorials['losing-streak'] = { foundAt: 1000 };
+      state.tutorials['main-ui'] = { foundAt: 1000 };
+    });
+
+    inTick(() => tutorialRearmProcessTick());
+
+    expect(isTutorialSeen('losing-streak')).toBe(false);
+    expect(isTutorialSeen('main-ui')).toBe(true);
+  });
+
+  it('keeps it seen while the trigger still holds', () => {
+    seedGamestate((state) => {
+      state.tutorials['losing-streak'] = { foundAt: 1000 };
+      state.world.autoMode.nodeFailureCounts = { A: 3 };
+    });
+
+    inTick(() => tutorialRearmProcessTick());
+
+    expect(isTutorialSeen('losing-streak')).toBe(true);
   });
 });

@@ -76,24 +76,19 @@ export class TutorialOverlayComponent {
 
   public targetRect = computed(() => {
     this.resizeTick();
-    const view = this.stepView();
-    if (!view) return undefined;
-    return tutorialTargetRect(view.step.targetKey);
+    const targetKey = this.stepView()?.step.targetKey;
+    return targetKey ? tutorialTargetRect(targetKey) : undefined;
   });
 
-  // Waits indefinitely (no timeout fallback) rather than showing a dimmed screen with no highlight before the target resolves - every target key is authored in this codebase, so it will always resolve.
-  public isReadyToRender = computed(
-    () => !!this.stepView() && !!this.targetRect(),
-  );
+  // Targeted steps wait indefinitely (no timeout fallback) rather than showing a dimmed screen with no highlight before the target resolves - every target key is defined in this codebase, so it will always resolve.
+  public isReadyToRender = computed(() => {
+    const view = this.stepView();
+    return !!view && (!view.step.targetKey || !!this.targetRect());
+  });
 
   public calloutPosition = computed(() => {
     const rect = this.targetRect();
-    if (!rect) {
-      return {
-        top: window.innerHeight / 2 - CALLOUT_HEIGHT_ESTIMATE / 2,
-        left: window.innerWidth / 2 - CALLOUT_WIDTH / 2,
-      };
-    }
+    if (!rect) return undefined;
 
     const spaceBelow = window.innerHeight - rect.bottom;
     const top =

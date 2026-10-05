@@ -33,6 +33,7 @@ import { townSpecialtyPriorityProcessTick } from '@helpers/town/crafting/town-cr
 import { townRaidProcessTick } from '@helpers/town/raid/town-raid-tick';
 import { townShopProcessTick } from '@helpers/town/shop/town-shop-tick';
 import { townWorkerProcessTick } from '@helpers/town/worker/town-worker-tick';
+import { tutorialRearmProcessTick } from '@helpers/tutorial/tutorial-seen';
 import { workersProcessTick } from '@helpers/worker/worker-tick';
 
 import { clamp } from 'es-toolkit/compat';
@@ -95,6 +96,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
       townShopProcessTick();
       townRaidProcessTick();
       townCommissionProcessTick();
+      tutorialRearmProcessTick();
 
       if (worldCombatState()) {
         combatDoCombatIteration();

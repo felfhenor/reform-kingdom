@@ -33,6 +33,18 @@ export const TUTORIAL_CATALOG: TutorialDefinition[] = [
     ],
   },
   {
+    id: 'losing-streak',
+    name: 'Struggling?',
+    trigger: { kind: 'losing-streak', losses: 3, belowLevel: 10 },
+    repeatable: true,
+    steps: [
+      {
+        title: 'Struggling?',
+        body: "You might be underpowered, underleveled, or both, for the creatures you're trying to face in combat. You should seek out crafting materials, craft items using the Kingdom tradeskills, and boost your overall power first!",
+      },
+    ],
+  },
+  {
     id: 'workers',
     name: 'Workers',
     trigger: { kind: 'first-worker' },

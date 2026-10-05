@@ -14,7 +14,7 @@ import {
   isTutorialSeen,
   tutorialMarkSeen,
 } from '@helpers/tutorial/tutorial-seen';
-import { tutorialTriggerSatisfied } from '@helpers/tutorial/tutorial-triggers.ui';
+import { tutorialTriggerSatisfied } from '@helpers/tutorial/tutorial-triggers';
 import type {
   GamePlayView,
   KingdomSubview,
@@ -71,6 +71,7 @@ export function activeTutorialStepView():
 }
 
 function navigateToStep(step: TutorialStep): void {
+  if (!step.view) return;
   setGamePlayView(step.view);
   if (step.view === 'kingdom' && step.subview) {
     kingdomSubviewShow(step.subview);
