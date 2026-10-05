@@ -263,3 +263,102 @@
   maxTradeskillLevel: 25
   tradeskillXP: 20
   craftTime: 300
+
+- id: 617ccb64-0915-4af9-9b39-6fe240d11bc5
+  name: 'Accessory: Fel Speedboots'
+  result:
+    equipmentId: Fel Speedboots
+
+  requirements:
+    - itemId: Fel Copper Ingot
+      quantity: 2
+
+    - itemId: Fel Fiber
+      quantity: 8
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 27
+  tradeskillXP: 170
+  craftTime: 420
+
+- id: b7034904-c0a2-400f-8d73-ea53b8cc0be3
+  name: 'Accessory: Fel Luckgem'
+  result:
+    equipmentId: Fel Luckgem
+
+  requirements:
+    - itemId: Fel Copper Ingot
+      quantity: 2
+
+    - itemId: Fel Fiber
+      quantity: 2
+
+    - itemId: Morganite
+      quantity: 2
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 27
+  tradeskillXP: 170
+  craftTime: 420
+
+- id: 2cba6a41-b976-4ed7-8c02-88b1e7c7a240
+  name: 'Accessory: Fel Earrings'
+  result:
+    equipmentId: Fel Earrings
+
+  requirements:
+    - itemId: Fel Copper Ingot
+      quantity: 2
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 27
+  tradeskillXP: 170
+  craftTime: 420
+
+- id: a0dd7a52-dba6-418d-a306-e3e3e4c52997
+  name: 'Weapon: Demonic Staff'
+  result:
+    equipmentId: Demonic Staff
+
+  requirements:
+    - itemId: Fel Copper Ingot
+      quantity: 2
+
+    - itemId: Felwood Rod
+      quantity: 4
+
+    - itemId: Morganite
+      quantity: 1
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450
+
+- id: f89e63e0-60c9-4abc-a34c-10d1d54c0081
+  name: 'Weapon: Demonic Mace'
+  result:
+    equipmentId: Demonic Mace
+
+  requirements:
+    - itemId: Fel Copper Ingot
+      quantity: 4
+
+    - itemId: Felwood Rod
+      quantity: 6
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450

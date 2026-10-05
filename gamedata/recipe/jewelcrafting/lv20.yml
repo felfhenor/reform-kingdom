@@ -149,3 +149,99 @@
   maxTradeskillLevel: 25
   tradeskillXP: 20
   craftTime: 20
+
+- id: b2859cb0-9b2d-45be-afdd-d057a12b6546
+  name: 'Offhand: Fel Casting Gloves'
+  result:
+    equipmentId: Fel Casting Gloves
+
+  requirements:
+    - itemId: Fel Copper Ingot
+      quantity: 2
+
+    - itemId: Fel Fiber
+      quantity: 4
+
+    - itemId: Morganite
+      quantity: 2
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 27
+  tradeskillXP: 170
+  craftTime: 420
+
+- id: 130ad8d5-fead-4813-9c71-ff58aa3508c5
+  name: 'Artifact: Fel Puzzle Box'
+  result:
+    equipmentId: Fel Puzzle Box
+
+  requirements:
+    - itemId: Fel Copper Ingot
+      quantity: 6
+
+    - itemId: Morganite
+      quantity: 6
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 27
+  tradeskillXP: 170
+  craftTime: 420
+
+- id: c1a94b0c-9d7c-416c-87ce-6ff0973c79f2
+  name: 'Ring: Fel Energy Loop'
+  result:
+    equipmentId: Fel Energy Loop
+
+  requirements:
+    - itemId: Fel Copper Ingot
+      quantity: 3
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 24
+  maxTradeskillLevel: 27
+  tradeskillXP: 170
+  craftTime: 420
+
+- id: 5c40bdbf-4ee4-47ff-a3d7-862ad5403e47
+  name: 'Accessory: Fel Taming Chain'
+  result:
+    equipmentId: Fel Taming Chain
+
+  requirements:
+    - itemId: Fel Copper Ingot
+      quantity: 4
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450
+
+- id: 78787d45-cae0-4eef-86b4-d8857f2b4545
+  name: 'Offhand: Fel Morganite Brooch'
+  result:
+    equipmentId: Fel Morganite Brooch
+
+  requirements:
+    - itemId: Fel Copper Ingot
+      quantity: 2
+
+    - itemId: Morganite
+      quantity: 3
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450
