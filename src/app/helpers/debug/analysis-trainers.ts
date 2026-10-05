@@ -220,7 +220,12 @@ function toCheck(
   passMessage: string,
 ): AnalysisCheck {
   return problems.length > 0
-    ? { id, label, status: 'fail', message: `${label} ${problems.join('; ')}.` }
+    ? {
+        id,
+        label,
+        status: 'warning',
+        message: `${label} ${problems.join('; ')}.`,
+      }
     : { id, label, status: 'pass', message: passMessage };
 }
 
