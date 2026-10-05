@@ -1,10 +1,12 @@
-// Bounds worker/node reachability by each worker's real leveling progression, not just raw stamina.
+// Bounds worker/node reachability by each worker's real leveling progression, not just raw stamina,
+// both without outposts and with every outpost at +5 (the best case the player can build toward).
 
 import { WORKER_MAX_LEVEL } from '@helpers/config';
 import { getEntriesByType } from '@helpers/content/content';
-import { buildNodeNameToMap } from '@helpers/debug/analysis-utils';
-import { travelPathBaseTotalTicks } from '@helpers/hero/travel-cost-base';
-import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
+import {
+  buildNodeNameToMap,
+  kingdomOneWayTicks,
+} from '@helpers/debug/analysis-utils';
 import {
   workerMinLevelForStamina,
   workerStatsForLevel,
@@ -15,33 +17,35 @@ import {
   type AnalysisRunResult,
   type AnalysisTable,
   type GatheringContent,
+  type OutpostRouting,
   type TownContent,
   type WorkerContent,
   type WorkerLevelingGapEntry,
   type WorkerReachabilityCheckEntry,
   type WorkerReachabilityNode,
+  type WorkerReachabilityProfile,
+  type WorkerReachabilityScenario,
+  type WorldNodeEntry,
 } from '@interfaces';
 import { minBy, sortBy } from 'es-toolkit/compat';
 
 function buildNodes(
   nodeNameToMap: Map<string, string>,
+  kingdom: WorldNodeEntry | undefined,
+  allowTeleport: boolean,
+  outpostRouting: OutpostRouting,
 ): WorkerReachabilityNode[] {
-  const kingdom = kingdomNodeGet();
-  const gatherings = getEntriesByType<GatheringContent>('gathering');
-
-  return gatherings.map((gathering) => {
-    // Ignores collectible gates - measures eventual reachability, not this run's ungated-nothing-found state.
-    const path = kingdom
-      ? travelPathFrom(kingdom, gathering.name, true, true)
-      : undefined;
-    return {
-      nodeName: gathering.name,
-      mapName: nodeNameToMap.get(gathering.name) ?? '(unplaced)',
-      oneWayTicks:
-        kingdom && path ? travelPathBaseTotalTicks(path, kingdom) : undefined,
-      levelRange: gathering.workerLevelRange,
-    };
-  });
+  return getEntriesByType<GatheringContent>('gathering').map((gathering) => ({
+    nodeName: gathering.name,
+    mapName: nodeNameToMap.get(gathering.name) ?? '(unplaced)',
+    oneWayTicks: kingdomOneWayTicks(
+      kingdom,
+      gathering.name,
+      allowTeleport,
+      outpostRouting,
+    ),
+    levelRange: gathering.workerLevelRange,
+  }));
 }
 
 // True if a node's window covers `level` and (unless `ignoreStamina`) is reachable there.
@@ -78,34 +82,67 @@ function achievableLevelCap(
   return level;
 }
 
-function buildReachabilityEntries(
-  workers: WorkerContent[],
-  nodes: WorkerReachabilityNode[],
-  caps: Map<string, number>,
-): WorkerReachabilityCheckEntry[] {
-  return workers.flatMap((worker) => {
-    const cap = caps.get(worker.id) ?? 1;
+function buildScenario(
+  worker: WorkerContent,
+  nodeNameToMap: Map<string, string>,
+  kingdom: WorldNodeEntry | undefined,
+  outpostRouting: OutpostRouting,
+): WorkerReachabilityScenario {
+  const nodes = buildNodes(
+    nodeNameToMap,
+    kingdom,
+    worker.canUseTeleports,
+    outpostRouting,
+  );
+  return { nodes, cap: achievableLevelCap(worker, nodes) };
+}
 
-    return nodes.map((node) => {
-      const rawReachableAtLevel =
-        node.oneWayTicks !== undefined
-          ? workerMinLevelForStamina(worker, node.oneWayTicks)
-          : undefined;
-      const reachableAtLevel =
-        rawReachableAtLevel !== undefined && rawReachableAtLevel <= cap
-          ? rawReachableAtLevel
-          : undefined;
+function buildProfile(
+  worker: WorkerContent,
+  nodeNameToMap: Map<string, string>,
+  kingdom: WorldNodeEntry | undefined,
+): WorkerReachabilityProfile {
+  return {
+    worker,
+    base: buildScenario(worker, nodeNameToMap, kingdom, 'None'),
+    outposts: buildScenario(worker, nodeNameToMap, kingdom, 'AllMaxed'),
+  };
+}
+
+function reachableAtLevel(
+  worker: WorkerContent,
+  cap: number,
+  oneWayTicks?: number,
+): number | undefined {
+  if (oneWayTicks === undefined) return undefined;
+
+  const level = workerMinLevelForStamina(worker, oneWayTicks);
+  return level !== undefined && level <= cap ? level : undefined;
+}
+
+function buildReachabilityEntries(
+  profiles: WorkerReachabilityProfile[],
+): WorkerReachabilityCheckEntry[] {
+  return profiles.flatMap(({ worker, base, outposts }) =>
+    base.nodes.map((node, index) => {
+      const outpostOneWayTicks = outposts.nodes[index]?.oneWayTicks;
 
       return {
         workerName: worker.name,
         nodeName: node.nodeName,
         mapName: node.mapName,
         oneWayTicks: node.oneWayTicks,
-        reachableAtLevel,
+        reachableAtLevel: reachableAtLevel(worker, base.cap, node.oneWayTicks),
+        outpostOneWayTicks,
+        outpostReachableAtLevel: reachableAtLevel(
+          worker,
+          outposts.cap,
+          outpostOneWayTicks,
+        ),
         levelRange: node.levelRange,
       };
-    });
-  });
+    }),
+  );
 }
 
 // Cheapest node covering `level` - the concrete reason a worker stuck at `level` can't progress.
@@ -123,38 +160,48 @@ function findBlockingNode(
 }
 
 function buildLevelingGapEntries(
-  workers: WorkerContent[],
-  nodes: WorkerReachabilityNode[],
-  caps: Map<string, number>,
+  profiles: WorkerReachabilityProfile[],
+  scenarioKey: 'base' | 'outposts',
   idealCap: number,
 ): WorkerLevelingGapEntry[] {
-  return workers
-    .filter((worker) => (caps.get(worker.id) ?? 1) < idealCap)
-    .map((worker) => {
-      const stuckAtLevel = caps.get(worker.id) ?? 1;
+  return profiles
+    .filter((profile) => profile[scenarioKey].cap < idealCap)
+    .map((profile) => {
+      const { nodes, cap: stuckAtLevel } = profile[scenarioKey];
       const blockingNode = findBlockingNode(nodes, stuckAtLevel);
 
       return {
-        workerName: worker.name,
+        workerName: profile.worker.name,
         stuckAtLevel,
         blockingNodeName: blockingNode?.nodeName,
         blockingNodeLevelRange: blockingNode?.levelRange,
-        workerStaminaAtStuckLevel: workerStatsForLevel(worker, stuckAtLevel)
-          .stamina,
+        workerStaminaAtStuckLevel: workerStatsForLevel(
+          profile.worker,
+          stuckAtLevel,
+        ).stamina,
         blockingNodeStaminaCost: blockingNode?.oneWayTicks,
       };
     });
+}
+
+function nodeNamesWhere(
+  nodes: WorkerReachabilityNode[],
+  entries: WorkerReachabilityCheckEntry[],
+  predicate: (nodeEntries: WorkerReachabilityCheckEntry[]) => boolean,
+): string[] {
+  return nodes
+    .filter((node) =>
+      predicate(entries.filter((e) => e.nodeName === node.nodeName)),
+    )
+    .map((node) => node.nodeName);
 }
 
 function nodeReachabilityCheck(
   nodes: WorkerReachabilityNode[],
   entries: WorkerReachabilityCheckEntry[],
 ): AnalysisCheck {
-  const unreachable = nodes.filter(
-    (node) =>
-      !entries.some(
-        (e) => e.nodeName === node.nodeName && e.reachableAtLevel !== undefined,
-      ),
+  const unreachable = nodeNamesWhere(nodes, entries, (nodeEntries) =>
+    nodeEntries.every((e) => e.outpostReachableAtLevel === undefined),
   );
 
   if (unreachable.length === 0) {
@@ -170,9 +217,30 @@ function nodeReachabilityCheck(
     id: 'unreachable',
     label: 'Node reachability',
     status: 'fail',
-    message: `${unreachable.length} node(s) are unreachable by every worker: ${unreachable
-      .map((node) => node.nodeName)
-      .join(', ')}`,
+    message: `${unreachable.length} node(s) are unreachable by every worker, even with every outpost at +5: ${unreachable.join(', ')}`,
+  };
+}
+
+function outpostOnlyNodesCheck(
+  nodes: WorkerReachabilityNode[],
+  entries: WorkerReachabilityCheckEntry[],
+): AnalysisCheck {
+  const outpostOnly = nodeNamesWhere(
+    nodes,
+    entries,
+    (nodeEntries) =>
+      nodeEntries.every((e) => e.reachableAtLevel === undefined) &&
+      nodeEntries.some((e) => e.outpostReachableAtLevel !== undefined),
+  );
+
+  return {
+    id: 'outpost-only-nodes',
+    label: 'Outpost-dependent nodes',
+    status: outpostOnly.length === 0 ? 'pass' : 'info',
+    message:
+      outpostOnly.length === 0
+        ? 'No gather node needs outposts to be reachable by a worker.'
+        : `${outpostOnly.length} node(s) are only reachable by workers once outposts are at +5: ${outpostOnly.join(', ')}`,
   };
 }
 
@@ -185,7 +253,7 @@ function levelingGapCheck(
       id: 'leveling-gaps',
       label: 'Worker leveling coverage',
       status: 'pass',
-      message: `Every worker can level all the way to the content-wide cap (Lv. ${idealCap}).`,
+      message: `Every worker can level all the way to the content-wide cap (Lv. ${idealCap}), given every outpost at +5.`,
     };
   }
 
@@ -193,35 +261,39 @@ function levelingGapCheck(
     id: 'leveling-gaps',
     label: 'Worker leveling coverage',
     status: 'warning',
-    message: `${gaps.length} worker(s) stall before the content-wide level cap (Lv. ${idealCap}) - see the leveling gaps table: ${gaps
+    message: `${gaps.length} worker(s) stall before the content-wide level cap (Lv. ${idealCap}) even with every outpost at +5 - see the leveling gaps tables: ${gaps
       .map((gap) => `${gap.workerName} (stuck at Lv.${gap.stuckAtLevel})`)
       .join(', ')}`,
   };
 }
 
-export function runWorkerReachabilityAnalysis(): AnalysisRunResult {
-  const towns = getEntriesByType<TownContent>('town');
-  const allWorkers = getEntriesByType<WorkerContent>('worker');
-  const nodeNameToMap = buildNodeNameToMap();
-  const nodes = buildNodes(nodeNameToMap);
-  const kingdom = kingdomNodeGet();
-
-  const workers = allWorkers.filter(
-    (w) =>
-      !towns.some((t) =>
-        t.gathering.workers.find((tw) => tw.workerId === w.id),
-      ),
+function outpostLevelingCheck(
+  profiles: WorkerReachabilityProfile[],
+): AnalysisCheck {
+  const boosted = profiles.filter(
+    (profile) => profile.outposts.cap > profile.base.cap,
   );
 
-  const caps = new Map(
-    workers.map((worker) => [worker.id, achievableLevelCap(worker, nodes)]),
-  );
-  const idealCap = achievableLevelCap(undefined, nodes, true);
+  return {
+    id: 'outpost-leveling',
+    label: 'Outpost-dependent leveling',
+    status: boosted.length === 0 ? 'pass' : 'info',
+    message:
+      boosted.length === 0
+        ? 'No worker levels any higher with outposts than without.'
+        : `${boosted.length} worker(s) level higher once outposts are at +5: ${boosted
+            .map(
+              ({ worker, base, outposts }) =>
+                `${worker.name} (Lv.${base.cap} -> Lv.${outposts.cap})`,
+            )
+            .join(', ')}`,
+  };
+}
 
-  const entries = buildReachabilityEntries(workers, nodes, caps);
-  const gaps = buildLevelingGapEntries(workers, nodes, caps, idealCap);
-
-  const reachabilityTable: AnalysisTable = {
+function reachabilityTable(
+  entries: WorkerReachabilityCheckEntry[],
+): AnalysisTable {
+  return {
     title: 'Worker node reachability',
     columns: [
       'Worker',
@@ -229,6 +301,8 @@ export function runWorkerReachabilityAnalysis(): AnalysisRunResult {
       'Map',
       'Stamina Req',
       'Reachable At',
+      'Stamina Req (+5 Outposts)',
+      'Reachable At (+5 Outposts)',
       'Node Level Window',
     ],
     rows: sortBy(entries, [
@@ -240,12 +314,19 @@ export function runWorkerReachabilityAnalysis(): AnalysisRunResult {
       Map: e.mapName,
       'Stamina Req': e.oneWayTicks ?? 'unroutable',
       'Reachable At': e.reachableAtLevel ?? 'never',
+      'Stamina Req (+5 Outposts)': e.outpostOneWayTicks ?? 'unroutable',
+      'Reachable At (+5 Outposts)': e.outpostReachableAtLevel ?? 'never',
       'Node Level Window': `${e.levelRange.min}-${e.levelRange.max}`,
     })),
   };
+}
 
-  const levelingGapsTable: AnalysisTable = {
-    title: 'Worker leveling gaps',
+function levelingGapsTable(
+  title: string,
+  gaps: WorkerLevelingGapEntry[],
+): AnalysisTable {
+  return {
+    title,
     columns: [
       'Worker',
       'Stuck At',
@@ -267,10 +348,36 @@ export function runWorkerReachabilityAnalysis(): AnalysisRunResult {
       }),
     ),
   };
+}
+
+export function runWorkerReachabilityAnalysis(): AnalysisRunResult {
+  const towns = getEntriesByType<TownContent>('town');
+  const allWorkers = getEntriesByType<WorkerContent>('worker');
+  const nodeNameToMap = buildNodeNameToMap();
+  const kingdom = kingdomNodeGet();
+
+  const workers = allWorkers.filter(
+    (w) =>
+      !towns.some((t) =>
+        t.gathering.workers.find((tw) => tw.workerId === w.id),
+      ),
+  );
+
+  const profiles = workers.map((worker) =>
+    buildProfile(worker, nodeNameToMap, kingdom),
+  );
+  const contentNodes = buildNodes(nodeNameToMap, kingdom, true, 'None');
+  const idealCap = achievableLevelCap(undefined, contentNodes, true);
+
+  const entries = buildReachabilityEntries(profiles);
+  const baseGaps = buildLevelingGapEntries(profiles, 'base', idealCap);
+  const outpostGaps = buildLevelingGapEntries(profiles, 'outposts', idealCap);
 
   const checks: AnalysisCheck[] = [
-    nodeReachabilityCheck(nodes, entries),
-    levelingGapCheck(gaps, idealCap),
+    nodeReachabilityCheck(contentNodes, entries),
+    outpostOnlyNodesCheck(contentNodes, entries),
+    levelingGapCheck(outpostGaps, idealCap),
+    outpostLevelingCheck(profiles),
   ];
 
   if (!kingdom) {
@@ -284,7 +391,11 @@ export function runWorkerReachabilityAnalysis(): AnalysisRunResult {
 
   return {
     checks,
-    tables: [reachabilityTable, levelingGapsTable],
-    summary: `${entries.length} worker/node pair(s) checked across ${workers.length} worker(s) and ${nodes.length} node(s); content-wide leveling cap is Lv. ${idealCap}.`,
+    tables: [
+      reachabilityTable(entries),
+      levelingGapsTable('Worker leveling gaps (no outposts)', baseGaps),
+      levelingGapsTable('Worker leveling gaps (+5 outposts)', outpostGaps),
+    ],
+    summary: `${entries.length} worker/node pair(s) checked across ${workers.length} worker(s) and ${contentNodes.length} node(s); content-wide leveling cap is Lv. ${idealCap}.`,
   };
 }

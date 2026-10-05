@@ -79,7 +79,7 @@ const noOutpostRoute = (allowTeleport: boolean) => [
   allowTeleport,
   false,
   false,
-  false,
+  'None',
 ];
 
 // The real route lookup has its own spec; here every route from the town costs `cost` ticks.

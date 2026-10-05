@@ -29,7 +29,7 @@ export function townWorkerStaminaCostToNode(
     allowTeleport,
     false,
     false,
-    false,
+    'None',
   );
   return path ? travelPathBaseTotalTicks(path, townNode) : undefined;
 }
@@ -76,7 +76,7 @@ export function townWorkerBeginOutboundTrip(
     canUseTeleports,
     false,
     false,
-    false,
+    'None',
   );
   if (!path) return;
 
@@ -118,7 +118,7 @@ export function townWorkerBeginReturnTrip(
       canUseTeleports,
       false,
       false,
-      false,
+      'None',
     );
 
     target.status = path

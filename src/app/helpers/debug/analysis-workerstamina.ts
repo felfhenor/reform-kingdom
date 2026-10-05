@@ -2,9 +2,10 @@
 // calibrating worker `stamina` stats against.
 
 import { getEntriesByType } from '@helpers/content/content';
-import { buildNodeNameToMap } from '@helpers/debug/analysis-utils';
-import { travelPathBaseTotalTicks } from '@helpers/hero/travel-cost-base';
-import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
+import {
+  buildNodeNameToMap,
+  kingdomOneWayTicks,
+} from '@helpers/debug/analysis-utils';
 import { kingdomNodeGet } from '@helpers/world-node/world-nodes';
 import type {
   AnalysisCheck,
@@ -20,20 +21,11 @@ export function runWorkerStaminaAnalysis(): AnalysisRunResult {
   const nodeNameToMap = buildNodeNameToMap();
   const kingdom = kingdomNodeGet();
 
-  const entries: WorkerStaminaCheckEntry[] = gatherings.map((gathering) => {
-    // Ignores collectible gates - measures eventual reachability, not this run's ungated-nothing-found state.
-    const path = kingdom
-      ? travelPathFrom(kingdom, gathering.name, true, true)
-      : undefined;
-    const oneWayTicks =
-      kingdom && path ? travelPathBaseTotalTicks(path, kingdom) : undefined;
-
-    return {
-      name: gathering.name,
-      mapName: nodeNameToMap.get(gathering.name) ?? '(unplaced)',
-      oneWayTicks,
-    };
-  });
+  const entries: WorkerStaminaCheckEntry[] = gatherings.map((gathering) => ({
+    name: gathering.name,
+    mapName: nodeNameToMap.get(gathering.name) ?? '(unplaced)',
+    oneWayTicks: kingdomOneWayTicks(kingdom, gathering.name),
+  }));
 
   const sorted = sortBy(entries, [
     (e: WorkerStaminaCheckEntry) => e.oneWayTicks ?? Number.MAX_SAFE_INTEGER,

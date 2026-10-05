@@ -420,14 +420,39 @@ describe('travelPathFrom via teleport-level outposts', () => {
     expect(travelPathFrom(origin, 'Bog')).toHaveLength(3);
   });
 
-  it('never hops when teleports are disallowed, for content-only tooling, or with useOutposts off', () => {
+  it('never hops when teleports are disallowed, for content-only tooling, or with outpost routing off', () => {
     seedOutposts({ 'Carrina Outpost': ready, 'Mire Outpost': ready });
 
     expect(travelPathFrom(origin, 'Bog', false)).toBeUndefined();
     expect(travelPathFrom(origin, 'Bog', true, true)).toBeUndefined();
     expect(
-      travelPathFrom(origin, 'Bog', true, false, false, false),
+      travelPathFrom(origin, 'Bog', true, false, false, 'None'),
     ).toBeUndefined();
+  });
+
+  it('AllMaxed hops through every outpost regardless of save levels, even for content-only tooling', () => {
+    seedOutposts({});
+
+    expect(
+      travelPathFrom(origin, 'Bog', true, true, false, 'AllMaxed'),
+    ).toEqual([
+      { kind: 'Move', mapName: 'Carrina', x: 1, y: 0 },
+      { kind: 'Teleport', mapName: 'CraggledMire', x: 1, y: 0 },
+      { kind: 'Move', mapName: 'CraggledMire', x: 2, y: 0 },
+    ]);
+    expect(travelPathFrom(origin, 'Bog', true, true)).toBeUndefined();
+  });
+
+  it('AllMaxed skips collectible-gated outposts unless gates are ignored', () => {
+    seedOutposts({});
+    lockBehindCollectible('Mire Outpost');
+
+    expect(
+      travelPathFrom(origin, 'Bog', true, false, false, 'AllMaxed'),
+    ).toBeUndefined();
+    expect(
+      travelPathFrom(origin, 'Bog', true, true, false, 'AllMaxed'),
+    ).toHaveLength(3);
   });
 
   it('takes an outpost hop within one map when it beats walking', () => {

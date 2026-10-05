@@ -5,6 +5,9 @@ export type TravelStatus = 'Idle' | 'Traveling';
 
 export type TravelStepKind = 'Move' | 'Teleport';
 
+// Which outposts act as hops: none, the save's +5 ones, or every Outpost node as if +5 (content-only tooling).
+export type OutpostRouting = 'None' | 'Unlocked' | 'AllMaxed';
+
 export type TravelStep = {
   kind: TravelStepKind;
   mapName: string;

@@ -1,5 +1,7 @@
 import { getEntriesByType } from '@helpers/content/content';
+import { travelPathBaseTotalTicks } from '@helpers/hero/travel-cost-base';
 import { allMaps } from '@helpers/maps';
+import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
 import type {
   AnalysisCheck,
   AnalysisIssue,
@@ -9,8 +11,10 @@ import type {
   EncounterContent,
   EncounterRandomContent,
   GatheringContent,
+  OutpostRouting,
   StatBlock,
   TiledMap,
+  WorldNodeEntry,
 } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
 
@@ -50,6 +54,26 @@ export function buildNodeNameToMap(): Map<string, string> {
   });
 
   return nodeNameToMap;
+}
+
+// Unboosted worker stamina cost to `nodeName`; ignores collectible gates to measure eventual, not current, reachability.
+export function kingdomOneWayTicks(
+  kingdom: WorldNodeEntry | undefined,
+  nodeName: string,
+  allowTeleport = true,
+  outpostRouting: OutpostRouting = 'None',
+): number | undefined {
+  if (!kingdom) return undefined;
+
+  const path = travelPathFrom(
+    kingdom,
+    nodeName,
+    allowTeleport,
+    true,
+    false,
+    outpostRouting,
+  );
+  return path ? travelPathBaseTotalTicks(path, kingdom) : undefined;
 }
 
 const STATS: BaseStat[] = [

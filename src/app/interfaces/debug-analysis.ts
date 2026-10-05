@@ -1,6 +1,7 @@
 import type { HasSprite } from '@interfaces/artable';
 import type { JobContent } from '@interfaces/content-job';
 import type { EquipmentSkillContent } from '@interfaces/content-skill';
+import type { WorkerContent } from '@interfaces/content-worker';
 import type { EquipmentItemType } from '@interfaces/equipment';
 import type { IsContentItem } from '@interfaces/identifiable';
 import type { LevelRange } from '@interfaces/level-range';
@@ -115,6 +116,19 @@ export type WorkerReachabilityNode = {
   levelRange: LevelRange;
 };
 
+// One routing assumption's node costs, plus the level the worker stalls at under them.
+export type WorkerReachabilityScenario = {
+  nodes: WorkerReachabilityNode[];
+  cap: number;
+};
+
+// `outposts` assumes every Outpost node is +5, so it's the best case the player can build toward.
+export type WorkerReachabilityProfile = {
+  worker: WorkerContent;
+  base: WorkerReachabilityScenario;
+  outposts: WorkerReachabilityScenario;
+};
+
 export type WorkerReachabilityCheckEntry = {
   workerName: string;
   nodeName: string;
@@ -122,6 +136,8 @@ export type WorkerReachabilityCheckEntry = {
   oneWayTicks?: number;
   // Undefined unless the worker's own leveling progression actually reaches this level.
   reachableAtLevel?: number;
+  outpostOneWayTicks?: number;
+  outpostReachableAtLevel?: number;
   levelRange: LevelRange;
 };
 

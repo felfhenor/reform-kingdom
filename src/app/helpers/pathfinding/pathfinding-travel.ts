@@ -10,9 +10,14 @@ import {
 } from '@helpers/pathfinding/pathfinding';
 import { worldCurrentLocationState } from '@helpers/state-game';
 import { outpostsWithTeleportUnlocked } from '@helpers/world-node/world-node-outpost';
-import { worldNodeByName } from '@helpers/world-node/world-nodes';
+import {
+  isWorldNodeCollectibleGateMet,
+  worldNodeByName,
+  worldNodesOfType,
+} from '@helpers/world-node/world-nodes';
 import type {
   CurrentLocation,
+  OutpostRouting,
   TravelRouteEdge,
   TravelStep,
   WorldNodeEntry,
@@ -43,6 +48,22 @@ function outpostEdges(outposts: WorldNodeEntry[]): TravelRouteEdge[] {
       (arrival) => arrival.nodeName !== gateway.nodeName,
     ),
   }));
+}
+
+// 'Unlocked' reads save-state outpost levels, so content-only tooling (ignoreCollectibleGate) never mixes them in.
+function routableOutposts(
+  outpostRouting: OutpostRouting,
+  ignoreCollectibleGate: boolean,
+): WorldNodeEntry[] {
+  if (outpostRouting === 'AllMaxed') {
+    const outposts = worldNodesOfType('Outpost');
+    return ignoreCollectibleGate
+      ? outposts
+      : outposts.filter(isWorldNodeCollectibleGateMet);
+  }
+  return outpostRouting === 'Unlocked' && !ignoreCollectibleGate
+    ? outpostsWithTeleportUnlocked()
+    : [];
 }
 
 function routeWaypoints(
@@ -170,20 +191,20 @@ function pathFromCacheKey(
   allowTeleport: boolean,
   ignoreCollectibleGate: boolean,
   passThroughNodes: boolean,
-  useOutposts: boolean,
+  outpostRouting: OutpostRouting,
 ): string {
-  return `${location.mapName}:${location.x}:${location.y}::${destinationNodeName}::${allowTeleport}:${ignoreCollectibleGate}:${passThroughNodes}:${useOutposts}`;
+  return `${location.mapName}:${location.x}:${location.y}::${destinationNodeName}::${allowTeleport}:${ignoreCollectibleGate}:${passThroughNodes}:${outpostRouting}`;
 }
 
 // Pure by-location variant, so non-party travelers (workers) can path from an arbitrary origin, not just the hero
-// party's current tile. `ignoreCollectibleGate` is for content-only debug/analysis tooling; NPC town workers pass `useOutposts = false`.
+// party's current tile. `ignoreCollectibleGate` is for content-only debug/analysis tooling; NPC town workers pass `outpostRouting = 'None'`.
 export function travelPathFrom(
   location: CurrentLocation,
   destinationNodeName: string,
   allowTeleport = true,
   ignoreCollectibleGate = false,
   passThroughNodes = false,
-  useOutposts = true,
+  outpostRouting: OutpostRouting = 'Unlocked',
 ): TravelStep[] | undefined {
   const currentMaps = allMaps();
   const currentDiscoveredCollectibleCount = discoveredCollectibleCount();
@@ -207,7 +228,7 @@ export function travelPathFrom(
     allowTeleport,
     ignoreCollectibleGate,
     passThroughNodes,
-    useOutposts,
+    outpostRouting,
   );
   if (pathFromCache.has(key)) return pathFromCache.get(key);
 
@@ -217,7 +238,7 @@ export function travelPathFrom(
     allowTeleport,
     ignoreCollectibleGate,
     passThroughNodes,
-    useOutposts,
+    outpostRouting,
   );
   pathFromCache.set(key, path);
   return path;
@@ -229,7 +250,7 @@ function computeTravelPathFrom(
   allowTeleport: boolean,
   ignoreCollectibleGate: boolean,
   passThroughNodes: boolean,
-  useOutposts: boolean,
+  outpostRouting: OutpostRouting,
 ): TravelStep[] | undefined {
   const destination = worldNodeByName(destinationNodeName);
   if (!destination) return undefined;
@@ -254,9 +275,7 @@ function computeTravelPathFrom(
       : undefined;
   }
 
-  // Outpost levels are save state, so content-only tooling (ignoreCollectibleGate) never hops through them.
-  const outposts =
-    useOutposts && !ignoreCollectibleGate ? outpostsWithTeleportUnlocked() : [];
+  const outposts = routableOutposts(outpostRouting, ignoreCollectibleGate);
   const outpostHopStartsHere =
     outposts.length > 1 &&
     outposts.some((outpost) => outpost.mapName === location.mapName);
