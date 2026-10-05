@@ -17,6 +17,7 @@
         [disabled]="!modifiable"
         (click)="optimizeEquipment()"
         appSfx="ui-click"
+        [tp]="'Optimizing your equipment will automatically equip the best equipment for this hero, based on their class and the stat priorities that class has.'"
         [sfxOffset]="0"
         [sfxTrigger]="['click', 'hover']"
       >

@@ -32,6 +32,7 @@ import {
   type EquipmentItemId,
   type EquipmentSlot,
 } from '@interfaces';
+import { TippyDirective } from '@ngneat/helipopper';
 import { sortBy } from 'es-toolkit/compat';
 
 const PAPERDOLL_ROWS: EquipmentSlot[][] = [
@@ -51,6 +52,7 @@ const PAPERDOLL_ROWS: EquipmentSlot[][] = [
     ScrollingModule,
     SFXDirective,
     SlotButtonContainerComponent,
+    TippyDirective,
   ],
   host: {
     class: 'contents',

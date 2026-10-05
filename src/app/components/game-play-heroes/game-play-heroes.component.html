@@ -2,16 +2,22 @@
   <span header>Heroes</span>
 
   <span pageactionssecondary>
-    <button
-      type="button"
-      class="btn btn-primary btn-sm"
-      (click)="optimizeAll()"
-      appSfx="ui-click"
+    <app-slot-button-container
       [disabled]="!equipmentModifiable()"
-      [sfxTrigger]="['click', 'hover']"
+      [helpText]="'This cannot be done in combat.'"
     >
-      Optimize All
-    </button>
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        (click)="optimizeAll()"
+        appSfx="ui-click"
+        [disabled]="!equipmentModifiable()"
+        [tp]="'Optimizing your equipment will automatically equip the best equipment for each hero, based on their class and the stat priorities that class has.'"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        Optimize All
+      </button>
+    </app-slot-button-container>
   </span>
 
   <div class="h-full flex flex-col gap-4">
