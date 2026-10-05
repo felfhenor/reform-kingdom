@@ -1,26 +1,16 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { IconComponent } from '@components/icon/icon.component';
-import { IconStatComponent } from '@components/icon-stat/icon-stat.component';
+import { IconDimensionComponent } from '@components/icon-dimension/icon-dimension.component';
 import { ICON_SIZE_VALUES } from '@helpers/engine/icons';
-import type { BaseStat, Icon, IconSize } from '@interfaces';
+import type { BaseStat, IconSize } from '@interfaces';
 import {
   CombatStatDimension,
   ElementResistanceDimension,
   MonsterTypeDimension,
+  StatDimension,
   StatOrder,
   StatusEffectTagDimension,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
-
-type IconEntry = {
-  name: string;
-  icon: Icon;
-};
-
-type IconCategory = {
-  title: string;
-  entries: IconEntry[];
-};
 
 // Every IconSize token, small to large - 'badge' is skipped since it's
 // indistinguishable from 'inline' at a glance.
@@ -29,7 +19,7 @@ const ICON_SIZES: IconSize[] = ['inline', 'row', 'stat', 'nav'];
 @Component({
   selector: 'app-icons',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconComponent, IconStatComponent, TippyDirective],
+  imports: [IconDimensionComponent, TippyDirective],
   templateUrl: './icons.component.html',
   styleUrl: './icons.component.scss',
 })
@@ -38,35 +28,29 @@ export class IconsComponent {
   public sizeValues = ICON_SIZE_VALUES;
 
   public stats: BaseStat[] = StatOrder;
+  public statDimension = StatDimension;
+  public resistanceDimension = StatusEffectTagDimension;
 
-  public iconCategories: IconCategory[] = [
+  public iconCategories = [
+    {
+      title: 'Stats',
+      dimension: StatDimension,
+    },
     {
       title: 'Combat Stats',
-      entries: CombatStatDimension.order.map((key) => ({
-        name: CombatStatDimension.label[key],
-        icon: CombatStatDimension.icon[key],
-      })),
+      dimension: CombatStatDimension,
     },
     {
       title: 'Resistances',
-      entries: StatusEffectTagDimension.order.map((key) => ({
-        name: StatusEffectTagDimension.label[key],
-        icon: StatusEffectTagDimension.icon[key],
-      })),
+      dimension: StatusEffectTagDimension,
     },
     {
       title: 'Elements',
-      entries: ElementResistanceDimension.order.map((key) => ({
-        name: key,
-        icon: ElementResistanceDimension.icon[key],
-      })),
+      dimension: ElementResistanceDimension,
     },
     {
       title: 'Monster Types',
-      entries: MonsterTypeDimension.order.map((key) => ({
-        name: MonsterTypeDimension.label[key],
-        icon: MonsterTypeDimension.icon[key],
-      })),
+      dimension: MonsterTypeDimension,
     },
   ];
 }

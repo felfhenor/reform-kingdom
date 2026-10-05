@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { IconComponent } from '@components/icon/icon.component';
-import type { Icon, StatDisplayDimension } from '@interfaces';
+import { IconDimensionComponent } from '@components/icon-dimension/icon-dimension.component';
+import type { StatDisplayDimension } from '@interfaces';
 import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 
 @Component({
   selector: 'app-row-labeled-values',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconComponent, StatDisplayPipe],
+  imports: [IconDimensionComponent, StatDisplayPipe],
   templateUrl: './row-labeled-values.component.html',
   styleUrl: './row-labeled-values.component.scss',
 })
@@ -33,10 +33,6 @@ export class RowLabeledValuesComponent {
 
   public label(key: string): string {
     return this.dimension().label[key];
-  }
-
-  public icon(key: string): Icon {
-    return this.dimension().icon[key];
   }
 
   public suffix(key: string): string {

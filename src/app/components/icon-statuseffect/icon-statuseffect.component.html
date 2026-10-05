@@ -59,7 +59,11 @@
         @for (mod of e.modifiers; track $index) {
           <div class="flex items-center gap-2 text-xs">
             @if (mod.stat) {
-              <app-icon-stat [stat]="mod.stat" size="inline" />
+              <app-icon-dimension
+                [dimension]="statDimension"
+                [key]="mod.stat"
+                size="inline"
+              />
             } @else if (mod.icon) {
               <app-icon [name]="mod.icon" size="inline" />
             }
@@ -83,7 +87,11 @@
         Resisted by
         @for (tag of e.tags; track tag) {
           <span class="flex items-center gap-2 not-italic">
-            <app-icon [name]="tagIcons[tag]" size="inline" />
+            <app-icon-dimension
+              [dimension]="tagDimension"
+              [key]="tag"
+              size="inline"
+            />
             {{ tagLabels[tag] }}
           </span>
         }

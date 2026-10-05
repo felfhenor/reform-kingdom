@@ -5,49 +5,26 @@
     </div>
   </div>
 
-  <div class="card bg-base-100 foreground shadow-xl">
-    <div class="card-body gap-4">
-      <div class="type-section-title">Stats</div>
-
-      <div class="grid grid-cols-4 gap-4">
-        @for (stat of stats; track stat) {
-          <div
-            class="flex flex-row flex-wrap items-center gap-2 rounded-box bg-base-200 p-2"
-          >
-            @for (size of sizes; track size) {
-              <app-icon-stat
-                [stat]="stat"
-                [size]="size"
-                [tp]="size + ' (' + sizeValues[size] + ')'"
-              />
-            }
-
-            <span>{{ stat }}</span>
-          </div>
-        }
-      </div>
-    </div>
-  </div>
-
   @for (category of iconCategories; track category.title) {
     <div class="card bg-base-100 foreground shadow-xl">
       <div class="card-body gap-4">
         <div class="type-section-title">{{ category.title }}</div>
 
         <div class="grid grid-cols-4 gap-4">
-          @for (entry of category.entries; track entry.name) {
+          @for (entry of category.dimension.order; track $index) {
             <div
               class="flex flex-row flex-wrap items-center gap-2 rounded-box bg-base-200 p-2"
             >
               @for (size of sizes; track size) {
-                <app-icon
-                  [name]="entry.icon"
+                <app-icon-dimension
+                  [dimension]="category.dimension"
+                  [key]="entry"
                   [size]="size"
                   [tp]="size + ' (' + sizeValues[size] + ')'"
                 />
               }
 
-              <span>{{ entry.name }}</span>
+              <span>{{ entry }}</span>
             </div>
           }
         </div>

@@ -4,8 +4,9 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { IconStatComponent } from '@components/icon-stat/icon-stat.component';
+import { IconDimensionComponent } from '@components/icon-dimension/icon-dimension.component';
 import {
+  StatDimension,
   StatOrder,
   StatShorthand,
   type BaseStat,
@@ -16,12 +17,13 @@ import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 @Component({
   selector: 'app-row-item-stats',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconStatComponent, StatDisplayPipe],
+  imports: [IconDimensionComponent, StatDisplayPipe],
   templateUrl: './row-item-stats.component.html',
   styleUrl: './row-item-stats.component.scss',
 })
 export class RowItemStatsComponent {
   public stats = input.required<StatBlock>();
+  public statDimension = StatDimension;
   // Extra flat bonus (e.g. from infusions/affixes), merged into the base
   // value it modifies rather than shown as its own row.
   public bonusStats = input<StatBlock>();

@@ -6,8 +6,7 @@ import {
   input,
   type Signal,
 } from '@angular/core';
-import { IconStatComponent } from '@components/icon-stat/icon-stat.component';
-import { IconComponent } from '@components/icon/icon.component';
+import { IconDimensionComponent } from '@components/icon-dimension/icon-dimension.component';
 import {
   characterCombatStatBonusTotals,
   characterTagResistances,
@@ -21,6 +20,7 @@ import {
   CombatStatDimension,
   ElementBoonDimension,
   ElementResistanceDimension,
+  StatDimension,
   StatInformation,
   StatOrder,
   StatShorthand,
@@ -38,7 +38,7 @@ import { injectTweenedNumber } from '@services/animation.service';
 @Component({
   selector: 'app-panel-hero-equipment-stats',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DecimalPipe, IconComponent, IconStatComponent, TippyDirective],
+  imports: [DecimalPipe, TippyDirective, IconDimensionComponent],
   host: {
     class: 'flex flex-col min-h-0 pb-8',
   },
@@ -50,6 +50,7 @@ export class PanelHeroEquipmentStatsComponent {
   public statKeys = StatOrder;
   public statShorthand = StatShorthand;
   public statInformation = StatInformation;
+  public statDimension = StatDimension;
   public resistanceDimension = StatusEffectTagDimension;
   public combatStatDimension = CombatStatDimension;
   public elementalResistanceDimension = ElementResistanceDimension;

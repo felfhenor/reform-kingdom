@@ -1,3 +1,5 @@
+import type { StatDisplayDimension } from '@interfaces/stat-display';
+
 export type BaseStat =
   | 'Intelligence'
   | 'Strength'
@@ -82,3 +84,55 @@ export const MagicalStats: GameStat[] = [
   'Energy',
   'Luck',
 ];
+
+export const StatDimension: StatDisplayDimension<BaseStat> = {
+  order: StatOrder,
+  label: {
+    Intelligence: 'Intelligence',
+    Strength: 'Strength',
+    Vitality: 'Vitality',
+    Resistance: 'Resistance',
+    Agility: 'Agility',
+    Health: 'Health',
+    Energy: 'Energy',
+    Luck: 'Luck',
+    Constitution: 'Constitution',
+    Spirit: 'Spirit',
+  },
+  icon: {
+    Intelligence: 'gameBrain',
+    Strength: 'gameGavel',
+    Vitality: 'gameHeartBeats',
+    Resistance: 'gameVibratingShield',
+    Agility: 'gameDuration',
+    Health: 'gameGlassHeart',
+    Energy: 'gameDrop',
+    Luck: 'gameClover',
+    Constitution: 'gameCaduceus',
+    Spirit: 'gameEmbrassedEnergy',
+  },
+  color: {
+    Intelligence: 'text-sky-400',
+    Strength: 'text-red-500',
+    Vitality: 'text-pink-400',
+    Resistance: 'text-indigo-400',
+    Agility: 'text-green-400',
+    Health: 'text-rose-500',
+    Energy: 'text-yellow-400',
+    Luck: 'text-emerald-400',
+    Constitution: 'text-rose-700',
+    Spirit: 'text-yellow-600',
+  },
+  isPercent: {
+    Intelligence: false,
+    Strength: false,
+    Vitality: false,
+    Resistance: false,
+    Agility: false,
+    Health: false,
+    Energy: false,
+    Luck: false,
+    Constitution: false,
+    Spirit: false,
+  },
+};

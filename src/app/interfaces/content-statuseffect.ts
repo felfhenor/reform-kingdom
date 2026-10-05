@@ -51,6 +51,15 @@ export const StatusEffectTagDimension: StatDisplayDimension<StatusEffectTag> = {
     Burn: 'gameFlame',
     Bleed: 'gameDrop',
   },
+  color: {
+    Stun: 'text-amber-700',
+    StatDown: 'text-orange-500',
+    Accuracy: 'text-yellow-500',
+    DamageOverTime: 'text-red-500',
+    Poison: 'text-purple-500',
+    Burn: 'text-red-500',
+    Bleed: 'text-red-800',
+  },
 };
 
 export type StatusEffectBehaviorType =

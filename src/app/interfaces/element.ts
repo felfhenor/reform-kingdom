@@ -28,6 +28,12 @@ export const ElementResistanceDimension: StatDisplayDimension<GameElement> = {
     Air: 'Air Resist',
   },
   icon: GameElementIcon,
+  color: {
+    Fire: 'text-red-600',
+    Water: 'text-blue-600',
+    Earth: 'text-amber-800',
+    Air: 'text-green-400',
+  },
 };
 
 export const ElementBoonDimension: StatDisplayDimension<GameElement> = {
@@ -39,4 +45,10 @@ export const ElementBoonDimension: StatDisplayDimension<GameElement> = {
     Air: 'Air Boon',
   },
   icon: GameElementIcon,
+  color: {
+    Fire: 'text-red-600',
+    Water: 'text-blue-600',
+    Earth: 'text-amber-800',
+    Air: 'text-green-400',
+  },
 };

@@ -7,7 +7,11 @@
     @let value = tweenedStatValue(stat);
 
     <div class="flex items-center gap-2">
-      <app-icon-stat [stat]="stat" [tp]="statInformation[stat]" />
+      <app-icon-dimension
+        [dimension]="statDimension"
+        [key]="stat"
+        [tp]="statInformation[stat]"
+      />
       <span class="text-base">{{ stat }} ({{ statShorthand[stat] }})</span>
       <span class="ml-auto font-semibold text-lg tabular-nums">
         {{ value | number: '1.0-1' }}
@@ -25,7 +29,11 @@
     @let value = tweenedCombatStatValue(stat);
 
     <div class="flex items-center gap-2">
-      <app-icon [name]="combatStatDimension.icon[stat]" size="stat" />
+      <app-icon-dimension
+        [dimension]="combatStatDimension"
+        [key]="stat"
+        size="stat"
+      />
       <span class="text-base">{{ combatStatDimension.label[stat] }}</span>
       <span class="ml-auto font-semibold text-lg tabular-nums">
         {{ value | number: '1.0-0' }}{{ suffix(combatStatDimension, stat) }}
@@ -43,7 +51,11 @@
     @let value = tweenedResistanceValue(stat);
 
     <div class="flex items-center gap-2">
-      <app-icon [name]="resistanceDimension.icon[stat]" size="stat" />
+      <app-icon-dimension
+        [dimension]="resistanceDimension"
+        [key]="stat"
+        size="stat"
+      />
       <span class="text-base">{{ resistanceDimension.label[stat] }}</span>
       <span class="ml-auto font-semibold text-lg tabular-nums">
         {{ value | number: '1.0-0' }}{{ suffix(resistanceDimension, stat) }}
@@ -70,8 +82,9 @@
     @let value = tweenedElementalResistanceValue(element);
 
     <div class="flex items-center gap-2">
-      <app-icon
-        [name]="elementalResistanceDimension.icon[element]"
+      <app-icon-dimension
+        [dimension]="elementalResistanceDimension"
+        [key]="element"
         size="stat"
       />
       <span class="text-base">
@@ -90,7 +103,11 @@
     @let value = tweenedElementalBoonValue(element);
 
     <div class="flex items-center gap-2">
-      <app-icon [name]="elementalBoonDimension.icon[element]" size="stat" />
+      <app-icon-dimension
+        [dimension]="elementalBoonDimension"
+        [key]="element"
+        size="stat"
+      />
       <span class="text-base">
         {{ elementalBoonDimension.label[element] }}
       </span>

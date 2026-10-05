@@ -75,6 +75,18 @@ export const CombatStatDimension: StatDisplayDimension<CombatStat> = {
     stunChance: 'gameKnockedOutStars',
     agroValue: 'gameTargeted',
   },
+  color: {
+    repeatActionChance: 'text-green-500',
+    skillStrikeAgainChance: 'text-red-600',
+    redirectionChance: 'text-sky-500',
+    missChance: 'text-rose-400',
+    debuffIgnoreChance: 'text-pink-500',
+    damageReflectPercent: 'text-fuchsia-500',
+    healingIgnorePercent: 'text-red-800',
+    reviveChance: 'text-lime-500',
+    stunChance: 'text-yellow-500',
+    agroValue: 'text-orange-600',
+  },
   isPercent: {
     repeatActionChance: true,
     skillStrikeAgainChance: true,

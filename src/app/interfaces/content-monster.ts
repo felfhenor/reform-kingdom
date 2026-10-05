@@ -36,6 +36,14 @@ export const MonsterTypeDimension: StatDisplayDimension<MonsterType> = {
     Beast: 'gameWolfHead',
     Spirit: 'gameGhost',
   },
+  color: {
+    Humanoid: 'text-pink-400',
+    Demon: 'text-cyan-400',
+    Amalgamation: 'text-green-700',
+    Insect: 'text-amber-900',
+    Beast: 'text-red-700',
+    Spirit: 'text-purple-700',
+  },
 };
 
 export type MonsterSkill = DropLevelRange & {

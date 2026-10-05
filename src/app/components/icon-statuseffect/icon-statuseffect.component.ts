@@ -6,10 +6,10 @@ import {
   input,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { IconDimensionComponent } from '@components/icon-dimension/icon-dimension.component';
 import { IconComponent } from '@components/icon/icon.component';
-import { IconStatComponent } from '@components/icon-stat/icon-stat.component';
 import type { StatusEffectPreview } from '@interfaces';
-import { StatusEffectTagDimension } from '@interfaces';
+import { StatDimension, StatusEffectTagDimension } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { PluralizePipe } from '@pipes/pluralize.pipe';
 
@@ -20,7 +20,7 @@ import { PluralizePipe } from '@pipes/pluralize.pipe';
     DecimalPipe,
     AtlasImageComponent,
     IconComponent,
-    IconStatComponent,
+    IconDimensionComponent,
     PluralizePipe,
     TippyDirective,
   ],
@@ -30,7 +30,8 @@ import { PluralizePipe } from '@pipes/pluralize.pipe';
 export class IconStatusEffectComponent {
   public effect = input.required<StatusEffectPreview>();
 
-  public tagIcons = StatusEffectTagDimension.icon;
+  public tagDimension = StatusEffectTagDimension;
+  public statDimension = StatDimension;
   public tagLabels = StatusEffectTagDimension.label;
 
   public isBuff = computed(() => this.effect().effectType === 'Buff');

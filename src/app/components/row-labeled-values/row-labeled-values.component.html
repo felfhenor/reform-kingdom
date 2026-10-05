@@ -11,7 +11,12 @@
       [class.text-value-positive]="!hasComparison() && bonusValue(key) > 0"
       [class.text-value-negative]="!hasComparison() && totalValue(key) < 0"
     >
-      <app-icon class="min-w-[20px]" [name]="icon(key)" size="stat" />
+      <app-icon-dimension
+        class="min-w-[20px]"
+        [dimension]="dimension()"
+        [key]="key"
+        size="stat"
+      />
 
       <span>
         {{ label(key) }} {{ totalValue(key) | statDisplay }}{{ suffix(key) }}
