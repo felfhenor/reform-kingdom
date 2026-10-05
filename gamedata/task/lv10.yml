@@ -121,8 +121,8 @@
     kind: RescueWorker
     workerId: Dekar Anten
   rewards:
-    - itemId: Gold Coin
-      quantity: 5000
+    - itemId: Duskhall Flux
+      quantity: 10
 
     - itemId: Trislime Core
       quantity: 5

@@ -32,8 +32,8 @@
     kind: RescueWorker
     workerId: Selan Rose
   rewards:
-    - itemId: Gold Coin
-      quantity: 25000
+    - itemId: Duskhall Flux
+      quantity: 25
 
     - itemId: Amber
       quantity: 15

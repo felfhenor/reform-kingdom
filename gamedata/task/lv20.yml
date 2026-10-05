@@ -6,8 +6,8 @@
     kind: RescueWorker
     workerId: Sefirah Hornacis
   rewards:
-    - itemId: Gold Coin
-      quantity: 6500
+    - itemId: Duskhall Flux
+      quantity: 20
 
     - itemId: Mirethread
       quantity: 25
