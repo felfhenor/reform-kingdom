@@ -205,17 +205,16 @@
           <div
             class="flex flex-col lg:flex-row items-end lg:items-center gap-2 flex-shrink-0"
           >
-            <span
-              class="text-xs font-semibold text-{{ entry.xpChanceTier }}"
-              [tp]="xpChanceTooltip(entry.xpChance)"
-              [tpPlacement]="'top'"
-            >
-              {{ entry.xpChanceTier }}
-
-              @if (entry.xpChance !== 0) {
-                <span>- XP +{{ entry.xp }}</span>
-              }
-            </span>
+            @if (entry.xpChance !== 0) {
+              <div
+                class="radial-progress text-{{ entry.xpChanceTier }}"
+                [style.--size]="'3rem'"
+                [style.--value]="entry.xpChance"
+                [tp]="xpChanceTooltip(entry)"
+              >
+                <span class="text-xs">+{{ entry.xp }}</span>
+              </div>
+            }
 
             <span
               class="type-meta lg:w-20 lg:shrink-0 lg:text-center tabular-nums"

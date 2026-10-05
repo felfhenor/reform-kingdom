@@ -55,6 +55,7 @@ import {
 import type {
   CollectibleContent,
   CraftQueueEntryId,
+  CraftRecipeEntry,
   CraftRequirementEntry,
   RecipeContent,
   RecipeId,
@@ -275,8 +276,8 @@ export class PanelPlayKingdomTradeskillComponent {
     return `${name} (${owned}/${quantity})`;
   }
 
-  public xpChanceTooltip(xpChance: number): string {
-    return `${Math.round(xpChance)}% chance to gain tradeskill XP`;
+  public xpChanceTooltip(entry: CraftRecipeEntry): string {
+    return `${entry.xpChanceTier} - ${Math.round(entry.xpChance)}% chance to gain tradeskill XP. This will reduce in probability as your tradeskill level gets higher.`;
   }
 
   public craft(
