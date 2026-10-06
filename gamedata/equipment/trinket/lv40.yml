@@ -15,5 +15,20 @@
     - tradeskillId: Tailoring
       value: 1
 
-  elementalResistances:
-    Fire: 5
+- id: 1cf15722-4b19-4120-b127-68b462c85383
+  name: Felshaped Gatherer's Gloves
+  description: A pair of gloves that allows for more effective gathering.
+  levelRequirement: 46
+  rarity: Rare
+  type: Trinket
+  sprite: '0257'
+  slots: 1
+  baseStats:
+    Agility: 7.6
+    Luck: 5.6
+
+  gatherYieldBonuses:
+    - tradeskillId: Artificing
+      value: 1
+    - tradeskillId: Jewelcrafting
+      value: 1

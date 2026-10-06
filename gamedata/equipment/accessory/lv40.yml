@@ -25,3 +25,20 @@
 
   elementalResistances:
     Fire: 5
+
+- id: 7759c83a-51d9-4e64-a702-054b9a67d6f8
+  name: Felshaped Bracers
+  description: A pair of bracers that absorb all elements mercilessly, and is commonly worn by frontline demons.
+  rarity: Rare
+  levelRequirement: 46
+  type: Accessory
+  sprite: '0258'
+  slots: 1
+  baseStats:
+    Resistance: 11.8
+
+  elementalResistances:
+    Fire: 10
+    Air: 10
+    Earth: 10
+    Water: 10

@@ -11,3 +11,15 @@
 
   elementalResistances:
     Fire: 5
+
+- id: 19d81afe-23dc-4394-afbb-11be8ce5affe
+  name: Felshaped Morganite Band
+  description: A ring set with a perfectly-cut morganite. It emanates a powerful energy.
+  levelRequirement: 46
+  rarity: Rare
+  type: Ring
+  sprite: '0259'
+  slots: 1
+  baseStats:
+    Health: 125
+    Energy: 25

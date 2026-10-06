@@ -23,6 +23,9 @@
     - collectibleId: Fel Sewing Gloves
       chance: 25
 
+    - equipmentId: Felshaped Gatherer's Gloves
+      chance: 10
+
     - itemId: Gold Coin
       chance: 100
       min: 2500
@@ -52,6 +55,9 @@
   completionRewards:
     - collectibleId: Fel Sword Prototype
       chance: 25
+
+    - equipmentId: Felshaped Morganite Band
+      chance: 10
 
     - itemId: Gold Coin
       chance: 100
@@ -84,6 +90,9 @@
     - collectibleId: Fel Ancient Magic Helm
       chance: 25
 
+    - equipmentId: Felshaped Animal Doll
+      chance: 10
+
     - itemId: Gold Coin
       chance: 100
       min: 2500
@@ -114,6 +123,9 @@
   completionRewards:
     - collectibleId: Fel Crown
       chance: 25
+
+    - equipmentId: Felshaped Bracers
+      chance: 10
 
     - itemId: Gold Coin
       chance: 100
@@ -146,6 +158,9 @@
   completionRewards:
     - collectibleId: Fel Knightcrest Shield
       chance: 25
+
+    - equipmentId: Felshaped Crown
+      chance: 10
 
     - itemId: Gold Coin
       chance: 100
