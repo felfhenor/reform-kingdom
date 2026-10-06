@@ -104,8 +104,14 @@
     1px 1px 0 #fff;
 }
 
+.tabular-nums {
+  letter-spacing: 0;
+  font-feature-settings: 'tnum' 1;
+  font-family: 'NumericText';
+}
+
 @utility text-lighter {
-  opacity: 0.7;
+  opacity: 0.9;
 }
 
 // Typography roles; use these over raw size/weight combos so the design language stays consistent.

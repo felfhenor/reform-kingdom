@@ -1,15 +1,24 @@
 @font-face {
   font-family: 'FancyText';
-  src: url('../../public/font/DancingScript-VariableFont_wght.ttf')
+  src:
+    url('../../public/font/GeistPixel-Square.woff2')
       format('truetype supports variations'),
-    url('../../public/font/DancingScript-VariableFont_wght.ttf')
+    url('../../public/font/GeistPixel-Square.woff2')
       format('truetype-variations');
 }
 
 @font-face {
   font-family: 'OtherText';
-  src: url('../../public/font/Montserrat-VariableFont_wght.ttf')
-      format('truetype supports variations'),
-    url('../../public/font/Montserrat-VariableFont_wght.ttf')
-      format('truetype-variations');
+  src: url('../../public/font/GeistPixel-Square.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'NumericText';
+  src: url('../../public/font/GeistMono.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }

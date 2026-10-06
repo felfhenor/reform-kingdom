@@ -14,7 +14,9 @@
     </span>
 
     @if (sellMode()) {
-      <span class="text-sm min-w-[80px]">{{ selectedCount() }} selected</span>
+      <span class="text-sm min-w-[80px] tabular-nums">
+        {{ selectedCount() }} selected
+      </span>
 
       <span class="text-sm flex items-center gap-2 min-w-[100px]">
         <app-currency-cost
