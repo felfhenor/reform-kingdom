@@ -12,3 +12,27 @@
 
   elementalResistances:
     Fire: 5
+
+- id: aad5a526-3aa2-4b4d-aa6a-942d29df3c7a
+  name: Purified Spellfocus
+  description: A purified demon staff containing the power of the elements.
+  levelRequirement: 46
+  rarity: Rare
+  type: Staff
+  sprite: '0254'
+  slots: 1
+  baseStats:
+    Intelligence: 31.2
+    Vitality: 24.1
+
+  elementalBoons:
+    Air: 10
+    Earth: 10
+    Fire: 10
+    Water: 10
+
+  elementalResistances:
+    Fire: 5
+    Air: 5
+    Earth: 5
+    Water: 5

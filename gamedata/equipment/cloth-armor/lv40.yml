@@ -12,3 +12,22 @@
 
   elementalResistances:
     Fire: 10
+
+- id: 4dcc7e76-dc97-4075-b7a2-af290f983f15
+  name: Purified Plateshirt
+  description: A purified demon tunic. It possesses incredible magical abilities.
+  levelRequirement: 46
+  rarity: Rare
+  type: Cloth Armor
+  sprite: '0249'
+  slots: 2
+  baseStats:
+    Vitality: 35.1
+    Resistance: 27.8
+    Energy: 15
+
+  elementalResistances:
+    Fire: 10
+    Air: 10
+    Earth: 10
+    Water: 10

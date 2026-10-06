@@ -12,3 +12,21 @@
 
   elementalResistances:
     Fire: 5
+
+- id: e835a543-3e97-4bbe-b553-a5d21da6dd21
+  name: Purified Baselard
+  description: A purified demon dagger that contains the power of the elven shadows.
+  levelRequirement: 46
+  rarity: Rare
+  type: Dagger
+  sprite: '0252'
+  slots: 1
+  baseStats:
+    Agility: 26.1
+    Strength: 21.5
+
+  combatStats:
+    repeatActionChance: 10
+
+  monsterTypeDamage:
+    Demon: 10

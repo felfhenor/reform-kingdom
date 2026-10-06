@@ -12,3 +12,21 @@
 
   elementalResistances:
     Fire: 5
+
+- id: 03337d2c-db19-4c03-ab9d-177f30ed27fe
+  name: Purified Stiletto
+  description: A purified stiletto that makes the wearers attack power like the wind.
+  levelRequirement: 46
+  rarity: Rare
+  type: Dirk
+  sprite: '0246'
+  slots: 1
+  baseStats:
+    Strength: 30.3
+    Agility: 14.6
+
+  elementalBoons:
+    Air: 10
+
+  monsterTypeDamage:
+    Demon: 5

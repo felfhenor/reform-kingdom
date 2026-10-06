@@ -12,3 +12,18 @@
 
   elementalResistances:
     Fire: 10
+
+- id: 63c8fe20-b121-439e-af7a-1443588663c0
+  name: Purified Defender
+  description: A purified demon shield containing the power of elven thorns.
+  levelRequirement: 46
+  rarity: Rare
+  type: Shield
+  sprite: '0244'
+  slots: 1
+  baseStats:
+    Vitality: 21.1
+    Resistance: 15.6
+
+  combatStats:
+    damageReflectPercent: 10
