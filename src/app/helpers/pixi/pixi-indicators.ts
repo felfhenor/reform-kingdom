@@ -132,11 +132,12 @@ export function pixiIndicatorNodeLabelCreate(
     text,
     style: {
       fontSize: 11,
-      fontFamily: 'Arial',
+      fontFamily: 'OtherText',
       fontWeight: 'bold',
       align: 'center',
       fill: NODE_LABEL_COLOR_BY_KIND[kind],
       stroke: { color: 0x000000, width: 3 },
+      letterSpacing: 1,
     },
   });
 

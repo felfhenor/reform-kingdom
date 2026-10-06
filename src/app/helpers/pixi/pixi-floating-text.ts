@@ -29,10 +29,11 @@ function pixiFloatingTextLabelCreate(
     text,
     style: {
       fontSize,
-      fontFamily: 'Arial',
+      fontFamily: 'OtherText',
       fontWeight: 'bold',
       fill: color,
       stroke: { color: 0x000000, width: 3 },
+      letterSpacing: 1,
     },
   });
 }
