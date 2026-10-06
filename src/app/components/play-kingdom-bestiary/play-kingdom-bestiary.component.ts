@@ -4,8 +4,8 @@ import {
   computed,
   signal,
 } from '@angular/core';
-import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
+import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { DetailBestiaryMonsterComponent } from '@components/detail-bestiary-monster/detail-bestiary-monster.component';
@@ -18,7 +18,7 @@ import {
   filterBestiaryEntries,
   getBestiaryEntries,
 } from '@helpers/kingdom/bestiary.ui';
-import type { MonsterId } from '@interfaces';
+import type { BestiaryEntry, MonsterId } from '@interfaces';
 
 @Component({
   selector: 'app-play-kingdom-bestiary',
@@ -64,7 +64,9 @@ export class PlayKingdomBestiaryComponent {
     this.searchText.set((event.target as HTMLInputElement).value);
   }
 
-  public selectMonster(monsterId: MonsterId): void {
-    this.selectedMonsterId.set(monsterId);
+  public selectMonster(monsterEntry: BestiaryEntry): void {
+    if (!monsterEntry.discovered) return;
+
+    this.selectedMonsterId.set(monsterEntry.monster.id);
   }
 }
