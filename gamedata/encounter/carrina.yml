@@ -512,13 +512,13 @@
 
   fights:
     - monsters:
-        - monsterId: Lesser Fel Demon
+        - monsterId: Fel Demon
         - monsterId: Green Slime
         - monsterId: Purple Slime
         - monsterId: Red Slime
     - monsters:
-        - monsterId: Lesser Fel Demon
-        - monsterId: Lesser Fel Demon
+        - monsterId: Fel Demon
+        - monsterId: Fel Demon
         - monsterId: Red Slime
 
   completionRewards:

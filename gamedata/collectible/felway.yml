@@ -27,3 +27,9 @@
   rarity: Uncommon
   description: An ancient wooden shield used by the first demons who waged war on the Duchy.
   sprite: '0061'
+
+- id: ec6212bd-2573-4b90-bb3f-1739aa08d574
+  name: Ritualistic Fel Tines
+  rarity: Uncommon
+  description: A musical instrument that produces haunting tones, often utilized by demonic worshippers and demons themselves. The music it produces can summon demonic creatures from afar.
+  sprite: '0063'

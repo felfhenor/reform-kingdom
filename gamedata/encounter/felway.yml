@@ -1,0 +1,153 @@
+- id: dd3110d5-c5a4-4e04-bf84-d1a1d651f12a
+  name: Sharitsa
+  description: A harmonious town of demons who take great pride in their tailoring work.
+  levelRange:
+    min: 40
+    max: 43
+
+  fights:
+    - monsters:
+        - monsterId: Fel Villager
+        - monsterId: Fel Villager
+
+    - monsters:
+        - monsterId: Fel Demon
+        - monsterId: Fel Villager
+
+    - monsters:
+        - monsterId: Fel Demon
+        - monsterId: Fel Villager
+        - monsterId: Fel Demon
+
+  completionRewards:
+    - collectibleId: Fel Sewing Gloves
+      chance: 25
+
+    - itemId: Gold Coin
+      chance: 100
+      min: 2500
+      max: 3000
+
+- id: 1131df69-cac7-4015-a321-654b2d5855b9
+  name: Taulen
+  description: A bustling demon town full of demons trying to do their best blacksmithing work for the Fel.
+  levelRange:
+    min: 42
+    max: 45
+
+  fights:
+    - monsters:
+        - monsterId: Fel Villager
+        - monsterId: Pixie
+
+    - monsters:
+        - monsterId: Fel Demon
+        - monsterId: Fel Villager
+
+    - monsters:
+        - monsterId: Fel Demon
+        - monsterId: Fel Villager
+        - monsterId: Pixie
+
+  completionRewards:
+    - collectibleId: Fel Sword Prototype
+      chance: 25
+
+    - itemId: Gold Coin
+      chance: 100
+      min: 2500
+      max: 3000
+
+- id: ad31b53d-2e8b-4641-882c-8738c25324d2
+  name: Chiuni
+  description: A seemingly-desolate town full of demons and wizards trying to create magical items of value.
+  levelRange:
+    min: 44
+    max: 47
+
+  fights:
+    - monsters:
+        - monsterId: Fel Villager
+        - monsterId: Pixie
+
+    - monsters:
+        - monsterId: Fel Demon
+        - monsterId: Fel Villager
+        - monsterId: Beholder
+
+    - monsters:
+        - monsterId: Fel Demon
+        - monsterId: Pixie
+        - monsterId: Beholder
+
+  completionRewards:
+    - collectibleId: Fel Ancient Magic Helm
+      chance: 25
+
+    - itemId: Gold Coin
+      chance: 100
+      min: 2500
+      max: 3000
+
+- id: 07ecadc4-1434-4ff2-ad9b-c54ef2e748eb
+  name: Qualan
+  description: A town of the finest crafters in the demonic world. They spend their time toiling away to infuse their jewels with magic and finding ways to better utilize their work.
+  levelRange:
+    min: 46
+    max: 49
+
+  fights:
+    - monsters:
+        - monsterId: Fel Villager
+        - monsterId: Pixie
+
+    - monsters:
+        - monsterId: Demon Knight
+        - monsterId: Fel Villager
+        - monsterId: Demon Knight
+
+    - monsters:
+        - monsterId: Fel Demon
+        - monsterId: Pixie
+        - monsterId: Demon Knight
+
+  completionRewards:
+    - collectibleId: Fel Crown
+      chance: 25
+
+    - itemId: Gold Coin
+      chance: 100
+      min: 2500
+      max: 3000
+
+- id: b352565d-7178-46df-877c-450af9c3665a
+  name: Diurtar
+  description: A town of demonic woodworkers, creating all manner of infrastructure and weaponry components in their large workshops.
+  levelRange:
+    min: 48
+    max: 41
+
+  fights:
+    - monsters:
+        - monsterId: Fel Villager
+        - monsterId: Pixie
+
+    - monsters:
+        - monsterId: Demon Knight
+        - monsterId: Fel Villager
+        - monsterId: Beholder
+
+    - monsters:
+        - monsterId: Fel Demon
+        - monsterId: Pixie
+        - monsterId: Demon Knight
+        - monsterId: Beholder
+
+  completionRewards:
+    - collectibleId: Fel Knightcrest Shield
+      chance: 25
+
+    - itemId: Gold Coin
+      chance: 100
+      min: 2500
+      max: 3000

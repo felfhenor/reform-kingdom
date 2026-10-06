@@ -15,7 +15,7 @@
     max: 4
 
   creaturePool:
-    - monsterId: Lesser Fel Demon
+    - monsterId: Fel Demon
       weight: 1
     - monsterId: Hawk
       weight: 2

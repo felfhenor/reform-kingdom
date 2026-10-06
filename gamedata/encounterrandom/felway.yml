@@ -1,0 +1,41 @@
+- id: 3794885f-6e5a-4bfb-95a1-f0c1ef6bb833
+  name: Felstone Temple
+  description: A temple created entirely of felstone. An impressively haunting feat of demonkind.
+
+  levelRange:
+    min: 50
+    max: 52
+
+  encounterRange:
+    min: 2
+    max: 3
+
+  combatantRange:
+    min: 2
+    max: 4
+
+  creaturePool:
+    - monsterId: Fel Demon
+      weight: 1
+    - monsterId: Fel Villager
+      weight: 1
+    - monsterId: Pixie
+      weight: 1
+    - monsterId: Beholder
+      weight: 1
+    - monsterId: Demon Knight
+      weight: 1
+
+  completionRewards:
+    - itemId: Duskhall Flux
+      min: 15
+      max: 25
+      chance: 100
+
+    - collectibleId: Ritualistic Fel Tines
+      chance: 100
+
+    - itemId: Gold Coin
+      min: 35000
+      max: 40000
+      chance: 100

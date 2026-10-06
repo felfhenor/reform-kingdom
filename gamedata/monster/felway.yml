@@ -1,6 +1,6 @@
 - id: abada04f-1132-47c6-8555-4864e691227b
-  name: Lesser Fel Demon
-  description: A lesser demon, often found serving Fel's commander.
+  name: Fel Demon
+  description: A strong demon, often found serving Fel's commander.
 
   types: [Demon]
   elementalResistances:
@@ -28,6 +28,11 @@
       chance: 10
       minLevel: 25
 
+    - itemId: Fel Essence
+      min: 4
+      max: 7
+      minLevel: 25
+
   skills:
     - skillId: Attack
       weight: 1
@@ -39,7 +44,7 @@
       weight: 2
 
   baseStats:
-    Health: 150
+    Health: 175
     Energy: 50
     Luck: 5
     Intelligence: 15
@@ -57,3 +62,239 @@
     Vitality: 0.5
     Resistance: 0.6
     Agility: 0.4
+
+- id: c14f8831-ebfc-45ed-8132-2548ea07e506
+  name: Fel Villager
+  description: A lesser demon that supports the Fel by cultivating land, harvesting food, and building infrastructure.
+
+  types: [Demon]
+  elementalResistances:
+    Fire: 50
+    Water: -25
+
+  sprite: '0140'
+  frames: 4
+
+  targetting: []
+
+  rarity: Uncommon
+
+  xp:
+    min: 125
+    max: 130
+    bonusPerLevel: 5
+
+  drops:
+    - itemId: Demon Horn
+      min: 1
+      max: 1
+      chance: 10
+      minLevel: 25
+
+    - itemId: Fel Essence
+      min: 4
+      max: 7
+      minLevel: 25
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Earthshake II
+      weight: 3
+
+  baseStats:
+    Health: 150
+    Energy: 75
+    Luck: 5
+    Intelligence: 20
+    Strength: 20
+    Vitality: 30
+    Resistance: 25
+    Agility: 5
+
+  statsPerLevel:
+    Health: 5
+    Energy: 3
+    Luck: 0.3
+    Intelligence: 0.4
+    Strength: 0.6
+    Vitality: 0.6
+    Resistance: 0.5
+    Agility: 0.4
+
+- id: db10b14b-4bd9-4b97-9930-b7de956f97b0
+  name: Beholder
+  description: A magical pet kept by demons to help with magical tasks.
+
+  types: [Demon]
+  elementalResistances:
+    Earth: 25
+
+  sprite: '0136'
+  frames: 4
+
+  targetting: []
+
+  rarity: Uncommon
+
+  xp:
+    min: 150
+    max: 155
+    bonusPerLevel: 4
+
+  drops:
+    - itemId: Fel Essence
+      min: 4
+      max: 7
+      minLevel: 25
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Broil I
+      weight: 3
+
+    - skillId: Frostfire Bolt I
+      weight: 2
+
+  baseStats:
+    Health: 100
+    Energy: 100
+    Luck: 5
+    Intelligence: 30
+    Strength: 15
+    Vitality: 15
+    Resistance: 40
+    Agility: 5
+
+  statsPerLevel:
+    Health: 5
+    Energy: 4
+    Luck: 0.3
+    Intelligence: 0.5
+    Strength: 0.3
+    Vitality: 0.3
+    Resistance: 0.6
+    Agility: 0.2
+
+- id: dc21bc0b-8a21-4a22-8949-a0e15d9cc9bd
+  name: Pixie
+  description: A magical creature that often aids demons with their support.
+
+  types: [Demon]
+  elementalResistances:
+    Air: 25
+
+  sprite: '0148'
+  frames: 4
+
+  targetting: []
+
+  rarity: Uncommon
+
+  xp:
+    min: 150
+    max: 155
+    bonusPerLevel: 4
+
+  drops:
+    - itemId: Fel Essence
+      min: 4
+      max: 7
+      minLevel: 25
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Holy Smite II
+      weight: 3
+
+    - skillId: Cure III
+      weight: 4
+
+    - skillId: Regrowth II
+      weight: 2
+
+    - skillId: Zephyr I
+      weight: 1
+
+  baseStats:
+    Health: 125
+    Energy: 100
+    Luck: 5
+    Intelligence: 35
+    Strength: 5
+    Vitality: 20
+    Resistance: 20
+    Agility: 5
+
+  statsPerLevel:
+    Health: 5
+    Energy: 4
+    Luck: 0.3
+    Intelligence: 0.6
+    Strength: 0.3
+    Vitality: 0.6
+    Resistance: 0.4
+    Agility: 0.2
+
+- id: 5ae12695-4cc0-4392-a3be-3ec379f28662
+  name: Demon Knight
+  description: A demon equipped with extremely protective armor. They lead the charge.
+
+  types: [Demon]
+  elementalResistances: {}
+
+  sprite: '0144'
+  frames: 4
+
+  targetting: []
+
+  rarity: Uncommon
+
+  xp:
+    min: 155
+    max: 160
+    bonusPerLevel: 5
+
+  drops:
+    - itemId: Fel Essence
+      min: 4
+      max: 7
+      minLevel: 25
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Double Strike II
+      weight: 3
+
+    - skillId: Sweep III
+      weight: 4
+
+    - skillId: Spiked Smash I
+      weight: 2
+
+  baseStats:
+    Health: 175
+    Energy: 50
+    Luck: 5
+    Intelligence: 5
+    Strength: 30
+    Vitality: 30
+    Resistance: 10
+    Agility: 5
+
+  statsPerLevel:
+    Health: 6
+    Energy: 4
+    Luck: 0.3
+    Intelligence: 0.3
+    Strength: 0.5
+    Vitality: 0.4
+    Resistance: 0.6
+    Agility: 0.8

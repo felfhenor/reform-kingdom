@@ -24,7 +24,7 @@
   description: The trader wants to slow down the demonic rituals that take place across the woodland.
 
   requirements:
-    - monsterId: Lesser Fel Demon
+    - monsterId: Fel Demon
       quantityMin: 10
       quantityMax: 20
 

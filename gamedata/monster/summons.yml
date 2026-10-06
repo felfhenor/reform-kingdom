@@ -1,0 +1,49 @@
+- id: dc1eab6a-9724-420f-861c-dddf348d27db
+  name: Earth Elemental
+  description: A summoned elemental, often used to help with physical labor tasks.
+
+  types: [Amalgamation]
+  elementalResistances:
+    Fire: 25
+    Water: -15
+
+  sprite: '0152'
+  frames: 4
+
+  targetting: []
+
+  rarity: Rare
+
+  xp:
+    min: 125
+    max: 130
+    bonusPerLevel: 5
+
+  drops: []
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Double Strike II
+      weight: 4
+
+  baseStats:
+    Health: 100
+    Energy: 50
+    Luck: 5
+    Intelligence: 15
+    Strength: 40
+    Vitality: 30
+    Resistance: 5
+    Agility: 5
+
+  statsPerLevel:
+    Health: 7
+    Energy: 1
+    Luck: 0.3
+    Intelligence: 0.4
+    Strength: 0.5
+    Vitality: 0.5
+    Resistance: 0.6
+    Agility: 0.4

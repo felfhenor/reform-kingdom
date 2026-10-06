@@ -285,7 +285,7 @@
     assaulter:
       numMonsters: 12
       monsterIds:
-        - Lesser Fel Demon
+        - Fel Demon
         - Woodspider
         - Woodwolf
         - Elf Ritualist

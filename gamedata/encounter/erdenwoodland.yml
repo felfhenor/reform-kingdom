@@ -7,22 +7,27 @@
 
   fights:
     - monsters:
-        - monsterId: Lesser Fel Demon
-        - monsterId: Lesser Fel Demon
+        - monsterId: Fel Demon
+        - monsterId: Fel Demon
 
     - monsters:
-        - monsterId: Lesser Fel Demon
-        - monsterId: Lesser Fel Demon
-        - monsterId: Lesser Fel Demon
+        - monsterId: Fel Demon
+        - monsterId: Fel Demon
+        - monsterId: Fel Demon
 
     - monsters:
-        - monsterId: Lesser Fel Demon
-        - monsterId: Lesser Fel Demon
-        - monsterId: Lesser Fel Demon
+        - monsterId: Fel Demon
+        - monsterId: Fel Demon
+        - monsterId: Fel Demon
 
   completionRewards:
     - collectibleId: Demon Supply Pouch
       chance: 25
+
+    - itemId: Crimson Lucre
+      chance: 100
+      min: 50
+      max: 100
 
 - id: 9d2e1a40-bf0b-4ed5-bcbc-58d59ed81d94
   name: Spiderwolf Forest
@@ -53,6 +58,11 @@
 
     - recipeId: "Ammo: Slayer's Arrow"
       chance: 10
+
+    - itemId: Crimson Lucre
+      chance: 100
+      min: 75
+      max: 125
 
 - id: d3d0f964-ff09-481e-81ee-9470ac6c4e2b
   name: Windwood Training
@@ -88,6 +98,11 @@
     - equipmentId: Demongold Flyssa
       chance: 15
 
+    - itemId: Crimson Lucre
+      chance: 100
+      min: 100
+      max: 150
+
 - id: 3c362132-eb38-483f-9670-60a91511ec62
   name: Demonelf Hideaway
   description: A small hideout for elves and demons that cohabitate and seek harmony with each other.
@@ -97,12 +112,12 @@
 
   fights:
     - monsters:
-        - monsterId: Lesser Fel Demon
+        - monsterId: Fel Demon
         - monsterId: Elf Druid
         - monsterId: Darkbat
 
     - monsters:
-        - monsterId: Lesser Fel Demon
+        - monsterId: Fel Demon
         - monsterId: Elf Ritualist
         - monsterId: Elf Ritualist
 
@@ -118,6 +133,11 @@
     - recipeId: 'Material: Crimson Lucre Forgery'
       chance: 5
 
+    - itemId: Crimson Lucre
+      chance: 100
+      min: 150
+      max: 200
+
 - id: 550e4813-163d-47a9-8467-1af243008eb8
   name: Demon's Den
   description: A twisted place of darkness, this cave is primarily inhabited by demons and the elves they corrupted.
@@ -127,12 +147,12 @@
 
   fights:
     - monsters:
-        - monsterId: Lesser Fel Demon
-        - monsterId: Lesser Fel Demon
+        - monsterId: Fel Demon
+        - monsterId: Fel Demon
         - monsterId: Elf Ritualist
 
     - monsters:
-        - monsterId: Lesser Fel Demon
+        - monsterId: Fel Demon
         - monsterId: Elf Ritualist
         - monsterId: Darkbat
 
@@ -150,3 +170,8 @@
 
     - equipmentId: Demongold Orbstaff
       chance: 15
+
+    - itemId: Crimson Lucre
+      chance: 100
+      min: 200
+      max: 300
