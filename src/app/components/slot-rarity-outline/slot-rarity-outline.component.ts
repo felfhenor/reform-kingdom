@@ -23,6 +23,6 @@ export class SlotRarityOutlineComponent {
 
   @HostBinding('class')
   public get classList() {
-    return `outline-2 rounded ${this.entry() ? `outline-${this.entry().rarity}` : 'outline-gray-500'}`;
+    return `outline-2 ${this.entry() ? `outline-${this.entry().rarity}` : 'outline-gray-500'}`;
   }
 }

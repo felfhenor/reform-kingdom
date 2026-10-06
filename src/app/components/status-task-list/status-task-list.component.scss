@@ -6,7 +6,7 @@
 }
 
 .task-list-header {
-  @apply flex items-center gap-2 rounded px-2 py-0.5 justify-between cursor-pointer text-start pr-0;
+  @apply flex items-center gap-2 px-2 py-0.5 justify-between cursor-pointer text-start pr-0;
   background-color: color-mix(in oklab, var(--color-base-300) 70%, transparent);
   text-shadow: 0 1px 2px rgb(0 0 0 / 80%);
   pointer-events: auto;

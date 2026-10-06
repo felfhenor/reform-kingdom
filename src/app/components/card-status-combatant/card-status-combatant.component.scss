@@ -5,7 +5,7 @@
 }
 
 .status-entry {
-  @apply relative flex flex-col items-center bg-black/60 border border-black/50 rounded;
+  @apply relative flex flex-col items-center bg-black/60 border border-black/50;
   width: 40px;
   padding: 2px;
   gap: 2px;

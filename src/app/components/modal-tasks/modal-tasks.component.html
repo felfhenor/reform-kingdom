@@ -15,7 +15,7 @@
   >
     @for (row of rows(); track row.taskId) {
       <div
-        class="flex items-center gap-4 p-3 rounded bg-base-200"
+        class="flex items-center gap-4 p-3 bg-base-200"
         [class.opacity-50]="row.isClaimed"
       >
         @if (row.isComplete) {

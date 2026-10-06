@@ -20,7 +20,7 @@
 }
 
 .spot-outline {
-  @apply absolute rounded pointer-events-none;
+  @apply absolute pointer-events-none;
   box-shadow: 0 0 0 3px rgb(251 191 36 / 90%);
   transition:
     top 150ms ease,
@@ -30,7 +30,7 @@
 }
 
 .tutorial-callout {
-  @apply absolute bg-black/90 border border-black/50 rounded text-white;
+  @apply absolute bg-black/90 border border-black/50 text-white;
   width: 320px;
   padding: 12px 14px;
   pointer-events: auto;

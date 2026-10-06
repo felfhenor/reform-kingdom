@@ -64,6 +64,14 @@
   --color-xp: #009b65;
 }
 
+body {
+  --swal2-border-radius: 0;
+  --swal2-input-border-radius: 0;
+  --radius-field: 0;
+  --radius-box: 0;
+  --radius-selector: 0;
+}
+
 .navbar {
   padding: 0;
   min-height: 2rem;
@@ -76,6 +84,7 @@
 
 .tippy-box {
   max-width: 400px !important;
+  border-radius: 0;
 }
 
 .tippy-content {

@@ -13,7 +13,7 @@
       <app-blank-slate>No towns currently need defending.</app-blank-slate>
     } @else {
       @for (row of defenseRows; track row.townId) {
-        <div class="flex flex-col gap-2 p-4 rounded bg-base-200">
+        <div class="flex flex-col gap-2 p-4 bg-base-200">
           <div class="flex items-center justify-between gap-2">
             <span class="flex gap-2">
               <span class="type-entity-name">{{ row.townName }}</span>

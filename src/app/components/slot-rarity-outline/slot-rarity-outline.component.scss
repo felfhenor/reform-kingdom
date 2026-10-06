@@ -72,7 +72,7 @@
 }
 
 .badge {
-  @apply absolute bottom-0 right-0 text-[16px] leading-tight px-1 rounded-sm text-white tabular-nums z-[20];
+  @apply absolute bottom-0 right-0 text-[16px] leading-tight px-1 text-white tabular-nums z-[20];
 
   &:empty {
     @apply hidden;

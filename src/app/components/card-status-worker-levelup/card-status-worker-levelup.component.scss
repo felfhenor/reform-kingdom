@@ -5,7 +5,7 @@
 }
 
 .status-entry {
-  @apply relative flex flex-row items-center bg-black/60 border border-black/50 rounded;
+  @apply relative flex flex-row items-center bg-black/60 border border-black/50;
   width: 40px;
   height: 40px;
   padding: 2px;
@@ -23,7 +23,7 @@
 }
 
 .entry-icon {
-  @apply relative flex items-center justify-center shrink-0 overflow-hidden rounded;
+  @apply relative flex items-center justify-center shrink-0 overflow-hidden;
   width: 32px;
   height: 32px;
 }

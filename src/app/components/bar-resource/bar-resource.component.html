@@ -1,10 +1,10 @@
 @if (areAnyGreaterThanZero()) {
   <div
-    class="bg-base-100 inline-flex items-center gap-2 px-2 py-1 rounded-b-lg backdrop-blur-sm"
+    class="bg-base-100 inline-flex items-center gap-2 px-2 py-1 backdrop-blur-sm"
   >
     @for (res of resources(); track res.itemRef.id) {
       <div
-        class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded tabular-nums whitespace-nowrap text-xs"
+        class="inline-flex items-center gap-0.5 px-1.5 py-0.5 tabular-nums whitespace-nowrap text-xs"
         (animate.enter)="onEnter($event)"
         (animate.leave)="onLeave($event)"
       >

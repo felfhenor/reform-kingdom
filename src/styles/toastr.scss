@@ -13,7 +13,7 @@ $toast-types: (
   width: 320px;
   padding: 16px 16px 16px 54px;
   border: 2px solid color-mix(in oklab, var(--toast-accent) 70%, black);
-  border-radius: 0.5rem;
+  border-radius: 0;
   background-color: var(--color-base-300);
   background-image: url(/asset/texture-bg.png);
   background-position: 0 0;

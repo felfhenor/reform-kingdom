@@ -1,6 +1,6 @@
 <div class="navbar bg-base-100 relative flex py-0">
   <div class="navbar-start flex-1">
-    <ul class="menu menu-horizontal py-0 px-1">
+    <ul class="menu menu-horizontal py-0 px-2">
       <li class="flex gap-2 flex-row" appRequireSetup>
         <button
           class="btn btn-xs btn-info"
@@ -108,7 +108,7 @@
   <app-button-update class="mx-1"></app-button-update>
 
   <div class="navbar-end">
-    <ul class="menu menu-horizontal px-1 flex gap-2">
+    <ul class="menu menu-horizontal px-2 flex gap-2">
       @for (panel of panelConfigs; track $index) {
         <li class="action-button" appRequireSetup>
           <button

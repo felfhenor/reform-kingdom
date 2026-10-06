@@ -12,7 +12,7 @@ import type { WorldNodeEntry } from '@interfaces';
   selector: 'app-sprite-node',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class: 'overflow-hidden shrink-0 rounded-box bg-base-200 inline-block',
+    class: 'overflow-hidden shrink-0 bg-base-200 inline-block',
   },
   template: `
     @if (spriteFrame(); as frame) {

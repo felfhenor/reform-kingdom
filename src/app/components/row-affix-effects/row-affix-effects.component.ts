@@ -15,9 +15,7 @@ import type { AffixDisplay } from '@interfaces';
   template: `
     @let entry = affix();
 
-    <div
-      class="flex flex-col gap-2 p-2 rounded-box border border-base-content/20"
-    >
+    <div class="flex flex-col gap-2 p-2 border border-base-content/20">
       <div class="flex items-center gap-2">
         <span class="type-entity-name text-{{ entry.rarity }}">
           {{ entry.name }}
