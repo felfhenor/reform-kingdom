@@ -69,6 +69,9 @@
         - level: 21
           skillId: Snipe III
 
+        - level: 37
+          skillId: Snipe IV
+
     - pathName: Rapidfire
       levels:
         - level: 3
@@ -88,6 +91,9 @@
         - level: 15
           skillId: Arrow Rain II
 
+        - level: 35
+          skillId: Arrow Rain III
+
     - pathName: Regrowth
       levels:
         - level: 13
@@ -100,3 +106,6 @@
       levels:
         - level: 28
           skillId: Barbed Shot I
+
+        - level: 41
+          skillId: Barbed Shot II

@@ -81,3 +81,31 @@
         Strength: 5
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: f73f57d9-a9e5-49c4-aa19-f833ef928122
+  name: Snipe IV
+  family: Snipe
+  description: Exert a lot of effort to shoot a deadly, accurate shot for {{ value }} damage.
+
+  rarity: Mystical
+  sprite: '0005'
+
+  epCost: 41
+  usesPerCombat: 1
+
+  requiredWeaponTypes: [Bow]
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 6.5
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** snipes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

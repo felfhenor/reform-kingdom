@@ -33,3 +33,39 @@
           duration: 3
 
       combatMessage: '**{{ combatant.name }}** fires a barbed arrow at **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: beb8da82-9ccb-46a5-b55f-eab82a85eecc
+  name: Barbed Shot II
+  family: Barbed Shot
+  description: Fire a barbed arrow at an enemy for {{ value }} damage, with a chance of inflicting Bleed on them.
+
+  rarity: Uncommon
+  sprite: '0038'
+
+  epCost: 15
+  usesPerCombat: 2
+
+  requiredWeaponTypes: [Bow]
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Bleeding
+      damageScaling:
+        Agility: 3
+        Strength: 1.5
+
+      statusEffects:
+        - statusEffectId: Bleeding
+          chance: 65
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** fires a barbed arrow at **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
