@@ -1,6 +1,7 @@
 import {
   combatantIsDead,
   combatCombatantTakeDamage,
+  combatCombatantTakeEnergyDamage,
 } from '@helpers/combat/combat-combatant-hp';
 import { combatantDamageEventEmit } from '@helpers/combat/combat-damage-events';
 import { combatDamageMitigationRoll } from '@helpers/combat/combat-damage-mitigation';
@@ -82,7 +83,8 @@ export function combatDamageElements(
 ): GameElement[] {
   const dealsDamage =
     techniqueHasAttribute(technique, 'DamagesTarget') &&
-    !techniqueHasAttribute(technique, 'HealsTarget');
+    !techniqueHasAttribute(technique, 'HealsTarget') &&
+    !techniqueHasAttribute(technique, 'RestoresTargetEnergy');
   return dealsDamage ? combatTechniqueElements(attacker, technique) : [];
 }
 
@@ -251,6 +253,10 @@ export function combatApplySkillToTarget(
 
     effectiveDamage *= deadlockPreventionMultiplier;
     effectiveDamage = Math.floor(effectiveDamage);
+
+    if (techniqueHasAttribute(technique, 'RestoresTargetEnergy')) {
+      combatCombatantTakeEnergyDamage(target, -effectiveDamage);
+    }
 
     combatCombatantTakeDamage(
       target,

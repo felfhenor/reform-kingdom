@@ -98,3 +98,8 @@
       levels:
         - level: 25
           skillId: Broil I
+
+    - pathName: Refresh
+      levels:
+        - level: 23
+          skillId: Refresh I

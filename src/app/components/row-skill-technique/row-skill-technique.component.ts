@@ -11,6 +11,7 @@ import { StatShorthand } from '@interfaces';
 const kindClasses: Record<SkillTechniqueKind, string> = {
   Damage: 'text-error',
   Heal: 'text-success',
+  Restore: 'text-success',
   Buff: 'text-info',
   Debuff: 'text-warning',
   Effect: '',

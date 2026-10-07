@@ -172,6 +172,7 @@ function heroSkillIdsAtLevel(
 function techniqueType(technique: EquipmentSkillContentTechnique): string {
   const attributes = technique.attributes ?? [];
   if (attributes.includes('HealsTarget')) return 'Heal';
+  if (attributes.includes('RestoresTargetEnergy')) return 'Restore';
   if (attributes.includes('DamagesTarget')) return 'Damage';
   if (attributes.includes('Buff')) return 'Buff';
   if (attributes.includes('Debuff')) return 'Debuff';

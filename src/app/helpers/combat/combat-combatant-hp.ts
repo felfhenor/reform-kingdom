@@ -22,3 +22,10 @@ export function combatCombatantTakeDamage(
     );
   }
 }
+
+export function combatCombatantTakeEnergyDamage(
+  combatant: Combatant,
+  damage: number,
+) {
+  combatant.ep = clamp(combatant.ep - damage, 0, combatant.totalStats.Energy);
+}

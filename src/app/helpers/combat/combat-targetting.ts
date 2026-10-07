@@ -46,7 +46,9 @@ function filterCombatantTargetListForSkillTechniqueBehavior(
     Always: (list) => list,
     ZeroHealth: (list) => list.filter((c) => c.hp <= 0),
     NotMaxHealth: (list) => list.filter((c) => c.hp < c.totalStats.Health),
+    ZeroEnergy: (list) => list.filter((c) => c.ep > 0),
     NotZeroHealth: (list) => list.filter((c) => c.hp > 0),
+    NotZeroEnergy: (list) => list.filter((c) => c.ep < c.totalStats.Energy),
     IfStatusEffect: (list) =>
       list.filter((c) =>
         combatantHasActiveStatusEffect(c, behaviorData.statusEffectId ?? ''),

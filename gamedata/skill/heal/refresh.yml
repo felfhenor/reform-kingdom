@@ -1,0 +1,26 @@
+- id: 3f1d08c5-57fa-4043-a2ab-5f3b79eceecb
+  name: Refresh I
+  family: Refresh
+  description: Restore {{ value }} EP to self.
+
+  sprite: '0042'
+
+  rarity: Common
+
+  epCost: 0
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Water]
+      attributes: [BypassDefense, NeverMisses, RestoresTargetEnergy]
+      targets: 1
+      targetType: Self
+      targetBehaviors:
+        - behavior: NotMaxEnergy
+      damageScaling:
+        Intelligence: 1
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} energy ({{ target.ep }}/{{ target.totalStats.Energy }} EP remaining).'

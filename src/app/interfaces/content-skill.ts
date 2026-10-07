@@ -18,6 +18,8 @@ export type EquipmentSkillTargetBehavior =
   | 'Always'
   | 'ZeroHealth'
   | 'NotZeroHealth'
+  | 'ZeroEnergy'
+  | 'NotZeroEnergy'
   | 'NotMaxHealth'
   | 'IfStatusEffect'
   | 'IfNotStatusEffect';
@@ -29,6 +31,7 @@ export type EquipmentSkillAttribute =
   | 'AllowPlink'
   | 'AllowLuckDodge'
   | 'HealsTarget'
+  | 'RestoresTargetEnergy'
   | 'Buff'
   | 'Debuff';
 

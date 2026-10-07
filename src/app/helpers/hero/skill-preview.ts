@@ -5,8 +5,8 @@ import {
 } from '@helpers/combat/combat-damage';
 import { elementalBoonMultiplier } from '@helpers/combat/combat-element';
 import { combatFormatMessage } from '@helpers/combat/combat-log';
-import { getEntry } from '@helpers/content/content';
 import { SKILL_MAX_ALLY_TARGETS } from '@helpers/config';
+import { getEntry } from '@helpers/content/content';
 import {
   skillTechniqueNumTargets,
   skillTechniqueStatScaling,
@@ -50,6 +50,8 @@ export function skillTechniqueKind(
   const scales = skillTechniqueStatScaling(technique).length > 0;
 
   if (techniqueHasAttribute(technique, 'HealsTarget')) return 'Heal';
+  if (techniqueHasAttribute(technique, 'RestoresTargetEnergy'))
+    return 'Restore';
   if (techniqueHasAttribute(technique, 'DamagesTarget') || scales) {
     return 'Damage';
   }
@@ -116,7 +118,7 @@ function skillTechniquePreview(
 ): SkillTechniquePreview {
   const kind = skillTechniqueKind(technique);
   const damageElements = combatDamageElements(combatant, technique);
-  const hasAmount = kind === 'Damage' || kind === 'Heal';
+  const hasAmount = kind === 'Damage' || kind === 'Heal' || kind === 'Restore';
 
   return {
     kind,
@@ -152,7 +154,11 @@ function skillDescriptionValue(
   skill: EquipmentSkillContent,
 ): number {
   const kinds = skill.techniques.map(skillTechniqueKind);
-  const valuedKind = kinds.includes('Damage') ? 'Damage' : 'Heal';
+  let valuedKind = '';
+
+  if (kinds.includes('Heal')) valuedKind = 'Heal';
+  if (kinds.includes('Damage')) valuedKind = 'Damage';
+  if (kinds.includes('Restore')) valuedKind = 'Restore';
 
   return sumBy(skill.techniques, (technique) =>
     skillTechniqueKind(technique) === valuedKind
