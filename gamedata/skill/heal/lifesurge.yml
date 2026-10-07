@@ -3,7 +3,7 @@
   family: Lifesurge
   description: Revive an incapacitated ally with {{ value }} HP.
 
-  sprite: '0004'
+  sprite: '0041'
 
   rarity: Common
 
@@ -30,7 +30,7 @@
   family: Lifesurge
   description: Revive an incapacitated ally with {{ value }} HP.
 
-  sprite: '0004'
+  sprite: '0041'
 
   rarity: Uncommon
 
