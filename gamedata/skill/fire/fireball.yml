@@ -93,3 +93,35 @@
           duration: 5
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: d6d3c453-9a96-48a8-80f7-e32bc49dc9cd
+  name: Fireball IV
+  family: Fireball
+  description: Burst 4 enemies for {{ value }} fire damage, with a 40% chance of inflicting Burning.
+
+  sprite: '0003'
+
+  rarity: Mystical
+
+  epCost: 21
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Fire]
+      attributes: [DamagesTarget, AllowPlink, Debuff]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 1.15
+
+      statusEffects:
+        - statusEffectId: Burning
+          chance: 50
+          duration: 6
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

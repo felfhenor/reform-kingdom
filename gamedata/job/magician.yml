@@ -72,6 +72,9 @@
         - level: 18
           skillId: Fireball III
 
+        - level: 35
+          skillId: Fireball IV
+
     - pathName: Thunderbolt
       levels:
         - level: 3
@@ -82,6 +85,9 @@
 
         - level: 21
           skillId: Thunderbolt III
+
+        - level: 40
+          skillId: Thunderbolt IV
 
     - pathName: Frostfire Bolt
       levels:
@@ -99,7 +105,13 @@
         - level: 25
           skillId: Broil I
 
+        - level: 42
+          skillId: Broil II
+
     - pathName: Refresh
       levels:
         - level: 23
           skillId: Refresh I
+
+        - level: 45
+          skillId: Refresh II

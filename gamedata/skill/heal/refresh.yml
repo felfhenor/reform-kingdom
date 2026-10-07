@@ -24,3 +24,30 @@
         Intelligence: 1
 
       combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} energy ({{ target.ep }}/{{ target.totalStats.Energy }} EP remaining).'
+
+- id: 10c8f8ce-ec38-4815-a6ce-5a658246eb2e
+  name: Refresh II
+  family: Refresh
+  description: Restore {{ value }} EP to self.
+
+  sprite: '0042'
+
+  rarity: Uncommon
+
+  epCost: 0
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Water]
+      attributes: [BypassDefense, NeverMisses, RestoresTargetEnergy]
+      targets: 1
+      targetType: Self
+      targetBehaviors:
+        - behavior: NotMaxEnergy
+      damageScaling:
+        Intelligence: 1.5
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} energy ({{ target.ep }}/{{ target.totalStats.Energy }} EP remaining).'

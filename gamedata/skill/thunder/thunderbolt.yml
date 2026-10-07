@@ -78,3 +78,30 @@
         Intelligence: 4.5
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 7f0002fb-4100-4b66-a302-24dba3a8deda
+  name: Thunderbolt IV
+  family: Thunderbolt
+  description: Blast a single enemy with an intense shock, dealing {{ value }} damage.
+
+  sprite: '0008'
+
+  rarity: Mystical
+
+  epCost: 39
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Air]
+      attributes: [DamagesTarget, AllowPlink]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 6.5
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
