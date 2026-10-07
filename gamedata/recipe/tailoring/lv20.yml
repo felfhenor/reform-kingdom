@@ -311,6 +311,9 @@
     - itemId: Fel Essence
       quantity: 1
 
+    - itemId: Pixie Claw
+      quantity: 1
+
   tradeskillId: Tailoring
   minTradeskillLevel: 25
   maxTradeskillLevel: 28

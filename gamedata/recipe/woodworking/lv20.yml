@@ -253,6 +253,9 @@
     - itemId: Fel Essence
       quantity: 1
 
+    - itemId: Beholder Eyeball
+      quantity: 1
+
   tradeskillId: Woodworking
   minTradeskillLevel: 25
   maxTradeskillLevel: 28
@@ -295,6 +298,9 @@
     - itemId: Fel Essence
       quantity: 1
 
+    - itemId: Beholder Eyeball
+      quantity: 1
+
   tradeskillId: Woodworking
   minTradeskillLevel: 25
   maxTradeskillLevel: 28
@@ -314,6 +320,9 @@
       quantity: 2
 
     - itemId: Fel Essence
+      quantity: 1
+
+    - itemId: Beholder Eyeball
       quantity: 1
 
   tradeskillId: Woodworking

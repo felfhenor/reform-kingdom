@@ -276,6 +276,9 @@
     - itemId: Fel Fiber
       quantity: 8
 
+    - itemId: Knight Belltag
+      quantity: 1
+
   tradeskillId: Artificing
   minTradeskillLevel: 24
   maxTradeskillLevel: 27
@@ -296,6 +299,9 @@
 
     - itemId: Morganite
       quantity: 2
+
+    - itemId: Knight Belltag
+      quantity: 1
 
   tradeskillId: Artificing
   minTradeskillLevel: 24
@@ -333,6 +339,9 @@
     - itemId: Morganite
       quantity: 1
 
+    - itemId: Pixie Claw
+      quantity: 1
+
     - itemId: Fel Essence
       quantity: 1
 
@@ -355,6 +364,12 @@
       quantity: 6
 
     - itemId: Fel Essence
+      quantity: 1
+
+    - itemId: Pixie Claw
+      quantity: 1
+
+    - itemId: Beholder Eyeball
       quantity: 1
 
   tradeskillId: Artificing

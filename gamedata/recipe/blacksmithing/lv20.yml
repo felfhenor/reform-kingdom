@@ -290,6 +290,9 @@
     - itemId: Fel Essence
       quantity: 1
 
+    - itemId: Beholder Eyeball
+      quantity: 1
+
   tradeskillId: Blacksmithing
   minTradeskillLevel: 25
   maxTradeskillLevel: 28
@@ -311,6 +314,9 @@
     - itemId: Fel Essence
       quantity: 1
 
+    - itemId: Beholder Eyeball
+      quantity: 1
+
   tradeskillId: Blacksmithing
   minTradeskillLevel: 25
   maxTradeskillLevel: 28
@@ -330,6 +336,9 @@
       quantity: 1
 
     - itemId: Fel Essence
+      quantity: 1
+
+    - itemId: Beholder Eyeball
       quantity: 1
 
   tradeskillId: Blacksmithing

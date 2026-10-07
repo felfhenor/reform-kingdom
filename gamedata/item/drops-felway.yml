@@ -1,0 +1,20 @@
+- id: 4480d5fe-2dd1-497f-83a3-6efd76198f97
+  name: Beholder Eyeball
+  description: An eyeball taken from a beholder. Some might speak of it's beauty, but most would say it's gross and tough.
+  rarity: Rare
+
+  sprite: '0083'
+
+- id: faf7d945-dadf-4a33-90fd-54a4644f0f07
+  name: Pixie Claw
+  description: A twisted pixie claw, effusively emitting magical energies.
+  rarity: Rare
+
+  sprite: '0082'
+
+- id: 0238eac7-8a18-4780-a8a7-06b56c3ee53f
+  name: Knight Belltag
+  description: A pair of bells commonly given to demon knights so they can be kept magically and physically tracked.
+  rarity: Rare
+
+  sprite: '0084'
