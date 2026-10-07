@@ -108,6 +108,28 @@
       combatMessage: '**{{ combatant.name }}** has lost their substantial luck (-{{ damage }} Luck)!'
       modifyStat: Luck
 
+- id: d8363fa7-e301-48a5-b8af-95cbbf221b46
+  name: Lucky III
+  sprite: '0018'
+
+  effectType: Buff
+  elements: []
+
+  trigger: TurnStart
+
+  statScaling:
+    Luck: 0.9
+
+  onApply:
+    - type: AddDamageToStat
+      combatMessage: '**{{ combatant.name }}** has been given substantial luck (+{{ damage }} Luck)!'
+      modifyStat: Luck
+
+  onUnapply:
+    - type: TakeDamageFromStat
+      combatMessage: '**{{ combatant.name }}** has lost their substantial luck (-{{ damage }} Luck)!'
+      modifyStat: Luck
+
 - id: 4e2f3e0d-f300-4b3d-bb5e-ec83b2412905
   name: Slime Skin
   sprite: '0019'
@@ -168,6 +190,36 @@
     - type: TakeCombatStatNumber
       combatStat: skillStrikeAgainChance
       value: 10
+
+- id: 55507765-2079-482e-91f5-345a4b1ea233
+  name: Zephyr Boost II
+  sprite: '0020'
+
+  effectType: Buff
+  elements: [Air]
+
+  trigger: TurnStart
+
+  statScaling:
+    Agility: 0.6
+
+  onApply:
+    - type: AddDamageToStat
+      combatMessage: '**{{ combatant.name }}** has gained the speed of the wind (+{{ damage }} Agility)!'
+      modifyStat: Agility
+
+    - type: AddCombatStatNumber
+      combatStat: skillStrikeAgainChance
+      value: 20
+
+  onUnapply:
+    - type: TakeDamageFromStat
+      combatMessage: '**{{ combatant.name }}** has lost their speed of the wind (-{{ damage }} Agility)!'
+      modifyStat: Agility
+
+    - type: TakeCombatStatNumber
+      combatStat: skillStrikeAgainChance
+      value: 20
 
 - id: eecca871-8d48-4b7d-8cec-dd9d5acf32a8
   name: Taunting I

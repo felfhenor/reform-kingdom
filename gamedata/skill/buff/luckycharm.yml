@@ -55,3 +55,32 @@
           duration: 3
 
       combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}**.'
+
+- id: 3311f7ce-e3e5-412f-abbf-a0022f743ec4
+  name: Lucky Charm III
+  family: Lucky Charm
+  description: Improve the luck of all allies!
+
+  sprite: '0018'
+
+  rarity: Rare
+
+  epCost: 18
+  usesPerCombat: -1
+
+  techniques:
+    - elements: []
+      attributes: [Buff]
+      targets: 4
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Lucky III
+
+      statusEffects:
+        - statusEffectId: Lucky III
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}**.'

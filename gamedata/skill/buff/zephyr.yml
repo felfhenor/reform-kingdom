@@ -26,3 +26,32 @@
           duration: 3
 
       combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}**.'
+
+- id: 75e1dc38-0535-4ce2-a033-051f7a5173c2
+  name: Zephyr II
+  family: Zephyr
+  description: Increase the Agility and repeat action chance of all allies.
+
+  sprite: '0029'
+
+  rarity: Uncommon
+
+  epCost: 35
+  usesPerCombat: -1
+
+  techniques:
+    - elements: [Air]
+      attributes: [Buff]
+      targets: 4
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Zephyr Boost II
+
+      statusEffects:
+        - statusEffectId: Zephyr Boost II
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}**.'

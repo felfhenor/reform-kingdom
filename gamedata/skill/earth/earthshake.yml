@@ -96,3 +96,37 @@
           duration: 3
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 39a62331-8317-427e-9e87-fbb555873c8c
+  name: Earthshake IV
+  family: Earthshake
+  description: Make the earth tremble, hitting 5 enemies for {{ value }} earth damage, with a chance of inflicting Trembling.
+
+  sprite: '0017'
+
+  rarity: Mystical
+
+  epCost: 22
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Earth]
+      attributes: [DamagesTarget, AllowPlink, Debuff]
+      targets: 5
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 1.6
+        Resistance: 2.1
+        Constitution: 5
+
+      statusEffects:
+        - statusEffectId: Trembling
+          chance: 75
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

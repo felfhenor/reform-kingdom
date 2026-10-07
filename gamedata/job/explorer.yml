@@ -70,6 +70,9 @@
         - level: 18
           skillId: Analyze III
 
+        - level: 33
+          skillId: Analyze IV
+
     - pathName: Earthshake
       levels:
         - level: 2
@@ -81,6 +84,9 @@
         - level: 23
           skillId: Earthshake III
 
+        - level: 37
+          skillId: Earthshake IV
+
     - pathName: Lucky Charm
       levels:
         - level: 9
@@ -89,7 +95,13 @@
         - level: 21
           skillId: Lucky Charm II
 
+        - level: 41
+          skillId: Lucky Charm III
+
     - pathName: Zephyr
       levels:
         - level: 24
           skillId: Zephyr I
+
+        - level: 45
+          skillId: Zephyr II

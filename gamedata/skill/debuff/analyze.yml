@@ -99,3 +99,38 @@
           duration: 3
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: bc6e75ce-e1d2-430d-b2bf-3ab2140f14e8
+  name: Analyze IV
+  family: Analyze
+  description: Analyze the weak spot of 2 enemies, dealing {{ value }} damage to them and inflicting Weakspot.
+
+  sprite: '0006'
+
+  rarity: Mystical
+
+  epCost: 16
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff]
+      elements: []
+      targets: 2
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Weakspot
+      damageScaling:
+        Vitality: 1.2
+        Luck: 3.5
+
+      statusEffects:
+        - statusEffectId: Weakspot
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
