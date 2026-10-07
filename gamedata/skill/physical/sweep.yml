@@ -75,3 +75,29 @@
         Strength: 1.1
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** sweeps **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: e7ffe0fa-4790-48fa-8257-9d7dbab01dda
+  name: Sweep IV
+  family: Sweep
+  description: Strike five enemies for {{ value }} damage.
+
+  rarity: Mystical
+  sprite: '0002'
+
+  epCost: 16
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 5
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 1.9
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** sweeps **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

@@ -75,3 +75,29 @@
         Strength: 3
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 62714dc0-1f4f-43d2-9dde-ee1c66cd5695
+  name: Double Strike IV
+  family: Double Strike
+  description: Strike two enemies for {{ value }} damage each.
+
+  rarity: Mystical
+  sprite: '0001'
+
+  epCost: 18
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 2
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 4.5
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

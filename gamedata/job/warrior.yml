@@ -74,6 +74,9 @@
         - level: 18
           skillId: Double Strike III
 
+        - level: 36
+          skillId: Double Strike IV
+
     - pathName: Sweep
       levels:
         - level: 4
@@ -85,15 +88,18 @@
         - level: 23
           skillId: Sweep III
 
+        - level: 40
+          skillId: Sweep IV
+
     - pathName: Smashing Board
       levels:
         - level: 6
           skillId: Smashing Board I
 
-        - level: 13
+        - level: 17
           skillId: Smashing Board II
 
-        - level: 26
+        - level: 31
           skillId: Smashing Board III
 
     - pathName: Taunt
