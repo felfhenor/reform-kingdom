@@ -76,7 +76,7 @@
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** sweeps **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
-- id: e7ffe0fa-4790-48fa-8257-9d7dbab01dda
+- id: 122dd0e9-2574-4e64-b0f7-433faa43033b
   name: Sweep IV
   family: Sweep
   description: Strike five enemies for {{ value }} damage.
