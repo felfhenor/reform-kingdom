@@ -83,6 +83,19 @@
       stat: Energy
       value: 25
 
+- id: d57ff2f2-9ec9-40b1-a79f-925d0abdc014
+  name: Invigoration of the Zelks II
+  sprite: '0007'
+  description: +50 HP/EP for all heroes.
+
+  effects:
+    - effectType: GainStats
+      stat: Health
+      value: 50
+    - effectType: GainStats
+      stat: Energy
+      value: 50
+
 - id: 1a6f4a0e-2c53-4e2c-8e5f-5f2f2e4c8a19
   name: Fortitude of the Warden I
   sprite: '0009'
