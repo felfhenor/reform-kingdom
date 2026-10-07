@@ -1,0 +1,71 @@
+- id: 1258af94-171a-4bf5-80ba-07b78c0d409b
+  name: Gather 25 Felrock
+  description: Travel to the Felrock Quarry and acquire 25 Felrock.
+  order: 700
+  requirement:
+    kind: GatherItem
+    nodeName: Elfheim Royal Mines
+    itemId: Felrock
+    quantity: 25
+  rewards:
+    - itemId: Fel Essence
+      quantity: 10
+
+- id: 6b766f0e-e8e5-48f0-bb28-2bf3290a7c2b
+  name: Clear Sharitsa
+  description: Defeat every demon and demonic creature in the town of Sharitsa.
+  order: 710
+  requirement:
+    kind: ClearEncounter
+    nodeName: Sharitsa
+    quantity: 1
+  rewards:
+    - itemId: Fel Essence
+      quantity: 15
+
+- id: 3b018829-ae73-4c58-8146-64b7d9530676
+  name: Reach Level 45
+  description: Keep adventuring until a hero reaches level 45.
+  order: 720
+  requirement:
+    kind: ReachLevel
+    level: 45
+  rewards:
+    - itemId: Gold Coin
+      quantity: 75000
+
+- id: aa04ba1f-e3f0-420e-a8c4-f7e3962b2bb4
+  name: Defeat 30 Beholders
+  description: Defeat 30 Beholders that assist demons in the Felway.
+  order: 730
+  requirement:
+    kind: DefeatMonster
+    monsterId: Beholder
+    quantity: 30
+  rewards:
+    - itemId: Beholder Eyeball
+      quantity: 10
+
+- id: f79589f8-b3bc-4f6a-930f-d6578525ef7c
+  name: Defeat 30 Pixies
+  description: Defeat 30 Pixies that assist demons in the Felway.
+  order: 740
+  requirement:
+    kind: DefeatMonster
+    monsterId: Pixie
+    quantity: 30
+  rewards:
+    - itemId: Pixie Claw
+      quantity: 10
+
+- id: 07d035ce-c847-4f1d-86ef-a69d06376f23
+  name: Defeat 30 Demon Knights
+  description: Defeat 30 Demon Knights that guard the Felway.
+  order: 750
+  requirement:
+    kind: DefeatMonster
+    monsterId: Demon Knight
+    quantity: 30
+  rewards:
+    - itemId: Knight Belltag
+      quantity: 10
