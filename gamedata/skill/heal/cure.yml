@@ -84,3 +84,33 @@
         Vitality: 1.75
 
       combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: d36b4301-479a-43c7-9b00-dadcd67084a5
+  name: Cure IV
+  family: Cure
+  description: Heal a living ally for {{ value }} HP.
+
+  sprite: '0004'
+
+  rarity: Mystical
+
+  epCost: 15
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Water]
+      attributes: [BypassDefense, NeverMisses, HealsTarget]
+      targets: 1
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: NotMaxHealth
+      damageScaling:
+        Intelligence: 4.25
+        Vitality: 2
+        Spirit: 3
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

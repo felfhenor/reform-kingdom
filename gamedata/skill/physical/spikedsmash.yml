@@ -30,3 +30,36 @@
           duration: 1
 
       combatMessage: '**{{ combatant.name }}** crushes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 5877438e-89c9-44f7-b9b2-d811e4c63640
+  name: Spiked Smash II
+  family: Spiked Smash
+  description: Smash the spikes of your mace into an enemy, dealing {{ value }} damage and having a chance to inflict Stunned on them.
+
+  rarity: Uncommon
+  sprite: '0028'
+
+  epCost: 20
+  usesPerCombat: -1
+
+  requiredWeaponTypes: [Mace]
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 4.25
+
+      statusEffects:
+        - statusEffectId: Stunned
+          chance: 50
+          duration: 1
+
+      combatMessage: '**{{ combatant.name }}** crushes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

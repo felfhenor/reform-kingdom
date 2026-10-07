@@ -40,6 +40,7 @@ export const VALID_SKILL_TARGET_TYPES: EquipmentSkillTargetType[] = [
 ];
 export const VALID_SKILL_TARGET_BEHAVIORS: EquipmentSkillTargetBehavior[] = [
   'Always',
+  'ZeroHealth',
   'NotZeroHealth',
   'NotMaxHealth',
   'IfStatusEffect',

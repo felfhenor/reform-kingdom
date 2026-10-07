@@ -81,3 +81,31 @@
         Vitality: 2
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 5a55f1a7-5935-44b1-80c1-d9059f31627a
+  name: Holy Smite IV
+  family: Holy Smite
+  description: Smite a single enemy, dealing {{ value }} damage.
+
+  sprite: '0016'
+
+  rarity: Mystical
+
+  epCost: 30
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: []
+      attributes: [DamagesTarget, AllowPlink]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 3.5
+        Vitality: 2.5
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

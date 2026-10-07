@@ -16,6 +16,7 @@ export type SkillContent = IsContentItem &
 
 export type EquipmentSkillTargetBehavior =
   | 'Always'
+  | 'ZeroHealth'
   | 'NotZeroHealth'
   | 'NotMaxHealth'
   | 'IfStatusEffect'

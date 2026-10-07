@@ -72,6 +72,9 @@
         - level: 17
           skillId: Holy Smite III
 
+        - level: 35
+          skillId: Holy Smite IV
+
     - pathName: Cure
       levels:
         - level: 3
@@ -82,6 +85,9 @@
 
         - level: 21
           skillId: Cure III
+
+        - level: 39
+          skillId: Cure IV
 
     - pathName: Starshine
       levels:
@@ -94,15 +100,29 @@
         - level: 25
           skillId: Starshine III
 
+        - level: 43
+          skillId: Starshine IV
+
     - pathName: Empower
       levels:
         - level: 4
           skillId: Empower I
 
-        - level: 14
+        - level: 21
           skillId: Empower II
 
     - pathName: Spiked Smash
       levels:
         - level: 24
           skillId: Spiked Smash I
+
+        - level: 39
+          skillId: Spiked Smash II
+
+    - pathName: Lifesurge
+      levels:
+        - level: 28
+          skillId: Lifesurge I
+
+        - level: 49
+          skillId: Lifesurge II

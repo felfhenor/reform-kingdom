@@ -44,6 +44,7 @@ function filterCombatantTargetListForSkillTechniqueBehavior(
     (c: Combatant[]) => Combatant[]
   > = {
     Always: (list) => list,
+    ZeroHealth: (list) => list.filter((c) => c.hp <= 0),
     NotMaxHealth: (list) => list.filter((c) => c.hp < c.totalStats.Health),
     NotZeroHealth: (list) => list.filter((c) => c.hp > 0),
     IfStatusEffect: (list) =>

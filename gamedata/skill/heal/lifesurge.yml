@@ -1,0 +1,53 @@
+- id: 79e2e869-bee9-4b5d-9f57-a7e471fb4e98
+  name: Lifesurge I
+  family: Lifesurge
+  description: Revive an incapacitated ally with {{ value }} HP.
+
+  sprite: '0004'
+
+  rarity: Common
+
+  epCost: 50
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Water]
+      attributes: [BypassDefense, NeverMisses, HealsTarget]
+      targets: 1
+      targetType: Allies
+      targetBehaviors:
+        - behavior: ZeroHealth
+      damageScaling:
+        Spirit: 5
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 56713773-8a3d-45fc-8638-78eb8a79d620
+  name: Lifesurge II
+  family: Lifesurge
+  description: Revive an incapacitated ally with {{ value }} HP.
+
+  sprite: '0004'
+
+  rarity: Uncommon
+
+  epCost: 65
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Water]
+      attributes: [BypassDefense, NeverMisses, HealsTarget]
+      targets: 1
+      targetType: Allies
+      targetBehaviors:
+        - behavior: ZeroHealth
+      damageScaling:
+        Spirit: 10
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

@@ -84,3 +84,33 @@
         Vitality: 1.5
 
       combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: a7ffa3b6-609f-44fc-9556-3acd7c2fc1ae
+  name: Starshine IV
+  family: Starshine
+  description: Heal all living allies for {{ value }} HP.
+
+  sprite: '0012'
+
+  rarity: Rare
+
+  epCost: 37
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Water]
+      attributes: [BypassDefense, NeverMisses, HealsTarget]
+      targets: 4
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: NotMaxHealth
+      damageScaling:
+        Intelligence: 3
+        Vitality: 2.25
+        Spirit: 3
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
