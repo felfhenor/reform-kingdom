@@ -4,8 +4,8 @@ import { analysisFail, analysisWarn } from '@helpers/debug/analysis-utils';
 import type {
   AnalysisIssue,
   EquipmentSkillAttribute,
-  EquipmentSkillContentTechnique as Technique,
   StatusEffectContent,
+  EquipmentSkillContentTechnique as Technique,
 } from '@interfaces';
 
 const DAMAGE_TOKEN = /\{\{\s*damage\s*\}\}/;
@@ -28,16 +28,17 @@ function lookupStatusEffect(id: string): StatusEffectContent | undefined {
 function damageTagIssues(t: Technique): AnalysisIssue[] {
   const damages = hasAttr(t, 'DamagesTarget');
   const heals = hasAttr(t, 'HealsTarget');
+  const restores = hasAttr(t, 'RestoresTargetEnergy');
   const scales = hasScaling(t);
   const issues: AnalysisIssue[] = [];
 
   if (damages && heals) {
     issues.push(analysisFail('is tagged both DamagesTarget and HealsTarget.'));
   }
-  if (scales && !damages && !heals) {
+  if (scales && !damages && !heals && !restores) {
     issues.push(
       analysisFail(
-        'has damageScaling but neither DamagesTarget nor HealsTarget, so it deals untagged damage (no crits or monster-type bonus).',
+        'has damageScaling but neither DamagesTarget nor HealsTarget nor RestoresTargetEnergy, so it deals untagged damage (no crits or monster-type bonus).',
       ),
     );
   }
