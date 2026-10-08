@@ -558,6 +558,19 @@
                  "width":64,
                  "x":1280,
                  "y":832
+                }, 
+                {
+                 "gid":403,
+                 "height":64,
+                 "id":212,
+                 "name":"Astral Purifier",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"ExchangeNode",
+                 "visible":true,
+                 "width":64,
+                 "x":256,
+                 "y":1088
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -566,7 +579,7 @@
          "y":0
         }],
  "nextlayerid":10,
- "nextobjectid":212,
+ "nextobjectid":213,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",
