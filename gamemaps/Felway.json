@@ -348,6 +348,19 @@
                  "width":64,
                  "x":1024,
                  "y":384
+                }, 
+                {
+                 "gid":403,
+                 "height":64,
+                 "id":162,
+                 "name":"Crimson Stones",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"ExchangeNode",
+                 "visible":true,
+                 "width":64,
+                 "x":640,
+                 "y":1664
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -356,7 +369,7 @@
          "y":0
         }],
  "nextlayerid":10,
- "nextobjectid":162,
+ "nextobjectid":163,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

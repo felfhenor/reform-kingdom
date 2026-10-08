@@ -15,6 +15,7 @@
         >
           @if (row.kind === 'Equipment') {
             <app-slot-armory-item
+              class="zoom-row"
               [equipment]="row.inputContent"
               [equipmentItem]="row.item"
             />
@@ -31,6 +32,7 @@
             </span>
 
             <app-slot-armory-item
+              class="zoom-row"
               [equipment]="row.outputContent"
               [equipmentItem]="row.outputItem"
             />
@@ -47,15 +49,20 @@
               }
             </div>
           } @else {
-            <app-row-currency-cost [costs]="itemInput(row)" />
-            <span class="type-muted">&rarr;</span>
-            <app-row-currency-cost [costs]="itemOutput(row)" />
+            <app-row-currency-cost class="flex-1" [costs]="itemInput(row)" />
+
+            <span class="type-muted">
+              <app-icon name="tablerArrowRight"></app-icon>
+            </span>
+
+            <app-row-currency-cost class="flex-1" [costs]="itemOutput(row)" />
+
             <div class="flex-1"></div>
           }
 
           <button
             type="button"
-            class="btn btn-xs btn-primary"
+            class="btn btn-xs btn-primary flex-1"
             [disabled]="!isAtNode() || !row.canAfford"
             (click)="perform(row)"
             appSfx="ui-success"

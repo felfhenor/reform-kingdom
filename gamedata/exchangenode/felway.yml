@@ -1,0 +1,46 @@
+- id: e2e9c4c2-9995-46b4-96a9-c7e2e70760ee
+  name: Crimson Stones
+  hidden: true
+  description: A demonic ritual altar containing the power to corrupt and add crimson under the Crimson Moon. This is heavily utilized by demons who wish to infiltrate the elven way of life.
+  emptyText: You do not have anything that can be converted.
+  actionLabel: Convert
+
+  exchanges:
+    - kind: Item
+      input:
+        itemId: Gold Coin
+        required: 10000
+
+      output:
+        itemId: Crimson Lucre
+        quantity: 100
+
+      costs:
+        - itemId: Crimson Ingot
+          required: 1
+
+    - kind: Item
+      input:
+        itemId: Gold Coin
+        required: 100000
+
+      output:
+        itemId: Crimson Lucre
+        quantity: 1000
+
+      costs:
+        - itemId: Crimson Ingot
+          required: 10
+
+    - kind: Item
+      input:
+        itemId: Gold Coin
+        required: 1000000
+
+      output:
+        itemId: Crimson Lucre
+        quantity: 10000
+
+      costs:
+        - itemId: Crimson Ingot
+          required: 100

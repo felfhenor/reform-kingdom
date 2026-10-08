@@ -111,18 +111,6 @@ function exchangeNodeProblems(node: ExchangeNodeContent): string[] {
 
   if (node.exchanges.length === 0) problems.push('offers no exchanges');
 
-  const seenInputs = new Set<string>();
-  node.exchanges.forEach((exchange, index) => {
-    problems.push(...exchangeProblems(exchange, index));
-
-    // Two exchanges with the same input would make the modal ambiguous about which one a click applies.
-    const key = exchangeInputKey(exchange);
-    if (seenInputs.has(key)) {
-      problems.push(`exchange ${index + 1} reuses an earlier exchange's input`);
-    }
-    seenInputs.add(key);
-  });
-
   return problems;
 }
 

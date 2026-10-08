@@ -10,35 +10,35 @@
       outputEquipmentId: Purified Piercer
       costs:
         - itemId: Elven Purity Water
-          required: 10
+          required: 5
 
     - kind: Equipment
       inputEquipmentId: Demonic Tunic
       outputEquipmentId: Purified Plateshirt
       costs:
         - itemId: Elven Purity Water
-          required: 10
+          required: 7
 
     - kind: Equipment
       inputEquipmentId: Demonic Tophat
       outputEquipmentId: Purified Platehat
       costs:
         - itemId: Elven Purity Water
-          required: 10
+          required: 3
 
     - kind: Equipment
       inputEquipmentId: Demonic Helm
       outputEquipmentId: Purified Helm
       costs:
         - itemId: Elven Purity Water
-          required: 10
+          required: 3
 
     - kind: Equipment
       inputEquipmentId: Demonic Platemail
       outputEquipmentId: Purified Platemail
       costs:
         - itemId: Elven Purity Water
-          required: 10
+          required: 7
 
     - kind: Equipment
       inputEquipmentId: Demonic Bow
@@ -52,28 +52,28 @@
       outputEquipmentId: Purified Baselard
       costs:
         - itemId: Elven Purity Water
-          required: 10
+          required: 5
 
     - kind: Equipment
       inputEquipmentId: Demonic Stiletto
       outputEquipmentId: Purified Stiletto
       costs:
         - itemId: Elven Purity Water
-          required: 10
+          required: 5
 
     - kind: Equipment
       inputEquipmentId: Demonic Mace
       outputEquipmentId: Purified Smasher
       costs:
         - itemId: Elven Purity Water
-          required: 10
+          required: 5
 
     - kind: Equipment
       inputEquipmentId: Demonic Shield
       outputEquipmentId: Purified Defender
       costs:
         - itemId: Elven Purity Water
-          required: 10
+          required: 5
 
     - kind: Equipment
       inputEquipmentId: Demonic Spear
@@ -94,11 +94,11 @@
       outputEquipmentId: Purified Epee
       costs:
         - itemId: Elven Purity Water
-          required: 10
+          required: 5
 
     - kind: Equipment
       inputEquipmentId: Demonic Whip
       outputEquipmentId: Purified Slashslicer
       costs:
         - itemId: Elven Purity Water
-          required: 10
+          required: 5

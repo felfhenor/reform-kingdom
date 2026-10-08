@@ -14,8 +14,8 @@ import {
   exchangeHasInput,
   exchangeNodeContent,
 } from '@helpers/exchange/exchange';
-import { equippedItems } from '@helpers/item/equipment';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
+import { equippedItems } from '@helpers/item/equipment';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   EquipmentContent,
@@ -182,7 +182,7 @@ export async function exchangePerformItem(
   const outputName =
     getEntry<ItemContent>(exchange.output.itemId)?.name ?? 'UNKNOWN';
   miscellaneousMessageLog(
-    `${exchangeVerb(nodeName)}: ${exchange.input.required}x ${inputName} became ${exchange.output.quantity}x ${outputName}.`,
+    `${exchangeVerb(nodeName)}: ${exchange.input.required.toLocaleString()}x ${inputName} became ${exchange.output.quantity.toLocaleString()}x ${outputName}.`,
   );
   exchangeAnalytics(nodeName, outputName);
 
