@@ -40,12 +40,6 @@ function isItem(id: string): boolean {
   return getEntry<ItemContent>(id)?.__type === 'item';
 }
 
-function exchangeInputKey(exchange: ExchangeNodeExchange): string {
-  return exchange.kind === 'Equipment'
-    ? `equipment:${exchange.inputEquipmentId}`
-    : `item:${exchange.input.itemId}`;
-}
-
 function exchangeProblems(
   exchange: ExchangeNodeExchange,
   index: number,
@@ -110,6 +104,10 @@ function exchangeNodeProblems(node: ExchangeNodeContent): string[] {
   }
 
   if (node.exchanges.length === 0) problems.push('offers no exchanges');
+
+  node.exchanges.forEach((exchange, index) => {
+    problems.push(...exchangeProblems(exchange, index));
+  });
 
   return problems;
 }
