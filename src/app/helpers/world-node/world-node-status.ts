@@ -44,6 +44,8 @@ export function worldNodeInteractionKind(
       return 'Outpost';
     case 'Trainer':
       return 'Trainer';
+    case 'ExchangeNode':
+      return 'Exchange';
     case 'TeleportNode':
     case 'Kingdom':
     case 'NonPlayerKingdom':

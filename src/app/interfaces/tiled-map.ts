@@ -41,6 +41,7 @@ export type WorldNodeType =
   | 'Shrine'
   | 'Outpost'
   | 'Trainer'
+  | 'ExchangeNode'
   | 'TeleportNode';
 
 export type KingdomObject = TiledObject & { type: 'Kingdom' };
@@ -56,6 +57,7 @@ export type GatherNodeObject = TiledObject & { type: 'GatherNode' };
 export type ShrineNodeObject = TiledObject & { type: 'Shrine' };
 export type OutpostNodeObject = TiledObject & { type: 'Outpost' };
 export type TrainerNodeObject = TiledObject & { type: 'Trainer' };
+export type ExchangeNodeObject = TiledObject & { type: 'ExchangeNode' };
 
 export type TeleportNodeProperty =
   | { name: 'tag'; type: 'string'; value: string }
@@ -76,6 +78,7 @@ export type WorldNodeObject =
   | ShrineNodeObject
   | OutpostNodeObject
   | TrainerNodeObject
+  | ExchangeNodeObject
   | TeleportNodeObject;
 
 export type TiledObjectSpriteFrame = {

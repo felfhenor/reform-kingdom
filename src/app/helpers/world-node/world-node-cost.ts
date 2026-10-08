@@ -8,6 +8,16 @@ export function worldNodeCanAffordCost(costs: CostItem[]): boolean {
   );
 }
 
+// Checks against a live `state` (not the signal) - for re-validating inside an `updateGamestate` callback.
+export function stateCanAffordCost(
+  state: GameState,
+  costs: CostItem[],
+): boolean {
+  return costs.every(
+    (cost) => (state.materials[cost.itemId]?.quantity ?? 0) >= cost.required,
+  );
+}
+
 // Mutates `state` directly - call only from inside an `updateGamestate` callback.
 export function worldNodeSpendCost(state: GameState, costs: CostItem[]): void {
   costs.forEach((cost) => {

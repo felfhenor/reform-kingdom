@@ -29,10 +29,22 @@ The most massive type of content, requiring a lot of design and sub-content piec
 - [ ] Monsters
 - [ ] Tradeskill Recipes
 - [ ] Trainers
+- [ ] Exchange Nodes
 
 ## Combat Nodes
 
 These have monsters, and a level. Monsters need to exist before they can be put into combat nodes. In terms of rewards, these _always_ need a collectible. They should have some drops beyond that - spread between gathering materials, equipment, recipes, or workers. Typically, workers will drop from "hard" encounters, so, boss encounters would drop these.
+
+## Exchange Nodes
+
+These trade one thing the player owns, plus a list of costs, for something else.
+
+Each exchange is one of two kinds:
+
+- `Equipment`: `inputEquipmentId` -> `outputEquipmentId`. Only unequipped (armory) gear qualifies. The base item is swapped.
+- `Item`: `input` (itemId + required) -> `output` (itemId + quantity).
+
+Every exchange needs at least one cost.
 
 ## Procgen Combat Nodes
 

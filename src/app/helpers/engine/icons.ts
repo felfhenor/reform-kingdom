@@ -78,6 +78,7 @@ import {
 } from '@ng-icons/game-icons';
 import {
   tablerArrowLeft,
+  tablerArrowRight,
   tablerCheck,
   tablerChecklist,
   tablerChevronLeft,
@@ -185,6 +186,7 @@ export const ALL_ICONS = {
   tablerSquareCheck,
   tablerList,
   tablerArrowLeft,
+  tablerArrowRight,
 };
 
 export const ICON_SIZE_VALUES: Record<IconSize, string> = {

@@ -23,6 +23,7 @@
     "./schemas/encounter.schema.json": "gamedata/encounter/**/*.yml",
     "./schemas/encounterrandom.schema.json": "gamedata/encounterrandom/**/*.yml",
     "./schemas/equipment.schema.json": "gamedata/equipment/**/*.yml",
+    "./schemas/exchangenode.schema.json": "gamedata/exchangenode/**/*.yml",
     "./schemas/gathering.schema.json": "gamedata/gathering/**/*.yml",
     "./schemas/globaleffect.schema.json": "gamedata/globaleffect/**/*.yml",
     "./schemas/item.schema.json": "gamedata/item/**/*.yml",

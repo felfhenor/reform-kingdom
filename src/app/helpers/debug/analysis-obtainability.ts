@@ -1,5 +1,5 @@
 // Validates every item/collectible/equipment is obtainable (dropped,
-// rewarded, gathered, crafted, traded) or marked `unobtainable: true`.
+// rewarded, gathered, crafted, traded, exchanged) or marked `unobtainable: true`.
 
 import { getEntriesByType } from '@helpers/content/content';
 import type {
@@ -12,6 +12,7 @@ import type {
   EncounterContent,
   EncounterRandomContent,
   EquipmentContent,
+  ExchangeNodeContent,
   GatheringContent,
   ItemContent,
   MonsterContent,
@@ -86,7 +87,7 @@ function checkCandidates(
       id,
       label: candidate.name,
       status: 'fail' as const,
-      message: `${kind} "${candidate.name}" has no drop, completion reward, gather result, or recipe result that produces it, and is not marked "unobtainable: true".`,
+      message: `${kind} "${candidate.name}" has no drop, completion reward, gather result, recipe result, or exchange that produces it, and is not marked "unobtainable: true".`,
     };
   });
 }
@@ -107,6 +108,7 @@ export function runObtainabilityAnalysis(): AnalysisRunResult {
   const towns = getEntriesByType<TownContent>('town');
   const commissionOffers =
     getEntriesByType<CommissionOfferContent>('commissionoffer');
+  const exchangeNodes = getEntriesByType<ExchangeNodeContent>('exchangenode');
 
   const obtainableItems = new Set<string>();
   const obtainableEquipment = new Set<string>();
@@ -182,6 +184,16 @@ export function runObtainabilityAnalysis(): AnalysisRunResult {
       addIfPresent(obtainableItems, trade.itemId);
       addIfPresent(obtainableEquipment, trade.equipmentId);
       addIfPresent(obtainableCollectibles, trade.collectibleId);
+    });
+  });
+
+  exchangeNodes.forEach((node) => {
+    node.exchanges.forEach((exchange) => {
+      if (exchange.kind === 'Equipment') {
+        addIfPresent(obtainableEquipment, exchange.outputEquipmentId);
+        return;
+      }
+      addIfPresent(obtainableItems, exchange.output.itemId);
     });
   });
 

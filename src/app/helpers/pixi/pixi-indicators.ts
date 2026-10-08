@@ -17,6 +17,7 @@ const NODE_LABEL_COLOR_BY_KIND: Record<WorldNodeInteractionKind, number> = {
   Shrine: 0x22d3ee,
   Outpost: 0xf97316,
   Trainer: 0x7777ff,
+  Exchange: 0xe2e8f0,
 };
 
 const NODE_STATUS_BEATEN_COLOR = 0x4ade80;

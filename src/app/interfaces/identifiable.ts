@@ -8,6 +8,7 @@ export type ContentType =
   | 'encounter'
   | 'encounterrandom'
   | 'equipment'
+  | 'exchangenode'
   | 'gathering'
   | 'globaleffect'
   | 'item'

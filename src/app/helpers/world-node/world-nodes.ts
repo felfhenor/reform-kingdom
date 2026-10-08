@@ -9,6 +9,7 @@ import type {
   CollectibleId,
   EncounterContent,
   EncounterRandomContent,
+  ExchangeNodeContent,
   GameMap,
   GatheringContent,
   NodeOverrideContent,
@@ -154,6 +155,13 @@ export function worldNodeTrainer(
   return content?.__type === 'trainer' ? content : undefined;
 }
 
+export function worldNodeExchange(
+  entry: WorldNodeEntry,
+): ExchangeNodeContent | undefined {
+  const content = getEntry<ExchangeNodeContent>(entry.nodeName);
+  return content?.__type === 'exchangenode' ? content : undefined;
+}
+
 export function worldNodeTown(entry: WorldNodeEntry): TownContent | undefined {
   const content = getEntry<TownContent>(entry.nodeName);
   return content?.__type === 'town' ? content : undefined;
@@ -178,6 +186,7 @@ export function isWorldNodeHidden(entry: WorldNodeEntry): boolean {
     worldNodeShrine(entry)?.hidden ??
     worldNodeOutpost(entry)?.hidden ??
     worldNodeTrainer(entry)?.hidden ??
+    worldNodeExchange(entry)?.hidden ??
     false
   );
 }
@@ -196,6 +205,7 @@ export function worldNodeCollectibleGateIds(
     worldNodeShrine(entry)?.invisibleUntilCollectibleIdsFound ??
     worldNodeOutpost(entry)?.invisibleUntilCollectibleIdsFound ??
     worldNodeTrainer(entry)?.invisibleUntilCollectibleIdsFound ??
+    worldNodeExchange(entry)?.invisibleUntilCollectibleIdsFound ??
     []
   );
 }

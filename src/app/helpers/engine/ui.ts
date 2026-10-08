@@ -135,6 +135,14 @@ export function trainerVisitOpen(entry: WorldNodeEntry): void {
 }
 
 // Not cleared on close - would collapse the modal's DOM mid-transition; overwritten next open instead.
+export const activeExchangeNode = signal<WorldNodeEntry | undefined>(undefined);
+
+export function exchangeNodeOpen(entry: WorldNodeEntry): void {
+  activeExchangeNode.set(entry);
+  modalOpen('exchange-node');
+}
+
+// Not cleared on close - would collapse the modal's DOM mid-transition; overwritten next open instead.
 export const activeOutpostTeleportNode = signal<WorldNodeEntry | undefined>(
   undefined,
 );

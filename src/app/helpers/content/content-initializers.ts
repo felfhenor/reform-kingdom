@@ -9,6 +9,7 @@ import {
   ensureEncounter,
   ensureEncounterRandom,
 } from '@helpers/content/ensure-encounternode';
+import { ensureExchangeNode } from '@helpers/content/ensure-exchangenode';
 import { ensureGathering } from '@helpers/content/ensure-gathernode';
 import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
 import {
@@ -49,6 +50,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   encounter: ensureEncounter,
   encounterrandom: ensureEncounterRandom,
   equipment: ensureEquipment,
+  exchangenode: ensureExchangeNode,
   gathering: ensureGathering,
   globaleffect: ensureGlobalEffect,
   item: ensureItem,

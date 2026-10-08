@@ -15,6 +15,7 @@ import type {
   CommissionOfferContent,
   EncounterContent,
   EncounterRandomContent,
+  ExchangeNodeContent,
   GatheringContent,
   ItemContent,
   MaterialUtilizationStats,
@@ -58,6 +59,7 @@ function emptyStats(item: ItemContent): MaterialUtilizationStats {
     traderTokenSinks: 0,
     nodeUpgradeCosts: 0,
     shrineCosts: 0,
+    exchangeCosts: 0,
     outpostCosts: 0,
     raidFortifyCosts: 0,
     trainerCosts: 0,
@@ -65,7 +67,7 @@ function emptyStats(item: ItemContent): MaterialUtilizationStats {
 }
 
 // One point per recipe, caravan buy, astral spell, commission, node-upgrade
-// tier, shrine/outpost tier, raid fortification, trainer teaching, and token-trade/unlock spend that consumes it, plus one each if infusable or the reforge reagent.
+// tier, shrine/outpost tier, exchange, raid fortification, trainer teaching, and token-trade/unlock spend that consumes it, plus one each if infusable or the reforge reagent.
 function score(stats: MaterialUtilizationStats): number {
   return (
     stats.craftedFrom +
@@ -75,6 +77,7 @@ function score(stats: MaterialUtilizationStats): number {
     stats.traderTokenSinks +
     stats.nodeUpgradeCosts +
     stats.shrineCosts +
+    stats.exchangeCosts +
     stats.outpostCosts +
     stats.raidFortifyCosts +
     stats.trainerCosts +
@@ -114,6 +117,7 @@ export function runMaterialUtilizationAnalysis(
   const gatherings = getEntriesByType<GatheringContent>('gathering');
   const shrines = getEntriesByType<ShrineContent>('shrine');
   const outposts = getEntriesByType<OutpostContent>('outpost');
+  const exchangeNodes = getEntriesByType<ExchangeNodeContent>('exchangenode');
   const towns = getEntriesByType<TownContent>('town');
   const trainerTeachings =
     getEntriesByType<TrainerTeachingContent>('trainerteaching');
@@ -184,6 +188,18 @@ export function runMaterialUtilizationAnalysis(
       level.costs.forEach((cost) => {
         const stats = byId.get(cost.itemId);
         if (stats) stats.shrineCosts += 1;
+      });
+    });
+  });
+
+  // One point per exchange the material is spent in, whether as a cost or an item exchange's input.
+  exchangeNodes.forEach((node) => {
+    node.exchanges.forEach((exchange) => {
+      const spent = new Set(exchange.costs.map((cost) => cost.itemId));
+      if (exchange.kind === 'Item') spent.add(exchange.input.itemId);
+      spent.forEach((itemId) => {
+        const stats = byId.get(itemId);
+        if (stats) stats.exchangeCosts += 1;
       });
     });
   });
@@ -283,6 +299,7 @@ export function runMaterialUtilizationAnalysis(
             'Trader Token Sinks': stats.traderTokenSinks,
             'Node Upgrade Costs': stats.nodeUpgradeCosts,
             'Shrine Costs': stats.shrineCosts,
+            'Exchange Costs': stats.exchangeCosts,
             'Outpost Costs': stats.outpostCosts,
             'Raid Fortify Costs': stats.raidFortifyCosts,
             'Trainer Costs': stats.trainerCosts,
@@ -322,6 +339,8 @@ export function runMaterialUtilizationAnalysis(
       sinks.push(`${stats.nodeUpgradeCosts} node upgrade tier(s)`);
     if (stats.shrineCosts > 0)
       sinks.push(`${stats.shrineCosts} shrine tier(s)`);
+    if (stats.exchangeCosts > 0)
+      sinks.push(`${stats.exchangeCosts} exchange(s)`);
     if (stats.outpostCosts > 0)
       sinks.push(`${stats.outpostCosts} outpost tier(s)`);
     if (stats.raidFortifyCosts > 0)

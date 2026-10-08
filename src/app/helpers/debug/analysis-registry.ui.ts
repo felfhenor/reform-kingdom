@@ -16,6 +16,7 @@ import { runOutpostsAnalysis } from '@helpers/debug/analysis-outposts';
 import { runRecipeIngredientOrderAnalysis } from '@helpers/debug/analysis-recipeingredientorder';
 import { runRecipeNamesAnalysis } from '@helpers/debug/analysis-recipenames';
 import { runRecipeRewardsAnalysis } from '@helpers/debug/analysis-reciperewards';
+import { runExchangeNodesAnalysis } from '@helpers/debug/analysis-exchangenodes';
 import { runShrinesAnalysis } from '@helpers/debug/analysis-shrines';
 import { runSkillBonusesAnalysis } from '@helpers/debug/analysis-skillbonuses';
 import { runSkillsAnalysis } from '@helpers/debug/analysis-skills';
@@ -190,7 +191,7 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     id: 'fieldnodes',
     title: 'Field Nodes',
     description:
-      'Every field node has a matching encounter, random encounter, gathering, shrine, outpost, or trainer entry.',
+      'Every field node has a matching encounter, random encounter, gathering, shrine, outpost, trainer, or exchange node entry.',
     category: 'World & Maps',
     strict: true,
     inputKeys: [],
@@ -215,6 +216,16 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     strict: true,
     inputKeys: [],
     run: runShrinesAnalysis,
+  },
+  {
+    id: 'exchangenodes',
+    title: 'Exchange Nodes',
+    description:
+      'Every exchange node is placed once and each exchange has a valid input, output, and at least one cost.',
+    category: 'World & Maps',
+    strict: true,
+    inputKeys: [],
+    run: runExchangeNodesAnalysis,
   },
   {
     id: 'outposts',

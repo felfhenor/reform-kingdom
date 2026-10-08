@@ -9,7 +9,10 @@ import { rollAffixIds } from '@helpers/item/affix';
 import { equipmentItemSlotCount } from '@helpers/item/infusion';
 import { goldCoinId, reforgeReagentId } from '@helpers/item/materials';
 import { RARITY_SELL_MULTIPLIER } from '@helpers/kingdom/armory';
-import { worldNodeSpendCost } from '@helpers/world-node/world-node-cost';
+import {
+  stateCanAffordCost,
+  worldNodeSpendCost,
+} from '@helpers/world-node/world-node-cost';
 import type {
   CostItem,
   DropRarity,
@@ -67,12 +70,6 @@ export function reforgedEquipmentItem(item: EquipmentItem): EquipmentItem {
   );
 
   return rerolled;
-}
-
-function stateCanAffordCost(state: GameState, cost: CostItem[]): boolean {
-  return cost.every(
-    (entry) => (state.materials[entry.itemId]?.quantity ?? 0) >= entry.required,
-  );
 }
 
 // Re-validates against live state since a UI-triggered write is deferred past the click's own checks.

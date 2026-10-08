@@ -49,7 +49,8 @@ export type WorldNodeInteractionKind =
   | 'Travel'
   | 'Shrine'
   | 'Outpost'
-  | 'Trainer';
+  | 'Trainer'
+  | 'Exchange';
 
 export type WorldNodeCompletionRewardProgress = {
   obtained: number;

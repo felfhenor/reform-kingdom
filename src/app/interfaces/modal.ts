@@ -8,6 +8,7 @@ export type ModalId =
   | 'raid-defense'
   | 'town-materials'
   | 'trainer-visit'
+  | 'exchange-node'
   | 'changelog'
   | 'pause-menu'
   | 'settings'
