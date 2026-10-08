@@ -4,7 +4,7 @@
   order: 700
   requirement:
     kind: GatherItem
-    nodeName: Elfheim Royal Mines
+    nodeName: Felrock Quarry
     itemId: Felrock
     quantity: 25
   rewards:
