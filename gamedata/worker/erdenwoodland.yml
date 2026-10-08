@@ -1,7 +1,7 @@
 - id: 592bfec8-0942-447e-b713-5e581520750b
   name: Fiore Jadd
   description: An extremely capable elf, nearly sacrificed for a dark, demonic ritual. Her eternal gratitude will manifest in gathering for the Duchy of Carrina.
-  sprite: '0008'
+  sprite: '0016'
   frames: 4
 
   baseStats:

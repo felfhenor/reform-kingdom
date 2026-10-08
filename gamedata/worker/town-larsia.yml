@@ -1,7 +1,7 @@
 - id: f45c2c45-979a-4aab-8778-01997dba3326
   name: Darwin Nork
   description: Darwin is a hard worker.
-  sprite: '0000'
+  sprite: '0020'
   frames: 4
 
   baseStats:
@@ -19,7 +19,7 @@
 - id: 300a1ef0-f11e-4696-86d8-c21801d22c37
   name: Talbot Frore
   description: Talbot is a hard worker.
-  sprite: '0000'
+  sprite: '0020'
   frames: 4
 
   baseStats:
@@ -37,7 +37,7 @@
 - id: 4f594f84-1aff-4b5b-8f44-af156b906ad8
   name: Nevyn Maeling
   description: Nevyn is a hard worker.
-  sprite: '0000'
+  sprite: '0020'
   frames: 4
 
   baseStats:

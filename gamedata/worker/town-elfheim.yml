@@ -1,7 +1,7 @@
 - id: 29a15f8d-d008-4903-bc34-101a24defe4d
   name: Sasha Rosago
   description: Sasha is a hard worker.
-  sprite: '0000'
+  sprite: '0024'
   frames: 4
 
   baseStats:
@@ -19,7 +19,7 @@
 - id: 744afe23-99e1-47ef-a45f-65c88cbf7418
   name: Elena Jadd
   description: Elena is a hard worker.
-  sprite: '0000'
+  sprite: '0024'
   frames: 4
 
   baseStats:
