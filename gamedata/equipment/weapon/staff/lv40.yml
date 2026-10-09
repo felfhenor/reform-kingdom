@@ -19,7 +19,7 @@
   levelRequirement: 46
   rarity: Rare
   type: Staff
-  sprite: '0254'
+  sprite: '0247'
   slots: 1
   baseStats:
     Intelligence: 31.2

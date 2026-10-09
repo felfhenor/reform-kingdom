@@ -18,7 +18,7 @@
   rarity: Uncommon
   levelRequirement: 43
   type: Accessory
-  sprite: '0240'
+  sprite: '0215'
   slots: 1
   baseStats:
     Resistance: 9.1

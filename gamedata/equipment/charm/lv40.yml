@@ -20,7 +20,7 @@
   levelRequirement: 46
   rarity: Rare
   type: Charm
-  sprite: '0260'
+  sprite: '0254'
   slots: 1
   baseStats:
     Spirit: 3

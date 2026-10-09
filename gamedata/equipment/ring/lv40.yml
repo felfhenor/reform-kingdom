@@ -18,7 +18,7 @@
   levelRequirement: 46
   rarity: Rare
   type: Ring
-  sprite: '0259'
+  sprite: '0255'
   slots: 1
   baseStats:
     Health: 125

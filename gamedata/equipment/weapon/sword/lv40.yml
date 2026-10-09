@@ -19,7 +19,7 @@
   levelRequirement: 46
   rarity: Rare
   type: Sword
-  sprite: '0255'
+  sprite: '0240'
   slots: 1
   baseStats:
     Strength: 25.6
