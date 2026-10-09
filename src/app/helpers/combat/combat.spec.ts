@@ -22,7 +22,10 @@ import {
   combatantIsDead,
   combatCombatantTakeDamage,
 } from '@helpers/combat/combat-combatant-hp';
-import { combatApplySkillToTarget } from '@helpers/combat/combat-damage';
+import {
+  combatApplySkillToTarget,
+  techniqueHasAttribute,
+} from '@helpers/combat/combat-damage';
 import { combatantDamageEvents } from '@helpers/combat/combat-damage-events';
 import { pickSkillFromCombatOrders } from '@helpers/combat/combat-order-evaluation';
 import { combatantSkillCastEvents } from '@helpers/combat/combat-skill-events';
@@ -40,7 +43,10 @@ import {
   combatGetTargetsFromPriorityList,
 } from '@helpers/combat/combat-targetting';
 import { ensureMonster } from '@helpers/content/ensure-monster';
-import { ensureSkill } from '@helpers/content/ensure-skill';
+import {
+  ensureEquipmentSkillTechnique,
+  ensureSkill,
+} from '@helpers/content/ensure-skill';
 import { defaultStats } from '@helpers/defaults';
 import { rngChoiceWeighted, rngSucceedsChance } from '@helpers/rng';
 import { gamestate, worldCombatState } from '@helpers/state-game';
@@ -107,6 +113,7 @@ beforeEach(() => {
   vi.mocked(combatCanTakeTurn).mockReturnValue(true);
   vi.mocked(rngSucceedsChance).mockReturnValue(false);
   vi.mocked(combatCombatantCombatStatSucceedsChance).mockReturnValue(false);
+  vi.mocked(techniqueHasAttribute).mockReturnValue(false);
   vi.mocked(combatGetPossibleCombatantTargetsForSkill).mockReturnValue([
     target,
   ]);
@@ -296,6 +303,45 @@ describe('combatantTakeTurn targeting', () => {
     expect(combatantDamageEvents()).toMatchObject([
       { combatantId: 'target-1', amount: 0, variant: 'miss' },
     ]);
+  });
+
+  it('ignores the miss roll for a NeverMisses technique', () => {
+    available(skill('weighted'));
+    vi.mocked(combatGetTargetsFromPriorityList).mockReturnValue([target]);
+    vi.mocked(techniqueHasAttribute).mockImplementation(
+      (_tech, attribute) => attribute === 'NeverMisses',
+    );
+    rollsSucceed('missChance');
+
+    combatantTakeTurn(buildCombat(), caster());
+
+    expect(combatApplySkillToTarget).toHaveBeenCalledOnce();
+  });
+
+  it('misses when a below-100 accuracy roll fails, and hits when it succeeds', () => {
+    const inaccurate = skill('inaccurate', {
+      techniques: [ensureEquipmentSkillTechnique({ accuracy: 70 })],
+    });
+    available(inaccurate);
+    vi.mocked(combatGetTargetsFromPriorityList).mockReturnValue([target]);
+
+    combatantTakeTurn(buildCombat(), caster());
+    expect(combatApplySkillToTarget).not.toHaveBeenCalled();
+    expect(rngSucceedsChance).toHaveBeenCalledWith(70);
+
+    vi.mocked(rngSucceedsChance).mockReturnValue(true);
+    combatantTakeTurn(buildCombat(), caster());
+    expect(combatApplySkillToTarget).toHaveBeenCalledOnce();
+  });
+
+  it('skips the accuracy roll entirely at 100 accuracy', () => {
+    available(skill('weighted'));
+    vi.mocked(combatGetTargetsFromPriorityList).mockReturnValue([target]);
+
+    combatantTakeTurn(buildCombat(), caster());
+
+    expect(rngSucceedsChance).not.toHaveBeenCalled();
+    expect(combatApplySkillToTarget).toHaveBeenCalledOnce();
   });
 
   it('applies the technique twice when the strike-again roll succeeds', () => {

@@ -138,6 +138,9 @@ function skillTechniquePreview(
     ),
     elements: damageElements.length > 0 ? damageElements : technique.elements,
     statusEffects: skillTechniqueStatusPreviews(skill, technique),
+    accuracy: techniqueHasAttribute(technique, 'NeverMisses')
+      ? 100
+      : technique.accuracy,
   };
 }
 

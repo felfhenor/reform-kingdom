@@ -15,6 +15,10 @@
       }
       {{ t.targeting.noun }}
     </span>
+
+    @if (t.accuracy < 100) {
+      <span class="text-lighter">({{ t.accuracy | number }}% to hit)</span>
+    }
   </div>
 
   @if (t.scaling.length > 0) {

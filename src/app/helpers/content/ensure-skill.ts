@@ -64,6 +64,7 @@ export function ensureEquipmentSkillTechnique(
       technique.statusEffects,
       ensureEquipmentSkillTechniqueStatusEffectApplication,
     ),
+    accuracy: technique.accuracy ?? 100,
     combatMessage: technique.combatMessage ?? 'UNKNOWN',
   };
 }

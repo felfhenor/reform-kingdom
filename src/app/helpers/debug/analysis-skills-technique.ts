@@ -272,8 +272,19 @@ export function statusEffectDamageTextIssues(
     : [];
 }
 
+function accuracyIssues(t: Technique): AnalysisIssue[] {
+  if (t.accuracy <= 0 || t.accuracy > 100) {
+    return [analysisFail(`has accuracy ${t.accuracy}; use 1-100.`)];
+  }
+  if (t.accuracy < 100 && hasAttr(t, 'NeverMisses')) {
+    return [analysisWarn('has accuracy below 100 but NeverMisses ignores it.')];
+  }
+  return [];
+}
+
 export function techniqueIssues(t: Technique): AnalysisIssue[] {
   return [
+    ...accuracyIssues(t),
     ...damageTagIssues(t),
     ...restoreIssues(t, 'HealsTarget', 'heals', 'NotMaxHealth'),
     ...restoreIssues(t, 'RestoresTargetEnergy', 'restores', 'NotMaxEnergy'),

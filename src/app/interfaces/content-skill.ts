@@ -68,6 +68,8 @@ export type EquipmentSkillContentTechnique = {
   elements: GameElement[];
   attributes: EquipmentSkillAttribute[];
   statusEffects: EquipmentSkillTechniqueStatusEffectApplication[];
+  // Percent chance to hit, rolled alongside the attacker's missChance.
+  accuracy: number;
 
   combatMessage: string;
 };

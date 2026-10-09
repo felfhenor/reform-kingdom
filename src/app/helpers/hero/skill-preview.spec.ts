@@ -235,6 +235,19 @@ describe('skillTechniqueTargeting', () => {
 });
 
 describe('skillTechniquePreviews', () => {
+  it('shows technique accuracy, but 100 when NeverMisses overrides it', () => {
+    const skill = buildSkill({
+      techniques: [
+        buildTechnique({ accuracy: 70 }),
+        buildTechnique({ accuracy: 70, attributes: ['NeverMisses'] }),
+      ],
+    });
+
+    expect(
+      skillTechniquePreviews(buildCombatant(), skill).map((p) => p.accuracy),
+    ).toEqual([70, 100]);
+  });
+
   it('lists each technique in order with its own amount, target and scaling', () => {
     const previews = skillTechniquePreviews(leechCombatant, leechSkill);
 

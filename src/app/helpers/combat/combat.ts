@@ -44,6 +44,7 @@ import type {
   Combatant,
   CombatOrderPick,
   EquipmentSkill,
+  EquipmentSkillContentTechnique,
 } from '@interfaces';
 
 type CombatTurnResult = {
@@ -148,6 +149,18 @@ function combatantAct(combat: Combat, combatant: Combatant): boolean {
   return true;
 }
 
+function combatTechniqueMisses(
+  combatant: Combatant,
+  tech: EquipmentSkillContentTechnique,
+): boolean {
+  if (techniqueHasAttribute(tech, 'NeverMisses')) return false;
+  if (combatCombatantCombatStatSucceedsChance(combatant, 'missChance')) {
+    return true;
+  }
+
+  return tech.accuracy < 100 && !rngSucceedsChance(tech.accuracy);
+}
+
 function combatantUseSkill(
   combat: Combat,
   combatant: Combatant,
@@ -192,16 +205,7 @@ function combatantUseSkill(
     targets.forEach((target) => {
       if (isCombatOver(combat)) return;
 
-      let shouldMiss = combatCombatantCombatStatSucceedsChance(
-        combatant,
-        'missChance',
-      );
-
-      if (techniqueHasAttribute(tech, 'AllowLuckDodge')) {
-        shouldMiss = false;
-      }
-
-      if (shouldMiss) {
+      if (combatTechniqueMisses(combatant, tech)) {
         combatMessageLog(
           combat,
           `**${combatantMessageToken(combatant)}**'s **${chosenSkill.name}** misses **${combatantMessageToken(target)}**!`,

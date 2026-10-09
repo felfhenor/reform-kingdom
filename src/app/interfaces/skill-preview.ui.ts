@@ -26,4 +26,6 @@ export type SkillTechniquePreview = {
   scaling: SkillStatScaling[];
   elements: GameElement[];
   statusEffects: SkillTechniqueStatusPreview[];
+  // 100 when the technique can't miss on its own.
+  accuracy: number;
 };
