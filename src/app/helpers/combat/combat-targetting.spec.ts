@@ -61,6 +61,17 @@ describe('combatAvailableSkillsForCombatant', () => {
     expect(combatAvailableSkillsForCombatant(combatant)).toEqual([skill]);
   });
 
+  it('excludes a skill made unaffordable by an EP cost increase', () => {
+    const skill = buildEquipmentSkill({ epCost: 10 });
+    const combatant = buildTestCombatant({
+      ep: 10,
+      skillRefs: [skill],
+      combatStats: { ...defaultCombatStats(), epCostIncreasePercent: 50 },
+    });
+
+    expect(combatAvailableSkillsForCombatant(combatant)).toEqual([]);
+  });
+
   it('still excludes skills that are out of uses even if ep is available', () => {
     const skill = buildEquipmentSkill({
       id: 'limited' as EquipmentSkillId,

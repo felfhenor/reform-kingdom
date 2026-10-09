@@ -9,6 +9,7 @@ vi.mock('@helpers/rng', async (importOriginal) => {
 import {
   combatCombatantCombatStatSucceedsChance,
   combatCombatantCombatStatValue,
+  combatCombatantSkillEpCost,
   combatStatsForCharacter,
 } from '@helpers/combat/combat-stats';
 import { ensureEquipment } from '@helpers/content/ensure-item';
@@ -24,7 +25,9 @@ import type {
 import {
   buildCharacter,
   buildEquipmentItem,
+  buildEquipmentSkill,
   buildHeroCombatant,
+  buildTestCombatant,
 } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 
@@ -89,5 +92,51 @@ describe('combatant combat stat rolls', () => {
     expect(
       combatCombatantCombatStatSucceedsChance(withStat(-1), 'stunChance'),
     ).toBe(false);
+  });
+});
+
+describe('combatCombatantSkillEpCost', () => {
+  const withIncrease = (epCostIncreasePercent: number): Combatant =>
+    buildTestCombatant({
+      combatStats: { ...defaultCombatStats(), epCostIncreasePercent },
+    });
+
+  it('charges the base cost with no increase', () => {
+    const skill = buildEquipmentSkill({ epCost: 10 });
+    expect(combatCombatantSkillEpCost(withIncrease(0), skill)).toBe(10);
+  });
+
+  it('scales the cost by the increase, rounding up', () => {
+    expect(
+      combatCombatantSkillEpCost(
+        withIncrease(50),
+        buildEquipmentSkill({ epCost: 10 }),
+      ),
+    ).toBe(15);
+    expect(
+      combatCombatantSkillEpCost(
+        withIncrease(50),
+        buildEquipmentSkill({ epCost: 5 }),
+      ),
+    ).toBe(8);
+    expect(
+      combatCombatantSkillEpCost(
+        withIncrease(20),
+        buildEquipmentSkill({ epCost: 5 }),
+      ),
+    ).toBe(6);
+  });
+
+  it('keeps free skills free', () => {
+    const skill = buildEquipmentSkill({ epCost: 0 });
+    expect(combatCombatantSkillEpCost(withIncrease(50), skill)).toBe(0);
+  });
+
+  it('falls back to the base cost for combatants saved without the stat', () => {
+    const legacy = buildTestCombatant();
+    delete (legacy.combatStats as Partial<typeof legacy.combatStats>)
+      .epCostIncreasePercent;
+    const skill = buildEquipmentSkill({ epCost: 10 });
+    expect(combatCombatantSkillEpCost(legacy, skill)).toBe(10);
   });
 });

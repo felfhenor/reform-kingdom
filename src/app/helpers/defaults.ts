@@ -178,6 +178,7 @@ export function defaultCombatStats(): CombatStatBlock {
     healingIgnorePercent: 0,
     reviveChance: 0,
     stunChance: 0,
+    epCostIncreasePercent: 0,
     agroValue: 0,
   };
 }

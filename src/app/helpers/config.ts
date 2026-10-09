@@ -152,6 +152,7 @@ export const VALUE_MULTIPLIER_PER_COMBAT_STAT: Record<CombatStat, number> = {
   healingIgnorePercent: 1,
   reviveChance: 10,
   stunChance: 1,
+  epCostIncreasePercent: 1,
   agroValue: 2,
 };
 

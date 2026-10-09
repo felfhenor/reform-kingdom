@@ -37,8 +37,11 @@ import { updateGamestate, worldCombatState } from '@helpers/state-game';
 
 import { clamp, sortBy } from 'es-toolkit/compat';
 
-import { combatCombatantCombatStatSucceedsChance } from '@helpers/combat/combat-stats';
-import { skillEpCost, skillTechniqueNumTargets } from '@helpers/hero/skill';
+import {
+  combatCombatantCombatStatSucceedsChance,
+  combatCombatantSkillEpCost,
+} from '@helpers/combat/combat-stats';
+import { skillTechniqueNumTargets } from '@helpers/hero/skill';
 import { rngChoiceWeighted, rngSucceedsChance } from '@helpers/rng';
 import type {
   Combat,
@@ -67,7 +70,7 @@ function combatantMarkSkillUse(
   combatant.skillUses[skill.id] += 1;
 
   combatant.ep = clamp(
-    combatant.ep - skillEpCost(skill),
+    combatant.ep - combatCombatantSkillEpCost(combatant, skill),
     0,
     combatant.totalStats.Energy,
   );

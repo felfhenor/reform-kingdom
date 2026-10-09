@@ -416,3 +416,55 @@
 
     - type: AddDamageToStat
       modifyStat: Luck
+
+- id: 6ff13370-b374-4f2e-bdf1-d0a19f2653d8
+  name: Gravity
+  sprite: '0022'
+
+  effectType: Debuff
+  elements: [Air]
+  tags: [StatDown]
+
+  trigger: TurnEnd
+
+  onApply:
+    - type: SendMessage
+      combatMessage: '**{{ combatant.name }}** is being pancaked by gravity!'
+
+    - type: AddCombatStatNumber
+      combatStat: epCostIncreasePercent
+      value: 50
+
+  onUnapply:
+    - type: SendMessage
+      combatMessage: '**{{ combatant.name }}** is no longer being crushed by gravity!'
+
+    - type: TakeCombatStatNumber
+      combatStat: epCostIncreasePercent
+      value: 50
+
+- id: 78d84b0b-648f-43a7-84d7-8ae23d5bec4a
+  name: Redirect
+  sprite: '0023'
+
+  effectType: Debuff
+  elements: [Air]
+  tags: [Accuracy]
+
+  trigger: TurnEnd
+
+  onApply:
+    - type: SendMessage
+      combatMessage: '**{{ combatant.name }}** is being redirected by the air!'
+
+    - type: AddCombatStatNumber
+      combatStat: redirectionChance
+      value: 20
+
+  onUnapply:
+    - type: SendMessage
+      combatMessage: '**{{ combatant.name }}** is no longer being redirected!'
+
+    - type: TakeCombatStatNumber
+      combatStat: redirectionChance
+      value: 20

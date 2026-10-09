@@ -1,12 +1,11 @@
-import { combatCombatantCombatStatSucceedsChance } from '@helpers/combat/combat-stats';
+import {
+  combatCombatantCombatStatSucceedsChance,
+  combatCombatantSkillEpCost,
+} from '@helpers/combat/combat-stats';
 import { combatantHasActiveStatusEffect } from '@helpers/combat/combat-statuseffects';
 import { combatantHasLivingSummon } from '@helpers/combat/combat-summon';
 import { getEntry } from '@helpers/content/content';
-import {
-  skillEpCost,
-  skillTechniqueNumTargets,
-  skillUses,
-} from '@helpers/hero/skill';
+import { skillTechniqueNumTargets, skillUses } from '@helpers/hero/skill';
 import type {
   Combat,
   Combatant,
@@ -32,7 +31,7 @@ export function combatAvailableSkillsForCombatant(
     (skill) =>
       (skill.usesPerCombat === -1 ||
         (combatant.skillUses[skill.id] ?? 0) < skillUses(skill)) &&
-      combatant.ep >= skillEpCost(skill),
+      combatant.ep >= combatCombatantSkillEpCost(combatant, skill),
   );
 }
 

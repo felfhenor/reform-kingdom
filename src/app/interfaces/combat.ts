@@ -36,6 +36,7 @@ export type CombatStat =
   | 'healingIgnorePercent'
   | 'reviveChance'
   | 'stunChance'
+  | 'epCostIncreasePercent'
   | 'agroValue';
 
 export type CombatStatBlock = Record<CombatStat, number>;
@@ -53,6 +54,7 @@ export const CombatStatDimension: StatDisplayDimension<CombatStat> = {
     'stunChance',
     'redirectionChance',
     'healingIgnorePercent',
+    'epCostIncreasePercent',
   ],
   label: {
     repeatActionChance: 'Extra Turn Chance',
@@ -64,6 +66,7 @@ export const CombatStatDimension: StatDisplayDimension<CombatStat> = {
     healingIgnorePercent: 'Healing Reduction',
     reviveChance: 'Revive Chance',
     stunChance: 'Self-Stun Chance',
+    epCostIncreasePercent: 'EP Cost Increase',
     agroValue: 'Aggro',
   },
   icon: {
@@ -76,6 +79,7 @@ export const CombatStatDimension: StatDisplayDimension<CombatStat> = {
     healingIgnorePercent: 'gameBrokenHeart',
     reviveChance: 'gameAngelWings',
     stunChance: 'gameKnockedOutStars',
+    epCostIncreasePercent: 'gameNestedEclipses',
     agroValue: 'gameTargeted',
   },
   color: {
@@ -88,6 +92,7 @@ export const CombatStatDimension: StatDisplayDimension<CombatStat> = {
     healingIgnorePercent: 'text-red-800',
     reviveChance: 'text-lime-500',
     stunChance: 'text-yellow-500',
+    epCostIncreasePercent: 'text-violet-500',
     agroValue: 'text-orange-600',
   },
   isPercent: {
@@ -100,6 +105,7 @@ export const CombatStatDimension: StatDisplayDimension<CombatStat> = {
     healingIgnorePercent: true,
     reviveChance: true,
     stunChance: true,
+    epCostIncreasePercent: true,
     agroValue: false,
   },
 };

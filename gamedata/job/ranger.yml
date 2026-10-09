@@ -109,3 +109,8 @@
 
         - level: 41
           skillId: Barbed Shot II
+
+    - pathName: Static Gust
+      levels:
+        - level: 26
+          skillId: Static Gust I

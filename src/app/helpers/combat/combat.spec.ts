@@ -29,7 +29,10 @@ import {
 import { combatantDamageEvents } from '@helpers/combat/combat-damage-events';
 import { pickSkillFromCombatOrders } from '@helpers/combat/combat-order-evaluation';
 import { combatantSkillCastEvents } from '@helpers/combat/combat-skill-events';
-import { combatCombatantCombatStatSucceedsChance } from '@helpers/combat/combat-stats';
+import {
+  combatCombatantCombatStatSucceedsChance,
+  combatCombatantSkillEpCost,
+} from '@helpers/combat/combat-stats';
 import {
   combatCanTakeTurn,
   combatExpireCombatantStatusEffects,
@@ -113,6 +116,7 @@ beforeEach(() => {
   vi.mocked(combatCanTakeTurn).mockReturnValue(true);
   vi.mocked(rngSucceedsChance).mockReturnValue(false);
   vi.mocked(combatCombatantCombatStatSucceedsChance).mockReturnValue(false);
+  vi.mocked(combatCombatantSkillEpCost).mockReturnValue(0);
   vi.mocked(techniqueHasAttribute).mockReturnValue(false);
   vi.mocked(combatGetPossibleCombatantTargetsForSkill).mockReturnValue([
     target,
@@ -213,6 +217,16 @@ describe('combatantTakeTurn skill selection', () => {
     expect(combatantSkillCastEvents()).toMatchObject([
       { combatantId: 'caster-1', skillName: 'Fireball', skillSprite: '0042' },
     ]);
+  });
+
+  it('spends the combatant-adjusted EP cost', () => {
+    available(skill('fireball', { epCost: 10 }));
+    vi.mocked(combatCombatantSkillEpCost).mockReturnValue(15);
+    const combatant = caster({ ep: 15 });
+
+    combatantTakeTurn(buildCombat(), combatant);
+
+    expect(combatant.ep).toBe(0);
   });
 
   it('uses the Combat Orders pick when the hero has configured orders', () => {

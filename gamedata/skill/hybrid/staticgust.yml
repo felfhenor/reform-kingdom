@@ -1,0 +1,39 @@
+- id: 33ee3b90-7f89-40d9-b292-305f0c7862c9
+  name: Static Gust I
+  family: Static Gust
+  description: Shoot out a charged burst of air at an enemy for {{ value }} damage, with a chance of inflicting Trembling, Gravity, and Redirect.
+
+  sprite: '0046'
+
+  rarity: Common
+
+  epCost: 25
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Earth, Air]
+      attributes: [DamagesTarget, AllowPlink, Debuff]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 3
+
+      statusEffects:
+        - statusEffectId: Trembling
+          chance: 40
+          duration: 3
+
+        - statusEffectId: Gravity
+          chance: 40
+          duration: 3
+
+        - statusEffectId: Redirect
+          chance: 40
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
