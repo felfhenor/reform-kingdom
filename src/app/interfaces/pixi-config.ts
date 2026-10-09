@@ -36,11 +36,10 @@ export type TiledObjectOrientation = {
 // worker's token.
 export type TravelGlideState = {
   visual: CurrentLocation;
-  stepOrigin: CurrentLocation;
-  stepDestination: CurrentLocation;
-  stepStartTime: number;
-  stepDurationMs: number;
-  hasActiveStep: boolean;
+  syncKey: string;
+  syncTime: number;
+  lastFrameTime: number;
+  correction: { x: number; y: number };
 };
 
 // Buffered so trailing party members can render a delayed copy of the leader's path instead of tracking their own travel state.

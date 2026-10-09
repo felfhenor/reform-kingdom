@@ -1,65 +1,116 @@
-import { travelStepTicksCost } from '@helpers/hero/travel';
-import type { CurrentLocation, TravelGlideState, TravelStep } from '@interfaces';
+import {
+  GAMELOOP_INTERVAL_MS,
+  TRAVEL_GLIDE_CORRECTION_MS,
+  TRAVEL_GLIDE_MAX_CORRECTION_TILES,
+} from '@helpers/config';
+import { travelStepTicksCost } from '@helpers/hero/travel-cost';
+import type {
+  CurrentLocation,
+  TravelGlideState,
+  TravelStep,
+} from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
-// Advances a token's eased visual position by one tick, toward the in-flight step.
+// Walks steps exactly like the tick layer, so an extrapolated position is where the next tick's state will put the token.
+export function travelPathPositionAt(
+  location: CurrentLocation,
+  path: TravelStep[],
+  progressTicks: number,
+): CurrentLocation {
+  let origin: CurrentLocation = { ...location };
+  let remaining = progressTicks;
+
+  for (const step of path) {
+    if (step.kind === 'Teleport' || step.mapName !== origin.mapName) break;
+
+    const cost = travelStepTicksCost(step, origin);
+    if (remaining < cost) {
+      const fraction = remaining / cost;
+      return {
+        mapName: origin.mapName,
+        x: origin.x + (step.x - origin.x) * fraction,
+        y: origin.y + (step.y - origin.y) * fraction,
+      };
+    }
+
+    remaining -= cost;
+    origin = { mapName: step.mapName, x: step.x, y: step.y };
+  }
+
+  return origin;
+}
+
+function travelGlideSyncKey(
+  location: CurrentLocation,
+  path: TravelStep[],
+  ticksIntoStep: number,
+): string {
+  const next = path[0];
+  const nextKey = next ? `${next.mapName}:${next.x}:${next.y}` : '';
+  return `${location.mapName}:${location.x}:${location.y}|${path.length}|${nextKey}|${ticksIntoStep}`;
+}
+
+// Remembers how far the rendered token is from the new tick state's position, so the gap eases out instead of snapping.
+function travelGlideResync(
+  glide: TravelGlideState,
+  syncKey: string,
+  start: CurrentLocation,
+  now: number,
+): TravelGlideState {
+  // The tick landed somewhere since the last frame; starting from now would stall the token for a frame every tick.
+  const syncTime = glide.lastFrameTime > 0 ? glide.lastFrameTime : now;
+  const x = glide.visual.x - start.x;
+  const y = glide.visual.y - start.y;
+  const keepsCorrection =
+    glide.visual.mapName === start.mapName &&
+    Math.hypot(x, y) <= TRAVEL_GLIDE_MAX_CORRECTION_TILES;
+
+  return {
+    visual: glide.visual,
+    syncKey,
+    syncTime,
+    lastFrameTime: glide.lastFrameTime,
+    correction: keepsCorrection ? { x, y } : { x: 0, y: 0 },
+  };
+}
+
+// Advances a token's visual position by extrapolating the tick state forward in real time.
 // Shared by the party's own token and each worker's token. Pure - callers persist the state.
 export function travelGlideAdvance(
   glide: TravelGlideState,
-  targetLocation: CurrentLocation,
-  inFlightStep: TravelStep | undefined,
+  location: CurrentLocation,
+  path: TravelStep[],
+  ticksIntoStep: number,
   now: number,
-  speedMultiplier: number,
+  ticksPerLoop: number,
 ): TravelGlideState {
-  // A map change or teleport/idle state has nothing to glide toward - snap.
-  if (
-    targetLocation.mapName !== glide.visual.mapName ||
-    !inFlightStep ||
-    inFlightStep.kind === 'Teleport'
-  ) {
-    return { ...glide, visual: { ...targetLocation }, hasActiveStep: false };
-  }
+  const syncKey = travelGlideSyncKey(location, path, ticksIntoStep);
+  const synced =
+    syncKey === glide.syncKey
+      ? glide
+      : travelGlideResync(
+          glide,
+          syncKey,
+          travelPathPositionAt(location, path, ticksIntoStep),
+          now,
+        );
 
-  const destinationChanged =
-    !glide.hasActiveStep ||
-    glide.stepDestination.mapName !== inFlightStep.mapName ||
-    glide.stepDestination.x !== inFlightStep.x ||
-    glide.stepDestination.y !== inFlightStep.y;
-
-  // Origin is wherever the token is currently rendered, not the tick-driven
-  // target, to avoid a visible snap on step handoff.
-  const next: TravelGlideState = destinationChanged
-    ? {
-        visual: glide.visual,
-        stepOrigin: { ...glide.visual },
-        stepDestination: {
-          mapName: inFlightStep.mapName,
-          x: inFlightStep.x,
-          y: inFlightStep.y,
-        },
-        stepStartTime: now,
-        stepDurationMs:
-          (travelStepTicksCost(inFlightStep, targetLocation) * 1000) /
-          Math.max(speedMultiplier, 0.001),
-        hasActiveStep: true,
-      }
-    : glide;
-
-  const fraction =
-    next.stepDurationMs > 0
-      ? clamp((now - next.stepStartTime) / next.stepDurationMs, 0, 1)
-      : 1;
+  const elapsedMs = Math.max(0, now - synced.syncTime);
+  const loopFraction = clamp(elapsedMs / GAMELOOP_INTERVAL_MS, 0, 1);
+  const base = travelPathPositionAt(
+    location,
+    path,
+    ticksIntoStep + loopFraction * ticksPerLoop,
+  );
+  const decay = clamp(1 - elapsedMs / TRAVEL_GLIDE_CORRECTION_MS, 0, 1);
 
   return {
-    ...next,
+    ...synced,
+    lastFrameTime: now,
     visual: {
-      mapName: targetLocation.mapName,
-      x:
-        next.stepOrigin.x +
-        (next.stepDestination.x - next.stepOrigin.x) * fraction,
-      y:
-        next.stepOrigin.y +
-        (next.stepDestination.y - next.stepOrigin.y) * fraction,
+      mapName: base.mapName,
+      x: base.x + synced.correction.x * decay,
+      y: base.y + synced.correction.y * decay,
     },
   };
 }
@@ -69,10 +120,9 @@ export function defaultTravelGlideState(
 ): TravelGlideState {
   return {
     visual: { ...location },
-    stepOrigin: { ...location },
-    stepDestination: { ...location },
-    stepStartTime: 0,
-    stepDurationMs: 0,
-    hasActiveStep: false,
+    syncKey: '',
+    syncTime: 0,
+    lastFrameTime: 0,
+    correction: { x: 0, y: 0 },
   };
 }

@@ -270,14 +270,11 @@ export class GamePlayWorldComponent implements OnDestroy {
   private lastPointerPosition = { x: 0, y: 0 };
 
   // Rendered position, eased toward the tick-driven `currentLocation` rather than snapping to it.
-  private visualPosition: CurrentLocation = { mapName: '', x: 0, y: 0 };
-
-  // Endpoints/schedule of the step currently being glided toward, captured once so pace stays constant.
-  private stepOriginTile: CurrentLocation = { mapName: '', x: 0, y: 0 };
-  private stepDestinationTile: CurrentLocation = { mapName: '', x: 0, y: 0 };
-  private stepStartTime = performance.now();
-  private stepDurationMs = 0;
-  private hasActiveStep = false;
+  private partyGlide: TravelGlideState = defaultTravelGlideState({
+    mapName: '',
+    x: 0,
+    y: 0,
+  });
 
   // Driven by visual arrival, not the tick-layer `currentLocation`, so the walking token stays visible for the full glide.
   private isShowingAtLocationIndicator = false;
@@ -361,8 +358,7 @@ export class GamePlayWorldComponent implements OnDestroy {
 
   private async snapVisualPositionTo(target: CurrentLocation): Promise<void> {
     await this.fadeOut();
-    this.visualPosition = { ...target };
-    this.hasActiveStep = false;
+    this.partyGlide = defaultTravelGlideState(target);
     // Cleared so followers don't walk back from their pre-teleport trail positions.
     this.partyPositionHistory = [];
     this.followerCatchUp = [];
@@ -486,8 +482,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     if (!element) return;
 
     this.map = map;
-    this.visualPosition = { ...worldCurrentLocationState() };
-    this.hasActiveStep = false;
+    this.partyGlide = defaultTravelGlideState(worldCurrentLocationState());
     mapNodeDeselect();
 
     this.app = await pixiAppInitialize(element, {
@@ -746,7 +741,7 @@ export class GamePlayWorldComponent implements OnDestroy {
 
     // Anchor only on the first off-center move of this gesture; later deltas accumulate against the same frozen anchor.
     if (!this.frozenCameraBase) {
-      const location = this.visualPosition;
+      const location = this.partyGlide.visual;
       this.frozenCameraBase = cameraPositionCalculate(
         location.x,
         location.y,
@@ -872,7 +867,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     const now = performance.now();
     this.partyPositionHistory = partyPositionHistoryRecord(
       this.partyPositionHistory,
-      this.visualPosition,
+      this.partyGlide.visual,
       now,
       PARTY_FORMATION_HISTORY_MAX_AGE_MS,
     );
@@ -889,7 +884,7 @@ export class GamePlayWorldComponent implements OnDestroy {
             this.partyPositionHistory,
             now,
             (index + 1) * PARTY_FORMATION_FOLLOW_DELAY_MS,
-          ) ?? this.visualPosition;
+          ) ?? this.partyGlide.visual;
         this.followerRenderedPosition[index] = partyFollowerJitterPosition(
           sampled,
           offset,
@@ -897,7 +892,10 @@ export class GamePlayWorldComponent implements OnDestroy {
         continue;
       }
 
-      const target = partyFollowerJitterPosition(this.visualPosition, offset);
+      const target = partyFollowerJitterPosition(
+        this.partyGlide.visual,
+        offset,
+      );
       const catchUp =
         this.followerCatchUp[index] ??
         partyFollowerCatchUpStart(
@@ -949,9 +947,9 @@ export class GamePlayWorldComponent implements OnDestroy {
   private isVisuallyAtTarget(): boolean {
     const target = worldCurrentLocationState();
     return (
-      this.visualPosition.mapName === target.mapName &&
-      Math.abs(this.visualPosition.x - target.x) < 0.001 &&
-      Math.abs(this.visualPosition.y - target.y) < 0.001
+      this.partyGlide.visual.mapName === target.mapName &&
+      Math.abs(this.partyGlide.visual.x - target.x) < 0.001 &&
+      Math.abs(this.partyGlide.visual.y - target.y) < 0.001
     );
   }
 
@@ -992,37 +990,19 @@ export class GamePlayWorldComponent implements OnDestroy {
     }
   }
 
-  // Glides toward the in-flight step as soon as it becomes current, rather than waiting for its ticks to resolve - otherwise the token would sit still for the whole tick-accumulation window then jump.
   // Map changes are handled separately (with a fade), so a mismatched map name here just snaps.
   private updateVisualPosition(): void {
     if (!this.map) return;
 
-    const location = worldCurrentLocationState();
     const travel = worldTravelState();
-    const inFlightStep =
-      travel.status === 'Traveling' ? travel.path[0] : undefined;
-
-    const glide = travelGlideAdvance(
-      {
-        visual: this.visualPosition,
-        stepOrigin: this.stepOriginTile,
-        stepDestination: this.stepDestinationTile,
-        stepStartTime: this.stepStartTime,
-        stepDurationMs: this.stepDurationMs,
-        hasActiveStep: this.hasActiveStep,
-      },
-      location,
-      inFlightStep,
+    this.partyGlide = travelGlideAdvance(
+      this.partyGlide,
+      worldCurrentLocationState(),
+      travel.status === 'Traveling' ? travel.path : [],
+      travel.ticksIntoStep,
       performance.now(),
       getOption('debugTickMultiplier'),
     );
-
-    this.visualPosition = glide.visual;
-    this.stepOriginTile = glide.stepOrigin;
-    this.stepDestinationTile = glide.stepDestination;
-    this.stepStartTime = glide.stepStartTime;
-    this.stepDurationMs = glide.stepDurationMs;
-    this.hasActiveStep = glide.hasActiveStep;
   }
 
   private positionCamera(): void {
@@ -1037,7 +1017,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     )
       return;
 
-    const location = this.visualPosition;
+    const location = this.partyGlide.visual;
     const { widthTiles: viewportWidthTiles, heightTiles: viewportHeightTiles } =
       this.viewportTiles;
     const bounds = this.cameraBounds;
@@ -1167,11 +1147,11 @@ export class GamePlayWorldComponent implements OnDestroy {
       const workerToken = this.workerTokens.get(token.workerId);
       if (!glide || !workerToken || !this.map) return;
 
-      const inFlightStep = token.path[0];
       const nextGlide = travelGlideAdvance(
         glide,
         workerLocation,
-        inFlightStep,
+        token.path,
+        token.ticksIntoStep,
         now,
         speedMultiplier,
       );
@@ -1267,11 +1247,11 @@ export class GamePlayWorldComponent implements OnDestroy {
       const workerToken = this.townWorkerTokens.get(key);
       if (!glide || !workerToken || !this.map) return;
 
-      const inFlightStep = token.path[0];
       const nextGlide = travelGlideAdvance(
         glide,
         workerLocation,
-        inFlightStep,
+        token.path,
+        token.ticksIntoStep,
         now,
         speedMultiplier,
       );

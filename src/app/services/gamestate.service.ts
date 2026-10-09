@@ -6,6 +6,7 @@ import {
   signal,
   untracked,
 } from '@angular/core';
+import { GAMELOOP_INTERVAL_MS } from '@helpers/config';
 import { isPageVisible } from '@helpers/engine/page-visibility';
 import { gameloop } from '@helpers/gameloop';
 import { migrateOptionsState } from '@helpers/migrate';
@@ -97,7 +98,7 @@ export class GamestateService {
 
     void runLoop(1);
 
-    interval(1000).subscribe(() => {
+    interval(GAMELOOP_INTERVAL_MS).subscribe(() => {
       if (lastRunTime <= 0 || !this.hasLoaded() || isRunning) return;
 
       if (!isPageVisible() && !getOption('debugAllowBackgroundOperations')) {

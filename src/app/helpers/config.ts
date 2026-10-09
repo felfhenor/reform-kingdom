@@ -56,6 +56,7 @@ export const LEVEL_UP_NODE_FAILURE_LIMIT = 5;
 
 // Engine
 
+export const GAMELOOP_INTERVAL_MS = 1000;
 export const MAX_EVENT_SEGMENTS = 5;
 export const MAX_SEGMENT_LENGTH = 32;
 // How long the full loading bar stays on screen before the overlay fades.
@@ -242,6 +243,10 @@ export const PARTY_FORMATION_HISTORY_MAX_AGE_MS = 2400;
 // leader - the nonzero minimum is what actually guarantees no two sprites ever land on the same spot.
 export const PARTY_FORMATION_JITTER_MIN_TILES = 0.4;
 export const PARTY_FORMATION_JITTER_MAX_TILES = 0.6;
+// A travel token's leftover offset after a tick (redirect, timing jitter) eases out over this long instead of snapping.
+export const TRAVEL_GLIDE_CORRECTION_MS = 250;
+// Gaps wider than this (e.g. a background catch-up) snap rather than slide across the map.
+export const TRAVEL_GLIDE_MAX_CORRECTION_TILES = 2;
 
 // Tasks
 
