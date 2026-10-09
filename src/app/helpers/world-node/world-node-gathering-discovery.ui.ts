@@ -1,8 +1,7 @@
-import { rangeLabel } from '@helpers/engine/leveled-range';
 import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
 import { isMaterialDiscovered } from '@helpers/item/materials';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
-import { worldNodeLevelRange } from '@helpers/world-node/world-node-status';
+import { worldNodeFarmOption } from '@helpers/world-node/world-node-status.ui';
 import {
   isWorldNodeVisible,
   worldNodeByName,
@@ -31,14 +30,7 @@ function discoveredGatherNodesWithMaterials(): WorldNodeEntry[] {
 // The pool a GatherMaterial clause's location dropdown offers.
 export function gatherNodeFarmOptions(): ExploreNodeFarmOption[] {
   return sortBy(
-    discoveredGatherNodesWithMaterials().map((entry) => {
-      const levelRange = worldNodeLevelRange(entry);
-      return {
-        nodeName: entry.nodeName,
-        levelLabel: levelRange ? rangeLabel(levelRange) : '?',
-        entry,
-      };
-    }),
+    discoveredGatherNodesWithMaterials().map(worldNodeFarmOption),
     (option) => option.nodeName,
   );
 }

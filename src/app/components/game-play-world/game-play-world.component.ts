@@ -59,6 +59,7 @@ import {
   pixiIndicatorPlayerAtLocationCreate,
   pixiIndicatorPlayerSpriteCreate,
   pixiIndicatorProgressBarCreate,
+  pixiNodeLabelColor,
 } from '@helpers/pixi/pixi-indicators';
 import { pixiTiledMapRender } from '@helpers/pixi/pixi-map-render';
 import {
@@ -643,7 +644,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     return entry ? worldNodeStatusInfo(entry) : undefined;
   }
 
-  // Catches countdown text and hidden-node discovery updates.
+  // Catches countdown text, hidden-node discovery, and difficulty shifts as the party levels.
   private updateNodeLabels(): void {
     if (!this.nodeLabels) return;
 
@@ -657,7 +658,10 @@ export class GamePlayWorldComponent implements OnDestroy {
       if (!visible) return;
 
       const info = worldNodeLabelInfo(entry);
-      if (info) label.text = info.text;
+      if (!info) return;
+
+      label.text = info.text;
+      label.style.fill = pixiNodeLabelColor(info);
     });
   }
 

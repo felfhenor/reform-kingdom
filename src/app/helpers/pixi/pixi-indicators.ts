@@ -3,24 +3,37 @@ import {
   INDICATOR_PROGRESS_BAR_OFFSET_Y,
   NODE_STATUS_ICON_RADIUS,
 } from '@helpers/config';
-import type { WorldNodeInteractionKind } from '@interfaces';
+import type {
+  DifficultyTier,
+  WorldNodeInteractionKind,
+  WorldNodeLabelInfo,
+  WorldNodeProgressKind,
+} from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
-import type { Texture } from 'pixi.js';
+import type { ColorSource, Texture } from 'pixi.js';
 import { AnimatedSprite, Container, Graphics, Text } from 'pixi.js';
 
+// Leveled kinds normally take their difficulty color; every hue here avoids the red-to-grey difficulty scale.
 const NODE_LABEL_COLOR_BY_KIND: Record<WorldNodeInteractionKind, number> = {
-  Gather: 0x4ade80,
-  Explore: 0xfb7185,
-  ExploreRandom: 0xc084fc,
-  Trade: 0xfbbf24,
+  Gather: 0xf8fafc,
+  Explore: 0xf8fafc,
+  ExploreRandom: 0xf8fafc,
+  Trade: 0xa78bfa,
   Travel: 0x60a5fa,
   Shrine: 0x22d3ee,
-  Outpost: 0xf97316,
-  Trainer: 0x7777ff,
-  Exchange: 0xe2e8f0,
+  Outpost: 0xe879f9,
+  Trainer: 0x818cf8,
+  Exchange: 0xf8fafc,
 };
 
-const NODE_STATUS_BEATEN_COLOR = 0x4ade80;
+const PROGRESS_BAR_COLOR_BY_KIND: Record<WorldNodeProgressKind, number> = {
+  Gather: 0x38bdf8,
+  Explore: 0xf8fafc,
+};
+
+const difficultyColorCache = new Map<DifficultyTier, string>();
+
+const NODE_STATUS_BEATEN_COLOR = 0x3baf66;
 const NODE_STATUS_NOT_BEATEN_COLOR = 0xef4444;
 
 export function pixiIndicatorPlayerAtLocationCreate(tileSize: number): {
@@ -86,10 +99,10 @@ export function pixiIndicatorPlayerSpriteCreate(
   return sprite;
 }
 
-// Tinted to match the activity's node label. The float-above offset lives in the transform, so scaling the fill doesn't drag it sideways.
+// The float-above offset lives in the transform, so scaling the fill doesn't drag it sideways.
 export function pixiIndicatorProgressBarCreate(
   tileSize: number,
-  kind: WorldNodeInteractionKind,
+  kind: WorldNodeProgressKind,
 ): {
   container: Container;
   update: (fraction: number) => void;
@@ -110,7 +123,7 @@ export function pixiIndicatorProgressBarCreate(
 
   const fill = new Graphics()
     .rect(0, 0, barWidth, INDICATOR_PROGRESS_BAR_HEIGHT)
-    .fill(NODE_LABEL_COLOR_BY_KIND[kind]);
+    .fill(PROGRESS_BAR_COLOR_BY_KIND[kind]);
   fill.x = offsetX;
   fill.y = INDICATOR_PROGRESS_BAR_OFFSET_Y;
 
@@ -124,18 +137,15 @@ export function pixiIndicatorProgressBarCreate(
 }
 
 // Always visible (not just on hover/selection) so players can spot interactable nodes at a glance.
-export function pixiIndicatorNodeLabelCreate(
-  kind: WorldNodeInteractionKind,
-  text: string,
-): Text {
+export function pixiIndicatorNodeLabelCreate(info: WorldNodeLabelInfo): Text {
   const label = new Text({
-    text,
+    text: info.text,
     style: {
       fontSize: 11,
       fontFamily: 'OtherText',
       fontWeight: 'bold',
       align: 'center',
-      fill: NODE_LABEL_COLOR_BY_KIND[kind],
+      fill: pixiNodeLabelColor(info),
       stroke: { color: 0x000000, width: 3 },
       letterSpacing: 1,
     },
@@ -145,6 +155,26 @@ export function pixiIndicatorNodeLabelCreate(
   label.cullable = true;
 
   return label;
+}
+
+export function pixiNodeLabelColor(info: WorldNodeLabelInfo): ColorSource {
+  return info.difficulty
+    ? pixiDifficultyColor(info.difficulty)
+    : NODE_LABEL_COLOR_BY_KIND[info.kind];
+}
+
+// Read from CSS so the palette lives in one place; empty reads aren't cached so they can recover.
+function pixiDifficultyColor(tier: DifficultyTier): string {
+  const cached = difficultyColorCache.get(tier);
+  if (cached) return cached;
+
+  const color = getComputedStyle(document.documentElement)
+    .getPropertyValue(`--difficulty-${tier.toLowerCase()}`)
+    .trim();
+  if (!color) return '#ffffff';
+
+  difficultyColorCache.set(tier, color);
+  return color;
 }
 
 // Small beaten/not-beaten badge for the bottom-right corner of a node's sprite. Position is set

@@ -1,3 +1,4 @@
+import { gatherDifficultyTier } from '@helpers/engine/difficulty-tier';
 import { rangeLabel } from '@helpers/engine/leveled-range';
 import { DecimalPipe } from '@angular/common';
 import {
@@ -51,6 +52,7 @@ import {
 } from '@helpers/world-node/world-nodes';
 import type {
   CostItem,
+  DifficultyTier,
   ItemContent,
   ItemId,
   RewardContentInfo,
@@ -80,6 +82,7 @@ type NodeOption = {
   entry: WorldNodeEntry;
   staminaCost?: number;
   levelRangeLabel: string;
+  difficulty?: DifficultyTier;
   maxLevel: number;
   disabled: boolean;
 };
@@ -276,6 +279,12 @@ export class PlayKingdomWorkersComponent {
           levelRangeLabel: gathering
             ? rangeLabel(gathering.workerLevelRange)
             : '?',
+          difficulty: gathering
+            ? gatherDifficultyTier(
+                gathering.workerLevelRange,
+                this.selectedEntry().state.level,
+              )
+            : undefined,
           disabled:
             !canWorkerReachNode(node.nodeName, stamina, allowTeleport) ||
             (gathering?.workerLevelRange.min ?? 0) >

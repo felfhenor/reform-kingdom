@@ -9,10 +9,22 @@ import { worldNodeExploreRandomIsCompleted } from '@helpers/world-node/world-nod
 import { worldNodeOutpostLevel } from '@helpers/world-node/world-node-outpost';
 import { worldNodeShrineLevel } from '@helpers/world-node/world-node-shrine';
 import {
+  exploreDifficultyTier,
+  gatherDifficultyTier,
+} from '@helpers/engine/difficulty-tier';
+import { partyMinLevel } from '@helpers/item/gathering';
+import {
   worldNodeInteractionKind,
   worldNodeLevelRange,
 } from '@helpers/world-node/world-node-status';
+import {
+  worldNodeEncounter,
+  worldNodeEncounterRandom,
+  worldNodeGathering,
+} from '@helpers/world-node/world-nodes';
 import type {
+  DifficultyTier,
+  ExploreNodeFarmOption,
   WorldNodeEntry,
   WorldNodeInteractionKind,
   WorldNodeLabelInfo,
@@ -35,6 +47,21 @@ function nodeNameSuffixLevel(
 function nodeRewardProgressSuffix(entry: WorldNodeEntry): string {
   const { obtained, total } = worldNodeCompletionRewardProgress(entry);
   return total > 0 && obtained < total ? ` (${obtained}/${total})` : '';
+}
+
+// Towns and caravans are excluded: their levels describe guardians/trader staffing, not a challenge to the party.
+export function worldNodeDifficultyTier(
+  entry: WorldNodeEntry,
+): DifficultyTier | undefined {
+  const gatherRange = worldNodeGathering(entry)?.levelRange;
+  if (gatherRange) return gatherDifficultyTier(gatherRange, partyMinLevel());
+
+  const exploreRange =
+    worldNodeEncounter(entry)?.levelRange ??
+    worldNodeEncounterRandom(entry)?.levelRange;
+  return exploreRange
+    ? exploreDifficultyTier(exploreRange, partyMinLevel())
+    : undefined;
 }
 
 // Ignores hidden/discovered state - pixi-map-render.ts creates every label up front and toggles
@@ -71,7 +98,23 @@ export function worldNodeLabelInfo(
     if (traderName) lines.push(traderName);
   }
 
-  return { kind, text: lines.join('\n') };
+  return {
+    kind,
+    text: lines.join('\n'),
+    difficulty: worldNodeDifficultyTier(entry),
+  };
+}
+
+export function worldNodeFarmOption(
+  entry: WorldNodeEntry,
+): ExploreNodeFarmOption {
+  const levelRange = worldNodeLevelRange(entry);
+  return {
+    nodeName: entry.nodeName,
+    levelLabel: levelRange ? rangeLabel(levelRange) : '?',
+    difficulty: worldNodeDifficultyTier(entry),
+    entry,
+  };
 }
 
 // Only ExploreRandomNode has a per-cycle beaten/not-beaten state worth badging on the map.

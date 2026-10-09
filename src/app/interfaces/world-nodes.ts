@@ -1,6 +1,7 @@
 import type { AtlasedImage } from '@interfaces/artable';
 import type { CollectibleId } from '@interfaces/content-collectible';
 import type { CostItem } from '@interfaces/cost';
+import type { DifficultyTier } from '@interfaces/difficulty-tier';
 import type { RewardIdentity } from '@interfaces/droppable';
 import type { TiledObject } from '@interfaces/tiled-map';
 
@@ -52,6 +53,11 @@ export type WorldNodeInteractionKind =
   | 'Trainer'
   | 'Exchange';
 
+export type WorldNodeProgressKind = Extract<
+  WorldNodeInteractionKind,
+  'Gather' | 'Explore'
+>;
+
 export type WorldNodeCompletionRewardProgress = {
   obtained: number;
   total: number;
@@ -67,6 +73,7 @@ export type WorldNodeEncounterProgress = {
 export type WorldNodeLabelInfo = {
   kind: WorldNodeInteractionKind;
   text: string;
+  difficulty?: DifficultyTier;
 };
 
 export type PixiNodeLabelResolver = (
@@ -93,6 +100,7 @@ export type RewardContentInfo = {
 export type ExploreNodeFarmOption = {
   nodeName: string;
   levelLabel: string;
+  difficulty?: DifficultyTier;
   entry: WorldNodeEntry;
 };
 

@@ -3,7 +3,7 @@ export * from './astral-projector';
 export * from './bestiary';
 export * from './caravan-state';
 export * from './caravan-state.ui';
-export * from './chance-tier';
+export * from './difficulty-tier';
 export * from './character';
 export * from './collectible-source';
 export * from './combat';

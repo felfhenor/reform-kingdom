@@ -190,22 +190,22 @@ describe('craftXpChance / craftXpChanceTier', () => {
   });
 
   it.each([
-    [5, 100, 'Guaranteed'],
-    [12, 50, 'Likely'],
-    [18, 25, 'Possible'],
+    [5, 100, 'Hard'],
+    [12, 50, 'Medium'],
+    [18, 25, 'Easy'],
     [20, 0, 'Trivial'],
   ])('at level %i is %i%% (%s)', (level, chance, tier) => {
     expect(craftXpChance(recipe, level)).toBe(chance);
     expect(craftXpChanceTier(recipe, level)).toBe(tier);
   });
 
-  it('treats a single-level recipe as guaranteed at that level and trivial past it', () => {
+  it('treats a single-level recipe as Hard at that level and trivial past it', () => {
     const fixed = ensureRecipe({
       minTradeskillLevel: 5,
       maxTradeskillLevel: 5,
     });
 
-    expect(craftXpChanceTier(fixed, 5)).toBe('Guaranteed');
+    expect(craftXpChanceTier(fixed, 5)).toBe('Hard');
     expect(craftXpChanceTier(fixed, 6)).toBe('Trivial');
   });
 });

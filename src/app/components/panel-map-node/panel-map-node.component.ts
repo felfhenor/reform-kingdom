@@ -68,6 +68,7 @@ import {
   shrinePray,
 } from '@helpers/world-node/world-node-shrine.ui';
 import { worldNodeLevelRange } from '@helpers/world-node/world-node-status';
+import { worldNodeDifficultyTier } from '@helpers/world-node/world-node-status.ui';
 import {
   worldNodeCaravan,
   worldNodeEncounter,
@@ -149,6 +150,15 @@ export class PanelMapNodeComponent {
     const entry = this.node();
     const levelRange = entry ? worldNodeLevelRange(entry) : undefined;
     return levelRange ? rangeLabel(levelRange) : '-';
+  });
+
+  // A locked gather node already shows the error badge, whose text color would clash.
+  public levelDifficultyClass = computed(() => {
+    const entry = this.node();
+    const difficulty = entry ? worldNodeDifficultyTier(entry) : undefined;
+    return difficulty && this.meetsGatherLevelRequirement()
+      ? `text-difficulty-${difficulty}`
+      : '';
   });
 
   public description = computed(() => {

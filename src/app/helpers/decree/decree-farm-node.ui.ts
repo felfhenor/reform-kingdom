@@ -1,4 +1,3 @@
-import { rangeLabel } from '@helpers/engine/leveled-range';
 import { getEntry } from '@helpers/content/content';
 import { farmableExploreNodes } from '@helpers/decree/decree-farm-node';
 import { assertNeverReward } from '@helpers/item/loot';
@@ -10,6 +9,7 @@ import {
   worldNodeCompletionRewards,
 } from '@helpers/world-node/world-node-rewards';
 import { worldNodeLevelRange } from '@helpers/world-node/world-node-status';
+import { worldNodeFarmOption } from '@helpers/world-node/world-node-status.ui';
 import {
   worldNodeByName,
   worldNodeEncounter,
@@ -35,14 +35,7 @@ export function farmNodeActiveWarning(nodeName: string): string | undefined {
 
 export function exploreNodeFarmOptions(): ExploreNodeFarmOption[] {
   return sortBy(
-    farmableExploreNodes().map((entry) => {
-      const levelRange = worldNodeLevelRange(entry);
-      return {
-        nodeName: entry.nodeName,
-        levelLabel: levelRange ? rangeLabel(levelRange) : '?',
-        entry,
-      };
-    }),
+    farmableExploreNodes().map(worldNodeFarmOption),
     (option) => option.nodeName,
   );
 }

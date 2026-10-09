@@ -1,0 +1,28 @@
+// Hex (not oklch) so Pixi map labels can read these too.
+:root {
+  --difficulty-toohigh: #ef4444;
+  --difficulty-hard: #fb923c;
+  --difficulty-medium: #facc15;
+  --difficulty-easy: #3baf66;
+  --difficulty-trivial: #9ca3af;
+}
+
+.text-difficulty-TooHigh {
+  color: var(--difficulty-toohigh);
+}
+
+.text-difficulty-Hard {
+  color: var(--difficulty-hard);
+}
+
+.text-difficulty-Medium {
+  color: var(--difficulty-medium);
+}
+
+.text-difficulty-Easy {
+  color: var(--difficulty-easy);
+}
+
+.text-difficulty-Trivial {
+  color: var(--difficulty-trivial);
+}

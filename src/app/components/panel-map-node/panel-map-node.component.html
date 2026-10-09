@@ -36,6 +36,7 @@
             <div
               class="badge badge-outline"
               [class.badge-error]="!meetsGatherLevelRequirement()"
+              [class]="levelDifficultyClass()"
             >
               Lv. {{ levelLabel() }}
             </div>

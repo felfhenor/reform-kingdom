@@ -171,7 +171,9 @@
                         </div>
 
                         <div class="type-meta">
-                          Lv. {{ item.levelRangeLabel }}
+                          <span class="text-difficulty-{{ item.difficulty }}">
+                            Lv. {{ item.levelRangeLabel }}
+                          </span>
                           @if (item.staminaCost !== undefined) {
                             · {{ item.staminaCost | number }} stamina
                           } @else {
@@ -193,7 +195,10 @@
                   <div class="flex flex-row items-center justify-between">
                     <div class="flex-1 flex items-center gap-2 w-full">
                       <app-sprite-node class="zoom-row" [entry]="item.entry" />
-                      {{ item.nodeName }} Lv. {{ item.levelRangeLabel }}
+                      {{ item.nodeName }}
+                      <span class="text-difficulty-{{ item.difficulty }}">
+                        Lv. {{ item.levelRangeLabel }}
+                      </span>
                     </div>
 
                     <div>

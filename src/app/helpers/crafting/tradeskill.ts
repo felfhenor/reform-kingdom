@@ -21,7 +21,7 @@ import {
   updateGamestate,
 } from '@helpers/state-game';
 import type {
-  ChanceTier,
+  DifficultyTier,
   GameState,
   GameStateTradeskills,
   RecipeContent,
@@ -245,11 +245,11 @@ export function craftXpChance(
 export function craftXpChanceTier(
   recipe: RecipeContent,
   buildingLevel: number,
-): ChanceTier {
+): DifficultyTier {
   const chance = craftXpChance(recipe, buildingLevel);
 
-  if (chance >= 100) return 'Guaranteed';
-  if (chance >= 50) return 'Likely';
-  if (chance >= 25) return 'Possible';
+  if (chance >= 100) return 'Hard';
+  if (chance >= 50) return 'Medium';
+  if (chance >= 25) return 'Easy';
   return 'Trivial';
 }

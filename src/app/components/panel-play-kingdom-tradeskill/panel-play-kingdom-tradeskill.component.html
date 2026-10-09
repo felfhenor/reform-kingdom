@@ -207,7 +207,7 @@
           >
             @if (entry.xpChance !== 0) {
               <div
-                class="radial-progress text-{{ entry.xpChanceTier }}"
+                class="radial-progress text-difficulty-{{ entry.xpChanceTier }}"
                 [style.--size]="'3rem'"
                 [style.--value]="entry.xpChance"
                 [tp]="xpChanceTooltip(entry)"

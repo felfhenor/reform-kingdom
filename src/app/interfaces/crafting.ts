@@ -1,4 +1,4 @@
-import type { ChanceTier } from '@interfaces/chance-tier';
+import type { DifficultyTier } from '@interfaces/difficulty-tier';
 import type { CollectibleContent } from '@interfaces/content-collectible';
 import type { EquipmentContent } from '@interfaces/content-equipment';
 import type { EquipmentItem } from '@interfaces/equipment';
@@ -76,6 +76,6 @@ export type CraftRecipeEntry = {
   ownedQuantity: number;
   xp: number;
   xpChance: number;
-  xpChanceTier: ChanceTier;
+  xpChanceTier: DifficultyTier;
   requirementEntries: CraftRequirementEntry[];
 };

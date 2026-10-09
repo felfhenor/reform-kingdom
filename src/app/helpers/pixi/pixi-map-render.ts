@@ -177,7 +177,7 @@ function pixiTiledObjectRender(
   const labelInfo = object.type ? resolveNodeLabel?.(object) : undefined;
   let label: Text | undefined;
   if (labelInfo) {
-    label = pixiIndicatorNodeLabelCreate(labelInfo.kind, labelInfo.text);
+    label = pixiIndicatorNodeLabelCreate(labelInfo);
     label.x = object.width / 2;
     label.y = -object.height - 4;
     label.visible = false;

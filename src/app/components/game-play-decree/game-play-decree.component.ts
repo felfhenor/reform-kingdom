@@ -10,6 +10,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RISK_BAND_DIFFICULTY } from '@helpers/engine/difficulty-tier';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { OptionRewardComponent } from '@components/option-reward/option-reward.component';
@@ -58,6 +59,7 @@ import type {
   DecreeClauseAction,
   DecreeClauseId,
   DecreeRiskLevel,
+  DifficultyTier,
   FarmNodeRewardOption,
   ItemContent,
   MaterialId,
@@ -90,6 +92,7 @@ const CLAUSE_TYPE_OPTIONS: {
 type RiskToleranceOption = {
   value: DecreeRiskLevel;
   label: string;
+  difficulty: DifficultyTier;
   description: string;
 };
 
@@ -99,18 +102,21 @@ const RISK_TOLERANCE_OPTIONS: RiskToleranceOption[] = [
   {
     value: 'Low',
     label: 'Low',
+    difficulty: RISK_BAND_DIFFICULTY.Low,
     description:
       "Only target nodes with a max level at or below the party's level.",
   },
   {
     value: 'Medium',
     label: 'Medium',
+    difficulty: RISK_BAND_DIFFICULTY.Medium,
     description:
       "Target nodes with at least a minimum level of the party's level.",
   },
   {
     value: 'High',
     label: 'High',
+    difficulty: RISK_BAND_DIFFICULTY.High,
     description: `Attempt encounters up to ${HIGH_RISK_LEVELS_ABOVE_PARTY} levels above the party's weakest hero - the riskiest fights Auto Mode will ever pick on its own.`,
   },
 ];
