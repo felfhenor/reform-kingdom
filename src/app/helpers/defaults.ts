@@ -66,6 +66,7 @@ export function defaultGameState(): GameState {
     shrines: {},
     outposts: {},
     worldDiscoveries: {},
+    discoveredMaps: {},
     bestiary: {},
     workers: {},
     discoveredWorkers: {},

@@ -31,6 +31,7 @@ import { seedWorldNodes } from '@/testing/world';
 import {
   isWorldNodeCollectibleGateMet,
   isWorldNodeHidden,
+  isWorldNodeMapVisited,
   isWorldNodeVisible,
   worldNodeDisplayName,
   worldNodeMapsBuild,
@@ -432,5 +433,22 @@ describe('worldNodeDisplayName', () => {
 
   it('falls back to the raw name when the node no longer resolves', () => {
     expect(worldNodeDisplayName('Ghost Node')).toBe('Ghost Node');
+  });
+});
+
+describe('isWorldNodeMapVisited', () => {
+  it("follows whether the node's map has been visited", () => {
+    seedWorldNodes([{ name: 'Forest Ruins', type: 'ExploreNode' }]);
+    seedGamestate();
+    expect(isWorldNodeMapVisited('Forest Ruins')).toBe(false);
+
+    seedGamestate((state) => {
+      state.discoveredMaps['TestMap'] = { foundAt: 1 };
+    });
+    expect(isWorldNodeMapVisited('Forest Ruins')).toBe(true);
+  });
+
+  it('treats an unplaced name as visited', () => {
+    expect(isWorldNodeMapVisited('Ghost Node')).toBe(true);
   });
 });

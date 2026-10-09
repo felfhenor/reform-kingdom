@@ -50,6 +50,7 @@ export const discoveredGatherNodesState = gamestateSlice(
 );
 export const gatherNodeLevelsState = gamestateSlice('gatherNodeLevels');
 export const worldDiscoveriesState = gamestateSlice('worldDiscoveries');
+export const discoveredMapsState = gamestateSlice('discoveredMaps');
 export const bestiaryState = gamestateSlice('bestiary');
 export const tradeskillsState = gamestateSlice('tradeskills');
 export const clockState = gamestateSlice('clock');

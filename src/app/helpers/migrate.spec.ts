@@ -52,7 +52,7 @@ import {
 } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
-import { seedWorldNodes } from '@/testing/world';
+import { locationOf, seedWorldNodes } from '@/testing/world';
 
 const sword = ensureEquipment({
   id: 'sword' as EquipmentId,
@@ -333,6 +333,24 @@ describe('migrateGameState', () => {
       [ore.id]: { foundAt: 500 },
       [copper.id]: { foundAt: 3000 },
     });
+  });
+
+  it('backfills visited maps from the current location and visited nodes, dropping maps that are gone', () => {
+    const { Kingdom } = seedWorldNodes([
+      { name: 'Kingdom', type: 'Kingdom' },
+      { name: 'Field Ruins', type: 'ExploreNode', mapName: 'Eastmarch' },
+      { name: 'Far Ruins', type: 'ExploreNode', mapName: 'Farlands' },
+    ]);
+
+    const migrated = migrate((save) => {
+      save.world.currentLocation = locationOf(Kingdom);
+      save.worldDiscoveries['Field Ruins'] = { foundAt: 1 };
+      save.discoveredMaps['Gone Map'] = { foundAt: 1 };
+    });
+
+    expect(new Set(Object.keys(migrated.discoveredMaps))).toEqual(
+      new Set(['Eastmarch', Kingdom.mapName]),
+    );
   });
 
   it('moves a party stranded on an unwalkable tile to the kingdom', () => {

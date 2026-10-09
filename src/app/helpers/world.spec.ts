@@ -1,8 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
-import { isPartyAtNode, isPlayerAtKingdom } from '@helpers/world';
+import {
+  discoveredMapsState,
+  worldCurrentLocationState,
+} from '@helpers/state-game';
+import {
+  currentLocationSet,
+  isPartyAtNode,
+  isPlayerAtKingdom,
+} from '@helpers/world';
 import type { CurrentLocation } from '@interfaces';
-import { seedGamestate } from '@/testing/gamestate';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 import { locationOf, seedWorldNodes } from '@/testing/world';
 
 function standAt(location: CurrentLocation): void {
@@ -37,5 +45,17 @@ describe('isPartyAtNode / isPlayerAtKingdom', () => {
 
     expect(isPartyAtNode('Forest Ruins')).toBe(false);
     expect(isPlayerAtKingdom()).toBe(false);
+  });
+});
+
+describe('currentLocationSet', () => {
+  it('moves the party and records the map as visited', () => {
+    seedGamestate();
+    const location = { mapName: 'Eastmarch', x: 3, y: 4 };
+
+    inTick(() => currentLocationSet(location));
+
+    expect(worldCurrentLocationState()).toEqual(location);
+    expect(Object.keys(discoveredMapsState())).toEqual(['Eastmarch']);
   });
 });

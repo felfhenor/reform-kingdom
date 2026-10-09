@@ -14,6 +14,7 @@ import {
   pruneInvalidDecreeGatherClauses,
 } from '@helpers/decree/decree';
 import { defaultGameState } from '@helpers/defaults';
+import { getMap } from '@helpers/maps';
 import { retrofitPartyXp } from '@helpers/hero/character-progress';
 import { recomputeGlobalEffectSums } from '@helpers/hero/global-effect-state';
 import { pruneInvalidPartyEquipment } from '@helpers/hero/party';
@@ -69,6 +70,10 @@ import {
   pruneInvalidWorkerStates,
 } from '@helpers/worker/worker-discovery';
 import { workerAssignmentIsValid } from '@helpers/worker/worker-travel';
+import {
+  backfillDiscoveredMaps,
+  pruneInvalidDiscoveredMaps,
+} from '@helpers/world-node/world-map-discovery';
 import { pruneInvalidWorldDiscoveries } from '@helpers/world-node/world-node-discovery';
 import { allGatherableMaterialIds } from '@helpers/world-node/world-node-gathering';
 import { pruneInvalidGatherNodeLevels } from '@helpers/world-node/world-node-level';
@@ -83,6 +88,7 @@ import {
 import type {
   AutoModeState,
   DecreeRiskLevel,
+  GameState,
   GameStateDiscoveredGatherNodes,
   GameStateDiscoveredMaterials,
   GameStateMaterials,
@@ -118,6 +124,23 @@ function backfillLegacyGatherNodeDiscoveries(
   return grandfatherGatherNodeDiscoveries(
     worldNodesOfType('GatherNode').map((entry) => entry.nodeName),
   );
+}
+
+// Pre-ledger saves: every node the party stood at, fought at, or developed proves its map was visited.
+function visitedNodeMapNames(state: GameState): string[] {
+  const nodeNames = [
+    ...Object.keys(state.discoveredGatherNodes),
+    ...Object.keys(state.worldDiscoveries),
+    ...Object.keys(state.shrines),
+    ...Object.keys(state.outposts),
+    ...Object.values(state.bestiary).flatMap((entry) => entry.foundAtNodes),
+    ...(state.world.homeNodeName ? [state.world.homeNodeName] : []),
+  ];
+
+  return nodeNames.flatMap((nodeName) => {
+    const mapName = worldNodeByName(nodeName)?.mapName;
+    return mapName ? [mapName] : [];
+  });
 }
 
 export function migrateGameState() {
@@ -235,6 +258,14 @@ export function migrateGameState() {
   newState.world.party = pruneInvalidPartyEquipment(newState.world.party);
   newState.world.currentLocation = repairUnwalkableCurrentLocation(
     newState.world.currentLocation,
+  );
+  newState.discoveredMaps = backfillDiscoveredMaps(newState.discoveredMaps, [
+    newState.world.currentLocation.mapName,
+    ...visitedNodeMapNames(newState),
+  ]);
+  newState.discoveredMaps = pruneInvalidDiscoveredMaps(
+    newState.discoveredMaps,
+    (mapName) => !!getMap(mapName),
   );
 
   newState.world.party = retrofitPartyXp(newState.world.party);

@@ -9,9 +9,13 @@ import {
   isCollectibleDiscovered,
 } from '@helpers/item/collectibles';
 import { recipeSourceNodeNames } from '@helpers/kingdom/museum';
-import { worldNodeDisplayName } from '@helpers/world-node/world-nodes';
+import {
+  isWorldNodeMapVisited,
+  worldNodeDisplayName,
+} from '@helpers/world-node/world-nodes';
 import type {
   CollectibleContent,
+  CollectibleId,
   CollectibleSource,
   MuseumCollectibleEntry,
   MuseumRecipeEntry,
@@ -28,19 +32,12 @@ export function getMuseumCollectibleEntries(): MuseumCollectibleEntry[] {
 
   const entries = collectibles.map((collectible) => {
     const discovered = isCollectibleDiscovered(collectible.id);
-    const rawSource = getCollectibleSource(collectible.id);
-
-    // A node source's name is re-masked here (rather than cached) since it depends on live world-discovery state.
-    const source: CollectibleSource | undefined =
-      rawSource?.type === 'node'
-        ? { type: 'node', name: worldNodeDisplayName(rawSource.name) }
-        : rawSource;
 
     return {
       collectible,
       discovered,
       quantity: getCollectibleQuantity(collectible.id),
-      source,
+      source: museumCollectibleSource(collectible.id, discovered),
     };
   });
 
@@ -53,6 +50,18 @@ export function getMuseumCollectibleEntries(): MuseumCollectibleEntry[] {
     ],
     ['desc', 'desc', 'asc'],
   );
+}
+
+// Node sources are re-masked live, and stay unknown for an undiscovered collectible until its map is visited.
+function museumCollectibleSource(
+  collectibleId: CollectibleId,
+  discovered: boolean,
+): CollectibleSource | undefined {
+  const source = getCollectibleSource(collectibleId);
+  if (source?.type !== 'node') return source;
+  if (!discovered && !isWorldNodeMapVisited(source.name)) return undefined;
+
+  return { type: 'node', name: worldNodeDisplayName(source.name) };
 }
 
 function collectibleSourceName(source: CollectibleSource): string {
@@ -101,9 +110,9 @@ export function getMuseumRecipeEntries(): MuseumRecipeEntry[] {
     return {
       recipe,
       discovered,
-      sourceNodeNames: recipeSourceNodeNames(recipe.id).map(
-        worldNodeDisplayName,
-      ),
+      sourceNodeNames: recipeSourceNodeNames(recipe.id)
+        .filter((name) => discovered || isWorldNodeMapVisited(name))
+        .map(worldNodeDisplayName),
       tokenUnlockCost: discovered ? undefined : recipe.tokenUnlockCost,
     };
   });

@@ -123,6 +123,11 @@ export type GameStateWorldDiscoveries = {
   [key: string]: { foundAt: number };
 };
 
+// Keyed by Tiled map name, recorded on arrival.
+export type GameStateDiscoveredMaps = {
+  [key: string]: { foundAt: number };
+};
+
 // Created per task on load; `completedAt` latches so spending the gathered items can't undo a task.
 export type GameStateTasks = {
   [key: TaskId]: { progress: number; completedAt?: number; claimedAt?: number };
@@ -175,6 +180,7 @@ export type GameState = {
   shrines: GameStateShrineLevels;
   outposts: GameStateOutpostLevels;
   worldDiscoveries: GameStateWorldDiscoveries;
+  discoveredMaps: GameStateDiscoveredMaps;
   bestiary: GameStateBestiary;
   workers: GameStateWorkers;
   discoveredWorkers: GameStateDiscoveredWorkers;

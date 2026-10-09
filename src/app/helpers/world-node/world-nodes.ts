@@ -4,6 +4,7 @@ import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { allMaps } from '@helpers/maps';
 import { tiledMapGetLayer } from '@helpers/pixi/tiled-map';
 import { isWorldNodeDiscovered } from '@helpers/world-node/world-node-discovery';
+import { isWorldMapVisited } from '@helpers/world-node/world-map-discovery';
 import type {
   CaravanContent,
   CollectibleId,
@@ -229,4 +230,10 @@ export function worldNodeDisplayName(nodeName: string): string {
   if (!entry) return nodeName;
 
   return isWorldNodeVisible(entry) ? nodeName : '???';
+}
+
+// Unplaced names (e.g. caravan traders) have no map to gate on.
+export function isWorldNodeMapVisited(nodeName: string): boolean {
+  const entry = worldNodeByName(nodeName);
+  return !entry || isWorldMapVisited(entry.mapName);
 }
