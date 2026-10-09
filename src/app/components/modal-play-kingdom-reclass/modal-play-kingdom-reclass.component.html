@@ -29,13 +29,19 @@
             [formField]="heroField.jobId"
           >
             <ng-template ng-option-tmp let-item="item">
-              {{ item.shorthand }} (Lv.
-              {{ jobLevelForHero(character, item.id) }})
+              <div class="flex items-center gap-2">
+                <app-icon-job class="zoom-row" [job]="item" />
+                {{ item.shorthand }} (Lv.
+                {{ jobLevelForHero(character, item.id) }})
+              </div>
             </ng-template>
 
             <ng-template ng-label-tmp let-item="item">
-              {{ item.shorthand }} (Lv.
-              {{ jobLevelForHero(character, item.id) }})
+              <div class="flex items-center gap-2">
+                <app-icon-job class="zoom-row" [job]="item" />
+                {{ item.shorthand }} (Lv.
+                {{ jobLevelForHero(character, item.id) }})
+              </div>
             </ng-template>
           </ng-select>
         </div>

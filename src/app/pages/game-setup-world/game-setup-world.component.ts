@@ -22,7 +22,11 @@ import { getUnlockedJobs } from '@helpers/hero/job';
 import { createCharacter, setParty } from '@helpers/hero/party';
 import { rngChoiceIdentifiable } from '@helpers/rng';
 import type { JobContent, JobId } from '@interfaces';
-import { NgSelectComponent } from '@ng-select/ng-select';
+import {
+  NgLabelTemplateDirective,
+  NgOptionTemplateDirective,
+  NgSelectComponent,
+} from '@ng-select/ng-select';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { sampleSize, sortBy } from 'es-toolkit/compat';
 
@@ -74,6 +78,8 @@ const heroPickSchema = schema<HeroPick>((hero) => {
     SFXDirective,
     IconJobComponent,
     NgSelectComponent,
+    NgOptionTemplateDirective,
+    NgLabelTemplateDirective,
     FormField,
   ],
   templateUrl: './game-setup-world.component.html',
