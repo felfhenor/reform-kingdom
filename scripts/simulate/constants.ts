@@ -24,7 +24,7 @@ export const DEFAULT_SEED_CHECKPOINT_LEVELS = 5;
 
 // Mirrors `xpForOverLevel` (monster.ts)'s decay onset - 4+ levels above the
 // hardest reachable node's max level is where XP gain has already started
-// collapsing toward the floor, even though the party is technically still
+// collapsed to zero, even though the party is technically still
 // "succeeding" at every fight.
 export const XP_DECAY_LEVEL_GAP = 4;
 

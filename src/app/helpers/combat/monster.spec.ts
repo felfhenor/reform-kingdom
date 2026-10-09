@@ -8,8 +8,8 @@ import {
 } from '@helpers/combat/monster';
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import {
+  OVERLEVEL_XP_DEGRADE_FLOOR,
   OVERLEVEL_XP_DEGRADE_PER_LEVEL,
-  OVERLEVEL_XP_HARD_CAP_AMOUNT,
   OVERLEVEL_XP_HARD_CAP_LEVELS,
 } from '@helpers/config';
 import { ensureStats } from '@helpers/content/ensure-helpers-stats';
@@ -138,18 +138,14 @@ describe('Monster Helper Functions', () => {
       );
     });
 
-    it('hard-caps xp once far enough over the node max', () => {
-      expect(xpForOverLevel(100, capLevel, 5)).toBe(
-        OVERLEVEL_XP_HARD_CAP_AMOUNT,
-      );
-      expect(xpForOverLevel(100, capLevel + 10, 5)).toBe(
-        OVERLEVEL_XP_HARD_CAP_AMOUNT,
-      );
+    it('grants no xp once at or past the hard cap', () => {
+      expect(xpForOverLevel(100, capLevel, 5)).toBe(0);
+      expect(xpForOverLevel(100, capLevel + 10, 5)).toBe(0);
     });
 
-    it('never degrades below the hard-cap amount, even for small raw amounts', () => {
-      expect(xpForOverLevel(1, capLevel - 1, 5)).toBeGreaterThanOrEqual(
-        OVERLEVEL_XP_HARD_CAP_AMOUNT,
+    it('never degrades below the floor before the hard cap', () => {
+      expect(xpForOverLevel(1, capLevel - 1, 5)).toBe(
+        OVERLEVEL_XP_DEGRADE_FLOOR,
       );
     });
   });

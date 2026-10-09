@@ -1,6 +1,6 @@
 import {
+  OVERLEVEL_XP_DEGRADE_FLOOR,
   OVERLEVEL_XP_DEGRADE_PER_LEVEL,
-  OVERLEVEL_XP_HARD_CAP_AMOUNT,
   OVERLEVEL_XP_HARD_CAP_LEVELS,
 } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
@@ -51,12 +51,10 @@ export function xpForOverLevel(
 ): number {
   const levelsOverCap = partyLevel - nodeMaxLevel;
   if (levelsOverCap <= 0) return rawXp;
-  if (levelsOverCap >= OVERLEVEL_XP_HARD_CAP_LEVELS) {
-    return OVERLEVEL_XP_HARD_CAP_AMOUNT;
-  }
+  if (levelsOverCap >= OVERLEVEL_XP_HARD_CAP_LEVELS) return 0;
 
   const multiplier = 1 - OVERLEVEL_XP_DEGRADE_PER_LEVEL * levelsOverCap;
-  return Math.max(OVERLEVEL_XP_HARD_CAP_AMOUNT, Math.round(rawXp * multiplier));
+  return Math.max(OVERLEVEL_XP_DEGRADE_FLOOR, Math.round(rawXp * multiplier));
 }
 
 // Lets a node be judged not worth the trip before any fight happens, rather than only after.
