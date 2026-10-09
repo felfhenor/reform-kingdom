@@ -4,6 +4,7 @@ import {
   pixiIndicatorNodeStatusCreate,
   pixiIndicatorNodeStatusUpdate,
 } from '@helpers/pixi/pixi-indicators';
+import { pixiTerrainNoiseSpriteCreate } from '@helpers/pixi/pixi-terrain-noise';
 import { tiledLayerTileAt } from '@helpers/pixi/tiled-map';
 import type {
   PixiNodeClickHandler,
@@ -40,6 +41,8 @@ const FLIPPED_VERTICALLY_FLAG = 0x40000000;
 const FLIPPED_DIAGONALLY_FLAG = 0x20000000;
 const FLIP_FLAGS_MASK =
   FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG;
+
+const TERRAIN_NOISE_LAYER_NAME = 'World Tiles';
 
 // Tiled's 3 flip flags (diagonal, horizontal, vertical) reduce to one of these 8 sprite transforms for a square tile.
 // Keyed by `${flipHorizontal}${flipVertical}${flipDiagonal}` as 0/1 digits.
@@ -241,6 +244,7 @@ function pixiTiledObjectLayerRender(
 export function pixiTiledMapRender(
   renderer: Renderer,
   map: TiledMap,
+  mapName: string,
   textures: Record<number, Texture>,
   onNodeClick?: PixiNodeClickHandler,
   resolveNodeLabel?: PixiNodeLabelResolver,
@@ -251,16 +255,15 @@ export function pixiTiledMapRender(
   const nodeWrappers = new Map<string, Container>();
   const nodeStatusIcons = new Map<string, Graphics>();
 
+  const mapWidthPx = map.width * map.tilewidth;
+  const mapHeightPx = map.height * map.tileheight;
+  const terrainNoiseTextures: Texture[] = [];
+
   let pendingTileRun: Container | undefined;
   const flushTileRun = () => {
     if (!pendingTileRun) return;
     container.addChild(
-      pixiTiledLayerRunBake(
-        renderer,
-        pendingTileRun,
-        map.width * map.tilewidth,
-        map.height * map.tileheight,
-      ),
+      pixiTiledLayerRunBake(renderer, pendingTileRun, mapWidthPx, mapHeightPx),
     );
     pendingTileRun = undefined;
   };
@@ -271,6 +274,15 @@ export function pixiTiledMapRender(
       pendingTileRun.addChild(
         pixiTiledLayerRender(layer, textures, map.tilewidth, map.tileheight),
       );
+      if (layer.name === TERRAIN_NOISE_LAYER_NAME) {
+        const noise = pixiTerrainNoiseSpriteCreate(
+          mapName,
+          mapWidthPx,
+          mapHeightPx,
+        );
+        terrainNoiseTextures.push(noise.texture);
+        pendingTileRun.addChild(noise);
+      }
       return;
     }
 
@@ -296,6 +308,8 @@ export function pixiTiledMapRender(
   });
 
   flushTileRun();
+  // Already baked into the run's texture, and the bake only tears down sprites, not their textures.
+  terrainNoiseTextures.forEach((texture) => texture.destroy(true));
 
   return { container, nodeLabels, nodeWrappers, nodeStatusIcons };
 }

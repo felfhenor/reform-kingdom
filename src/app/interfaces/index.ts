@@ -62,6 +62,7 @@ export * from './meta';
 export * from './modal';
 export * from './museum';
 export * from './museum.ui';
+export * from './noise';
 export * from './pixi-config';
 export * from './roman-numerals';
 export * from './savefile';

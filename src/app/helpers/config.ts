@@ -232,6 +232,13 @@ export const GATHER_VFX_JITTER_RANGE = 30;
 export const INDICATOR_PROGRESS_BAR_HEIGHT = 6;
 export const INDICATOR_PROGRESS_BAR_OFFSET_Y = -50;
 export const NODE_STATUS_ICON_RADIUS = 7;
+// World px per noise pixel - matches the terrain art's chunky pixel size so the overlay reads as pixel art.
+export const TERRAIN_NOISE_CELL_PX = 2;
+// Noise pixels per cluster-noise lattice unit; larger = broader patches of speckles.
+export const TERRAIN_NOISE_FEATURE_CELLS = 4;
+// Peak speckle chance per noise pixel, reached only at the densest point of a cluster.
+export const TERRAIN_NOISE_DENSITY = 0.1;
+export const TERRAIN_NOISE_ALPHA = 0.07;
 
 // How far each trailing party member's screen position lags behind the leader's, in party order (position 2 = 1x, position 3 = 2x, ...).
 export const PARTY_FORMATION_FOLLOW_DELAY_MS = 450;
