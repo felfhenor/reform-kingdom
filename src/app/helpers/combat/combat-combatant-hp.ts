@@ -28,4 +28,8 @@ export function combatCombatantTakeEnergyDamage(
   damage: number,
 ) {
   combatant.ep = clamp(combatant.ep - damage, 0, combatant.totalStats.Energy);
+
+  if (damage !== 0) {
+    combatantDamageEventEmit(combatant.id, -damage, 'energy');
+  }
 }

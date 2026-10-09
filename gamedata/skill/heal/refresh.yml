@@ -19,6 +19,7 @@
       targets: 1
       targetType: Self
       targetBehaviors:
+        - behavior: NotZeroHealth
         - behavior: NotMaxEnergy
       damageScaling:
         Intelligence: 1
@@ -46,6 +47,7 @@
       targets: 1
       targetType: Self
       targetBehaviors:
+        - behavior: NotZeroHealth
         - behavior: NotMaxEnergy
       damageScaling:
         Intelligence: 1.5

@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import {
   combatantIsDead,
   combatCombatantTakeDamage,
+  combatCombatantTakeEnergyDamage,
 } from '@helpers/combat/combat-combatant-hp';
 import { combatantDamageEvents } from '@helpers/combat/combat-damage-events';
 import { buildTestCombatant } from '@/testing/builders';
@@ -89,6 +90,29 @@ describe('combatCombatantTakeDamage', () => {
     const hero = buildCombatant(100);
 
     combatCombatantTakeDamage(hero, 0);
+
+    expect(combatantDamageEvents()).toHaveLength(0);
+  });
+});
+
+describe('combatCombatantTakeEnergyDamage', () => {
+  beforeEach(() => {
+    combatantDamageEvents.set([]);
+  });
+
+  it('emits a signed energy event for a restore', () => {
+    const hero = buildTestCombatant({ ep: 10 });
+
+    combatCombatantTakeEnergyDamage(hero, -15);
+
+    expect(hero.ep).toBe(25);
+    expect(combatantDamageEvents()).toMatchObject([
+      { combatantId: hero.id, amount: 15, variant: 'energy' },
+    ]);
+  });
+
+  it('does not emit an event when the amount is zero', () => {
+    combatCombatantTakeEnergyDamage(buildTestCombatant(), 0);
 
     expect(combatantDamageEvents()).toHaveLength(0);
   });

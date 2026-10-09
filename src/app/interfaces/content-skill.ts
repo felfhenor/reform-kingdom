@@ -21,6 +21,7 @@ export type EquipmentSkillTargetBehavior =
   | 'ZeroEnergy'
   | 'NotZeroEnergy'
   | 'NotMaxHealth'
+  | 'NotMaxEnergy'
   | 'IfStatusEffect'
   | 'IfNotStatusEffect';
 

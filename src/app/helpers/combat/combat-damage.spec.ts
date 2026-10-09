@@ -101,6 +101,52 @@ describe('combatApplySkillToTarget healing', () => {
   });
 });
 
+describe('combatApplySkillToTarget energy restore', () => {
+  function restore(ep: number): Combatant {
+    combatantDamageEvents.set([]);
+    const caster = buildCombatant({
+      hp: 50,
+      ep,
+      totalStats: {
+        ...defaultStats(),
+        Health: 100,
+        Energy: 100,
+        Intelligence: 30,
+      },
+    });
+
+    combatApplySkillToTarget(
+      buildCombat({ heroes: [caster] }),
+      caster,
+      caster,
+      buildSkill(),
+      buildTechnique({
+        damageScaling: { ...defaultStats(), Intelligence: 1 },
+        attributes: ['BypassDefense', 'NeverMisses', 'RestoresTargetEnergy'],
+      }),
+    );
+
+    return caster;
+  }
+
+  it('restores EP without touching HP and emits only an energy event', () => {
+    const caster = restore(10);
+
+    expect(caster.ep).toBe(40);
+    expect(caster.hp).toBe(50);
+    expect(combatantDamageEvents()).toMatchObject([
+      { combatantId: caster.id, amount: 30, variant: 'energy' },
+    ]);
+  });
+
+  it('caps the restore at missing EP', () => {
+    const caster = restore(90);
+
+    expect(caster.ep).toBe(100);
+    expect(combatantDamageEvents()).toMatchObject([{ amount: 10 }]);
+  });
+});
+
 describe('combatApplySkillToTarget defense', () => {
   it('mitigates a purely physical technique using only the target Vitality stat', () => {
     const attacker = buildCombatant({

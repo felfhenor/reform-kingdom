@@ -43,6 +43,9 @@ export const VALID_SKILL_TARGET_BEHAVIORS: EquipmentSkillTargetBehavior[] = [
   'ZeroHealth',
   'NotZeroHealth',
   'NotMaxHealth',
+  'ZeroEnergy',
+  'NotZeroEnergy',
+  'NotMaxEnergy',
   'IfStatusEffect',
   'IfNotStatusEffect',
 ];

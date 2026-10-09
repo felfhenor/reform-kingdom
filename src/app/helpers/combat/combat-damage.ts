@@ -212,6 +212,13 @@ export function combatApplySkillToTarget(
       effectiveDamage = -Math.abs(effectiveDamage);
     }
 
+    if (techniqueHasAttribute(technique, 'RestoresTargetEnergy')) {
+      effectiveDamage = -Math.min(
+        effectiveDamage,
+        target.totalStats.Energy - target.ep,
+      );
+    }
+
     if (!techniqueHasAttribute(technique, 'BypassDefense')) {
       const targetDefense = targetDefenseValue(target, technique);
 
@@ -255,14 +262,14 @@ export function combatApplySkillToTarget(
     effectiveDamage = Math.floor(effectiveDamage);
 
     if (techniqueHasAttribute(technique, 'RestoresTargetEnergy')) {
-      combatCombatantTakeEnergyDamage(target, -effectiveDamage);
+      combatCombatantTakeEnergyDamage(target, effectiveDamage);
+    } else {
+      combatCombatantTakeDamage(
+        target,
+        effectiveDamage,
+        isCriticalHit ? 'critical' : undefined,
+      );
     }
-
-    combatCombatantTakeDamage(
-      target,
-      effectiveDamage,
-      isCriticalHit ? 'critical' : undefined,
-    );
 
     if (
       effectiveDamage === 0 &&

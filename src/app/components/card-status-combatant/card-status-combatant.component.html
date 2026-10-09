@@ -46,7 +46,9 @@
               Block
             }
             @case ('energy') {
-              +{{ num.event.amount | number }} EP
+              {{ num.event.amount > 0 ? '+' : ''
+              }}{{ num.event.amount | number }}
+              EP
             }
             @case ('xp') {
               +{{ num.event.amount | number }} EXP

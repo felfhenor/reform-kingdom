@@ -89,6 +89,8 @@ function skillTargetBehaviorCondition(
   switch (behavior.behavior) {
     case 'NotMaxHealth':
       return ['Only if wounded'];
+    case 'NotMaxEnergy':
+      return ['Only if missing EP'];
     case 'IfStatusEffect':
       return [`Only if it has ${effectName()}`];
     case 'IfNotStatusEffect':

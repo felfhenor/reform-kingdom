@@ -479,6 +479,40 @@ describe('combatSkillHasValidTargetsForMode', () => {
     ).toBe(false);
   });
 
+  it('is false for a NotMaxEnergy technique when the caster is at full EP', () => {
+    const caster = buildTestCombatant({ id: 'caster', ep: 100 });
+    const combat = buildCombat({ heroes: [caster] });
+    const skill = buildEquipmentSkill({
+      techniques: [
+        buildTechnique({ targetBehaviors: [{ behavior: 'NotMaxEnergy' }] }),
+      ],
+    });
+    const context: CombatTargetModeContext = { combatant: caster };
+
+    expect(
+      combatSkillHasValidTargetsForMode(combat, caster, skill, 'Self', context),
+    ).toBe(false);
+  });
+
+  it.each([
+    ['NotMaxEnergy', 99, true],
+    ['ZeroEnergy', 0, true],
+    ['ZeroEnergy', 1, false],
+    ['NotZeroEnergy', 1, true],
+    ['NotZeroEnergy', 0, false],
+  ] as const)('%s with %i EP is valid: %s', (behavior, ep, expected) => {
+    const caster = buildTestCombatant({ id: 'caster', ep });
+    const combat = buildCombat({ heroes: [caster] });
+    const skill = buildEquipmentSkill({
+      techniques: [buildTechnique({ targetBehaviors: [{ behavior }] })],
+    });
+    const context: CombatTargetModeContext = { combatant: caster };
+
+    expect(
+      combatSkillHasValidTargetsForMode(combat, caster, skill, 'Self', context),
+    ).toBe(expected);
+  });
+
   it('ignores confusion, which is handled at cast time instead', () => {
     const caster = buildTestCombatant({
       id: 'caster',

@@ -4,6 +4,7 @@ import { analysisFail, analysisWarn } from '@helpers/debug/analysis-utils';
 import type {
   AnalysisIssue,
   EquipmentSkillAttribute,
+  EquipmentSkillTargetBehavior,
   StatusEffectContent,
   EquipmentSkillContentTechnique as Technique,
 } from '@interfaces';
@@ -35,6 +36,11 @@ function damageTagIssues(t: Technique): AnalysisIssue[] {
   if (damages && heals) {
     issues.push(analysisFail('is tagged both DamagesTarget and HealsTarget.'));
   }
+  if (heals && restores) {
+    issues.push(
+      analysisFail('is tagged both HealsTarget and RestoresTargetEnergy.'),
+    );
+  }
   if (scales && !damages && !heals && !restores) {
     issues.push(
       analysisFail(
@@ -59,34 +65,37 @@ function damageTagIssues(t: Technique): AnalysisIssue[] {
   return issues;
 }
 
-function healIssues(t: Technique): AnalysisIssue[] {
-  if (!hasAttr(t, 'HealsTarget')) return [];
+function restoreIssues(
+  t: Technique,
+  attribute: EquipmentSkillAttribute,
+  verb: string,
+  wastedGuard: EquipmentSkillTargetBehavior,
+): AnalysisIssue[] {
+  if (!hasAttr(t, attribute)) return [];
 
   const issues: AnalysisIssue[] = [];
   if (!hasAttr(t, 'BypassDefense')) {
     issues.push(
       analysisFail(
-        'heals without BypassDefense, so target defense zeroes the heal.',
+        `${verb} without BypassDefense, so target defense zeroes the ${verb}.`,
       ),
     );
   }
   if (hasAttr(t, 'AllowPlink')) {
     issues.push(
-      analysisFail(
-        'heals with AllowPlink, which turns the heal into 1 damage.',
-      ),
+      analysisFail(`${verb} with AllowPlink, which turns it into a 1 drain.`),
     );
   }
   if (t.targetType === 'Enemies') {
-    issues.push(analysisFail('is tagged HealsTarget but targets Enemies.'));
+    issues.push(analysisFail(`is tagged ${attribute} but targets Enemies.`));
   }
   if (hasAttr(t, 'AllowLuckDodge')) {
-    issues.push(analysisWarn('heals with AllowLuckDodge, so heals can miss.'));
+    issues.push(analysisWarn(`${verb} with AllowLuckDodge, so it can miss.`));
   }
-  if (!t.targetBehaviors.some((b) => b.behavior === 'NotMaxHealth')) {
+  if (!t.targetBehaviors.some((b) => b.behavior === wastedGuard)) {
     issues.push(
       analysisWarn(
-        'heals without a NotMaxHealth target behavior, so casts can be wasted on full-health targets.',
+        `${verb} without a ${wastedGuard} target behavior, so casts can be wasted on full targets.`,
       ),
     );
   }
@@ -266,7 +275,8 @@ export function statusEffectDamageTextIssues(
 export function techniqueIssues(t: Technique): AnalysisIssue[] {
   return [
     ...damageTagIssues(t),
-    ...healIssues(t),
+    ...restoreIssues(t, 'HealsTarget', 'heals', 'NotMaxHealth'),
+    ...restoreIssues(t, 'RestoresTargetEnergy', 'restores', 'NotMaxEnergy'),
     ...statusEffectIssues(t),
     ...targetBehaviorIssues(t),
     ...targetCountIssues(t),
