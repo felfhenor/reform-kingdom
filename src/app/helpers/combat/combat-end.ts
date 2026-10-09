@@ -71,8 +71,10 @@ function didHeroesWin(combat: Combat): boolean {
 
 type DefeatedMonster = { monster: MonsterContent; level: number };
 
+// Summons are excluded so a re-summoning monster can't be farmed for rewards.
 function defeatedMonsters(combat: Combat): DefeatedMonster[] {
   return combat.guardians
+    .filter((guardian) => !guardian.summonerId)
     .map((guardian) => {
       const monster = guardian.monsterId
         ? getEntry<MonsterContent>(guardian.monsterId)

@@ -143,6 +143,31 @@ describe('combatDoCombatIteration', () => {
     expect(previous).toEqual(snapshot);
   });
 
+  it('skips a combatant replaced earlier in the round', () => {
+    const fast = caster({
+      totalStats: { ...defaultStats(), Health: 40, Agility: 10 },
+    });
+    const summon = caster({ id: 'summon-1', summonerId: 'caster-1' });
+    available(skill('weighted'));
+    vi.mocked(combatGetTargetsFromPriorityList).mockReturnValue([target]);
+    vi.mocked(combatApplySkillToTarget).mockImplementation((combat) => {
+      combat.helpers = [];
+    });
+    seedGamestate(
+      (state) =>
+        (state.world.combat = buildCombat({
+          heroes: [fast],
+          helpers: [summon],
+        })),
+    );
+
+    inTick(combatDoCombatIteration);
+
+    expect(combatantSkillCastEvents().map((e) => e.combatantId)).toEqual([
+      'caster-1',
+    ]);
+  });
+
   it('does nothing when there is no combat', () => {
     const before = seedGamestate();
 
@@ -352,6 +377,22 @@ describe('combatantTakeTurn targeting', () => {
     combatantTakeTurn(buildCombat(), caster());
 
     expect(combatApplySkillToTarget).toHaveBeenCalledTimes(2);
+  });
+
+  it('never strikes again with a summon technique', () => {
+    available(
+      skill('summon', {
+        techniques: [
+          ensureEquipmentSkillTechnique({ summonMonsterId: 'wolf' }),
+        ],
+      }),
+    );
+    vi.mocked(combatGetTargetsFromPriorityList).mockReturnValue([target]);
+    rollsSucceed('skillStrikeAgainChance');
+
+    combatantTakeTurn(buildCombat(), caster());
+
+    expect(combatApplySkillToTarget).toHaveBeenCalledTimes(1);
   });
 });
 

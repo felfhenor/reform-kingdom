@@ -8,13 +8,17 @@
       <span class="font-semibold">{{ t.amount | number }}</span>
     }
 
-    <span class="text-lighter">
-      to
-      @if (t.targeting.count !== undefined) {
-        {{ t.targeting.count | number }}
-      }
-      {{ t.targeting.noun }}
-    </span>
+    @if (t.summonName) {
+      <span class="font-semibold">{{ t.summonName }}</span>
+    } @else {
+      <span class="text-lighter">
+        to
+        @if (t.targeting.count !== undefined) {
+          {{ t.targeting.count | number }}
+        }
+        {{ t.targeting.noun }}
+      </span>
+    }
 
     @if (t.accuracy < 100) {
       <span class="text-lighter">({{ t.accuracy | number }}% to hit)</span>

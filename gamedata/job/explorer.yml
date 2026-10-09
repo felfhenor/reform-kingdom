@@ -87,6 +87,14 @@
         - level: 37
           skillId: Earthshake IV
 
+    - pathName: Look for Trouble
+      levels:
+        - level: 5
+          skillId: Look for Trouble I
+
+        - level: 25
+          skillId: Look for Trouble II
+
     - pathName: Lucky Charm
       levels:
         - level: 9

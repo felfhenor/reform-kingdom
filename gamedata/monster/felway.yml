@@ -103,6 +103,9 @@
     - skillId: Earthshake II
       weight: 3
 
+    - skillId: Summon Earth Elemental
+      weight: 1
+
   baseStats:
     Health: 150
     Energy: 75

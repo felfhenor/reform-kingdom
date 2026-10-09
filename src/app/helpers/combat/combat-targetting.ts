@@ -1,5 +1,6 @@
 import { combatCombatantCombatStatSucceedsChance } from '@helpers/combat/combat-stats';
 import { combatantHasActiveStatusEffect } from '@helpers/combat/combat-statuseffects';
+import { combatantHasLivingSummon } from '@helpers/combat/combat-summon';
 import { getEntry } from '@helpers/content/content';
 import {
   skillEpCost,
@@ -36,6 +37,7 @@ export function combatAvailableSkillsForCombatant(
 }
 
 function filterCombatantTargetListForSkillTechniqueBehavior(
+  combat: Combat,
   combatants: Combatant[],
   behaviorData: EquipmentSkillTargetBehaviorData,
 ): Combatant[] {
@@ -59,6 +61,8 @@ function filterCombatantTargetListForSkillTechniqueBehavior(
         (c) =>
           !combatantHasActiveStatusEffect(c, behaviorData.statusEffectId ?? ''),
       ),
+    IfNoSummon: (list) =>
+      list.filter((c) => !combatantHasLivingSummon(combat, c)),
   };
 
   if (!behaviors[behaviorData.behavior])
@@ -68,12 +72,13 @@ function filterCombatantTargetListForSkillTechniqueBehavior(
 }
 
 function filterCombatantTargetListForSkillTechnique(
+  combat: Combat,
   combatants: Combatant[],
   technique: EquipmentSkillContentTechnique,
 ): Combatant[] {
   return intersection(
     ...technique.targetBehaviors.map((b) =>
-      filterCombatantTargetListForSkillTechniqueBehavior(combatants, b),
+      filterCombatantTargetListForSkillTechniqueBehavior(combat, combatants, b),
     ),
   );
 }
@@ -121,7 +126,7 @@ export function combatGetPossibleCombatantTargetsForSkillTechnique(
     tech,
     redirected,
   );
-  return filterCombatantTargetListForSkillTechnique(baseList, tech);
+  return filterCombatantTargetListForSkillTechnique(combat, baseList, tech);
 }
 
 export function combatGetPossibleCombatantTargetsForSkill(

@@ -1,0 +1,53 @@
+- id: 16a6e78b-9410-4fdd-a981-abb536a22e36
+  name: Look for Trouble I
+  family: Look for Trouble
+  description: Lure a wandering Goblin to help out in combat!
+
+  rarity: Common
+  sprite: '0044'
+
+  epCost: 10
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [NeverMisses]
+      elements: []
+      targets: 1
+      targetType: Self
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNoSummon
+      damageScaling: {}
+      statusEffects: []
+      summonMonsterId: Goblin
+      combatMessage: '**{{ combatant.name }}** goes looking for trouble and finds **{{ summon.name }}**!'
+
+- id: d79b1ccb-0420-462d-918b-938a7d8cba16
+  name: Look for Trouble II
+  family: Look for Trouble
+  description: Lure a wandering Akroki Vanguard to help out in combat!
+
+  rarity: Uncommon
+  sprite: '0044'
+
+  epCost: 20
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [NeverMisses]
+      elements: []
+      targets: 1
+      targetType: Self
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNoSummon
+      damageScaling: {}
+      statusEffects: []
+      summonMonsterId: Akroki Vanguard
+      combatMessage: '**{{ combatant.name }}** goes looking for trouble and finds **{{ summon.name }}**!'

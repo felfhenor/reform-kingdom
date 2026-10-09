@@ -65,6 +65,7 @@ export function ensureEquipmentSkillTechnique(
       ensureEquipmentSkillTechniqueStatusEffectApplication,
     ),
     accuracy: technique.accuracy ?? 100,
+    summonMonsterId: technique.summonMonsterId,
     combatMessage: technique.combatMessage ?? 'UNKNOWN',
   };
 }

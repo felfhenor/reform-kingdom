@@ -81,7 +81,8 @@ export function rngChoiceWeighted<T>(
   const totalWeight = sumBy(items, weightFn);
   if (totalWeight <= 0) return undefined;
 
-  const randomValue = rngNumber(totalWeight, rng);
+  // Unfloored so fractional weights stay pickable.
+  const randomValue = rngUniform(rng) * totalWeight;
   let cumulativeWeight = 0;
 
   for (const item of items) {

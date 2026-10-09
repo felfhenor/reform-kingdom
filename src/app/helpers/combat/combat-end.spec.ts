@@ -177,6 +177,18 @@ describe('combatCheckIfOver', () => {
       expect(gamestate().world.combat).toBeUndefined();
     });
 
+    it('grants no kill credit for summoned guardians', () => {
+      const summon = buildMonsterCombatant(goblin, {
+        hp: 0,
+        summonerId: 'enemy-1',
+      });
+
+      endFight(fight({ guardians: [summon] }));
+
+      expect(gamestate().bestiary[goblinId]).toBeUndefined();
+      expect(commissionRecordMonsterKill).not.toHaveBeenCalled();
+    });
+
     it('starts the next fight, granting this fight’s drops first, without resetting combat', () => {
       seedContent([
         goblin,

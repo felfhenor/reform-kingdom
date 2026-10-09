@@ -146,6 +146,18 @@ describe('RNG Helper Functions', () => {
       }
     });
 
+    it('can pick an item with a fractional weight', () => {
+      const items = [
+        { key: 'heavy', weight: 1 },
+        { key: 'light', weight: 0.5 },
+      ];
+      const mockRng = (() => 0.9) as PRNG;
+
+      expect(
+        rngChoiceWeighted(items, (item) => item.weight, mockRng)?.key,
+      ).toBe('light');
+    });
+
     it('never selects an item beyond the cumulative weight range', () => {
       const items = [1, 2, 3];
       const mockRng = (() => 0.999999) as PRNG;

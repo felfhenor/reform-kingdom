@@ -15,6 +15,7 @@ const kindClasses: Record<SkillTechniqueKind, string> = {
   Buff: 'text-info',
   Debuff: 'text-warning',
   Effect: '',
+  Summon: 'text-info',
 };
 
 @Component({

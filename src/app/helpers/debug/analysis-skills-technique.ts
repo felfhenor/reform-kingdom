@@ -272,6 +272,17 @@ export function statusEffectDamageTextIssues(
     : [];
 }
 
+function summonIssues(t: Technique): AnalysisIssue[] {
+  if (!t.summonMonsterId) return [];
+  if (getEntry(t.summonMonsterId)?.__type !== 'monster') {
+    return [analysisFail(`summons unknown monster "${t.summonMonsterId}".`)];
+  }
+  if (t.targetType !== 'Self') {
+    return [analysisWarn('summons but does not target Self.')];
+  }
+  return [];
+}
+
 function accuracyIssues(t: Technique): AnalysisIssue[] {
   if (t.accuracy <= 0 || t.accuracy > 100) {
     return [analysisFail(`has accuracy ${t.accuracy}; use 1-100.`)];
@@ -291,6 +302,7 @@ export function techniqueIssues(t: Technique): AnalysisIssue[] {
     ...statusEffectIssues(t),
     ...targetBehaviorIssues(t),
     ...targetCountIssues(t),
+    ...summonIssues(t),
     ...combatMessageIssues(t),
   ];
 }

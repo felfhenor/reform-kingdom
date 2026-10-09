@@ -16,6 +16,7 @@ import {
   combatMessageLog,
 } from '@helpers/combat/combat-log';
 import { combatCombatantCombatStatValue } from '@helpers/combat/combat-stats';
+import { combatSummonMonster } from '@helpers/combat/combat-summon';
 import {
   combatApplyStatusEffectToTarget,
   combatCreateStatusEffect,
@@ -293,12 +294,19 @@ export function combatApplySkillToTarget(
     }
   }
 
+  const summon = technique.summonMonsterId
+    ? combatSummonMonster(combat, combatant, technique.summonMonsterId)
+    : undefined;
+
   if (technique.combatMessage) {
     // Spread here, not in templateData, so combatant/target keep the damage applied above.
     const renderData = {
       ...templateData,
       combatant: { ...combatant, name: combatantMessageToken(combatant) },
       target: { ...target, name: combatantMessageToken(target) },
+      summon: summon
+        ? { ...summon, name: combatantMessageToken(summon) }
+        : undefined,
     };
     const message = combatFormatMessage(technique.combatMessage, renderData);
     const critSuffix = isCriticalHit ? ' **Critical hit (2x)!**' : '';

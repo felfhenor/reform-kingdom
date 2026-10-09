@@ -26,6 +26,7 @@ import {
   combatTickCombatantStatusEffects,
   combatUnapplyAllStatusEffects,
 } from '@helpers/combat/combat-statuseffects';
+import { combatHasCombatant } from '@helpers/combat/combat-summon';
 import {
   combatAvailableSkillsForCombatant,
   combatGetPossibleCombatantTargetsForSkill,
@@ -223,10 +224,12 @@ function combatantUseSkill(
         capturedCreatorStats,
       );
 
-      const shouldApplyAgain = combatCombatantCombatStatSucceedsChance(
-        combatant,
-        'skillStrikeAgainChance',
-      );
+      const shouldApplyAgain =
+        !tech.summonMonsterId &&
+        combatCombatantCombatStatSucceedsChance(
+          combatant,
+          'skillStrikeAgainChance',
+        );
 
       if (shouldApplyAgain && !combatantIsDead(target)) {
         combatMessageLog(combat, `**${chosenSkill.name}** strikes again!`);
@@ -335,6 +338,9 @@ export function combatDoCombatIteration(): void {
 
   const turnOrder = orderCombatantsByAgility(combat);
   turnOrder.forEach((char) => {
+    // A summon replaced earlier this round no longer acts.
+    if (!combatHasCombatant(combat, char)) return;
+
     const res = combatantTakeTurn(combat, char);
 
     if (res?.takeAnotherTurn) {

@@ -69,6 +69,25 @@ describe('combatOrderConditionMatches', () => {
     ).toBe(true);
   });
 
+  it('SelfHasNoSummon matches until the combatant has a living summon', () => {
+    const combatant = buildTestCombatant({ id: 'caster' });
+    const summon = buildTestCombatant({ id: 'summon', summonerId: 'caster' });
+    const withSummon = buildCombat({ heroes: [combatant], helpers: [summon] });
+    const condition: CombatOrderCondition = { type: 'SelfHasNoSummon' };
+
+    expect(combatOrderConditionMatches(condition, combat, combatant)).toBe(
+      true,
+    );
+    expect(combatOrderConditionMatches(condition, withSummon, combatant)).toBe(
+      false,
+    );
+
+    summon.hp = 0;
+    expect(combatOrderConditionMatches(condition, withSummon, combatant)).toBe(
+      true,
+    );
+  });
+
   it('SelfHealthPercent compares current HP% against the threshold', () => {
     const combatant = buildTestCombatant({
       hp: 50,
@@ -647,7 +666,7 @@ describe('pickSkillFromCombatOrders', () => {
     });
   });
 
-  it('RandomSkill always matches and stops, uniformly picking an available skill', () => {
+  it('RandomSkill always matches and stops, picking an available skill', () => {
     const cure = buildEquipmentSkill({
       id: 'cure' as EquipmentSkillId,
       family: 'Cure',

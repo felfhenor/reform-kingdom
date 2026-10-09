@@ -79,6 +79,7 @@ const CONDITION_TYPE_OPTIONS: SelectOption<CombatOrderCondition['type']>[] = [
   { value: 'EnemyCount', label: 'Enemy Count' },
   { value: 'EnemyCountHealthPercent', label: 'Enemy Count vs Health %' },
   { value: 'SpecificHeroHealthPercent', label: 'Specific Hero Health %' },
+  { value: 'SelfHasNoSummon', label: 'I Have No Summon' },
 ];
 
 const COMPARATOR_OPTIONS: SelectOption<CombatOrderComparator>[] = [
@@ -265,6 +266,8 @@ export class ModalHeroCombatOrdersComponent {
     switch (type) {
       case 'Always':
         return { type: 'Always' };
+      case 'SelfHasNoSummon':
+        return { type: 'SelfHasNoSummon' };
       case 'SelfHealthPercent':
         return {
           type: 'SelfHealthPercent',

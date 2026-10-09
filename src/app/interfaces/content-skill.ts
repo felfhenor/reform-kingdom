@@ -23,7 +23,8 @@ export type EquipmentSkillTargetBehavior =
   | 'NotMaxHealth'
   | 'NotMaxEnergy'
   | 'IfStatusEffect'
-  | 'IfNotStatusEffect';
+  | 'IfNotStatusEffect'
+  | 'IfNoSummon';
 
 export type EquipmentSkillAttribute =
   | 'BypassDefense'
@@ -70,6 +71,8 @@ export type EquipmentSkillContentTechnique = {
   statusEffects: EquipmentSkillTechniqueStatusEffectApplication[];
   // Percent chance to hit, rolled alongside the attacker's missChance.
   accuracy: number;
+  // Untyped (not MonsterId) to avoid a circular import.
+  summonMonsterId?: string;
 
   combatMessage: string;
 };

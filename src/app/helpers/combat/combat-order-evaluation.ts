@@ -1,4 +1,5 @@
 import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
+import { combatantHasLivingSummon } from '@helpers/combat/combat-summon';
 import { combatSkillHasValidTargetsForMode } from '@helpers/combat/combat-targetting';
 import { rngChoice } from '@helpers/rng';
 import type {
@@ -106,6 +107,8 @@ export function combatOrderConditionMatches(
         condition.comparator,
         condition.count,
       );
+    case 'SelfHasNoSummon':
+      return !combatantHasLivingSummon(combat, combatant);
     case 'SpecificHeroHealthPercent': {
       const hero = livingAllies(combat, combatant).find(
         (ally) => ally.id === condition.characterId,

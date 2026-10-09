@@ -1,0 +1,26 @@
+- id: 443581bd-8bee-4d5e-b12c-ec8013b47833
+  name: Summon Earth Elemental
+  family: Summon Earth Elemental
+  description: Raise an Earth Elemental from the soil to fight.
+
+  rarity: Rare
+  sprite: '0045'
+
+  epCost: 20
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [NeverMisses]
+      elements: []
+      targets: 1
+      targetType: Self
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNoSummon
+      damageScaling: {}
+      statusEffects: []
+      summonMonsterId: Earth Elemental
+      combatMessage: '**{{ combatant.name }}** raises **{{ summon.name }}** from the ground!'

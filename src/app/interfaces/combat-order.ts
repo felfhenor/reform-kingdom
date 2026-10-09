@@ -36,6 +36,7 @@ export type CombatOrderCondition =
     }
   | CombatOrderHealthCountCondition
   | { type: 'EnemyCount'; comparator: CombatOrderComparator; count: number }
+  | { type: 'SelfHasNoSummon' }
   | {
       type: 'SpecificHeroHealthPercent';
       characterId: CharacterId;

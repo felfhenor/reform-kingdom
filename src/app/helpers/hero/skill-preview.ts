@@ -19,6 +19,7 @@ import type {
   EquipmentSkillContent,
   EquipmentSkillContentTechnique,
   EquipmentSkillTargetBehaviorData,
+  MonsterContent,
   SkillTechniqueKind,
   SkillTechniquePreview,
   SkillTechniqueStatusPreview,
@@ -49,6 +50,7 @@ export function skillTechniqueKind(
 ): SkillTechniqueKind {
   const scales = skillTechniqueStatScaling(technique).length > 0;
 
+  if (technique.summonMonsterId) return 'Summon';
   if (techniqueHasAttribute(technique, 'HealsTarget')) return 'Heal';
   if (techniqueHasAttribute(technique, 'RestoresTargetEnergy'))
     return 'Restore';
@@ -95,6 +97,8 @@ function skillTargetBehaviorCondition(
       return [`Only if it has ${effectName()}`];
     case 'IfNotStatusEffect':
       return [`Only if it lacks ${effectName()}`];
+    case 'IfNoSummon':
+      return ['Only if no summon is active'];
     default:
       return [];
   }
@@ -141,6 +145,9 @@ function skillTechniquePreview(
     accuracy: techniqueHasAttribute(technique, 'NeverMisses')
       ? 100
       : technique.accuracy,
+    summonName: technique.summonMonsterId
+      ? getEntry<MonsterContent>(technique.summonMonsterId)?.name
+      : undefined,
   };
 }
 
