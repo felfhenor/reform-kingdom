@@ -17,6 +17,13 @@ function hasAttr(t: Technique, attribute: EquipmentSkillAttribute): boolean {
   return t.attributes.includes(attribute);
 }
 
+function hasBehavior(
+  t: Technique,
+  behavior: EquipmentSkillTargetBehavior,
+): boolean {
+  return t.targetBehaviors.some((b) => b.behavior === behavior);
+}
+
 function hasScaling(t: Technique): boolean {
   return Object.values(t.damageScaling).some((value) => value !== 0);
 }
@@ -69,7 +76,7 @@ function restoreIssues(
   t: Technique,
   attribute: EquipmentSkillAttribute,
   verb: string,
-  wastedGuard: EquipmentSkillTargetBehavior,
+  wastedGuards: EquipmentSkillTargetBehavior[],
 ): AnalysisIssue[] {
   if (!hasAttr(t, attribute)) return [];
 
@@ -92,10 +99,10 @@ function restoreIssues(
   if (hasAttr(t, 'AllowLuckDodge')) {
     issues.push(analysisWarn(`${verb} with AllowLuckDodge, so it can miss.`));
   }
-  if (!t.targetBehaviors.some((b) => b.behavior === wastedGuard)) {
+  if (!wastedGuards.some((guard) => hasBehavior(t, guard))) {
     issues.push(
       analysisWarn(
-        `${verb} without a ${wastedGuard} target behavior, so casts can be wasted on full targets.`,
+        `${verb} without a ${wastedGuards.join(' or ')} target behavior, so casts can be wasted on full targets.`,
       ),
     );
   }
@@ -202,7 +209,7 @@ function targetBehaviorIssues(t: Technique): AnalysisIssue[] {
     }
   });
 
-  if (!t.targetBehaviors.some((b) => b.behavior === 'NotZeroHealth')) {
+  if (!hasBehavior(t, 'NotZeroHealth') && !hasBehavior(t, 'ZeroHealth')) {
     issues.push(
       analysisWarn(
         'has no NotZeroHealth target behavior, so it can target downed combatants.',
@@ -297,8 +304,8 @@ export function techniqueIssues(t: Technique): AnalysisIssue[] {
   return [
     ...accuracyIssues(t),
     ...damageTagIssues(t),
-    ...restoreIssues(t, 'HealsTarget', 'heals', 'NotMaxHealth'),
-    ...restoreIssues(t, 'RestoresTargetEnergy', 'restores', 'NotMaxEnergy'),
+    ...restoreIssues(t, 'HealsTarget', 'heals', ['NotMaxHealth', 'ZeroHealth']),
+    ...restoreIssues(t, 'RestoresTargetEnergy', 'restores', ['NotMaxEnergy']),
     ...statusEffectIssues(t),
     ...targetBehaviorIssues(t),
     ...targetCountIssues(t),
