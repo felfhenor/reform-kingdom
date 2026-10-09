@@ -8,15 +8,27 @@ import { idbGet, idbIsAvailable, idbPut } from '@helpers/engine/idb';
 import { error } from '@helpers/engine/logging';
 import { delay } from 'es-toolkit';
 
+// JSON.stringify(undefined) is undefined, which setItem would coerce to an unparseable "undefined".
+function localStorageSerialize<T>(value: T): string {
+  return value === undefined ? '' : JSON.stringify(value);
+}
+
+function localStorageDeserialize<T>(raw: string): T {
+  // "undefined" is a legacy value written before empty-string serialization.
+  return raw === '' || raw === 'undefined'
+    ? (undefined as T)
+    : (JSON.parse(raw) as T);
+}
+
 export function localStorageSignal<T>(
   localStorageKey: string,
   initialValue: T,
   onLoad?: (value: T) => void,
 ): WritableSignal<T> {
   const storedValueRaw = localStorage.getItem(localStorageKey);
-  if (storedValueRaw) {
+  if (storedValueRaw !== null) {
     try {
-      initialValue = JSON.parse(storedValueRaw);
+      initialValue = localStorageDeserialize<T>(storedValueRaw);
       onLoad?.(initialValue);
     } catch {
       error(
@@ -26,20 +38,20 @@ export function localStorageSignal<T>(
       );
     }
   } else {
-    localStorage.setItem(localStorageKey, JSON.stringify(initialValue));
+    localStorage.setItem(localStorageKey, localStorageSerialize(initialValue));
   }
 
   const writableSignal = signal(initialValue);
 
   const originalSet = writableSignal.set;
   writableSignal.set = (value: T) => {
-    localStorage.setItem(localStorageKey, JSON.stringify(value));
+    localStorage.setItem(localStorageKey, localStorageSerialize(value));
     originalSet(value);
   };
 
   writableSignal.update = (updateFn: (value: T) => T) => {
     const value = updateFn(writableSignal());
-    localStorage.setItem(localStorageKey, JSON.stringify(value));
+    localStorage.setItem(localStorageKey, localStorageSerialize(value));
     originalSet(value);
   };
 

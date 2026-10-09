@@ -19,7 +19,8 @@ vi.mock('@helpers/engine/logging', () => ({
 }));
 
 import { idbGet, idbPut } from '@helpers/engine/idb';
-import { indexedDbSignal } from '@helpers/engine/signal';
+import { error } from '@helpers/engine/logging';
+import { indexedDbSignal, localStorageSignal } from '@helpers/engine/signal';
 
 function flush(): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, 0));
@@ -109,5 +110,40 @@ describe('indexedDbSignal', () => {
     await flush();
 
     expect(onSaveError).toHaveBeenCalledExactlyOnceWith(failure);
+  });
+});
+
+describe('localStorageSignal', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    const store = new Map<string, string>();
+    vi.mocked(localStorage.getItem).mockImplementation(
+      (key) => store.get(key) ?? null,
+    );
+    vi.mocked(localStorage.setItem).mockImplementation((key, value) => {
+      store.set(key, String(value));
+    });
+  });
+
+  it('stores undefined as an empty string and reads it back', () => {
+    const value = localStorageSignal<string | undefined>('key', 'initial');
+    value.set(undefined);
+
+    expect(localStorage.getItem('key')).toBe('');
+    expect(localStorageSignal('key', 'initial')()).toBeUndefined();
+    expect(error).not.toHaveBeenCalled();
+  });
+
+  it('reads a legacy "undefined" value without logging a parse error', () => {
+    localStorage.setItem('key', 'undefined');
+
+    expect(localStorageSignal('key', 'initial')()).toBeUndefined();
+    expect(error).not.toHaveBeenCalled();
+  });
+
+  it('round-trips a JSON value', () => {
+    localStorageSignal('key', { a: 1 }).set({ a: 2 });
+
+    expect(localStorageSignal('key', { a: 1 })()).toEqual({ a: 2 });
   });
 });
