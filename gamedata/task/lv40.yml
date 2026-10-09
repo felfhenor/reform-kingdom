@@ -1,3 +1,14 @@
+- id: 82c5d10a-5ce1-4da6-b15f-771f4cf2850c
+  name: Reach Level 40
+  description: Keep adventuring until a hero reaches level 40.
+  order: 699
+  requirement:
+    kind: ReachLevel
+    level: 40
+  rewards:
+    - itemId: Gold Coin
+      quantity: 75000
+
 - id: 1258af94-171a-4bf5-80ba-07b78c0d409b
   name: Gather 25 Felrock
   description: Travel to the Felrock Quarry and acquire 25 Felrock.
@@ -32,7 +43,7 @@
     level: 45
   rewards:
     - itemId: Gold Coin
-      quantity: 75000
+      quantity: 100000
 
 - id: aa04ba1f-e3f0-420e-a8c4-f7e3962b2bb4
   name: Defeat 30 Beholders
