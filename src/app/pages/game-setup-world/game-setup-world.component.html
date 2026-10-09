@@ -49,14 +49,14 @@
                     <ng-template ng-option-tmp let-item="item">
                       <div class="flex items-center gap-2">
                         <app-icon-job class="zoom-row" [job]="item" />
-                        {{ item.name }}
+                        {{ item.name }} ({{ item.shorthand }})
                       </div>
                     </ng-template>
 
                     <ng-template ng-label-tmp let-item="item">
                       <div class="flex items-center gap-2">
                         <app-icon-job class="zoom-row" [job]="item" />
-                        {{ item.name }}
+                        {{ item.name }} ({{ item.shorthand }})
                       </div>
                     </ng-template>
                   </ng-select>
