@@ -74,6 +74,7 @@ import {
   gameTargeted,
   gameTrophyCup,
   gameVibratingShield,
+  gameVillage,
   gameWolfHead,
   gameWorld,
 } from '@ng-icons/game-icons';
@@ -173,6 +174,7 @@ export const ALL_ICONS = {
   gameWolfHead,
   gameGhost,
   gamePlainArrow,
+  gameVillage,
   tablerPlus,
   tablerSettings,
   tablerX,

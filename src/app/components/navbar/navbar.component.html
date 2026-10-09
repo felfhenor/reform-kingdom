@@ -1,9 +1,9 @@
 <div class="navbar bg-base-100 relative flex py-0">
   <div class="navbar-start flex-1">
-    <ul class="menu menu-horizontal py-0 px-2">
-      <li class="flex gap-2 flex-row" appRequireSetup>
+    <ul class="menu menu-horizontal py-0 px-1">
+      <li class="flex gap-1 flex-row" appRequireSetup>
         <button
-          class="btn btn-xs btn-info"
+          class="btn btn-sm btn-info"
           [class.btn-outline]="activeGamePlayView() !== 'world'"
           tp="World [1]"
           (click)="changeGamePlayView('world')"
@@ -19,7 +19,7 @@
         </button>
 
         <button
-          class="btn btn-xs btn-info"
+          class="btn btn-sm btn-info"
           [class.btn-outline]="activeGamePlayView() !== 'kingdom'"
           tp="Kingdom [2]"
           (click)="setKingdomPlayView()"
@@ -35,7 +35,7 @@
         </button>
 
         <button
-          class="btn btn-xs btn-info"
+          class="btn btn-sm btn-info"
           [class.btn-outline]="activeGamePlayView() !== 'heroes'"
           tp="Heroes [3]"
           (click)="changeGamePlayView('heroes')"
@@ -51,7 +51,7 @@
         </button>
 
         <button
-          class="btn btn-xs btn-info"
+          class="btn btn-sm btn-info"
           [class.btn-outline]="activeGamePlayView() !== 'adventurelog'"
           tp="Adventure Log [4]"
           (click)="changeGamePlayView('adventurelog')"
@@ -69,7 +69,7 @@
         </button>
 
         <button
-          class="btn btn-xs btn-info"
+          class="btn btn-sm btn-info"
           [class.btn-outline]="activeGamePlayView() !== 'decree'"
           tp="Decree [5]"
           (click)="changeGamePlayView('decree')"
@@ -84,23 +84,6 @@
         >
           Decree
         </button>
-
-        @if (currentTownEntry()) {
-          <button
-            class="btn btn-xs btn-secondary"
-            [class.btn-outline]="activeGamePlayView() !== 'town'"
-            [tp]="currentTownName() + ' [6]'"
-            (click)="openCurrentTown()"
-            appSfx="ui-click"
-            [sfxOffset]="5"
-            [sfxTrigger]="['click', 'hover']"
-            [hotkeys]="'6'"
-            (hotkey)="hotkeyMatches($event, '6') && openCurrentTown()"
-            isGlobal
-          >
-            {{ currentTownName() }}
-          </button>
-        }
       </li>
     </ul>
   </div>
@@ -108,11 +91,11 @@
   <app-button-update class="mx-1"></app-button-update>
 
   <div class="navbar-end">
-    <ul class="menu menu-horizontal px-2 flex gap-2">
+    <ul class="menu menu-horizontal px-1 flex gap-1">
       @for (panel of panelConfigs; track $index) {
         <li class="action-button" appRequireSetup>
           <button
-            class="btn btn-xs btn-secondary"
+            class="btn btn-sm btn-secondary"
             [tp]="panel.name + ' [' + panel.hotkey + ']'"
             (click)="panel.clickCb()"
             [hotkeys]="panel.hotkey"
@@ -127,10 +110,27 @@
         </li>
       }
 
+      @if (currentTownEntry()) {
+        <button
+          class="btn btn-sm btn-secondary"
+          appButtonGlow
+          [tp]="currentTownName() + ' [T]'"
+          (click)="openCurrentTown()"
+          appSfx="ui-click"
+          [sfxOffset]="5"
+          [sfxTrigger]="['click', 'hover']"
+          [hotkeys]="'T'"
+          (hotkey)="hotkeyMatches($event, 'T') && openCurrentTown()"
+          isGlobal
+        >
+          <app-icon name="gameVillage" size="nav"></app-icon>
+        </button>
+      }
+
       @if (showCaravanTradeButton()) {
         <li class="action-button" appRequireSetup>
           <button
-            class="btn btn-xs btn-secondary"
+            class="btn btn-sm btn-secondary"
             appButtonGlow
             tp="Trade with the Caravan [T]"
             (click)="openCaravanTrade()"
@@ -149,7 +149,7 @@
       @if (showRecenterButton()) {
         <li class="action-button" appRequireSetup>
           <button
-            class="btn btn-xs btn-secondary"
+            class="btn btn-sm btn-secondary"
             tp="Recenter on Hero [R]"
             (click)="recenterCamera()"
             appSfx="ui-click"
@@ -167,7 +167,7 @@
 
       <li class="action-button" appRequireSetup>
         <button
-          class="btn btn-xs btn-info"
+          class="btn btn-sm btn-info"
           [tp]="isPaused() ? 'Resume Game [SPACE]' : 'Pause Game [SPACE]'"
           (click)="togglePause()"
           appSfx="ui-click"
@@ -187,7 +187,7 @@
       <li class="action-button" appRequireNotSetup>
         <button
           type="button"
-          class="btn btn-xs btn-warning"
+          class="btn btn-sm btn-warning"
           [swal]="leaveSwal"
           [tp]="'Go Back [Q]'"
           appSfx="ui-error"
@@ -203,7 +203,7 @@
 
       <li class="action-button" appRequireSetup>
         <button
-          class="btn btn-xs btn-accent"
+          class="btn btn-sm btn-accent"
           [tp]="'Open Menu [ESC]'"
           (click)="closeAllMenus()"
           appSfx="ui-click"
