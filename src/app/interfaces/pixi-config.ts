@@ -1,4 +1,5 @@
 import type { CurrentLocation } from '@interfaces/state-game';
+import type { TravelStep } from '@interfaces/travel';
 
 export type PixiAppConfig = {
   width: number;
@@ -34,12 +35,18 @@ export type TiledObjectOrientation = {
 // Tracks a single map-token's eased visual position toward a tick-driven
 // logical location - shared shape for the party's own token and each
 // worker's token.
+export type TravelGlideCursor = {
+  origin: CurrentLocation;
+  path: TravelStep[];
+  progressTicks: number;
+};
+
 export type TravelGlideState = {
   visual: CurrentLocation;
-  syncKey: string;
-  syncTime: number;
+  cursor: TravelGlideCursor;
   lastFrameTime: number;
   correction: { x: number; y: number };
+  correctionStartTime: number;
 };
 
 // Buffered so trailing party members can render a delayed copy of the leader's path instead of tracking their own travel state.
