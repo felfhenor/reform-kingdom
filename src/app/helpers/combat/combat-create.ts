@@ -160,6 +160,14 @@ export function combatantFromCharacter(character: Character): Combatant {
   return combatant;
 }
 
+// A..Z, then AA, AB, ... so long fights never run out of labels.
+export function combatantIndexLabel(index: number): string {
+  const letter = String.fromCharCode((index % 26) + 65);
+  return index < 26
+    ? letter
+    : `${combatantIndexLabel(Math.floor(index / 26) - 1)}${letter}`;
+}
+
 export function combatantFromMonster(
   monster: MonsterContent,
   level: number,
@@ -171,7 +179,7 @@ export function combatantFromMonster(
   return {
     id: rngUuid(),
     monsterId: monster.id,
-    name: `${monster.name} Lv.${level} [${String.fromCharCode(index + 65)}]`,
+    name: `${monster.name} Lv.${level} [${combatantIndexLabel(index)}]`,
     isEnemy: true,
 
     targetting: monster.targetting,

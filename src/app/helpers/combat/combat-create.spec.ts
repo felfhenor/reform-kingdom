@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import {
   combatantFromCharacter,
+  combatantIndexLabel,
   combatantFromMonster,
   combatantsFromTownGuardians,
   combatCreateForEncounter,
@@ -154,6 +155,19 @@ describe('combatantFromCharacter', () => {
     expect(combatant.combatStats.reviveChance).toBe(2);
     expect(combatant.tagResistance.Accuracy).toBe(5 + 3);
     expect(combatant.tagResistance.Stun).toBe(3);
+  });
+});
+
+describe('combatantIndexLabel', () => {
+  it('rolls over from Z to AA', () => {
+    expect([0, 25, 26, 27, 51, 52].map(combatantIndexLabel)).toEqual([
+      'A',
+      'Z',
+      'AA',
+      'AB',
+      'AZ',
+      'BA',
+    ]);
   });
 });
 

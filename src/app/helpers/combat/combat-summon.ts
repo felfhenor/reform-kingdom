@@ -33,11 +33,23 @@ export function combatSummonMonster(
   const side = summoner.isEnemy ? 'guardians' : 'helpers';
   const kept = combat[side].filter((c) => c.summonerId !== summoner.id);
   const summon: Combatant = {
-    ...combatantFromMonster(monster, summoner.level, kept.length),
+    ...combatantFromMonster(monster, summoner.level, combatSummonIndex(combat)),
     isEnemy: summoner.isEnemy,
     summonerId: summoner.id,
   };
 
   combat[side] = [...kept, summon];
+  combat.summonCount = (combat.summonCount ?? 0) + 1;
   return summon;
+}
+
+// Starts past every original combatant's label on either side and never repeats.
+function combatSummonIndex(combat: Combat): number {
+  const originals = (list: Combatant[]) =>
+    list.filter((c) => !c.summonerId).length;
+
+  return (
+    Math.max(originals(combat.guardians), originals(combat.helpers)) +
+    (combat.summonCount ?? 0)
+  );
 }

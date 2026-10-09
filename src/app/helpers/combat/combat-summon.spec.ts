@@ -64,6 +64,25 @@ describe('combatSummonMonster', () => {
     expect(combat.helpers).not.toContain(first);
   });
 
+  it('never reuses a label, even after a summon is replaced or on the other side', () => {
+    const enemyA = buildMonsterCombatant(wolf, { id: 'enemy-1' });
+    const enemyB = buildMonsterCombatant(wolf, { id: 'enemy-2' });
+    const hero = buildTestCombatant({ id: 'hero-1' });
+    const combat = buildCombat({
+      heroes: [hero],
+      guardians: [enemyA, enemyB],
+    });
+
+    const labels = [
+      combatSummonMonster(combat, enemyA, wolf.id),
+      combatSummonMonster(combat, enemyB, wolf.id),
+      combatSummonMonster(combat, enemyA, wolf.id),
+      combatSummonMonster(combat, hero, wolf.id),
+    ].map((summon) => summon?.name.match(/\[(\w+)\]$/)?.[1]);
+
+    expect(labels).toEqual(['C', 'D', 'E', 'F']);
+  });
+
   it('does nothing for an unknown monster', () => {
     const hero = buildTestCombatant();
     const combat = buildCombat({ heroes: [hero] });

@@ -203,6 +203,7 @@ export type Combat = {
   fightIndex?: number;
   // Untyped (not TownId) to avoid a circular import.
   raidTownId?: string;
+  summonCount?: number;
 };
 
 // A combatant HP change; amount is signed for display (positive = heal).

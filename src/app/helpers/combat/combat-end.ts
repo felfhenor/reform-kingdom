@@ -40,6 +40,7 @@ import {
 import type {
   CharacterXpGain,
   Combat,
+  Combatant,
   EncounterContent,
   EncounterId,
   EncounterRandomContent,
@@ -71,10 +72,8 @@ function didHeroesWin(combat: Combat): boolean {
 
 type DefeatedMonster = { monster: MonsterContent; level: number };
 
-// Summons are excluded so a re-summoning monster can't be farmed for rewards.
-function defeatedMonsters(combat: Combat): DefeatedMonster[] {
-  return combat.guardians
-    .filter((guardian) => !guardian.summonerId)
+function defeatedMonsters(guardians: Combatant[]): DefeatedMonster[] {
+  return guardians
     .map((guardian) => {
       const monster = guardian.monsterId
         ? getEntry<MonsterContent>(guardian.monsterId)
@@ -82,6 +81,11 @@ function defeatedMonsters(combat: Combat): DefeatedMonster[] {
       return monster ? { monster, level: guardian.level } : undefined;
     })
     .filter((entry): entry is DefeatedMonster => !!entry);
+}
+
+// Summons are excluded so a re-summoning monster can't be farmed for rewards.
+function rewardingMonsters(combat: Combat): DefeatedMonster[] {
+  return defeatedMonsters(combat.guardians.filter((g) => !g.summonerId));
 }
 
 // Max level for the source encounter, used to cap over-level XP scaling.
@@ -136,12 +140,12 @@ function logVictoryXp(combat: Combat, gains: CharacterXpGain[]): void {
 }
 
 function grantVictoryRewards(combat: Combat): void {
-  const monsters = defeatedMonsters(combat);
-
-  monsters.forEach(({ monster, level }) => {
+  defeatedMonsters(combat.guardians).forEach(({ monster, level }) => {
     monsterRecordKill(monster.id, level, combat.locationName);
-    commissionRecordMonsterKill(monster.id);
   });
+
+  const monsters = rewardingMonsters(combat);
+  monsters.forEach(({ monster }) => commissionRecordMonsterKill(monster.id));
 
   const gains = partyGainXp(victoryXpAtLevel(combat, monsters));
   logVictoryXp(combat, gains);
@@ -152,7 +156,7 @@ function grantVictoryRewards(combat: Combat): void {
 
 function rollMonsterDrops(combat: Combat): ResolvedDrop[] {
   const dropRateBoost = combatItemDropRateBoost();
-  return defeatedMonsters(combat).flatMap(({ monster, level }) =>
+  return rewardingMonsters(combat).flatMap(({ monster, level }) =>
     rollDroppedRewards(monster.drops, level, dropRateBoost),
   );
 }
