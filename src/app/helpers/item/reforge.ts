@@ -62,7 +62,7 @@ export function reforgedEquipmentItem(item: EquipmentItem): EquipmentItem {
 
   const rerolled: EquipmentItem = {
     ...item,
-    affixIds: rollAffixIds(content.rarity, content.levelRequirement),
+    affixIds: rollAffixIds(content, true),
   };
   rerolled.infusedItemIds = item.infusedItemIds.slice(
     0,

@@ -1,6 +1,7 @@
 import {
   defaultAffinities,
   defaultCombatStats,
+  defaultEquipment,
   defaultStats,
   defaultTagResistances,
 } from '@helpers/defaults';
@@ -9,6 +10,7 @@ import type {
   CaravanTradeType,
   CombatStatBlock,
   EquipmentItemType,
+  EquipmentSlot,
   EquipmentSkillAttribute,
   EquipmentSkillTargetBehavior,
   EquipmentSkillTargetType,
@@ -29,6 +31,9 @@ export const VALID_GAME_STATS = Object.keys(defaultStats()) as GameStat[];
 export const VALID_COMBAT_STATS = Object.keys(
   defaultCombatStats(),
 ) as (keyof CombatStatBlock)[];
+export const VALID_EQUIPMENT_SLOTS = Object.keys(
+  defaultEquipment(),
+) as EquipmentSlot[];
 export const VALID_EQUIPMENT_ITEM_TYPES = Object.keys(
   EquipmentTypeToSlot,
 ) as EquipmentItemType[];

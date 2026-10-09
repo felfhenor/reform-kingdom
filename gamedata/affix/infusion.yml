@@ -4,6 +4,7 @@
   rarity: Rare
   family: InfusionSlot
   levelRequirement: 10
+  fluxOnly: true
   effects:
     - kind: InfusionSlot
       value: 1
@@ -14,6 +15,7 @@
   rarity: Legendary
   family: InfusionSlot
   levelRequirement: 25
+  fluxOnly: true
   effects:
     - kind: InfusionSlot
       value: 2

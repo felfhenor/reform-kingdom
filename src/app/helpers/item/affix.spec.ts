@@ -2,23 +2,28 @@ import type * as RngHelper from '@helpers/rng';
 
 vi.mock('@helpers/rng', async (importOriginal) => {
   const actual = await importOriginal<typeof RngHelper>();
-  return { ...actual, rngChoiceRarity: vi.fn(actual.rngChoiceRarity) };
+  return { ...actual, rngChoiceWeighted: vi.fn(actual.rngChoiceWeighted) };
 });
 
 import { ensureAffix } from '@helpers/content/ensure-affix';
+import { ensureEquipment } from '@helpers/content/ensure-item';
 import {
+  affixCanRollOn,
   affixEffectsOfKind,
   affixEffectSum,
+  affixRollWeight,
   equipmentItemAffixEffects,
   equipmentItemAffixes,
   equipmentItemDisplayName,
   equipmentItemMiscAffixDescriptions,
   rollAffixIds,
 } from '@helpers/item/affix';
-import { rngChoiceRarity } from '@helpers/rng';
+import { rngChoiceWeighted } from '@helpers/rng';
 import type {
   AffixEffect,
   AffixId,
+  DropRarity,
+  EquipmentItemType,
   EquipmentSkillId,
   EquipmentId,
   EquipmentItem,
@@ -68,56 +73,84 @@ const agilityPrefixAffix = ensureAffix({
   effects: [{ kind: 'Stat', stat: 'Agility', value: 3 }],
 });
 
+const fluxAffix = ensureAffix({
+  id: 'affix-flux' as AffixId,
+  name: 'Prismatic',
+  levelRequirement: 20,
+  rarity: 'Mystical',
+  family: 'FluxPrismatic',
+  position: 'Prefix',
+  fluxOnly: true,
+  gearSlots: ['Weapon'],
+  effects: [{ kind: 'ElementalBoon', element: 'Fire', value: 15 }],
+});
+
+function gear(
+  rarity: DropRarity,
+  levelRequirement: number,
+  type: EquipmentItemType = 'Sword',
+) {
+  return ensureEquipment({ rarity, levelRequirement, type });
+}
+
 describe('rollAffixIds', () => {
   beforeEach(() => {
-    vi.mocked(rngChoiceRarity).mockReset();
+    vi.mocked(rngChoiceWeighted).mockReset();
     seedContent([strengthAffix, luckAffix]);
   });
 
   it('rolls zero affixes for Common rarity', () => {
-    expect(rollAffixIds('Common', 1)).toEqual([]);
-    expect(rngChoiceRarity).not.toHaveBeenCalled();
+    expect(rollAffixIds(gear('Common', 1))).toEqual([]);
+    expect(rngChoiceWeighted).not.toHaveBeenCalled();
   });
 
   it('rolls one affix for Uncommon rarity', () => {
-    vi.mocked(rngChoiceRarity).mockReturnValueOnce(strengthAffix);
+    vi.mocked(rngChoiceWeighted).mockReturnValueOnce(strengthAffix);
 
-    expect(rollAffixIds('Uncommon', 1)).toEqual([strengthAffix.id]);
-    expect(rngChoiceRarity).toHaveBeenCalledTimes(1);
+    expect(rollAffixIds(gear('Uncommon', 1))).toEqual([strengthAffix.id]);
+    expect(rngChoiceWeighted).toHaveBeenCalledTimes(1);
   });
 
   it('excludes an already-rolled family from subsequent rolls', () => {
     seedContent([agilityPrefixAffix, weakeningAffix, strengthAffix]);
-    vi.mocked(rngChoiceRarity)
+    vi.mocked(rngChoiceWeighted)
       .mockReturnValueOnce(weakeningAffix)
       .mockReturnValueOnce(agilityPrefixAffix);
 
-    expect(rollAffixIds('Rare', 1)).toEqual([
+    expect(rollAffixIds(gear('Rare', 1))).toEqual([
       weakeningAffix.id,
       agilityPrefixAffix.id,
     ]);
     // Weakening is a Prefix, so only the shared Strength family rules out the Strength suffix.
-    expect(rngChoiceRarity).toHaveBeenNthCalledWith(2, [agilityPrefixAffix]);
+    expect(rngChoiceWeighted).toHaveBeenNthCalledWith(
+      2,
+      [agilityPrefixAffix],
+      expect.any(Function),
+    );
   });
 
   it('stops rolling once the picker returns nothing (pool exhausted)', () => {
-    vi.mocked(rngChoiceRarity)
+    vi.mocked(rngChoiceWeighted)
       .mockReturnValueOnce(strengthAffix)
       .mockReturnValueOnce(undefined);
 
-    expect(rollAffixIds('Legendary', 1)).toEqual([strengthAffix.id]);
-    expect(rngChoiceRarity).toHaveBeenCalledTimes(2);
+    expect(rollAffixIds(gear('Legendary', 1))).toEqual([strengthAffix.id]);
+    expect(rngChoiceWeighted).toHaveBeenCalledTimes(2);
   });
 
   it('never rolls more than one Suffix-position affix, excluding remaining suffixes from later rolls even across different families', () => {
     seedContent([strengthAffix, luckAffix]);
-    vi.mocked(rngChoiceRarity)
+    vi.mocked(rngChoiceWeighted)
       .mockReturnValueOnce(strengthAffix)
       .mockReturnValueOnce(undefined);
 
-    expect(rollAffixIds('Legendary', 1)).toEqual([strengthAffix.id]);
+    expect(rollAffixIds(gear('Legendary', 1))).toEqual([strengthAffix.id]);
     // luckAffix is a different family but still a Suffix, so the second roll's eligible pool is empty.
-    expect(rngChoiceRarity).toHaveBeenNthCalledWith(2, []);
+    expect(rngChoiceWeighted).toHaveBeenNthCalledWith(
+      2,
+      [],
+      expect.any(Function),
+    );
   });
 
   it('leaves affixes gated above the item level out of the pool', () => {
@@ -127,29 +160,121 @@ describe('rollAffixIds', () => {
       levelRequirement: 10,
     });
     seedContent([strengthAffix, gatedAffix]);
-    vi.mocked(rngChoiceRarity).mockReturnValue(strengthAffix);
+    vi.mocked(rngChoiceWeighted).mockReturnValue(strengthAffix);
 
-    rollAffixIds('Uncommon', 9);
-    expect(rngChoiceRarity).toHaveBeenLastCalledWith([strengthAffix]);
+    rollAffixIds(gear('Uncommon', 9));
+    expect(rngChoiceWeighted).toHaveBeenLastCalledWith(
+      [strengthAffix],
+      expect.any(Function),
+    );
 
-    rollAffixIds('Uncommon', 10);
-    expect(rngChoiceRarity).toHaveBeenLastCalledWith([
-      strengthAffix,
-      gatedAffix,
-    ]);
+    rollAffixIds(gear('Uncommon', 10));
+    expect(rngChoiceWeighted).toHaveBeenLastCalledWith(
+      [strengthAffix, gatedAffix],
+      expect.any(Function),
+    );
   });
 
   it('keeps rolling Prefix affixes normally after the one Suffix slot is filled', () => {
     seedContent([strengthAffix, agilityPrefixAffix]);
-    vi.mocked(rngChoiceRarity)
+    vi.mocked(rngChoiceWeighted)
       .mockReturnValueOnce(strengthAffix)
       .mockReturnValueOnce(agilityPrefixAffix);
 
-    expect(rollAffixIds('Rare', 1)).toEqual([
+    expect(rollAffixIds(gear('Rare', 1))).toEqual([
       strengthAffix.id,
       agilityPrefixAffix.id,
     ]);
-    expect(rngChoiceRarity).toHaveBeenNthCalledWith(2, [agilityPrefixAffix]);
+    expect(rngChoiceWeighted).toHaveBeenNthCalledWith(
+      2,
+      [agilityPrefixAffix],
+      expect.any(Function),
+    );
+  });
+
+  it('only offers flux-only affixes on a reforge', () => {
+    seedContent([strengthAffix, fluxAffix]);
+    vi.mocked(rngChoiceWeighted).mockReturnValue(strengthAffix);
+
+    rollAffixIds(gear('Uncommon', 20));
+    expect(rngChoiceWeighted).toHaveBeenLastCalledWith(
+      [strengthAffix],
+      expect.any(Function),
+    );
+
+    rollAffixIds(gear('Uncommon', 20), true);
+    expect(rngChoiceWeighted).toHaveBeenLastCalledWith(
+      [strengthAffix, fluxAffix],
+      expect.any(Function),
+    );
+  });
+
+  it('leaves slot-restricted affixes out of non-matching gear', () => {
+    seedContent([strengthAffix, fluxAffix]);
+    vi.mocked(rngChoiceWeighted).mockReturnValue(strengthAffix);
+
+    rollAffixIds(gear('Uncommon', 20, 'Ring'), true);
+    expect(rngChoiceWeighted).toHaveBeenLastCalledWith(
+      [strengthAffix],
+      expect.any(Function),
+    );
+  });
+});
+
+describe('affixCanRollOn', () => {
+  it('gates by item level on drops and reforges alike', () => {
+    expect(affixCanRollOn(fluxAffix, gear('Rare', 19), true)).toBe(false);
+    expect(affixCanRollOn(fluxAffix, gear('Rare', 20), true)).toBe(true);
+  });
+
+  it('keeps flux-only affixes off fresh drops', () => {
+    expect(affixCanRollOn(fluxAffix, gear('Rare', 20), false)).toBe(false);
+  });
+
+  it('matches by any slot the item type fills', () => {
+    expect(affixCanRollOn(fluxAffix, gear('Rare', 20, 'Mace'), true)).toBe(
+      true,
+    );
+    const offhandAffix = ensureAffix({
+      ...fluxAffix,
+      gearSlots: ['Offhand'],
+    });
+    expect(affixCanRollOn(offhandAffix, gear('Rare', 20, 'Bow'), true)).toBe(
+      true,
+    );
+    expect(affixCanRollOn(offhandAffix, gear('Rare', 20, 'Sword'), true)).toBe(
+      false,
+    );
+  });
+
+  it('matches by exact item type when one is listed', () => {
+    const trinketAffix = ensureAffix({
+      ...fluxAffix,
+      gearSlots: [],
+      gearTypes: ['Trinket'],
+    });
+    expect(
+      affixCanRollOn(trinketAffix, gear('Rare', 20, 'Trinket'), true),
+    ).toBe(true);
+    expect(
+      affixCanRollOn(trinketAffix, gear('Rare', 20, 'Accessory'), true),
+    ).toBe(false);
+  });
+
+  it('rolls anywhere when unrestricted', () => {
+    expect(affixCanRollOn(strengthAffix, gear('Rare', 1, 'Arrow'), false)).toBe(
+      true,
+    );
+  });
+});
+
+describe('affixRollWeight', () => {
+  it('boosts flux-only affixes only on a reforge', () => {
+    expect(affixRollWeight(fluxAffix, false)).toBe(3);
+    expect(affixRollWeight(fluxAffix, true)).toBe(15);
+    expect(
+      affixRollWeight(ensureAffix({ ...fluxAffix, fluxOnly: false }), true),
+    ).toBe(3);
   });
 });
 

@@ -1,6 +1,8 @@
 import {
   VALID_AFFIX_POSITIONS,
   VALID_COMBAT_STATS,
+  VALID_EQUIPMENT_ITEM_TYPES,
+  VALID_EQUIPMENT_SLOTS,
   VALID_GAME_STATS,
   VALID_GAME_ELEMENTS,
   VALID_MONSTER_TYPES,
@@ -123,5 +125,12 @@ export function ensureAffix(
     position: ensureEnumValue(affix.position, VALID_AFFIX_POSITIONS, 'Suffix'),
     levelRequirement: affix.levelRequirement ?? 1,
     effects: ensureArray(affix.effects, ensureAffixEffect),
+    fluxOnly: affix.fluxOnly ?? false,
+    gearSlots: ensureArray(affix.gearSlots, (slot) =>
+      ensureEnumValue(slot, VALID_EQUIPMENT_SLOTS, 'Weapon'),
+    ),
+    gearTypes: ensureArray(affix.gearTypes, (type) =>
+      ensureEnumValue(type, VALID_EQUIPMENT_ITEM_TYPES, 'Sword'),
+    ),
   };
 }

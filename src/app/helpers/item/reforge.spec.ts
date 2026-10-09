@@ -149,7 +149,7 @@ describe('reforge', () => {
       expect(reforged.equipmentId).toBe(item.equipmentId);
       expect(reforged.affixIds).toEqual([strengthAffix.id]);
       expect(reforged.infusedItemIds).toEqual([gem.id]);
-      expect(rollAffixIds).toHaveBeenCalledWith('Rare', 10);
+      expect(rollAffixIds).toHaveBeenCalledWith(rareSpear, true);
     });
 
     it('drops gems from affix-added sockets the new roll no longer grants', () => {

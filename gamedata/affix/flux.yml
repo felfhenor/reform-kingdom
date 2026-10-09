@@ -1,0 +1,299 @@
+- id: 9c1db213-a3ca-4f2d-9317-908f060a3bac
+  name: Prismatic
+  description: Boosts the efficacy of all four elements.
+  rarity: Mystical
+  family: FluxPrismatic
+  position: Prefix
+  levelRequirement: 25
+  fluxOnly: true
+  gearSlots:
+    - Weapon
+  effects:
+    - kind: ElementalBoon
+      element: Fire
+      value: 15
+    - kind: ElementalBoon
+      element: Water
+      value: 15
+    - kind: ElementalBoon
+      element: Earth
+      value: 15
+    - kind: ElementalBoon
+      element: Air
+      value: 15
+
+- id: 6d46c842-75a7-4d40-8221-8edd54aaa4d9
+  name: Slayer's
+  description: Improves the wielder's capability to slay all kinds of creatures.
+  rarity: Mystical
+  family: FluxSlaying
+  position: Prefix
+  levelRequirement: 20
+  fluxOnly: true
+  gearSlots:
+    - Weapon
+  effects:
+    - kind: MonsterTypeDamage
+      monsterType: Amalgamation
+      value: 15
+    - kind: MonsterTypeDamage
+      monsterType: Beast
+      value: 15
+    - kind: MonsterTypeDamage
+      monsterType: Demon
+      value: 15
+    - kind: MonsterTypeDamage
+      monsterType: Humanoid
+      value: 15
+    - kind: MonsterTypeDamage
+      monsterType: Insect
+      value: 15
+    - kind: MonsterTypeDamage
+      monsterType: Spirit
+      value: 15
+
+- id: a60b8409-b5d4-47d6-a1b7-903a94bcfe0c
+  name: of the Dusk
+  description: Improves the double strike and repeat action chance of the wielder.
+  rarity: Legendary
+  family: FluxDusk
+  levelRequirement: 35
+  fluxOnly: true
+  gearSlots:
+    - Weapon
+  effects:
+    - kind: CombatStat
+      stat: repeatActionChance
+      value: 10
+    - kind: CombatStat
+      stat: skillStrikeAgainChance
+      value: 10
+
+- id: dc675a56-63aa-4c19-8c33-67e37a9f1e0b
+  name: of the Eclipse
+  description: Resist all four elements more effectively.
+  rarity: Mystical
+  family: FluxEclipse
+  levelRequirement: 25
+  fluxOnly: true
+  gearSlots:
+    - Armor
+  effects:
+    - kind: ElementalResistance
+      element: Fire
+      value: 15
+    - kind: ElementalResistance
+      element: Water
+      value: 15
+    - kind: ElementalResistance
+      element: Earth
+      value: 15
+    - kind: ElementalResistance
+      element: Air
+      value: 15
+
+- id: 77f79670-fa53-4320-a445-7307c7195af8
+  name: Undying
+  description: Periodically save the wearer from death.
+  rarity: Mystical
+  family: FluxUndying
+  position: Prefix
+  levelRequirement: 20
+  fluxOnly: true
+  gearSlots:
+    - Armor
+  effects:
+    - kind: CombatStat
+      stat: reviveChance
+      value: 15
+
+- id: 6bb84994-ed11-4676-ade2-3e23fed09d12
+  name: Unshakable
+  description: Improve the ability of the wearer to resist debuffs.
+  rarity: Legendary
+  family: FluxUnshakable
+  position: Prefix
+  levelRequirement: 30
+  fluxOnly: true
+  gearSlots:
+    - Helmet
+  effects:
+    - kind: CombatStat
+      stat: debuffIgnoreChance
+      value: 15
+
+- id: 538e74ce-49dc-4e3a-a00a-a26feb929133
+  name: of the Bastion
+  description: Improves the damage reflection capabilities of the wearer.
+  rarity: Mystical
+  family: FluxBastion
+  levelRequirement: 20
+  fluxOnly: true
+  gearTypes:
+    - Shield
+    - Charm
+    - Dirk
+  effects:
+    - kind: CombatStat
+      stat: damageReflectPercent
+      value: 15
+    - kind: Stat
+      stat: Vitality
+      value: 5
+
+- id: 41c66d5f-d620-4186-baff-4f60dfad322b
+  name: Duskforged
+  description: Improves every attribute.
+  rarity: Mystical
+  family: FluxDuskforged
+  position: Prefix
+  levelRequirement: 20
+  fluxOnly: true
+  gearSlots:
+    - Ring
+  effects:
+    - kind: Stat
+      stat: Strength
+      value: 3
+    - kind: Stat
+      stat: Intelligence
+      value: 3
+    - kind: Stat
+      stat: Vitality
+      value: 3
+    - kind: Stat
+      stat: Resistance
+      value: 3
+    - kind: Stat
+      stat: Agility
+      value: 3
+    - kind: Stat
+      stat: Luck
+      value: 3
+
+- id: 1774f472-1c8e-4669-b9f8-432e2f707eec
+  name: Gilded
+  description: Caravans buy for more and sell for less.
+  rarity: Legendary
+  family: FluxGilded
+  position: Prefix
+  levelRequirement: 15
+  fluxOnly: true
+  gearTypes:
+    - Accessory
+  effects:
+    - kind: CaravanBuyDiscount
+      value: 5
+    - kind: CaravanSellBonus
+      value: 5
+
+- id: 8b88a908-4a21-4373-bb7f-7f9c9fe91048
+  name: of Abundance
+  description: Yields more materials of every kind when gathering.
+  rarity: Legendary
+  family: FluxAbundance
+  levelRequirement: 30
+  fluxOnly: true
+  gearTypes:
+    - Trinket
+  effects:
+    - kind: GatherYield
+      tradeskillId: Artificing
+      value: 1
+    - kind: GatherYield
+      tradeskillId: Blacksmithing
+      value: 1
+    - kind: GatherYield
+      tradeskillId: Jewelcrafting
+      value: 1
+    - kind: GatherYield
+      tradeskillId: Tailoring
+      value: 1
+    - kind: GatherYield
+      tradeskillId: Woodworking
+      value: 1
+
+- id: c0d67008-3a37-41a9-a17b-f0818d29dc12
+  name: of the Woodsmith
+  description: Yields more Woodworking and Blacksmithing materials when gathering.
+  rarity: Mystical
+  family: FluxGatherPair
+  levelRequirement: 15
+  fluxOnly: true
+  gearSlots:
+    - Ring
+  effects:
+    - kind: GatherYield
+      tradeskillId: Woodworking
+      value: 1
+    - kind: GatherYield
+      tradeskillId: Blacksmithing
+      value: 1
+
+- id: 92d01984-6c57-4c7d-b32f-1c4f18a54e2b
+  name: of the Goldsmith
+  description: Yields more Blacksmithing and Jewelcrafting materials when gathering.
+  rarity: Mystical
+  family: FluxGatherPair
+  levelRequirement: 15
+  fluxOnly: true
+  gearSlots:
+    - Ring
+  effects:
+    - kind: GatherYield
+      tradeskillId: Blacksmithing
+      value: 1
+    - kind: GatherYield
+      tradeskillId: Jewelcrafting
+      value: 1
+
+- id: 4aa9a32f-1c55-40f0-aa16-ff6f18900e7b
+  name: of the Gemwright
+  description: Yields more Jewelcrafting and Artificing materials when gathering.
+  rarity: Mystical
+  family: FluxGatherPair
+  levelRequirement: 15
+  fluxOnly: true
+  gearSlots:
+    - Ring
+  effects:
+    - kind: GatherYield
+      tradeskillId: Jewelcrafting
+      value: 1
+    - kind: GatherYield
+      tradeskillId: Artificing
+      value: 1
+
+- id: 60ed9736-6806-4d31-93c5-be80795b78af
+  name: of the Tinker
+  description: Yields more Artificing and Tailoring materials when gathering.
+  rarity: Mystical
+  family: FluxGatherPair
+  levelRequirement: 15
+  fluxOnly: true
+  gearSlots:
+    - Ring
+  effects:
+    - kind: GatherYield
+      tradeskillId: Artificing
+      value: 1
+    - kind: GatherYield
+      tradeskillId: Tailoring
+      value: 1
+
+- id: 02ad6e10-6f21-440e-be70-91a1a71b34af
+  name: of the Loomwright
+  description: Yields more Tailoring and Woodworking materials when gathering.
+  rarity: Mystical
+  family: FluxGatherPair
+  levelRequirement: 15
+  fluxOnly: true
+  gearSlots:
+    - Ring
+  effects:
+    - kind: GatherYield
+      tradeskillId: Tailoring
+      value: 1
+    - kind: GatherYield
+      tradeskillId: Woodworking
+      value: 1

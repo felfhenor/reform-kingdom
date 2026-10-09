@@ -26,6 +26,7 @@ import { runShrinesAnalysis } from '@helpers/debug/analysis-shrines';
 import { runTasksAnalysis } from '@helpers/debug/analysis-tasks';
 import { runTrainersAnalysis } from '@helpers/debug/analysis-trainers';
 import { runSkillBonusesAnalysis } from '@helpers/debug/analysis-skillbonuses';
+import { runAffixesAnalysis } from '@helpers/debug/analysis-affixes';
 import { runSkillsAnalysis } from '@helpers/debug/analysis-skills';
 import { loadCompiledContentFromDisk } from './debug/load-compiled-content';
 import { printAnalysisResult } from './debug/run-analysis-cli';
@@ -64,6 +65,7 @@ const ANALYSIS_CHECKS: Array<{ title: string; run: () => AnalysisRunResult }> =
     { title: 'validate:tasks', run: runTasksAnalysis },
     { title: 'validate:skills', run: runSkillsAnalysis },
     { title: 'validate:skillbonuses', run: runSkillBonusesAnalysis },
+    { title: 'validate:affixes', run: runAffixesAnalysis },
   ];
 
 async function main(): Promise<void> {

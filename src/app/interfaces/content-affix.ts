@@ -5,6 +5,7 @@ import type { StatusEffectTag } from '@interfaces/content-statuseffect';
 import type { TradeskillId } from '@interfaces/content-tradeskill';
 import type { DropRarity, HasRarity } from '@interfaces/droppable';
 import type { GameElement } from '@interfaces/element';
+import type { EquipmentItemType, EquipmentSlot } from '@interfaces/equipment';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { BaseStat, SkillStatBonus } from '@interfaces/stat';
 import type { HasDescription } from '@interfaces/traits';
@@ -125,6 +126,13 @@ export type AffixContent = IsContentItem &
 
     // Multiple effects let one affix do several things at once (e.g. a stat bonus plus a curse elsewhere).
     effects: AffixEffect[];
+
+    // Only rolls on a Duskhall Flux reforge, never on a fresh drop/craft/purchase.
+    fluxOnly: boolean;
+
+    // Both empty = any item; otherwise the item must fill one of these slots or be one of these types.
+    gearSlots: EquipmentSlot[];
+    gearTypes: EquipmentItemType[];
   };
 
 export const AffixCountByRarity: Record<DropRarity, number> = {

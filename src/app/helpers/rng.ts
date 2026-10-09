@@ -1,4 +1,4 @@
-import type { DropRarity, HasRarity, Identifiable } from '@interfaces';
+import type { Identifiable } from '@interfaces';
 import { pull, sumBy } from 'es-toolkit/compat';
 import seedrandom, { type PRNG } from 'seedrandom';
 import { v4 as uuid4 } from 'uuid';
@@ -88,34 +88,6 @@ export function rngChoiceWeighted<T>(
   for (const item of items) {
     cumulativeWeight += weightFn(item);
     if (randomValue < cumulativeWeight) return item;
-  }
-
-  return undefined;
-}
-
-export function rngChoiceRarity<T extends HasRarity>(
-  items: T[],
-  rng = rngSeeded(rngUuid()),
-): T | undefined {
-  const rarityWeights: Record<DropRarity, number> = {
-    Common: 25,
-    Uncommon: 15,
-    Rare: 5,
-    Mystical: 3,
-    Legendary: 1,
-  };
-
-  const totalRarity = sumBy(items, (f) => rarityWeights[f.rarity]);
-  const itemOrdering = rngShuffle(items, rng);
-
-  const randomValue = rngNumber(totalRarity, rng);
-  let cumulativeRarity = 0;
-
-  for (const item of itemOrdering) {
-    cumulativeRarity += rarityWeights[item.rarity];
-    if (randomValue < cumulativeRarity) {
-      return item;
-    }
   }
 
   return undefined;

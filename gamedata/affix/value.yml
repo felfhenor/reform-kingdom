@@ -22,6 +22,7 @@
   description: This item is worth more when sold.
   rarity: Mystical
   family: SellValue
+  fluxOnly: true
   effects:
     - kind: SellValue
       value: 5000

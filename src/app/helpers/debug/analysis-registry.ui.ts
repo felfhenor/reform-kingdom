@@ -19,6 +19,7 @@ import { runRecipeRewardsAnalysis } from '@helpers/debug/analysis-reciperewards'
 import { runExchangeNodesAnalysis } from '@helpers/debug/analysis-exchangenodes';
 import { runShrinesAnalysis } from '@helpers/debug/analysis-shrines';
 import { runSkillBonusesAnalysis } from '@helpers/debug/analysis-skillbonuses';
+import { runAffixesAnalysis } from '@helpers/debug/analysis-affixes';
 import { runSkillsAnalysis } from '@helpers/debug/analysis-skills';
 import { runSpritesAnalysis } from '@helpers/debug/analysis-sprites';
 import { runTeleportNodesAnalysis } from '@helpers/debug/analysis-teleportnodes';
@@ -86,6 +87,16 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     strict: true,
     inputKeys: [],
     run: runObtainabilityAnalysis,
+  },
+  {
+    id: 'affixes',
+    title: 'Affix Reachability',
+    description:
+      'Every flux-only or slot/type-restricted affix can roll on at least one obtainable, reforgeable equipment item.',
+    category: 'Equipment & Items',
+    strict: true,
+    inputKeys: [],
+    run: runAffixesAnalysis,
   },
   {
     id: 'sprites',

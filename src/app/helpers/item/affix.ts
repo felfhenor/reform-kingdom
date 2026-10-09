@@ -1,33 +1,91 @@
 import { getEntriesByType, getEntry } from '@helpers/content/content';
-import { rngChoiceRarity } from '@helpers/rng';
+import { rngChoiceWeighted } from '@helpers/rng';
 import type {
   AffixContent,
   AffixEffect,
   AffixId,
   DropRarity,
+  EquipmentContent,
   EquipmentItem,
 } from '@interfaces';
-import { AffixCountByRarity } from '@interfaces';
+import { AffixCountByRarity, EquipmentTypeToSlot } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
+
+export const AFFIX_ROLL_WEIGHT_BY_RARITY: Record<DropRarity, number> = {
+  Common: 25,
+  Uncommon: 15,
+  Rare: 5,
+  Mystical: 3,
+  Legendary: 1,
+};
+
+// At drop weights a specific Legendary chase takes ~1700 reforges, so reforges boost flux-only affixes.
+export const FLUX_ONLY_AFFIX_WEIGHT_BY_RARITY: Record<DropRarity, number> = {
+  ...AFFIX_ROLL_WEIGHT_BY_RARITY,
+  Mystical: 15,
+  Legendary: 5,
+};
+
+export function affixMatchesEquipment(
+  affix: AffixContent,
+  content: EquipmentContent,
+): boolean {
+  if (affix.gearSlots.length === 0 && affix.gearTypes.length === 0) {
+    return true;
+  }
+
+  return (
+    affix.gearTypes.includes(content.type) ||
+    EquipmentTypeToSlot[content.type].some((slot) =>
+      affix.gearSlots.includes(slot),
+    )
+  );
+}
+
+// itemLevel gating applies to reforges too - it's what paces affix power with progression.
+export function affixCanRollOn(
+  affix: AffixContent,
+  content: EquipmentContent,
+  isReforge: boolean,
+): boolean {
+  return (
+    affix.levelRequirement <= content.levelRequirement &&
+    (isReforge || !affix.fluxOnly) &&
+    affixMatchesEquipment(affix, content)
+  );
+}
+
+export function affixRollWeight(
+  affix: AffixContent,
+  isReforge: boolean,
+): number {
+  return isReforge && affix.fluxOnly
+    ? FLUX_ONLY_AFFIX_WEIGHT_BY_RARITY[affix.rarity]
+    : AFFIX_ROLL_WEIGHT_BY_RARITY[affix.rarity];
+}
 
 // Item rarity controls how many affixes roll; each roll is independently weighted by the affix's own rarity, so a Common item can still land a rarer affix - it just gets fewer rolls overall.
 // At most one Suffix-position affix total; Prefix affixes are otherwise uncapped.
-// itemLevel is the base item's level requirement; affixes gated above it stay out of the pool.
-export function rollAffixIds(rarity: DropRarity, itemLevel: number): AffixId[] {
-  const pool = getEntriesByType<AffixContent>('affix').filter(
-    (affix) => affix.levelRequirement <= itemLevel,
+export function rollAffixIds(
+  content: EquipmentContent,
+  isReforge = false,
+): AffixId[] {
+  const pool = getEntriesByType<AffixContent>('affix').filter((affix) =>
+    affixCanRollOn(affix, content, isReforge),
   );
   const rolledFamilies = new Set<string>();
   const rolledIds: AffixId[] = [];
   let hasRolledSuffix = false;
 
-  for (let i = 0; i < AffixCountByRarity[rarity]; i++) {
+  for (let i = 0; i < AffixCountByRarity[content.rarity]; i++) {
     const eligible = pool.filter(
       (affix) =>
         !rolledFamilies.has(affix.family) &&
         !(hasRolledSuffix && affix.position === 'Suffix'),
     );
-    const picked = rngChoiceRarity(eligible);
+    const picked = rngChoiceWeighted(eligible, (affix) =>
+      affixRollWeight(affix, isReforge),
+    );
     if (!picked) break;
 
     if (picked.position === 'Suffix') hasRolledSuffix = true;

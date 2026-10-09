@@ -59,9 +59,7 @@ export function newEquipmentItem(
     id: rngUuid() as EquipmentItemId,
     equipmentId,
     infusedItemIds: [],
-    affixIds:
-      affixIds ??
-      (content ? rollAffixIds(content.rarity, content.levelRequirement) : []),
+    affixIds: affixIds ?? (content ? rollAffixIds(content) : []),
   };
 }
 
