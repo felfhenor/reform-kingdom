@@ -287,7 +287,11 @@ export function combatApplySkillToTarget(
       target,
       'damageReflectPercent',
     );
-    if (effectiveDamage > 0 && damageReflectPercent > 0) {
+    if (
+      effectiveDamage > 0 &&
+      damageReflectPercent > 0 &&
+      techniqueHasAttribute(technique, 'CanBeReflected')
+    ) {
       retaliationDamage = Math.floor(
         (effectiveDamage * damageReflectPercent) / 100,
       );

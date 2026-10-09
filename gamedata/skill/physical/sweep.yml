@@ -13,7 +13,7 @@
   statusEffectChanceBoost: {}
 
   techniques:
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 4
       targetType: Enemies
@@ -39,7 +39,7 @@
   statusEffectChanceBoost: {}
 
   techniques:
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 4
       targetType: Enemies
@@ -65,7 +65,7 @@
   statusEffectChanceBoost: {}
 
   techniques:
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 4
       targetType: Enemies
@@ -91,7 +91,7 @@
   statusEffectChanceBoost: {}
 
   techniques:
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 5
       targetType: Enemies

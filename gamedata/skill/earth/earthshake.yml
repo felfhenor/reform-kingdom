@@ -15,7 +15,7 @@
 
   techniques:
     - elements: [Earth]
-      attributes: [DamagesTarget, AllowPlink, Debuff]
+      attributes: [DamagesTarget, AllowPlink, Debuff, CanBeReflected]
       targets: 3
       targetType: Enemies
       targetBehaviors:
@@ -48,7 +48,7 @@
 
   techniques:
     - elements: [Earth]
-      attributes: [DamagesTarget, AllowPlink, Debuff]
+      attributes: [DamagesTarget, AllowPlink, Debuff, CanBeReflected]
       targets: 4
       targetType: Enemies
       targetBehaviors:
@@ -81,7 +81,7 @@
 
   techniques:
     - elements: [Earth]
-      attributes: [DamagesTarget, AllowPlink, Debuff]
+      attributes: [DamagesTarget, AllowPlink, Debuff, CanBeReflected]
       targets: 5
       targetType: Enemies
       targetBehaviors:
@@ -114,7 +114,7 @@
 
   techniques:
     - elements: [Earth]
-      attributes: [DamagesTarget, AllowPlink, Debuff]
+      attributes: [DamagesTarget, AllowPlink, Debuff, CanBeReflected]
       targets: 5
       targetType: Enemies
       targetBehaviors:

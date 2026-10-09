@@ -13,7 +13,7 @@
   statusEffectChanceBoost: {}
 
   techniques:
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 25
       targetType: All

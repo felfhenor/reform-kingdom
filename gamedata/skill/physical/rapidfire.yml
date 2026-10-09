@@ -15,7 +15,7 @@
   statusEffectChanceBoost: {}
 
   techniques:
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 1
       targetType: Enemies
@@ -27,7 +27,7 @@
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 1
       targetType: Enemies
@@ -39,7 +39,7 @@
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 1
       targetType: Enemies
@@ -51,7 +51,7 @@
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 1
       targetType: Enemies
@@ -80,7 +80,7 @@
   statusEffectChanceBoost: {}
 
   techniques:
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 1
       targetType: Enemies
@@ -92,7 +92,7 @@
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 1
       targetType: Enemies
@@ -104,7 +104,7 @@
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 1
       targetType: Enemies
@@ -116,7 +116,7 @@
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 1
       targetType: Enemies
@@ -128,7 +128,7 @@
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 1
       targetType: Enemies
@@ -157,7 +157,7 @@
   statusEffectChanceBoost: {}
 
   techniques:
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 1
       targetType: Enemies
@@ -169,7 +169,7 @@
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 1
       targetType: Enemies
@@ -181,7 +181,7 @@
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 1
       targetType: Enemies
@@ -193,7 +193,7 @@
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 1
       targetType: Enemies
@@ -205,7 +205,7 @@
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 1
       targetType: Enemies
@@ -217,7 +217,7 @@
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** rapidly fires at **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 1
       targetType: Enemies

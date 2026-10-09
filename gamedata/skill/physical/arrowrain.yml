@@ -15,7 +15,7 @@
   statusEffectChanceBoost: {}
 
   techniques:
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 3
       targetType: Enemies
@@ -27,7 +27,7 @@
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 2
       targetType: Enemies
@@ -56,7 +56,7 @@
   statusEffectChanceBoost: {}
 
   techniques:
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 4
       targetType: Enemies
@@ -68,7 +68,7 @@
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 3
       targetType: Enemies
@@ -80,7 +80,7 @@
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 2
       targetType: Enemies
@@ -109,7 +109,7 @@
   statusEffectChanceBoost: {}
 
   techniques:
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 4
       targetType: Enemies
@@ -121,7 +121,7 @@
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 3
       targetType: Enemies
@@ -133,7 +133,7 @@
       statusEffects: []
       combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
 
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
       targets: 2
       targetType: Enemies

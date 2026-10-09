@@ -57,6 +57,7 @@ export const VALID_SKILL_ATTRIBUTES: EquipmentSkillAttribute[] = [
   'DamagesTarget',
   'AllowPlink',
   'AllowLuckDodge',
+  'CanBeReflected',
   'HealsTarget',
   'RestoresTargetEnergy',
   'Buff',

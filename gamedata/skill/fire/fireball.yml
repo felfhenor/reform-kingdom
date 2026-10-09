@@ -15,7 +15,7 @@
 
   techniques:
     - elements: [Fire]
-      attributes: [DamagesTarget, AllowPlink, Debuff]
+      attributes: [DamagesTarget, AllowPlink, Debuff, CanBeReflected]
       targets: 3
       targetType: Enemies
       targetBehaviors:
@@ -47,7 +47,7 @@
 
   techniques:
     - elements: [Fire]
-      attributes: [DamagesTarget, AllowPlink, Debuff]
+      attributes: [DamagesTarget, AllowPlink, Debuff, CanBeReflected]
       targets: 3
       targetType: Enemies
       targetBehaviors:
@@ -79,7 +79,7 @@
 
   techniques:
     - elements: [Fire]
-      attributes: [DamagesTarget, AllowPlink, Debuff]
+      attributes: [DamagesTarget, AllowPlink, Debuff, CanBeReflected]
       targets: 3
       targetType: Enemies
       targetBehaviors:
@@ -111,7 +111,7 @@
 
   techniques:
     - elements: [Fire]
-      attributes: [DamagesTarget, AllowPlink, Debuff]
+      attributes: [DamagesTarget, AllowPlink, Debuff, CanBeReflected]
       targets: 4
       targetType: Enemies
       targetBehaviors:

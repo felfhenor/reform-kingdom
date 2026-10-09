@@ -32,6 +32,7 @@ export type EquipmentSkillAttribute =
   | 'DamagesTarget'
   | 'AllowPlink'
   | 'AllowLuckDodge'
+  | 'CanBeReflected'
   | 'HealsTarget'
   | 'RestoresTargetEnergy'
   | 'Buff'

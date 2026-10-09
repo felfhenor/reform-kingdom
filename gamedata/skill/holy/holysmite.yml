@@ -15,7 +15,7 @@
 
   techniques:
     - elements: []
-      attributes: [DamagesTarget, AllowPlink]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected]
       targets: 1
       targetType: Enemies
       targetBehaviors:
@@ -43,7 +43,7 @@
 
   techniques:
     - elements: []
-      attributes: [DamagesTarget, AllowPlink]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected]
       targets: 1
       targetType: Enemies
       targetBehaviors:
@@ -71,7 +71,7 @@
 
   techniques:
     - elements: []
-      attributes: [DamagesTarget, AllowPlink]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected]
       targets: 1
       targetType: Enemies
       targetBehaviors:
@@ -99,7 +99,7 @@
 
   techniques:
     - elements: []
-      attributes: [DamagesTarget, AllowPlink]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected]
       targets: 1
       targetType: Enemies
       targetBehaviors:

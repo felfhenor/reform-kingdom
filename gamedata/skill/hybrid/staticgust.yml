@@ -15,7 +15,7 @@
 
   techniques:
     - elements: [Earth, Air]
-      attributes: [DamagesTarget, AllowPlink, Debuff]
+      attributes: [DamagesTarget, AllowPlink, Debuff, CanBeReflected]
       targets: 1
       targetType: Enemies
       targetBehaviors:

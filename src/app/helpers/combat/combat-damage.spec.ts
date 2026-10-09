@@ -354,6 +354,50 @@ describe('combatApplySkillToTarget critical hit event', () => {
   });
 });
 
+describe('combatApplySkillToTarget damage reflect', () => {
+  function hitReflectingTarget(
+    attributes: EquipmentSkillContentTechnique['attributes'],
+  ): Combatant {
+    const attacker = buildCombatant({
+      hp: 1000,
+      totalStats: {
+        ...buildCombatant().totalStats!,
+        Health: 1000,
+        Strength: 100,
+      },
+    });
+    const target = buildCombatant({
+      id: 'target-1',
+      hp: 1000,
+      totalStats: { ...buildCombatant().totalStats!, Health: 1000 },
+      combatStats: { ...defaultCombatStats(), damageReflectPercent: 50 },
+    });
+
+    combatApplySkillToTarget(
+      buildCombat({ heroes: [attacker], guardians: [target] }),
+      attacker,
+      target,
+      buildSkill(),
+      buildTechnique({
+        attributes,
+        damageScaling: { ...buildTechnique().damageScaling, Strength: 1 },
+      }),
+    );
+
+    return attacker;
+  }
+
+  it('reflects a percent of the damage back at the attacker for a CanBeReflected technique', () => {
+    expect(hitReflectingTarget(['DamagesTarget', 'CanBeReflected']).hp).toBe(
+      1000 - 50,
+    );
+  });
+
+  it('does not reflect a technique without CanBeReflected', () => {
+    expect(hitReflectingTarget(['DamagesTarget']).hp).toBe(1000);
+  });
+});
+
 describe('combatApplySkillToTarget block and dodge events', () => {
   const zeroStats = () => buildCombatant().totalStats!;
   const strengthScaling = () => ({
