@@ -1,4 +1,5 @@
 import { combatantDamageEventEmit } from '@helpers/combat/combat-damage-events';
+import { combatantClearDelayedSkills } from '@helpers/combat/combat-skill-delay';
 import type { Combatant, DamageEventVariant } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
@@ -12,6 +13,7 @@ export function combatCombatantTakeDamage(
   variant?: DamageEventVariant,
 ) {
   combatant.hp = clamp(combatant.hp - damage, 0, combatant.totalStats.Health);
+  if (combatantIsDead(combatant)) combatantClearDelayedSkills(combatant);
 
   // Sign flipped so positive damage shows as "-".
   if (damage !== 0) {

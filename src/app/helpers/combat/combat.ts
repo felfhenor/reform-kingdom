@@ -15,6 +15,10 @@ import {
 } from '@helpers/combat/combat-log';
 import { pickSkillFromCombatOrders } from '@helpers/combat/combat-order-evaluation';
 import { combatantDamageEventEmit } from '@helpers/combat/combat-damage-events';
+import {
+  combatantAdvanceDelayedSkills,
+  combatantQueueDelayedSkill,
+} from '@helpers/combat/combat-skill-delay';
 import { combatantSkillCastEventEmit } from '@helpers/combat/combat-skill-events';
 import {
   combatCanTakeTurn,
@@ -35,7 +39,12 @@ import { clamp, sortBy } from 'es-toolkit/compat';
 import { combatCombatantCombatStatSucceedsChance } from '@helpers/combat/combat-stats';
 import { skillEpCost, skillTechniqueNumTargets } from '@helpers/hero/skill';
 import { rngChoiceWeighted, rngSucceedsChance } from '@helpers/rng';
-import type { Combat, Combatant, EquipmentSkill } from '@interfaces';
+import type {
+  Combat,
+  Combatant,
+  CombatOrderPick,
+  EquipmentSkill,
+} from '@interfaces';
 
 type CombatTurnResult = {
   takeAnotherTurn?: boolean;
@@ -126,6 +135,25 @@ function combatantAct(combat: Combat, combatant: Combatant): boolean {
     chosenSkill.sprite,
   );
 
+  if (chosenSkill.delay > 0) {
+    combatMessageLog(
+      combat,
+      `**${combatantMessageToken(combatant)}** begins charging **${chosenSkill.name}**!`,
+    );
+    combatantQueueDelayedSkill(combatant, chosenSkill, combatOrderPick);
+    return true;
+  }
+
+  combatantUseSkill(combat, combatant, chosenSkill, combatOrderPick);
+  return true;
+}
+
+function combatantUseSkill(
+  combat: Combat,
+  combatant: Combatant,
+  chosenSkill: EquipmentSkill,
+  combatOrderPick?: CombatOrderPick,
+): void {
   const capturedCreatorStats = { ...combatant.totalStats };
 
   chosenSkill.techniques.forEach((tech) => {
@@ -210,8 +238,28 @@ function combatantAct(combat: Combat, combatant: Combatant): boolean {
       }
     });
   });
+}
 
-  return true;
+// A ready batch stops once the caster dies mid-batch (e.g. from reflect).
+function combatantFireDelayedSkills(
+  combat: Combat,
+  combatant: Combatant,
+): boolean {
+  const ready = combatantAdvanceDelayedSkills(combatant);
+
+  ready.forEach((entry) => {
+    if (isCombatOver(combat) || combatantIsDead(combatant)) return;
+
+    const { skill } = entry;
+    combatantSkillCastEventEmit(combatant.id, skill.name, skill.sprite);
+    combatMessageLog(
+      combat,
+      `**${combatantMessageToken(combatant)}** unleashes **${skill.name}**!`,
+    );
+    combatantUseSkill(combat, combatant, skill, entry);
+  });
+
+  return ready.length > 0;
 }
 
 export function combatantTakeTurn(
@@ -237,6 +285,9 @@ export function combatantTakeTurn(
       return {};
     }
   }
+
+  const firedDelayed = combatantFireDelayedSkills(combat, combatant);
+  if (firedDelayed && combatantLogIfDefeated(combat, combatant)) return {};
 
   combatTickCombatantStatusEffects(combat, combatant, 'TurnStart');
 

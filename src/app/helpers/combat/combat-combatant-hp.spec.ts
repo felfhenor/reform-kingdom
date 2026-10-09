@@ -1,4 +1,4 @@
-import type { Combatant } from '@interfaces';
+import type { Combatant, EquipmentSkill } from '@interfaces';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import {
@@ -36,6 +36,17 @@ describe('combatCombatantTakeDamage', () => {
 
     combatCombatantTakeDamage(hero, 500);
     expect(hero.hp).toBe(0);
+  });
+
+  it('drops pending delayed skills only on a killing blow', () => {
+    const hero = buildCombatant(50);
+    hero.delayedSkills = [{ skill: {} as EquipmentSkill, turnsRemaining: 1 }];
+
+    combatCombatantTakeDamage(hero, 25);
+    expect(hero.delayedSkills).toHaveLength(1);
+
+    combatCombatantTakeDamage(hero, 25);
+    expect(hero.delayedSkills).toEqual([]);
   });
 
   it('emits a damage event with the sign flipped for a hero taking damage', () => {

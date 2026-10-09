@@ -13,6 +13,13 @@
 
       <div class="text-sm">{{ skillDescription() }}</div>
 
+      @if (skillData.delay > 0) {
+        <div class="text-xs mt-1 italic">
+          Takes effect after {{ skillData.delay | number }}
+          {{ 'turn' | pluralize: skillData.delay !== 1 }}.
+        </div>
+      }
+
       @let techniques = skillTechniques();
 
       @if (techniques.length > 0) {

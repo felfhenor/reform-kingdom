@@ -102,6 +102,17 @@
         - level: 31
           skillId: Smashing Board III
 
+    - pathName: Charged Strike
+      levels:
+        - level: 12
+          skillId: Charged Strike I
+
+        - level: 28
+          skillId: Charged Strike II
+
+        - level: 45
+          skillId: Charged Strike III
+
     - pathName: Taunt
       levels:
         - level: 20

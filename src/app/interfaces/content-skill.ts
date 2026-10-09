@@ -89,6 +89,9 @@ export type EquipmentSkillContent = IsContentItem &
     // Stable identity across tiers (e.g. "Cure I"/"Cure II"/"Cure III" all
     // share family "Cure") and across source (job path vs. equipment-granted).
     family: string;
+
+    // Caster turns before the skill fires; 0 fires immediately.
+    delay: number;
   };
 
 export type EquipmentSkill = EquipmentSkillContent & {

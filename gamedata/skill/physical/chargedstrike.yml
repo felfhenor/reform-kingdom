@@ -1,0 +1,80 @@
+- id: 35d8cb55-6f8c-485a-9721-c4987903d3f1
+  name: Charged Strike I
+  family: Charged Strike
+  description: Gather strength for 2 turns, then strike an enemy for {{ value }} damage.
+
+  rarity: Common
+  sprite: '0043'
+
+  epCost: 10
+  usesPerCombat: -1
+  delay: 2
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 5.5
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** slams **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: e62f4b5f-8e84-4b6d-850a-351c8eca9879
+  name: Charged Strike II
+  family: Charged Strike
+  description: Gather strength for 2 turns, then strike an enemy for {{ value }} damage.
+
+  rarity: Uncommon
+  sprite: '0043'
+
+  epCost: 18
+  usesPerCombat: -1
+  delay: 2
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 10
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** slams **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: cf22f057-4b5f-40f1-bb1e-a0628f791ee9
+  name: Charged Strike III
+  family: Charged Strike
+  description: Gather strength for 2 turns, then strike an enemy for {{ value }} damage.
+
+  rarity: Rare
+  sprite: '0043'
+
+  epCost: 28
+  usesPerCombat: -1
+  delay: 2
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge]
+      elements: []
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 15
+      statusEffects: []
+      combatMessage: '**{{ combatant.name }}** slams **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

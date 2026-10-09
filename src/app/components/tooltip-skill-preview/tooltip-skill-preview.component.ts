@@ -16,6 +16,7 @@ import type {
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { RowSkillTechniqueComponent } from '@components/row-skill-technique/row-skill-technique.component';
 import { skillIsUsableWithEquippedWeapons } from '@helpers/hero/skill';
+import { PluralizePipe } from '@pipes/pluralize.pipe';
 import {
   skillDescriptionWithPreview,
   skillTechniquePreviews,
@@ -27,7 +28,12 @@ import {
 @Component({
   selector: 'app-tooltip-skill-preview',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DecimalPipe, RowSkillTechniqueComponent, IconItemPreviewComponent],
+  imports: [
+    DecimalPipe,
+    PluralizePipe,
+    RowSkillTechniqueComponent,
+    IconItemPreviewComponent,
+  ],
   templateUrl: './tooltip-skill-preview.component.html',
   styleUrl: './tooltip-skill-preview.component.scss',
 })

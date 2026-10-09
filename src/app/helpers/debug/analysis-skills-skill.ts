@@ -32,6 +32,9 @@ function costIssues(skill: Skill): AnalysisIssue[] {
   if (skill.epCost < 0) {
     issues.push(analysisFail(`has a negative epCost (${skill.epCost}).`));
   }
+  if (skill.delay < 0) {
+    issues.push(analysisFail(`has a negative delay (${skill.delay}).`));
+  }
   if (skill.usesPerCombat !== -1 && skill.usesPerCombat < 1) {
     issues.push(
       analysisFail(

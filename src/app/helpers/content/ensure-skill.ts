@@ -88,5 +88,6 @@ export function ensureSkill(
       VALID_EQUIPMENT_ITEM_TYPES,
     ),
     family: skill.family ?? 'UNKNOWN',
+    delay: skill.delay ?? 0,
   };
 }

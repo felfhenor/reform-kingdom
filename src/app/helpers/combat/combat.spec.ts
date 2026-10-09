@@ -402,3 +402,109 @@ describe('combatantTakeTurn status effect timing', () => {
     });
   });
 });
+
+describe('combatantTakeTurn delayed skills', () => {
+  const charged = skill('charged', { name: 'Charged Strike', delay: 2 });
+
+  beforeEach(() => {
+    vi.mocked(combatGetTargetsFromPriorityList).mockReturnValue([target]);
+  });
+
+  function castThenIdle(combatant: Combatant, idleTurns: number): void {
+    available(charged);
+    combatantTakeTurn(buildCombat(), combatant);
+    available();
+    for (let i = 0; i < idleTurns; i++) {
+      combatantTakeTurn(buildCombat(), combatant);
+    }
+  }
+
+  it('spends the skill on cast but only queues it', () => {
+    const combatant = caster();
+
+    castThenIdle(combatant, 0);
+
+    expect(combatant.skillUses['charged' as EquipmentSkillId]).toBe(1);
+    expect(combatant.delayedSkills).toEqual([
+      { skill: charged, turnsRemaining: 2 },
+    ]);
+    expect(combatApplySkillToTarget).not.toHaveBeenCalled();
+  });
+
+  it("fires at the start of the caster's delay-th turn, before TurnStart effects", () => {
+    const combatant = caster();
+
+    castThenIdle(combatant, 1);
+    expect(combatApplySkillToTarget).not.toHaveBeenCalled();
+
+    vi.mocked(combatTickCombatantStatusEffects).mockClear();
+    combatantTakeTurn(buildCombat(), combatant);
+
+    expect(combatApplySkillToTarget).toHaveBeenCalledOnce();
+    expect(
+      vi.mocked(combatApplySkillToTarget).mock.invocationCallOrder[0],
+    ).toBeLessThan(
+      vi.mocked(combatTickCombatantStatusEffects).mock.invocationCallOrder[0],
+    );
+    expect(combatant.delayedSkills).toEqual([]);
+  });
+
+  it('fires even when the caster then loses their turn', () => {
+    const combatant = caster();
+    castThenIdle(combatant, 1);
+    vi.mocked(combatCanTakeTurn).mockReturnValue(false);
+
+    combatantTakeTurn(buildCombat(), combatant);
+
+    expect(combatApplySkillToTarget).toHaveBeenCalledOnce();
+  });
+
+  it("keeps the cast's Combat Order target override for when it fires", () => {
+    const combatant = caster({ combatOrders: [castFireball] });
+    vi.mocked(pickSkillFromCombatOrders).mockReturnValue({
+      skill: charged,
+      targetMode: 'Weakest',
+    });
+    castThenIdle(combatant, 1);
+    vi.mocked(combatGetTargetsFromPriorityList).mockClear();
+
+    combatantTakeTurn(buildCombat(), combatant);
+
+    expect(
+      vi.mocked(combatGetTargetsFromPriorityList).mock.calls[0][1],
+    ).toEqual([{ type: 'Weakest' }]);
+  });
+
+  it('stops a ready batch and ends the turn once the caster dies mid-batch', () => {
+    const combatant = caster();
+    available(charged);
+    combatantTakeTurn(buildCombat(), combatant);
+    combatantTakeTurn(buildCombat(), combatant);
+    combatant.delayedSkills?.forEach((entry) => (entry.turnsRemaining = 1));
+    vi.mocked(combatApplySkillToTarget).mockImplementationOnce(() =>
+      vi.mocked(combatantIsDead).mockReturnValue(true),
+    );
+    vi.mocked(combatTickCombatantStatusEffects).mockClear();
+
+    combatantTakeTurn(buildCombat(), combatant);
+
+    expect(combatApplySkillToTarget).toHaveBeenCalledOnce();
+    expect(combatTickCombatantStatusEffects).not.toHaveBeenCalled();
+  });
+
+  it('keeps overlapping casts as separate delays', () => {
+    const combatant = caster();
+    available(charged);
+
+    combatantTakeTurn(buildCombat(), combatant);
+    combatantTakeTurn(buildCombat(), combatant);
+    expect(combatant.delayedSkills).toHaveLength(2);
+
+    available();
+    combatantTakeTurn(buildCombat(), combatant);
+    expect(combatApplySkillToTarget).toHaveBeenCalledOnce();
+
+    combatantTakeTurn(buildCombat(), combatant);
+    expect(combatApplySkillToTarget).toHaveBeenCalledTimes(2);
+  });
+});

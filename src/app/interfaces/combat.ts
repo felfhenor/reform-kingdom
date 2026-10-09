@@ -1,6 +1,9 @@
 import type { HasAnimation } from '@interfaces/artable';
 import type { CharacterId } from '@interfaces/character';
-import type { CombatOrderClause } from '@interfaces/combat-order';
+import type {
+  CombatOrderClause,
+  CombatOrderPick,
+} from '@interfaces/combat-order';
 import type { EncounterId } from '@interfaces/content-encounter';
 import type { EncounterRandomId } from '@interfaces/content-encounter-random';
 import type { JobId } from '@interfaces/content-job';
@@ -124,6 +127,14 @@ export type CombatTargetModeContext = {
   matchingCombatants?: Combatant[];
 };
 
+// Keeps the cast's Combat Order target override; matched combatants can't survive the per-round clone.
+export type CombatantDelayedSkill = Omit<
+  CombatOrderPick,
+  'matchingCombatants'
+> & {
+  turnsRemaining: number;
+};
+
 export type Combatant = HasAnimation & {
   id: string;
   name: string;
@@ -167,6 +178,8 @@ export type Combatant = HasAnimation & {
   skillWeights: Record<EquipmentSkillId, number>;
 
   skillUses: Record<EquipmentSkillId, number>;
+  // Optional so mid-combat saves still load.
+  delayedSkills?: CombatantDelayedSkill[];
 
   statusEffects: StatusEffect[];
   statusEffectData: CombatantStatusEffectData;
