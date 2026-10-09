@@ -116,7 +116,7 @@ body {
 .tabular-nums {
   letter-spacing: 0;
   font-feature-settings: 'tnum' 1;
-  font-family: 'NumericText';
+  font-family: var(--font-numeric);
 }
 
 @utility text-lighter {

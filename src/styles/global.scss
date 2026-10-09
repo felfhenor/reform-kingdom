@@ -3,8 +3,13 @@ html {
 }
 
 body {
-  font-family: 'OtherText', serif;
-  letter-spacing: 1px;
+  --font-text: 'OtherText', serif;
+  --font-fancy: 'FancyText', sans-serif;
+  --font-numeric: 'NumericText';
+  --font-letter-spacing: 1px;
+
+  font-family: var(--font-text);
+  letter-spacing: var(--font-letter-spacing);
   overflow: hidden;
   height: 100vh;
   background: url(/asset/splash-dark.png) no-repeat center center/cover;
@@ -14,14 +19,16 @@ body {
   }
 
   &.clean-font {
-    font-family: 'CleanText', sans-serif;
-    letter-spacing: normal;
+    --font-text: 'CleanText', sans-serif;
+    --font-fancy: 'CleanText', sans-serif;
+    --font-numeric: 'CleanText', sans-serif;
+    --font-letter-spacing: normal;
   }
 }
 
 .title {
-  font-family: 'FancyText', sans-serif;
-  letter-spacing: 1px;
+  font-family: var(--font-fancy);
+  letter-spacing: var(--font-letter-spacing);
 }
 
 .card:not(.card-untextured) {

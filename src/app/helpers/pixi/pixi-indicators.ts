@@ -3,7 +3,10 @@ import {
   INDICATOR_PROGRESS_BAR_OFFSET_Y,
   NODE_STATUS_ICON_RADIUS,
 } from '@helpers/config';
-import { uiTextFontFamily } from '@helpers/engine/font.ui';
+import {
+  uiTextFontFamily,
+  uiTextLetterSpacing,
+} from '@helpers/engine/font.ui';
 import type {
   DifficultyTier,
   WorldNodeInteractionKind,
@@ -148,7 +151,7 @@ export function pixiIndicatorNodeLabelCreate(info: WorldNodeLabelInfo): Text {
       align: 'center',
       fill: pixiNodeLabelColor(info),
       stroke: { color: 0x000000, width: 3 },
-      letterSpacing: 1,
+      letterSpacing: uiTextLetterSpacing(),
     },
   });
 

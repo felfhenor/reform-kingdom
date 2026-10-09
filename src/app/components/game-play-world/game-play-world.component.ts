@@ -25,7 +25,10 @@ import {
   PARTY_FORMATION_JITTER_MIN_TILES,
 } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
-import { uiTextFontFamily } from '@helpers/engine/font.ui';
+import {
+  uiTextFontFamily,
+  uiTextLetterSpacing,
+} from '@helpers/engine/font.ui';
 import { gatherVfx$ } from '@helpers/engine/gather-vfx';
 import {
   isWorldCameraPanned,
@@ -651,6 +654,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     if (!this.nodeLabels) return;
 
     const fontFamily = uiTextFontFamily();
+    const letterSpacing = uiTextLetterSpacing();
     this.nodeLabels.forEach((label, nodeName) => {
       const entry = worldNodeByName(nodeName);
       if (!entry) return;
@@ -666,8 +670,10 @@ export class GamePlayWorldComponent implements OnDestroy {
       label.text = info.text;
       label.style.fill = pixiNodeLabelColor(info);
       // Guarded since every style write re-renders the label texture.
-      if (label.style.fontFamily !== fontFamily)
+      if (label.style.fontFamily !== fontFamily) {
         label.style.fontFamily = fontFamily;
+        label.style.letterSpacing = letterSpacing;
+      }
     });
   }
 
