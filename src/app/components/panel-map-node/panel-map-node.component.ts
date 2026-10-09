@@ -30,6 +30,7 @@ import {
   mapNodeDeselect,
   outpostTeleportOpen,
   selectedMapNode,
+  setGamePlayView,
   townOpen,
   trainerVisitOpen,
 } from '@helpers/engine/ui';
@@ -222,6 +223,10 @@ export class PanelMapNodeComponent {
     return !!entry && !!worldNodeTown(entry);
   });
 
+  public isKingdomNode = computed(
+    () => this.node()?.nodeData.type === 'Kingdom',
+  );
+
   public townId = computed(() => {
     const entry = this.node();
     return entry ? worldNodeTown(entry)?.id : undefined;
@@ -349,6 +354,10 @@ export class PanelMapNodeComponent {
     if (!entry) return;
 
     townOpen(entry);
+  }
+
+  public visitKingdom(): void {
+    setGamePlayView('kingdom');
   }
 
   public develop(): void {

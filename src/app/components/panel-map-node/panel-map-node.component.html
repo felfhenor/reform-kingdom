@@ -125,6 +125,16 @@
           <app-panel-map-node-actions-town (openTown)="openTown()" />
         } @else if (isTrainerNode()) {
           <app-panel-map-node-actions-trainer (visit)="visitTrainer()" />
+        } @else if (isKingdomNode()) {
+          <button
+            type="button"
+            class="btn btn-block btn-sm btn-primary"
+            (click)="visitKingdom()"
+            appSfx="ui-click"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            Visit
+          </button>
         } @else if (exchangeNode(); as exchange) {
           <app-panel-map-node-actions-exchange
             [node]="exchange"
