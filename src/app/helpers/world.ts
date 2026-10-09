@@ -1,8 +1,8 @@
+import { ledgerMark } from '@helpers/engine/ledger';
 import {
   updateGamestate,
   worldCurrentLocationState,
 } from '@helpers/state-game';
-import { worldMapMarkVisited } from '@helpers/world-node/world-map-discovery';
 import { worldNodeAt } from '@helpers/world-node/world-nodes';
 import type {
   CurrentLocation,
@@ -20,7 +20,7 @@ export function setWorld(world: GameStateWorld): void {
 export function currentLocationSet(location: CurrentLocation): void {
   updateGamestate((gs) => {
     gs.world.currentLocation = location;
-    worldMapMarkVisited(gs, location.mapName);
+    ledgerMark(gs.discoveredMaps, location.mapName);
     return gs;
   });
 }

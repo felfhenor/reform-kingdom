@@ -1,4 +1,5 @@
 import { isRecipeDiscovered } from '@helpers/crafting/recipes';
+import { ledgerHas } from '@helpers/engine/ledger';
 import { partyAffixEffects } from '@helpers/hero/party';
 import { affixEffectSum } from '@helpers/item/affix';
 import {
@@ -44,7 +45,7 @@ export function caravanTradeOwnedQuantity(
 
   if (trade.recipeId) {
     const discovered = state
-      ? !!state.discoveredRecipes[trade.recipeId]?.foundAt
+      ? ledgerHas(state.discoveredRecipes, trade.recipeId)
       : isRecipeDiscovered(trade.recipeId);
     return discovered ? 1 : 0;
   }
@@ -117,14 +118,14 @@ export function caravanTradeMaxQuantity(
 ): number {
   if (trade.collectibleId) {
     const discovered = state
-      ? !!state.collectibles[trade.collectibleId]?.foundAt
+      ? ledgerHas(state.collectibles, trade.collectibleId)
       : isCollectibleDiscovered(trade.collectibleId);
     return discovered ? 0 : 1;
   }
 
   if (trade.recipeId) {
     const discovered = state
-      ? !!state.discoveredRecipes[trade.recipeId]?.foundAt
+      ? ledgerHas(state.discoveredRecipes, trade.recipeId)
       : isRecipeDiscovered(trade.recipeId);
     return discovered ? 0 : 1;
   }

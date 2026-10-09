@@ -4,7 +4,6 @@ import {
   gatherNodeDiscover,
   grandfatherGatherNodeDiscoveries,
   isGatherNodeDiscovered,
-  pruneInvalidGatherNodeDiscoveries,
 } from '@helpers/item/gather-node-discovery';
 import { discoveredGatherNodesState } from '@helpers/state-game';
 import { captureAnalyticsEvents } from '@/testing/analytics';
@@ -37,17 +36,6 @@ describe('gatherNodeDiscover', () => {
 
     expect(discoveredGatherNodesState()[woods].foundAt).toBe(1000);
     expect(events).toEqual([]);
-  });
-});
-
-describe('pruneInvalidGatherNodeDiscoveries', () => {
-  it('keeps only nodes the existence check accepts', () => {
-    expect(
-      pruneInvalidGatherNodeDiscoveries(
-        { [woods]: { foundAt: 1000 }, Removed: { foundAt: 2000 } },
-        (nodeName) => nodeName === woods,
-      ),
-    ).toEqual({ [woods]: { foundAt: 1000 } });
   });
 });
 

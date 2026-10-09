@@ -1,4 +1,5 @@
 import { resetCombatLog } from '@helpers/combat/combat-log';
+import { ledgerMark } from '@helpers/engine/ledger';
 import { kingdomSubviewClear, setGamePlayView } from '@helpers/engine/ui';
 import { grantStartingGold } from '@helpers/item/materials';
 import { migrateGameState } from '@helpers/migrate';
@@ -7,7 +8,6 @@ import { setupFinish } from '@helpers/setup';
 import { resetGameState, updateGamestate } from '@helpers/state-game';
 import { setOption } from '@helpers/state-options';
 import { setWorld } from '@helpers/world';
-import { worldMapMarkVisited } from '@helpers/world-node/world-map-discovery';
 import { worldgenGenerateWorld } from '@helpers/worldgen';
 
 export async function gameStart(): Promise<void> {
@@ -19,7 +19,7 @@ export async function gameStart(): Promise<void> {
   setWorld(world);
   await updateGamestate((state) => {
     grantStartingGold(state);
-    worldMapMarkVisited(state, state.world.currentLocation.mapName);
+    ledgerMark(state.discoveredMaps, state.world.currentLocation.mapName);
     return state;
   });
 

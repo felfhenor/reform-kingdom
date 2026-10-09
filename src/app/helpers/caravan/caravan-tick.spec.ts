@@ -5,12 +5,12 @@ import {
   caravanWeightedSample,
 } from '@helpers/caravan/caravan-tick';
 import { ACTIVE_TRADE_COUNT } from '@helpers/config';
-import { applyRecipeDiscovery } from '@helpers/crafting/recipes';
 import {
   ensureCaravan,
   ensureCaravanTrader,
 } from '@helpers/content/ensure-caravan';
 import { ensureEquipment } from '@helpers/content/ensure-item';
+import { ledgerMark } from '@helpers/engine/ledger';
 import { applyCollectibleGrant } from '@helpers/item/collectibles';
 import { worldCaravansState } from '@helpers/state-game';
 import type {
@@ -212,7 +212,7 @@ describe('caravanProcessTick', () => {
     );
     seedCaravans({}, (state) => {
       applyCollectibleGrant(state, collectibleId, 1);
-      applyRecipeDiscovery(state, recipeId);
+      ledgerMark(state.discoveredRecipes, recipeId);
     });
 
     expect(rerolled().activeTradeIndices).toEqual([2]);

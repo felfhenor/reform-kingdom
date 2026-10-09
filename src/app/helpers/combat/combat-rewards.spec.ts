@@ -12,9 +12,9 @@ import {
 } from '@helpers/content/ensure-item';
 import { ensureRecipe } from '@helpers/content/ensure-recipe';
 import { ensureWorker } from '@helpers/content/ensure-worker';
-import { applyRecipeDiscovery } from '@helpers/crafting/recipes';
 import { defaultGameState } from '@helpers/defaults';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
+import { ledgerMark } from '@helpers/engine/ledger';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { armoryOverflowCapForState } from '@helpers/kingdom/armory-global-effects';
@@ -142,7 +142,7 @@ describe('grantResolvedDrops', () => {
 
     vi.clearAllMocks();
     grant([{ kind: 'Recipe', recipeId: recipe.id }], fight(), (state) =>
-      applyRecipeDiscovery(state, recipe.id),
+      ledgerMark(state.discoveredRecipes, recipe.id),
     );
     expect(logMessages()).toHaveLength(1);
     expect(gatherVfxEmit).not.toHaveBeenCalled();

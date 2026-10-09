@@ -17,7 +17,6 @@ import {
   getArmoryEntries,
   isEquipmentDiscovered,
   pruneInvalidArmoryItems,
-  pruneInvalidDiscoveredEquipment,
   RARITY_SELL_MULTIPLIER,
 } from '@helpers/kingdom/armory';
 import { armoryState, gamestate } from '@helpers/state-game';
@@ -264,17 +263,6 @@ describe('isEquipmentDiscovered', () => {
 
     expect(isEquipmentDiscovered(swordId)).toBe(true);
     expect(isEquipmentDiscovered(shieldId)).toBe(false);
-  });
-});
-
-describe('pruneInvalidDiscoveredEquipment', () => {
-  it('drops only the entries that no longer resolve to content', () => {
-    expect(
-      pruneInvalidDiscoveredEquipment({
-        [swordId]: { foundAt: 1000 },
-        [staleId]: { foundAt: 1000 },
-      }),
-    ).toEqual({ [swordId]: { foundAt: 1000 } });
   });
 });
 

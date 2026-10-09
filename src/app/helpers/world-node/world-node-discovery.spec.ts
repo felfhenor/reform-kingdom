@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { worldDiscoveriesState } from '@helpers/state-game';
 import {
   isWorldNodeDiscovered,
-  pruneInvalidWorldDiscoveries,
   worldNodeDiscover,
   worldNodeUndiscover,
 } from '@helpers/world-node/world-node-discovery';
@@ -60,16 +59,5 @@ describe('worldNodeUndiscover', () => {
     inTick(() => worldNodeUndiscover(grove));
 
     expect(isWorldNodeDiscovered(grove)).toBe(false);
-  });
-});
-
-describe('pruneInvalidWorldDiscoveries', () => {
-  it('keeps only entries the existence check accepts', () => {
-    expect(
-      pruneInvalidWorldDiscoveries(
-        { [grove]: { foundAt: 1000 }, 'Removed Node': { foundAt: 2000 } },
-        (nodeName) => nodeName === grove,
-      ),
-    ).toEqual({ [grove]: { foundAt: 1000 } });
   });
 });

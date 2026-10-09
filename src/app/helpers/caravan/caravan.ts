@@ -3,7 +3,8 @@ import {
   URGENCY_SAFE_MIN_TICKS,
   URGENCY_WARNING_MIN_TICKS,
 } from '@helpers/config';
-import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { getEntriesByType } from '@helpers/content/content';
+import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
 import { formatDuration, timerTicksElapsed } from '@helpers/engine/timer';
 import {
   discoveredCaravansState,
@@ -19,7 +20,6 @@ import type {
   CaravanTimerUrgency,
   CaravanTraderContent,
   CaravanTraderId,
-  GameStateDiscoveredCaravans,
 } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
@@ -96,7 +96,7 @@ export function caravanTimerUrgency(
 }
 
 export function isCaravanDiscovered(caravanId: CaravanId): boolean {
-  return !!discoveredCaravansState()[caravanId]?.foundAt;
+  return ledgerHas(discoveredCaravansState(), caravanId);
 }
 
 export function isPartyAtCaravan(caravanId: CaravanId): boolean {
@@ -108,7 +108,7 @@ export function caravanMarkDiscovered(caravanId: CaravanId): void {
   if (isCaravanDiscovered(caravanId)) return;
 
   updateGamestate((state) => {
-    state.discoveredCaravans[caravanId] = { foundAt: Date.now() };
+    ledgerMark(state.discoveredCaravans, caravanId);
     return state;
   });
 }
@@ -124,20 +124,4 @@ export function caravanMarkVisited(caravanId: CaravanId): void {
     }
     return state;
   });
-}
-
-// Drops any discovery entries whose caravanId no longer resolves to real
-// content - e.g. after a caravan is renamed/removed from gamedata.
-export function pruneInvalidDiscoveredCaravans(
-  discovered: GameStateDiscoveredCaravans,
-): GameStateDiscoveredCaravans {
-  const pruned: GameStateDiscoveredCaravans = {};
-
-  (Object.keys(discovered) as CaravanId[]).forEach((caravanId) => {
-    if (getEntry<CaravanContent>(caravanId)) {
-      pruned[caravanId] = discovered[caravanId];
-    }
-  });
-
-  return pruned;
 }

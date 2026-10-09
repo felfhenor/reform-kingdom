@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest';
 import { tutorialsState } from '@helpers/state-game';
 import {
   isTutorialSeen,
-  pruneInvalidTutorials,
   tutorialMarkSeen,
   tutorialRearmProcessTick,
 } from '@helpers/tutorial/tutorial-seen';
@@ -32,17 +31,6 @@ describe('tutorialMarkSeen', () => {
 
     expect(tutorialsState()['main-ui']).toEqual({ foundAt: 1000 });
     expect(events).toEqual([]);
-  });
-});
-
-describe('pruneInvalidTutorials', () => {
-  it('keeps only tutorials the existence check accepts', () => {
-    expect(
-      pruneInvalidTutorials(
-        { 'main-ui': { foundAt: 1000 }, removed: { foundAt: 2000 } },
-        (tutorialId) => tutorialId === 'main-ui',
-      ),
-    ).toEqual({ 'main-ui': { foundAt: 1000 } });
   });
 });
 

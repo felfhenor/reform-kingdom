@@ -8,6 +8,7 @@ import {
   VALUE_MULTIPLIER_PER_STAT,
 } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
+import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
 import { affixEffectSum, equipmentItemAffixEffects } from '@helpers/item/affix';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import {
@@ -38,7 +39,6 @@ import type {
   EquipmentId,
   EquipmentItem,
   GameState,
-  GameStateDiscoveredEquipment,
 } from '@interfaces';
 import { RARITY_PRIORITY } from '@interfaces';
 import { orderBy } from 'es-toolkit/compat';
@@ -110,18 +110,6 @@ export function pruneInvalidArmoryItems(
   );
 }
 
-// Permanent "ever found" flag - separate from armory possession, so it still
-// applies to equipment the player never actually keeps (e.g. auto-sold loot).
-export function markEquipmentDiscovered(
-  state: GameState,
-  equipmentId: EquipmentId,
-): void {
-  const existing = state.discoveredEquipment[equipmentId];
-  state.discoveredEquipment[equipmentId] = {
-    foundAt: existing?.foundAt ?? Date.now(),
-  };
-}
-
 // Clamps to available room (or skips the check for debug tooling) and returns what was actually admitted - a full armory can mean fewer items landed than requested.
 export function addArmoryItems(
   state: GameState,
@@ -143,7 +131,7 @@ export function addArmoryItems(
 
   state.armory = [...state.armory, ...admitted];
   syncArmoryGlobalEffects(state);
-  markEquipmentDiscovered(state, equipmentId);
+  ledgerMark(state.discoveredEquipment, equipmentId);
 
   return admitted;
 }
@@ -198,7 +186,7 @@ export function armoryAddWithAffixes(
 // Whether this equipment has ever been found - unlike armory ownership, this
 // is permanent and survives equipping, selling, or breaking the gear down.
 export function isEquipmentDiscovered(equipmentId: EquipmentId): boolean {
-  return !!discoveredEquipmentState()[equipmentId]?.foundAt;
+  return ledgerHas(discoveredEquipmentState(), equipmentId);
 }
 
 export const RARITY_SELL_MULTIPLIER: Record<DropRarity, number> = {
@@ -258,20 +246,4 @@ export function equipmentSellValue(entry: EquipmentArmoryEntry): number {
       combatStatTotal * SELL_GOLD_PER_COMBAT_STAT_POINT +
       resistanceTotal * SELL_GOLD_PER_RESISTANCE_POINT,
   );
-}
-
-// Drops any discovery entries whose equipmentId no longer resolves to real
-// content - e.g. after a piece of gear is renamed/removed from gamedata.
-export function pruneInvalidDiscoveredEquipment(
-  discovered: GameStateDiscoveredEquipment,
-): GameStateDiscoveredEquipment {
-  const pruned: GameStateDiscoveredEquipment = {};
-
-  (Object.keys(discovered) as EquipmentId[]).forEach((equipmentId) => {
-    if (getEntry<EquipmentContent>(equipmentId)) {
-      pruned[equipmentId] = discovered[equipmentId];
-    }
-  });
-
-  return pruned;
 }

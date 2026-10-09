@@ -1,5 +1,6 @@
 import { STARTING_GOLD_AMOUNT } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
+import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
 import {
   discoveredMaterialsState,
   materialsState,
@@ -7,7 +8,6 @@ import {
 } from '@helpers/state-game';
 import type {
   GameState,
-  GameStateDiscoveredMaterials,
   GameStateMaterials,
   ItemContent,
   ItemId,
@@ -54,22 +54,7 @@ export function getMaterialQuantity(materialId: MaterialId): number {
 
 // Reads the permanent `discoveredMaterials` record, not live stock - it survives being spent down to 0.
 export function isMaterialDiscovered(materialId: MaterialId): boolean {
-  return !!discoveredMaterialsState()[materialId]?.foundAt;
-}
-
-// Drops any invalid discoveredMaterials entries whose id no longer resolves to real content.
-export function pruneInvalidDiscoveredMaterials(
-  discoveredMaterials: GameStateDiscoveredMaterials,
-): GameStateDiscoveredMaterials {
-  const pruned: GameStateDiscoveredMaterials = {};
-
-  (Object.keys(discoveredMaterials) as MaterialId[]).forEach((materialId) => {
-    if (getEntry<ItemContent>(materialId)) {
-      pruned[materialId] = discoveredMaterials[materialId];
-    }
-  });
-
-  return pruned;
+  return ledgerHas(discoveredMaterialsState(), materialId);
 }
 
 function setMaterialEntry(
@@ -110,9 +95,7 @@ export function applyMaterialDelta(
     );
   }
 
-  if (delta > 0 && !state.discoveredMaterials[materialId]) {
-    state.discoveredMaterials[materialId] = { foundAt: Date.now() };
-  }
+  if (delta > 0) ledgerMark(state.discoveredMaterials, materialId);
 }
 
 export function addMaterial(materialId: MaterialId, quantity: number): void {

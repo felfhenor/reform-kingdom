@@ -1,4 +1,5 @@
 import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
 import { getCollectibleQuantity } from '@helpers/item/collectibles';
 import { equippedItems } from '@helpers/item/equipment';
 import { getMaterialQuantity, traderTokenId } from '@helpers/item/materials';
@@ -15,7 +16,6 @@ import type {
   EquipmentContent,
   EquipmentId,
   GameState,
-  GameStateDiscoveredRecipes,
   ItemContent,
   RecipeContent,
   RecipeId,
@@ -31,8 +31,10 @@ export function isRecipeDiscovered(
   recipeId: RecipeId,
   state?: GameState,
 ): boolean {
-  const discovered = state ? state.discoveredRecipes : discoveredRecipesState();
-  return !!discovered[recipeId]?.foundAt;
+  return ledgerHas(
+    state ? state.discoveredRecipes : discoveredRecipesState(),
+    recipeId,
+  );
 }
 
 // Whether this recipe is gated behind a world drop or a caravan trader sale -
@@ -69,20 +71,9 @@ export function isRecipeCraftable(recipeId: RecipeId): boolean {
   return !isRecipeDropGated(recipeId);
 }
 
-// Mutates `state.discoveredRecipes` in place, for callers already inside their own `updateGamestate`.
-export function applyRecipeDiscovery(
-  state: GameState,
-  recipeId: RecipeId,
-): void {
-  const existing = state.discoveredRecipes[recipeId];
-  state.discoveredRecipes[recipeId] = {
-    foundAt: existing?.foundAt ?? Date.now(),
-  };
-}
-
 export function recipeDiscover(recipeId: RecipeId): void {
   updateGamestate((state) => {
-    applyRecipeDiscovery(state, recipeId);
+    ledgerMark(state.discoveredRecipes, recipeId);
     return state;
   });
 }
@@ -114,22 +105,6 @@ export function recipeCanUnlockWithTokens(
     !isRecipeDiscovered(recipeId, state) &&
     tokenQuantity >= recipe.tokenUnlockCost
   );
-}
-
-// Drops any discovery entries whose recipeId no longer resolves to real
-// content - e.g. after a recipe is renamed/removed from gamedata.
-export function pruneInvalidDiscoveredRecipes(
-  discovered: GameStateDiscoveredRecipes,
-): GameStateDiscoveredRecipes {
-  const pruned: GameStateDiscoveredRecipes = {};
-
-  (Object.keys(discovered) as RecipeId[]).forEach((recipeId) => {
-    if (getEntry<RecipeContent>(recipeId)) {
-      pruned[recipeId] = discovered[recipeId];
-    }
-  });
-
-  return pruned;
 }
 
 // The kind of content a recipe crafts - used to pick the right spritesheet

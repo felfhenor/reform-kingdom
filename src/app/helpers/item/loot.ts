@@ -1,10 +1,8 @@
 import { CHARACTER_MAX_LEVEL } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
-import {
-  applyRecipeDiscovery,
-  isRecipeTownUnique,
-} from '@helpers/crafting/recipes';
+import { isRecipeTownUnique } from '@helpers/crafting/recipes';
 import { tradeskillBuildingIn } from '@helpers/crafting/tradeskill';
+import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
 import { rangeAtLevel } from '@helpers/engine/leveled-range';
 import { applyCollectibleGrant } from '@helpers/item/collectibles';
 import { newEquipmentItem } from '@helpers/item/equipment';
@@ -148,9 +146,9 @@ function applyCollectibleDrop(
 }
 
 function applyWorkerDrop(state: GameState, drop: ResolvedWorkerDrop): void {
-  if (state.discoveredWorkers[drop.workerId]) return;
+  if (ledgerHas(state.discoveredWorkers, drop.workerId)) return;
 
-  state.discoveredWorkers[drop.workerId] = { foundAt: Date.now() };
+  ledgerMark(state.discoveredWorkers, drop.workerId);
   state.workers[drop.workerId] = defaultWorkerState();
 }
 
@@ -170,7 +168,7 @@ export function applyResolvedDropToState(
       applyCollectibleDrop(state, drop);
       return;
     case 'Recipe':
-      applyRecipeDiscovery(state, drop.recipeId);
+      ledgerMark(state.discoveredRecipes, drop.recipeId);
       return;
     case 'Worker':
       applyWorkerDrop(state, drop);

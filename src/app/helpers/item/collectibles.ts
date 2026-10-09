@@ -3,6 +3,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { ledgerHas } from '@helpers/engine/ledger';
 import { recomputeGlobalEffectSums } from '@helpers/hero/global-effect-state';
 import { collectiblesState, updateGamestate } from '@helpers/state-game';
 import type {
@@ -34,7 +35,7 @@ export function getCollectibleQuantity(collectibleId: CollectibleId): number {
 }
 
 export function isCollectibleDiscovered(collectibleId: CollectibleId): boolean {
-  return !!collectiblesState()[collectibleId]?.foundAt;
+  return ledgerHas(collectiblesState(), collectibleId);
 }
 
 export function discoveredCollectibleCount(): number {

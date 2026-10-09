@@ -3,6 +3,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { ledgerHas } from '@helpers/engine/ledger';
 import { bestiaryState, updateGamestate } from '@helpers/state-game';
 import type {
   EncounterContent,
@@ -15,7 +16,7 @@ import type {
 import { taskEventMonsterKilled } from '@helpers/task/task-events';
 
 export function isMonsterDiscovered(monsterId: MonsterId): boolean {
-  return !!bestiaryState()[monsterId]?.foundAt;
+  return ledgerHas(bestiaryState(), monsterId);
 }
 
 export function getMonsterKillCount(monsterId: MonsterId): number {

@@ -12,7 +12,6 @@ import {
   caravanTimerUrgency,
   isCaravanDiscovered,
   isPartyAtCaravan,
-  pruneInvalidDiscoveredCaravans,
 } from '@helpers/caravan/caravan';
 import { commissionGenerateIfMissing } from '@helpers/commission/commission-tick';
 import {
@@ -196,18 +195,5 @@ describe('caravanMarkVisited', () => {
 
     expect(isCaravanDiscovered(caravan.id)).toBe(true);
     expect(worldCaravansState()).toEqual({});
-  });
-});
-
-describe('pruneInvalidDiscoveredCaravans', () => {
-  it('drops discoveries of caravans no longer in content', () => {
-    const discovered = {
-      [caravan.id]: { foundAt: 1000 },
-      ['removed' as CaravanId]: { foundAt: 1000 },
-    };
-
-    expect(pruneInvalidDiscoveredCaravans(discovered)).toEqual({
-      [caravan.id]: { foundAt: 1000 },
-    });
   });
 });

@@ -1,5 +1,6 @@
 import { getEntry } from '@helpers/content/content';
 import { tradeskillBuildingIn } from '@helpers/crafting/tradeskill';
+import { ledgerHas } from '@helpers/engine/ledger';
 import { equippedItems } from '@helpers/item/equipment';
 import { partyMaxLevel } from '@helpers/item/gathering';
 import { townReputationTierForAmount } from '@helpers/town/reputation/town-reputation';
@@ -59,7 +60,7 @@ export function taskStateRequirementSatisfied(
     case 'LearnTeaching':
       return partyHasLearnedFromTrainer(state, requirement.trainerId);
     case 'RescueWorker':
-      return !!state.discoveredWorkers[requirement.workerId];
+      return ledgerHas(state.discoveredWorkers, requirement.workerId);
     case 'DefeatMonster':
       return (
         (state.bestiary[requirement.monsterId]?.kills ?? 0) >=

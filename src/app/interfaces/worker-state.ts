@@ -1,5 +1,6 @@
 import type { WorkerId } from '@interfaces/content-worker';
 import type { ItemId } from '@interfaces/content-item';
+import type { Ledger } from '@interfaces/ledger';
 import type { CurrentLocation } from '@interfaces/state-game';
 import type { TravelStep } from '@interfaces/travel';
 
@@ -67,9 +68,7 @@ export type GameStateWorkers = {
 
 // Permanent "ever rescued" ledger, distinct from `GameStateWorkers` (live progress) -
 // same discovery-ledger split as every other collectible-like system.
-export type GameStateDiscoveredWorkers = {
-  [key: WorkerId]: { foundAt: number };
-};
+export type GameStateDiscoveredWorkers = Ledger<WorkerId>;
 
 // Display-only shape for one ready-to-level-up corner card.
 export type WorkerLevelUpStatusEntry = {

@@ -1,5 +1,5 @@
 import { getEntry } from '@helpers/content/content';
-import { markEquipmentDiscovered } from '@helpers/kingdom/armory';
+import { ledgerMark } from '@helpers/engine/ledger';
 import { equipmentItemSlotCount } from '@helpers/item/infusion';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import {
@@ -122,7 +122,7 @@ export function applyEquipmentExchange(
     exchange.outputEquipmentId,
   );
   worldNodeSpendCost(state, exchange.costs);
-  markEquipmentDiscovered(state, exchange.outputEquipmentId);
+  ledgerMark(state.discoveredEquipment, exchange.outputEquipmentId);
 
   return 'ok';
 }

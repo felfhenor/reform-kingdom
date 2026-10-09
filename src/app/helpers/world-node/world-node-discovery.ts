@@ -2,12 +2,12 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
 import { notifySuccess } from '@helpers/engine/notify';
 import { updateGamestate, worldDiscoveriesState } from '@helpers/state-game';
-import type { GameStateWorldDiscoveries } from '@interfaces';
 
 export function isWorldNodeDiscovered(nodeName: string): boolean {
-  return !!worldDiscoveriesState()[nodeName]?.foundAt;
+  return ledgerHas(worldDiscoveriesState(), nodeName);
 }
 
 // Marks a hidden node as revealed - only notifies the player on the first
@@ -16,10 +16,7 @@ export function worldNodeDiscover(nodeName: string): void {
   const alreadyDiscovered = isWorldNodeDiscovered(nodeName);
 
   updateGamestate((state) => {
-    const existing = state.worldDiscoveries[nodeName];
-    state.worldDiscoveries[nodeName] = {
-      foundAt: existing?.foundAt ?? Date.now(),
-    };
+    ledgerMark(state.worldDiscoveries, nodeName);
     return state;
   });
 
@@ -37,20 +34,4 @@ export function worldNodeUndiscover(nodeName: string): void {
     delete state.worldDiscoveries[nodeName];
     return state;
   });
-}
-
-// Takes an existence check (not `worldNodeByName`) to avoid a world-nodes.ts <-> world-node-discovery.ts import cycle.
-export function pruneInvalidWorldDiscoveries(
-  discovered: GameStateWorldDiscoveries,
-  nodeExists: (nodeName: string) => boolean,
-): GameStateWorldDiscoveries {
-  const pruned: GameStateWorldDiscoveries = {};
-
-  Object.keys(discovered).forEach((nodeName) => {
-    if (nodeExists(nodeName)) {
-      pruned[nodeName] = discovered[nodeName];
-    }
-  });
-
-  return pruned;
 }

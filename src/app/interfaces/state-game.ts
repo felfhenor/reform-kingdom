@@ -19,6 +19,7 @@ import type { GameStateExploreRandom } from '@interfaces/explore-random';
 import type { GatheringState } from '@interfaces/gathering';
 import type { GlobalEffectSums } from '@interfaces/global-effect-sums';
 import type { Branded } from '@interfaces/identifiable';
+import type { Ledger } from '@interfaces/ledger';
 import type { LootFilterSettings } from '@interfaces/loot-filter';
 import type { GameStateTowns } from '@interfaces/town-state';
 import type { TravelState } from '@interfaces/travel';
@@ -57,9 +58,7 @@ export type GameStateMaterials = {
 };
 
 // Unlike `materials` (deletes the entry once stock hits 0), this is never pruned on spend - a standing "has this ever been found" flag.
-export type GameStateDiscoveredMaterials = {
-  [key: MaterialId]: { foundAt: number };
-};
+export type GameStateDiscoveredMaterials = Ledger<MaterialId>;
 
 // Where a collectible was found is derived fresh from content each render, so this only tracks ownership.
 export type GameStateCollectibles = {
@@ -70,31 +69,22 @@ export type GameStateCollectibles = {
 };
 
 // Unlike `armory`, this is never pruned on equip/sell/breakdown - it's a standing "has this ever been found" flag.
-export type GameStateDiscoveredEquipment = {
-  [key: EquipmentId]: { foundAt: number };
-};
+export type GameStateDiscoveredEquipment = Ledger<EquipmentId>;
 
 // Marked when the player opens a caravan's trade UI - gates which caravans
 // show in the Commissions panel. Keyed by caravan (not trader), since
 // traders don't map 1:1 to a caravan brand.
-export type GameStateDiscoveredCaravans = {
-  [key: CaravanId]: { foundAt: number };
-};
+export type GameStateDiscoveredCaravans = Ledger<CaravanId>;
 
 // Marked when the player opens a trainer's Visit modal - unlocks the heroes' Teachings list.
-export type GameStateDiscoveredTrainers = {
-  [key: TrainerId]: { foundAt: number };
-};
+export type GameStateDiscoveredTrainers = Ledger<TrainerId>;
 
 // Level-learned recipes never appear here. No stored location.
-export type GameStateDiscoveredRecipes = {
-  [key: RecipeId]: { foundAt: number };
-};
+export type GameStateDiscoveredRecipes = Ledger<RecipeId>;
 
 // One-time ledger of already-announced unlocks.
-export type GameStateDiscoveredAstralProjectorSpells = {
-  [key: AstralProjectorId]: { foundAt: number };
-};
+export type GameStateDiscoveredAstralProjectorSpells =
+  Ledger<AstralProjectorId>;
 
 export type GameStateActiveAstralProjectorSpell = {
   astralProjectorId: AstralProjectorId;
@@ -103,9 +93,7 @@ export type GameStateActiveAstralProjectorSpell = {
 };
 
 // Keyed by Tiled node name (no branded id for world nodes). Scopes auto-mode's material picker to sources the player has actually found.
-export type GameStateDiscoveredGatherNodes = {
-  [key: string]: { foundAt: number };
-};
+export type GameStateDiscoveredGatherNodes = Ledger;
 
 // Keyed by Tiled node name; shared by every developable node type.
 export type GameStateWorldNodeLevels = {
@@ -119,14 +107,10 @@ export type GameStateShrineLevels = GameStateWorldNodeLevels;
 export type GameStateOutpostLevels = GameStateWorldNodeLevels;
 
 // Unlike `discoveredGatherNodes` (GatherNodes only, recorded on arrival), this covers every node type, recorded on click.
-export type GameStateWorldDiscoveries = {
-  [key: string]: { foundAt: number };
-};
+export type GameStateWorldDiscoveries = Ledger;
 
 // Keyed by Tiled map name, recorded on arrival.
-export type GameStateDiscoveredMaps = {
-  [key: string]: { foundAt: number };
-};
+export type GameStateDiscoveredMaps = Ledger;
 
 // Created per task on load; `completedAt` latches so spending the gathered items can't undo a task.
 export type GameStateTasks = {
@@ -134,9 +118,7 @@ export type GameStateTasks = {
 };
 
 // One-time ledger of tutorials already shown to the player.
-export type GameStateTutorials = {
-  [key: string]: { foundAt: number };
-};
+export type GameStateTutorials = Ledger;
 
 // `kills` keeps counting past the first kill (unlike other discovery slices) for the bestiary's running count. `minLevelFound`/`maxLevelFound` are actual fought levels, not encounter data's theoretical range.
 export type GameStateBestiary = {

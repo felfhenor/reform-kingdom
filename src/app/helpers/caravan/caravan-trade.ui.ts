@@ -4,14 +4,12 @@ import {
   caravanTradePrice,
 } from '@helpers/caravan/caravan-trade-quantity';
 import { getEntry } from '@helpers/content/content';
-import {
-  applyRecipeDiscovery,
-  isRecipeDiscovered,
-} from '@helpers/crafting/recipes';
+import { isRecipeDiscovered } from '@helpers/crafting/recipes';
 import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
 import { notifyError } from '@helpers/engine/notify';
 import {
   applyCollectibleGrant,
@@ -93,7 +91,7 @@ function grantCaravanReward(
   }
 
   if (trade.recipeId) {
-    applyRecipeDiscovery(state, trade.recipeId);
+    ledgerMark(state.discoveredRecipes, trade.recipeId);
   }
 }
 
@@ -234,13 +232,13 @@ function isTokenTradeAlreadyOwned(
 ): boolean {
   if (trade.collectibleId) {
     return state
-      ? !!state.collectibles[trade.collectibleId]?.foundAt
+      ? ledgerHas(state.collectibles, trade.collectibleId)
       : isCollectibleDiscovered(trade.collectibleId);
   }
 
   if (trade.recipeId) {
     return state
-      ? !!state.discoveredRecipes[trade.recipeId]?.foundAt
+      ? ledgerHas(state.discoveredRecipes, trade.recipeId)
       : isRecipeDiscovered(trade.recipeId);
   }
 

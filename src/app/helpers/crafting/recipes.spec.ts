@@ -12,12 +12,10 @@ import { ensureRecipe } from '@helpers/content/ensure-recipe';
 import { ensureTown } from '@helpers/content/ensure-town';
 import { ensureTradeskill } from '@helpers/content/ensure-tradeskill';
 import {
-  applyRecipeDiscovery,
   isRecipeCraftable,
   isRecipeDiscovered,
   isRecipeDropGated,
   isRecipeTownUnique,
-  pruneInvalidDiscoveredRecipes,
   recipeCanUnlockWithTokens,
   recipeDiscover,
   recipeResultContent,
@@ -173,19 +171,6 @@ describe('isRecipeCraftable', () => {
 });
 
 describe('recipe discovery', () => {
-  it('stamps a new discovery now and keeps the original on repeat finds', () => {
-    const state = defaultGameState();
-    state.discoveredRecipes[itemRecipe.id] = { foundAt: 1000 };
-
-    applyRecipeDiscovery(state, itemRecipe.id);
-    applyRecipeDiscovery(state, equipmentRecipe.id);
-
-    expect(state.discoveredRecipes).toEqual({
-      [itemRecipe.id]: { foundAt: 1000 },
-      [equipmentRecipe.id]: { foundAt: 5000 },
-    });
-  });
-
   it('discovers and undiscovers through the committed state', () => {
     seedDiscovered();
 
@@ -196,17 +181,6 @@ describe('recipe discovery', () => {
 
     inTick(() => recipeUndiscover(equipmentRecipe.id));
     expect(discoveredRecipesState()).toEqual({});
-  });
-});
-
-describe('pruneInvalidDiscoveredRecipes', () => {
-  it('drops only the entries that no longer resolve to content', () => {
-    expect(
-      pruneInvalidDiscoveredRecipes({
-        [itemRecipe.id]: { foundAt: 1000 },
-        ['stale' as RecipeId]: { foundAt: 1000 },
-      }),
-    ).toEqual({ [itemRecipe.id]: { foundAt: 1000 } });
   });
 });
 

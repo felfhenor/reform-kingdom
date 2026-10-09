@@ -1,6 +1,7 @@
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import { MAX_ACTIVE_ASTRAL_PROJECTOR_SPELLS } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
 import { notifySuccess } from '@helpers/engine/notify';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
@@ -14,7 +15,6 @@ import type {
   AstralProjectorContent,
   AstralProjectorId,
   GameStateActiveAstralProjectorSpell,
-  GameStateDiscoveredAstralProjectorSpells,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
 
@@ -63,13 +63,11 @@ function astralProjectorProcessUnlocks(): void {
   const discovered = gamestate().discoveredAstralProjectorSpells;
 
   astralProjectorEntries().forEach((content) => {
-    if (discovered[content.id]) return;
+    if (ledgerHas(discovered, content.id)) return;
     if (!isAstralProjectorCollectiblesMet(content)) return;
 
     updateGamestate((state) => {
-      state.discoveredAstralProjectorSpells[content.id] = {
-        foundAt: Date.now(),
-      };
+      ledgerMark(state.discoveredAstralProjectorSpells, content.id);
       return state;
     });
 
@@ -107,20 +105,6 @@ function astralProjectorProcessExpiry(): void {
 export function astralProjectorProcessTick(): void {
   astralProjectorProcessUnlocks();
   astralProjectorProcessExpiry();
-}
-
-export function pruneInvalidDiscoveredAstralProjectorSpells(
-  discovered: GameStateDiscoveredAstralProjectorSpells,
-): GameStateDiscoveredAstralProjectorSpells {
-  const pruned: GameStateDiscoveredAstralProjectorSpells = {};
-
-  (Object.keys(discovered) as AstralProjectorId[]).forEach((id) => {
-    if (getEntry<AstralProjectorContent>(id)) {
-      pruned[id] = discovered[id];
-    }
-  });
-
-  return pruned;
 }
 
 export function pruneInvalidActiveAstralProjectorSpells(

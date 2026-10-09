@@ -8,7 +8,6 @@ import { taskEventWorkerRescued } from '@helpers/task/task-events';
 import {
   isWorkerContentKnown,
   isWorkerRescued,
-  pruneInvalidDiscoveredWorkers,
   pruneInvalidWorkerStates,
   workerRescue,
 } from '@helpers/worker/worker-discovery';
@@ -65,20 +64,6 @@ describe('workerRescue', () => {
     expect(isWorkerContentKnown(gone)).toBe(false);
     expect(isWorkerRescued(gone)).toBe(false);
     expect(workersState()).toEqual({});
-  });
-});
-
-describe('pruneInvalidDiscoveredWorkers', () => {
-  it('keeps only workers the existence check accepts', () => {
-    expect(
-      pruneInvalidDiscoveredWorkers(
-        {
-          [nell.id]: { foundAt: 1000 },
-          ['removed' as WorkerId]: { foundAt: 2000 },
-        },
-        (workerId) => workerId === nell.id,
-      ),
-    ).toEqual({ [nell.id]: { foundAt: 1000 } });
   });
 });
 

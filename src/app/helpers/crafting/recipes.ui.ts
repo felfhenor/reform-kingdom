@@ -1,12 +1,10 @@
 import { getEntry } from '@helpers/content/content';
-import {
-  applyRecipeDiscovery,
-  recipeCanUnlockWithTokens,
-} from '@helpers/crafting/recipes';
+import { recipeCanUnlockWithTokens } from '@helpers/crafting/recipes';
 import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { ledgerMark } from '@helpers/engine/ledger';
 import { applyMaterialDelta, traderTokenId } from '@helpers/item/materials';
 import { updateGamestate } from '@helpers/state-game';
 import type { RecipeContent, RecipeId } from '@interfaces';
@@ -26,7 +24,7 @@ export async function recipeUnlockWithTokens(
     if (!recipeCanUnlockWithTokens(recipeId, state)) return state;
 
     applyMaterialDelta(state, traderTokenId(), -recipe.tokenUnlockCost);
-    applyRecipeDiscovery(state, recipeId);
+    ledgerMark(state.discoveredRecipes, recipeId);
     unlocked = true;
 
     return state;

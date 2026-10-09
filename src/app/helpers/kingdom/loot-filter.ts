@@ -1,12 +1,9 @@
 import { LOOT_FILTER_AUTO_SELL_PERCENT } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
+import { ledgerMark } from '@helpers/engine/ledger';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import { gainGold } from '@helpers/item/materials';
-import {
-  addArmoryItems,
-  equipmentSellValue,
-  markEquipmentDiscovered,
-} from '@helpers/kingdom/armory';
+import { addArmoryItems, equipmentSellValue } from '@helpers/kingdom/armory';
 import { updateGamestate } from '@helpers/state-game';
 import type {
   EquipmentContent,
@@ -46,7 +43,7 @@ export function armoryAddLootDrop(equipmentId: EquipmentId): LootDropOutcome {
     const item = newEquipmentItem(equipmentId);
 
     if (!equipmentPassesLootFilter(content, state.lootFilters)) {
-      markEquipmentDiscovered(state, equipmentId);
+      ledgerMark(state.discoveredEquipment, equipmentId);
 
       const goldEarned = Math.round(
         equipmentSellValue({ item, content }) * LOOT_FILTER_AUTO_SELL_PERCENT,

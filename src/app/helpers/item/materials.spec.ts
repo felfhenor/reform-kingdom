@@ -12,7 +12,6 @@ import {
   grantStartingGold,
   hasTraderTokens,
   isMaterialDiscovered,
-  pruneInvalidDiscoveredMaterials,
   pruneInvalidMaterials,
   removeMaterial,
   spendGold,
@@ -173,16 +172,5 @@ describe('pruneInvalidMaterials', () => {
         [staleId]: { quantity: 2, foundAt: 2000 },
       }),
     ).toEqual({ [oreId]: { quantity: 5, foundAt: 1000 } });
-  });
-});
-
-describe('pruneInvalidDiscoveredMaterials', () => {
-  it('drops only the entries that no longer resolve to content', () => {
-    expect(
-      pruneInvalidDiscoveredMaterials({
-        [oreId]: { foundAt: 1000 },
-        [staleId]: { foundAt: 2000 },
-      }),
-    ).toEqual({ [oreId]: { foundAt: 1000 } });
   });
 });

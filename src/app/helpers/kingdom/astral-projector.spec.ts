@@ -10,7 +10,6 @@ import {
   astralProjectorSpellToBeOverwritten,
   isAstralProjectorCastable,
   pruneInvalidActiveAstralProjectorSpells,
-  pruneInvalidDiscoveredAstralProjectorSpells,
 } from '@helpers/kingdom/astral-projector';
 import { gamestate } from '@helpers/state-game';
 import type {
@@ -159,15 +158,9 @@ describe('astralProjectorProcessTick', () => {
 });
 
 describe('pruning', () => {
-  it('drops discovered and active spells no longer in content', () => {
+  it('drops active spells no longer in content', () => {
     seedContent([starfall]);
 
-    expect(
-      pruneInvalidDiscoveredAstralProjectorSpells({
-        [starfall.id]: { foundAt: 1 },
-        [moonrise.id]: { foundAt: 2 },
-      }),
-    ).toEqual({ [starfall.id]: { foundAt: 1 } });
     expect(
       pruneInvalidActiveAstralProjectorSpells([
         cast(starfall.id, 0),

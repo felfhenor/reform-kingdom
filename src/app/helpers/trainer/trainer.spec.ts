@@ -11,7 +11,6 @@ import {
   characterApplyTeaching,
   isPartyAtTrainer,
   pruneInvalidCharacterTeachings,
-  pruneInvalidDiscoveredTrainers,
   trainerForTeaching,
   trainerTeachingAvailability,
   trainerTeachingsForJob,
@@ -255,16 +254,5 @@ describe('pruneInvalidCharacterTeachings', () => {
 
   it('tolerates saves without the field', () => {
     expect(pruneInvalidCharacterTeachings(undefined)).toEqual({});
-  });
-});
-
-describe('pruneInvalidDiscoveredTrainers', () => {
-  it('drops trainers that no longer exist', () => {
-    expect(
-      pruneInvalidDiscoveredTrainers({
-        [trainer.id]: { foundAt: 1 },
-        ['gone' as TrainerId]: { foundAt: 2 },
-      }),
-    ).toEqual({ [trainer.id]: { foundAt: 1 } });
   });
 });

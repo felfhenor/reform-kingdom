@@ -1,4 +1,5 @@
 import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
 import { characterStats } from '@helpers/hero/party';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { discoveredTrainersState, updateGamestate } from '@helpers/state-game';
@@ -9,7 +10,6 @@ import { worldNodeTrainer } from '@helpers/world-node/world-nodes';
 import type {
   Character,
   CollectibleId,
-  GameStateDiscoveredTrainers,
   JobContent,
   JobId,
   TrainerContent,
@@ -98,7 +98,7 @@ export function isPartyAtTrainer(trainerId: TrainerId): boolean {
 }
 
 export function isTrainerDiscovered(trainerId: TrainerId): boolean {
-  return !!discoveredTrainersState()[trainerId]?.foundAt;
+  return ledgerHas(discoveredTrainersState(), trainerId);
 }
 
 export function isAnyTrainerDiscovered(): boolean {
@@ -109,7 +109,7 @@ export function trainerMarkDiscovered(trainerId: TrainerId): void {
   if (isTrainerDiscovered(trainerId)) return;
 
   updateGamestate((state) => {
-    state.discoveredTrainers[trainerId] = { foundAt: Date.now() };
+    ledgerMark(state.discoveredTrainers, trainerId);
     return state;
   });
 }
@@ -132,20 +132,6 @@ export function characterApplyTeaching(
   character.stats = stats;
   character.hp = clamp(character.hp + healthGain, 0, stats.Health);
   character.ep = clamp(character.ep + energyGain, 0, stats.Energy);
-}
-
-export function pruneInvalidDiscoveredTrainers(
-  discovered: GameStateDiscoveredTrainers,
-): GameStateDiscoveredTrainers {
-  const pruned: GameStateDiscoveredTrainers = {};
-
-  (Object.keys(discovered) as TrainerId[]).forEach((trainerId) => {
-    if (getEntry<TrainerContent>(trainerId)) {
-      pruned[trainerId] = discovered[trainerId];
-    }
-  });
-
-  return pruned;
 }
 
 // Drops removed jobs/teachings and duplicates; a teaching no longer offered to a job is kept, since it was already paid for.

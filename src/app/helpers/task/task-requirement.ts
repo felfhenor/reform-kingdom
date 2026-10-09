@@ -1,5 +1,6 @@
 import { getEntry } from '@helpers/content/content';
 import { tradeskillBuildingIn } from '@helpers/crafting/tradeskill';
+import { ledgerHas } from '@helpers/engine/ledger';
 import { isClearProofReward } from '@helpers/item/loot';
 import { traderTokenId } from '@helpers/item/materials';
 import { isTaskRequirementCounter } from '@helpers/task/task';
@@ -18,9 +19,10 @@ function recipeResultDiscovered(
   recipe: RecipeContent,
 ): boolean {
   const { result } = recipe;
-  if ('itemId' in result) return !!state.discoveredMaterials[result.itemId];
+  if ('itemId' in result)
+    return ledgerHas(state.discoveredMaterials, result.itemId);
   if ('equipmentId' in result) {
-    return !!state.discoveredEquipment[result.equipmentId];
+    return ledgerHas(state.discoveredEquipment, result.equipmentId);
   }
   return !!state.collectibles[result.collectibleId];
 }
@@ -45,7 +47,8 @@ function encounterGuaranteedRewardFound(
     if (!isClearProofReward(reward)) return false;
     if ('collectibleId' in reward)
       return !!state.collectibles[reward.collectibleId];
-    if ('workerId' in reward) return !!state.discoveredWorkers[reward.workerId];
+    if ('workerId' in reward)
+      return ledgerHas(state.discoveredWorkers, reward.workerId);
     return false;
   });
 }
@@ -58,8 +61,8 @@ export function taskCounterRequirementHasEvidence(
   switch (requirement.kind) {
     case 'GatherItem':
       return (
-        !!state.discoveredGatherNodes[requirement.nodeName] &&
-        !!state.discoveredMaterials[requirement.itemId]
+        ledgerHas(state.discoveredGatherNodes, requirement.nodeName) &&
+        ledgerHas(state.discoveredMaterials, requirement.itemId)
       );
     case 'CraftRecipe': {
       const recipe = getEntry<RecipeContent>(requirement.recipeId);
@@ -68,7 +71,7 @@ export function taskCounterRequirementHasEvidence(
     case 'ClearEncounter':
       return encounterGuaranteedRewardFound(state, requirement.nodeName);
     case 'FulfillCommission':
-      return !!state.discoveredMaterials[traderTokenId()];
+      return ledgerHas(state.discoveredMaterials, traderTokenId());
     case 'CastAstralSpell':
       return state.activeAstralProjectorSpells.some(
         (spell) => spell.astralProjectorId === requirement.astralProjectorId,
