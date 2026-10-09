@@ -186,6 +186,18 @@
               </option>
             }
           </select>
+
+          <div class="form-control">
+            <label class="label cursor-pointer label-checkbox">
+              <input
+                type="checkbox"
+                [checked]="getOption('cleanFont')"
+                class="checkbox checkbox-secondary"
+                (click)="setOption('cleanFont', !getOption('cleanFont'))"
+              />
+              <span class="label-text">Clean Font</span>
+            </label>
+          </div>
         </div>
       </div>
     </div>

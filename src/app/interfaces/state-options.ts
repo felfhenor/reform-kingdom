@@ -13,7 +13,8 @@ export type GameOption =
   | 'analyticsOptInDismissed'
   | 'partyViewAlwaysExpand'
   | 'craftingViewAlwaysExpand'
-  | 'adventureLogOverlay';
+  | 'adventureLogOverlay'
+  | 'cleanFont';
 
 export type NotificationCategory = 'Error' | 'Success' | 'Warning';
 

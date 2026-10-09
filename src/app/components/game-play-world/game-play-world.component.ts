@@ -25,6 +25,7 @@ import {
   PARTY_FORMATION_JITTER_MIN_TILES,
 } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
+import { uiTextFontFamily } from '@helpers/engine/font.ui';
 import { gatherVfx$ } from '@helpers/engine/gather-vfx';
 import {
   isWorldCameraPanned,
@@ -385,7 +386,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.cameraOffset.set({ x: 0, y: 0 });
     this.frozenCameraBase = undefined;
 
-    await this.initPixi(map);
+    await this.initPixi(map, mapName);
 
     if (isFirstLoad) {
       this.isMapLoading.set(false);
@@ -478,7 +479,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.canvas = undefined;
   }
 
-  private async initPixi(map: TiledMap): Promise<void> {
+  private async initPixi(map: TiledMap, mapName: string): Promise<void> {
     const element = this.pixiContainer()?.nativeElement;
     if (!element) return;
 
@@ -530,6 +531,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     const renderedMap = pixiTiledMapRender(
       this.app.renderer,
       map,
+      mapName,
       textures,
       (object) => this.onNodeClick(object),
       (object) => this.resolveNodeLabel(object),
@@ -648,6 +650,7 @@ export class GamePlayWorldComponent implements OnDestroy {
   private updateNodeLabels(): void {
     if (!this.nodeLabels) return;
 
+    const fontFamily = uiTextFontFamily();
     this.nodeLabels.forEach((label, nodeName) => {
       const entry = worldNodeByName(nodeName);
       if (!entry) return;
@@ -662,6 +665,9 @@ export class GamePlayWorldComponent implements OnDestroy {
 
       label.text = info.text;
       label.style.fill = pixiNodeLabelColor(info);
+      // Guarded since every style write re-renders the label texture.
+      if (label.style.fontFamily !== fontFamily)
+        label.style.fontFamily = fontFamily;
     });
   }
 

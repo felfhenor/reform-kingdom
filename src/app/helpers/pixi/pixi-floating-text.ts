@@ -3,6 +3,7 @@ import {
   GATHER_VFX_JITTER_RANGE,
   GATHER_VFX_LIFETIME_MS,
 } from '@helpers/config';
+import { uiTextFontFamily } from '@helpers/engine/font.ui';
 import type { GatherVfxEvent } from '@interfaces';
 import type { Texture } from 'pixi.js';
 import { Container, Sprite, Text } from 'pixi.js';
@@ -29,7 +30,7 @@ function pixiFloatingTextLabelCreate(
     text,
     style: {
       fontSize,
-      fontFamily: 'OtherText',
+      fontFamily: uiTextFontFamily(),
       fontWeight: 'bold',
       fill: color,
       stroke: { color: 0x000000, width: 3 },

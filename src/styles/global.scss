@@ -12,6 +12,11 @@ body {
   &.swal2-height-auto {
     height: 100vh !important;
   }
+
+  &.clean-font {
+    font-family: 'CleanText', sans-serif;
+    letter-spacing: normal;
+  }
 }
 
 .title {
