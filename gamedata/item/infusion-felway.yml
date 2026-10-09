@@ -1,0 +1,12 @@
+- id: 5be57aff-98f7-48c2-a158-1e0a0d7c2a68
+  name: Fel-infused Scale
+  description: A scale infused with powerful fel energies that absorbs the primal elements from the space around it.
+  rarity: Rare
+
+  sprite: '0085'
+
+  infusionElementalResistances:
+    Air: 10
+    Earth: 10
+    Fire: 10
+    Water: 10
