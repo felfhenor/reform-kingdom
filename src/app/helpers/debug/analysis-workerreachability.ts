@@ -284,7 +284,7 @@ function outpostLevelingCheck(
         : `${boosted.length} worker(s) level higher once outposts are at +5: ${boosted
             .map(
               ({ worker, base, outposts }) =>
-                `${worker.name} (Lv.${base.cap} -> Lv.${outposts.cap})`,
+                `${worker.name} (Lv. ${base.cap} -> Lv. ${outposts.cap})`,
             )
             .join(', ')}`,
   };

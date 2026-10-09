@@ -1,9 +1,12 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { buildCharacter, buildEquipmentItem } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 import {
   combatantFromCharacter,
-  combatantIndexLabel,
   combatantFromMonster,
+  combatantIndexLabel,
   combatantsFromTownGuardians,
   combatCreateForEncounter,
 } from '@helpers/combat/combat-create';
@@ -31,9 +34,6 @@ import type {
   MonsterId,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
-import { buildCharacter, buildEquipmentItem } from '@/testing/builders';
-import { seedContent } from '@/testing/content';
-import { seedGamestate } from '@/testing/gamestate';
 
 const rangerId = 'ranger' as JobId;
 const bowId = 'bow' as EquipmentId;
@@ -190,7 +190,7 @@ describe('combatantFromMonster', () => {
     expect(combatant).toMatchObject({
       isEnemy: true,
       monsterId: 'hawk',
-      name: 'Hawk Lv.7 [C]',
+      name: 'Hawk Lv. 7 [C]',
       level: 7,
       skillIds: [snipeId],
       statBoosts: defaultStats(),
@@ -241,10 +241,10 @@ describe('combatantsFromTownGuardians', () => {
     );
 
     expect(combatants.map((c) => c.name)).toEqual([
-      'Larsian Citizen Lv.25 [A]',
-      'Larsian Citizen Lv.25 [B]',
-      'Larsian Guard Lv.25 [C]',
-      'Larsian Guard Lv.25 [D]',
+      'Larsian Citizen Lv. 25 [A]',
+      'Larsian Citizen Lv. 25 [B]',
+      'Larsian Guard Lv. 25 [C]',
+      'Larsian Guard Lv. 25 [D]',
     ]);
     expect(combatants.every((c) => !c.isEnemy && c.level === 25)).toBe(true);
   });
@@ -268,8 +268,8 @@ describe('combatCreateForEncounter', () => {
     });
     expect(combat.heroes.map((hero) => hero.name)).toEqual(['Ada', 'Bo']);
     expect(combat.guardians.map((guardian) => guardian.name)).toEqual([
-      'Larsian Citizen Lv.12 [A]',
-      'Larsian Guard Lv.12 [B]',
+      'Larsian Citizen Lv. 12 [A]',
+      'Larsian Guard Lv. 12 [B]',
     ]);
   });
 });

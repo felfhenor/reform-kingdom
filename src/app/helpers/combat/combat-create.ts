@@ -14,7 +14,6 @@ import {
   defaultStats,
   defaultTagResistances,
 } from '@helpers/defaults';
-import { globalEffectSumsState } from '@helpers/state-game';
 import { characterSkills } from '@helpers/hero/job';
 import { skillIsUsableWithEquippedWeapons } from '@helpers/hero/skill';
 import {
@@ -29,6 +28,7 @@ import {
 } from '@helpers/item/equipment-element';
 import { equipmentSkillStatBonuses } from '@helpers/item/equipment-skill-bonus';
 import { rngUuid } from '@helpers/rng';
+import { globalEffectSumsState } from '@helpers/state-game';
 import type {
   Character,
   Combat,
@@ -179,7 +179,7 @@ export function combatantFromMonster(
   return {
     id: rngUuid(),
     monsterId: monster.id,
-    name: `${monster.name} Lv.${level} [${combatantIndexLabel(index)}]`,
+    name: `${monster.name} Lv. ${level} [${combatantIndexLabel(index)}]`,
     isEnemy: true,
 
     targetting: monster.targetting,

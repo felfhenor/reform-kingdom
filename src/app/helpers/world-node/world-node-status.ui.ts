@@ -1,18 +1,18 @@
-import { rangeLabel } from '@helpers/engine/leveled-range';
 import { caravanBrandName } from '@helpers/caravan/caravan';
-import { worldNodeCaravanTimerText } from '@helpers/world-node/world-node-caravan';
-import { worldNodeCaravanVisitedTraderName } from '@helpers/world-node/world-node-caravan.ui';
-import { worldNodeExploreRandomTimerText } from '@helpers/world-node/world-node-encounter';
-import { worldNodeLevel } from '@helpers/world-node/world-node-level';
-import { worldNodeCompletionRewardProgress } from '@helpers/world-node/world-node-rewards';
-import { worldNodeExploreRandomIsCompleted } from '@helpers/world-node/world-node-encounter.ui';
-import { worldNodeOutpostLevel } from '@helpers/world-node/world-node-outpost';
-import { worldNodeShrineLevel } from '@helpers/world-node/world-node-shrine';
 import {
   exploreDifficultyTier,
   gatherDifficultyTier,
 } from '@helpers/engine/difficulty-tier';
+import { rangeLabel } from '@helpers/engine/leveled-range';
 import { partyMinLevel } from '@helpers/item/gathering';
+import { worldNodeCaravanTimerText } from '@helpers/world-node/world-node-caravan';
+import { worldNodeCaravanVisitedTraderName } from '@helpers/world-node/world-node-caravan.ui';
+import { worldNodeExploreRandomTimerText } from '@helpers/world-node/world-node-encounter';
+import { worldNodeExploreRandomIsCompleted } from '@helpers/world-node/world-node-encounter.ui';
+import { worldNodeLevel } from '@helpers/world-node/world-node-level';
+import { worldNodeOutpostLevel } from '@helpers/world-node/world-node-outpost';
+import { worldNodeCompletionRewardProgress } from '@helpers/world-node/world-node-rewards';
+import { worldNodeShrineLevel } from '@helpers/world-node/world-node-shrine';
 import {
   worldNodeInteractionKind,
   worldNodeLevelRange,
@@ -82,7 +82,7 @@ export function worldNodeLabelInfo(
     kind === 'Trade' ? [caravanBrandName(entry.nodeName)] : [nodeNameLine];
   // Caravan level range shows in the node panel instead; the floating label stays name + timer only.
   if (levelRange && kind !== 'Trade') {
-    lines.push(`Lv.${rangeLabel(levelRange)}`);
+    lines.push(`Lv. ${rangeLabel(levelRange)}`);
   }
 
   if (kind === 'ExploreRandom') {

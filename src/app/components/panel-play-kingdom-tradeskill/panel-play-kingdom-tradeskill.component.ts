@@ -133,14 +133,14 @@ export class PanelPlayKingdomTradeskillComponent {
   ): string {
     const level = formatNumber(building.level, this.locale);
     if (building.queue.length === 0)
-      return `${content.name} Lv.${level} (idle)`;
+      return `${content.name} Lv. ${level} (idle)`;
 
     const units = formatNumber(
       craftQueueUnitsRemaining(tradeskill),
       this.locale,
     );
     const remaining = formatDuration(craftQueueTicksRemaining(tradeskill));
-    return `${content.name} Lv.${level} (${units} items crafting, ${remaining} remaining)`;
+    return `${content.name} Lv. ${level} (${units} items crafting, ${remaining} remaining)`;
   }
 
   public building = computed(() => tradeskillBuilding(this.tradeskill()));
