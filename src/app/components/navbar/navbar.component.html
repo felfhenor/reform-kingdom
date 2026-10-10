@@ -146,6 +146,25 @@
         </li>
       }
 
+      @if (currentTrainerEntry()) {
+        <li class="action-button" appRequireSetup>
+          <button
+            class="btn btn-sm btn-secondary"
+            appButtonGlow
+            tp="Visit the Trainer [T]"
+            (click)="openCurrentTrainer()"
+            appSfx="ui-click"
+            [sfxTrigger]="['click', 'hover']"
+            [hotkeys]="'t'"
+            [hotkeysOptions]="noPreventDefault"
+            (hotkey)="hotkeyMatches($event, 't') && openCurrentTrainer()"
+            isGlobal
+          >
+            <app-icon name="gameClassicalKnowledge" size="nav"></app-icon>
+          </button>
+        </li>
+      }
+
       @if (showRecenterButton()) {
         <li class="action-button" appRequireSetup>
           <button

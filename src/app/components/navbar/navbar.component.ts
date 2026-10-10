@@ -35,6 +35,7 @@ import {
   kingdomSubviewClear,
   setGamePlayView,
   townOpen,
+  trainerVisitOpen,
   worldCameraRecenter,
 } from '@helpers/engine/ui';
 import { isSetup } from '@helpers/setup';
@@ -45,6 +46,7 @@ import { worldNodeCaravanIsAvailable } from '@helpers/world-node/world-node-cara
 import {
   worldNodeCaravan,
   worldNodeTown,
+  worldNodeTrainer,
 } from '@helpers/world-node/world-nodes';
 import type { GamePlayView, Icon } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -141,6 +143,18 @@ export class NavbarComponent {
     if (!entry) return;
 
     townOpen(entry);
+  }
+
+  public currentTrainerEntry = computed(() => {
+    const entry = worldNodeAtCurrentLocation();
+    return entry && worldNodeTrainer(entry) ? entry : undefined;
+  });
+
+  public openCurrentTrainer(): void {
+    const entry = this.currentTrainerEntry();
+    if (!entry) return;
+
+    trainerVisitOpen(entry);
   }
 
   public changeGamePlayView(view: GamePlayView): void {
