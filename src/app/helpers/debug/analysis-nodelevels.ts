@@ -107,6 +107,17 @@ export function runNodeLevelsAnalysis(
     });
   }
 
+  entries.forEach((entry) => {
+    if (entry.levelRange.min > entry.levelRange.max) {
+      checks.push({
+        id: 'minmax-error',
+        label: 'Level range',
+        status: 'fail',
+        message: `${entry.name} has a min level > max level`,
+      });
+    }
+  });
+
   const warnings = checks.filter((c) => c.status === 'warning').length;
 
   return {

@@ -137,7 +137,7 @@
   description: A town of demonic woodworkers, creating all manner of infrastructure and weaponry components in their large workshops.
   levelRange:
     min: 48
-    max: 41
+    max: 51
 
   fights:
     - monsters:
