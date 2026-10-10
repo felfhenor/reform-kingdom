@@ -49,7 +49,7 @@
       <div class="hero-skill-row-name">
         <div class="text-{{ burst.rarity }}">{{ burst.name }}</div>
 
-        <span class="badge badge-sm badge-info badge-outline">
+        <span class="badge badge-sm badge-info">
           {{ burst.epCost | number }} EP
         </span>
       </div>
@@ -98,9 +98,7 @@
           {{ skill.name }}
         </div>
 
-        <span class="badge badge-sm badge-info badge-outline">
-          {{ skill.epCost }} EP
-        </span>
+        <span class="badge badge-sm badge-info">{{ skill.epCost }} EP</span>
       </div>
     </div>
   } @empty {

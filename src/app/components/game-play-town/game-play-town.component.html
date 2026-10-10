@@ -4,9 +4,8 @@
   <span header class="flex gap-2 items-center">
     @if (townData) {
       {{ townData.name }}
-      <span class="badge badge-outline">Lv. {{ townData.level | number }}</span>
-      <span class="badge badge-info badge-outline">
-        {{ townData.scaleType }}
+      <span class="badge badge-info">
+        Lv. {{ townData.level | number }} {{ townData.scaleType }}
       </span>
     }
   </span>

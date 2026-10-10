@@ -1,12 +1,11 @@
-import { rangeLabel } from '@helpers/engine/leveled-range';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { BarTownReputationComponent } from '@components/bar-town-reputation/bar-town-reputation.component';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
 import { PanelMapNodeActionsCaravanComponent } from '@components/panel-map-node-actions-caravan/panel-map-node-actions-caravan.component';
+import { PanelMapNodeActionsExchangeComponent } from '@components/panel-map-node-actions-exchange/panel-map-node-actions-exchange.component';
 import { PanelMapNodeActionsExploreComponent } from '@components/panel-map-node-actions-explore/panel-map-node-actions-explore.component';
 import { PanelMapNodeActionsGatherComponent } from '@components/panel-map-node-actions-gather/panel-map-node-actions-gather.component';
 import { PanelMapNodeActionsOutpostComponent } from '@components/panel-map-node-actions-outpost/panel-map-node-actions-outpost.component';
-import { PanelMapNodeActionsExchangeComponent } from '@components/panel-map-node-actions-exchange/panel-map-node-actions-exchange.component';
 import { PanelMapNodeActionsShrineComponent } from '@components/panel-map-node-actions-shrine/panel-map-node-actions-shrine.component';
 import { PanelMapNodeActionsTownComponent } from '@components/panel-map-node-actions-town/panel-map-node-actions-town.component';
 import { PanelMapNodeActionsTrainerComponent } from '@components/panel-map-node-actions-trainer/panel-map-node-actions-trainer.component';
@@ -23,6 +22,7 @@ import { SFXDirective } from '@directives/sfx.directive';
 import { caravanBrandName } from '@helpers/caravan/caravan';
 import { encounterStartFight } from '@helpers/encounter/encounter';
 import { encounterRandomStartFight } from '@helpers/encounter/encounter-random-combat';
+import { rangeLabel } from '@helpers/engine/leveled-range';
 import { notifySuccess } from '@helpers/engine/notify';
 import {
   caravanTradeOpen,
@@ -45,9 +45,9 @@ import { rewardDisplayOrder } from '@helpers/item/loot';
 import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
 import {
   worldCombatState,
+  worldCurrentLocationState,
   worldGatheringState,
   worldTravelState,
-  worldCurrentLocationState,
 } from '@helpers/state-game';
 import { homeNodeSet } from '@helpers/town/town-spawn.ui';
 import {
@@ -59,9 +59,9 @@ import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-nod
 import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import { worldNodeLevel } from '@helpers/world-node/world-node-level';
 import { gatherNodeLevelUp } from '@helpers/world-node/world-node-level.ui';
-import { worldNodeCompletionRewards } from '@helpers/world-node/world-node-rewards';
 import { worldNodeOutpostLevel } from '@helpers/world-node/world-node-outpost';
 import { outpostLevelUp } from '@helpers/world-node/world-node-outpost.ui';
+import { worldNodeCompletionRewards } from '@helpers/world-node/world-node-rewards';
 import { worldNodeShrineLevel } from '@helpers/world-node/world-node-shrine';
 import {
   shrineLevelUp,
@@ -152,13 +152,12 @@ export class PanelMapNodeComponent {
     return levelRange ? rangeLabel(levelRange) : '-';
   });
 
-  // A locked gather node already shows the error badge, whose text color would clash.
-  public levelDifficultyClass = computed(() => {
+  public levelBadgeClass = computed(() => {
+    if (!this.meetsGatherLevelRequirement()) return 'badge-error';
+
     const entry = this.node();
     const difficulty = entry ? worldNodeDifficultyTier(entry) : undefined;
-    return difficulty && this.meetsGatherLevelRequirement()
-      ? `text-difficulty-${difficulty}`
-      : '';
+    return difficulty ? `badge-difficulty-${difficulty}` : 'badge-info';
   });
 
   public description = computed(() => {

@@ -1,13 +1,13 @@
 @if (scaleType(); as scale) {
-  <div class="badge badge-info badge-outline">{{ scale }}</div>
+  <div class="badge badge-info">{{ scale }}</div>
 }
 
 @if (reputationTierName(); as tierName) {
-  <div class="badge badge-secondary badge-outline">{{ tierName }}</div>
+  <div class="badge badge-secondary">{{ tierName }}</div>
 }
 
 @if (raidCountdown(); as countdown) {
-  <div class="badge badge-warning badge-outline">
+  <div class="badge badge-warning">
     Raid in
     <span class="tabular-nums">{{ countdown }}</span>
   </div>

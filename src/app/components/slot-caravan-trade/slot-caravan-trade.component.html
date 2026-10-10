@@ -46,7 +46,7 @@
         }
 
         @if (entry.ownedQuantity > 0) {
-          <span class="badge badge-sm badge-info badge-outline">
+          <span class="badge badge-sm badge-info">
             Owned: {{ entry.ownedQuantity }}
           </span>
         }
@@ -54,7 +54,7 @@
         @let remaining = entry.remaining ?? 0;
 
         @if (remaining > 0) {
-          <span class="badge badge-sm badge-info badge-outline">
+          <span class="badge badge-sm badge-info">
             Trades Remaining: {{ remaining }}
           </span>
         }

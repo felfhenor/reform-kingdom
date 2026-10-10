@@ -3,18 +3,18 @@
 @let rewards = rewardProgress();
 
 @if (encounters) {
-  <div class="badge badge-outline">{{ encounters }} Encounters</div>
+  <div class="badge badge-info">{{ encounters }} Encounters</div>
 }
 
 @if (monsterCountValue) {
-  <div class="badge badge-outline" [tp]="monstersTooltip" [tpPlacement]="'top'">
+  <div class="badge badge-info" [tp]="monstersTooltip" [tpPlacement]="'top'">
     {{ monsterCountValue }} Monsters
   </div>
 }
 
 @if (rewards.total > 0) {
   <div
-    class="badge badge-outline"
+    class="badge badge-info"
     [class.badge-success]="rewards.obtained === rewards.total"
   >
     {{ rewards.obtained }}/{{ rewards.total }} Rewards

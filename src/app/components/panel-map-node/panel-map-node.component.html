@@ -33,11 +33,7 @@
             !isTrainerNode() &&
             !exchangeNode()
           ) {
-            <div
-              class="badge badge-outline"
-              [class.badge-error]="!meetsGatherLevelRequirement()"
-              [class]="levelDifficultyClass()"
-            >
+            <div class="badge" [class]="levelBadgeClass()">
               Lv. {{ levelLabel() }}
             </div>
           }

@@ -166,19 +166,19 @@
               </span>
 
               <div class="flex items-center gap-2 flex-wrap">
-                <span class="badge badge-sm badge-info badge-outline">
+                <span class="badge badge-sm badge-info">
                   Craftable: {{ entry.maxCraftable | number }}
                 </span>
 
                 @if (entry.ownedQuantity > 0) {
-                  <span class="badge badge-sm badge-info badge-outline">
+                  <span class="badge badge-sm badge-info">
                     Owned: {{ entry.ownedQuantity | number }}
                   </span>
                 }
 
                 @if (entry.resultChance !== 100) {
                   <span
-                    class="badge badge-sm badge-warning badge-outline"
+                    class="badge badge-sm badge-warning"
                     [tp]="'This recipe does not have a 100% chance of yielding an item, but it will still yield XP on failure'"
                   >
                     {{ entry.resultChance }}% success rate

@@ -26,3 +26,19 @@
 .text-difficulty-Trivial {
   color: var(--difficulty-trivial);
 }
+
+// Darkened tier colors so white badge text clears WCAG AA (4.5:1).
+$difficulty-badge-colors: (
+  TooHigh: #d53d3d,
+  Hard: #ab6329,
+  Medium: #8c720c,
+  Easy: #2c834c,
+  Trivial: #70757e,
+);
+
+@each $tier, $color in $difficulty-badge-colors {
+  .badge-difficulty-#{$tier} {
+    --badge-color: #{$color};
+    --badge-fg: #fff;
+  }
+}
