@@ -111,6 +111,14 @@ export function characterBurstSkillOptions(
   ]);
 }
 
+export function partyFirstBurstSkillHero(
+  party: Character[],
+): Character | undefined {
+  return party.find(
+    (character) => characterBurstSkillOptions(character).length > 0,
+  );
+}
+
 // Drops a chosen skill the hero no longer knows, e.g. after unequipping the gear that granted it.
 export function characterChosenBurstSkills(
   character: CharacterStatSource & Pick<Character, 'burstSkills'>,

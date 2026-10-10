@@ -16,6 +16,7 @@ import {
   tutorialAdvance,
   tutorialCheckAutoTrigger,
   tutorialSkip,
+  tutorialRestoreActiveTarget,
   tutorialTargetRect,
 } from '@helpers/tutorial/tutorial-engine.ui';
 import type { TutorialId } from '@interfaces';
@@ -80,7 +81,7 @@ export class TutorialOverlayComponent {
     return targetKey ? tutorialTargetRect(targetKey) : undefined;
   });
 
-  // Targeted steps wait indefinitely (no timeout fallback) rather than showing a dimmed screen with no highlight before the target resolves - every target key is defined in this codebase, so it will always resolve.
+  // Targeted steps wait indefinitely (no timeout fallback) rather than showing a dimmed screen with no highlight before the target resolves - targets that depend on UI state are kept on screen by their step's prepare.
   public isReadyToRender = computed(() => {
     const view = this.stepView();
     return !!view && (!view.step.targetKey || !!this.targetRect());
@@ -116,6 +117,11 @@ export class TutorialOverlayComponent {
     effect(() => {
       if (!this.isGameReady()) return;
       tutorialCheckAutoTrigger();
+    });
+
+    effect(() => {
+      if (!this.isGameReady()) return;
+      tutorialRestoreActiveTarget();
     });
 
     // Restarts the settle timer whenever the raw (unsettled) step changes - new tutorial, new step, or a different one picked via the corner icon.

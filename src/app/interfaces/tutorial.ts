@@ -3,7 +3,12 @@ import type { GamePlayView, KingdomSubview } from '@interfaces/ui';
 export type TutorialId = string;
 
 // Untargeted steps render centered and never navigate, so they can never auto-trigger either.
-export type TutorialStep = { title: string; body: string } & (
+export type TutorialStep = {
+  title: string;
+  body: string;
+  // Runs before navigating, to put the target on screen (e.g. selecting the hero it lives on).
+  prepare?: () => void;
+} & (
   | { targetKey: string; view: GamePlayView; subview?: KingdomSubview }
   | { targetKey?: undefined; view?: undefined; subview?: undefined }
 );
@@ -17,6 +22,7 @@ export type TutorialTrigger =
   | { kind: 'first-town-visit' }
   | { kind: 'first-caravan-visit' }
   | { kind: 'first-trainer-visit' }
+  | { kind: 'first-burst-skill' }
   | { kind: 'losing-streak'; losses: number; belowLevel: number };
 
 export type TutorialDefinition = {

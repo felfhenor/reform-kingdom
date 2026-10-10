@@ -1,0 +1,80 @@
+@let currentItem = item();
+@let affixes = affixDisplays();
+
+<ng-container *appTeleportTo="actionOutlet()">
+  @let reforgeCost = cost();
+
+  <app-slot-button-container
+    [disabled]="!modifiable()"
+    [helpText]="'Equipped gear cannot be reforged in combat.'"
+  >
+    <button
+      class="btn btn-primary btn-sm"
+      [disabled]="!canReforge()"
+      (click)="$event.shiftKey || requestReforge()"
+      (click.shift)="requestReforge(true)"
+      appSfx="ui-click"
+      [sfxTrigger]="['click', 'hover']"
+    >
+      Reforge
+      @if (reforgeCost.length > 0) {
+        <app-row-currency-cost [costs]="reforgeCost" />
+      }
+    </button>
+  </app-slot-button-container>
+</ng-container>
+
+<div class="flex flex-col gap-2 flex-1 min-h-0 overflow-y-auto">
+  <app-detail-item-preview
+    class="shrink-0"
+    [display]="previewDisplay()"
+    [showEquippableBy]="false"
+  >
+    @if (slotCount() > 0) {
+      <app-row-infused-materials
+        [infusedItemIds]="currentItem.infusedItemIds"
+        [maxSlots]="slotCount()"
+      />
+    }
+  </app-detail-item-preview>
+
+  @if (reforgeable()) {
+    <div class="shrink-0 flex flex-col gap-2">
+      <div class="type-label">Affixes</div>
+
+      @for (affix of affixes; track affix.id) {
+        <app-row-affix-effects
+          [affix]="affix"
+          (animate.enter)="onAffixEnter($event, $index)"
+        />
+      } @empty {
+        <span class="type-hint">No affixes rolled.</span>
+      }
+    </div>
+  } @else {
+    <app-blank-slate>Common gear cannot be reforged.</app-blank-slate>
+  }
+</div>
+
+@if (reforgeable()) {
+  <div class="shrink-0 flex flex-col gap-2">
+    @if (mayDestroyGems()) {
+      <div class="type-hint text-warning">
+        Reforging may destroy gems in sockets added by affixes.
+      </div>
+    }
+
+    @if (!canAfford()) {
+      <span class="type-hint">You cannot afford this reforge.</span>
+    }
+  </div>
+}
+
+<swal
+  #reforgeSwal
+  title="Reforge this item?"
+  icon="warning"
+  confirmButtonText="Yes, reforge it"
+  cancelButtonText="Cancel"
+  (confirm)="confirmReforge()"
+></swal>

@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
@@ -11,6 +6,10 @@ import { PanelHeroEquipmentComponent } from '@components/panel-hero-equipment/pa
 import { SlotButtonContainerComponent } from '@components/slot-button-container/slot-button-container.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
+import {
+  heroesSelectCharacter,
+  heroesSelectedCharacterId,
+} from '@helpers/engine/ui';
 import { optimizeCharacterEquipment } from '@helpers/hero/character-equipment';
 import { canModifyEquipment } from '@helpers/item/equipment';
 import { worldPartyState } from '@helpers/state-game';
@@ -35,17 +34,14 @@ import { TippyDirective } from '@ngneat/helipopper';
 export class GamePlayHeroesComponent {
   public party = computed(() => worldPartyState());
 
-  private explicitSelectedId = signal<CharacterId | undefined>(undefined);
-
-  public selectedCharacterId = computed(
-    () => this.explicitSelectedId() ?? this.party()[0]?.id,
+  public selectedCharacter = computed(
+    () =>
+      this.party().find(
+        (character) => character.id === heroesSelectedCharacterId(),
+      ) ?? this.party()[0],
   );
 
-  public selectedCharacter = computed(() =>
-    this.party().find(
-      (character) => character.id === this.selectedCharacterId(),
-    ),
-  );
+  public selectedCharacterId = computed(() => this.selectedCharacter()?.id);
 
   public equipmentModifiable = computed(() => canModifyEquipment());
 
@@ -54,7 +50,7 @@ export class GamePlayHeroesComponent {
   }
 
   public selectCharacter(characterId: CharacterId): void {
-    this.explicitSelectedId.set(characterId);
+    heroesSelectCharacter(characterId);
   }
 
   optimizeAll() {

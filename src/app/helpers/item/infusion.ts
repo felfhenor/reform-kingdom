@@ -26,6 +26,7 @@ import {
   weightedBlockTotal,
 } from '@helpers/item/equipment-bonus';
 import { getGoldQuantity, getMaterialQuantity } from '@helpers/item/materials';
+import { discoveredMaterialsState } from '@helpers/state-game';
 import type {
   CombatStatBlock,
   EquipmentContent,
@@ -77,6 +78,13 @@ const INFUSION_BLOCKS: ((
   ELEMENT_RESISTANCE_BONUS.infusionBlock,
   ELEMENT_BOON_BONUS.infusionBlock,
 ];
+
+export function isInfusionUnlocked(): boolean {
+  return Object.keys(discoveredMaterialsState()).some((id) => {
+    const item = getEntry<ItemContent>(id as ItemId);
+    return !!item && isInfusionMaterial(item);
+  });
+}
 
 export function isInfusionMaterial(item: ItemContent): boolean {
   const hasDimensionBonus = INFUSION_BLOCKS.some((infusionBlock) =>

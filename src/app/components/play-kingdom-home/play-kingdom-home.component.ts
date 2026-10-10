@@ -25,12 +25,10 @@ import {
   kingdomSubviewShow,
   uiClockTick,
 } from '@helpers/engine/ui';
+import { isInfusionUnlocked } from '@helpers/item/infusion';
+import { isReforgeUnlocked } from '@helpers/item/reforge';
 import { armoryCap, armoryGet } from '@helpers/kingdom/armory';
 import { armoryFillColor } from '@helpers/kingdom/armory.ui';
-import {
-  isMaterialDiscovered,
-  reforgeReagentId,
-} from '@helpers/item/materials';
 import { unlockedAstralProjectorEntries } from '@helpers/kingdom/astral-projector.ui';
 import { getBestiaryEntries } from '@helpers/kingdom/bestiary.ui';
 import {
@@ -127,8 +125,8 @@ export class PlayKingdomHomeComponent {
     () => workersReadyToLevelUpEntries().length,
   );
 
-  public reforgeUnlocked = computed(() =>
-    isMaterialDiscovered(reforgeReagentId()),
+  public workshopUnlocked = computed(
+    () => isInfusionUnlocked() || isReforgeUnlocked(),
   );
 
   // Hidden until any caravan has actually generated a commission.

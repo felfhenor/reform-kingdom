@@ -8,8 +8,7 @@ import { PlayKingdomAstralProjectorComponent } from '@components/play-kingdom-as
 import { PlayKingdomBestiaryComponent } from '@components/play-kingdom-bestiary/play-kingdom-bestiary.component';
 import { PlayKingdomCommissionsComponent } from '@components/play-kingdom-commissions/play-kingdom-commissions.component';
 import { PlayKingdomHomeComponent } from '@components/play-kingdom-home/play-kingdom-home.component';
-import { PlayKingdomInfusionComponent } from '@components/play-kingdom-infusion/play-kingdom-infusion.component';
-import { PlayKingdomReforgeComponent } from '@components/play-kingdom-reforge/play-kingdom-reforge.component';
+import { PlayKingdomWorkshopComponent } from '@components/play-kingdom-workshop/play-kingdom-workshop.component';
 import { PlayKingdomMuseumComponent } from '@components/play-kingdom-museum/play-kingdom-museum.component';
 import { PlayKingdomPrestigeComponent } from '@components/play-kingdom-prestige/play-kingdom-prestige.component';
 import { PlayKingdomStorageComponent } from '@components/play-kingdom-storage/play-kingdom-storage.component';
@@ -32,8 +31,7 @@ import { kingdomSubview } from '@helpers/engine/ui';
     PlayKingdomAstralProjectorComponent,
     PlayKingdomBestiaryComponent,
     PlayKingdomCommissionsComponent,
-    PlayKingdomInfusionComponent,
-    PlayKingdomReforgeComponent,
+    PlayKingdomWorkshopComponent,
     PlayKingdomTradeskillArtificingComponent,
     PlayKingdomTradeskillBlacksmithingComponent,
     PlayKingdomTradeskillJewelcraftingComponent,

@@ -2,71 +2,73 @@
   @let burst = chosenBurstSkill();
   @let modifiable = burstModifiable();
 
-  <div>
-    <span class="type-section-title">
-      Burst Skill
+  <div appTutorialTarget="hero-burst-skill">
+    <div>
+      <span class="type-section-title">
+        Burst Skill
 
-      @if (burst) {
-        <app-slot-button-container
-          [disabled]="!modifiable"
-          [helpText]="'This cannot be done in combat.'"
-        >
-          <button
-            type="button"
-            class="btn btn-sm btn-primary"
+        @if (burst) {
+          <app-slot-button-container
             [disabled]="!modifiable"
-            (click)="openBurstPicker()"
-            appSfx="ui-click"
-            [sfxOffset]="0"
-            [sfxTrigger]="['click', 'hover']"
+            [helpText]="'This cannot be done in combat.'"
           >
-            Change
-          </button>
-        </app-slot-button-container>
-      }
-    </span>
-  </div>
-
-  @if (burst) {
-    <app-tooltip-skill-preview
-      #burstPreview
-      [display]="burst"
-      [displayCombatant]="heroCombatant()"
-      [displayCharacterWeaponTypes]="equippedWeaponTypes()"
-    />
-
-    <div
-      class="hero-skill-row shrink-0 my-4"
-      [tp]="burstPreview.template()"
-      [tpPlacement]="'left'"
-    >
-      <app-slot-rarity-outline
-        class="hero-skill-row-icon"
-        [entry]="burst"
-        spritesheet="skill"
-      ></app-slot-rarity-outline>
-
-      <div class="hero-skill-row-name">
-        <div class="text-{{ burst.rarity }}">{{ burst.name }}</div>
-
-        <span class="badge badge-sm badge-info">
-          {{ burst.epCost | number }} EP
-        </span>
-      </div>
+            <button
+              type="button"
+              class="btn btn-sm btn-primary"
+              [disabled]="!modifiable"
+              (click)="openBurstPicker()"
+              appSfx="ui-click"
+              [sfxOffset]="0"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              Change
+            </button>
+          </app-slot-button-container>
+        }
+      </span>
     </div>
-  } @else {
-    <button
-      type="button"
-      class="hero-skill-row shrink-0 my-4 !cursor-pointer !ps-0"
-      appButtonGlow
-      (click)="openBurstPicker()"
-      appSfx="ui-click"
-      [sfxTrigger]="['click', 'hover']"
-    >
-      <app-slot-icon-blank class="hero-skill-row-icon" />
-      <div class="hero-skill-row-name type-meta">Choose a burst skill</div>
-    </button>
-  }
+
+    @if (burst) {
+      <app-tooltip-skill-preview
+        #burstPreview
+        [display]="burst"
+        [displayCombatant]="heroCombatant()"
+        [displayCharacterWeaponTypes]="equippedWeaponTypes()"
+      />
+
+      <div
+        class="hero-skill-row shrink-0 my-4"
+        [tp]="burstPreview.template()"
+        [tpPlacement]="'left'"
+      >
+        <app-slot-rarity-outline
+          class="hero-skill-row-icon"
+          [entry]="burst"
+          spritesheet="skill"
+        ></app-slot-rarity-outline>
+
+        <div class="hero-skill-row-name">
+          <div class="text-{{ burst.rarity }}">{{ burst.name }}</div>
+
+          <span class="badge badge-sm badge-info">
+            {{ burst.epCost | number }} EP
+          </span>
+        </div>
+      </div>
+    } @else {
+      <button
+        type="button"
+        class="hero-skill-row shrink-0 my-4 !cursor-pointer !ps-0"
+        appButtonGlow
+        (click)="openBurstPicker()"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        <app-slot-icon-blank class="hero-skill-row-icon" />
+        <div class="hero-skill-row-name type-meta">Choose a burst skill</div>
+      </button>
+    }
+  </div>
 }
 
 <div>

@@ -154,7 +154,7 @@
 
 - id: ffa82301-bd37-4d72-87b9-fdf0ca484bfc
   name: Infuse Your Equipment
-  description: Use Infusion in the Kingdom to infuse a material into a piece of equipment.
+  description: Use the Kingdom Workshop to infuse a material into a piece of equipment.
   order: 130
   requirement:
     kind: InfuseEquipment

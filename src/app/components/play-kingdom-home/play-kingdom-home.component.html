@@ -253,7 +253,7 @@
               [sfxOffset]="0"
               [sfxTrigger]="['click', 'hover']"
             >
-              <app-icon name="gameVibratingShield" size="inline" />
+              <app-icon name="gameVibratingShield" size="row" />
               Requested Defenses
               <span class="badge badge-sm badge-error">{{ raidCount }}</span>
             </button>
@@ -269,7 +269,7 @@
             [sfxOffset]="5"
             [sfxTrigger]="['click', 'hover']"
           >
-            <app-icon name="tablerChecklist" size="inline" />
+            <app-icon name="tablerChecklist" size="row" />
             Tasks
             @if (claimableTasks > 0) {
               <span class="badge badge-sm badge-secondary">
@@ -278,27 +278,16 @@
             }
           </button>
 
-          <button
-            class="btn btn-accent btn-sm"
-            (click)="openSubview('infusion')"
-            appSfx="ui-click"
-            [sfxOffset]="2"
-            [sfxTrigger]="['click', 'hover']"
-          >
-            <app-icon name="gameMagicPotion" size="inline" />
-            Infusion
-          </button>
-
-          @if (reforgeUnlocked()) {
+          @if (workshopUnlocked()) {
             <button
               class="btn btn-accent btn-sm"
-              (click)="openSubview('reforge')"
+              (click)="openSubview('workshop')"
               appSfx="ui-click"
               [sfxOffset]="2"
               [sfxTrigger]="['click', 'hover']"
             >
-              <app-icon name="gameAnvilImpact" size="inline" />
-              Reforge
+              <app-icon name="gameAnvil" size="row" />
+              Workshop
             </button>
           }
 
@@ -310,7 +299,7 @@
               [sfxOffset]="3"
               [sfxTrigger]="['click', 'hover']"
             >
-              <app-icon name="gameContract" size="inline" />
+              <app-icon name="gameContract" size="row" />
               Commissions
             </button>
           }
@@ -327,7 +316,7 @@
               [sfxOffset]="1"
               [sfxTrigger]="['click', 'hover']"
             >
-              <app-icon name="gameBodySwapping" size="inline" />
+              <app-icon name="gameBodySwapping" size="row" />
               Reclass Heroes
             </button>
           </app-slot-button-container>
@@ -345,7 +334,7 @@
                 [sfxOffset]="4"
                 [sfxTrigger]="['click', 'hover']"
               >
-                <app-icon name="gameHouse" size="inline" />
+                <app-icon name="gameHouse" size="row" />
                 Set Home
               </button>
             </app-slot-button-container>

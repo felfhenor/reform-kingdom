@@ -7,7 +7,7 @@ import {
 import { notifyError } from '@helpers/engine/notify';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
 import { stateOwnedEquipmentItem } from '@helpers/hero/character-equipment';
-import { applyEquipmentReforge } from '@helpers/item/reforge';
+import { applyEquipmentReforge, isReforgeable } from '@helpers/item/reforge';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   EquipmentContent,
@@ -15,6 +15,11 @@ import type {
   EquipmentItemId,
   EquipmentReforgeResult,
 } from '@interfaces';
+
+export function isEquipmentItemReforgeable(item: EquipmentItem): boolean {
+  const content = getEntry<EquipmentContent>(item.equipmentId);
+  return !!content && isReforgeable(content);
+}
 
 export function reforgeMayDestroyGems(item: EquipmentItem): boolean {
   const baseSlots = getEntry<EquipmentContent>(item.equipmentId)?.slots ?? 0;

@@ -29,10 +29,12 @@ import {
   applyEquipmentReforge,
   equipmentItemReforgeCost,
   isReforgeable,
+  isReforgeUnlocked,
   reforgedEquipmentItem,
 } from '@helpers/item/reforge';
 import { buildCombat, buildEquipmentItem } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 
 describe('reforge', () => {
   const gold = ensureItem({ id: 'gold' as ItemId, name: 'Gold Coin' });
@@ -113,6 +115,20 @@ describe('reforge', () => {
     vi.clearAllMocks();
     seedContent(content);
     vi.mocked(rollAffixIds).mockReturnValue([strengthAffix.id]);
+  });
+
+  describe('isReforgeUnlocked', () => {
+    it('stays locked until Duskhall Flux is discovered', () => {
+      seedGamestate((state) => {
+        state.discoveredMaterials[gold.id] = { foundAt: 1 };
+      });
+      expect(isReforgeUnlocked()).toBe(false);
+
+      seedGamestate((state) => {
+        state.discoveredMaterials[flux.id] = { foundAt: 1 };
+      });
+      expect(isReforgeUnlocked()).toBe(true);
+    });
   });
 
   describe('isReforgeable', () => {

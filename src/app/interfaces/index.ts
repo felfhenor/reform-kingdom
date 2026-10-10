@@ -94,4 +94,5 @@ export * from './travel';
 export * from './tutorial';
 export * from './ui';
 export * from './worker-state';
+export * from './workshop.ui';
 export * from './world-nodes';

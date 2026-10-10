@@ -2,6 +2,7 @@ import type { IconSize } from '@interfaces/icon-size';
 import {
   gameAges,
   gameAngelWings,
+  gameAnvil,
   gameAnvilImpact,
   gameArmorDowngrade,
   gameBallGlow,
@@ -177,6 +178,7 @@ export const ALL_ICONS = {
   gamePlainArrow,
   gameVillage,
   gameClassicalKnowledge,
+  gameAnvil,
   tablerPlus,
   tablerSettings,
   tablerX,

@@ -86,6 +86,14 @@ export function heroTeachingsModalOpen(characterId: CharacterId): void {
   modalOpen('hero-teachings');
 }
 
+export const heroesSelectedCharacterId = signal<CharacterId | undefined>(
+  undefined,
+);
+
+export function heroesSelectCharacter(characterId: CharacterId): void {
+  heroesSelectedCharacterId.set(characterId);
+}
+
 // Not cleared on close - clearing it would collapse the modal's DOM mid-transition.
 export const heroBurstSkillsModalCharacterId = signal<CharacterId | undefined>(
   undefined,

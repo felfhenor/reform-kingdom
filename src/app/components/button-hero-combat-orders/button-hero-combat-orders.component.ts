@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { SFXDirective } from '@directives/sfx.directive';
+import { TutorialTargetDirective } from '@directives/tutorial-target.directive';
 import { combatOrdersModalOpen } from '@helpers/engine/ui';
 import type { CharacterId } from '@interfaces';
 
 @Component({
   selector: 'app-button-hero-combat-orders',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SFXDirective],
+  imports: [SFXDirective, TutorialTargetDirective],
   host: {
     class: 'w-full',
   },
@@ -14,6 +15,7 @@ import type { CharacterId } from '@interfaces';
     <button
       class="btn btn-block btn-sm btn-secondary"
       (click)="open()"
+      appTutorialTarget="hero-combat-orders"
       appSfx="ui-click"
       [sfxOffset]="0"
       [sfxTrigger]="['click', 'hover']"

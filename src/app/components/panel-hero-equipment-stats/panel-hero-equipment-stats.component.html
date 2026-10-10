@@ -3,7 +3,7 @@
 </div>
 
 <div class="flex flex-col gap-2 min-h-0 flex-1 overflow-y-auto pr-2 mt-4">
-  @for (stat of statKeys; track stat) {
+  @for (stat of statKeys; track $index) {
     @let value = tweenedStatValue(stat);
 
     <div class="flex items-center gap-2">
@@ -25,7 +25,7 @@
     </div>
   }
 
-  @for (stat of combatStatRows(); track stat) {
+  @for (stat of combatStatRows(); track $index) {
     @let value = tweenedCombatStatValue(stat);
 
     <div class="flex items-center gap-2">
@@ -47,7 +47,7 @@
     </div>
   }
 
-  @for (stat of resistanceRows(); track stat) {
+  @for (stat of resistanceRows(); track $index) {
     @let value = tweenedResistanceValue(stat);
 
     <div class="flex items-center gap-2">
@@ -99,7 +99,7 @@
     </div>
   }
 
-  @for (element of elementalBoonRows(); track element) {
+  @for (element of elementalBoonRows(); track $index) {
     @let value = tweenedElementalBoonValue(element);
 
     <div class="flex items-center gap-2">

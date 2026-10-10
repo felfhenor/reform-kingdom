@@ -71,6 +71,7 @@ export function activeTutorialStepView():
 }
 
 function navigateToStep(step: TutorialStep): void {
+  step.prepare?.();
   if (!step.view) return;
   setGamePlayView(step.view);
   if (step.view === 'kingdom' && step.subview) {
@@ -130,6 +131,14 @@ export function tutorialTargetRegister(
 export function tutorialTargetUnregister(key: string): void {
   tutorialTargets.delete(key);
   tutorialTargetRegistryVersion.update((v) => v + 1);
+}
+
+// Re-prepares if the active step's target vanished (e.g. the player switched heroes), so the overlay never waits on it forever.
+export function tutorialRestoreActiveTarget(): void {
+  tutorialTargetRegistryVersion();
+  const step = activeTutorialStepView()?.step;
+  if (!step?.targetKey || tutorialTargets.has(step.targetKey)) return;
+  step.prepare?.();
 }
 
 // Reads the version signal unconditionally so computed()/effect() callers re-run once a target (re)registers.

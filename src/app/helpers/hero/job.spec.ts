@@ -11,6 +11,7 @@ import {
   getUnlockedJobs,
   heroSkillsAtLevel,
   heroSkillsWithEquipment,
+  partyFirstBurstSkillHero,
 } from '@helpers/hero/job';
 import type {
   EquipmentId,
@@ -20,7 +21,7 @@ import type {
   TrainerTeachingId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { buildEquipmentItem } from '@/testing/builders';
+import { buildCharacter, buildEquipmentItem } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 
 describe('Job Helper Functions', () => {
@@ -281,6 +282,17 @@ describe('Job Helper Functions', () => {
       expect(
         characterCombatSkills(hero(['Tempest', 'Unknown'])).map((s) => s.id),
       ).toEqual(['Strike', 'Tempest']);
+    });
+
+    it('finds the first party hero with a burst skill', () => {
+      const plain = ensureJob({ id: 'job-plain' as JobId, name: 'Plain' });
+      seedContent([job, plain, strike, inferno1, inferno2, tempest]);
+      const party = [
+        buildCharacter({ name: 'A', jobId: plain.id }),
+        buildCharacter({ name: 'B', jobId: job.id }),
+      ];
+      expect(partyFirstBurstSkillHero(party)?.name).toBe('B');
+      expect(partyFirstBurstSkillHero([party[0]])).toBeUndefined();
     });
   });
 });

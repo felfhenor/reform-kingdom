@@ -12,6 +12,7 @@ import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-bl
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { TooltipSkillPreviewComponent } from '@components/tooltip-skill-preview/tooltip-skill-preview.component';
 import { SFXDirective } from '@directives/sfx.directive';
+import { TutorialTargetDirective } from '@directives/tutorial-target.directive';
 import { combatantFromCharacter } from '@helpers/combat/combat-create';
 import { getEntry } from '@helpers/content/content';
 import { heroBurstSkillsModalOpen } from '@helpers/engine/ui';
@@ -40,6 +41,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     ButtonGlowComponent,
     SlotIconBlankComponent,
     SFXDirective,
+    TutorialTargetDirective,
     DecimalPipe,
     SlotButtonContainerComponent,
   ],

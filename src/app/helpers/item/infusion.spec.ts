@@ -22,6 +22,7 @@ import {
   equipmentItemSlotCount,
   infusionMaterialCost,
   isInfusionMaterial,
+  isInfusionUnlocked,
 } from '@helpers/item/infusion';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import { ensureAffix } from '@helpers/content/ensure-affix';
@@ -263,6 +264,29 @@ describe('Infusion Helper Functions', () => {
         affixIds: [slotAffix.id],
       };
       expect(equipmentItemSlotCount(withAffix)).toBe(3);
+    });
+  });
+
+  describe('isInfusionUnlocked', () => {
+    function discover(...ids: ItemId[]) {
+      seedGamestate((state) => {
+        ids.forEach((id) => (state.discoveredMaterials[id] = { foundAt: 1 }));
+      });
+    }
+
+    it('is locked on a fresh game', () => {
+      discover();
+      expect(isInfusionUnlocked()).toBe(false);
+    });
+
+    it('ignores discovered materials that grant nothing when infused', () => {
+      discover(plainMaterial.id, goldCoin.id);
+      expect(isInfusionUnlocked()).toBe(false);
+    });
+
+    it('unlocks once any infusion material is discovered', () => {
+      discover(plainMaterial.id, crystal.id);
+      expect(isInfusionUnlocked()).toBe(true);
     });
   });
 

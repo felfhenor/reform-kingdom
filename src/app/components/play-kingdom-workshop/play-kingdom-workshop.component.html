@@ -1,0 +1,95 @@
+@let item = selectedItem();
+@let itemDisplay = selectedItemDisplay();
+@let tab = activeTab();
+@let canModify = modifiable();
+
+<app-card-page heightProfile="full">
+  <span header>Workshop</span>
+
+  <app-button-kingdom-back pageactions />
+
+  <div pageactionssecondary>
+    <ng-container [appTeleportOutlet]="actionOutlet"></ng-container>
+  </div>
+
+  @if (tab) {
+    <div class="grid grid-cols-[260px_300px_1fr] gap-4 h-full min-h-0">
+      <app-panel-equipment-picker
+        [(source)]="selectedSource"
+        [(selectedItemId)]="selectedEquipmentItemId"
+        [armoryFilter]="armoryFilter"
+        [itemEnabled]="itemEnabled()"
+        [itemMeta]="workshopMeta"
+        emptyArmoryText="No modifiable gear in the armory."
+      />
+
+      <ng-template #workshopMeta let-sourceItem let-enabled="enabled">
+        @if (tab?.id === 'reforge') {
+          @if (enabled) {
+            @let affixCount = sourceItem.affixIds.length;
+            {{ affixCount | number }}
+            {{ 'affix' | pluralize: affixCount !== 1 }}
+          } @else {
+            <span class="italic">Common gear cannot be reforged</span>
+          }
+        } @else if (enabled) {
+          {{ filledSlotCount(sourceItem) | number }}/{{
+            slotCountFor(sourceItem) | number
+          }}
+          infusion slots used
+        } @else {
+          <span class="italic">No infusion slots</span>
+        }
+      </ng-template>
+
+      <div class="flex flex-col gap-2 h-full min-h-0 pl-2">
+        <div role="tablist" class="tabs tabs-boxed shrink-0">
+          @for (option of tabs(); track option.id) {
+            @let active = tab?.id === option.id;
+
+            <button
+              type="button"
+              role="tab"
+              class="tab flex gap-2 items-center"
+              [class.tab-active]="active"
+              [class.font-bold]="active"
+              [appTutorialTarget]="option.tutorialTarget"
+              (click)="activeTab.set(option)"
+              appSfx="ui-click"
+              [sfxOffset]="$index"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              <app-icon [name]="option.icon" size="row" />
+              {{ option.label }}
+            </button>
+          }
+        </div>
+
+        @if (item && itemDisplay) {
+          @switch (tab?.id) {
+            @case ('reforge') {
+              <app-panel-kingdom-workshop-reforge
+                [item]="item"
+                [display]="itemDisplay"
+                [modifiable]="canModify"
+                [actionOutlet]="actionOutlet"
+              />
+            }
+            @case ('infuse') {
+              <app-panel-kingdom-workshop-infuse
+                [item]="item"
+                [display]="itemDisplay"
+                [modifiable]="canModify"
+                [actionOutlet]="actionOutlet"
+              />
+            }
+          }
+        } @else {
+          <app-blank-slate>Select an item to modify it.</app-blank-slate>
+        }
+      </div>
+    </div>
+  } @else {
+    <app-blank-slate>The Workshop has nothing to offer yet.</app-blank-slate>
+  }
+</app-card-page>

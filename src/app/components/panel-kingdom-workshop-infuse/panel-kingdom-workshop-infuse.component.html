@@ -1,0 +1,136 @@
+@let currentItem = item();
+@let slotIndex = selectedSlotIndex();
+@let materials = infusionMaterials();
+@let canModify = modifiable();
+
+<ng-container *appTeleportTo="actionOutlet()">
+  @let selected = selectedInfusion();
+
+  <app-slot-button-container
+    [disabled]="!modifiable() || !selected"
+    [helpText]="'Equipped gear cannot be infused in combat.'"
+  >
+    <button
+      class="btn btn-primary btn-sm"
+      [disabled]="!selected || !canAffordMaterial(selected.item.id)"
+      appSfx="ui-click"
+      [sfxTrigger]="['click', 'hover']"
+      (click)="$event.shiftKey || requestInfuse(selected, $event)"
+      (click.shift)="requestInfuse(selected, $event, true)"
+    >
+      Infuse
+
+      @if (selected) {
+        <app-row-currency-cost [costs]="selectedInfusionCost()" />
+      }
+    </button>
+  </app-slot-button-container>
+</ng-container>
+
+<app-detail-item-preview
+  class="shrink-0"
+  [display]="display()"
+  [showEquippableBy]="false"
+>
+  @if (slotCount() > 0) {
+    <div class="type-hint mb-2">
+      Click a slot to choose what to infuse into it.
+    </div>
+
+    <app-row-infused-materials
+      [infusedItemIds]="currentItem.infusedItemIds"
+      [maxSlots]="slotCount()"
+      [selectable]="true"
+      [selectedSlotIndex]="slotIndex"
+      (slotClick)="selectSlot($event)"
+    />
+  }
+</app-detail-item-preview>
+
+@if (slotCount() > 0) {
+  @if (slotIndex !== undefined) {
+    <div class="flex flex-col flex-1 min-h-0">
+      <div class="type-label mb-2 shrink-0">
+        Infuse Slot {{ slotIndex + 1 }}
+      </div>
+
+      @if (materials.length > 0) {
+        <div
+          class="flex flex-col gap-2 pr-2 flex-1 min-h-0 overflow-y-auto"
+          appListReflow
+        >
+          @for (entry of materials; track entry.item.id) {
+            @let cost = materialCost(entry.item.id);
+            @let affordable = canAffordMaterial(entry.item.id);
+
+            <button
+              appListRow
+              [disabled]="!affordable || !canModify"
+              [listRowSelected]="selectedInfusion() === entry"
+              appSfx="ui-click"
+              [sfxOffset]="$index"
+              [sfxTrigger]="['click', 'hover']"
+              (click)="selectedInfusion.set(entry)"
+            >
+              <app-slot-rarity-outline
+                class="shrink-0"
+                [entry]="entry.item"
+                spritesheet="item"
+              ></app-slot-rarity-outline>
+
+              <div class="flex flex-col gap-2 min-w-0">
+                <span
+                  class="type-entity-name truncate text-{{ entry.item.rarity }}"
+                >
+                  {{ entry.item.name }} (x{{ entry.quantity }})
+                </span>
+
+                <div>
+                  <app-row-stat-summary
+                    [stats]="entry.item.infusionStats!"
+                    [resistances]="entry.item.infusionDebuffResistances"
+                    [combatStats]="entry.item.infusionCombatStats"
+                    [monsterTypeDamage]="entry.item.infusionMonsterTypeDamage"
+                    [elementalResistances]="
+                      entry.item.infusionElementalResistances
+                    "
+                    [elementalBoons]="entry.item.infusionElementalBoons"
+                    [layout]="'row'"
+                    [maxDecimals]="1"
+                  />
+
+                  <app-row-gather-yield-bonuses
+                    [bonuses]="materialGatherYieldBonuses(entry.item)"
+                  />
+
+                  <app-row-skill-stat-bonuses
+                    [bonuses]="materialSkillStatBonuses(entry.item)"
+                  />
+                </div>
+              </div>
+
+              <app-currency-cost
+                [type]="goldCoinItemId"
+                [amount]="cost"
+                class="ml-auto mr-2 shrink-0"
+              />
+            </button>
+          }
+        </div>
+      } @else {
+        <app-blank-slate>No infusable materials owned.</app-blank-slate>
+      }
+    </div>
+  }
+} @else {
+  <app-blank-slate>This item has no infusion slots.</app-blank-slate>
+}
+
+<swal
+  #infuseSwal
+  title="Infuse this slot?"
+  icon="warning"
+  confirmButtonText="Yes, infuse it"
+  cancelButtonText="Cancel"
+  (confirm)="confirmInfuse()"
+></swal>

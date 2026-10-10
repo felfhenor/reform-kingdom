@@ -1,3 +1,6 @@
+import { heroesSelectCharacter } from '@helpers/engine/ui';
+import { partyFirstBurstSkillHero } from '@helpers/hero/job';
+import { worldPartyState } from '@helpers/state-game';
 import type { TutorialDefinition } from '@interfaces';
 
 export const TUTORIAL_CATALOG: TutorialDefinition[] = [
@@ -64,11 +67,11 @@ export const TUTORIAL_CATALOG: TutorialDefinition[] = [
     trigger: { kind: 'first-infusion-material' },
     steps: [
       {
-        targetKey: 'kingdom-subview-infusion',
+        targetKey: 'kingdom-workshop-tab-infuse',
         view: 'kingdom',
-        subview: 'infusion',
+        subview: 'workshop',
         title: 'Infusion',
-        body: 'Infuse your equipment with various materials found on your travels to increase your exploration and combat power!',
+        body: 'Here you can infuse your equipment with materials found on your travels to increase your exploration and combat power!',
       },
     ],
   },
@@ -78,11 +81,11 @@ export const TUTORIAL_CATALOG: TutorialDefinition[] = [
     trigger: { kind: 'first-reforge-reagent' },
     steps: [
       {
-        targetKey: 'kingdom-subview-reforge',
+        targetKey: 'kingdom-workshop-tab-reforge',
         view: 'kingdom',
-        subview: 'reforge',
+        subview: 'workshop',
         title: 'Reforge',
-        body: 'Spend gold and Duskhall Flux to reroll the affixes on a piece of equipment.',
+        body: 'Here you can reforge your gear by spending gold and Duskhall Flux to reroll the affixes on a piece of equipment!',
       },
     ],
   },
@@ -105,7 +108,7 @@ export const TUTORIAL_CATALOG: TutorialDefinition[] = [
     trigger: { kind: 'party-level', level: 3 },
     steps: [
       {
-        targetKey: 'nav-heroes',
+        targetKey: 'hero-combat-orders',
         view: 'heroes',
         title: 'Combat Orders',
         body: 'Each hero has a Combat Orders button that you can use to loosely guide their actions in combat.',
@@ -149,6 +152,23 @@ export const TUTORIAL_CATALOG: TutorialDefinition[] = [
         view: 'heroes',
         title: 'Teachings',
         body: 'Trainers around the world teach permanent upgrades to your heroes. Each teaching is learned per hero, per job, and applies to every job the hero has unlocked.',
+      },
+    ],
+  },
+  {
+    id: 'burst-skills',
+    name: 'Burst Skills',
+    trigger: { kind: 'first-burst-skill' },
+    steps: [
+      {
+        targetKey: 'hero-burst-skill',
+        view: 'heroes',
+        prepare: () => {
+          const hero = partyFirstBurstSkillHero(worldPartyState());
+          if (hero) heroesSelectCharacter(hero.id);
+        },
+        title: 'Burst Skills',
+        body: 'This hero has learned a burst skill - a powerful special attack. Each hero can slot one burst skill per job here, and it will be used in combat alongside their normal skills.',
       },
     ],
   },

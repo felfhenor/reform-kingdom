@@ -7,7 +7,11 @@ import {
 } from '@helpers/hero/character-equipment';
 import { rollAffixIds } from '@helpers/item/affix';
 import { equipmentItemSlotCount } from '@helpers/item/infusion';
-import { goldCoinId, reforgeReagentId } from '@helpers/item/materials';
+import {
+  goldCoinId,
+  isMaterialDiscovered,
+  reforgeReagentId,
+} from '@helpers/item/materials';
 import { RARITY_SELL_MULTIPLIER } from '@helpers/kingdom/armory';
 import {
   stateCanAffordCost,
@@ -31,6 +35,10 @@ export const REFORGE_REAGENT_BY_RARITY: Record<DropRarity, number> = {
   Mystical: 3,
   Legendary: 5,
 };
+
+export function isReforgeUnlocked(): boolean {
+  return isMaterialDiscovered(reforgeReagentId());
+}
 
 export function isReforgeable(content: EquipmentContent): boolean {
   return AffixCountByRarity[content.rarity] > 0;
