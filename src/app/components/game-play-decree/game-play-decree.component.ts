@@ -10,14 +10,13 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RISK_BAND_DIFFICULTY } from '@helpers/engine/difficulty-tier';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { OptionRewardComponent } from '@components/option-reward/option-reward.component';
 import { RowDecreeClauseComponent } from '@components/row-decree-clause/row-decree-clause.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
-import { ListReflowDirective } from '@directives/list-reflow.directive';
 import { ListReflowDragDirective } from '@directives/list-reflow-drag.directive';
+import { ListReflowDirective } from '@directives/list-reflow.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { HIGH_RISK_LEVELS_ABOVE_PARTY } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
@@ -47,6 +46,7 @@ import {
   decreeSetWaitForFullEnergyBeforeCombat,
   decreeSetWaitForFullHealthBeforeCombat,
 } from '@helpers/decree/decree.ui';
+import { RISK_BAND_DIFFICULTY } from '@helpers/engine/difficulty-tier';
 import { homeNodeGet } from '@helpers/town/town-spawn';
 import {
   gatherNodeFarmOptions,
@@ -97,6 +97,8 @@ type RiskToleranceOption = {
 };
 
 type MaterialOption = RewardContentInfo & { id: MaterialId };
+
+const DEFAULT_DECREE_GATHER_QUANTITY = 100;
 
 const RISK_TOLERANCE_OPTIONS: RiskToleranceOption[] = [
   {
@@ -206,7 +208,7 @@ export class GamePlayDecreeComponent {
   public draftMaterialId = signal<MaterialId | undefined>(undefined);
   public draftNodeName = signal<string | undefined>(undefined);
   public draftRewardKey = signal<string | undefined>(undefined);
-  public draftTargetQuantity = signal<number>(100);
+  public draftTargetQuantity = signal<number>(DEFAULT_DECREE_GATHER_QUANTITY);
   public draftRiskTolerance = signal<DecreeRiskLevel>('Medium');
   // Undefined = "any town"
   public draftTownName = signal<string | undefined>(undefined);
@@ -408,7 +410,7 @@ export class GamePlayDecreeComponent {
     this.draftMaterialId.set(undefined);
     this.draftNodeName.set(undefined);
     this.draftRewardKey.set(undefined);
-    this.draftTargetQuantity.set(100);
+    this.draftTargetQuantity.set(DEFAULT_DECREE_GATHER_QUANTITY);
     this.draftRiskTolerance.set('Medium');
     this.draftTownName.set(undefined);
   }
@@ -424,7 +426,7 @@ export class GamePlayDecreeComponent {
 
     if (succeeded) {
       this.editingClauseId.set(undefined);
-      this.draftTargetQuantity.set(1);
+      this.draftTargetQuantity.set(DEFAULT_DECREE_GATHER_QUANTITY);
     }
   }
 }
