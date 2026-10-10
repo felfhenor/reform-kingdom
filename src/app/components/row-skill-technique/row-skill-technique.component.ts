@@ -5,6 +5,8 @@ import {
   computed,
   input,
 } from '@angular/core';
+import { IconElementChargeComponent } from '@components/icon-element-charge/icon-element-charge.component';
+import { TippyDirective } from '@ngneat/helipopper';
 import type { SkillTechniqueKind, SkillTechniquePreview } from '@interfaces';
 import { StatShorthand } from '@interfaces';
 
@@ -21,7 +23,7 @@ const kindClasses: Record<SkillTechniqueKind, string> = {
 @Component({
   selector: 'app-row-skill-technique',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, IconElementChargeComponent, TippyDirective],
   templateUrl: './row-skill-technique.component.html',
 })
 export class RowSkillTechniqueComponent {

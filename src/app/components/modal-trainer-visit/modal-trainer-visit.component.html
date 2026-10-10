@@ -7,10 +7,6 @@
 >
   <span title>{{ trainer()?.name ?? 'Trainer' }}</span>
 
-  @if (trainer(); as trainerContent) {
-    <p subtitle>{{ trainerContent.description }}</p>
-  }
-
   <div body class="flex flex-col gap-4">
     <div class="grid grid-cols-[220px_minmax(0,1fr)] gap-4">
       <div class="flex flex-col gap-2">

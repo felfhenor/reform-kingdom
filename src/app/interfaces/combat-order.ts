@@ -1,6 +1,7 @@
 import type { CharacterId } from '@interfaces/character';
 import type { Combatant, CombatantTargettingType } from '@interfaces/combat';
 import type { EquipmentSkill } from '@interfaces/content-skill';
+import type { GameElement } from '@interfaces/element';
 import type { Branded } from '@interfaces/identifiable';
 
 export type CombatOrderClauseId = Branded<string, 'CombatOrderClauseId'>;
@@ -37,6 +38,12 @@ export type CombatOrderCondition =
   | CombatOrderHealthCountCondition
   | { type: 'EnemyCount'; comparator: CombatOrderComparator; count: number }
   | { type: 'SelfHasNoSummon' }
+  | {
+      type: 'ElementCount';
+      element: GameElement;
+      comparator: CombatOrderComparator;
+      count: number;
+    }
   | {
       type: 'SpecificHeroHealthPercent';
       characterId: CharacterId;

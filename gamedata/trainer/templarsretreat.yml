@@ -2,4 +2,5 @@
   name: Fio Kaipo
   description: An explorer at heart. This trainer explores every nook and cranny everywhere possible, often getting into unpredictable and uncomfortable situations.
 
-  trainerTeachingIds: []
+  trainerTeachingIds:
+    - 'Burst: Prismatic Burst III'

@@ -22,6 +22,7 @@ export const URGENCY_WARNING_MIN_TICKS = 300; // 5 minutes
 
 export const COMBAT_ORDER_ROW_CAP = 10;
 export const SKILL_MAX_ALLY_TARGETS = 4;
+export const COMBAT_ELEMENT_CHARGES_PER_ELEMENT = 2;
 
 // Resistance can't reach immunity; a weakness can at most double incoming damage.
 export const ELEMENT_RESISTANCE_MAX = 75;
@@ -90,6 +91,7 @@ export const HEALING_MINIMUM_SECONDS = 10;
 export const HEALING_SECONDS_PER_LEVEL = 2;
 export const RECLASS_GOLD_PER_LEVEL = 100;
 export const CHARACTER_MAX_LEVEL = 99;
+export const HERO_BURST_SKILL_SLOTS = 1;
 export const CHARACTER_XP_START = 100;
 export const CHARACTER_XP_END = 100000;
 export const RESTING_REGEN_PERCENT = 0.01;

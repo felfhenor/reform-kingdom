@@ -19,12 +19,13 @@
         <div class="type-page-title flex justify-center relative">
           <ng-content select="[title]"></ng-content>
 
-          @if (showCloseButton()) {
-            <app-button-close
-              class="absolute top-[-4px] right-2"
-              (click)="closeModal()"
-            ></app-button-close>
-          }
+          <div class="absolute top-[-4px] right-2 flex items-center gap-2">
+            <ng-content select="[titleActions]"></ng-content>
+
+            @if (showCloseButton()) {
+              <app-button-close (click)="closeModal()"></app-button-close>
+            }
+          </div>
         </div>
 
         <div class="type-flavor text-center empty:hidden">

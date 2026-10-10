@@ -286,6 +286,9 @@
     - skillId: Attack
       weight: 1
 
+    - skillId: Pocket Sand
+      weight: 2
+
     - skillId: Cure I
       weight: 2
 

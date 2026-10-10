@@ -25,6 +25,8 @@ export type SkillTechniquePreview = {
   conditions: string[];
   scaling: SkillStatScaling[];
   elements: GameElement[];
+  // Charges this technique adds to the combat element pool.
+  generatedElements: GameElement[];
   statusEffects: SkillTechniqueStatusPreview[];
   // 100 when the technique can't miss on its own.
   accuracy: number;

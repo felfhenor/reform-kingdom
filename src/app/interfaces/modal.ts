@@ -1,6 +1,7 @@
 export type ModalId =
   | 'caravan-trade'
   | 'combat-orders'
+  | 'hero-burst-skills'
   | 'hero-teachings'
   | 'loot-filters'
   | 'outpost-teleport'

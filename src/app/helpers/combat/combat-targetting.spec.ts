@@ -34,6 +34,8 @@ function buildTechnique(
 }
 
 describe('combatAvailableSkillsForCombatant', () => {
+  const combat = buildCombat();
+
   it('excludes skills whose epCost exceeds the combatant current ep', () => {
     const affordable = buildEquipmentSkill({
       id: 'cheap' as EquipmentSkillId,
@@ -49,7 +51,7 @@ describe('combatAvailableSkillsForCombatant', () => {
       skillRefs: [affordable, tooExpensive],
     });
 
-    const available = combatAvailableSkillsForCombatant(combatant);
+    const available = combatAvailableSkillsForCombatant(combat, combatant);
 
     expect(available.map((s) => s.id)).toEqual(['cheap']);
   });
@@ -58,7 +60,9 @@ describe('combatAvailableSkillsForCombatant', () => {
     const skill = buildEquipmentSkill({ epCost: 10 });
     const combatant = buildTestCombatant({ ep: 10, skillRefs: [skill] });
 
-    expect(combatAvailableSkillsForCombatant(combatant)).toEqual([skill]);
+    expect(combatAvailableSkillsForCombatant(combat, combatant)).toEqual([
+      skill,
+    ]);
   });
 
   it('excludes a skill made unaffordable by an EP cost increase', () => {
@@ -69,7 +73,7 @@ describe('combatAvailableSkillsForCombatant', () => {
       combatStats: { ...defaultCombatStats(), epCostIncreasePercent: 50 },
     });
 
-    expect(combatAvailableSkillsForCombatant(combatant)).toEqual([]);
+    expect(combatAvailableSkillsForCombatant(combat, combatant)).toEqual([]);
   });
 
   it('still excludes skills that are out of uses even if ep is available', () => {
@@ -84,7 +88,34 @@ describe('combatAvailableSkillsForCombatant', () => {
       skillUses: { ['limited' as EquipmentSkillId]: 1 },
     });
 
-    expect(combatAvailableSkillsForCombatant(combatant)).toEqual([]);
+    expect(combatAvailableSkillsForCombatant(combat, combatant)).toEqual([]);
+  });
+
+  it('excludes a skill whose element costs exceed the pool', () => {
+    const skill = buildEquipmentSkill({
+      elementCosts: { Fire: 2, Water: 0, Earth: 0, Air: 0 },
+    });
+    const combatant = buildTestCombatant({ skillRefs: [skill] });
+
+    const short = buildCombat({
+      elements: { Fire: 1, Water: 2, Earth: 2, Air: 2 },
+    });
+    const full = buildCombat({
+      elements: { Fire: 2, Water: 0, Earth: 0, Air: 0 },
+    });
+
+    expect(combatAvailableSkillsForCombatant(short, combatant)).toEqual([]);
+    expect(combatAvailableSkillsForCombatant(full, combatant)).toEqual([skill]);
+  });
+
+  it('excludes a skill on cooldown', () => {
+    const skill = buildEquipmentSkill({ id: 'burst' as EquipmentSkillId });
+    const combatant = buildTestCombatant({
+      skillRefs: [skill],
+      skillCooldowns: { ['burst' as EquipmentSkillId]: 1 },
+    });
+
+    expect(combatAvailableSkillsForCombatant(combat, combatant)).toEqual([]);
   });
 });
 

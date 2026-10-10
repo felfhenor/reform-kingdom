@@ -2,10 +2,19 @@ import {
   combatCombatantCombatStatSucceedsChance,
   combatCombatantSkillEpCost,
 } from '@helpers/combat/combat-stats';
+import {
+  elementPool,
+  elementPoolCanPay,
+} from '@helpers/combat/combat-element-pool';
+import { combatantSkillOnCooldown } from '@helpers/combat/combat-skill-cooldown';
 import { combatantHasActiveStatusEffect } from '@helpers/combat/combat-statuseffects';
 import { combatantHasLivingSummon } from '@helpers/combat/combat-summon';
 import { getEntry } from '@helpers/content/content';
-import { skillTechniqueNumTargets, skillUses } from '@helpers/hero/skill';
+import {
+  skillElementCosts,
+  skillTechniqueNumTargets,
+  skillUses,
+} from '@helpers/hero/skill';
 import type {
   Combat,
   Combatant,
@@ -22,8 +31,10 @@ import type {
 import { intersection, sampleSize, sortBy, union } from 'es-toolkit/compat';
 
 export function combatAvailableSkillsForCombatant(
+  combat: Combat,
   combatant: Combatant,
 ): EquipmentSkill[] {
+  const pool = elementPool(combat);
   return [
     ...combatant.skillIds.map((s) => getEntry<EquipmentSkill>(s)!),
     ...combatant.skillRefs,
@@ -31,7 +42,9 @@ export function combatAvailableSkillsForCombatant(
     (skill) =>
       (skill.usesPerCombat === -1 ||
         (combatant.skillUses[skill.id] ?? 0) < skillUses(skill)) &&
-      combatant.ep >= combatCombatantSkillEpCost(combatant, skill),
+      combatant.ep >= combatCombatantSkillEpCost(combatant, skill) &&
+      elementPoolCanPay(pool, skillElementCosts(skill)) &&
+      !combatantSkillOnCooldown(combatant, skill),
   );
 }
 

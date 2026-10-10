@@ -200,3 +200,26 @@
 
   jobIds:
     - Ranger
+
+- id: 8e92d5f3-069f-41ba-bf76-0a1add84771d
+  name: 'Burst: Prismatic Burst IV'
+
+  effects:
+    - kind: GrantSkill
+      skillId: Prismatic Burst IV
+
+  requiredLevel: 38
+
+  costs:
+    - itemId: Crimson Lucre
+      required: 7500
+
+    - itemId: Gold Ingot
+      required: 10
+
+  jobIds:
+    - Explorer
+    - Warrior
+    - Ranger
+    - Magician
+    - Healer

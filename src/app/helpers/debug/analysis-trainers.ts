@@ -7,6 +7,7 @@
 
 import { CHARACTER_MAX_LEVEL } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { skillIsSpecial } from '@helpers/hero/skill';
 import { allMaps } from '@helpers/maps';
 import type {
   AnalysisCheck,
@@ -135,8 +136,11 @@ function effectProblems(teaching: TrainerTeachingContent): string[] {
   if (teaching.effects.length === 0) problems.push('has no effects');
   teaching.effects.forEach((effect) => {
     if (effect.kind === 'GrantSkill') {
-      if (!getEntry<EquipmentSkillContent>(effect.skillId)) {
+      const skill = getEntry<EquipmentSkillContent>(effect.skillId);
+      if (!skill) {
         problems.push(`grants unknown skill "${effect.skillId}"`);
+      } else if (!skillIsSpecial(skill)) {
+        problems.push(`grants non-special skill "${effect.skillId}"`);
       }
       return;
     }

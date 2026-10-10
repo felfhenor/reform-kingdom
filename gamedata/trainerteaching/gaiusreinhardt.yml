@@ -89,3 +89,22 @@
 
   jobIds:
     - Healer
+
+- id: b859c4c6-8a0b-49c0-a711-76180cbea569
+  name: 'Burst: Landslide'
+
+  effects:
+    - kind: GrantSkill
+      skillId: Landslide
+
+  requiredLevel: 15
+
+  costs:
+    - itemId: Gold Coin
+      required: 5000
+
+    - itemId: Malachite
+      required: 5
+
+  jobIds:
+    - Warrior

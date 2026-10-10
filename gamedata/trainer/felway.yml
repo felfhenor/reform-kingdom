@@ -1,0 +1,6 @@
+- id: cb005f0e-1e0f-4e95-9053-aa105a94185f
+  name: Gorm
+  description: A demon magician more sagely than the average demon. To some, he was called Gorm the Lesser, but they don't say that anymore.
+
+  trainerTeachingIds:
+    - 'Burst: Prismatic Burst V'

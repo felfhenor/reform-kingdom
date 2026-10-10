@@ -23,6 +23,7 @@ import type {
   SkillStatBonus,
   SkillStatBonusContext,
   SkillStatBonusSource,
+  TrainerTeachingContent,
 } from '@interfaces';
 import { groupBy, min, sortBy } from 'es-toolkit/compat';
 
@@ -74,15 +75,16 @@ function jobFamilies(job: JobContent): string[] {
   );
 }
 
-// Families a hero can ever cast: learned on a job path, or granted by gear.
+// Families a hero can ever cast: learned on a job path, granted by gear, or taught by a trainer.
 function heroCastableFamilies(
   jobs: JobContent[],
   equipment: EquipmentContent[],
   affixes: AffixContent[],
 ): Set<string> {
+  const teachings = getEntriesByType<TrainerTeachingContent>('trainerteaching');
   return new Set(
-    collectSkillReferences(jobs, [], equipment, affixes).flatMap((reference) =>
-      familyOfSkill(reference.skillRef),
+    collectSkillReferences(jobs, [], equipment, affixes, teachings).flatMap(
+      (reference) => familyOfSkill(reference.skillRef),
     ),
   );
 }

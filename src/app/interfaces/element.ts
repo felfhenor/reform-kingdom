@@ -12,11 +12,18 @@ export const GameElementOrder: GameElement[] = [
   'Air',
 ];
 
-const GameElementIcon: Record<GameElement, Icon> = {
+export const GameElementIcon: Record<GameElement, Icon> = {
   Fire: 'gameSmallFire',
   Water: 'gameIceCube',
   Earth: 'gameStonePile',
   Air: 'gameSwanBreeze',
+};
+
+export const GameElementTextColor: Record<GameElement, string> = {
+  Fire: 'text-element-Fire',
+  Water: 'text-element-Water',
+  Earth: 'text-element-Earth',
+  Air: 'text-element-Air',
 };
 
 export const ElementResistanceDimension: StatDisplayDimension<GameElement> = {
@@ -28,12 +35,7 @@ export const ElementResistanceDimension: StatDisplayDimension<GameElement> = {
     Air: 'Air Resist',
   },
   icon: GameElementIcon,
-  color: {
-    Fire: 'text-red-600',
-    Water: 'text-blue-600',
-    Earth: 'text-amber-800',
-    Air: 'text-green-400',
-  },
+  color: GameElementTextColor,
 };
 
 export const ElementBoonDimension: StatDisplayDimension<GameElement> = {
@@ -45,10 +47,5 @@ export const ElementBoonDimension: StatDisplayDimension<GameElement> = {
     Air: 'Air Boon',
   },
   icon: GameElementIcon,
-  color: {
-    Fire: 'text-red-600',
-    Water: 'text-blue-600',
-    Earth: 'text-amber-800',
-    Air: 'text-green-400',
-  },
+  color: GameElementTextColor,
 };

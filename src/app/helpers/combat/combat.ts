@@ -15,6 +15,12 @@ import {
 } from '@helpers/combat/combat-log';
 import { pickSkillFromCombatOrders } from '@helpers/combat/combat-order-evaluation';
 import { combatantDamageEventEmit } from '@helpers/combat/combat-damage-events';
+import { combatantPickSkill } from '@helpers/combat/combat-skill-pick';
+import { combatantTickSkillCooldowns } from '@helpers/combat/combat-skill-cooldown';
+import {
+  combatantPaySkillCast,
+  combatFillSkillElements,
+} from '@helpers/combat/combat-skill-elements';
 import {
   combatantAdvanceDelayedSkills,
   combatantQueueDelayedSkill,
@@ -42,7 +48,7 @@ import {
   combatCombatantSkillEpCost,
 } from '@helpers/combat/combat-stats';
 import { skillTechniqueNumTargets } from '@helpers/hero/skill';
-import { rngChoiceWeighted, rngSucceedsChance } from '@helpers/rng';
+import { rngSucceedsChance } from '@helpers/rng';
 import type {
   Combat,
   Combatant,
@@ -116,7 +122,7 @@ function combatantCanAct(combat: Combat, combatant: Combatant): boolean {
 function combatantAct(combat: Combat, combatant: Combatant): boolean {
   if (!combatantCanAct(combat, combatant)) return false;
 
-  const skills = combatAvailableSkillsForCombatant(combatant).filter(
+  const skills = combatAvailableSkillsForCombatant(combat, combatant).filter(
     (s) =>
       combatGetPossibleCombatantTargetsForSkill(combat, combatant, s).length >
       0,
@@ -129,8 +135,7 @@ function combatantAct(combat: Combat, combatant: Combatant): boolean {
       : undefined;
 
   const chosenSkill =
-    combatOrderPick?.skill ??
-    rngChoiceWeighted(skills, (skill) => combatant.skillWeights[skill.id] ?? 1);
+    combatOrderPick?.skill ?? combatantPickSkill(combatant, skills);
   if (!chosenSkill) return false;
 
   combatantMarkSkillUse(combatant, chosenSkill);
@@ -139,12 +144,9 @@ function combatantAct(combat: Combat, combatant: Combatant): boolean {
     chosenSkill.name,
     chosenSkill.sprite,
   );
+  combatantPaySkillCast(combat, combatant, chosenSkill);
 
   if (chosenSkill.delay > 0) {
-    combatMessageLog(
-      combat,
-      `**${combatantMessageToken(combatant)}** begins charging **${chosenSkill.name}**!`,
-    );
     combatantQueueDelayedSkill(combatant, chosenSkill, combatOrderPick);
     return true;
   }
@@ -171,6 +173,8 @@ function combatantUseSkill(
   chosenSkill: EquipmentSkill,
   combatOrderPick?: CombatOrderPick,
 ): void {
+  combatFillSkillElements(combat, chosenSkill);
+
   const capturedCreatorStats = { ...combatant.totalStats };
 
   chosenSkill.techniques.forEach((tech) => {
@@ -295,6 +299,8 @@ export function combatantTakeTurn(
       return {};
     }
   }
+
+  combatantTickSkillCooldowns(combatant);
 
   const firedDelayed = combatantFireDelayedSkills(combat, combatant);
   if (firedDelayed && combatantLogIfDefeated(combat, combatant)) return {};

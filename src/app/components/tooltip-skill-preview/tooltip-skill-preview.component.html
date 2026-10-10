@@ -9,6 +9,9 @@
     <div>
       <div class="type-entity-name mb-1 text-{{ skillData.rarity }}">
         {{ skillData.name }}
+        @if (isSpecial()) {
+          <span class="badge badge-sm badge-info ml-1">Burst</span>
+        }
       </div>
 
       <div class="text-sm">{{ skillDescription() }}</div>
@@ -16,7 +19,23 @@
       @if (skillData.delay > 0) {
         <div class="text-xs mt-1 italic">
           Takes effect after {{ skillData.delay | number }}
-          {{ 'turn' | pluralize: skillData.delay !== 1 }}.
+          {{ 'turn' | pluralize: skillData.delay !== 1 }}
+        </div>
+      }
+
+      @let cooldownTurns = cooldown();
+      @if (cooldownTurns > 0) {
+        <div class="text-xs mt-1 italic">
+          Cooldown: {{ cooldownTurns | number }}
+          {{ 'turn' | pluralize: cooldownTurns !== 1 }}
+        </div>
+      }
+
+      @let costBlock = costs();
+      @if (costBlock) {
+        <div class="flex items-center gap-2 mt-1 text-xs">
+          <span class="type-meta">Cost</span>
+          <app-row-element-charges [block]="costBlock" />
         </div>
       }
 

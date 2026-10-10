@@ -1,0 +1,389 @@
+- id: 2347454d-3320-48c3-ae65-f75d22bf64b4
+  name: Prismatic Burst I
+  family: Prismatic Burst
+  description: Gather every element and then unleash them on every enemy for {{ value }} damage each.
+
+  sprite: '0056'
+
+  rarity: Common
+
+  epCost: 5
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 6
+  delay: 1
+
+  elementCosts:
+    Fire: 1
+    Water: 1
+    Earth: 1
+    Air: 1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Fire]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 0.2
+        Strength: 0.2
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - elements: [Water]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 0.2
+        Strength: 0.2
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - elements: [Earth]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 0.2
+        Strength: 0.2
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - elements: [Air]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 0.2
+        Strength: 0.2
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 679ab000-8a76-41b8-9afb-b0b7fff8a916
+  name: Prismatic Burst II
+  family: Prismatic Burst
+  description: Gather every element and then unleash them on every enemy for {{ value }} damage each.
+
+  sprite: '0056'
+
+  rarity: Uncommon
+
+  epCost: 10
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 5
+  delay: 1
+
+  elementCosts:
+    Fire: 1
+    Water: 1
+    Earth: 1
+    Air: 1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Fire]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 0.4
+        Strength: 0.4
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - elements: [Water]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 0.4
+        Strength: 0.4
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - elements: [Earth]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 0.4
+        Strength: 0.4
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - elements: [Air]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 0.4
+        Strength: 0.4
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 14c253a3-ff0b-40ae-aa54-7a521c42cf00
+  name: Prismatic Burst III
+  family: Prismatic Burst
+  description: Gather every element and then unleash them on every enemy for {{ value }} damage each.
+
+  sprite: '0056'
+
+  rarity: Rare
+
+  epCost: 20
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 4
+  delay: 1
+
+  elementCosts:
+    Fire: 1
+    Water: 1
+    Earth: 1
+    Air: 1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Fire]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 0.6
+        Strength: 0.6
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - elements: [Water]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 0.6
+        Strength: 0.6
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - elements: [Earth]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 0.6
+        Strength: 0.6
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - elements: [Air]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 0.6
+        Strength: 0.6
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: bf81da64-09eb-4fba-a5d0-d63f84a9d0fb
+  name: Prismatic Burst IV
+  family: Prismatic Burst
+  description: Gather every element and then unleash them on every enemy for {{ value }} damage each.
+
+  sprite: '0056'
+
+  rarity: Mystical
+
+  epCost: 30
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 4
+  delay: 1
+
+  elementCosts:
+    Fire: 1
+    Water: 1
+    Earth: 1
+    Air: 1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Fire]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 0.8
+        Strength: 0.8
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - elements: [Water]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 0.8
+        Strength: 0.8
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - elements: [Earth]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 0.8
+        Strength: 0.8
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - elements: [Air]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 0.8
+        Strength: 0.8
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 8e8b9bbd-7963-4770-98a7-1bbf851cf602
+  name: Prismatic Burst V
+  family: Prismatic Burst
+  description: Gather every element and then unleash them on every enemy for {{ value }} damage each.
+
+  sprite: '0056'
+
+  rarity: Legendary
+
+  epCost: 50
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 3
+  delay: 1
+
+  elementCosts:
+    Fire: 1
+    Water: 1
+    Earth: 1
+    Air: 1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Fire]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 1
+        Strength: 1
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - elements: [Water]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 1
+        Strength: 1
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - elements: [Earth]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 1
+        Strength: 1
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - elements: [Air]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 1
+        Strength: 1
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

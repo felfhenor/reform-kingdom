@@ -1,4 +1,4 @@
-// Audits skills: technique tagging, family/tier consistency, and assignment to a job, monster, equipment, or affix.
+// Audits skills: technique tagging, family/tier consistency, and assignment to a job, monster, equipment, affix, or teaching.
 
 import { getEntriesByType } from '@helpers/content/content';
 import { buildMonsterSpawnRanges } from '@helpers/debug/analysis-item-sources';
@@ -40,6 +40,7 @@ import type {
   MonsterContent,
   SkillSource,
   TownContent,
+  TrainerTeachingContent,
 } from '@interfaces';
 import { groupBy, sortBy } from 'es-toolkit/compat';
 
@@ -58,7 +59,7 @@ function skillAllIssues(
     sources.length === 0
       ? [
           analysisWarn(
-            'is not assigned to any job path, monster, equipment, or affix.',
+            'is not assigned to any job path, monster, equipment, affix, or teaching.',
           ),
         ]
       : [];
@@ -135,6 +136,7 @@ export function runSkillsAnalysis(
     monsters,
     getEntriesByType<EquipmentContent>('equipment'),
     getEntriesByType<AffixContent>('affix'),
+    getEntriesByType<TrainerTeachingContent>('trainerteaching'),
   );
   const sources = buildSkillSourceMap(references);
   const spawnRanges = buildMonsterSpawnRanges(

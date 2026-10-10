@@ -11,6 +11,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { IconElementChargeComponent } from '@components/icon-element-charge/icon-element-charge.component';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { RowCombatOrderClauseComponent } from '@components/row-combat-order-clause/row-combat-order-clause.component';
@@ -33,11 +34,14 @@ import {
   isCombatOrderTargetModeAllowedForCondition,
   isCombatOrderTargetModeUsable,
 } from '@helpers/combat/combat-order-evaluation.ui';
-import { COMBAT_ORDER_ROW_CAP } from '@helpers/config';
+import {
+  COMBAT_ELEMENT_CHARGES_PER_ELEMENT,
+  COMBAT_ORDER_ROW_CAP,
+} from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { combatOrdersModalCharacterId } from '@helpers/engine/ui';
 import { defaultEquipment } from '@helpers/defaults';
-import { characterSkills } from '@helpers/hero/job';
+import { characterCombatSkills, characterSkills } from '@helpers/hero/job';
 import { worldPartyState } from '@helpers/state-game';
 import { equippedItemTypes } from '@helpers/item/equipment';
 import type {
@@ -52,8 +56,10 @@ import type {
   CombatOrderHealthDirection,
   EquipmentItemType,
   EquipmentSkillContent,
+  GameElement,
   JobContent,
 } from '@interfaces';
+import { GameElementOrder } from '@interfaces';
 import {
   NgLabelTemplateDirective,
   NgOptionTemplateDirective,
@@ -80,6 +86,7 @@ const CONDITION_TYPE_OPTIONS: SelectOption<CombatOrderCondition['type']>[] = [
   { value: 'EnemyCountHealthPercent', label: 'Enemy Count vs Health %' },
   { value: 'SpecificHeroHealthPercent', label: 'Specific Hero Health %' },
   { value: 'SelfHasNoSummon', label: 'I Have No Summon' },
+  { value: 'ElementCount', label: 'Element Charges' },
 ];
 
 const COMPARATOR_OPTIONS: SelectOption<CombatOrderComparator>[] = [
@@ -105,6 +112,10 @@ const ALL_TARGET_MODE_OPTIONS: SelectOption<CombatantTargettingType | ''>[] = [
   { value: 'MatchingAllies', label: 'Matching Allies' },
   { value: 'MatchingEnemies', label: 'Matching Enemies' },
 ];
+
+const ELEMENT_OPTIONS: SelectOption<GameElement>[] = GameElementOrder.map(
+  (element) => ({ value: element, label: element }),
+);
 
 const DEFAULT_DRAFT_COMPARATOR: CombatOrderComparator = 'LessThan';
 const DEFAULT_DRAFT_HEALTH_DIRECTION: CombatOrderHealthDirection = 'Below';
@@ -136,6 +147,7 @@ const ALWAYS_RANDOM_CLAUSE: CombatOrderClause = {
     NgLabelTemplateDirective,
     AtlasImageComponent,
     IconJobComponent,
+    IconElementChargeComponent,
     SFXDirective,
   ],
   templateUrl: './modal-hero-combat-orders.component.html',
@@ -147,6 +159,8 @@ export class ModalHeroCombatOrdersComponent {
   public readonly conditionTypeOptions = CONDITION_TYPE_OPTIONS;
   public readonly comparatorOptions = COMPARATOR_OPTIONS;
   public readonly healthDirectionOptions = HEALTH_DIRECTION_OPTIONS;
+  public readonly elementOptions = ELEMENT_OPTIONS;
+  public readonly maxElementCharges = COMBAT_ELEMENT_CHARGES_PER_ELEMENT;
   public readonly alwaysRandomClause = ALWAYS_RANDOM_CLAUSE;
 
   public party = computed<Character[]>(() => worldPartyState());
@@ -182,6 +196,12 @@ export class ModalHeroCombatOrdersComponent {
   public heroSkills = computed<EquipmentSkillContent[]>(() => {
     const character = this.character();
     return character ? characterSkills(character) : [];
+  });
+
+  // Burst skills only count as usable while chosen.
+  public combatSkills = computed<EquipmentSkillContent[]>(() => {
+    const character = this.character();
+    return character ? characterCombatSkills(character) : [];
   });
 
   // The gear-free skill list (job path + teachings) - used to flag rows whose
@@ -224,6 +244,7 @@ export class ModalHeroCombatOrdersComponent {
   );
   public draftHealthPercent = signal<number>(50);
   public draftCount = signal<number>(1);
+  public draftElement = signal<GameElement>('Fire');
   public draftConditionCharacterId = signal<CharacterId | undefined>(undefined);
   public draftFamily = signal<string | undefined>(undefined);
   public draftTargetMode = signal<CombatantTargettingType | undefined>(
@@ -291,6 +312,13 @@ export class ModalHeroCombatOrdersComponent {
         };
       case 'EnemyCount':
         return { type: 'EnemyCount', comparator, count: this.draftCount() };
+      case 'ElementCount':
+        return {
+          type: 'ElementCount',
+          element: this.draftElement(),
+          comparator,
+          count: this.draftCount(),
+        };
       case 'SpecificHeroHealthPercent': {
         const characterId = this.draftConditionCharacterId();
         if (!characterId) return undefined;
@@ -335,6 +363,11 @@ export class ModalHeroCombatOrdersComponent {
     const next = option?.value ?? 'Always';
     this.draftConditionType.set(next);
 
+    if (next === 'ElementCount') {
+      this.draftComparator.set('GreaterThanOrEqual');
+      this.draftCount.set(this.maxElementCharges);
+    }
+
     // Clear a stale Matching* selection rather than saving a mismatched clause.
     if (
       !isCombatOrderTargetModeAllowedForCondition(this.draftTargetMode(), next)
@@ -355,6 +388,10 @@ export class ModalHeroCombatOrdersComponent {
     this.draftHealthDirection.set(
       option?.value ?? DEFAULT_DRAFT_HEALTH_DIRECTION,
     );
+  }
+
+  public setDraftElement(option: SelectOption<GameElement> | null): void {
+    this.draftElement.set(option?.value ?? 'Fire');
   }
 
   public setDraftFamily(option: SelectOption<string> | null): void {
@@ -389,7 +426,7 @@ export class ModalHeroCombatOrdersComponent {
     if (clause.action.type !== 'CastSkillFamily') return true;
     return isCombatOrderFamilyUsable(
       clause.action.family,
-      this.heroSkills(),
+      this.combatSkills(),
       this.equippedWeaponTypes(),
     );
   }
@@ -494,6 +531,10 @@ export class ModalHeroCombatOrdersComponent {
     } else if (condition.type === 'EnemyCount') {
       this.draftComparator.set(condition.comparator);
       this.draftCount.set(condition.count);
+    } else if (condition.type === 'ElementCount') {
+      this.draftElement.set(condition.element);
+      this.draftComparator.set(condition.comparator);
+      this.draftCount.set(condition.count);
     } else if (condition.type === 'SpecificHeroHealthPercent') {
       this.draftConditionCharacterId.set(condition.characterId);
       this.draftComparator.set(condition.comparator);
@@ -509,6 +550,7 @@ export class ModalHeroCombatOrdersComponent {
     this.draftHealthDirection.set(DEFAULT_DRAFT_HEALTH_DIRECTION);
     this.draftHealthPercent.set(50);
     this.draftCount.set(1);
+    this.draftElement.set('Fire');
     this.draftConditionCharacterId.set(undefined);
     this.draftFamily.set(undefined);
     this.draftTargetMode.set(undefined);

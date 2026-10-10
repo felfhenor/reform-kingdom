@@ -42,3 +42,26 @@
 
   requiredCollectibleIds:
     - Goblin Ruby
+
+- id: 7f9e6061-0882-49bd-8bac-87269f78d501
+  name: 'Burst: Prismatic Burst I'
+
+  effects:
+    - kind: GrantSkill
+      skillId: Prismatic Burst I
+
+  requiredLevel: 10
+
+  costs:
+    - itemId: Gold Coin
+      required: 1000
+
+    - itemId: Copper Ingot
+      required: 10
+
+  jobIds:
+    - Explorer
+    - Warrior
+    - Ranger
+    - Magician
+    - Healer

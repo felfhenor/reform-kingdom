@@ -48,6 +48,8 @@ function conditionSummary(condition: CombatOrderCondition): string {
       return `if enemy count ${COMPARATOR_SYMBOLS[condition.comparator]} ${condition.count}`;
     case 'SelfHasNoSummon':
       return 'if I have no summon';
+    case 'ElementCount':
+      return `if ${condition.element} charges ${COMPARATOR_SYMBOLS[condition.comparator]} ${condition.count}`;
     case 'SpecificHeroHealthPercent':
       return `if ${heroName(condition.characterId)}'s Health ${COMPARATOR_SYMBOLS[condition.comparator]} ${condition.value}%`;
   }

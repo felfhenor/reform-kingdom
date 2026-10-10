@@ -8,6 +8,7 @@ import { combatFormatMessage } from '@helpers/combat/combat-log';
 import { SKILL_MAX_ALLY_TARGETS } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import {
+  skillTechniqueGeneratedElements,
   skillTechniqueNumTargets,
   skillTechniqueStatScaling,
   skillTechniqueStatusEffectChance,
@@ -19,6 +20,7 @@ import type {
   EquipmentSkillContent,
   EquipmentSkillContentTechnique,
   EquipmentSkillTargetBehaviorData,
+  GameElement,
   MonsterContent,
   SkillTechniqueKind,
   SkillTechniquePreview,
@@ -121,6 +123,7 @@ function skillTechniquePreview(
   combatant: Combatant,
   skill: EquipmentSkillContent,
   technique: EquipmentSkillContentTechnique,
+  generatedElements: GameElement[],
 ): SkillTechniquePreview {
   const kind = skillTechniqueKind(technique);
   const damageElements = combatDamageElements(combatant, technique);
@@ -141,6 +144,7 @@ function skillTechniquePreview(
       ),
     ),
     elements: damageElements.length > 0 ? damageElements : technique.elements,
+    generatedElements,
     statusEffects: skillTechniqueStatusPreviews(skill, technique),
     accuracy: techniqueHasAttribute(technique, 'NeverMisses')
       ? 100
@@ -155,8 +159,9 @@ export function skillTechniquePreviews(
   combatant: Combatant,
   skill: EquipmentSkillContent,
 ): SkillTechniquePreview[] {
-  return skill.techniques.map((technique) =>
-    skillTechniquePreview(combatant, skill, technique),
+  const generated = skillTechniqueGeneratedElements(skill);
+  return skill.techniques.map((technique, i) =>
+    skillTechniquePreview(combatant, skill, technique, generated[i]),
   );
 }
 

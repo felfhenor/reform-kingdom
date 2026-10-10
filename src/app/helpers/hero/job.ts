@@ -1,11 +1,16 @@
 import { getEntriesByType, getEntry } from '@helpers/content/content';
-import { mergeGrantedSkills } from '@helpers/hero/skill';
+import {
+  mergeGrantedSkills,
+  skillIsSpecial,
+  skillNameTier,
+} from '@helpers/hero/skill';
 import { equipmentGrantedSkillIds } from '@helpers/item/equipment';
 import {
   characterAllTeachingIds,
   trainerTeachingGrantedSkillIds,
 } from '@helpers/trainer/trainer-teaching';
 import type {
+  Character,
   CharacterStatSource,
   EquipmentBlock,
   EquipmentSkillContent,
@@ -13,7 +18,7 @@ import type {
   JobContent,
   TrainerTeachingId,
 } from '@interfaces';
-import { sortBy } from 'es-toolkit/compat';
+import { sortBy, uniq } from 'es-toolkit/compat';
 
 export function getUnlockedJobs(): JobContent[] {
   return getEntriesByType<JobContent>('job');
@@ -67,4 +72,60 @@ export function characterSkills(
     character.equipment,
     characterAllTeachingIds(character),
   );
+}
+
+export function characterNormalSkills(
+  character: CharacterStatSource,
+): EquipmentSkillContent[] {
+  return characterSkills(character).filter((skill) => !skillIsSpecial(skill));
+}
+
+// Every unlocked job-path level plus gear and teaching grants, so each learned tier stays pickable.
+function characterUnmergedSkillIds(
+  character: CharacterStatSource,
+  job: JobContent,
+): EquipmentSkillId[] {
+  return uniq([
+    ...job.skillPath.flatMap((path) =>
+      path.levels
+        .filter((entry) => entry.level <= character.level)
+        .map((entry) => entry.skillId),
+    ),
+    ...equipmentGrantedSkillIds(character.equipment),
+    ...trainerTeachingGrantedSkillIds(characterAllTeachingIds(character)),
+  ]);
+}
+
+export function characterBurstSkillOptions(
+  character: CharacterStatSource,
+): EquipmentSkillContent[] {
+  const job = getEntry<JobContent>(character.jobId);
+  if (!job) return [];
+
+  const specials = resolveSkills(
+    characterUnmergedSkillIds(character, job),
+  ).filter(skillIsSpecial);
+  return sortBy(specials, [
+    (skill) => skill.family,
+    (skill) => skillNameTier(skill.name).tier,
+  ]);
+}
+
+// Drops a chosen skill the hero no longer knows, e.g. after unequipping the gear that granted it.
+export function characterChosenBurstSkills(
+  character: CharacterStatSource & Pick<Character, 'burstSkills'>,
+): EquipmentSkillContent[] {
+  const chosen = character.burstSkills?.[character.jobId] ?? [];
+  return characterBurstSkillOptions(character).filter((skill) =>
+    chosen.includes(skill.id),
+  );
+}
+
+export function characterCombatSkills(
+  character: CharacterStatSource & Pick<Character, 'burstSkills'>,
+): EquipmentSkillContent[] {
+  return [
+    ...characterNormalSkills(character),
+    ...characterChosenBurstSkills(character),
+  ];
 }

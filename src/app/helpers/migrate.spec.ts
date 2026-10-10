@@ -12,6 +12,7 @@ import {
 import { ensureCaravan } from '@helpers/content/ensure-caravan';
 import { ensureJob } from '@helpers/content/ensure-job';
 import { ensureRecipe } from '@helpers/content/ensure-recipe';
+import { ensureSkill } from '@helpers/content/ensure-skill';
 import { ensureTask } from '@helpers/content/ensure-task';
 import { ensureTown } from '@helpers/content/ensure-town';
 import { ensureTradeskill } from '@helpers/content/ensure-tradeskill';
@@ -32,6 +33,7 @@ import type {
   DecreeClause,
   DecreeClauseId,
   EquipmentId,
+  EquipmentSkillId,
   GameState,
   GatheringId,
   ItemId,
@@ -397,6 +399,40 @@ describe('migrateGameState', () => {
     });
 
     expect(migrated.world.party[0].combatOrders).toEqual({});
+  });
+
+  it('backfills burst skills, maps legacy family names to ids, and drops non-special or unknown entries', () => {
+    const inferno = ensureSkill({
+      id: 'inferno' as EquipmentSkillId,
+      name: 'Inferno',
+      family: 'Inferno',
+      special: true,
+    });
+    const strike = ensureSkill({
+      id: 'strike' as EquipmentSkillId,
+      name: 'Strike',
+      family: 'Strike',
+    });
+    seedContent([warrior, inferno, strike]);
+
+    const migrated = migrate((save) => {
+      const legacy: Partial<Character> = buildCharacter();
+      delete legacy.burstSkills;
+      save.world.party = [
+        legacy as Character,
+        buildCharacter({
+          burstSkills: {
+            [warrior.id]: ['strike', 'gone', 'Inferno'] as EquipmentSkillId[],
+            [gone<JobId>('job')]: ['inferno' as EquipmentSkillId],
+          },
+        }),
+      ];
+    });
+
+    expect(migrated.world.party[0].burstSkills).toEqual({});
+    expect(migrated.world.party[1].burstSkills).toEqual({
+      [warrior.id]: ['inferno'],
+    });
   });
 
   it('recomputes global effect sums from what the save still owns', () => {

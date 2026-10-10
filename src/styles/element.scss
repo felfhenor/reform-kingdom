@@ -1,0 +1,20 @@
+:root {
+  --element-fire: #dc2626;
+  --element-water: #2563eb;
+  --element-earth: #92400e;
+  --element-air: #4ade80;
+}
+
+@each $element, $var in (Fire: fire, Water: water, Earth: earth, Air: air) {
+  .text-element-#{$element} {
+    color: var(--element-#{$var});
+  }
+
+  .bg-element-#{$element} {
+    background-color: var(--element-#{$var});
+  }
+
+  .border-element-#{$element} {
+    border-color: var(--element-#{$var});
+  }
+}

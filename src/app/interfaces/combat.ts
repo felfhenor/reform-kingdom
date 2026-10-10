@@ -187,6 +187,7 @@ export type Combatant = HasAnimation & {
   skillUses: Record<EquipmentSkillId, number>;
   // Optional so mid-combat saves still load.
   delayedSkills?: CombatantDelayedSkill[];
+  skillCooldowns?: Record<EquipmentSkillId, number>;
 
   statusEffects: StatusEffect[];
   statusEffectData: CombatantStatusEffectData;
@@ -210,6 +211,8 @@ export type Combat = {
   // Untyped (not TownId) to avoid a circular import.
   raidTownId?: string;
   summonCount?: number;
+  // Shared by both sides; optional so mid-combat saves still load.
+  elements?: ElementBlock;
 };
 
 // A combatant HP change; amount is signed for display (positive = heal).

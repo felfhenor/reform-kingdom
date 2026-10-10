@@ -17,6 +17,7 @@ import type {
   MonsterSkill,
   SkillReference,
   SkillSource,
+  TrainerTeachingContent,
 } from '@interfaces';
 import { intersection, max, range, uniq } from 'es-toolkit/compat';
 
@@ -69,17 +70,36 @@ function affixReferences(affixes: AffixContent[]): SkillReference[] {
   );
 }
 
+function teachingReferences(
+  teachings: TrainerTeachingContent[],
+): SkillReference[] {
+  return teachings.flatMap((teaching) =>
+    teaching.effects.flatMap((effect) =>
+      effect.kind === 'GrantSkill'
+        ? [
+            {
+              skillRef: effect.skillId,
+              source: { kind: 'Teaching' as const, name: teaching.name },
+            },
+          ]
+        : [],
+    ),
+  );
+}
+
 export function collectSkillReferences(
   jobs: JobContent[],
   monsters: MonsterContent[],
   equipment: EquipmentContent[],
   affixes: AffixContent[],
+  teachings: TrainerTeachingContent[],
 ): SkillReference[] {
   return [
     ...jobReferences(jobs),
     ...monsterReferences(monsters),
     ...equipmentReferences(equipment),
     ...affixReferences(affixes),
+    ...teachingReferences(teachings),
   ];
 }
 

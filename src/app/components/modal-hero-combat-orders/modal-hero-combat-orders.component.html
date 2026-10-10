@@ -169,6 +169,59 @@
                 (change)="draftCount.set($any($event.target).valueAsNumber)"
               />
             }
+
+            @if (draftConditionType() === 'ElementCount') {
+              <ng-select
+                class="w-32"
+                [items]="elementOptions"
+                bindLabel="label"
+                bindValue="value"
+                [clearable]="false"
+                [ngModel]="draftElement()"
+                (change)="setDraftElement($event)"
+              >
+                <ng-template ng-option-tmp let-item="item">
+                  <div class="flex items-center gap-2">
+                    <app-icon-element-charge
+                      [element]="item.value"
+                      [filled]="true"
+                      size="sm"
+                    />
+                    {{ item.label }}
+                  </div>
+                </ng-template>
+
+                <ng-template ng-label-tmp let-item="item">
+                  <div class="flex items-center gap-2">
+                    <app-icon-element-charge
+                      [element]="item.value"
+                      [filled]="true"
+                      size="sm"
+                    />
+                    {{ item.label }}
+                  </div>
+                </ng-template>
+              </ng-select>
+
+              <ng-select
+                class="w-24"
+                [items]="comparatorOptions"
+                bindLabel="label"
+                bindValue="value"
+                [clearable]="false"
+                [ngModel]="draftComparator()"
+                (change)="setDraftComparator($event)"
+              ></ng-select>
+
+              <input
+                type="number"
+                min="0"
+                [max]="maxElementCharges"
+                class="input input-bordered input-sm w-20"
+                [value]="draftCount()"
+                (change)="draftCount.set($any($event.target).valueAsNumber)"
+              />
+            }
           </div>
 
           <div class="flex flex-row flex-wrap items-center gap-2">

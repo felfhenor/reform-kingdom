@@ -609,3 +609,123 @@ describe('combatantTakeTurn delayed skills', () => {
     expect(combatApplySkillToTarget).toHaveBeenCalledTimes(2);
   });
 });
+
+describe('combatantTakeTurn element pool and cooldowns', () => {
+  const empty = { Fire: 0, Water: 0, Earth: 0, Air: 0 };
+  const fireTech = ensureEquipmentSkillTechnique({ elements: ['Fire'] });
+  const fireball = skill('fireball', { techniques: [fireTech] });
+  const inferno = skill('inferno', {
+    techniques: [fireTech],
+    elementCosts: { ...empty, Fire: 2 },
+    cooldown: 2,
+  });
+
+  it('fills the pool from an elemental skill, hit or miss', () => {
+    const combat = buildCombat();
+    rollsSucceed('missChance');
+    available(fireball);
+
+    combatantTakeTurn(combat, caster());
+
+    expect(combat.elements).toEqual({ ...empty, Fire: 1 });
+  });
+
+  it('pays element costs on cast without also filling', () => {
+    const combat = buildCombat({ elements: { ...empty, Fire: 2 } });
+    available(inferno);
+
+    combatantTakeTurn(combat, caster());
+
+    expect(combat.elements).toEqual(empty);
+  });
+
+  it('starts the cooldown on cast and ticks it even while stunned', () => {
+    const combatant = caster();
+    available(inferno);
+    combatantTakeTurn(
+      buildCombat({ elements: { ...empty, Fire: 2 } }),
+      combatant,
+    );
+    available();
+    rollsSucceed('stunChance');
+
+    combatantTakeTurn(buildCombat(), combatant);
+    combatantTakeTurn(buildCombat(), combatant);
+
+    expect(combatant.skillCooldowns).toEqual({
+      ['inferno' as EquipmentSkillId]: 1,
+    });
+  });
+
+  it('gives monsters, allied ones included, priority to an available special skill', () => {
+    const slam = skill('slam', { special: true });
+    available(fireball, slam);
+
+    combatantTakeTurn(buildCombat(), caster());
+
+    expect(rngChoiceWeighted).not.toHaveBeenCalled();
+    expect(combatantSkillCastEvents()[0].skillName).toBe('slam');
+  });
+
+  it('leaves special skills to the weighted roll for non-monsters', () => {
+    const slam = skill('slam', { special: true });
+    available(fireball, slam);
+
+    combatantTakeTurn(buildCombat(), caster({ monsterId: undefined }));
+
+    expect(rngChoiceWeighted).toHaveBeenCalled();
+  });
+
+  describe('delayed', () => {
+    const charged = skill('charged', {
+      techniques: [fireTech],
+      elementCosts: { ...empty, Earth: 2 },
+      delay: 1,
+    });
+
+    it('pays costs on the cast turn and releases without rechecking or refilling', () => {
+      const combat = buildCombat({
+        elements: { ...empty, Earth: 2, Water: 2 },
+      });
+      const combatant = caster();
+      available(charged);
+      combatantTakeTurn(combat, combatant);
+      expect(combat.elements).toEqual({ ...empty, Water: 2 });
+
+      available();
+      combatantTakeTurn(combat, combatant);
+
+      expect(combatantSkillCastEvents()).toHaveLength(2);
+      expect(combat.elements).toEqual({ ...empty, Water: 2 });
+    });
+
+    it('keeps the paid costs spent when the queue is cleared before release', () => {
+      const combat = buildCombat({
+        elements: { ...empty, Earth: 2, Water: 2 },
+      });
+      const combatant = caster();
+      available(charged);
+      combatantTakeTurn(combat, combatant);
+      combatant.delayedSkills = [];
+
+      available();
+      combatantTakeTurn(combat, combatant);
+
+      expect(combatantSkillCastEvents()).toHaveLength(1);
+      expect(combat.elements).toEqual({ ...empty, Water: 2 });
+    });
+
+    it('releases a skill copy saved before the element fields existed', () => {
+      const legacy = { ...skill('legacy', { techniques: [fireTech] }) };
+      delete (legacy as Partial<EquipmentSkill>).elementCosts;
+      const combat = buildCombat();
+      const combatant = caster({
+        delayedSkills: [{ skill: legacy as EquipmentSkill, turnsRemaining: 1 }],
+      });
+
+      combatantTakeTurn(combat, combatant);
+
+      expect(combat.elements).toEqual({ ...empty, Fire: 1 });
+    });
+  });
+});

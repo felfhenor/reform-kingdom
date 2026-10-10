@@ -14,7 +14,7 @@ import {
   defaultStats,
   defaultTagResistances,
 } from '@helpers/defaults';
-import { characterSkills } from '@helpers/hero/job';
+import { characterCombatSkills } from '@helpers/hero/job';
 import { skillIsUsableWithEquippedWeapons } from '@helpers/hero/skill';
 import {
   characterTagResistances,
@@ -128,7 +128,7 @@ export function combatantFromCharacter(character: Character): Combatant {
     skillIds: job
       ? heroUsableSkillIds(
           character,
-          characterSkills(character).map((skill) => skill.id),
+          characterCombatSkills(character).map((skill) => skill.id),
         )
       : ['Attack' as EquipmentSkillId],
     skillRefs: [],
@@ -256,5 +256,6 @@ export function combatCreateForEncounter(
     heroes,
     helpers,
     guardians,
+    elements: defaultAffinities(),
   };
 }

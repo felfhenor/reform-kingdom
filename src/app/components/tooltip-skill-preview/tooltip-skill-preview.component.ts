@@ -15,7 +15,14 @@ import type {
 
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { RowSkillTechniqueComponent } from '@components/row-skill-technique/row-skill-technique.component';
-import { skillIsUsableWithEquippedWeapons } from '@helpers/hero/skill';
+import { RowElementChargesComponent } from '@components/row-element-charges/row-element-charges.component';
+import {
+  skillCooldown,
+  skillElementCosts,
+  skillHasElementCosts,
+  skillIsSpecial,
+  skillIsUsableWithEquippedWeapons,
+} from '@helpers/hero/skill';
 import { PluralizePipe } from '@pipes/pluralize.pipe';
 import {
   skillDescriptionWithPreview,
@@ -33,6 +40,7 @@ import {
     PluralizePipe,
     RowSkillTechniqueComponent,
     IconItemPreviewComponent,
+    RowElementChargesComponent,
   ],
   templateUrl: './tooltip-skill-preview.component.html',
   styleUrl: './tooltip-skill-preview.component.scss',
@@ -50,6 +58,14 @@ export class TooltipSkillPreviewComponent {
   public skillTechniques = computed(() =>
     skillTechniquePreviews(this.displayCombatant(), this.display()),
   );
+  public isSpecial = computed(() => skillIsSpecial(this.display()));
+  public cooldown = computed(() => skillCooldown(this.display()));
+  public costs = computed(() =>
+    skillHasElementCosts(this.display())
+      ? skillElementCosts(this.display())
+      : undefined,
+  );
+
   public skillUsable = computed(() =>
     skillIsUsableWithEquippedWeapons(
       this.display(),

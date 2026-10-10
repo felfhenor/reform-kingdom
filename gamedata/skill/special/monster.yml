@@ -1,0 +1,167 @@
+- id: b4650253-1b7b-4f3e-b6b0-f425eef09972
+  name: Silk Snare
+  family: Silk Snare
+  description: Spit sticky silk for {{ value }} damage, with a chance to inflict slow.
+
+  sprite: '0057'
+
+  rarity: Uncommon
+
+  epCost: 4
+  usesPerCombat: -1
+
+  elementCosts:
+    Water: 1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: []
+      attributes:
+        [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected, Debuff]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.4
+
+      statusEffects:
+        - statusEffectId: Slowed
+          chance: 30
+          duration: 2
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 515b1e30-b8e5-48d6-90a4-f619c2b4c051
+  name: Gust Grab
+  family: Gust Grab
+  description: Forcefully throw air at your enemy for {{ value }} damage.
+
+  sprite: '0058'
+
+  rarity: Uncommon
+
+  epCost: 4
+  usesPerCombat: -1
+
+  elementCosts:
+    Air: 1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: []
+      attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.6
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 98826df2-c9d6-4550-8c2d-ff8e83453e09
+  name: Nature's Reclaim
+  family: Nature's Reclaim
+  description: Draw strength from nature, healing yourself for {{ value }}.
+
+  sprite: '0059'
+
+  rarity: Uncommon
+
+  epCost: 8
+  usesPerCombat: -1
+
+  elementCosts:
+    Earth: 2
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: []
+      attributes: [BypassDefense, NeverMisses, HealsTarget]
+      targets: 1
+      targetType: Self
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: NotMaxHealth
+      damageScaling:
+        Intelligence: 1
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 49f18926-58c0-43ae-9348-a8ed78bd0761
+  name: Pocket Sand
+  family: Pocket Sand
+  description: Throw arid sand at the target, dealing {{ value }} damage and potentially inflicting blindness on the target.
+
+  sprite: '0060'
+
+  rarity: Uncommon
+
+  epCost: 6
+  usesPerCombat: -1
+
+  elementCosts:
+    Water: 2
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: []
+      attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Blind I
+      damageScaling:
+        Strength: 0.5
+      statusEffects:
+        - statusEffectId: Blind I
+          chance: 50
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 67d83f69-56ea-4e5b-b298-e7cf03429461
+  name: Hydroify
+  family: Hydroify
+  description: Consume dry air, replacing it with a moist cloud for {{ value }} damage.
+
+  sprite: '0061'
+
+  rarity: Uncommon
+
+  epCost: 6
+  usesPerCombat: -1
+
+  elementCosts:
+    Fire: 1
+    Air: 1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Water]
+      attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.4
+        Intelligence: 0.4
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

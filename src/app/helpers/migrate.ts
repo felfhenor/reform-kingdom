@@ -37,6 +37,7 @@ import {
 import { repairUnwalkableCurrentLocation } from '@helpers/pathfinding/pathfinding';
 import { pruneInvalidHomeNode } from '@helpers/town/town-spawn';
 import { pruneInvalidTowns } from '@helpers/town/town-prune';
+import { pruneInvalidBurstSkills } from '@helpers/hero/burst-skill';
 import { pruneInvalidCharacterTeachings } from '@helpers/trainer/trainer';
 import { pruneInvalidTasks, retrofitTasks } from '@helpers/task/task-migrate';
 import { TUTORIAL_CATALOG } from '@helpers/tutorial/tutorial-catalog';
@@ -147,6 +148,7 @@ export function migrateGameState() {
     equipment: backfillEquipmentBlock(character.equipment),
     combatOrders: character.combatOrders ?? {},
     teachings: pruneInvalidCharacterTeachings(character.teachings),
+    burstSkills: pruneInvalidBurstSkills(character.burstSkills),
   }));
 
   newState.armory = pruneInvalidArmoryItems(newState.armory);

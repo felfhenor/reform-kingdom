@@ -10,7 +10,10 @@ import {
   ensureEnumArray,
   ensureEnumValue,
 } from '@helpers/content/ensure-helpers-core';
-import { ensureStats } from '@helpers/content/ensure-helpers-stats';
+import {
+  ensureElementBlock,
+  ensureStats,
+} from '@helpers/content/ensure-helpers-stats';
 import type {
   EquipmentSkillContent,
   EquipmentSkillContentTechnique,
@@ -91,5 +94,8 @@ export function ensureSkill(
     ),
     family: skill.family ?? 'UNKNOWN',
     delay: skill.delay ?? 0,
+    special: skill.special ?? false,
+    elementCosts: ensureElementBlock(skill.elementCosts),
+    cooldown: skill.cooldown ?? 0,
   };
 }

@@ -97,3 +97,64 @@
 
   jobIds:
     - Explorer
+
+- id: 7854eb5d-ec3a-489b-9edc-3dd9795fbddd
+  name: 'Burst: Inferno'
+
+  effects:
+    - kind: GrantSkill
+      skillId: Inferno
+
+  requiredLevel: 15
+
+  costs:
+    - itemId: Gold Coin
+      required: 5000
+
+    - itemId: Malachite
+      required: 5
+
+  jobIds:
+    - Magician
+
+- id: d048db6f-d8f2-4683-8ade-ec658b3e327d
+  name: 'Burst: Tidal Grace'
+
+  effects:
+    - kind: GrantSkill
+      skillId: Tidal Grace
+
+  requiredLevel: 15
+
+  costs:
+    - itemId: Gold Coin
+      required: 5000
+
+    - itemId: Malachite
+      required: 5
+
+  jobIds:
+    - Healer
+
+- id: b437a755-d83a-4ba9-a4ca-9fc89b4d6741
+  name: 'Burst: Prismatic Burst II'
+
+  effects:
+    - kind: GrantSkill
+      skillId: Prismatic Burst II
+
+  requiredLevel: 17
+
+  costs:
+    - itemId: Gold Coin
+      required: 7500
+
+    - itemId: Ghost Peridot
+      required: 10
+
+  jobIds:
+    - Explorer
+    - Warrior
+    - Ranger
+    - Magician
+    - Healer

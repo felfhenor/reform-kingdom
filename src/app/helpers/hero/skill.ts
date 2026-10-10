@@ -1,4 +1,5 @@
 import type {
+  ElementBlock,
   EquipmentItemType,
   EquipmentSkill,
   EquipmentSkillContent,
@@ -10,7 +11,8 @@ import type {
   SkillStatScaling,
 } from '@interfaces';
 import { SKILL_MAX_ALLY_TARGETS } from '@helpers/config';
-import { ROMAN_NUMERAL_TIERS, StatOrder } from '@interfaces';
+import { ensureElementBlock } from '@helpers/content/ensure-helpers-stats';
+import { GameElementOrder, ROMAN_NUMERAL_TIERS, StatOrder } from '@interfaces';
 
 import { clamp, uniq } from 'es-toolkit/compat';
 
@@ -31,6 +33,24 @@ export function skillUses(skill: EquipmentSkill): number {
 
 export function skillEpCost(skill: EquipmentSkill): number {
   return skill.epCost + (skill.mods?.epCost ?? 0);
+}
+
+// Skill copies stored in pre-existing mid-combat saves may lack these fields.
+export function skillIsSpecial(skill: EquipmentSkill): boolean {
+  return skill.special ?? false;
+}
+
+export function skillCooldown(skill: EquipmentSkill): number {
+  return skill.cooldown ?? 0;
+}
+
+export function skillElementCosts(skill: EquipmentSkill): ElementBlock {
+  return ensureElementBlock(skill.elementCosts);
+}
+
+export function skillHasElementCosts(skill: EquipmentSkill): boolean {
+  const costs = skillElementCosts(skill);
+  return GameElementOrder.some((element) => costs[element] > 0);
 }
 
 export function skillTechniqueNumTargets(
@@ -111,6 +131,22 @@ export function skillTechniqueStatusEffectDuration(
 
 export function skillElements(skill: EquipmentSkill): GameElement[] {
   return uniq(skill.techniques.flatMap((t) => t.elements)).sort();
+}
+
+// The pool gains one charge per element per cast, credited to the first technique carrying it.
+export function skillTechniqueGeneratedElements(
+  skill: EquipmentSkill,
+): GameElement[][] {
+  if (skillHasElementCosts(skill)) return skill.techniques.map(() => []);
+
+  const seen = new Set<GameElement>();
+  return skill.techniques.map((technique) =>
+    uniq(technique.elements).filter((element) => {
+      if (seen.has(element)) return false;
+      seen.add(element);
+      return true;
+    }),
+  );
 }
 
 // Splits a display name into upgrade family and rank, e.g. "Starshine II" -> { family: 'Starshine', tier: 2 }.

@@ -473,6 +473,8 @@
       weight: 1
     - skillId: Slow Web I
       weight: 3
+    - skillId: Silk Snare
+      weight: 2
 
   baseStats:
     Health: 25
@@ -526,6 +528,8 @@
     - skillId: Slow Web I
       weight: 4
     - skillId: Venom Bite I
+      weight: 2
+    - skillId: Silk Snare
       weight: 2
 
   baseStats:
@@ -583,6 +587,12 @@
       weight: 3
     - skillId: Octa Strike I
       weight: 2
+    - skillId: Silken Tomb
+      weight: 1
+    - skillId: Brood Frenzy
+      weight: 1
+    - skillId: Burrowing Fang
+      weight: 3
 
   baseStats:
     Health: 100
@@ -954,6 +964,8 @@
       weight: 4
     - skillId: Fortify I
       weight: 2
+    - skillId: Nature's Reclaim
+      weight: 2
 
   baseStats:
     Health: 45
@@ -1007,7 +1019,8 @@
   skills:
     - skillId: Attack
       weight: 5
-
+    - skillId: Gust Grab
+      weight: 2
     - skillId: Gnash I
       weight: 1
       minLevel: 30
@@ -1073,6 +1086,12 @@
     - skillId: Arrow Rain II
       weight: 2
     - skillId: Thunderbolt II
+      weight: 2
+    - skillId: Gale Volley
+      weight: 1
+    - skillId: Verdant Barrage
+      weight: 1
+    - skillId: Fortify I
       weight: 2
 
   baseStats:

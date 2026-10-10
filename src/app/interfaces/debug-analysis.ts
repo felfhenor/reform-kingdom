@@ -193,7 +193,8 @@ export type SkillStatBonusContext = {
   jobs: JobContent[];
 };
 
-export type SkillSourceKind = 'Job' | 'Monster' | 'Equipment' | 'Affix';
+export type SkillSourceKind =
+  'Job' | 'Monster' | 'Equipment' | 'Affix' | 'Teaching';
 
 export type SkillSource = { kind: SkillSourceKind; name: string };
 

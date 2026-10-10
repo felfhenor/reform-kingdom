@@ -203,6 +203,9 @@
     - skillId: Attack
       weight: 1
 
+    - skillId: Hydroify
+      weight: 2
+
     - skillId: Toxic Breath
       weight: 3
 

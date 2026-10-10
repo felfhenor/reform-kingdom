@@ -1,5 +1,6 @@
 import type { CombatOrderClause } from '@interfaces/combat-order';
 import type { JobId } from '@interfaces/content-job';
+import type { EquipmentSkillId } from '@interfaces/content-skill';
 import type { TrainerTeachingId } from '@interfaces/content-trainer-teaching';
 import type { EquipmentBlock } from '@interfaces/equipment';
 import type { Branded } from '@interfaces/identifiable';
@@ -33,6 +34,8 @@ export type Character = {
   combatOrders: Partial<Record<JobId, CombatOrderClause[]>>;
   // Trainer teachings, bought once per job; every job's teachings apply regardless of the current job.
   teachings: Partial<Record<JobId, TrainerTeachingId[]>>;
+  // Chosen special skills, keyed by job id; a specific skill rather than a family so any learned tier can be picked.
+  burstSkills: Partial<Record<JobId, EquipmentSkillId[]>>;
 
   hp: number;
   ep: number;

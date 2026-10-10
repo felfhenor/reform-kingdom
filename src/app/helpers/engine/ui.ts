@@ -86,6 +86,16 @@ export function heroTeachingsModalOpen(characterId: CharacterId): void {
   modalOpen('hero-teachings');
 }
 
+// Not cleared on close - clearing it would collapse the modal's DOM mid-transition.
+export const heroBurstSkillsModalCharacterId = signal<CharacterId | undefined>(
+  undefined,
+);
+
+export function heroBurstSkillsModalOpen(characterId: CharacterId): void {
+  heroBurstSkillsModalCharacterId.set(characterId);
+  modalOpen('hero-burst-skills');
+}
+
 export const isWorldCameraPanned = signal<boolean>(false);
 
 // Incremented to signal a recenter request; the navbar's button has no direct reference to the map component, so this bridges them.

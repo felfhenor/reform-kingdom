@@ -369,3 +369,23 @@
 
   jobIds:
     - Ranger
+
+- id: 6b35ea1c-bf8d-4d12-a3e0-ecdb7d426243
+  name: 'Burst: Tempest'
+
+  effects:
+    - kind: GrantSkill
+      skillId: Tempest
+
+  requiredLevel: 15
+
+  costs:
+    - itemId: Gold Coin
+      required: 5000
+
+    - itemId: Malachite
+      required: 5
+
+  jobIds:
+    - Ranger
+    - Explorer

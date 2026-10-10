@@ -1,0 +1,193 @@
+- id: 2a13e858-dad9-4327-a2a3-f625fe13b7a6
+  name: Silken Tomb
+  family: Silken Tomb
+  description: Wrap an enemy in silk for {{ value }} damage, inflicting Slowed.
+
+  sprite: '0047'
+
+  rarity: Rare
+
+  epCost: 10
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 3
+
+  elementCosts:
+    Water: 1
+    Earth: 1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: []
+      attributes:
+        [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected, Debuff]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 2.5
+
+      statusEffects:
+        - statusEffectId: Slowed
+          chance: 90
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 708c919b-987a-4e90-aba4-554c82ca7f20
+  name: Brood Frenzy
+  family: Brood Frenzy
+  description: Call the brood down on every enemy for {{ value }} damage, with a 50% chance of inflicting Venom.
+
+  sprite: '0048'
+
+  rarity: Rare
+
+  epCost: 12
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 4
+  delay: 1
+
+  elementCosts:
+    Earth: 2
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: []
+      attributes:
+        [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected, Debuff]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.8
+
+      statusEffects:
+        - statusEffectId: Venom I
+          chance: 50
+          duration: 4
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: ec0054d2-bb4d-40f7-a3cf-b27f46e8e700
+  name: Burrowing Fang
+  family: Burrowing Fang
+  description: Strike up from beneath the earth for {{ value }} earth damage.
+
+  sprite: '0049'
+
+  rarity: Rare
+
+  epCost: 4
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Earth]
+      attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 1
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: c52dfe27-f9d5-465b-8643-5d8fc5687235
+  name: Gale Volley
+  family: Gale Volley
+  description: Loose two wind-borne volleys at every enemy, each doing up to {{ value }} air damage. It never misses.
+
+  sprite: '0050'
+
+  rarity: Rare
+
+  epCost: 15
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 4
+  delay: 1
+
+  elementCosts:
+    Air: 2
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Air]
+      attributes:
+        [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected, NeverMisses]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.5
+        Agility: 0.5
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - elements: [Air]
+      attributes:
+        [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected, NeverMisses]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.5
+        Agility: 0.5
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: d7ac4507-dfef-46c2-9f8b-5bd230c74464
+  name: Verdant Barrage
+  family: Verdant Barrage
+  description: An unerring shot that ignores defense for {{ value }} earth damage.
+
+  sprite: '0051'
+
+  rarity: Rare
+
+  epCost: 10
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 3
+
+  elementCosts:
+    Earth: 1
+    Air: 1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Earth]
+      attributes: [DamagesTarget, AllowPlink, BypassDefense, CanBeReflected]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 2.5
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

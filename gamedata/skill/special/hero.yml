@@ -1,0 +1,186 @@
+- id: ef34cc15-c137-4d75-b21d-0da30f4c1ab6
+  name: Inferno
+  family: Inferno
+  description: Engulf every enemy in a blazing heat for {{ value }} fire damage, inflicting them all with Burning.
+
+  sprite: '0052'
+
+  rarity: Rare
+
+  epCost: 0
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 4
+
+  elementCosts:
+    Fire: 2
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Fire]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected, Debuff]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 1.2
+
+      statusEffects:
+        - statusEffectId: Burning
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 5b913e17-0617-434d-a17d-3abc89d9e378
+  name: Tidal Grace
+  family: Tidal Grace
+  description: Heal each ally for {{ value }} HP.
+
+  sprite: '0053'
+
+  rarity: Rare
+
+  epCost: 0
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 5
+
+  elementCosts:
+    Water: 2
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Water]
+      attributes: [BypassDefense, NeverMisses, HealsTarget]
+      targets: 4
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: NotMaxHealth
+      damageScaling:
+        Intelligence: 1.5
+        Vitality: 0.75
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: ff5b2a3e-9f70-4b66-b542-a3ab86f07c6f
+  name: Landslide
+  family: Landslide
+  description: Bury every enemy for {{ value }} earth damage, with a 60% chance of leaving them Trembling.
+
+  sprite: '0054'
+
+  rarity: Rare
+
+  epCost: 0
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 4
+
+  elementCosts:
+    Earth: 2
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Earth]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected, Debuff]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.8
+        Resistance: 1
+
+      statusEffects:
+        - statusEffectId: Trembling
+          chance: 60
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+- id: 780997a3-20b0-4eb9-880f-7d4c9cb96319
+  name: Tempest
+  family: Tempest
+  description: Strike four times with the wind, each hit doing {{ value }} air damage.
+
+  sprite: '0055'
+
+  rarity: Rare
+
+  epCost: 0
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 4
+
+  elementCosts:
+    Air: 2
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Air]
+      attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Agility: 0.5
+        Intelligence: 0.25
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - elements: [Air]
+      attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Agility: 0.5
+        Intelligence: 0.25
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - elements: [Air]
+      attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Agility: 0.5
+        Intelligence: 0.25
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+
+    - elements: [Air]
+      attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Agility: 0.5
+        Intelligence: 0.25
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'

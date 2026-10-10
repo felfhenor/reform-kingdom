@@ -1,4 +1,6 @@
+import { COMBAT_ELEMENT_CHARGES_PER_ELEMENT } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
+import { skillHasElementCosts } from '@helpers/hero/skill';
 import { analysisFail, analysisWarn } from '@helpers/debug/analysis-utils';
 import type {
   AnalysisIssue,
@@ -6,6 +8,7 @@ import type {
   EquipmentSkillTargetType,
   StatusEffectContent,
 } from '@interfaces';
+import { GameElementOrder } from '@interfaces';
 
 const REQUIRED_FIELDS = ['name', 'description', 'sprite', 'family'] as const;
 const VALUE_TOKEN = /\{\{\s*value\s*\}\}/;
@@ -41,6 +44,33 @@ function costIssues(skill: Skill): AnalysisIssue[] {
         `has usesPerCombat ${skill.usesPerCombat}; use -1 for unlimited or a positive count.`,
       ),
     );
+  }
+
+  return issues;
+}
+
+function elementCostIssues(skill: Skill): AnalysisIssue[] {
+  return GameElementOrder.filter((element) => {
+    const value = skill.elementCosts[element];
+    return value < 0 || value > COMBAT_ELEMENT_CHARGES_PER_ELEMENT;
+  }).map((element) =>
+    analysisFail(
+      `has elementCosts.${element} ${skill.elementCosts[element]}, outside 0-${COMBAT_ELEMENT_CHARGES_PER_ELEMENT}.`,
+    ),
+  );
+}
+
+function specialIssues(skill: Skill): AnalysisIssue[] {
+  const issues: AnalysisIssue[] = [];
+
+  if (skill.cooldown < 0) {
+    issues.push(analysisFail(`has a negative cooldown (${skill.cooldown}).`));
+  }
+  if (skill.special && skill.cooldown < 1) {
+    issues.push(analysisFail('is special but has no cooldown.'));
+  }
+  if (skill.special && !skillHasElementCosts(skill)) {
+    issues.push(analysisWarn('is special but has no element costs.'));
   }
 
   return issues;
@@ -135,6 +165,8 @@ export function skillIssues(skill: Skill): AnalysisIssue[] {
   return [
     ...fieldIssues(skill),
     ...costIssues(skill),
+    ...elementCostIssues(skill),
+    ...specialIssues(skill),
     ...descriptionIssues(skill),
     ...boostIssues(skill),
   ];

@@ -4,6 +4,9 @@ import { ensureSkill } from '@helpers/content/ensure-skill';
 import { ensureTrainerTeaching } from '@helpers/content/ensure-trainer';
 import { defaultEquipment } from '@helpers/defaults';
 import {
+  characterBurstSkillOptions,
+  characterCombatSkills,
+  characterNormalSkills,
   characterSkills,
   getUnlockedJobs,
   heroSkillsAtLevel,
@@ -210,6 +213,74 @@ describe('Job Helper Functions', () => {
         'Double Strike II',
         'Sweep I',
       ]);
+    });
+  });
+
+  describe('burst skills', () => {
+    const strike = ensureSkill({
+      id: 'Strike' as EquipmentSkillId,
+      name: 'Strike',
+      family: 'Strike',
+    });
+    const burst = (name: string) =>
+      ensureSkill({
+        id: name as EquipmentSkillId,
+        name,
+        family: name.replace(/ I+$/, ''),
+        special: true,
+      });
+    const inferno1 = burst('Inferno I');
+    const inferno2 = burst('Inferno II');
+    const tempest = burst('Tempest');
+    const job = ensureJob({
+      id: 'job-burst' as JobId,
+      name: 'Burster',
+      skillPath: [
+        { pathName: 'Strike', levels: [{ level: 1, skillId: strike.id }] },
+        {
+          pathName: 'Inferno',
+          levels: [
+            { level: 1, skillId: inferno1.id },
+            { level: 5, skillId: inferno2.id },
+          ],
+        },
+        { pathName: 'Tempest', levels: [{ level: 1, skillId: tempest.id }] },
+      ],
+    });
+    const hero = (chosen: string[], level = 1) => ({
+      jobId: job.id,
+      level,
+      equipment: defaultEquipment(),
+      teachings: {},
+      burstSkills: { [job.id]: chosen as EquipmentSkillId[] },
+    });
+
+    beforeEach(() => seedContent([job, strike, inferno1, inferno2, tempest]));
+
+    it('keeps special skills out of the normal list', () => {
+      expect(characterNormalSkills(hero([])).map((s) => s.id)).toEqual([
+        'Strike',
+      ]);
+    });
+
+    it('offers every learned tier of a burst family, in tier order', () => {
+      expect(characterBurstSkillOptions(hero([], 5)).map((s) => s.id)).toEqual([
+        'Inferno I',
+        'Inferno II',
+        'Tempest',
+      ]);
+    });
+
+    it('lets a lower tier be chosen over a higher one', () => {
+      expect(
+        characterCombatSkills(hero(['Inferno I'], 5)).map((s) => s.id),
+      ).toEqual(['Strike', 'Inferno I']);
+    });
+
+    it('fights with normal skills plus only the chosen burst skill', () => {
+      expect(
+        characterCombatSkills(hero(['Tempest', 'Unknown'])).map((s) => s.id),
+      ).toEqual(['Strike', 'Tempest']);
     });
   });
 });

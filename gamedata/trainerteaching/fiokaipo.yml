@@ -1,0 +1,22 @@
+- id: 2c819d79-8873-4877-8fa9-b278bea3b09f
+  name: 'Burst: Prismatic Burst III'
+
+  effects:
+    - kind: GrantSkill
+      skillId: Prismatic Burst III
+
+  requiredLevel: 24
+
+  costs:
+    - itemId: Gold Coin
+      required: 15000
+
+    - itemId: Spirit Flesh
+      required: 10
+
+  jobIds:
+    - Explorer
+    - Warrior
+    - Ranger
+    - Magician
+    - Healer

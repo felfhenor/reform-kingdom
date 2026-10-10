@@ -2,6 +2,7 @@ import {
   mergeGrantedSkills,
   skillEpCost,
   skillIsUsableWithEquippedWeapons,
+  skillTechniqueGeneratedElements,
   skillTechniqueStatScaling,
   skillTechniqueWithStatBonuses,
 } from '@helpers/hero/skill';
@@ -210,5 +211,30 @@ describe('skillTechniqueWithStatBonuses', () => {
     ]);
 
     expect(scaled.damageScaling.Intelligence).toBe(0);
+  });
+});
+
+describe('skillTechniqueGeneratedElements', () => {
+  const technique = (elements: EquipmentSkillContentTechnique['elements']) =>
+    ensureEquipmentSkillTechnique({ elements });
+
+  it('credits each element once, to the first technique carrying it', () => {
+    const skill = buildEquipmentSkill({
+      techniques: [technique(['Earth', 'Air']), technique(['Air', 'Fire'])],
+    });
+
+    expect(skillTechniqueGeneratedElements(skill)).toEqual([
+      ['Earth', 'Air'],
+      ['Fire'],
+    ]);
+  });
+
+  it('generates nothing for a skill that pays element costs', () => {
+    const skill = buildEquipmentSkill({
+      techniques: [technique(['Fire'])],
+      elementCosts: { Fire: 2, Water: 0, Earth: 0, Air: 0 },
+    });
+
+    expect(skillTechniqueGeneratedElements(skill)).toEqual([[]]);
   });
 });

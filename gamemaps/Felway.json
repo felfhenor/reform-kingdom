@@ -361,6 +361,19 @@
                  "width":64,
                  "x":640,
                  "y":1664
+                }, 
+                {
+                 "gid":431,
+                 "height":64,
+                 "id":163,
+                 "name":"Gorm",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"Trainer",
+                 "visible":true,
+                 "width":64,
+                 "x":128,
+                 "y":640
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -369,7 +382,7 @@
          "y":0
         }],
  "nextlayerid":10,
- "nextobjectid":163,
+ "nextobjectid":164,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

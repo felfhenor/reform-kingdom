@@ -1,7 +1,7 @@
 import type { HasSprite } from '@interfaces/artable';
 import type { StatusEffectId } from '@interfaces/content-statuseffect';
 import type { HasRarity } from '@interfaces/droppable';
-import type { GameElement } from '@interfaces/element';
+import type { ElementBlock, GameElement } from '@interfaces/element';
 import type { EquipmentItemType } from '@interfaces/equipment';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { StatBlock } from '@interfaces/stat';
@@ -98,6 +98,15 @@ export type EquipmentSkillContent = IsContentItem &
 
     // Caster turns before the skill fires; 0 fires immediately.
     delay: number;
+
+    // Hero: only usable from the burst slot. Monster: cast before the weighted roll when affordable.
+    special: boolean;
+
+    // Spent from the combat element pool on the cast turn.
+    elementCosts: ElementBlock;
+
+    // Caster turns before the skill can be cast again; 0 means no cooldown.
+    cooldown: number;
   };
 
 export type EquipmentSkill = EquipmentSkillContent & {

@@ -11,6 +11,7 @@ import { ButtonHeroCombatOrdersComponent } from '@components/button-hero-combat-
 import { ButtonHeroTeachingsComponent } from '@components/button-hero-teachings/button-hero-teachings.component';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { ModalHeroCombatOrdersComponent } from '@components/modal-hero-combat-orders/modal-hero-combat-orders.component';
+import { ModalHeroBurstSkillsComponent } from '@components/modal-hero-burst-skills/modal-hero-burst-skills.component';
 import { ModalHeroTeachingsComponent } from '@components/modal-hero-teachings/modal-hero-teachings.component';
 import { PanelHeroEquipmentEquipmentComponent } from '@components/panel-hero-equipment-equipment/panel-hero-equipment-equipment.component';
 import { PanelHeroEquipmentSkillsComponent } from '@components/panel-hero-equipment-skills/panel-hero-equipment-skills.component';
@@ -38,6 +39,7 @@ import type { Character, JobContent } from '@interfaces';
     ButtonHeroTeachingsComponent,
     ModalHeroCombatOrdersComponent,
     ModalHeroTeachingsComponent,
+    ModalHeroBurstSkillsComponent,
     BarProgressComponent,
     TextNumberTweenComponent,
     SlotIconBlankComponent,

@@ -8,6 +8,7 @@ import type {
   CharacterId,
   Combatant,
   CombatOrderClauseId,
+  CombatOrderComparator,
   CombatOrderCondition,
   EquipmentSkillContentTechnique,
   EquipmentSkillId,
@@ -86,6 +87,24 @@ describe('combatOrderConditionMatches', () => {
     expect(combatOrderConditionMatches(condition, withSummon, combatant)).toBe(
       true,
     );
+  });
+
+  it('ElementCount compares the shared pool charge for one element', () => {
+    const pool = buildCombat({
+      elements: { Fire: 1, Water: 2, Earth: 0, Air: 0 },
+    });
+    const matches = (comparator: CombatOrderComparator, count: number) =>
+      combatOrderConditionMatches(
+        { type: 'ElementCount', element: 'Fire', comparator, count },
+        pool,
+        buildTestCombatant(),
+      );
+
+    expect(matches('LessThan', 2)).toBe(true);
+    expect(matches('LessThanOrEqual', 0)).toBe(false);
+    expect(matches('Equal', 1)).toBe(true);
+    expect(matches('GreaterThanOrEqual', 2)).toBe(false);
+    expect(matches('GreaterThan', 0)).toBe(true);
   });
 
   it('SelfHealthPercent compares current HP% against the threshold', () => {
