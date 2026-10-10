@@ -8,11 +8,11 @@ import {
   XP_CURVE_EASE,
 } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { defaultTradeskillBuilding } from '@helpers/defaults';
 import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { defaultTradeskillBuilding } from '@helpers/defaults';
 import { roundToNearest10 } from '@helpers/engine/number';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import {
@@ -20,6 +20,7 @@ import {
   tradeskillsState,
   updateGamestate,
 } from '@helpers/state-game';
+import { taskEventTradeskillLevel } from '@helpers/task/task-events';
 import type {
   DifficultyTier,
   GameState,
@@ -32,7 +33,6 @@ import type {
   TradeskillLevelRequirementContent,
 } from '@interfaces';
 import { ALL_TRADESKILLS } from '@interfaces';
-import { taskEventTradeskillLevel } from '@helpers/task/task-events';
 
 const DEFAULT_BUILDING = defaultTradeskillBuilding();
 
@@ -198,15 +198,6 @@ export function tradeskillGainXp(tradeskill: Tradeskill, amount: number): void {
   }
 }
 
-// Remaps a save's tradeskill keys from the pre-gamedata `Tradeskill` name
-// strings (e.g. "Blacksmithing") to real TradeskillId values, then backfills
-// any tradeskill known to gamedata that still has no entry (covers a
-// brand-new save, whose default tradeskill state is deliberately empty).
-// A legacy key already shaped like an id passes through unchanged, and an
-// unresolvable legacy key (should never happen once content is loaded) is
-// defensively dropped rather than aborting the whole migration. This function
-// is only ever called once content is guaranteed loaded, unlike similar
-// lookups elsewhere.
 export function migrateTradeskillStateKeys(
   tradeskills: Record<string, TradeskillBuildingState>,
 ): GameStateTradeskills {
@@ -227,7 +218,6 @@ export function migrateTradeskillStateKeys(
   return remapped;
 }
 
-// WoW-style skill-up odds: guaranteed early, coin flip past halfway, long shot near the cap, nothing once out-levelled.
 export function craftXpChance(
   recipe: RecipeContent,
   buildingLevel: number,
@@ -235,10 +225,11 @@ export function craftXpChance(
   const { minTradeskillLevel: min, maxTradeskillLevel: max } = recipe;
   if (max <= min) return buildingLevel <= min ? 100 : 0;
 
-  const progress = (buildingLevel - min) / (max - min);
+  const progress = (buildingLevel - min) / (max - min + 1);
   if (progress >= 1) return 0;
   if (progress >= 0.75) return 25;
   if (progress >= 0.5) return 50;
+  if (progress >= 0.25) return 50;
   return 100;
 }
 

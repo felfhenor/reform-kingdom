@@ -2,6 +2,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/task/task-events');
 
+import { captureAnalyticsEvents } from '@/testing/analytics';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 import {
   TRADESKILL_MAX_LEVEL,
   TRADESKILL_QUEUE_BASE_SIZE,
@@ -42,9 +45,6 @@ import type {
   TradeskillId,
   TradeskillLevelRequirementId,
 } from '@interfaces';
-import { captureAnalyticsEvents } from '@/testing/analytics';
-import { seedContent } from '@/testing/content';
-import { inTick, seedGamestate } from '@/testing/gamestate';
 
 const BLACKSMITHING_ID = 'blacksmithing' as TradeskillId;
 const WOODWORKING_ID = 'woodworking' as TradeskillId;
@@ -193,7 +193,8 @@ describe('craftXpChance / craftXpChanceTier', () => {
     [5, 100, 'Hard'],
     [12, 50, 'Medium'],
     [18, 25, 'Easy'],
-    [20, 0, 'Trivial'],
+    [20, 25, 'Easy'],
+    [22, 0, 'Trivial'],
   ])('at level %i is %i%% (%s)', (level, chance, tier) => {
     expect(craftXpChance(recipe, level)).toBe(chance);
     expect(craftXpChanceTier(recipe, level)).toBe(tier);
