@@ -196,7 +196,7 @@
     - itemId: Fel Essence
       quantity: 1
 
-  tradeskillId: Tailoring
+  tradeskillId: Woodworking
   minTradeskillLevel: 24
   maxTradeskillLevel: 25
   tradeskillXP: 20
