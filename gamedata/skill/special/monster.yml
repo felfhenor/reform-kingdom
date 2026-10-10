@@ -117,7 +117,8 @@
 
   techniques:
     - elements: []
-      attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
+      attributes:
+        [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected, Debuff]
       targets: 1
       targetType: Enemies
       targetBehaviors:
