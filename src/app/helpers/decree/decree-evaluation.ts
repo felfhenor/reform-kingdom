@@ -88,9 +88,12 @@ function routeTo(
   );
 }
 
-// Clauses with no risk setting of their own still have to fight through a gateway to get anywhere past it.
+// Only explore clauses' risk covers fights en route; DefendTowns' risk is about the raid, so it routes like any trip.
 function clauseRiskTolerance(clause: DecreeClause): DecreeRiskLevel {
-  return 'riskTolerance' in clause ? clause.riskTolerance : 'High';
+  return clause.type === 'LevelUpParty' ||
+    clause.type === 'FinishUnfinishedAreas'
+    ? clause.riskTolerance
+    : 'High';
 }
 
 // Nearest reachable node by fewest pathfinding steps - only called while idle or stationary (path cache hits), never mid-travel.
@@ -250,7 +253,7 @@ function defendTownsTargetNode(
     if (!acceptable.some((town) => town.name === clause.townName)) {
       return undefined;
     }
-    return reachableVisibleNode(clause.townName, clause.riskTolerance);
+    return reachableVisibleNode(clause.townName, clauseRiskTolerance(clause));
   }
 
   const candidates = acceptable
@@ -258,7 +261,7 @@ function defendTownsTargetNode(
     .filter(
       (entry): entry is WorldNodeEntry => !!entry && isWorldNodeVisible(entry),
     );
-  return nearestReachableNode(candidates, clause.riskTolerance);
+  return nearestReachableNode(candidates, clauseRiskTolerance(clause));
 }
 
 // Mystical nodes have nothing to fight once cleared, so they only count while their cycle is up.

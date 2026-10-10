@@ -322,6 +322,26 @@ describe('a node walled in behind another node', () => {
     ).toEqual(nodes['Slimed Waystation']);
   });
 
+  it('lets DefendTowns fight through a gateway riskier than the raid tolerance', () => {
+    const nodes = seedDecreeWorld(
+      [
+        { content: town('Larsia', 20, 25), steps: 3, via: 'Slimed Waystation' },
+        { name: 'Slimed Waystation', ...fightingGateway(30) },
+      ],
+      withEdits(raidOn('Larsia'), partyAt(25)),
+    );
+    [undefined, 'Larsia'].forEach((townName) => {
+      const defend = decreeClause({
+        type: 'DefendTowns',
+        riskTolerance: 'Low',
+        townName,
+      });
+
+      expect(clauseTargetNode(defend)).toEqual(nodes['Larsia']);
+      expect(clauseTravelNode(defend)).toEqual(nodes['Slimed Waystation']);
+    });
+  });
+
   it('counts gateway losses against it for LevelUpParty', () => {
     const nodes = seedDecreeWorld(
       [
