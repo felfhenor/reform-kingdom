@@ -125,7 +125,7 @@ async function validateType(type: string): Promise<UnusedSprite[]> {
   return unused;
 }
 
-export async function runUnusedSpriteValidation(): Promise<UnusedSprite[]> {
+export async function runUnusedSpriteValidation(): Promise<string[]> {
   console.log('=== validate:unusedsprites ===');
   console.log(
     'Checking that every sprite PNG under gameassets/ is referenced by a gamedata entry.\n',
@@ -142,15 +142,19 @@ export async function runUnusedSpriteValidation(): Promise<UnusedSprite[]> {
 
   console.log('\n=== Summary ===');
 
-  if (allUnused.length > 0) {
-    console.log(`\n${allUnused.length} unused sprite(s) found:\n`);
-    allUnused.forEach((sprite) => {
-      const message = `[${sprite.type}] "gameassets/${sprite.type}/${sprite.file}" is unused - remove it or wire it up to a gamedata entry.`;
+  const problems = allUnused.map(
+    (sprite) =>
+      `[${sprite.type}] "gameassets/${sprite.type}/${sprite.file}" is unused - remove it or wire it up to a gamedata entry.`,
+  );
+
+  if (problems.length > 0) {
+    console.log(`\n${problems.length} unused sprite(s) found:\n`);
+    problems.forEach((message) => {
       console.log(`  - ${message}`);
       console.log(`::error::${message}`);
     });
     console.error(
-      `\n[validate:unusedsprites] FAILED: ${allUnused.length} unused sprite(s) found.`,
+      `\n[validate:unusedsprites] FAILED: ${problems.length} unused sprite(s) found.`,
     );
   } else {
     console.log(
@@ -158,5 +162,5 @@ export async function runUnusedSpriteValidation(): Promise<UnusedSprite[]> {
     );
   }
 
-  return allUnused;
+  return problems;
 }

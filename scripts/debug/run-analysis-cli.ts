@@ -8,11 +8,16 @@
 
 import type { AnalysisRunResult, AnalysisTable } from '@interfaces';
 
-const STATUS_ICON: Record<string, string> = {
+export const STATUS_ICON: Record<string, string> = {
   pass: '✓',
   fail: '✗',
   warning: '⚠',
   info: '-',
+};
+
+const GITHUB_ANNOTATION: Record<string, string> = {
+  fail: 'error',
+  warning: 'warning',
 };
 
 function printTable(table: AnalysisTable): void {
@@ -48,6 +53,11 @@ export function printAnalysisResult(
     console.log(`  ${STATUS_ICON['pass']} ${passes.length} check(s) passed`);
   }
 
+  nonPasses.forEach((check) => {
+    const level = GITHUB_ANNOTATION[check.status];
+    if (level) console.log(`::${level}::[${title}] ${check.message}`);
+  });
+
   (result.tables ?? []).forEach((table) => printTable(table));
 
   console.log('\n=== Summary ===');
@@ -61,7 +71,6 @@ export function printAnalysisResult(
     return;
   }
 
-  failures.forEach((check) => console.log(`::error::${check.message}`));
   console.error(`\n[${title}] FAILED: ${failures.length} problem(s) found.`);
   process.exit(1);
 }

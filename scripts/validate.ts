@@ -29,7 +29,7 @@ import { runSkillBonusesAnalysis } from '@helpers/debug/analysis-skillbonuses';
 import { runAffixesAnalysis } from '@helpers/debug/analysis-affixes';
 import { runSkillsAnalysis } from '@helpers/debug/analysis-skills';
 import { loadCompiledContentFromDisk } from './debug/load-compiled-content';
-import { printAnalysisResult } from './debug/run-analysis-cli';
+import { printAnalysisResult, STATUS_ICON } from './debug/run-analysis-cli';
 import { runSchemaValidation } from './debug/schema-validation';
 import { runUnusedSpriteValidation } from './debug/unused-sprite-validation';
 
@@ -68,8 +68,17 @@ const ANALYSIS_CHECKS: Array<{ title: string; run: () => AnalysisRunResult }> =
     { title: 'validate:affixes', run: runAffixesAnalysis },
   ];
 
+function printFinalSummary(
+  problems: Array<{ status: string; message: string }>,
+): void {
+  console.log('\n=== validate summary ===');
+  problems.forEach(({ status, message }) =>
+    console.log(`  ${STATUS_ICON[status]} ${message}`),
+  );
+}
+
 async function main(): Promise<void> {
-  let failed = false;
+  const problems: Array<{ status: string; message: string }> = [];
 
   try {
     loadCompiledContentFromDisk();
@@ -83,15 +92,27 @@ async function main(): Promise<void> {
   ANALYSIS_CHECKS.forEach(({ title, run }) => {
     const result = run();
     printAnalysisResult(title, result, { strict: false });
-    if (result.checks.some((check) => check.status === 'fail')) failed = true;
+    result.checks
+      .filter((check) => check.status === 'fail' || check.status === 'warning')
+      .forEach((check) =>
+        problems.push({
+          status: check.status,
+          message: `[${title}] ${check.message}`,
+        }),
+      );
   });
 
-  if ((await runSchemaValidation()).length > 0) failed = true;
-  if ((await runUnusedSpriteValidation()).length > 0) failed = true;
+  const fileProblems = [
+    ...(await runSchemaValidation()),
+    ...(await runUnusedSpriteValidation()),
+  ];
+  fileProblems.forEach((message) => problems.push({ status: 'fail', message }));
 
-  if (failed) {
+  printFinalSummary(problems);
+
+  if (problems.some((problem) => problem.status === 'fail')) {
     console.error(
-      '\n[validate] FAILED: one or more checks reported problems above.',
+      `\n[validate] ${STATUS_ICON['fail']} FAILED: one or more checks reported problems above.`,
     );
     process.exit(1);
   }
