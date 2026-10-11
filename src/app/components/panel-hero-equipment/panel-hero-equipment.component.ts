@@ -22,9 +22,15 @@ import { HideUntilLevelDirective } from '@directives/hide-until-level.directive'
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
 import { demoteHero, promoteHero } from '@helpers/hero/position-swapping';
+import {
+  characterCurrentRegalia,
+  regaliaMissingItems,
+} from '@helpers/hero/regalia';
+import { armoryState, regaliasState } from '@helpers/state-game';
 import { isPlayerAtKingdom, worldPartyState } from '@helpers/index';
 import { isAnyTrainerDiscovered } from '@helpers/trainer/trainer';
 import type { Character, JobContent } from '@interfaces';
+import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-panel-hero-equipment',
@@ -46,6 +52,7 @@ import type { Character, JobContent } from '@interfaces';
     HideUntilLevelDirective,
     SlotButtonContainerComponent,
     SFXDirective,
+    TippyDirective,
   ],
   templateUrl: './panel-hero-equipment.component.html',
   styleUrl: './panel-hero-equipment.component.scss',
@@ -65,6 +72,20 @@ export class PanelHeroEquipmentComponent {
   public job = computed<JobContent | undefined>(() =>
     getEntry<JobContent>(this.character().jobId),
   );
+
+  public currentRegalia = computed(() =>
+    characterCurrentRegalia(regaliasState().entries, this.character()),
+  );
+
+  public regaliaMissingCount = computed(() => {
+    const regalia = this.currentRegalia();
+    return regalia
+      ? regaliaMissingItems(regalia, this.character(), [
+          ...regaliasState().vault,
+          ...armoryState(),
+        ]).length
+      : 0;
+  });
 
   promote() {
     promoteHero(this.character());

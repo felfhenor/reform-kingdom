@@ -40,16 +40,39 @@
       </app-slot-icon-blank>
     </div>
 
-    <div class="flex flex-col items-start gap-2 min-w-[400px]">
-      <div class="type-entity-heading">
-        {{ char.name }}
-        <span class="type-muted font-normal">
-          Lv. {{ char.level }} {{ job()?.name }} ({{ job()?.shorthand }})
-        </span>
+    <div
+      class="flex flex-col flex-1 items-start gap-2 min-w-[400px] max-w-[60%]"
+    >
+      <div
+        class="type-entity-heading flex gap-2 justify-between items-center w-full"
+      >
+        <div class="flex gap-2 items-center">
+          {{ char.name }}
+          <span class="type-muted font-normal">
+            Lv. {{ char.level }} {{ job()?.name }} ({{ job()?.shorthand }})
+          </span>
+        </div>
+
+        @if (currentRegalia(); as regalia) {
+          @let missing = regaliaMissingCount();
+
+          <span
+            class="badge"
+            [class.badge-info]="missing === 0"
+            [class.badge-warning]="missing > 0"
+            [tp]="
+              missing > 0
+                ? 'Some of this regalia\'s gear is unavailable.'
+                : 'Current regalia.'
+            "
+          >
+            {{ regalia.name }}
+          </span>
+        }
       </div>
 
       <app-bar-progress
-        class="w-56"
+        class="w-full"
         color="xp"
         [value]="char.xp.current"
         [max]="char.xp.maximum"

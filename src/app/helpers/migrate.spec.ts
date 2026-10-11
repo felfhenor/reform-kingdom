@@ -221,6 +221,33 @@ describe('migrateGameState', () => {
     expect(migrated.armory).toEqual([reserved]);
   });
 
+  it('collapses a pre-instance-id two-hander backfilled into one phantom copy per slot, without minting a second item', () => {
+    const spear = ensureEquipment({
+      id: 'spear' as EquipmentId,
+      type: 'Spear',
+    });
+    seedContent([spear]);
+    const weaponHalf = buildEquipmentItem(spear.id);
+    const phantomHalf = buildEquipmentItem(spear.id);
+
+    const migrated = migrate((save) => {
+      save.world.party = [
+        buildCharacter({
+          equipment: {
+            ...buildCharacter().equipment,
+            Weapon: weaponHalf,
+            Offhand: phantomHalf,
+          },
+        }),
+      ];
+    });
+
+    const { equipment } = migrated.world.party[0];
+    expect(equipment.Weapon?.id).toBe(weaponHalf.id);
+    expect(equipment.Offhand?.id).toBe(weaponHalf.id);
+    expect(migrated.armory).toEqual([]);
+  });
+
   describe('gather-node discoveries', () => {
     const groves = ['Wergen Woods', 'Rocky Outcrop'];
     function seedGroves(): void {

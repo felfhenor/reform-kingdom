@@ -32,6 +32,7 @@ import {
   gamePlayView,
   isWorldCameraPanned,
   kingdomSubview,
+  heroesSubviewClear,
   kingdomSubviewClear,
   setGamePlayView,
   townOpen,
@@ -159,6 +160,12 @@ export class NavbarComponent {
 
   public changeGamePlayView(view: GamePlayView): void {
     setGamePlayView(view);
+  }
+
+  public setHeroesPlayView(): void {
+    if (gamePlayView() === 'heroes') heroesSubviewClear();
+
+    this.changeGamePlayView('heroes');
   }
 
   public setKingdomPlayView(): void {

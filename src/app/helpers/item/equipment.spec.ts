@@ -30,6 +30,7 @@ import {
   isSlotAvailableForJob,
   newEquipmentItem,
   pruneInvalidEquippedItems,
+  repairSplitEquippedItems,
   slotsHoldingEquipment,
 } from '@helpers/item/equipment';
 import type {
@@ -343,6 +344,46 @@ describe('slotsHoldingEquipment', () => {
       'Offhand',
     ]);
     expect(slotsHoldingEquipment(twoHanded(), swordId)).toEqual([]);
+  });
+});
+
+describe('repairSplitEquippedItems', () => {
+  it('discards the phantom copy of a split two-hander, keeping the primary slot instance in both', () => {
+    const weaponHalf = item(spearId, { id: 'weapon-half' as EquipmentItemId });
+    const phantom = item(spearId, { id: 'offhand-half' as EquipmentItemId });
+    const helmetItem = item(helmetId);
+
+    expect(
+      repairSplitEquippedItems(
+        equipped({ Weapon: weaponHalf, Offhand: phantom, Helmet: helmetItem }),
+      ),
+    ).toEqual({
+      equipment: equipped({
+        Weapon: weaponHalf,
+        Offhand: weaponHalf,
+        Helmet: helmetItem,
+      }),
+      extras: [],
+    });
+  });
+
+  it('hands back a different item the two-hander overlapped', () => {
+    const spearItem = item(spearId);
+    const staffItem = item(staffId);
+
+    expect(
+      repairSplitEquippedItems(
+        equipped({ Weapon: spearItem, Offhand: staffItem }),
+      ),
+    ).toEqual({ equipment: twoHanded(), extras: [staffItem] });
+  });
+
+  it('leaves a healthy block untouched', () => {
+    const block = equipped({ ...twoHanded(), Helmet: item(helmetId) });
+    expect(repairSplitEquippedItems(block)).toEqual({
+      equipment: block,
+      extras: [],
+    });
   });
 });
 

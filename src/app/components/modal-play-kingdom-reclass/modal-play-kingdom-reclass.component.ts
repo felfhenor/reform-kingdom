@@ -26,7 +26,11 @@ import {
   charactersReclass,
 } from '@helpers/hero/character-reclass';
 import { getUnlockedJobs } from '@helpers/hero/job';
-import { worldPartyState } from '@helpers/state-game';
+import {
+  characterCurrentRegalia,
+  regaliaMatchesCharacter,
+} from '@helpers/hero/regalia';
+import { regaliasState, worldPartyState } from '@helpers/state-game';
 import { goldCoinId, hasGold } from '@helpers/item/materials';
 import type {
   Character,
@@ -85,6 +89,26 @@ export class ModalPlayKingdomReclassComponent {
     this.picksModel().some(
       (pick, index) => pick.jobId !== this.party()[index]?.jobId,
     ),
+  );
+
+  // Reclassing back reloads the saved regalia, so unsaved edits to the outgoing one would be undone.
+  public unsavedRegaliaNames = computed(() =>
+    this.picksModel().map((pick, index) => {
+      const character = this.party()[index];
+      if (!character || pick.jobId === character.jobId) return undefined;
+
+      const regalia = characterCurrentRegalia(
+        regaliasState().entries,
+        character,
+      );
+      return regalia && !regaliaMatchesCharacter(regalia, character)
+        ? regalia.name
+        : undefined;
+    }),
+  );
+
+  public hasUnsavedRegalias = computed(() =>
+    this.unsavedRegaliaNames().some((name) => !!name),
   );
 
   public goldItemId = goldCoinId();

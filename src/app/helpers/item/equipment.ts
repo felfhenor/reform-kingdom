@@ -31,6 +31,7 @@ import type {
   EquipmentItemType,
   EquipmentSkillId,
   EquipmentSlot,
+  EquipmentSplitRepair,
   GatherYieldBonus,
   JobContent,
   JobId,
@@ -40,7 +41,7 @@ import type {
 } from '@interfaces';
 import { EquipmentTypeToSlot } from '@interfaces';
 
-import { orderBy, uniq } from 'es-toolkit/compat';
+import { orderBy, uniq, uniqBy } from 'es-toolkit/compat';
 
 // Gear can be swapped freely while gathering, but not mid-fight.
 export function canModifyEquipment(): boolean {
@@ -116,6 +117,33 @@ export function slotsHoldingEquipment(
   return (Object.keys(equipment) as EquipmentSlot[]).filter(
     (slot) => equipment[slot]?.equipmentId === equipmentId,
   );
+}
+
+// Pre-instance-id saves stored one multi-slot item per slot, which backfill split into phantom copies; only the primary slot's is real.
+export function repairSplitEquippedItems(
+  equipment: EquipmentBlock,
+): EquipmentSplitRepair {
+  const repaired = { ...equipment };
+  const extras: EquipmentItem[] = [];
+
+  (Object.keys(repaired) as EquipmentSlot[]).forEach((slot) => {
+    const item = repaired[slot];
+    const content = item
+      ? getEntry<EquipmentContent>(item.equipmentId)
+      : undefined;
+    if (!item || !content || EquipmentTypeToSlot[content.type][0] !== slot) {
+      return;
+    }
+
+    EquipmentTypeToSlot[content.type].forEach((covered) => {
+      const other = repaired[covered];
+      const isPhantom = other?.equipmentId === item.equipmentId;
+      if (other && other.id !== item.id && !isPhantom) extras.push(other);
+      repaired[covered] = item;
+    });
+  });
+
+  return { equipment: repaired, extras: uniqBy(extras, 'id') };
 }
 
 // Class-unique slots per the design doc (Artifact/Mage, Ammo/Ranger), matched by job name.

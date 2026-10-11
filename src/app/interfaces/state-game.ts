@@ -21,6 +21,7 @@ import type { GlobalEffectSums } from '@interfaces/global-effect-sums';
 import type { Branded } from '@interfaces/identifiable';
 import type { Ledger } from '@interfaces/ledger';
 import type { LootFilterSettings } from '@interfaces/loot-filter';
+import type { GameStateRegalias } from '@interfaces/regalia';
 import type { GameStateTowns } from '@interfaces/town-state';
 import type { TravelState } from '@interfaces/travel';
 import type {
@@ -152,6 +153,7 @@ export type GameState = {
   discoveredMaterials: GameStateDiscoveredMaterials;
   collectibles: GameStateCollectibles;
   armory: EquipmentItem[];
+  regalias: GameStateRegalias;
   lootFilters: LootFilterSettings;
   discoveredEquipment: GameStateDiscoveredEquipment;
   discoveredCaravans: GameStateDiscoveredCaravans;

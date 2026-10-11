@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { IconComponent } from '@components/icon/icon.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { hotkeyMatches } from '@helpers/engine/hotkeys.ui';
@@ -29,7 +29,10 @@ import { HotkeysDirective } from '@ngneat/hotkeys';
 export class ButtonKingdomBackComponent {
   protected hotkeyMatches = hotkeyMatches;
 
+  // Subviews outside the Kingdom tab (e.g. the Heroes regalia page) pass their own exit.
+  public onBack = input<() => void>(kingdomSubviewClear);
+
   public back(): void {
-    kingdomSubviewClear();
+    this.onBack()();
   }
 }

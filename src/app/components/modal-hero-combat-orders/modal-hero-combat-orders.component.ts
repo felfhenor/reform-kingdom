@@ -19,7 +19,10 @@ import { IconComponent } from '@components/icon/icon.component';
 import { ListReflowDirective } from '@directives/list-reflow.directive';
 import { ListReflowDragDirective } from '@directives/list-reflow-drag.directive';
 import { SFXDirective } from '@directives/sfx.directive';
-import { combatOrderClauses } from '@helpers/combat/combat-order';
+import {
+  COMBAT_ORDER_ALWAYS_RANDOM_CLAUSE,
+  combatOrderClauses,
+} from '@helpers/combat/combat-order';
 import {
   combatOrderClauseAdd,
   combatOrderClauseRemove,
@@ -120,16 +123,6 @@ const ELEMENT_OPTIONS: SelectOption<GameElement>[] = GameElementOrder.map(
 const DEFAULT_DRAFT_COMPARATOR: CombatOrderComparator = 'LessThan';
 const DEFAULT_DRAFT_HEALTH_DIRECTION: CombatOrderHealthDirection = 'Below';
 
-// The mandatory trailing fallback row - not a real stored clause; rendered
-// read-only via the same row component so it looks consistent with the
-// rest of the list instead of standing out.
-const ALWAYS_RANDOM_CLAUSE: CombatOrderClause = {
-  id: 'always-random-fallback' as CombatOrderClauseId,
-  enabled: true,
-  condition: { type: 'Always' },
-  action: { type: 'RandomSkill' },
-};
-
 @Component({
   selector: 'app-modal-hero-combat-orders',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -161,7 +154,7 @@ export class ModalHeroCombatOrdersComponent {
   public readonly healthDirectionOptions = HEALTH_DIRECTION_OPTIONS;
   public readonly elementOptions = ELEMENT_OPTIONS;
   public readonly maxElementCharges = COMBAT_ELEMENT_CHARGES_PER_ELEMENT;
-  public readonly alwaysRandomClause = ALWAYS_RANDOM_CLAUSE;
+  public readonly alwaysRandomClause = COMBAT_ORDER_ALWAYS_RANDOM_CLAUSE;
 
   public party = computed<Character[]>(() => worldPartyState());
 

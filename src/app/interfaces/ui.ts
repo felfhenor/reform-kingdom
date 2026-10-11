@@ -17,6 +17,8 @@ export type BlankSlateSize = 'inline' | 'page';
 export type GamePlayView =
   'world' | 'kingdom' | 'adventurelog' | 'heroes' | 'decree' | 'town';
 
+export type HeroesSubview = '' | 'regalia';
+
 export type KingdomSubview =
   | 'storage'
   | 'museum'

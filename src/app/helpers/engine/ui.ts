@@ -16,6 +16,7 @@ import {
 import type {
   CharacterId,
   GamePlayView,
+  HeroesSubview,
   KingdomSubview,
   Tradeskill,
   WorldNodeEntry,
@@ -92,6 +93,17 @@ export const heroesSelectedCharacterId = signal<CharacterId | undefined>(
 
 export function heroesSelectCharacter(characterId: CharacterId): void {
   heroesSelectedCharacterId.set(characterId);
+}
+
+export const heroesSubview = signal<HeroesSubview>('');
+
+export function heroesSubviewClear(): void {
+  heroesSubview.set('');
+}
+
+export function regaliaPageOpen(characterId: CharacterId): void {
+  heroesSelectCharacter(characterId);
+  heroesSubview.set('regalia');
 }
 
 // Not cleared on close - clearing it would collapse the modal's DOM mid-transition.

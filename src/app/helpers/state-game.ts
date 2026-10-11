@@ -85,6 +85,7 @@ export const tutorialsState = gamestateSlice('tutorials');
 export const tasksState = gamestateSlice('tasks');
 export const lootFiltersState = gamestateSlice('lootFilters');
 export const armoryState = gamestateSlice('armory');
+export const regaliasState = gamestateSlice('regalias');
 export const globalEffectsState = gamestateSlice('globalEffects');
 export const globalEffectSumsState = gamestateSlice('globalEffectSums');
 export const activeAstralProjectorSpellsState = gamestateSlice(

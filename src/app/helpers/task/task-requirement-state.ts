@@ -30,6 +30,7 @@ function partyHasLearnedFromTrainer(
 function ownedEquipmentItems(state: GameState): EquipmentItem[] {
   return [
     ...state.armory,
+    ...state.regalias.vault,
     ...state.world.party.flatMap((character) =>
       equippedItems(character.equipment),
     ),

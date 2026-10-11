@@ -17,7 +17,12 @@ import {
   characterXpForLevel,
 } from '@helpers/hero/party';
 import { applyMaterialDelta } from '@helpers/item/materials';
-import { armoryState, gamestate, worldPartyState } from '@helpers/state-game';
+import {
+  armoryState,
+  gamestate,
+  regaliasState,
+  worldPartyState,
+} from '@helpers/state-game';
 import { taskEventLevelReached } from '@helpers/task/task-events';
 import type {
   Character,
@@ -30,6 +35,8 @@ import type {
   ItemId,
   JobContent,
   JobId,
+  Regalia,
+  RegaliaId,
 } from '@interfaces';
 import { captureAnalyticsEvents } from '@/testing/analytics';
 import { buildCharacter, buildEquipmentItem } from '@/testing/builders';
@@ -332,5 +339,78 @@ describe('auto-optimizing the new loadout', () => {
     await characterReclass('Jala' as CharacterId, 'gone' as JobId);
     expect(reclassed().equipment).toEqual(defaultEquipment());
     expect(armoryState()).toContainEqual(sword);
+  });
+});
+
+describe('regalias', () => {
+  const regalia = (
+    id: string,
+    characterId: string,
+    jobId: JobId,
+    items: EquipmentItem[],
+  ): Regalia => ({
+    id: id as RegaliaId,
+    name: id,
+    characterId: characterId as CharacterId,
+    jobId,
+    equipmentItemIds: items.map((item) => item.id),
+    combatOrders: [],
+    burstSkillIds: [],
+  });
+
+  beforeEach(() => seedJobs({ equippableTypes: ['Sword', 'Spear'] }));
+
+  it('loads the incoming job regalia instead of optimizing, vaulting only the outgoing regalia gear', async () => {
+    const [sword, spear] = [swordId, spearId].map((id) =>
+      buildEquipmentItem(id),
+    );
+    const jala = hero('Jala', {
+      currentRegaliaIds: {
+        [explorerId]: 'explorer' as RegaliaId,
+        [warriorId]: 'warrior' as RegaliaId,
+      },
+    });
+    seedWorld([jala], 100_000, [sword]);
+    seedGamestate((state) => {
+      Object.assign(state, gamestate());
+      state.regalias.entries = [
+        regalia('explorer', 'Jala', explorerId, [jala.equipment.Armor!]),
+        regalia('warrior', 'Jala', warriorId, [spear]),
+      ];
+      state.regalias.vault = [spear];
+    });
+
+    await characterReclass(jala.id, warriorId);
+
+    expect(reclassed().equipment.Weapon?.id).toBe(spear.id);
+    expect(regaliasState().vault.map((item) => item.id)).toEqual([
+      jala.equipment.Armor!.id,
+    ]);
+    expect(armoryState().map((item) => item.id)).toEqual([
+      sword.id,
+      jala.equipment.Helmet!.id,
+    ]);
+  });
+
+  it('loads regalia heroes before optimizing the rest, whatever the pick order', async () => {
+    const [sword, spear] = [swordId, spearId].map((id) =>
+      buildEquipmentItem(id),
+    );
+    const kim = hero('Kim', {
+      currentRegaliaIds: { [warriorId]: 'kim' as RegaliaId },
+    });
+    seedWorld([hero('Jala'), kim], 100_000, [sword, spear]);
+    seedGamestate((state) => {
+      Object.assign(state, gamestate());
+      state.regalias.entries = [regalia('kim', 'Kim', warriorId, [sword])];
+    });
+
+    await charactersReclass([
+      { characterId: 'Jala' as CharacterId, jobId: warriorId },
+      { characterId: kim.id, jobId: warriorId },
+    ]);
+
+    expect(reclassed(0).equipment.Weapon?.id).toBe(spear.id);
+    expect(reclassed(1).equipment.Weapon?.id).toBe(sword.id);
   });
 });

@@ -25,6 +25,7 @@ import {
 import {
   backfillEquipmentBlock,
   backfillEquipmentItem,
+  repairSplitEquippedItems,
 } from '@helpers/item/equipment';
 import { grandfatherGatherNodeDiscoveries } from '@helpers/item/gather-node-discovery';
 import { pruneInvalidMaterials } from '@helpers/item/materials';
@@ -38,6 +39,7 @@ import { repairUnwalkableCurrentLocation } from '@helpers/pathfinding/pathfindin
 import { pruneInvalidHomeNode } from '@helpers/town/town-spawn';
 import { pruneInvalidTowns } from '@helpers/town/town-prune';
 import { pruneInvalidBurstSkills } from '@helpers/hero/burst-skill';
+import { stateRegaliaMigrate } from '@helpers/hero/regalia-state';
 import { pruneInvalidCharacterTeachings } from '@helpers/trainer/trainer';
 import { pruneInvalidTasks, retrofitTasks } from '@helpers/task/task-migrate';
 import { TUTORIAL_CATALOG } from '@helpers/tutorial/tutorial-catalog';
@@ -150,6 +152,12 @@ export function migrateGameState() {
     teachings: pruneInvalidCharacterTeachings(character.teachings),
     burstSkills: pruneInvalidBurstSkills(character.burstSkills),
   }));
+  newState.world.party = newState.world.party.map((character) => {
+    const { equipment, extras } = repairSplitEquippedItems(character.equipment);
+    newState.armory.push(...extras);
+    return { ...character, equipment };
+  });
+  stateRegaliaMigrate(newState);
 
   newState.armory = pruneInvalidArmoryItems(newState.armory);
   newState.materials = pruneInvalidMaterials(newState.materials);

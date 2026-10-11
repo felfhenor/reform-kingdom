@@ -76,6 +76,12 @@ export type EquipmentItem = {
 
 export type EquipmentBlock = Record<EquipmentSlot, EquipmentItem | undefined>;
 
+// Result of merging a legacy split multi-slot item: `extras` are other real items it had overlapped, for the armory.
+export type EquipmentSplitRepair = {
+  equipment: EquipmentBlock;
+  extras: EquipmentItem[];
+};
+
 // Pairs an owned instance with its resolved content, for per-instance list
 // views (armory list, equip picker) where duplicate copies of the same
 // content id must stay visually distinct (e.g. different infusions).

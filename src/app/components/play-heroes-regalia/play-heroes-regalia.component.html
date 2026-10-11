@@ -1,0 +1,237 @@
+@let heroes = party();
+@let character = selectedCharacter();
+@let regaliaList = regalias();
+@let regalia = selectedRegalia();
+@let currentId = currentRegaliaId();
+@let missingMap = missingByRegalia();
+@let missingReasons = selectedMissingReasons();
+@let itemsById = ownedItemsById();
+@let burst = selectedBurstSkill();
+@let matches = selectedMatches();
+@let canModify = equipmentModifiable();
+
+<app-card-page heightProfile="full">
+  <span header>Regalias</span>
+
+  <app-button-kingdom-back pageactions [onBack]="back" />
+
+  <div pageactionssecondary class="flex gap-2">
+    @if (character && regalia) {
+      <app-slot-button-container
+        [disabled]="!canModify"
+        [helpText]="'This cannot be done in combat.'"
+      >
+        <button
+          type="button"
+          class="btn btn-primary btn-sm"
+          [disabled]="!canModify || (regalia.id === currentId && matches)"
+          (click)="equip()"
+          appSfx="ui-success"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Equip
+        </button>
+      </app-slot-button-container>
+
+      <button
+        type="button"
+        class="btn btn-secondary btn-sm"
+        (click)="rename()"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        Rename
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-error btn-sm"
+        [swal]="removeSwal"
+        appSfx="ui-error"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        Remove
+      </button>
+    }
+  </div>
+
+  <div class="grid grid-cols-[260px_300px_1fr] gap-4 h-full min-h-0">
+    <div class="flex flex-col gap-2 overflow-y-auto">
+      <span class="type-section-title">Heroes</span>
+
+      @for (hero of heroes; track hero.id) {
+        <button
+          appListRow
+          [listRowSelected]="character?.id === hero.id"
+          (click)="selectCharacter(hero.id)"
+          appSfx="ui-click"
+          [sfxOffset]="$index"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          <app-row-hero-summary [hero]="hero" />
+        </button>
+      }
+    </div>
+
+    <div class="flex flex-col gap-2 min-h-0">
+      <span class="type-section-title">Regalias</span>
+
+      @if (character) {
+        <div class="flex flex-col gap-2 overflow-y-auto h-full" appListReflow>
+          @for (entry of regaliaList; track entry.id) {
+            @let missingCount = missingMap.get(entry.id)?.length ?? 0;
+
+            <button
+              appListRow
+              [listRowSelected]="regalia?.id === entry.id"
+              (click)="selectRegalia(entry)"
+              appSfx="ui-click"
+              [sfxOffset]="$index"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              <app-slot-icon-blank>
+                <app-icon name="gameCrown" size="nav" />
+              </app-slot-icon-blank>
+
+              <div class="flex flex-col min-w-0 items-start gap-2">
+                <span class="type-entity-name truncate">{{ entry.name }}</span>
+
+                <div class="flex gap-2">
+                  @if (entry.id === currentId) {
+                    <span class="badge badge-sm badge-success">Current</span>
+                  }
+
+                  @if (missingCount > 0) {
+                    <span
+                      class="badge badge-sm badge-warning"
+                      [tp]="'Some of this regalia\'s gear is unavailable.'"
+                    >
+                      {{ missingCount | number }} missing
+                    </span>
+                  }
+                </div>
+              </div>
+            </button>
+          }
+
+          @if (regaliaList.length < maxRegalias) {
+            <button
+              appListRow
+              (click)="create()"
+              appSfx="ui-click"
+              [sfxOffset]="regaliaList.length"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              <app-slot-icon-blank>
+                <app-icon name="tablerPlus" size="nav" />
+              </app-slot-icon-blank>
+
+              <div class="flex flex-col min-w-0">
+                <span class="type-entity-name truncate">Create Regalia</span>
+                <span class="type-meta">Save current loadout</span>
+              </div>
+            </button>
+          }
+        </div>
+      } @else {
+        <app-blank-slate>No heroes yet.</app-blank-slate>
+      }
+    </div>
+
+    <div class="flex flex-col gap-4 h-full min-h-0 overflow-y-auto pl-2">
+      @if (regalia) {
+        <div class="flex flex-col gap-2 shrink-0">
+          <span class="type-label">Equipment</span>
+
+          @for (itemId of regalia.equipmentItemIds; track itemId) {
+            @let item = itemsById.get(itemId);
+            @let reason = missingReasons.get(itemId);
+
+            <div
+              class="flex items-center gap-2"
+              [class.opacity-50]="!!reason"
+              [tp]="missingTooltip(reason)"
+              [tpIsEnabled]="!!reason"
+            >
+              @if (item) {
+                <app-row-equipment-item-summary [item]="item" />
+              } @else {
+                <app-slot-icon-blank>
+                  <app-icon name="tablerExclamationCircle" size="nav" />
+                </app-slot-icon-blank>
+                <span class="type-meta italic">Item missing</span>
+              }
+
+              @if (reason) {
+                <app-icon
+                  name="tablerExclamationCircle"
+                  size="row"
+                  class="text-warning shrink-0"
+                />
+              }
+            </div>
+          } @empty {
+            <span class="type-hint">No equipment saved.</span>
+          }
+        </div>
+
+        <div class="flex flex-col gap-2 shrink-0">
+          <span class="type-label">Burst Skill</span>
+
+          @if (burst) {
+            <div class="flex items-center gap-2">
+              <app-slot-rarity-outline [entry]="burst" spritesheet="skill" />
+              <span class="text-{{ burst.rarity }}">{{ burst.name }}</span>
+            </div>
+          } @else {
+            <span class="type-hint">No burst skill chosen.</span>
+          }
+        </div>
+
+        <div class="flex flex-col gap-2 shrink-0">
+          <span class="type-label">Combat Orders</span>
+
+          <ul class="flex flex-col gap-2">
+            @for (clause of regalia.combatOrders; track clause.id) {
+              <li class="flex flex-row items-center gap-2 p-2 bg-base-200">
+                <app-row-combat-order-clause
+                  [clause]="clause"
+                  [readOnly]="true"
+                />
+              </li>
+            }
+
+            <li class="flex flex-row items-center gap-2 p-2 bg-base-200">
+              <app-row-combat-order-clause
+                [clause]="alwaysRandomClause"
+                [readOnly]="true"
+              />
+            </li>
+          </ul>
+        </div>
+      } @else {
+        <app-blank-slate>
+          Select a regalia, or create one from this hero's current loadout.
+        </app-blank-slate>
+      }
+    </div>
+  </div>
+</app-card-page>
+
+<swal
+  #renameSwal
+  title="Rename regalia"
+  input="text"
+  confirmButtonText="Rename"
+  cancelButtonText="Cancel"
+></swal>
+
+<swal
+  #removeSwal
+  title="Remove this regalia?"
+  text="Gear the hero is wearing stays equipped. Stored gear only this regalia uses returns to the armory."
+  icon="warning"
+  confirmButtonText="Yes, remove it"
+  cancelButtonText="Cancel"
+  (confirm)="remove()"
+></swal>

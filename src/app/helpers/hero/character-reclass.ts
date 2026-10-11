@@ -6,7 +6,12 @@ import {
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { characterStats, characterXpForLevel } from '@helpers/hero/party';
-import { equippedItems } from '@helpers/item/equipment';
+import { characterCurrentRegalia } from '@helpers/hero/regalia';
+import {
+  stateCharacterUnequipForRegalia,
+  stateRegaliaLoad,
+  stateRegaliaSettle,
+} from '@helpers/hero/regalia-state';
 import { planEquipmentOptimization } from '@helpers/item/equipment-optimize';
 import { applyMaterialDelta, goldCoinId } from '@helpers/item/materials';
 import { updateGamestate } from '@helpers/state-game';
@@ -24,6 +29,7 @@ import type {
 import { EquipmentTypeToSlot } from '@interfaces';
 import { partyMaxLevel } from '@helpers/item/gathering';
 import { taskEventLevelReached } from '@helpers/task/task-events';
+import { partition } from 'es-toolkit/compat';
 
 // Level the hero would resume a job at: their current level if it's the active job, else their saved progress, else 1 for a job never held.
 export function characterJobLevel(character: Character, jobId: JobId): number {
@@ -86,7 +92,7 @@ function applyOptimizationWinners(
 }
 
 // Mutates `state` in place - shared across every pick in a reclass batch, so an earlier pick's gold spend is reflected before a later pick's affordability check.
-function reclassCharacterInState(
+function reclassCharacterStart(
   state: GameState,
   characterId: CharacterId,
   jobId: JobId,
@@ -99,43 +105,73 @@ function reclassCharacterInState(
   if ((state.materials[goldId]?.quantity ?? 0) < cost) return false;
 
   applyMaterialDelta(state, goldId, -cost);
-
-  state.armory = [...state.armory, ...equippedItems(character.equipment)];
+  stateCharacterUnequipForRegalia(state, characterId);
 
   const { jobProgress, level, xp } = characterJobProgressSwap(character, jobId);
-  const job = getEntry<JobContent>(jobId);
-  const winners = job
-    ? planEquipmentOptimization(
-        { ...character, jobId, level, equipment: defaultEquipment() },
-        state.armory,
-        job.statPriority,
-      )
-    : [];
-  const { equipment, armory } = applyOptimizationWinners(state.armory, winners);
-  state.armory = armory;
-
-  const stats = characterStats({ ...character, jobId, level, equipment });
-
-  state.world.party = state.world.party.map((c) =>
-    c.id === characterId
-      ? {
-          ...c,
-          jobId,
-          jobProgress,
-          equipment,
-          stats,
-          hp: stats.Health,
-          ep: stats.Energy,
-          level,
-          xp,
-        }
-      : c,
-  );
-
+  Object.assign(character, { jobId, jobProgress, level, xp });
   return true;
 }
 
-// Reclassing unequips gear to the Armory rather than discarding it, then auto-optimizes the new loadout.
+function reclassCharacterOptimize(
+  state: GameState,
+  characterId: CharacterId,
+): void {
+  const character = state.world.party.find((c) => c.id === characterId);
+  const job = character ? getEntry<JobContent>(character.jobId) : undefined;
+  if (!character || !job) return;
+
+  const winners = planEquipmentOptimization(
+    character,
+    state.armory,
+    job.statPriority,
+  );
+  const { equipment, armory } = applyOptimizationWinners(state.armory, winners);
+  state.armory = armory;
+  character.equipment = equipment;
+}
+
+function reclassCharacterFinish(
+  state: GameState,
+  characterId: CharacterId,
+): void {
+  const character = state.world.party.find((c) => c.id === characterId);
+  if (!character) return;
+
+  const stats = characterStats(character);
+  Object.assign(character, { stats, hp: stats.Health, ep: stats.Energy });
+}
+
+// Every hero is unequipped before any loads, and regalia heroes load before the rest optimize, so batch order can't steal gear.
+function reclassCharactersInState(
+  state: GameState,
+  picks: CharacterReclassPick[],
+): CharacterReclassPick[] {
+  const started = picks.filter((pick) =>
+    reclassCharacterStart(state, pick.characterId, pick.jobId),
+  );
+  const regaliaFor = (pick: CharacterReclassPick) => {
+    const character = state.world.party.find((c) => c.id === pick.characterId);
+    return character
+      ? characterCurrentRegalia(state.regalias.entries, character)
+      : undefined;
+  };
+  const [withRegalia, without] = partition(
+    started,
+    (pick) => !!regaliaFor(pick),
+  );
+
+  withRegalia.forEach((pick) => {
+    const regalia = regaliaFor(pick);
+    if (regalia) stateRegaliaLoad(state, pick.characterId, regalia);
+  });
+  without.forEach((pick) => reclassCharacterOptimize(state, pick.characterId));
+  started.forEach((pick) => reclassCharacterFinish(state, pick.characterId));
+
+  stateRegaliaSettle(state);
+  return started;
+}
+
+// Reclassing unequips gear (to the Armory, or the regalia vault), then loads the new job's current regalia or auto-optimizes.
 // Batched into one `updateGamestate` transaction so a multi-hero "Reclass All" prices and applies every swap atomically.
 export async function charactersReclass(
   picks: CharacterReclassPick[],
@@ -143,11 +179,9 @@ export async function charactersReclass(
   const reclassedJobNames: string[] = [];
 
   await updateGamestate((state) => {
-    picks.forEach((pick) => {
-      if (reclassCharacterInState(state, pick.characterId, pick.jobId)) {
-        const jobName = getEntry<JobContent>(pick.jobId)?.name;
-        if (jobName) reclassedJobNames.push(jobName);
-      }
+    reclassCharactersInState(state, picks).forEach((pick) => {
+      const jobName = getEntry<JobContent>(pick.jobId)?.name;
+      if (jobName) reclassedJobNames.push(jobName);
     });
 
     return state;

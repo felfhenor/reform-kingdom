@@ -56,6 +56,7 @@ export function defaultGameState(): GameState {
     discoveredMaterials: {},
     collectibles: {},
     armory: [],
+    regalias: { entries: [], vault: [] },
     lootFilters: defaultLootFilterSettings(),
     discoveredEquipment: {},
     discoveredCaravans: {},

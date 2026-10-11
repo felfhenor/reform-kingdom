@@ -55,7 +55,7 @@ function equipmentClearedSlots(
 }
 
 // Mutates `state`; reads displacement from it too, so chained equips in one callback see each other.
-function stateEquipFromArmory(
+export function stateEquipFromArmory(
   state: GameState,
   characterId: CharacterId,
   armoryItem: EquipmentItem,

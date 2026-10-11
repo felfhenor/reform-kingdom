@@ -38,12 +38,12 @@
           class="btn btn-sm btn-info"
           [class.btn-outline]="activeGamePlayView() !== 'heroes'"
           tp="Heroes [3]"
-          (click)="changeGamePlayView('heroes')"
+          (click)="setHeroesPlayView()"
           appSfx="ui-click"
           [sfxOffset]="3"
           [sfxTrigger]="['click', 'hover']"
           [hotkeys]="'3'"
-          (hotkey)="hotkeyMatches($event, '3') && changeGamePlayView('heroes')"
+          (hotkey)="hotkeyMatches($event, '3') && setHeroesPlayView()"
           isGlobal
           appTutorialTarget="nav-heroes"
         >

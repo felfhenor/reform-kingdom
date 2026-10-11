@@ -45,6 +45,13 @@
             </ng-template>
           </ng-select>
         </div>
+
+        @if (unsavedRegaliaNames()[$index]; as regaliaName) {
+          <div class="badge badge-warning">
+            {{ character.name }}'s "{{ regaliaName }}" regalia has unsaved
+            changes.
+          </div>
+        }
       }
     }
   </div>
@@ -76,7 +83,8 @@
   [text]="
     'Any hero whose class you changed will be reclassed and their equipment will be unequipped. This action will cost ' +
     (totalReclassCost() | number) +
-    ' gold.'
+    ' gold.' +
+    (hasUnsavedRegalias() ? ' Some heroes have unsaved regalia changes.' : '')
   "
   icon="warning"
   (confirm)="applyReclassAll()"

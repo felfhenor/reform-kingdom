@@ -10,7 +10,7 @@ import type {
 } from '@interfaces';
 import { uniq } from 'es-toolkit/compat';
 
-function burstSkillIdFor(ref: string): EquipmentSkillId[] {
+export function burstSkillIdFor(ref: string): EquipmentSkillId[] {
   const skill = getEntry<EquipmentSkillContent>(ref);
   return skill?.__type === 'skill' && skillIsSpecial(skill) ? [skill.id] : [];
 }

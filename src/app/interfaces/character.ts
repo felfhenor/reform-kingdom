@@ -4,6 +4,7 @@ import type { EquipmentSkillId } from '@interfaces/content-skill';
 import type { TrainerTeachingId } from '@interfaces/content-trainer-teaching';
 import type { EquipmentBlock } from '@interfaces/equipment';
 import type { Branded } from '@interfaces/identifiable';
+import type { RegaliaId } from '@interfaces/regalia';
 import type { StatBlock } from '@interfaces/stat';
 
 export type CharacterId = Branded<string, 'CharacterId'>;
@@ -36,6 +37,8 @@ export type Character = {
   teachings: Partial<Record<JobId, TrainerTeachingId[]>>;
   // Chosen special skills, keyed by job id; a specific skill rather than a family so any learned tier can be picked.
   burstSkills: Partial<Record<JobId, EquipmentSkillId[]>>;
+  // The regalia last loaded for each job, re-equipped when reclassing back into that job.
+  currentRegaliaIds: Partial<Record<JobId, RegaliaId>>;
 
   hp: number;
   ep: number;

@@ -1,6 +1,10 @@
 import { resetCombatLog } from '@helpers/combat/combat-log';
 import { ledgerMark } from '@helpers/engine/ledger';
-import { kingdomSubviewClear, setGamePlayView } from '@helpers/engine/ui';
+import {
+  heroesSubviewClear,
+  kingdomSubviewClear,
+  setGamePlayView,
+} from '@helpers/engine/ui';
 import { grantStartingGold } from '@helpers/item/materials';
 import { migrateGameState } from '@helpers/migrate';
 import { savefileMarkFresh } from '@helpers/savefile/savefile-load';
@@ -39,5 +43,6 @@ export function gameReset(): void {
 
   setGamePlayView('world');
   kingdomSubviewClear();
+  heroesSubviewClear();
   resetCombatLog();
 }
