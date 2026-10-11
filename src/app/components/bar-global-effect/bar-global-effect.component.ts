@@ -53,7 +53,7 @@ import { AnimationService } from '@services/animation.service';
               <p class="italic">{{ effectDescription(effect) }}</p>
 
               @if (effect.extendedDescription) {
-                <p class="type-hint mt-2">
+                <p class="type-meta mt-2">
                   {{ effect.extendedDescription }}
                 </p>
               }

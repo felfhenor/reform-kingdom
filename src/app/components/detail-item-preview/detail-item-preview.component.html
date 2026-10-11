@@ -25,7 +25,7 @@
           @if (equippable.length > 0) {
             {{ equippable.join(' ') }}
           } @else {
-            <span class="text-warning">
+            <span class="badge badge-sm badge-warning">
               None of your heroes can equip this.
             </span>
           }
@@ -68,7 +68,7 @@
     />
 
     @if (item.elements?.length) {
-      <div class="type-hint my-2">
+      <div class="type-meta my-2">
         Attacks deal {{ item.elements!.join('/') }} damage
       </div>
     }
@@ -78,7 +78,7 @@
     <app-row-skill-stat-bonuses [bonuses]="item.skillStatBonuses" />
 
     @for (skill of item.skills; track skill.id) {
-      <div class="type-hint my-2 flex items-center gap-2">
+      <div class="type-meta my-2 flex items-center gap-2">
         Teaches
         <span class="zoom-inline">
           <app-slot-icon-blank [showBackground]="false">

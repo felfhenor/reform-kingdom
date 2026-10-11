@@ -328,9 +328,7 @@
             }
 
             @if (atRowCap() && !isEditing()) {
-              <span class="text-xs text-warning">
-                Orders limit reached ({{ rowCap }} max).
-              </span>
+              <span class="badge badge-warning">Orders limit reached.</span>
             }
           </div>
         </div>

@@ -52,7 +52,7 @@
             Discoverable in: {{ e.sourceNodeNames.join(', ') }}
           </span>
         } @else {
-          <span class="type-hint">Location unknown</span>
+          <span class="type-meta">Location unknown</span>
         }
       </div>
     }
@@ -84,7 +84,7 @@
                 (animate.enter)="onSkillEnter($event, $index)"
               />
             } @empty {
-              <span class="type-hint">No skills.</span>
+              <span class="type-flavor">No skills.</span>
             }
           }
         </div>

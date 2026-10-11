@@ -77,6 +77,12 @@ body {
   min-height: 2rem;
 }
 
+// daisyUI badges are fixed-height, so a wrapped warning sentence would spill out of its fill.
+.badge {
+  height: auto;
+  min-height: var(--size);
+}
+
 .tippy-variation-contextMenu .tippy-box {
   background-color: unset;
   color: unset;

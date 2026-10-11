@@ -63,13 +63,17 @@
       }
 
       @if (e.tokenUnlockCost !== undefined) {
-        <div class="type-hint flex items-center gap-2 mt-1">
-          {{ canUnlock() ? 'Click to unlock for' : 'Unlock for' }}
+        <div class="type-meta flex items-center gap-2 mt-1">
+          Unlock for
           <app-currency-cost
             [type]="traderTokenItemId"
             [amount]="e.tokenUnlockCost"
           />
         </div>
+
+        @if (canUnlock()) {
+          <div class="type-hint mt-1">Click to unlock.</div>
+        }
       }
     </div>
   </div>

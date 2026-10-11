@@ -9,10 +9,10 @@
   </h2>
 
   @if (craftDebuffRemaining(); as debuffRemaining) {
-    <p class="text-warning italic">
+    <div class="badge badge-warning">
       This town was recently raided, it will craft slower for
       {{ debuffRemaining }}.
-    </p>
+    </div>
   }
 
   @if (raidTelegraph()) {

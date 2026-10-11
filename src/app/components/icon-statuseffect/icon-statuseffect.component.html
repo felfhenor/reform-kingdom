@@ -83,10 +83,10 @@
     }
 
     @if (e.tags.length > 0) {
-      <div class="flex flex-wrap items-center gap-2 type-hint">
+      <div class="flex flex-wrap items-center gap-2 type-meta">
         Resisted by
         @for (tag of e.tags; track tag) {
-          <span class="flex items-center gap-2 not-italic">
+          <span class="flex items-center gap-2">
             <app-icon-dimension
               [dimension]="tagDimension"
               [key]="tag"
