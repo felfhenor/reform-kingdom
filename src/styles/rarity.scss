@@ -2,11 +2,16 @@
 @reference 'tailwindcss';
 
 :root {
-  --color-white: #ffffff;
-  --color-green-400: #4ade80;
-  --color-blue-400: #60a5fa;
-  --color-purple-400: #c084fc;
-  --color-yellow-400: #facc15;
+  --color-common: #ffffff;
+  --color-common-dark: #4b5563;
+  --color-uncommon: #4ade80;
+  --color-uncommon-dark: #15803d;
+  --color-rare: #60a5fa;
+  --color-rare-dark: #2563eb;
+  --color-mystical: #c084fc;
+  --color-mystical-dark: #9333ea;
+  --color-legendary: #facc15;
+  --color-legendary-dark: #a16207;
 }
 
 .text-value-positive {
@@ -58,51 +63,46 @@
 }
 
 .bg-Common {
-  @apply text-black;
-  --bg-color: var(--color-white) !important;
-  --btn-color: var(--color-white) !important;
+  @apply text-white;
+  --btn-color: var(--color-common-dark) !important;
 
   &.btn-outline {
-    @apply text-white;
+    --btn-color: var(--color-common) !important;
   }
 }
 
 .bg-Uncommon {
-  @apply text-black;
-  --bg-color: var(--color-green-400) !important;
-  --btn-color: var(--color-green-400) !important;
+  @apply text-white;
+  --btn-color: var(--color-uncommon-dark) !important;
 
   &.btn-outline {
-    @apply text-white;
+    --btn-color: var(--color-uncommon) !important;
   }
 }
 
 .bg-Rare {
-  @apply text-black;
-  --bg-color: var(--color-blue-400) !important;
-  --btn-color: var(--color-blue-400) !important;
+  @apply text-white;
+  --btn-color: var(--color-rare-dark) !important;
 
   &.btn-outline {
-    @apply text-white;
+    --btn-color: var(--color-rare) !important;
   }
 }
 
 .bg-Mystical {
-  @apply text-black;
-  --bg-color: var(--color-purple-400) !important;
-  --btn-color: var(--color-purple-400) !important;
+  @apply text-white;
+  --btn-color: var(--color-mystical-dark) !important;
 
   &.btn-outline {
-    @apply text-white;
+    --btn-color: var(--color-mystical) !important;
   }
 }
 
 .bg-Legendary {
-  @apply text-black;
-  --bg-color: var(--color-yellow-400) !important;
-  --btn-color: var(--color-yellow-400) !important;
+  @apply text-white;
+  --btn-color: var(--color-legendary-dark) !important;
 
   &.btn-outline {
-    @apply text-white;
+    --btn-color: var(--color-legendary) !important;
   }
 }
