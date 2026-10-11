@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { ModalPlayKingdomReclassComponent } from '@components/modal-play-kingdom-reclass/modal-play-kingdom-reclass.component';
 import { ModalRaidDefenseComponent } from '@components/modal-raid-defense/modal-raid-defense.component';
 import { PageBlankComponent } from '@components/page-blank/page-blank.component';
-import { PlayKingdomAchievementsComponent } from '@components/play-kingdom-achievements/play-kingdom-achievements.component';
+import { PanelKingdomNavComponent } from '@components/panel-kingdom-nav/panel-kingdom-nav.component';
 import { PlayKingdomArmoryComponent } from '@components/play-kingdom-armory/play-kingdom-armory.component';
 import { PlayKingdomAstralProjectorComponent } from '@components/play-kingdom-astralprojector/play-kingdom-astralprojector.component';
 import { PlayKingdomBestiaryComponent } from '@components/play-kingdom-bestiary/play-kingdom-bestiary.component';
@@ -10,7 +10,6 @@ import { PlayKingdomCommissionsComponent } from '@components/play-kingdom-commis
 import { PlayKingdomHomeComponent } from '@components/play-kingdom-home/play-kingdom-home.component';
 import { PlayKingdomWorkshopComponent } from '@components/play-kingdom-workshop/play-kingdom-workshop.component';
 import { PlayKingdomMuseumComponent } from '@components/play-kingdom-museum/play-kingdom-museum.component';
-import { PlayKingdomPrestigeComponent } from '@components/play-kingdom-prestige/play-kingdom-prestige.component';
 import { PlayKingdomStorageComponent } from '@components/play-kingdom-storage/play-kingdom-storage.component';
 import { PlayKingdomTradeskillArtificingComponent } from '@components/play-kingdom-tradeskill-artificing/play-kingdom-tradeskill-artificing.component';
 import { PlayKingdomTradeskillBlacksmithingComponent } from '@components/play-kingdom-tradeskill-blacksmithing/play-kingdom-tradeskill-blacksmithing.component';
@@ -37,12 +36,11 @@ import { kingdomSubview } from '@helpers/engine/ui';
     PlayKingdomTradeskillJewelcraftingComponent,
     PlayKingdomTradeskillTailoringComponent,
     PlayKingdomTradeskillWoodworkingComponent,
-    PlayKingdomAchievementsComponent,
-    PlayKingdomPrestigeComponent,
     PlayKingdomWorkersComponent,
     ModalPlayKingdomReclassComponent,
     ModalRaidDefenseComponent,
     PageBlankComponent,
+    PanelKingdomNavComponent,
   ],
   templateUrl: './game-play-kingdom.component.html',
 })

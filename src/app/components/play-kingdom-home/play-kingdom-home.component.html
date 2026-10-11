@@ -18,8 +18,8 @@
             <span
               class="text-base font-bold flex items-center gap-2 justify-center"
             >
-              <app-icon name="gameChest" size="row" />
-              Storage
+              <app-icon [name]="nav.storage.icon" size="row" />
+              {{ nav.storage.label }}
             </span>
             <span class="type-meta">
               {{ count }}
@@ -38,8 +38,8 @@
             <span
               class="text-base font-bold flex items-center gap-2 justify-center"
             >
-              <app-icon name="gameCrossedSwords" size="row" />
-              Armory
+              <app-icon [name]="nav.armory.icon" size="row" />
+              {{ nav.armory.label }}
             </span>
 
             <app-bar-progress
@@ -51,27 +51,28 @@
             </app-bar-progress>
           </button>
 
-          @let spellCount = unlockedAstralSpellCount();
-          <button
-            class="btn btn-primary flex flex-col justify-center gap-2 h-28"
-            (click)="openSubview('astralprojector')"
-            appSfx="ui-click"
-            [sfxOffset]="2"
-            [sfxTrigger]="['click', 'hover']"
-            [disabled]="spellCount === 0"
-          >
-            <span
-              class="text-base font-bold flex items-center gap-2 justify-center"
+          @if (isFeatureAvailable('astralprojector')) {
+            @let spellCount = unlockedAstralSpellCount();
+            <button
+              class="btn btn-primary flex flex-col justify-center gap-2 h-28"
+              (click)="openSubview('astralprojector')"
+              appSfx="ui-click"
+              [sfxOffset]="2"
+              [sfxTrigger]="['click', 'hover']"
             >
-              <app-icon name="gameCrystalBall" size="row" />
-              Astral Projector
-            </span>
+              <span
+                class="text-base font-bold flex items-center gap-2 justify-center"
+              >
+                <app-icon [name]="nav.astralprojector.icon" size="row" />
+                {{ nav.astralprojector.label }}
+              </span>
 
-            <span class="type-meta">
-              {{ spellCount | number }}
-              {{ 'spell' | pluralize: spellCount > 1 }} learned
-            </span>
-          </button>
+              <span class="type-meta">
+                {{ spellCount | number }}
+                {{ 'spell' | pluralize: spellCount > 1 }} learned
+              </span>
+            </button>
+          }
         </div>
       </div>
     </div>
@@ -96,8 +97,8 @@
             <span
               class="text-base font-bold flex items-center gap-2 justify-center"
             >
-              <app-icon name="gameTrophyCup" size="row" />
-              Museum
+              <app-icon [name]="nav.museum.icon" size="row" />
+              {{ nav.museum.label }}
             </span>
 
             <app-bar-progress
@@ -128,8 +129,8 @@
             <span
               class="text-base font-bold flex items-center gap-2 justify-center"
             >
-              <app-icon name="gameOpenBook" size="row" />
-              Bestiary
+              <app-icon [name]="nav.bestiary.icon" size="row" />
+              {{ nav.bestiary.label }}
             </span>
 
             <app-bar-progress [value]="discovered" [max]="bestiaryList.length">
@@ -140,7 +141,7 @@
       </div>
     </div>
 
-    @if (workersUnlocked()) {
+    @if (isFeatureAvailable('workers')) {
       <div class="card shadow-sm">
         <div class="card-body p-3 gap-2">
           <h2 class="type-section-title">Workforce</h2>
@@ -157,8 +158,8 @@
               <span
                 class="text-base font-bold flex items-center gap-2 justify-center"
               >
-                <app-icon name="gameMeepleGroup" size="row" />
-                Quartermaster's Annex
+                <app-icon [name]="nav.workers.icon" size="row" />
+                {{ nav.workers.label }}
               </span>
               <span class="type-meta">
                 {{ workerBusyCount() }}/{{ workerTotalCount() }} workers busy
@@ -278,7 +279,7 @@
             }
           </button>
 
-          @if (workshopUnlocked()) {
+          @if (isFeatureAvailable('workshop')) {
             <button
               class="btn btn-accent btn-sm"
               (click)="openSubview('workshop')"
@@ -286,12 +287,12 @@
               [sfxOffset]="2"
               [sfxTrigger]="['click', 'hover']"
             >
-              <app-icon name="gameAnvil" size="row" />
-              Workshop
+              <app-icon [name]="nav.workshop.icon" size="row" />
+              {{ nav.workshop.label }}
             </button>
           }
 
-          @if (commissionsUnlocked()) {
+          @if (isFeatureAvailable('commissions')) {
             <button
               class="btn btn-accent btn-sm"
               (click)="openSubview('commissions')"
@@ -299,8 +300,8 @@
               [sfxOffset]="3"
               [sfxTrigger]="['click', 'hover']"
             >
-              <app-icon name="gameContract" size="row" />
-              Commissions
+              <app-icon [name]="nav.commissions.icon" size="row" />
+              {{ nav.commissions.label }}
             </button>
           }
 

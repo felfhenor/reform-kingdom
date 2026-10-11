@@ -5,6 +5,7 @@ export * from './astral-projector';
 export * from './astral-projector.ui';
 export * from './bestiary';
 export * from './bestiary.ui';
+export * from './kingdom-nav.ui';
 export * from './loot-filter';
 export * from './loot-filter.ui';
 export * from './museum';

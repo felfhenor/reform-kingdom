@@ -1,114 +1,109 @@
 @let subview = activeSubview();
 
-@switch (subview) {
-  @case ('storage') {
-    @defer (on immediate) {
-      <app-play-kingdom-storage></app-play-kingdom-storage>
-    } @placeholder {
-      <app-page-blank></app-page-blank>
+<div class="flex h-full">
+  @if (subview) {
+    <!-- Overlaps the card page's own left padding so the rail sits flush against the card. -->
+    <app-panel-kingdom-nav
+      class="relative z-10 shrink-0 mt-4 -mr-4 ml-4 self-start max-h-[calc(100%-2rem)] flex"
+    />
+  }
+
+  <div class="flex-1 min-w-0">
+    @switch (subview) {
+      @case ('storage') {
+        @defer (on immediate) {
+          <app-play-kingdom-storage></app-play-kingdom-storage>
+        } @placeholder {
+          <app-page-blank></app-page-blank>
+        }
+      }
+
+      @case ('museum') {
+        @defer (on immediate) {
+          <app-play-kingdom-museum></app-play-kingdom-museum>
+        } @placeholder {
+          <app-page-blank></app-page-blank>
+        }
+      }
+
+      @case ('bestiary') {
+        @defer (on immediate) {
+          <app-play-kingdom-bestiary></app-play-kingdom-bestiary>
+        } @placeholder {
+          <app-page-blank></app-page-blank>
+        }
+      }
+
+      @case ('armory') {
+        @defer (on immediate) {
+          <app-play-kingdom-armory></app-play-kingdom-armory>
+        } @placeholder {
+          <app-page-blank></app-page-blank>
+        }
+      }
+
+      @case ('commissions') {
+        @defer (on immediate) {
+          <app-play-kingdom-commissions></app-play-kingdom-commissions>
+        } @placeholder {
+          <app-page-blank></app-page-blank>
+        }
+      }
+
+      @case ('astralprojector') {
+        @defer (on immediate) {
+          <app-play-kingdom-astralprojector></app-play-kingdom-astralprojector>
+        } @placeholder {
+          <app-page-blank></app-page-blank>
+        }
+      }
+
+      @case ('workshop') {
+        @defer (on immediate) {
+          <app-play-kingdom-workshop></app-play-kingdom-workshop>
+        } @placeholder {
+          <app-page-blank></app-page-blank>
+        }
+      }
+
+      @case ('tradeskill-artificing') {
+        <app-play-kingdom-tradeskill-artificing></app-play-kingdom-tradeskill-artificing>
+      }
+
+      @case ('tradeskill-blacksmithing') {
+        <app-play-kingdom-tradeskill-blacksmithing></app-play-kingdom-tradeskill-blacksmithing>
+      }
+
+      @case ('tradeskill-jewelcrafting') {
+        <app-play-kingdom-tradeskill-jewelcrafting></app-play-kingdom-tradeskill-jewelcrafting>
+      }
+
+      @case ('tradeskill-tailoring') {
+        <app-play-kingdom-tradeskill-tailoring></app-play-kingdom-tradeskill-tailoring>
+      }
+
+      @case ('tradeskill-woodworking') {
+        <app-play-kingdom-tradeskill-woodworking></app-play-kingdom-tradeskill-woodworking>
+      }
+
+      @case ('workers') {
+        @defer (on immediate) {
+          <app-play-kingdom-workers></app-play-kingdom-workers>
+        } @placeholder {
+          <app-page-blank></app-page-blank>
+        }
+      }
+
+      @default {
+        @defer (on immediate) {
+          <app-play-kingdom-home></app-play-kingdom-home>
+        } @placeholder {
+          <app-page-blank></app-page-blank>
+        }
+      }
     }
-  }
-
-  @case ('museum') {
-    @defer (on immediate) {
-      <app-play-kingdom-museum></app-play-kingdom-museum>
-    } @placeholder {
-      <app-page-blank></app-page-blank>
-    }
-  }
-
-  @case ('bestiary') {
-    @defer (on immediate) {
-      <app-play-kingdom-bestiary></app-play-kingdom-bestiary>
-    } @placeholder {
-      <app-page-blank></app-page-blank>
-    }
-  }
-
-  @case ('armory') {
-    @defer (on immediate) {
-      <app-play-kingdom-armory></app-play-kingdom-armory>
-    } @placeholder {
-      <app-page-blank></app-page-blank>
-    }
-  }
-
-  @case ('commissions') {
-    @defer (on immediate) {
-      <app-play-kingdom-commissions></app-play-kingdom-commissions>
-    } @placeholder {
-      <app-page-blank></app-page-blank>
-    }
-  }
-
-  @case ('astralprojector') {
-    @defer (on immediate) {
-      <app-play-kingdom-astralprojector></app-play-kingdom-astralprojector>
-    } @placeholder {
-      <app-page-blank></app-page-blank>
-    }
-  }
-
-  @case ('workshop') {
-    @defer (on immediate) {
-      <app-play-kingdom-workshop></app-play-kingdom-workshop>
-    } @placeholder {
-      <app-page-blank></app-page-blank>
-    }
-  }
-
-  @case ('tradeskill-artificing') {
-    <app-play-kingdom-tradeskill-artificing></app-play-kingdom-tradeskill-artificing>
-  }
-
-  @case ('tradeskill-blacksmithing') {
-    <app-play-kingdom-tradeskill-blacksmithing></app-play-kingdom-tradeskill-blacksmithing>
-  }
-
-  @case ('tradeskill-jewelcrafting') {
-    <app-play-kingdom-tradeskill-jewelcrafting></app-play-kingdom-tradeskill-jewelcrafting>
-  }
-
-  @case ('tradeskill-tailoring') {
-    <app-play-kingdom-tradeskill-tailoring></app-play-kingdom-tradeskill-tailoring>
-  }
-
-  @case ('tradeskill-woodworking') {
-    <app-play-kingdom-tradeskill-woodworking></app-play-kingdom-tradeskill-woodworking>
-  }
-
-  @case ('achievements') {
-    @defer (on immediate) {
-      <app-play-kingdom-achievements></app-play-kingdom-achievements>
-    } @placeholder {
-      <app-page-blank></app-page-blank>
-    }
-  }
-
-  @case ('prestige') {
-    @defer (on immediate) {
-      <app-play-kingdom-prestige></app-play-kingdom-prestige>
-    } @placeholder {
-      <app-page-blank></app-page-blank>
-    }
-  }
-
-  @case ('workers') {
-    @defer (on immediate) {
-      <app-play-kingdom-workers></app-play-kingdom-workers>
-    } @placeholder {
-      <app-page-blank></app-page-blank>
-    }
-  }
-
-  @default {
-    @defer (on immediate) {
-      <app-play-kingdom-home></app-play-kingdom-home>
-    } @placeholder {
-      <app-page-blank></app-page-blank>
-    }
-  }
-}
+  </div>
+</div>
 
 <app-modal-play-kingdom-reclass></app-modal-play-kingdom-reclass>
 <app-modal-raid-defense></app-modal-raid-defense>

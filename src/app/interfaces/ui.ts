@@ -1,3 +1,6 @@
+import type { Icon } from '@interfaces/artable';
+import type { Tradeskill } from '@interfaces/tradeskill';
+
 export type DaisyColor =
   | 'primary'
   | 'secondary'
@@ -32,6 +35,34 @@ export type KingdomSubview =
   | 'tradeskill-jewelcrafting'
   | 'tradeskill-tailoring'
   | 'tradeskill-woodworking'
-  | 'achievements'
-  | 'prestige'
   | 'workers';
+
+export type KingdomFeatureSubview = Exclude<
+  KingdomSubview,
+  `tradeskill-${string}`
+>;
+
+export type KingdomNavGroup =
+  'reserves' | 'collections' | 'workforce' | 'crafting' | 'actions';
+
+export type KingdomFeatureNav = {
+  label: string;
+  icon: Icon;
+  group: KingdomNavGroup;
+  isAvailable?: () => boolean;
+};
+
+export type KingdomNavEntry =
+  | { kind: 'feature'; subview: KingdomSubview; label: string; icon: Icon }
+  | {
+      kind: 'tradeskill';
+      subview: KingdomSubview;
+      label: string;
+      sprite: string;
+      tradeskill: Tradeskill;
+    };
+
+export type KingdomNavSection = {
+  group: KingdomNavGroup;
+  entries: KingdomNavEntry[];
+};

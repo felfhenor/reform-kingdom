@@ -9,7 +9,6 @@ import { IconComponent } from '@components/icon/icon.component';
 import { SlotButtonContainerComponent } from '@components/slot-button-container/slot-button-container.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { commissionCanFulfill } from '@helpers/commission/commission-fulfill';
-import { hasAnyCommission } from '@helpers/commission/commission-tick.ui';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { craftQueueTicksRemaining } from '@helpers/crafting/crafting';
 import {
@@ -25,18 +24,19 @@ import {
   kingdomSubviewShow,
   uiClockTick,
 } from '@helpers/engine/ui';
-import { isInfusionUnlocked } from '@helpers/item/infusion';
-import { isReforgeUnlocked } from '@helpers/item/reforge';
 import { armoryCap, armoryGet } from '@helpers/kingdom/armory';
 import { armoryFillColor } from '@helpers/kingdom/armory.ui';
 import { unlockedAstralProjectorEntries } from '@helpers/kingdom/astral-projector.ui';
 import { getBestiaryEntries } from '@helpers/kingdom/bestiary.ui';
 import {
+  isKingdomFeatureAvailable,
+  KINGDOM_FEATURE_NAV,
+} from '@helpers/kingdom/kingdom-nav.ui';
+import {
   getMuseumCollectibleEntries,
   getMuseumRecipeEntries,
 } from '@helpers/kingdom/museum.ui';
 import {
-  discoveredWorkersState,
   materialsState,
   workersState,
   worldHomeNodeNameState,
@@ -110,10 +110,9 @@ export class PlayKingdomHomeComponent {
     () => this.bestiaryEntries().filter((entry) => entry.discovered).length,
   );
 
-  // Hidden until the player has rescued at least one worker.
-  public workersUnlocked = computed(
-    () => Object.keys(discoveredWorkersState()).length > 0,
-  );
+  protected readonly nav = KINGDOM_FEATURE_NAV;
+  protected isFeatureAvailable = isKingdomFeatureAvailable;
+
   public workerTotalCount = computed(() => Object.keys(workersState()).length);
   public workerBusyCount = computed(
     () =>
@@ -124,13 +123,6 @@ export class PlayKingdomHomeComponent {
   public workerLevelUpReadyCount = computed(
     () => workersReadyToLevelUpEntries().length,
   );
-
-  public workshopUnlocked = computed(
-    () => isInfusionUnlocked() || isReforgeUnlocked(),
-  );
-
-  // Hidden until any caravan has actually generated a commission.
-  public commissionsUnlocked = computed(() => hasAnyCommission());
 
   public raidDefenseCount = computed(() => raidDefenseRowViewModels().length);
 

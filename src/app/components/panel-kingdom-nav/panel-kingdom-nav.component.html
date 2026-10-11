@@ -1,0 +1,52 @@
+<nav
+  class="flex flex-col items-center gap-2 p-2 max-h-full overflow-y-auto bg-base-100 shadow-xl"
+  aria-label="Kingdom navigation"
+>
+  <button
+    type="button"
+    class="btn btn-square btn-ghost"
+    tp="Kingdom"
+    [tpPlacement]="'right'"
+    aria-label="Kingdom"
+    (click)="kingdomSubviewClear()"
+    appSfx="ui-click"
+    [sfxTrigger]="['click', 'hover']"
+  >
+    <app-icon name="gameCastle" size="nav" />
+  </button>
+
+  @let active = kingdomSubview();
+  @for (section of sections(); track section.group) {
+    <div class="divider my-0 h-0"></div>
+
+    @for (item of section.items; track item.entry.subview) {
+      @let isActive = item.entry.subview === active;
+      <button
+        (animate.enter)="onEntryEnter($event)"
+        type="button"
+        class="btn btn-square"
+        [class.btn-ghost]="!isActive"
+        [class.btn-primary]="isActive"
+        [class.glow-idle]="item.isIdle"
+        [tp]="item.tooltip"
+        [tpPlacement]="'right'"
+        [attr.aria-label]="item.entry.label"
+        [attr.aria-current]="isActive ? 'page' : null"
+        (click)="kingdomSubviewShow(item.entry.subview)"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        @if (item.entry.kind === 'tradeskill') {
+          <div class="zoom-row">
+            <app-atlas-image
+              spritesheet="tradeskill"
+              [assetName]="item.entry.sprite"
+            />
+          </div>
+        } @else {
+          <app-icon [name]="item.entry.icon" size="nav" />
+        }
+      </button>
+    }
+  }
+</nav>
