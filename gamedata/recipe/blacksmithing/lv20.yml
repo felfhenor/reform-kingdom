@@ -219,7 +219,7 @@
   minTradeskillLevel: 24
   maxTradeskillLevel: 25
   tradeskillXP: 20
-  craftTime: 20
+  craftTime: 5
 
 - id: ca4f1531-028c-4509-bd8c-29cb6264af3b
   name: 'Material: Fel Copper Ingot'
