@@ -31,6 +31,7 @@
     - itemId: Fel Essence
       min: 4
       max: 7
+      chance: 100
       minLevel: 25
 
   skills:
@@ -94,6 +95,7 @@
     - itemId: Fel Essence
       min: 4
       max: 7
+      chance: 100
       minLevel: 25
 
   skills:
@@ -150,6 +152,7 @@
     - itemId: Fel Essence
       min: 4
       max: 7
+      chance: 100
       minLevel: 25
 
     - itemId: Beholder Eyeball
@@ -212,6 +215,7 @@
     - itemId: Fel Essence
       min: 4
       max: 7
+      chance: 100
       minLevel: 25
 
     - itemId: Pixie Claw
@@ -279,6 +283,7 @@
     - itemId: Fel Essence
       min: 4
       max: 7
+      chance: 100
       minLevel: 25
 
     - itemId: Knight Belltag
