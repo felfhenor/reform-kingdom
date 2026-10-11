@@ -12,12 +12,20 @@ import { SlotCompletionRewardComponent } from '@components/slot-completion-rewar
 import { SlotRequirementComponent } from '@components/slot-requirement/slot-requirement.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { commissionRarity } from '@helpers/commission/commission-requirement.ui';
+import { getEntriesByType, getEntry } from '@helpers/content';
+import { kingdomSubviewShow } from '@helpers/engine';
 import { formatDuration } from '@helpers/engine/timer';
 import { bestiaryDropQuantityLabel } from '@helpers/kingdom/bestiary.ui';
 import type {
   CommissionRequirementEntry,
   CommissionSlotDisplay,
   DroppedReward,
+  KingdomSubview,
+  RecipeContent,
+  RecipeResultEquipment,
+  RecipeResultItem,
+  TradeskillContent,
+  TradeskillId,
 } from '@interfaces';
 
 @Component({
@@ -72,5 +80,30 @@ export class SlotCommissionComponent {
   public async doTurnIn(): Promise<void> {
     if (!(await this.fulfill()())) return;
     this.turnIn.emit();
+  }
+
+  public tradeskillForRequirement(
+    requirement: CommissionRequirementEntry,
+  ): TradeskillId | undefined {
+    const recipes = getEntriesByType<RecipeContent>('recipe').filter(
+      (r) =>
+        (r.result as RecipeResultEquipment).equipmentId ===
+          requirement.content?.id ||
+        (r.result as RecipeResultItem).itemId === requirement.content?.id,
+    );
+
+    return recipes[0].tradeskillId;
+  }
+
+  public navigateToTradeskill(requirement: CommissionRequirementEntry): void {
+    const tradeskillForRequirement = this.tradeskillForRequirement(requirement);
+    if (!tradeskillForRequirement) return;
+
+    const tradeskillRef = getEntry<TradeskillContent>(tradeskillForRequirement);
+    if (!tradeskillRef) return;
+
+    kingdomSubviewShow(
+      `tradeskill-${tradeskillRef.name.toLowerCase()}` as KingdomSubview,
+    );
   }
 }
