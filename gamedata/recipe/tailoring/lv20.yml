@@ -200,6 +200,9 @@
     - itemId: Fel Fiber
       quantity: 4
 
+    - itemId: Felrock
+      quantity: 2
+
   tradeskillId: Tailoring
   minTradeskillLevel: 24
   maxTradeskillLevel: 27
@@ -214,6 +217,9 @@
   requirements:
     - itemId: Fel Fiber
       quantity: 2
+
+    - itemId: Felrock
+      quantity: 1
 
   tradeskillId: Tailoring
   minTradeskillLevel: 24
@@ -269,6 +275,9 @@
     - itemId: Fel Essence
       quantity: 1
 
+    - itemId: Felrock
+      quantity: 4
+
   tradeskillId: Tailoring
   minTradeskillLevel: 25
   maxTradeskillLevel: 28
@@ -289,6 +298,9 @@
 
     - itemId: Fel Essence
       quantity: 1
+
+    - itemId: Felrock
+      quantity: 2
 
   tradeskillId: Tailoring
   minTradeskillLevel: 25
