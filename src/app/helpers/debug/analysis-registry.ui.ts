@@ -8,6 +8,7 @@ import { runGatherDevelopmentLevelsAnalysis } from '@helpers/debug/analysis-gath
 import { runHeroStatsAnalysis } from '@helpers/debug/analysis-herostats';
 import { runInfusionGapsAnalysis } from '@helpers/debug/analysis-infusiongaps';
 import { runMaterialUtilizationAnalysis } from '@helpers/debug/analysis-materialutilization';
+import { runMonsterDropsAnalysis } from '@helpers/debug/analysis-monsterdrops';
 import { runMonsterStatsAnalysis } from '@helpers/debug/analysis-monsterstats';
 import { runNodeLevelsAnalysis } from '@helpers/debug/analysis-nodelevels';
 import { runNodeNamesAnalysis } from '@helpers/debug/analysis-nodenames';
@@ -364,5 +365,15 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     strict: false,
     inputKeys: ['level', 'monsterFilter'],
     run: runMonsterStatsAnalysis,
+  },
+  {
+    id: 'monsterdrops',
+    title: 'Monster Drops',
+    description:
+      'Monster drops with a 0% chance (including an omitted chance).',
+    category: 'Monster Stats',
+    strict: true,
+    inputKeys: [],
+    run: runMonsterDropsAnalysis,
   },
 ];

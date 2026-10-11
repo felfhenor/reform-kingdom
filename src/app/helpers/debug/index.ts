@@ -13,6 +13,7 @@ export * from './analysis-infusiongaps';
 export * from './analysis-inputs.ui';
 export * from './analysis-item-sources';
 export * from './analysis-materialutilization';
+export * from './analysis-monsterdrops';
 export * from './analysis-monsterstats';
 export * from './analysis-nodelevels';
 export * from './analysis-nodenames';
