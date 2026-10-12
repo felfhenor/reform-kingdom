@@ -1,3 +1,5 @@
+export * from './worker-crafting';
+export * from './worker-crafting.ui';
 export * from './worker-discovery';
 export * from './worker-gathering';
 export * from './worker-progression';

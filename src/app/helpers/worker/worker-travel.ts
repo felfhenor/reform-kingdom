@@ -7,6 +7,10 @@ import { travelPathBaseTotalTicks } from '@helpers/hero/travel-cost-base';
 import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import {
+  workerCraftAssignmentIsValid,
+  workerStopCrafting,
+} from '@helpers/worker/worker-crafting';
 import { workerStatsForLevel } from '@helpers/worker/worker-progression';
 import { workerGatherNodeHasItem } from '@helpers/worker/worker-shared';
 import { kingdomNodeGet } from '@helpers/world-node/world-nodes';
@@ -14,6 +18,7 @@ import type {
   ItemId,
   WorkerAssignment,
   WorkerContent,
+  WorkerGatherAssignment,
   WorkerId,
 } from '@interfaces';
 
@@ -47,6 +52,16 @@ export function workerAssignmentIsValid(
   level: number,
   assignment: WorkerAssignment,
 ): boolean {
+  return 'recipeId' in assignment
+    ? workerCraftAssignmentIsValid(workerId, level, assignment)
+    : workerGatherAssignmentIsValid(workerId, level, assignment);
+}
+
+function workerGatherAssignmentIsValid(
+  workerId: WorkerId,
+  level: number,
+  assignment: WorkerGatherAssignment,
+): boolean {
   const content = getEntry<WorkerContent>(workerId);
   if (!content) return false;
 
@@ -63,7 +78,7 @@ export function workerAssignmentIsValid(
 // Kingdom. No-ops (leaves the worker AtDuchy) if no route resolves.
 export function workerBeginOutboundTrip(
   workerId: WorkerId,
-  assignment: WorkerAssignment,
+  assignment: WorkerGatherAssignment,
 ): void {
   const kingdom = kingdomNodeGet();
   if (!kingdom) return;
@@ -138,7 +153,7 @@ export function workerAssign(
   const worker = gamestate().workers[workerId];
   if (!worker) return false;
 
-  const assignment: WorkerAssignment = { nodeName, itemId };
+  const assignment: WorkerGatherAssignment = { nodeName, itemId };
   if (!workerAssignmentIsValid(workerId, worker.level, assignment))
     return false;
 
@@ -147,13 +162,14 @@ export function workerAssign(
     if (!target) return state;
 
     target.assignment = assignment;
+    workerStopCrafting(state, workerId);
 
     return state;
   });
 
-  // Only kicks off a trip immediately if the worker is idle at the Duchy -
+  // Only kicks off a trip immediately if the worker is at the Duchy -
   // changing assignment mid-trip takes effect on the next loop, not this one.
-  if (worker.status.kind === 'AtDuchy') {
+  if (worker.status.kind === 'AtDuchy' || worker.status.kind === 'Crafting') {
     workerBeginOutboundTrip(workerId, assignment);
   }
 
@@ -166,33 +182,32 @@ export function workerAssign(
   return true;
 }
 
-// Always safe to clear the assignment. Only TravelingTo/Gathering actually get
-// interrupted - the UI hides Recall for TravelingBack/AtDuchy.
+// Always safe to clear the assignment. Crafting stops in place; only TravelingTo/Gathering start a trip home.
 export function workerRecall(workerId: WorkerId): void {
+  const worker = gamestate().workers[workerId];
+
   updateGamestate((state) => {
     const target = state.workers[workerId];
     if (!target) return state;
 
     target.assignment = null;
+    workerStopCrafting(state, workerId);
 
     return state;
   });
 
-  const worker = gamestate().workers[workerId];
-  if (!worker) return;
-  if (
-    worker.status.kind === 'TravelingBack' ||
-    worker.status.kind === 'AtDuchy'
-  ) {
+  const status = worker?.status;
+  if (!status || status.kind === 'TravelingBack' || status.kind === 'AtDuchy')
     return;
+
+  if (status.kind !== 'Crafting') {
+    const carriedItemId =
+      status.kind === 'Gathering' ? status.itemId : undefined;
+    const carriedQuantity =
+      status.kind === 'Gathering' ? status.itemsGathered : 0;
+
+    workerBeginReturnTrip(workerId, carriedItemId, carriedQuantity);
   }
-
-  const carriedItemId =
-    worker.status.kind === 'Gathering' ? worker.status.itemId : undefined;
-  const carriedQuantity =
-    worker.status.kind === 'Gathering' ? worker.status.itemsGathered : 0;
-
-  workerBeginReturnTrip(workerId, carriedItemId, carriedQuantity);
 
   const workerName = getEntry<WorkerContent>(workerId)?.name;
   analyticsSendDesignEvent(

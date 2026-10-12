@@ -19,6 +19,7 @@ import type {
   CurrentLocation,
   OutpostRouting,
   TravelRouteEdge,
+  TravelRouteHopTree,
   TravelStep,
   WorldNodeEntry,
 } from '@interfaces';
@@ -102,12 +103,11 @@ function teleportStepTo(arrival: WorldNodeEntry): TravelStep {
 
 // Dijkstra over every hop arrival (plus the origin) so a destination behind multiple hops still
 // resolves via the cheapest chain, not just the first one found; linear-scan min-pick is fine since the graph is tiny.
-function travelPathViaHops(
+function routeHopTree(
   location: CurrentLocation,
-  destination: WorldNodeEntry,
   edges: TravelRouteEdge[],
   passThroughNodes: boolean,
-): TravelStep[] | undefined {
+): TravelRouteHopTree {
   const waypoints = routeWaypoints(location, edges);
 
   const dist = new Map<string, number>([[ROUTE_START_KEY, 0]]);
@@ -151,6 +151,14 @@ function travelPathViaHops(
       });
   }
 
+  return { waypoints, dist, stepsFromStart };
+}
+
+function travelPathViaHops(
+  { waypoints, dist, stepsFromStart }: TravelRouteHopTree,
+  destination: WorldNodeEntry,
+  passThroughNodes: boolean,
+): TravelStep[] | undefined {
   let bestSteps: TravelStep[] | undefined;
   let bestCost = Number.POSITIVE_INFINITY;
 
@@ -184,6 +192,8 @@ let cachedMapsRef: ReturnType<typeof allMaps> | undefined;
 let cachedDiscoveredCollectibleCount: number | undefined;
 let cachedOutpostTeleportKey: string | undefined;
 const pathFromCache = new Map<string, TravelStep[] | undefined>();
+// Every destination from one origin shares the same hop chains; only the latest is kept so a moving origin can't grow it.
+let cachedHopTree: { key: string; tree: TravelRouteHopTree } | undefined;
 
 function pathFromCacheKey(
   location: CurrentLocation,
@@ -220,6 +230,7 @@ export function travelPathFrom(
     cachedDiscoveredCollectibleCount = currentDiscoveredCollectibleCount;
     cachedOutpostTeleportKey = currentOutpostTeleportKey;
     pathFromCache.clear();
+    cachedHopTree = undefined;
   }
 
   const key = pathFromCacheKey(
@@ -288,11 +299,29 @@ function computeTravelPathFrom(
     );
   }
 
-  const edges = [
-    ...teleportNodeEdges(ignoreCollectibleGate),
-    ...outpostEdges(outposts),
-  ];
-  return travelPathViaHops(location, destination, edges, passThroughNodes);
+  const treeKey = pathFromCacheKey(
+    location,
+    '',
+    allowTeleport,
+    ignoreCollectibleGate,
+    passThroughNodes,
+    outpostRouting,
+  );
+  if (cachedHopTree?.key !== treeKey) {
+    cachedHopTree = {
+      key: treeKey,
+      tree: routeHopTree(
+        location,
+        [
+          ...teleportNodeEdges(ignoreCollectibleGate),
+          ...outpostEdges(outposts),
+        ],
+        passThroughNodes,
+      ),
+    };
+  }
+
+  return travelPathViaHops(cachedHopTree.tree, destination, passThroughNodes);
 }
 
 export function travelPathTo(

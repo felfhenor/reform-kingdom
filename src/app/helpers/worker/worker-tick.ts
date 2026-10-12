@@ -1,4 +1,5 @@
 import { gamestate } from '@helpers/state-game';
+import { workerCraftingProcessTick } from '@helpers/worker/worker-crafting';
 import { workerGatheringProcessTick } from '@helpers/worker/worker-gathering';
 import { workerTravelProcessTick } from '@helpers/worker/worker-travel-tick';
 import type { WorkerId } from '@interfaces';
@@ -16,6 +17,11 @@ export function workersProcessTick(): void {
 
     if (status === 'Gathering') {
       workerGatheringProcessTick(workerId);
+      return;
+    }
+
+    if (status === 'Crafting') {
+      workerCraftingProcessTick(workerId);
     }
   });
 }

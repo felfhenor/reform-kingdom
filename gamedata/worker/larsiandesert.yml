@@ -7,9 +7,11 @@
   baseStats:
     capacity: 3
     gatherSpeed: 0.5
+    craftSpeed: 1
     stamina: 130
 
   statsPerLevel:
     capacity: 1.2
     gatherSpeed: 0.1
+    craftSpeed: 0.1
     stamina: 3.5

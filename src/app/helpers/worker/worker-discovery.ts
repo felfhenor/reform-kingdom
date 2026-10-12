@@ -10,6 +10,7 @@ import { defaultWorkerState } from '@helpers/worker/worker-progression';
 import type {
   GameStateWorkers,
   WorkerAssignment,
+  WorkerStatus,
   WorkerContent,
   WorkerId,
 } from '@interfaces';
@@ -51,6 +52,16 @@ export function workerUndiscover(workerId: WorkerId): void {
   });
 }
 
+function workerInFlightAssignment(
+  status: WorkerStatus,
+): WorkerAssignment | undefined {
+  if (status.kind === 'Crafting') return { recipeId: status.recipeId };
+  if (status.kind === 'TravelingTo' || status.kind === 'Gathering') {
+    return { nodeName: status.nodeName, itemId: status.itemId };
+  }
+  return undefined;
+}
+
 // Parks a worker back at the Duchy if its stored/in-flight assignment no longer resolves.
 // Takes `assignmentValid` as a param (not imported directly).
 export function pruneInvalidWorkerStates(
@@ -65,10 +76,7 @@ export function pruneInvalidWorkerStates(
 
   (Object.keys(workers) as WorkerId[]).forEach((workerId) => {
     const worker = workers[workerId];
-    const inFlight: WorkerAssignment | undefined =
-      worker.status.kind === 'TravelingTo' || worker.status.kind === 'Gathering'
-        ? { nodeName: worker.status.nodeName, itemId: worker.status.itemId }
-        : undefined;
+    const inFlight = workerInFlightAssignment(worker.status);
 
     const isStale =
       (!!worker.assignment &&

@@ -1,0 +1,102 @@
+<div class="flex flex-col gap-2">
+  <span class="flex items-center gap-2 type-label">
+    Gathering
+    @if (isActive()) {
+      <span class="badge badge-sm badge-success">Active</span>
+    }
+  </span>
+
+  <div class="flex flex-row gap-2">
+    <ng-select
+      class="w-full"
+      [items]="nodeOptions()"
+      bindLabel="nodeName"
+      bindValue="nodeName"
+      placeholder="Select a gather node..."
+      [clearable]="false"
+      [ngModel]="displayedNodeName()"
+      (change)="setDraftNodeName($event.nodeName)"
+    >
+      <ng-template ng-option-tmp let-item="item">
+        <div class="flex flex-row items-center justify-between gap-2">
+          <div class="flex-1 flex gap-2">
+            <app-sprite-node class="zoom-row" [entry]="item.entry" />
+
+            <div>
+              <div class="type-label">
+                {{ item.nodeName }}
+              </div>
+
+              <div class="type-meta">
+                <span class="text-difficulty-{{ item.difficulty }}">
+                  Lv. {{ item.levelRangeLabel }}
+                </span>
+                @if (item.staminaCost !== undefined) {
+                  · {{ item.staminaCost | number }} stamina
+                } @else {
+                  · unreachable
+                }
+              </div>
+            </div>
+          </div>
+
+          <div>
+            @if (level() > item.maxLevel) {
+              <span class="badge badge-warning text-sm">No XP</span>
+            }
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template ng-label-tmp let-item="item">
+        <div class="flex flex-row items-center justify-between">
+          <div class="flex-1 flex items-center gap-2 w-full">
+            <app-sprite-node class="zoom-row" [entry]="item.entry" />
+            {{ item.nodeName }}
+            <span class="text-difficulty-{{ item.difficulty }}">
+              Lv. {{ item.levelRangeLabel }}
+            </span>
+          </div>
+
+          <div>
+            @if (level() > item.maxLevel) {
+              <span class="badge badge-warning text-sm">No XP</span>
+            }
+          </div>
+        </div>
+      </ng-template>
+    </ng-select>
+
+    @if (displayedNodeName()) {
+      <ng-select
+        class="w-full"
+        [items]="itemOptions()"
+        bindLabel="name"
+        bindValue="id"
+        placeholder="Select a material..."
+        [clearable]="false"
+        [ngModel]="displayedItemId()"
+        (change)="setDraftItemId($event.id)"
+      >
+        <ng-template ng-option-tmp let-item="item">
+          <app-option-reward [reward]="item" />
+        </ng-template>
+
+        <ng-template ng-label-tmp let-item="item">
+          <app-option-reward [reward]="item" />
+        </ng-template>
+      </ng-select>
+    }
+
+    <button
+      class="btn btn-sm btn-primary w-fit"
+      [disabled]="!canConfirm()"
+      (click)="confirm()"
+      appSfx="ui-click"
+      [sfxOffset]="0"
+      [sfxTrigger]="['click', 'hover']"
+    >
+      Confirm
+    </button>
+  </div>
+</div>

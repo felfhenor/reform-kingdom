@@ -7,11 +7,13 @@
   baseStats:
     capacity: 10
     gatherSpeed: 0.5
+    craftSpeed: 0
     stamina: 100
 
   statsPerLevel:
     capacity: 0.5
     gatherSpeed: 0.1
+    craftSpeed: 0
     stamina: 1
 
   canUseTeleports: false
@@ -25,11 +27,13 @@
   baseStats:
     capacity: 10
     gatherSpeed: 0.5
+    craftSpeed: 0
     stamina: 100
 
   statsPerLevel:
     capacity: 0.5
     gatherSpeed: 0.1
+    craftSpeed: 0
     stamina: 1
 
   canUseTeleports: false
@@ -43,11 +47,13 @@
   baseStats:
     capacity: 10
     gatherSpeed: 0.5
+    craftSpeed: 0
     stamina: 100
 
   statsPerLevel:
     capacity: 0.5
     gatherSpeed: 0.1
+    craftSpeed: 0
     stamina: 1
 
   canUseTeleports: false

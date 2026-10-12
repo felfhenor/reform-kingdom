@@ -14,6 +14,7 @@ import {
   defaultWorkerState,
   workerGainXp,
   workerIsReadyToLevelUp,
+  workerLevelInRange,
   workerLevelUpCost,
   workerMinLevelForStamina,
   workerStatsForLevel,
@@ -28,8 +29,13 @@ const goldId = 'gold' as ItemId;
 const nell = ensureWorker({
   id: 'weaver-nell' as WorkerId,
   name: 'Weaver Nell',
-  baseStats: { capacity: 6, gatherSpeed: 1, stamina: 30 },
-  statsPerLevel: { capacity: 0.5, gatherSpeed: 0.1, stamina: 2 },
+  baseStats: { capacity: 6, gatherSpeed: 1, craftSpeed: 0.5, stamina: 30 },
+  statsPerLevel: {
+    capacity: 0.5,
+    gatherSpeed: 0.1,
+    craftSpeed: 0.05,
+    stamina: 2,
+  },
 });
 
 function worker(overrides: Partial<WorkerState> = {}): WorkerState {
@@ -58,6 +64,7 @@ describe('workerStatsForLevel', () => {
     expect(workerStatsForLevel(nell, 5)).toEqual({
       capacity: 6 + 0.5 * 4,
       gatherSpeed: 1 + 0.1 * 4,
+      craftSpeed: 0.5 + 0.05 * 4,
       stamina: 30 + 2 * 4,
     });
   });
@@ -148,5 +155,15 @@ describe('workerIsReadyToLevelUp', () => {
     expect(workerLevelUpCost(50) / workerXpForLevel(51)).toBeCloseTo(
       workerLevelUpCost(98) / workerXpForLevel(99),
     );
+  });
+});
+
+describe('workerLevelInRange', () => {
+  it('holds within the range, inclusive', () => {
+    expect(
+      [4, 5, 10, 11].map((level) =>
+        workerLevelInRange({ min: 5, max: 10 }, level),
+      ),
+    ).toEqual([false, true, true, false]);
   });
 });

@@ -7,6 +7,7 @@ import { getEntry } from '@helpers/content/content';
 import { travelPathAdvanceTick } from '@helpers/hero/travel-progress';
 import { addMaterial } from '@helpers/item/materials';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import { workerStartCrafting } from '@helpers/worker/worker-crafting';
 import {
   applyWorkerTravelAdvance,
   workerGatheringStatusStart,
@@ -114,7 +115,15 @@ function processTravelingBack(workerId: WorkerId): void {
   // Never trust the stored assignment blindly on redeploy - content may have
   // changed since it was set.
   if (workerAssignmentIsValid(workerId, level, pendingAssignment)) {
-    workerBeginOutboundTrip(workerId, pendingAssignment);
+    if (!('recipeId' in pendingAssignment)) {
+      workerBeginOutboundTrip(workerId, pendingAssignment);
+      return;
+    }
+
+    updateGamestate((state) => {
+      workerStartCrafting(state, workerId, pendingAssignment.recipeId);
+      return state;
+    });
     return;
   }
 

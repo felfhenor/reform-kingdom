@@ -10,6 +10,7 @@ import { updateGamestate } from '@helpers/state-game';
 import { kingdomNodeGet } from '@helpers/world-node/world-nodes';
 import type {
   CurrentLocation,
+  LevelRange,
   WorkerContent,
   WorkerId,
   WorkerStatBlock,
@@ -25,6 +26,10 @@ export function workerXpForLevel(level: number): number {
   return roundToNearest10(xp);
 }
 
+export function workerLevelInRange(range: LevelRange, level: number): boolean {
+  return level >= range.min && level <= range.max;
+}
+
 export function statBlockForLevel(
   base: WorkerStatBlock,
   perLevel: WorkerStatBlock,
@@ -33,6 +38,7 @@ export function statBlockForLevel(
   return {
     capacity: base.capacity + perLevel.capacity * (level - 1),
     gatherSpeed: base.gatherSpeed + perLevel.gatherSpeed * (level - 1),
+    craftSpeed: base.craftSpeed + perLevel.craftSpeed * (level - 1),
     stamina: base.stamina + perLevel.stamina * (level - 1),
   };
 }

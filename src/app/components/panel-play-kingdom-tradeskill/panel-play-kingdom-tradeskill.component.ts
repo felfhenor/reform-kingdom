@@ -10,6 +10,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
@@ -37,6 +38,7 @@ import {
 import {
   tradeskillActiveGate,
   tradeskillBuilding,
+  tradeskillIdForName,
   tradeskillMaxQueueSize,
 } from '@helpers/crafting/tradeskill';
 import { formatDuration } from '@helpers/engine/timer';
@@ -54,16 +56,18 @@ import type {
   RecipeId,
   Tradeskill,
 } from '@interfaces';
+import { workerCraftSlots } from '@helpers/worker/worker-crafting.ui';
 import { TippyDirective } from '@ngneat/helipopper';
 import { AnimationService } from '@services/animation.service';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
-import { clamp } from 'es-toolkit/compat';
+import { chunk, clamp } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-play-kingdom-tradeskill',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    AtlasImageComponent,
     ListReflowDirective,
     SlotRequirementComponent,
     BlankSlateComponent,
@@ -92,6 +96,12 @@ export class PanelPlayKingdomTradeskillComponent {
   public formatDuration = formatDuration;
 
   public building = computed(() => tradeskillBuilding(this.tradeskill()));
+
+  // Four half-size worker squares share one full-size queue cell.
+  public workerCraftGroups = computed(() => {
+    const tradeskillId = tradeskillIdForName(this.tradeskill());
+    return tradeskillId ? chunk(workerCraftSlots(tradeskillId), 4) : [];
+  });
   public recipeEntries = computed(() =>
     getCraftableRecipeEntries(this.tradeskill()),
   );

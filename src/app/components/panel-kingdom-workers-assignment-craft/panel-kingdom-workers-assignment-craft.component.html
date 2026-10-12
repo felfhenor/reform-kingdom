@@ -1,0 +1,82 @@
+<div class="flex flex-col gap-2">
+  <span class="flex items-center gap-2 type-label">
+    Crafting
+    @if (isPending()) {
+      <span class="badge badge-sm badge-info">Starts on return</span>
+    } @else if (isActive()) {
+      <span class="badge badge-sm badge-success">Active</span>
+    }
+  </span>
+
+  <div class="flex flex-row gap-2">
+    <ng-select
+      class="w-full"
+      [items]="recipeOptions()"
+      bindLabel="name"
+      bindValue="recipeId"
+      groupBy="tradeskillName"
+      placeholder="Select a recipe..."
+      [clearable]="false"
+      [ngModel]="displayedRecipeId()"
+      (change)="setDraftRecipeId($event.recipeId)"
+    >
+      <ng-template ng-option-tmp let-item="item">
+        <div class="flex flex-row items-center justify-between gap-2">
+          <div class="flex-1 flex items-center gap-2">
+            <app-atlas-image
+              class="zoom-row"
+              spritesheet="item"
+              [assetName]="item.sprite"
+            />
+
+            <div>
+              <div class="type-label">{{ item.name }}</div>
+
+              <div class="type-meta">
+                <span class="text-difficulty-{{ item.difficulty }}">
+                  Lv. {{ item.levelRangeLabel }}
+                </span>
+                · {{ item.staminaCost | number }} stamina
+              </div>
+            </div>
+          </div>
+
+          @if (level() > item.maxLevel) {
+            <span class="badge badge-warning text-sm">No XP</span>
+          }
+        </div>
+      </ng-template>
+
+      <ng-template ng-label-tmp let-item="item">
+        <div class="flex flex-row items-center justify-between">
+          <div class="flex-1 flex items-center gap-2 w-full">
+            <app-atlas-image
+              class="zoom-row"
+              spritesheet="item"
+              [assetName]="item.sprite"
+            />
+            {{ item.name }}
+            <span class="text-difficulty-{{ item.difficulty }}">
+              Lv. {{ item.levelRangeLabel }}
+            </span>
+          </div>
+
+          @if (level() > item.maxLevel) {
+            <span class="badge badge-warning text-sm">No XP</span>
+          }
+        </div>
+      </ng-template>
+    </ng-select>
+
+    <button
+      class="btn btn-sm btn-primary w-fit"
+      [disabled]="!canConfirm()"
+      (click)="confirm()"
+      appSfx="ui-click"
+      [sfxOffset]="0"
+      [sfxTrigger]="['click', 'hover']"
+    >
+      Confirm
+    </button>
+  </div>
+</div>

@@ -3,6 +3,7 @@ import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
   workerGainXp,
+  workerLevelInRange,
   workerStatsForLevel,
 } from '@helpers/worker/worker-progression';
 import {
@@ -18,21 +19,7 @@ import {
 } from '@helpers/worker/worker-travel';
 import { gatheringEffectiveGatherTime } from '@helpers/world-node/world-node-gathering';
 import { worldNodeLevel } from '@helpers/world-node/world-node-level';
-import type {
-  GatheringContent,
-  ItemContent,
-  ItemId,
-  WorkerContent,
-  WorkerId,
-} from '@interfaces';
-
-export function workerGatherXpGateSatisfied(
-  gathering: GatheringContent,
-  level: number,
-): boolean {
-  const { min, max } = gathering.workerLevelRange;
-  return level >= min && level <= max;
-}
+import type { ItemContent, ItemId, WorkerContent, WorkerId } from '@interfaces';
 
 // Defensive re-check (gamedata can change mid-session in dev) - parks AtDuchy on failure.
 function abandonInvalidGather(workerId: WorkerId): void {
@@ -125,7 +112,7 @@ export function workerGatheringProcessTick(workerId: WorkerId): void {
     return;
   }
 
-  if (workerGatherXpGateSatisfied(gathering, worker.level)) {
+  if (workerLevelInRange(gathering.workerLevelRange, worker.level)) {
     workerGainXp(workerId, 1);
   }
 

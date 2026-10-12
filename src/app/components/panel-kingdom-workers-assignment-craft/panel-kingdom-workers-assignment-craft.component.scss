@@ -1,0 +1,5 @@
+@reference 'tailwindcss';
+
+ng-select ::ng-deep .ng-value {
+  @apply w-full pr-2;
+}

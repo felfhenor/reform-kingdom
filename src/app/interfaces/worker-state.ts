@@ -1,13 +1,21 @@
 import type { WorkerId } from '@interfaces/content-worker';
 import type { ItemId } from '@interfaces/content-item';
+import type { RecipeId } from '@interfaces/content-recipe';
 import type { Ledger } from '@interfaces/ledger';
 import type { CurrentLocation } from '@interfaces/state-game';
 import type { TravelStep } from '@interfaces/travel';
 
-export type WorkerAssignment = {
+export type WorkerGatherAssignment = {
   nodeName: string;
   itemId: ItemId;
 };
+
+export type WorkerCraftAssignment = {
+  recipeId: RecipeId;
+};
+
+// Told apart structurally ('recipeId' in a) so pre-crafting saves load unchanged.
+export type WorkerAssignment = WorkerGatherAssignment | WorkerCraftAssignment;
 
 export type WorkerStatusAtDuchy = {
   kind: 'AtDuchy';
@@ -41,8 +49,17 @@ export type WorkerStatusTravelingBack = {
   carriedQuantity: number;
 };
 
+// `materialsHeld` = one unit's inputs already taken from storage, refunded if the craft is abandoned.
+export type WorkerStatusCrafting = {
+  kind: 'Crafting';
+  recipeId: RecipeId;
+  ticksIntoCraft: number;
+  materialsHeld: boolean;
+};
+
 export type WorkerStatus =
   | WorkerStatusAtDuchy
+  | WorkerStatusCrafting
   | WorkerStatusTravelingTo
   | WorkerStatusGathering
   | WorkerStatusTravelingBack;
@@ -77,4 +94,12 @@ export type WorkerLevelUpStatusEntry = {
   sprite: string;
   frames: number;
   level: number;
+};
+
+// Display-only shape for one half-size worker craft square beside a tradeskill queue.
+export type WorkerCraftSlot = {
+  workerId: WorkerId;
+  sprite: string;
+  waiting: boolean;
+  tooltip: string;
 };

@@ -15,6 +15,7 @@ import {
 import { workerTravelProcessTick } from '@helpers/worker/worker-travel-tick';
 import type {
   ItemId,
+  RecipeId,
   TravelStep,
   WorkerId,
   WorkerState,
@@ -146,6 +147,38 @@ describe('workerTravelProcessTick', () => {
     });
 
     expect(combatLog()).toEqual([]);
+  });
+
+  it('starts crafting at the Duchy on a still-valid craft assignment', () => {
+    const craft = { recipeId: 'copper-ingot' as RecipeId };
+    seedTraveler(returning(), { assignment: craft });
+
+    travelUntilArrived();
+
+    expect(workerBeginOutboundTrip).not.toHaveBeenCalled();
+    expect(worker()).toMatchObject({
+      assignment: craft,
+      status: {
+        kind: 'Crafting',
+        recipeId: craft.recipeId,
+        ticksIntoCraft: 0,
+        materialsHeld: false,
+      },
+    });
+  });
+
+  it('drops a craft assignment that no longer qualifies on arrival', () => {
+    vi.mocked(workerAssignmentIsValid).mockReturnValue(false);
+    seedTraveler(returning(), {
+      assignment: { recipeId: 'copper-ingot' as RecipeId },
+    });
+
+    travelUntilArrived();
+
+    expect(worker()).toMatchObject({
+      assignment: null,
+      status: { kind: 'AtDuchy' },
+    });
   });
 
   it('heads straight back out on a still-valid assignment, else drops it', () => {

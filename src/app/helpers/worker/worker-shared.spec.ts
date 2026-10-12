@@ -41,8 +41,8 @@ const workerContent: WorkerContent = ensureWorker({
   description: 'test',
   sprite: '0000',
   frames: 4,
-  baseStats: { capacity: 6, gatherSpeed: 2, stamina: 30 },
-  statsPerLevel: { capacity: 0.5, gatherSpeed: 0.1, stamina: 2 },
+  baseStats: { capacity: 6, gatherSpeed: 2, craftSpeed: 0, stamina: 30 },
+  statsPerLevel: { capacity: 0.5, gatherSpeed: 0.1, craftSpeed: 0, stamina: 2 },
   canUseTeleports: true,
 });
 

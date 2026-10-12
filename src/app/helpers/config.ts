@@ -331,3 +331,5 @@ export const TOWN_HOME_MIN_REPUTATION_TIER = 2;
 export const WORKER_MAX_LEVEL = 99;
 export const WORKER_XP_START = 10;
 export const WORKER_XP_END = 10000;
+// Stamina a worker needs per tradeskill level of a recipe's minimum, to be assigned to craft it.
+export const WORKER_CRAFT_STAMINA_PER_TRADESKILL_LEVEL = 5;

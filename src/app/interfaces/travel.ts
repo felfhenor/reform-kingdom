@@ -21,6 +21,13 @@ export type TravelRouteEdge = {
   arrivals: WorldNodeEntry[];
 };
 
+// Cheapest hop chain from one origin to every hop arrival, keyed by arrival nodeName ('' = the origin).
+export type TravelRouteHopTree = {
+  waypoints: Map<string, CurrentLocation>;
+  dist: Map<string, number>;
+  stepsFromStart: Map<string, TravelStep[]>;
+};
+
 export type TravelState = {
   status: TravelStatus;
   destinationNodeName?: string;

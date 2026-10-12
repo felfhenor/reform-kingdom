@@ -283,6 +283,29 @@ describe('travelPathTo', () => {
     ]);
   });
 
+  it('routes to each destination behind the same hops from one origin', () => {
+    seedWorldNodes(
+      [
+        teleportOut('To Mire', 'Carrina', 2, 'mire-from-carrina'),
+        teleportIn('From Carrina', 'CraggledMire', 0, 'mire-from-carrina'),
+        node('Swampfields', 'CraggledMire', 2, 0),
+        node('Miremetal Mines', 'CraggledMire', 0, 2),
+      ],
+      [],
+      { Carrina: fiveByFive, CraggledMire: fiveByFive },
+    );
+    standAt(carrina(0, 0));
+
+    expect(travelPathTo('Swampfields')?.slice(-2)).toEqual([
+      { kind: 'Move', mapName: 'CraggledMire', x: 1, y: 0 },
+      { kind: 'Move', mapName: 'CraggledMire', x: 2, y: 0 },
+    ]);
+    expect(travelPathTo('Miremetal Mines')?.slice(-2)).toEqual([
+      { kind: 'Move', mapName: 'CraggledMire', x: 0, y: 1 },
+      { kind: 'Move', mapName: 'CraggledMire', x: 0, y: 2 },
+    ]);
+  });
+
   it('picks the cheaper of two competing teleport routes, not just the first one found', () => {
     // Seeded before the cheaper exit, so a "first match wins" router would pick it.
     seedWorldNodes(

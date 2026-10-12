@@ -12,7 +12,10 @@ import {
   reservedEquipmentIdsFor,
   splitReservedEquipment,
 } from '@helpers/crafting/crafting-reserved-equipment';
-import { recipeResultQuantity } from '@helpers/crafting/recipe-result';
+import {
+  recipeResultQuantity,
+  recipeResultRollSucceeds,
+} from '@helpers/crafting/recipe-result';
 import { isRecipeCraftable } from '@helpers/crafting/recipes';
 import {
   craftXpChance,
@@ -281,9 +284,7 @@ export function craftQueueStart(
 // An item result with a `chance` roll can whiff entirely, producing nothing
 // - but the tradeskill still attempted the craft, so XP is granted either way.
 function grantCraftResult(tradeskill: Tradeskill, recipe: RecipeContent): void {
-  const { chance } = recipe.result;
-
-  if (chance !== undefined && !rngSucceedsChance(chance)) {
+  if (!recipeResultRollSucceeds(recipe)) {
     categoryMessageLog(
       'Craft',
       tradeskill,

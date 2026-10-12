@@ -28,6 +28,10 @@
   white-space: nowrap;
 }
 
+.ng-option-label {
+  color: var(--color-base-content) !important;
+}
+
 .ng-option {
   background-color: var(--color-base-100) !important;
   color: var(--color-base-content) !important;

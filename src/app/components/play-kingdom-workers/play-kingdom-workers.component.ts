@@ -1,5 +1,3 @@
-import { gatherDifficultyTier } from '@helpers/engine/difficulty-tier';
-import { rangeLabel } from '@helpers/engine/leveled-range';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -8,14 +6,14 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconComponent } from '@components/icon/icon.component';
-import { OptionRewardComponent } from '@components/option-reward/option-reward.component';
+import { PanelKingdomWorkersAssignmentCraftComponent } from '@components/panel-kingdom-workers-assignment-craft/panel-kingdom-workers-assignment-craft.component';
+import { PanelKingdomWorkersAssignmentGatherComponent } from '@components/panel-kingdom-workers-assignment-gather/panel-kingdom-workers-assignment-gather.component';
 import { RowCurrencyCostComponent } from '@components/row-currency-cost/row-currency-cost.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
@@ -23,71 +21,41 @@ import { TextNumberTweenComponent } from '@components/text-number-tween/text-num
 import { ListRowDirective } from '@directives/list-row.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { TutorialTargetDirective } from '@directives/tutorial-target.directive';
-import { WORKER_MAX_LEVEL } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { formatDuration } from '@helpers/engine/timer';
-import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
 import { goldCoinId } from '@helpers/item/materials';
 import { discoveredWorkersState, workersState } from '@helpers/state-game';
+import { workerCraftRemainingTicks } from '@helpers/worker/worker-crafting.ui';
 import {
   workerIsReadyToLevelUp,
   workerLevelUpCost,
   workerStatsForLevel,
 } from '@helpers/worker/worker-progression';
 import { workerLevelUp } from '@helpers/worker/worker-progression.ui';
-import {
-  canWorkerReachNode,
-  workerAssign,
-  workerRecall,
-  workerStaminaCostToNode,
-} from '@helpers/worker/worker-travel';
+import { workerRecall } from '@helpers/worker/worker-travel';
 import { workerTravelRemainingTicks } from '@helpers/worker/worker-travel.ui';
-import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
-import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
 import {
   kingdomNodeGet,
   worldNodeByName,
-  worldNodeGathering,
-  worldNodesOfType,
 } from '@helpers/world-node/world-nodes';
 import type {
   CostItem,
-  DifficultyTier,
   ItemContent,
-  ItemId,
-  RewardContentInfo,
-  WorkerAssignment,
+  RecipeContent,
   WorkerContent,
   WorkerId,
   WorkerState,
+  WorkerStatusCrafting,
   WorldNodeEntry,
 } from '@interfaces';
-import {
-  NgLabelTemplateDirective,
-  NgOptionTemplateDirective,
-  NgSelectComponent,
-} from '@ng-select/ng-select';
 import { TippyDirective } from '@ngneat/helipopper';
 import { AnimationService } from '@services/animation.service';
-import { sortBy } from 'es-toolkit/compat';
 
 type WorkerEntry = {
   id: WorkerId;
   content: WorkerContent;
   state: WorkerState;
 };
-
-type NodeOption = {
-  nodeName: string;
-  entry: WorldNodeEntry;
-  staminaCost?: number;
-  levelRangeLabel: string;
-  difficulty?: DifficultyTier;
-  maxLevel: number;
-  disabled: boolean;
-};
-
-type ItemOption = RewardContentInfo & { id: ItemId };
 
 type EntryStatusDisplay = {
   label: string;
@@ -106,11 +74,6 @@ type EntryStatusDisplay = {
     TextNumberTweenComponent,
     IconComponent,
     SpriteNodeComponent,
-    OptionRewardComponent,
-    FormsModule,
-    NgSelectComponent,
-    NgOptionTemplateDirective,
-    NgLabelTemplateDirective,
     DecimalPipe,
     TippyDirective,
     SlotIconBlankComponent,
@@ -118,6 +81,8 @@ type EntryStatusDisplay = {
     SFXDirective,
     TutorialTargetDirective,
     RowCurrencyCostComponent,
+    PanelKingdomWorkersAssignmentGatherComponent,
+    PanelKingdomWorkersAssignmentCraftComponent,
   ],
   templateUrl: './play-kingdom-workers.component.html',
   styleUrl: './play-kingdom-workers.component.scss',
@@ -125,11 +90,7 @@ type EntryStatusDisplay = {
 export class PlayKingdomWorkersComponent {
   private anim = inject(AnimationService);
 
-  public readonly workerMaxLevel = WORKER_MAX_LEVEL;
-
   public selectedWorkerId = signal<WorkerId | undefined>(undefined);
-  public draftNodeName = signal<string | undefined>(undefined);
-  public draftItemId = signal<ItemId | undefined>(undefined);
 
   public entries = computed<WorkerEntry[]>(() => {
     const discovered = discoveredWorkersState();
@@ -173,6 +134,8 @@ export class PlayKingdomWorkersComponent {
     switch (status.kind) {
       case 'AtDuchy':
         return 'At the Duchy';
+      case 'Crafting':
+        return this.craftingLabel(entry.id, status);
       case 'TravelingTo': {
         const remaining = workerTravelRemainingTicks(entry.id);
         return `Traveling to ${status.nodeName} (${remaining !== undefined ? formatDuration(remaining) : '?'} remaining)`;
@@ -194,6 +157,11 @@ export class PlayKingdomWorkersComponent {
     switch (status.kind) {
       case 'AtDuchy':
         return { label: 'At the Duchy', locationEntry: kingdomNodeGet() };
+      case 'Crafting':
+        return {
+          label: status.materialsHeld ? 'Crafting...' : 'Waiting for materials',
+          locationEntry: kingdomNodeGet(),
+        };
       case 'TravelingTo': {
         const remaining = workerTravelRemainingTicks(entry.id);
         return {
@@ -222,8 +190,15 @@ export class PlayKingdomWorkersComponent {
   }
 
   public canRecall = computed(() => {
-    const status = this.selectedEntry()?.state.status.kind;
-    return status === 'TravelingTo' || status === 'Gathering';
+    const state = this.selectedEntry()?.state;
+    const status = state?.status.kind;
+    if (status === 'TravelingTo' || status === 'Gathering') return true;
+    if (status === 'Crafting') return true;
+    return (
+      status === 'TravelingBack' &&
+      !!state?.assignment &&
+      'recipeId' in state.assignment
+    );
   });
 
   public levelUpCost = computed(() => {
@@ -243,112 +218,20 @@ export class PlayKingdomWorkersComponent {
     },
   ]);
 
-  // Live status while traveling/gathering, else the stored assignment (`state.assignment` may
-  // already point at a different, not-yet-started job even mid-trip).
-  public currentAssignment = computed<WorkerAssignment | null>(() => {
-    const entry = this.selectedEntry();
-    if (!entry) return null;
-
-    const status = entry.state.status;
-    if (status.kind === 'TravelingTo' || status.kind === 'Gathering') {
-      return { nodeName: status.nodeName, itemId: status.itemId };
-    }
-
-    return entry.state.assignment;
-  });
-
-  public displayedNodeName = computed(
-    () => this.draftNodeName() ?? this.currentAssignment()?.nodeName,
-  );
-
-  // Every discovered gather node the worker could theoretically be sent to,
-  // disabled (not filtered out) when out of stamina range for the selected worker.
-  public nodeOptions = computed<NodeOption[]>(() => {
-    const stamina = this.selectedStats()?.stamina ?? 0;
-    const allowTeleport = this.selectedEntry()?.content.canUseTeleports ?? true;
-
-    const options = worldNodesOfType('GatherNode')
-      .filter((node) => isGatherNodeDiscovered(node.nodeName))
-      .map((node) => {
-        const gathering = worldNodeGathering(node);
-        return {
-          nodeName: node.nodeName,
-          entry: node,
-          staminaCost: workerStaminaCostToNode(node.nodeName, allowTeleport),
-          maxLevel: gathering?.workerLevelRange.max ?? WORKER_MAX_LEVEL,
-          levelRangeLabel: gathering
-            ? rangeLabel(gathering.workerLevelRange)
-            : '?',
-          difficulty: gathering
-            ? gatherDifficultyTier(
-                gathering.workerLevelRange,
-                this.selectedEntry().state.level,
-              )
-            : undefined,
-          disabled:
-            !canWorkerReachNode(node.nodeName, stamina, allowTeleport) ||
-            (gathering?.workerLevelRange.min ?? 0) >
-              this.selectedEntry().state.level,
-        };
-      });
-
-    return sortBy(options, (o) => o.nodeName);
-  });
-
-  public itemOptions = computed<ItemOption[]>(() => {
-    const nodeName = this.displayedNodeName();
-    if (!nodeName) return [];
-
-    const node = worldNodeByName(nodeName);
-    if (!node) return [];
-
-    return worldNodeGatherMaterialIds(node)
-      .map((itemId) => {
-        const info = rewardContentInfo({ itemId });
-        return info ? { id: itemId, ...info } : undefined;
-      })
-      .filter((option): option is ItemOption => !!option);
-  });
-
-  public displayedItemId = computed(() => {
-    const itemId = this.draftItemId() ?? this.currentAssignment()?.itemId;
-    if (!itemId) return undefined;
-    return this.itemOptions().some((option) => option.id === itemId)
-      ? itemId
-      : undefined;
-  });
-
-  public canConfirmAssignment = computed(
-    () =>
-      !!this.selectedEntry() &&
-      !!this.displayedNodeName() &&
-      !!this.displayedItemId(),
-  );
-
   public selectWorker(id: WorkerId): void {
     this.selectedWorkerId.set(id);
-    this.draftNodeName.set(undefined);
-    this.draftItemId.set(undefined);
   }
 
-  public setDraftNodeName(nodeName: string): void {
-    this.draftNodeName.set(nodeName);
-    this.draftItemId.set(undefined);
-  }
+  private craftingLabel(
+    workerId: WorkerId,
+    status: WorkerStatusCrafting,
+  ): string {
+    const recipe = getEntry<RecipeContent>(status.recipeId);
+    const name = recipe?.name ?? '???';
+    if (!status.materialsHeld) return `Waiting for materials (${name})`;
 
-  public setDraftItemId(itemId: ItemId): void {
-    this.draftItemId.set(itemId);
-  }
-
-  public confirmAssignment(): void {
-    const entry = this.selectedEntry();
-    const nodeName = this.displayedNodeName();
-    const itemId = this.displayedItemId();
-    if (!entry || !nodeName || !itemId) return;
-
-    workerAssign(entry.id, nodeName, itemId);
-    this.draftNodeName.set(undefined);
-    this.draftItemId.set(undefined);
+    const remaining = workerCraftRemainingTicks(workerId);
+    return `Crafting ${name} (${remaining !== undefined ? formatDuration(remaining) : '?'} remaining)`;
   }
 
   public recall(): void {

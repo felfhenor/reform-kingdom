@@ -14,6 +14,7 @@ import {
 import { defaultWorkerState } from '@helpers/worker/worker-progression';
 import type {
   ItemId,
+  RecipeId,
   WorkerAssignment,
   WorkerId,
   WorkerState,
@@ -102,5 +103,24 @@ describe('pruneInvalidWorkerStates', () => {
         });
       },
     );
+  });
+
+  it('checks a crafting worker against its in-progress recipe', () => {
+    const recipeId = 'copper-ingot' as RecipeId;
+    const crafting: WorkerState['status'] = {
+      kind: 'Crafting',
+      recipeId,
+      ticksIntoCraft: 1,
+      materialsHeld: true,
+    };
+    const valid = vi.fn(() => false);
+
+    const result = pruneInvalidWorkerStates(
+      { [nell.id]: { ...defaultWorkerState(), status: crafting } },
+      valid,
+    )[nell.id];
+
+    expect(valid).toHaveBeenCalledWith(nell.id, 1, { recipeId });
+    expect(result.status).toEqual({ kind: 'AtDuchy' });
   });
 });

@@ -6,8 +6,10 @@ import {
   ensureGatherResult,
   ensureGathering,
 } from '@helpers/content/ensure-gathernode';
+import { ensureRecipe } from '@helpers/content/ensure-recipe';
 import { ensureWorker } from '@helpers/content/ensure-worker';
 import { travelPathBaseTotalTicks } from '@helpers/hero/travel-cost-base';
+import { getMaterialQuantity } from '@helpers/item/materials';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
 import { workersState } from '@helpers/state-game';
 import { defaultWorkerState } from '@helpers/worker/worker-progression';
@@ -24,6 +26,7 @@ import type {
   GameState,
   GatheringId,
   ItemId,
+  RecipeId,
   TravelStep,
   WorkerContent,
   WorkerId,
@@ -79,8 +82,8 @@ function tripCost(): number {
 
 function staminaFor(cost: number): Partial<WorkerContent> {
   return {
-    baseStats: { capacity: 5, gatherSpeed: 1, stamina: cost },
-    statsPerLevel: { capacity: 0, gatherSpeed: 0, stamina: 0 },
+    baseStats: { capacity: 5, gatherSpeed: 1, craftSpeed: 0, stamina: cost },
+    statsPerLevel: { capacity: 0, gatherSpeed: 0, craftSpeed: 0, stamina: 0 },
   };
 }
 
@@ -307,5 +310,100 @@ describe('workerRecall', () => {
 
     expect(workersState()[workerId].status).toEqual(headingHome);
     expect(travelPathFrom).not.toHaveBeenCalled();
+  });
+});
+
+describe('leaving a craft', () => {
+  const recipeId = 'copper-ingot' as RecipeId;
+  const crafting: WorkerState['status'] = {
+    kind: 'Crafting',
+    recipeId,
+    ticksIntoCraft: 1,
+    materialsHeld: true,
+  };
+
+  function seedCrafter(): void {
+    seedContent([
+      ensureWorker({
+        id: workerId,
+        name: 'Weaver Nell',
+        ...staminaFor(tripCost()),
+      }),
+      ensureGathering({
+        id: 'woods' as GatheringId,
+        name: woods,
+        gatherResults: [
+          ensureGatherResult({
+            chance: 10,
+            items: [{ itemId: copperId, quantity: 1 }],
+          }),
+        ],
+      }),
+      ensureRecipe({
+        id: recipeId,
+        requirements: [{ itemId: copperId, quantity: 2 }],
+      }),
+    ]);
+    seedWorkerState({ assignment: { recipeId }, status: crafting });
+  }
+
+  it('refunds the held unit and heads out when reassigned to gather', () => {
+    seedCrafter();
+
+    inTick(() => workerAssign(workerId, woods, copperId));
+
+    expect(getMaterialQuantity(copperId)).toBe(2);
+    expect(workersState()[workerId]).toMatchObject({
+      assignment,
+      status: { kind: 'TravelingTo', nodeName: woods },
+    });
+  });
+
+  it('parks refunded, not crafting, when the outbound route vanishes', () => {
+    seedCrafter();
+    vi.mocked(travelPathFrom)
+      .mockReturnValueOnce(path)
+      .mockReturnValueOnce(undefined);
+
+    inTick(() => workerAssign(workerId, woods, copperId));
+
+    expect(getMaterialQuantity(copperId)).toBe(2);
+    expect(workersState()[workerId]).toMatchObject({
+      assignment,
+      status: { kind: 'AtDuchy' },
+    });
+  });
+
+  it('only clears a pending craft assignment while heading home', () => {
+    seedCrafter();
+    const headingHome: WorkerState['status'] = {
+      kind: 'TravelingBack',
+      path,
+      ticksIntoStep: 0,
+      carriedQuantity: 0,
+    };
+    seedWorkerState({ assignment: { recipeId }, status: headingHome });
+
+    inTick(() => workerRecall(workerId));
+
+    expect(workersState()[workerId]).toMatchObject({
+      assignment: null,
+      status: headingHome,
+    });
+  });
+
+  it('refunds the held unit and parks at the duchy when recalled', () => {
+    seedCrafter();
+    const events = captureAnalyticsEvents();
+
+    inTick(() => workerRecall(workerId));
+
+    expect(events).toEqual(['Worker:Recall:Weaver Nell']);
+
+    expect(getMaterialQuantity(copperId)).toBe(2);
+    expect(workersState()[workerId]).toMatchObject({
+      assignment: null,
+      status: { kind: 'AtDuchy' },
+    });
   });
 });

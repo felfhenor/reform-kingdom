@@ -11,10 +11,7 @@ import { ensureItem } from '@helpers/content/ensure-item';
 import { ensureWorker } from '@helpers/content/ensure-worker';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { workersState } from '@helpers/state-game';
-import {
-  workerGatherXpGateSatisfied,
-  workerGatheringProcessTick,
-} from '@helpers/worker/worker-gathering';
+import { workerGatheringProcessTick } from '@helpers/worker/worker-gathering';
 import {
   defaultWorkerState,
   workerStatsForLevel,
@@ -39,7 +36,7 @@ import { seedWorldNodes } from '@/testing/world';
 const nell = ensureWorker({
   id: 'weaver-nell' as WorkerId,
   name: 'Weaver Nell',
-  baseStats: { capacity: 3, gatherSpeed: 2, stamina: 30 },
+  baseStats: { capacity: 3, gatherSpeed: 2, craftSpeed: 0, stamina: 30 },
 });
 const copper = ensureItem({
   id: 'copper-ore' as ItemId,
@@ -124,18 +121,6 @@ beforeEach(() => {
   vi.mocked(workerAssignmentIsValid).mockReturnValue(true);
   vi.mocked(workerBeginReturnTrip).mockReturnValue(true);
   seedNode();
-});
-
-describe('workerGatherXpGateSatisfied', () => {
-  it('holds within the node’s worker level range, inclusive', () => {
-    const gathering = woods({ workerLevelRange: { min: 5, max: 10 } });
-
-    expect(
-      [4, 5, 10, 11].map((level) =>
-        workerGatherXpGateSatisfied(gathering, level),
-      ),
-    ).toEqual([false, true, true, false]);
-  });
 });
 
 describe('workerGatheringProcessTick', () => {

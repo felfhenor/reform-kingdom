@@ -28,7 +28,10 @@ import {
   repairSplitEquippedItems,
 } from '@helpers/item/equipment';
 import { grandfatherGatherNodeDiscoveries } from '@helpers/item/gather-node-discovery';
-import { pruneInvalidMaterials } from '@helpers/item/materials';
+import {
+  applyMaterialDelta,
+  pruneInvalidMaterials,
+} from '@helpers/item/materials';
 import { pruneInvalidArmoryItems } from '@helpers/kingdom/armory';
 import { pruneInvalidActiveAstralProjectorSpells } from '@helpers/kingdom/astral-projector';
 import {
@@ -55,6 +58,7 @@ import {
   isWorkerContentKnown,
   pruneInvalidWorkerStates,
 } from '@helpers/worker/worker-discovery';
+import { workerCraftOrphanedMaterials } from '@helpers/worker/worker-crafting';
 import { workerAssignmentIsValid } from '@helpers/worker/worker-travel';
 import { backfillDiscoveredMaps } from '@helpers/world-node/world-map-discovery';
 import { allGatherableMaterialIds } from '@helpers/world-node/world-node-gathering';
@@ -244,10 +248,14 @@ export function migrateGameState() {
   newState.tutorials = ledgerPrune(newState.tutorials, (id) =>
     TUTORIAL_CATALOG.some((t) => t.id === id),
   );
-  newState.workers = pruneInvalidWorkerStates(
+  const prunedWorkers = pruneInvalidWorkerStates(
     newState.workers,
     workerAssignmentIsValid,
   );
+  workerCraftOrphanedMaterials(newState.workers, prunedWorkers).forEach(
+    ({ itemId, quantity }) => applyMaterialDelta(newState, itemId, quantity),
+  );
+  newState.workers = prunedWorkers;
   newState.armory = [
     ...newState.armory,
     ...craftQueueOrphanedEquipment(newState.tradeskills),

@@ -1,4 +1,8 @@
-import { getEntriesByType, getEntry } from '@helpers/content/content';
+import {
+  allContentById,
+  getEntriesByType,
+  getEntry,
+} from '@helpers/content/content';
 import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
 import { getCollectibleQuantity } from '@helpers/item/collectibles';
 import { equippedItems } from '@helpers/item/equipment';
@@ -37,30 +41,58 @@ export function isRecipeDiscovered(
   );
 }
 
+// Keyed by the content map, so a content reload is just a cache miss.
+const dropGatedCache = new WeakMap<object, Set<RecipeId>>();
+const townUniqueCache = new WeakMap<object, Set<RecipeId>>();
+
+function dropGatedRecipeIds(): Set<RecipeId> {
+  const content = allContentById();
+  const cached = dropGatedCache.get(content);
+  if (cached) return cached;
+
+  const fromEncounters = getEntriesByType<EncounterContent>(
+    'encounter',
+  ).flatMap((encounter) =>
+    encounter.completionRewards.flatMap((reward) =>
+      'recipeId' in reward ? [reward.recipeId] : [],
+    ),
+  );
+  const fromTraders = getEntriesByType<CaravanTraderContent>(
+    'caravantrader',
+  ).flatMap((trader) =>
+    [...trader.trades, ...trader.tokenTrades].flatMap((trade) =>
+      trade.recipeId ? [trade.recipeId] : [],
+    ),
+  );
+
+  const ids = new Set([...fromEncounters, ...fromTraders]);
+  dropGatedCache.set(content, ids);
+  return ids;
+}
+
+function townUniqueRecipeIds(): Set<RecipeId> {
+  const content = allContentById();
+  const cached = townUniqueCache.get(content);
+  if (cached) return cached;
+
+  const ids = new Set(
+    getEntriesByType<TownContent>('town').flatMap(
+      (town) => town.crafting.uniqueRecipeIds,
+    ),
+  );
+  townUniqueCache.set(content, ids);
+  return ids;
+}
+
 // Whether this recipe is gated behind a world drop or a caravan trader sale -
 // gated recipes should never be craftable until discovered.
 export function isRecipeDropGated(recipeId: RecipeId): boolean {
-  const droppedByEncounter = getEntriesByType<EncounterContent>(
-    'encounter',
-  ).some((encounter) =>
-    encounter.completionRewards.some(
-      (reward) => 'recipeId' in reward && reward.recipeId === recipeId,
-    ),
-  );
-  if (droppedByEncounter) return true;
-
-  return getEntriesByType<CaravanTraderContent>('caravantrader').some(
-    (trader) =>
-      trader.trades.some((trade) => trade.recipeId === recipeId) ||
-      trader.tokenTrades.some((trade) => trade.recipeId === recipeId),
-  );
+  return dropGatedRecipeIds().has(recipeId);
 }
 
 // Exclusively obtainable through the town's own shop stock - never on the player's own tradeskill craft list.
 export function isRecipeTownUnique(recipeId: RecipeId): boolean {
-  return getEntriesByType<TownContent>('town').some((town) =>
-    town.crafting.uniqueRecipeIds.includes(recipeId),
-  );
+  return townUniqueRecipeIds().has(recipeId);
 }
 
 // A drop-gated recipe can only be crafted once found; every other recipe is

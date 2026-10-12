@@ -156,6 +156,7 @@ export function defaultWorkerStats(): WorkerStatBlock {
   return {
     capacity: 0,
     gatherSpeed: 0,
+    craftSpeed: 0,
     stamina: 0,
   };
 }
