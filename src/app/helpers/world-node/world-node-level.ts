@@ -10,11 +10,11 @@ export function worldNodeLevel(nodeName: string): number {
   return gatherNodeLevelsState()?.[nodeName]?.level ?? 0;
 }
 
-// levelCost.length is the tier count (levelRequirement is authored 0..length-1), not a level value itself.
+// Level 0 is free, so each levelCost entry buys one level above it.
 export function worldNodeMaxAchievableLevel(
   gathering: GatheringContent,
 ): number {
-  return gathering.levelCost.length - 1;
+  return gathering.levelCost.length;
 }
 
 export function worldNodeIsMaxLevel(

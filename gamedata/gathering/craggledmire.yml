@@ -32,19 +32,6 @@
         - itemId: Mirewood
           required: 75
 
-    - costs:
-        - itemId: Gold Coin
-          required: 150000
-
-        - itemId: Miremetal Ingot
-          required: 75
-
-        - itemId: Mirewood
-          required: 50
-
-        - itemId: Elven Wood
-          required: 75
-
   gatherResults:
     # level 1
     - chance: 5
@@ -124,16 +111,6 @@
 
         - itemId: Tattered Hide
           required: 50
-
-    - costs:
-        - itemId: Gold Coin
-          required: 135000
-
-        - itemId: Mirewood
-          required: 100
-
-        - itemId: Mireweed
-          required: 100
 
   gatherResults:
     # level 1

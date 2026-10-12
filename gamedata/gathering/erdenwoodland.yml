@@ -29,16 +29,6 @@
         - itemId: Elven Corewood
           required: 100
 
-    - costs:
-        - itemId: Crimson Lucre
-          required: 5000
-
-        - itemId: Elven Corewood
-          required: 100
-
-        - itemId: Strong Spider Silk
-          required: 50
-
   gatherResults:
     # level 1
     - chance: 1
@@ -125,19 +115,6 @@
           required: 25
 
         - itemId: Elven Wood
-          required: 100
-
-    - costs:
-        - itemId: Crimson Lucre
-          required: 3000
-
-        - itemId: Demon Horn
-          required: 25
-
-        - itemId: Bat Wing
-          required: 25
-
-        - itemId: Elven Corewood
           required: 100
 
   gatherResults:
@@ -248,16 +225,6 @@
 
         - itemId: Elven Corewood
           required: 75
-
-    - costs:
-        - itemId: Crimson Lucre
-          required: 5000
-
-        - itemId: Elven Corewood
-          required: 100
-
-        - itemId: Hawk Feather
-          required: 50
 
   gatherResults:
     # level 1

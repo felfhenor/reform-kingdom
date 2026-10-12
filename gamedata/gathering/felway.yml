@@ -44,22 +44,6 @@
         - itemId: Fel Essence
           required: 20
 
-    - costs:
-        - itemId: Gold Coin
-          required: 300000
-
-        - itemId: Felwood
-          required: 125
-
-        - itemId: Fel Copper Ingot
-          required: 100
-
-        - itemId: Fel Fiber
-          required: 75
-
-        - itemId: Fel Essence
-          required: 30
-
   gatherResults:
     # level 1
     - chance: 1
@@ -154,22 +138,6 @@
 
         - itemId: Fel Essence
           required: 20
-
-    - costs:
-        - itemId: Gold Coin
-          required: 300000
-
-        - itemId: Felrock
-          required: 150
-
-        - itemId: Felwood
-          required: 75
-
-        - itemId: Morganite
-          required: 50
-
-        - itemId: Fel Essence
-          required: 30
 
   gatherResults:
     # level 1

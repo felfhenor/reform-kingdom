@@ -32,16 +32,6 @@
         - itemId: Elven Wood
           required: 75
 
-    - costs:
-        - itemId: Gold Coin
-          required: 225000
-
-        - itemId: Elven Wood
-          required: 75
-
-        - itemId: Ghostcopper Dust
-          required: 25
-
   gatherResults:
     # level 1
     - chance: 6

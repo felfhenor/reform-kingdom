@@ -47,14 +47,14 @@ describe('worldNodeLevel', () => {
 describe('leveling up a node', () => {
   const fiveTiers = gathering(5);
 
-  it('tops out one below the number of defined cost tiers', () => {
-    expect(worldNodeMaxAchievableLevel(fiveTiers)).toBe(4);
+  it('tops out at the number of defined cost tiers', () => {
+    expect(worldNodeMaxAchievableLevel(fiveTiers)).toBe(5);
 
-    atLevel(3);
-    expect(worldNodeIsMaxLevel(fiveTiers, mines)).toBe(false);
     atLevel(4);
-    expect(worldNodeIsMaxLevel(fiveTiers, mines)).toBe(true);
+    expect(worldNodeIsMaxLevel(fiveTiers, mines)).toBe(false);
     atLevel(5);
+    expect(worldNodeIsMaxLevel(fiveTiers, mines)).toBe(true);
+    atLevel(6);
     expect(worldNodeIsMaxLevel(fiveTiers, mines)).toBe(true);
   });
 
@@ -77,6 +77,6 @@ describe('pruneInvalidGatherNodeLevels', () => {
         { [mines]: { level: 5 }, Removed: { level: 1 } },
         (nodeName) => (nodeName === mines ? gathering(2) : undefined),
       ),
-    ).toEqual({ [mines]: { level: 1 } });
+    ).toEqual({ [mines]: { level: 2 } });
   });
 });

@@ -43,6 +43,6 @@ export type GatheringContent = IsContentItem &
     // Gates whether a worker gains XP gathering here.
     workerLevelRange: LevelRange;
 
-    // Tier count is levelCost.length; gatherResults' levelRequirement values are authored 0..levelCost.length-1.
+    // levelCost[N-1] buys level N, so gatherResults' levelRequirement values are authored 0..levelCost.length.
     levelCost: GatherLevelCost[];
   };

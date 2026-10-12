@@ -213,7 +213,7 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     id: 'gatherdevelopmentlevels',
     title: 'Gather Development Levels',
     description:
-      'Every GatherNode development level (0..maxLevel-1) has at least one available gatherResults entry.',
+      'Every GatherNode level its levelCost can buy (0..levelCost.length) has available gatherResults, and no result requires an unreachable level.',
     category: 'World & Maps',
     strict: true,
     inputKeys: [],

@@ -38,22 +38,6 @@
         - itemId: Tattered Hide
           required: 50
 
-    - costs:
-        - itemId: Gold Coin
-          required: 30000
-
-        - itemId: Wergen Stick
-          required: 100
-
-        - itemId: Wergen Wood
-          required: 100
-
-        - itemId: Tattered Hide
-          required: 50
-
-        - itemId: Elven Wood
-          required: 50
-
   gatherResults:
     # level 1
     - chance: 4
@@ -172,16 +156,6 @@
         - itemId: Flax Flower
           required: 200
 
-    - costs:
-        - itemId: Gold Coin
-          required: 30000
-
-        - itemId: Flax Flower
-          required: 200
-
-        - itemId: Wergen Stick
-          required: 100
-
   gatherResults:
     - chance: 1
       levelRequirement: 0
@@ -259,16 +233,6 @@
           required: 100
 
         - itemId: Elven Wood
-          required: 100
-
-    - costs:
-        - itemId: Gold Coin
-          required: 75000
-
-        - itemId: Miremetal Ingot
-          required: 100
-
-        - itemId: Mirewood
           required: 100
 
   gatherResults:
@@ -395,16 +359,6 @@
           required: 100
 
         - itemId: Wergen Wood
-          required: 100
-
-    - costs:
-        - itemId: Gold Coin
-          required: 105000
-
-        - itemId: Elven Wood
-          required: 100
-
-        - itemId: Mirewood
           required: 100
 
   gatherResults:

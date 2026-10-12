@@ -1,9 +1,8 @@
 /**
- * Validates that every GatherNode's development level (0..maxLevel-1) has at
- * least one gatherResults entry available at that level - either an
- * unrestricted result (no levelRequirement) or one whose levelRequirement
- * matches exactly. A level with zero matching results would gather nothing
- * once a node reaches it.
+ * Validates that a GatherNode's levelCost and gatherResults tiers line up: base
+ * level 0 is free and levelCost[N-1] buys level N, so every level 0..levelCost.length
+ * needs at least one available result (unrestricted, or levelRequirement matching
+ * exactly), and no result may require a level past levelCost.length (unreachable).
  */
 
 import { getEntriesByType } from '@helpers/content/content';
@@ -13,30 +12,45 @@ import type {
   AnalysisRunResult,
   GatheringContent,
 } from '@interfaces';
+import { range, uniq } from 'es-toolkit/compat';
+
+function emptyLevels(gathering: GatheringContent): number[] {
+  return range(0, gathering.levelCost.length + 1).filter(
+    (level) => gatheringResultsAtLevel(gathering, level).length === 0,
+  );
+}
+
+function unreachableLevels(gathering: GatheringContent): number[] {
+  const requirements = gathering.gatherResults.map((r) => r.levelRequirement);
+  return uniq(
+    requirements.filter(
+      (level): level is number =>
+        level !== undefined && level > gathering.levelCost.length,
+    ),
+  );
+}
 
 function checkGathering(gathering: GatheringContent): AnalysisCheck {
   const maxLevel = gathering.levelCost.length;
-  const gapLevels: number[] = [];
-  for (let level = 0; level < maxLevel; level += 1) {
-    if (gatheringResultsAtLevel(gathering, level).length === 0) {
-      gapLevels.push(level);
-    }
-  }
-
-  if (gapLevels.length > 0) {
-    return {
-      id: `gatherdevelopmentlevels:${gathering.id}`,
-      label: gathering.name,
-      status: 'fail',
-      message: `${gathering.name} has no gatherResults available at level(s) ${gapLevels.join(', ')} (checked 0..${maxLevel - 1}) - gathering there would yield nothing once developed to that level.`,
-    };
-  }
+  const empty = emptyLevels(gathering);
+  const unreachable = unreachableLevels(gathering);
+  const problems = [
+    ...(empty.length > 0
+      ? [`no gatherResults at level(s) ${empty.join(', ')}`]
+      : []),
+    ...(unreachable.length > 0
+      ? [`gatherResults require unreachable level(s) ${unreachable.join(', ')}`]
+      : []),
+  ];
 
   return {
     id: `gatherdevelopmentlevels:${gathering.id}`,
     label: gathering.name,
-    status: 'pass',
-    message: `${gathering.name}: every level 0..${maxLevel - 1} has at least one available gatherResults entry.`,
+    status: problems.length > 0 ? 'fail' : 'pass',
+    message:
+      problems.length > 0
+        ? `${gathering.name} has ${maxLevel} levelCost entries (levels 0..${maxLevel}), but ${problems.join('; ')}.`
+        : `${gathering.name}: every level 0..${maxLevel} has at least one available gatherResults entry.`,
   };
 }
 
@@ -50,7 +64,7 @@ export function runGatherDevelopmentLevelsAnalysis(): AnalysisRunResult {
     checks,
     summary:
       failures === 0
-        ? 'Every gather node has at least one available result at each of its development levels.'
-        : `${failures} gather node(s) have a development level with no available results.`,
+        ? 'Every gather node has available results at each level its levelCost entries can buy.'
+        : `${failures} gather node(s) have levelCost entries that don't line up with their gatherResults tiers.`,
   };
 }

@@ -35,19 +35,6 @@
         - itemId: Flax Flower
           required: 25
 
-    - costs:
-        - itemId: Gold Coin
-          required: 60000
-
-        - itemId: Firmwater
-          required: 100
-
-        - itemId: Petrifiwood
-          required: 25
-
-        - itemId: Timberfuzz
-          required: 25
-
   gatherResults:
     # level 1
     - chance: 1
@@ -128,19 +115,6 @@
           required: 25
 
         - itemId: Red Slime Crystal
-          required: 25
-
-    - costs:
-        - itemId: Gold Coin
-          required: 120000
-
-        - itemId: Firmwater
-          required: 25
-
-        - itemId: Mireweed
-          required: 25
-
-        - itemId: Green Slime Crystal
           required: 25
 
   gatherResults:
@@ -245,19 +219,6 @@
           required: 50
 
         - itemId: Mireweed
-          required: 50
-
-    - costs:
-        - itemId: Gold Coin
-          required: 180000
-
-        - itemId: Petrifiwood
-          required: 75
-
-        - itemId: Flax Flower
-          required: 50
-
-        - itemId: Weak Spider Silk
           required: 50
 
   gatherResults:
