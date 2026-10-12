@@ -13,6 +13,7 @@ import type { ItemId } from '@interfaces';
       [minWidth]="minWidth()"
       [numberFormat]="numberFormat()"
       [animate]="animate()"
+      [detailed]="detailed()"
     />
   `,
   host: {
@@ -26,4 +27,5 @@ export class CurrencyCostComponent {
   public minWidth = input('');
   public numberFormat = input('1.0-0');
   public animate = input(false);
+  public detailed = input(false);
 }

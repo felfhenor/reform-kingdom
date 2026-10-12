@@ -1,0 +1,34 @@
+import { getEntriesByType } from '@helpers/content/content';
+import { farmableExploreNodes } from '@helpers/decree/decree-farm-node';
+import { farmNodeRewardOptions } from '@helpers/decree/decree-farm-node.ui';
+import { isMaterialDiscovered } from '@helpers/item/materials';
+import { discoveredGatherNodesFor } from '@helpers/world-node/world-node-gathering-discovery';
+import type { ItemId, RecipeContent, WorldNodeEntry } from '@interfaces';
+import { sortBy, uniq } from 'es-toolkit/compat';
+
+function farmNodesFor(itemId: ItemId): WorldNodeEntry[] {
+  return farmableExploreNodes().filter((entry) =>
+    farmNodeRewardOptions(entry.nodeName).some(
+      (option) => 'itemId' in option.reward && option.reward.itemId === itemId,
+    ),
+  );
+}
+
+// The nodes a worker gather assignment or a decree GatherMaterial/FarmNode clause can target; empty until found, so it never spoils.
+export function materialSourceNodeNames(itemId: ItemId): string[] {
+  if (!isMaterialDiscovered(itemId)) return [];
+
+  const entries = [
+    ...discoveredGatherNodesFor(itemId),
+    ...farmNodesFor(itemId),
+  ];
+  return sortBy(uniq(entries.map((entry) => entry.nodeName)));
+}
+
+export function materialSourceIsCrafting(itemId: ItemId): boolean {
+  if (!isMaterialDiscovered(itemId)) return false;
+
+  return getEntriesByType<RecipeContent>('recipe').some(
+    (recipe) => 'itemId' in recipe.result && recipe.result.itemId === itemId,
+  );
+}

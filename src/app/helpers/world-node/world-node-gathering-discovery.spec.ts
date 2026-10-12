@@ -4,7 +4,10 @@ import {
   ensureGatherResult,
   ensureGathering,
 } from '@helpers/content/ensure-gathernode';
-import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
+import {
+  discoveredGatherNodesFor,
+  worldNodeGatherMaterialIds,
+} from '@helpers/world-node/world-node-gathering-discovery';
 import type { GatheringId, GatherResult, ItemId } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
 import { seedContent } from '@/testing/content';
@@ -66,5 +69,38 @@ describe('worldNodeGatherMaterialIds', () => {
     const nodes = seedWoods([result('wood')]);
 
     expect(materialsAt(nodes, 'Signpost')).toEqual([]);
+  });
+});
+
+describe('discoveredGatherNodesFor', () => {
+  it('lists only discovered gather nodes yielding the item', () => {
+    const nodes = seedWoods([result('wood')]);
+    expect(discoveredGatherNodesFor('wood' as ItemId)).toEqual([]);
+
+    seedGamestate((state) => {
+      state.gatherNodeLevels['Wergen Woods'] = { level: 0 };
+      state.discoveredGatherNodes['Wergen Woods'] = { foundAt: 1 };
+    });
+    expect(discoveredGatherNodesFor('wood' as ItemId)).toEqual([
+      nodes['Wergen Woods'],
+    ]);
+    expect(discoveredGatherNodesFor('sap' as ItemId)).toEqual([]);
+  });
+
+  it('skips a hidden node the player hasn’t revealed', () => {
+    seedWoods([]);
+    seedContent([
+      ensureGathering({
+        id: 'gather-1' as GatheringId,
+        name: 'Wergen Woods',
+        hidden: true,
+        gatherResults: [result('wood')],
+      }),
+    ]);
+    seedGamestate((state) => {
+      state.discoveredGatherNodes['Wergen Woods'] = { foundAt: 1 };
+    });
+
+    expect(discoveredGatherNodesFor('wood' as ItemId)).toEqual([]);
   });
 });

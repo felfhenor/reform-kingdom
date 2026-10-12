@@ -18,6 +18,7 @@ export * from './infusion';
 export * from './item-preview';
 export * from './item-preview.ui';
 export * from './loot';
+export * from './material-source.ui';
 export * from './materials';
 export * from './reforge';
 export * from './reforge.ui';

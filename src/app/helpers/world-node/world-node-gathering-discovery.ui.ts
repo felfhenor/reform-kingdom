@@ -1,12 +1,10 @@
-import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
 import { isMaterialDiscovered } from '@helpers/item/materials';
-import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
-import { worldNodeFarmOption } from '@helpers/world-node/world-node-status.ui';
 import {
-  isWorldNodeVisible,
-  worldNodeByName,
-  worldNodesOfType,
-} from '@helpers/world-node/world-nodes';
+  discoveredGatherNodes,
+  worldNodeGatherMaterialIds,
+} from '@helpers/world-node/world-node-gathering-discovery';
+import { worldNodeFarmOption } from '@helpers/world-node/world-node-status.ui';
+import { worldNodeByName } from '@helpers/world-node/world-nodes';
 import type {
   ExploreNodeFarmOption,
   MaterialId,
@@ -17,14 +15,9 @@ import { sortBy } from 'es-toolkit/compat';
 // Discovered + visible GatherNodes with at least one discovered material - a node's other
 // possible drops stay hidden until their own weighted roll lands
 function discoveredGatherNodesWithMaterials(): WorldNodeEntry[] {
-  return worldNodesOfType('GatherNode')
-    .filter(
-      (entry) =>
-        isGatherNodeDiscovered(entry.nodeName) && isWorldNodeVisible(entry),
-    )
-    .filter((entry) =>
-      worldNodeGatherMaterialIds(entry).some((id) => isMaterialDiscovered(id)),
-    );
+  return discoveredGatherNodes().filter((entry) =>
+    worldNodeGatherMaterialIds(entry).some((id) => isMaterialDiscovered(id)),
+  );
 }
 
 // The pool a GatherMaterial clause's location dropdown offers.

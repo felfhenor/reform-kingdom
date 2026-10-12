@@ -9,7 +9,11 @@ import type { CostItem } from '@interfaces';
   template: `
     <div class="flex flex-wrap items-center gap-2">
       @for (cost of costs(); track cost.itemId) {
-        <app-currency-cost [type]="cost.itemId" [amount]="cost.required" />
+        <app-currency-cost
+          [type]="cost.itemId"
+          [amount]="cost.required"
+          [detailed]="true"
+        />
       }
     </div>
   `,

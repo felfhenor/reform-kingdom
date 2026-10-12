@@ -13,13 +13,12 @@ import { farmNodeRewardQuantity } from '@helpers/decree/decree-farm-node';
 import { decreeRouteTo } from '@helpers/decree/decree-route';
 import { riskBandForLevelRange } from '@helpers/engine/risk-band';
 import { isPartyAtFullEnergy, isPartyAtFullHealth } from '@helpers/hero/party';
-import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
 import { partyMinLevel } from '@helpers/item/gathering';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { telegraphedRaidTownIds } from '@helpers/town/raid/town-raid-state';
 import { homeNodeGet, isPlayerAtHome } from '@helpers/town/town-spawn';
 import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';
-import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
+import { discoveredGatherNodesFor } from '@helpers/world-node/world-node-gathering-discovery';
 import { worldNodeObtainableMissingRewards } from '@helpers/world-node/world-node-rewards';
 import {
   isWorldNodeVisible,
@@ -211,14 +210,7 @@ export function mostChallengingExploreNodeForRisk(
 export function nearestGatherNodeFor(
   materialId: MaterialId,
 ): WorldNodeEntry | undefined {
-  const candidates = worldNodesOfType('GatherNode').filter(
-    (entry) =>
-      isGatherNodeDiscovered(entry.nodeName) &&
-      isWorldNodeVisible(entry) &&
-      worldNodeGatherMaterialIds(entry).includes(materialId),
-  );
-
-  return nearestReachableNode(candidates, 'High');
+  return nearestReachableNode(discoveredGatherNodesFor(materialId), 'High');
 }
 
 function acceptableRaidTowns(riskTolerance: DecreeRiskLevel): TownContent[] {
