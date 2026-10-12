@@ -14,6 +14,7 @@ import { runNodeLevelsAnalysis } from '@helpers/debug/analysis-nodelevels';
 import { runNodeNamesAnalysis } from '@helpers/debug/analysis-nodenames';
 import { runObtainabilityAnalysis } from '@helpers/debug/analysis-obtainability';
 import { runOutpostsAnalysis } from '@helpers/debug/analysis-outposts';
+import { runNodeDevelopmentTimesAnalysis } from '@helpers/debug/analysis-nodedevelopmenttimes';
 import { runRecipeIngredientOrderAnalysis } from '@helpers/debug/analysis-recipeingredientorder';
 import { runRecipeNamesAnalysis } from '@helpers/debug/analysis-recipenames';
 import { runRecipeRewardsAnalysis } from '@helpers/debug/analysis-reciperewards';
@@ -213,7 +214,7 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     id: 'gatherdevelopmentlevels',
     title: 'Gather Development Levels',
     description:
-      'Every GatherNode level its levelCost can buy (0..levelCost.length) has available gatherResults, and no result requires an unreachable level.',
+      'Every GatherNode level its development levels can buy (0..levels.length) has available gatherResults, and no result requires an unreachable level.',
     category: 'World & Maps',
     strict: true,
     inputKeys: [],
@@ -248,6 +249,16 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     strict: true,
     inputKeys: [],
     run: runOutpostsAnalysis,
+  },
+  {
+    id: 'nodedevelopmenttimes',
+    title: 'Node Development Times',
+    description:
+      'Every GatherNode, Shrine and Outpost development level sets a positive developTime (ticks).',
+    category: 'World & Maps',
+    strict: true,
+    inputKeys: [],
+    run: runNodeDevelopmentTimesAnalysis,
   },
   {
     id: 'trainers',

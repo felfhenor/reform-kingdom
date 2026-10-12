@@ -3,7 +3,8 @@
   description: A shrine dedicated to a war hero whose origins are lost to time. It's said that orcs come here to pray for battle spoils.
 
   levels:
-    - costs:
+    - developTime: 300
+      costs:
         - itemId: Miremetal Ore
           required: 50
 
@@ -16,7 +17,8 @@
       globalEffectId: Victor's Harvest I
       globalEffectDuration: 1800
 
-    - costs:
+    - developTime: 600
+      costs:
         - itemId: Peridot
           required: 50
 
@@ -29,7 +31,8 @@
       globalEffectId: Victor's Harvest II
       globalEffectDuration: 3600
 
-    - costs:
+    - developTime: 900
+      costs:
         - itemId: Miremetal Ingot
           required: 150
 
@@ -39,7 +42,8 @@
       globalEffectId: Victor's Harvest III
       globalEffectDuration: 7200
 
-    - costs:
+    - developTime: 1200
+      costs:
         - itemId: Mirewood
           required: 200
 
@@ -52,7 +56,8 @@
       globalEffectId: Victor's Harvest IV
       globalEffectDuration: 14400
 
-    - costs:
+    - developTime: 1500
+      costs:
         - itemId: Ghostcopper Dust
           required: 100
 

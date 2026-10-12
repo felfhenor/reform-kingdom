@@ -14,8 +14,9 @@
   gatherTime: 5
   gatherReductionPerUpgradeLevel: 1
 
-  levelCost:
-    - costs:
+  levels:
+    - developTime: 300
+      costs:
         - itemId: Gold Coin
           required: 10000
 
@@ -25,7 +26,8 @@
         - itemId: Wergen Wood
           required: 50
 
-    - costs:
+    - developTime: 600
+      costs:
         - itemId: Gold Coin
           required: 20000
 
@@ -141,15 +143,17 @@
   gatherTime: 5
   gatherReductionPerUpgradeLevel: 1
 
-  levelCost:
-    - costs:
+  levels:
+    - developTime: 300
+      costs:
         - itemId: Gold Coin
           required: 10000
 
         - itemId: Flax Flower
           required: 100
 
-    - costs:
+    - developTime: 600
+      costs:
         - itemId: Gold Coin
           required: 20000
 
@@ -194,15 +198,17 @@
   gatherTime: 6
   gatherReductionPerUpgradeLevel: 1
 
-  levelCost:
-    - costs:
+  levels:
+    - developTime: 300
+      costs:
         - itemId: Gold Coin
           required: 15000
 
         - itemId: Copper Ore
           required: 100
 
-    - costs:
+    - developTime: 600
+      costs:
         - itemId: Gold Coin
           required: 30000
 
@@ -212,7 +218,8 @@
         - itemId: Copper Ingot
           required: 50
 
-    - costs:
+    - developTime: 900
+      costs:
         - itemId: Gold Coin
           required: 45000
 
@@ -225,7 +232,8 @@
         - itemId: Azurite
           required: 50
 
-    - costs:
+    - developTime: 1200
+      costs:
         - itemId: Gold Coin
           required: 60000
 
@@ -343,15 +351,17 @@
   gatherTime: 10
   gatherReductionPerUpgradeLevel: 1
 
-  levelCost:
-    - costs:
+  levels:
+    - developTime: 300
+      costs:
         - itemId: Gold Coin
           required: 35000
 
         - itemId: Elven Wood
           required: 100
 
-    - costs:
+    - developTime: 600
+      costs:
         - itemId: Gold Coin
           required: 70000
 

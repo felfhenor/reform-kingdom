@@ -3,14 +3,16 @@
   description: A shrine dedicated to Culcula, the explorer. They were known for their extraordinary mobility.
 
   levels:
-    - costs:
+    - developTime: 300
+      costs:
         - itemId: Crimson Lucre
           required: 500
 
       globalEffectId: Mobility of the Explorer I
       globalEffectDuration: 1800
 
-    - costs:
+    - developTime: 600
+      costs:
         - itemId: Crimson Lucre
           required: 2000
 
@@ -26,7 +28,8 @@
       globalEffectId: Mobility of the Explorer II
       globalEffectDuration: 3600
 
-    - costs:
+    - developTime: 900
+      costs:
         - itemId: Crimson Lucre
           required: 4500
 
@@ -42,7 +45,8 @@
       globalEffectId: Mobility of the Explorer III
       globalEffectDuration: 7200
 
-    - costs:
+    - developTime: 1200
+      costs:
         - itemId: Crimson Lucre
           required: 10000
 
@@ -58,7 +62,8 @@
       globalEffectId: Mobility of the Explorer IV
       globalEffectDuration: 14400
 
-    - costs:
+    - developTime: 1500
+      costs:
         - itemId: Crimson Lucre
           required: 25000
 

@@ -3,14 +3,16 @@
   description: A shrine dedicated to the founder of the Duchy of Carrina. It helps new adventurers and old ones alike to recognize their experiences and learn more from them.
 
   levels:
-    - costs:
+    - developTime: 300
+      costs:
         - itemId: Gold Coin
           required: 500
 
       globalEffectId: Wisdom of the Founder I
       globalEffectDuration: 1800
 
-    - costs:
+    - developTime: 600
+      costs:
         - itemId: Gold Coin
           required: 10000
 
@@ -26,7 +28,8 @@
       globalEffectId: Wisdom of the Founder II
       globalEffectDuration: 3600
 
-    - costs:
+    - developTime: 900
+      costs:
         - itemId: Gold Coin
           required: 25000
 
@@ -42,7 +45,8 @@
       globalEffectId: Wisdom of the Founder III
       globalEffectDuration: 7200
 
-    - costs:
+    - developTime: 1200
+      costs:
         - itemId: Gold Coin
           required: 65000
 
@@ -58,7 +62,8 @@
       globalEffectId: Wisdom of the Founder IV
       globalEffectDuration: 14400
 
-    - costs:
+    - developTime: 1500
+      costs:
         - itemId: Gold Coin
           required: 150000
 
@@ -82,35 +87,40 @@
   description: A shrine erected by local merchants. They say that praying here increases your wealth.
 
   levels:
-    - costs:
+    - developTime: 300
+      costs:
         - itemId: Gold Coin
           required: 500
 
       globalEffectId: Triumph of the Merchants I
       globalEffectDuration: 1800
 
-    - costs:
+    - developTime: 600
+      costs:
         - itemId: Gold Coin
           required: 25000
 
       globalEffectId: Triumph of the Merchants II
       globalEffectDuration: 3600
 
-    - costs:
+    - developTime: 900
+      costs:
         - itemId: Gold Coin
           required: 100000
 
       globalEffectId: Triumph of the Merchants III
       globalEffectDuration: 7200
 
-    - costs:
+    - developTime: 1200
+      costs:
         - itemId: Gold Coin
           required: 250000
 
       globalEffectId: Triumph of the Merchants IV
       globalEffectDuration: 14400
 
-    - costs:
+    - developTime: 1500
+      costs:
         - itemId: Gold Coin
           required: 1000000
 

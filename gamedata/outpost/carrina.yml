@@ -3,7 +3,8 @@
   description: A lightly-traveled outpost near the elves of the Duchy of Carrina. It can provide great boon to any adventurer tenacious enough to repair it.
 
   levels:
-    - costs:
+    - developTime: 300
+      costs:
         - itemId: Gold Coin
           required: 1000
 
@@ -16,7 +17,8 @@
         - itemId: Copper Ingot
           required: 10
 
-    - costs:
+    - developTime: 600
+      costs:
         - itemId: Gold Coin
           required: 2500
 
@@ -29,7 +31,8 @@
         - itemId: Copper Ingot
           required: 25
 
-    - costs:
+    - developTime: 900
+      costs:
         - itemId: Gold Coin
           required: 5000
 
@@ -42,7 +45,8 @@
         - itemId: Copper Ingot
           required: 50
 
-    - costs:
+    - developTime: 1200
+      costs:
         - itemId: Gold Coin
           required: 15000
 
@@ -55,7 +59,8 @@
         - itemId: Tattered Hide
           required: 150
 
-    - costs:
+    - developTime: 1500
+      costs:
         - itemId: Gold Coin
           required: 30000
 

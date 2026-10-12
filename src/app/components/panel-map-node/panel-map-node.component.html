@@ -101,20 +101,15 @@
         } @else if (isCaravanNode()) {
           <app-panel-map-node-actions-caravan (openTrade)="openTrade()" />
         } @else if (isGatherNode()) {
-          <app-panel-map-node-actions-gather
-            [entry]="entry"
-            (develop)="develop()"
-          />
+          <app-button-world-node-develop [entry]="entry" />
         } @else if (isShrineNode()) {
           <app-panel-map-node-actions-shrine
             [entry]="entry"
-            (develop)="developShrine()"
             (pray)="prayShrine()"
           />
         } @else if (isOutpostNode()) {
           <app-panel-map-node-actions-outpost
             [entry]="entry"
-            (develop)="developOutpost()"
             (setHome)="setOutpostHome()"
             (teleport)="openOutpostTeleport()"
           />

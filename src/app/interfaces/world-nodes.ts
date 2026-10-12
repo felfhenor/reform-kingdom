@@ -1,5 +1,8 @@
 import type { AtlasedImage } from '@interfaces/artable';
 import type { CollectibleId } from '@interfaces/content-collectible';
+import type { GatheringContent } from '@interfaces/content-gathering';
+import type { OutpostContent } from '@interfaces/content-outpost';
+import type { ShrineContent } from '@interfaces/content-shrine';
 import type { CostItem } from '@interfaces/cost';
 import type { DifficultyTier } from '@interfaces/difficulty-tier';
 import type { RewardIdentity } from '@interfaces/droppable';
@@ -15,11 +18,26 @@ export type WorldNodeHideable = {
 
 export type WorldNodeDevelopmentLevel = {
   costs: CostItem[];
+
+  // Ticks between paying for this level and it taking effect.
+  developTime: number;
 };
 
 // Level 0 = undeveloped; reaching level N (1..levels.length) pays levels[N-1].costs.
 export type WorldNodeDevelopable = {
   levels: WorldNodeDevelopmentLevel[];
+};
+
+export type WorldNodeDevelopableContent =
+  GatheringContent | ShrineContent | OutpostContent;
+
+export type WorldNodeDevelopableType = WorldNodeDevelopableContent['__type'];
+
+// `level` is the level the node reaches once this development finishes.
+export type WorldNodeDevelopmentDue = {
+  nodeName: string;
+  content: WorldNodeDevelopableContent;
+  level: number;
 };
 
 export type WorldNodeEntry = {

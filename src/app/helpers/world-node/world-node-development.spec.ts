@@ -5,13 +5,15 @@ import {
   worldNodeDevelopmentIsMaxLevel,
   worldNodeDevelopmentLevelUpCost,
   worldNodeDevelopmentMaxLevel,
+  worldNodeDevelopmentTime,
 } from '@helpers/world-node/world-node-development';
 import type { ItemId, WorldNodeDevelopable } from '@interfaces';
 
 function buildDevelopable(required: number[] = [500, 10000, 25000]) {
   return {
-    levels: required.map((amount) => ({
+    levels: required.map((amount, index) => ({
       costs: [{ itemId: 'Gold Coin' as ItemId, required: amount }],
+      developTime: (index + 1) * 300,
     })),
   } satisfies WorldNodeDevelopable;
 }
@@ -45,7 +47,34 @@ describe('worldNodeDevelopmentLevelUpCost', () => {
   });
 });
 
+describe('worldNodeDevelopmentTime', () => {
+  it('returns the time for the next level, and 0 past the last level', () => {
+    expect(worldNodeDevelopmentTime(buildDevelopable(), 1)).toBe(600);
+    expect(worldNodeDevelopmentTime(buildDevelopable(), 99)).toBe(0);
+  });
+});
+
 describe('pruneInvalidWorldNodeDevelopmentLevels', () => {
+  it('keeps a pending development that still has a level to reach', () => {
+    const result = pruneInvalidWorldNodeDevelopmentLevels(
+      { Shrine: { level: 1, developCompletesAtTick: 50 } },
+      () => buildDevelopable(),
+    );
+
+    expect(result).toEqual({
+      Shrine: { level: 1, developCompletesAtTick: 50 },
+    });
+  });
+
+  it('drops a pending development once the clamped level is already max', () => {
+    const result = pruneInvalidWorldNodeDevelopmentLevels(
+      { Shrine: { level: 5, developCompletesAtTick: 50 } },
+      () => buildDevelopable([500]),
+    );
+
+    expect(result).toEqual({ Shrine: { level: 1 } });
+  });
+
   it('drops entries whose node no longer resolves to developable content', () => {
     const result = pruneInvalidWorldNodeDevelopmentLevels(
       { "Founder's Shrine": { level: 1 }, Removed: { level: 1 } },

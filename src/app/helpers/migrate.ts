@@ -62,13 +62,14 @@ import { workerCraftOrphanedMaterials } from '@helpers/worker/worker-crafting';
 import { workerAssignmentIsValid } from '@helpers/worker/worker-travel';
 import { backfillDiscoveredMaps } from '@helpers/world-node/world-map-discovery';
 import { allGatherableMaterialIds } from '@helpers/world-node/world-node-gathering';
-import { pruneInvalidGatherNodeLevels } from '@helpers/world-node/world-node-level';
 import { pruneInvalidWorldNodeDevelopmentLevels } from '@helpers/world-node/world-node-development';
 import {
+  WORLD_NODE_DEVELOPABLE_TYPES,
+  WORLD_NODE_DEVELOPMENT_SLICES,
+  worldNodeDevelopable,
+} from '@helpers/world-node/world-node-development-state';
+import {
   worldNodeByName,
-  worldNodeGathering,
-  worldNodeOutpost,
-  worldNodeShrine,
   worldNodesOfType,
 } from '@helpers/world-node/world-nodes';
 import type {
@@ -206,27 +207,16 @@ export function migrateGameState() {
     newState.discoveredGatherNodes,
     newState.materials,
   );
-  newState.gatherNodeLevels = pruneInvalidGatherNodeLevels(
-    newState.gatherNodeLevels,
-    (nodeName) => {
-      const node = worldNodeByName(nodeName);
-      return node ? worldNodeGathering(node) : undefined;
-    },
-  );
-  newState.shrines = pruneInvalidWorldNodeDevelopmentLevels(
-    newState.shrines,
-    (nodeName) => {
-      const node = worldNodeByName(nodeName);
-      return node ? worldNodeShrine(node) : undefined;
-    },
-  );
-  newState.outposts = pruneInvalidWorldNodeDevelopmentLevels(
-    newState.outposts,
-    (nodeName) => {
-      const node = worldNodeByName(nodeName);
-      return node ? worldNodeOutpost(node) : undefined;
-    },
-  );
+  WORLD_NODE_DEVELOPABLE_TYPES.forEach((type) => {
+    const slice = WORLD_NODE_DEVELOPMENT_SLICES[type];
+    newState[slice] = pruneInvalidWorldNodeDevelopmentLevels(
+      newState[slice],
+      (nodeName) => {
+        const content = worldNodeDevelopable(nodeName);
+        return content?.__type === type ? content : undefined;
+      },
+    );
+  });
   newState.worldDiscoveries = ledgerPrune(
     newState.worldDiscoveries,
     (nodeName) => !!worldNodeByName(nodeName),

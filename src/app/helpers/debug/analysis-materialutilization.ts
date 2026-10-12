@@ -175,7 +175,7 @@ export function runMaterialUtilizationAnalysis(
       });
     });
 
-    gathering.levelCost.forEach((tier) => {
+    gathering.levels.forEach((tier) => {
       tier.costs.forEach((cost) => {
         const stats = byId.get(cost.itemId);
         if (stats) stats.nodeUpgradeCosts += 1;

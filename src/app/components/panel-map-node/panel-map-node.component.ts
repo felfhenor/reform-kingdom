@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { BarTownReputationComponent } from '@components/bar-town-reputation/bar-town-reputation.component';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
+import { ButtonWorldNodeDevelopComponent } from '@components/button-world-node-develop/button-world-node-develop.component';
 import { PanelMapNodeActionsCaravanComponent } from '@components/panel-map-node-actions-caravan/panel-map-node-actions-caravan.component';
 import { PanelMapNodeActionsExchangeComponent } from '@components/panel-map-node-actions-exchange/panel-map-node-actions-exchange.component';
 import { PanelMapNodeActionsExploreComponent } from '@components/panel-map-node-actions-explore/panel-map-node-actions-explore.component';
-import { PanelMapNodeActionsGatherComponent } from '@components/panel-map-node-actions-gather/panel-map-node-actions-gather.component';
 import { PanelMapNodeActionsOutpostComponent } from '@components/panel-map-node-actions-outpost/panel-map-node-actions-outpost.component';
 import { PanelMapNodeActionsShrineComponent } from '@components/panel-map-node-actions-shrine/panel-map-node-actions-shrine.component';
 import { PanelMapNodeActionsTownComponent } from '@components/panel-map-node-actions-town/panel-map-node-actions-town.component';
@@ -58,15 +58,10 @@ import { worldNodeDescription } from '@helpers/world-node/world-node-content.ui'
 import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import { worldNodeLevel } from '@helpers/world-node/world-node-level';
-import { gatherNodeLevelUp } from '@helpers/world-node/world-node-level.ui';
 import { worldNodeOutpostLevel } from '@helpers/world-node/world-node-outpost';
-import { outpostLevelUp } from '@helpers/world-node/world-node-outpost.ui';
 import { worldNodeCompletionRewards } from '@helpers/world-node/world-node-rewards';
 import { worldNodeShrineLevel } from '@helpers/world-node/world-node-shrine';
-import {
-  shrineLevelUp,
-  shrinePray,
-} from '@helpers/world-node/world-node-shrine.ui';
+import { shrinePray } from '@helpers/world-node/world-node-shrine.ui';
 import { worldNodeLevelRange } from '@helpers/world-node/world-node-status';
 import { worldNodeDifficultyTier } from '@helpers/world-node/world-node-status.ui';
 import {
@@ -92,7 +87,7 @@ import { sortBy } from 'es-toolkit/compat';
     SlotGatherMaterialComponent,
     PanelMapNodeActionsCaravanComponent,
     PanelMapNodeActionsExploreComponent,
-    PanelMapNodeActionsGatherComponent,
+    ButtonWorldNodeDevelopComponent,
     PanelMapNodeActionsOutpostComponent,
     PanelMapNodeActionsShrineComponent,
     PanelMapNodeActionsTownComponent,
@@ -369,32 +364,11 @@ export class PanelMapNodeComponent {
     setGamePlayView('kingdom');
   }
 
-  public develop(): void {
-    const entry = this.node();
-    if (!entry) return;
-
-    gatherNodeLevelUp(entry.nodeName);
-  }
-
-  public developShrine(): void {
-    const entry = this.node();
-    if (!entry) return;
-
-    shrineLevelUp(entry.nodeName);
-  }
-
   public prayShrine(): void {
     const entry = this.node();
     if (!entry) return;
 
     shrinePray(entry.nodeName);
-  }
-
-  public developOutpost(): void {
-    const entry = this.node();
-    if (!entry) return;
-
-    void outpostLevelUp(entry.nodeName);
   }
 
   public openOutpostTeleport(): void {

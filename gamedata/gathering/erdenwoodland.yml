@@ -14,15 +14,17 @@
   gatherTime: 25
   gatherReductionPerUpgradeLevel: 4
 
-  levelCost:
-    - costs:
+  levels:
+    - developTime: 300
+      costs:
         - itemId: Crimson Lucre
           required: 1000
 
         - itemId: Elven Wood
           required: 100
 
-    - costs:
+    - developTime: 600
+      costs:
         - itemId: Crimson Lucre
           required: 2500
 
@@ -93,8 +95,9 @@
   gatherTime: 15
   gatherReductionPerUpgradeLevel: 2
 
-  levelCost:
-    - costs:
+  levels:
+    - developTime: 300
+      costs:
         - itemId: Crimson Lucre
           required: 500
 
@@ -104,7 +107,8 @@
         - itemId: Gold Ore
           required: 25
 
-    - costs:
+    - developTime: 600
+      costs:
         - itemId: Crimson Lucre
           required: 1500
 
@@ -211,15 +215,17 @@
   gatherTime: 25
   gatherReductionPerUpgradeLevel: 5
 
-  levelCost:
-    - costs:
+  levels:
+    - developTime: 300
+      costs:
         - itemId: Crimson Lucre
           required: 1000
 
         - itemId: Weak Spider Silk
           required: 50
 
-    - costs:
+    - developTime: 600
+      costs:
         - itemId: Crimson Lucre
           required: 2500
 

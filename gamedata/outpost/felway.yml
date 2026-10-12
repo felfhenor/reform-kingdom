@@ -3,7 +3,8 @@
   description: An outpost destroyed by the Fel. They have no need of such things.
 
   levels:
-    - costs:
+    - developTime: 300
+      costs:
         - itemId: Gold Coin
           required: 50000
 
@@ -13,7 +14,8 @@
         - itemId: Felwood
           required: 50
 
-    - costs:
+    - developTime: 600
+      costs:
         - itemId: Gold Coin
           required: 100000
 
@@ -26,7 +28,8 @@
         - itemId: Fel Copper Ingot
           required: 50
 
-    - costs:
+    - developTime: 900
+      costs:
         - itemId: Gold Coin
           required: 150000
 
@@ -42,7 +45,8 @@
         - itemId: Fel Fiber
           required: 50
 
-    - costs:
+    - developTime: 1200
+      costs:
         - itemId: Gold Coin
           required: 200000
 
@@ -58,7 +62,8 @@
         - itemId: Fel Fiber
           required: 75
 
-    - costs:
+    - developTime: 1500
+      costs:
         - itemId: Gold Coin
           required: 250000
 

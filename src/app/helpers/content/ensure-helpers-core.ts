@@ -19,6 +19,7 @@ export function ensureWorldNodeDevelopmentLevel(
 ): WorldNodeDevelopmentLevel {
   return {
     costs: ensureArray(level.costs, ensureCostItem),
+    developTime: level.developTime ?? 0,
   };
 }
 

@@ -14,15 +14,17 @@
   gatherTime: 10
   gatherReductionPerUpgradeLevel: 1
 
-  levelCost:
-    - costs:
+  levels:
+    - developTime: 300
+      costs:
         - itemId: Gold Coin
           required: 20000
 
         - itemId: Firmwater
           required: 100
 
-    - costs:
+    - developTime: 600
+      costs:
         - itemId: Gold Coin
           required: 40000
 
@@ -90,8 +92,9 @@
   gatherTime: 10
   gatherReductionPerUpgradeLevel: 1
 
-  levelCost:
-    - costs:
+  levels:
+    - developTime: 300
+      costs:
         - itemId: Gold Coin
           required: 40000
 
@@ -104,7 +107,8 @@
         - itemId: Purple Slime Crystal
           required: 25
 
-    - costs:
+    - developTime: 600
+      costs:
         - itemId: Gold Coin
           required: 80000
 
@@ -197,8 +201,9 @@
   gatherTime: 10
   gatherReductionPerUpgradeLevel: 1
 
-  levelCost:
-    - costs:
+  levels:
+    - developTime: 300
+      costs:
         - itemId: Gold Coin
           required: 60000
 
@@ -208,7 +213,8 @@
         - itemId: Strongreed
           required: 50
 
-    - costs:
+    - developTime: 600
+      costs:
         - itemId: Gold Coin
           required: 120000
 

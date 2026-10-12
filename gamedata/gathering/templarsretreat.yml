@@ -14,15 +14,17 @@
   gatherTime: 15
   gatherReductionPerUpgradeLevel: 2
 
-  levelCost:
-    - costs:
+  levels:
+    - developTime: 300
+      costs:
         - itemId: Gold Coin
           required: 75000
 
         - itemId: Copper Ingot
           required: 100
 
-    - costs:
+    - developTime: 600
+      costs:
         - itemId: Gold Coin
           required: 15000
 

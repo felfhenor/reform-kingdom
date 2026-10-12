@@ -14,15 +14,17 @@
   gatherTime: 10
   gatherReductionPerUpgradeLevel: 1
 
-  levelCost:
-    - costs:
+  levels:
+    - developTime: 300
+      costs:
         - itemId: Gold Coin
           required: 50000
 
         - itemId: Miremetal Ore
           required: 100
 
-    - costs:
+    - developTime: 600
+      costs:
         - itemId: Gold Coin
           required: 100000
 
@@ -94,15 +96,17 @@
   gatherTime: 10
   gatherReductionPerUpgradeLevel: 1
 
-  levelCost:
-    - costs:
+  levels:
+    - developTime: 300
+      costs:
         - itemId: Gold Coin
           required: 45000
 
         - itemId: Mirewood
           required: 100
 
-    - costs:
+    - developTime: 600
+      costs:
         - itemId: Gold Coin
           required: 90000
 

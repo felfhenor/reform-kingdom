@@ -4,7 +4,7 @@ import {
 } from '@helpers/world-node/world-nodes';
 import type { GatherResult, GatheringContent, MaterialId } from '@interfaces';
 
-// Keyed by (content, level) - level only ever increases (gatherNodeLevelUp), so a level-up is just a miss, never stale.
+// Keyed by (content, level) - level only ever increases, so a level-up is just a miss, never stale.
 const resultsAtLevelCache = new WeakMap<
   GatheringContent,
   Map<number, GatherResult[]>

@@ -14,8 +14,9 @@
   gatherTime: 15
   gatherReductionPerUpgradeLevel: 2
 
-  levelCost:
-    - costs:
+  levels:
+    - developTime: 300
+      costs:
         - itemId: Gold Coin
           required: 100000
 
@@ -28,7 +29,8 @@
         - itemId: Fel Essence
           required: 10
 
-    - costs:
+    - developTime: 600
+      costs:
         - itemId: Gold Coin
           required: 200000
 
@@ -109,8 +111,9 @@
   gatherTime: 15
   gatherReductionPerUpgradeLevel: 2
 
-  levelCost:
-    - costs:
+  levels:
+    - developTime: 300
+      costs:
         - itemId: Gold Coin
           required: 100000
 
@@ -123,7 +126,8 @@
         - itemId: Fel Essence
           required: 10
 
-    - costs:
+    - developTime: 600
+      costs:
         - itemId: Gold Coin
           required: 200000
 

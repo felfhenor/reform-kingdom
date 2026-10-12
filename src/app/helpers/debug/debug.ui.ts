@@ -37,6 +37,7 @@ import {
   worldPartyState,
   worldTownsState,
 } from '@helpers/state-game';
+import { timerTicksElapsed } from '@helpers/engine/timer';
 import { raidAssaulterMonsterIds } from '@helpers/town/raid/town-raid-state';
 import { telegraphRaid } from '@helpers/town/raid/town-raid-tick';
 import {
@@ -49,7 +50,11 @@ import { townMarkVisited } from '@helpers/town/town-visit';
 import { tutorialUnmarkSeen } from '@helpers/tutorial/tutorial-seen';
 import { workerRescue } from '@helpers/worker/worker-discovery';
 import { workerXpForLevel } from '@helpers/worker/worker-progression';
-import { worldNodeMaxAchievableLevel } from '@helpers/world-node/world-node-level';
+import { worldNodeDevelopmentMaxLevel } from '@helpers/world-node/world-node-development';
+import {
+  WORLD_NODE_DEVELOPABLE_TYPES,
+  WORLD_NODE_DEVELOPMENT_SLICES,
+} from '@helpers/world-node/world-node-development-state';
 import {
   worldNodeByName,
   worldNodeGathering,
@@ -434,16 +439,35 @@ export function debugSetGatherNodeLevel(nodeName: string, level: number): void {
     return;
   }
 
-  const clampedLevel = clamp(
-    Math.round(level),
-    0,
-    worldNodeMaxAchievableLevel(gathering),
-  );
+  const maxLevel = worldNodeDevelopmentMaxLevel(gathering);
+  const clampedLevel = clamp(Math.round(level), 0, maxLevel);
 
+  // A pending development survives unless it would push the node past max.
   updateGamestate((state) => {
-    state.gatherNodeLevels[nodeName] = {
-      level: clampedLevel,
-    };
+    const pending =
+      clampedLevel < maxLevel
+        ? state.gatherNodeLevels[nodeName]?.developCompletesAtTick
+        : undefined;
+    state.gatherNodeLevels[nodeName] =
+      pending === undefined
+        ? { level: clampedLevel }
+        : { level: clampedLevel, developCompletesAtTick: pending };
+    return state;
+  });
+}
+
+// Finishes on the next tick, so completion notices and side effects still fire normally.
+export function debugCompleteWorldNodeDevelopments(): void {
+  const nowTick = timerTicksElapsed();
+  updateGamestate((state) => {
+    WORLD_NODE_DEVELOPABLE_TYPES.forEach((type) => {
+      Object.values(state[WORLD_NODE_DEVELOPMENT_SLICES[type]]).forEach(
+        (entry) => {
+          if (entry.developCompletesAtTick === undefined) return;
+          entry.developCompletesAtTick = nowTick;
+        },
+      );
+    });
     return state;
   });
 }

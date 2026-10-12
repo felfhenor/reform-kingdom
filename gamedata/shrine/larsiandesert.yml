@@ -3,7 +3,8 @@
   description: A shrine dedicated to a legendary farmer who was said to turn sand into soil.
 
   levels:
-    - costs:
+    - developTime: 300
+      costs:
         - itemId: Cactspine
           required: 100
 
@@ -16,7 +17,8 @@
       globalEffectId: Bountiful Gathering I
       globalEffectDuration: 1800
 
-    - costs:
+    - developTime: 600
+      costs:
         - itemId: Gold Coin
           required: 50000
 
@@ -26,7 +28,8 @@
       globalEffectId: Bountiful Gathering II
       globalEffectDuration: 3600
 
-    - costs:
+    - developTime: 900
+      costs:
         - itemId: Gold Coin
           required: 100000
 
@@ -42,7 +45,8 @@
       globalEffectId: Bountiful Gathering III
       globalEffectDuration: 7200
 
-    - costs:
+    - developTime: 1200
+      costs:
         - itemId: Gold Coin
           required: 200000
 
@@ -55,7 +59,8 @@
       globalEffectId: Bountiful Gathering IV
       globalEffectDuration: 14400
 
-    - costs:
+    - developTime: 1500
+      costs:
         - itemId: Gold Coin
           required: 350000
 

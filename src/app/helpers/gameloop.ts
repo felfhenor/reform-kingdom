@@ -35,6 +35,7 @@ import { townShopProcessTick } from '@helpers/town/shop/town-shop-tick';
 import { townWorkerProcessTick } from '@helpers/town/worker/town-worker-tick';
 import { tutorialRearmProcessTick } from '@helpers/tutorial/tutorial-seen';
 import { workersProcessTick } from '@helpers/worker/worker-tick';
+import { worldNodeDevelopmentProcessTick } from '@helpers/world-node/world-node-development-tick';
 
 import { clamp } from 'es-toolkit/compat';
 
@@ -82,6 +83,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
       travelProcessTick();
       globalEffectsProcessTick();
       astralProjectorProcessTick();
+      worldNodeDevelopmentProcessTick();
       gatheringProcessTick();
       encounterRandomProcessTick();
       caravanProcessTick();

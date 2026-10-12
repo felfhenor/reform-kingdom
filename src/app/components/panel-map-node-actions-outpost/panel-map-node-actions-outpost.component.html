@@ -38,21 +38,7 @@
       </p>
     }
 
-    <button
-      type="button"
-      class="btn btn-sm btn-primary"
-      [disabled]="!canDevelop()"
-      (click)="develop.emit()"
-      appSfx="ui-click"
-      [sfxTrigger]="['click', 'hover']"
-    >
-      @if (isMaxLevel()) {
-        This outpost is fully developed
-      } @else {
-        Develop for
-        <app-row-currency-cost [costs]="cost()" />
-      }
-    </button>
+    <app-button-world-node-develop [entry]="entry()" subject="outpost" />
   }
 
   <button

@@ -3,7 +3,8 @@
   description: An abandoned outpost near the demoniacs of the Erden Woodland. It can provide great boon to any adventurer tenacious enough to repair it.
 
   levels:
-    - costs:
+    - developTime: 300
+      costs:
         - itemId: Crimson Lucre
           required: 500
 
@@ -16,7 +17,8 @@
         - itemId: Wolf Pelt
           required: 5
 
-    - costs:
+    - developTime: 600
+      costs:
         - itemId: Crimson Lucre
           required: 1000
 
@@ -29,7 +31,8 @@
         - itemId: Wolf Pelt
           required: 10
 
-    - costs:
+    - developTime: 900
+      costs:
         - itemId: Crimson Lucre
           required: 2000
 
@@ -42,7 +45,8 @@
         - itemId: Wolf Pelt
           required: 15
 
-    - costs:
+    - developTime: 1200
+      costs:
         - itemId: Crimson Lucre
           required: 3500
 
@@ -55,7 +59,8 @@
         - itemId: Wolf Pelt
           required: 25
 
-    - costs:
+    - developTime: 1500
+      costs:
         - itemId: Crimson Lucre
           required: 7000
 

@@ -1,14 +1,9 @@
 import {
   ensureArray,
-  ensureCostItem,
   ensureItemQuantity,
+  ensureWorldNodeDevelopmentLevel,
 } from '@helpers/content/ensure-helpers-core';
-import type {
-  GatheringContent,
-  GatheringId,
-  GatherLevelCost,
-  GatherResult,
-} from '@interfaces';
+import type { GatheringContent, GatheringId, GatherResult } from '@interfaces';
 
 export function ensureGatherResult(
   result: Partial<GatherResult> = {},
@@ -18,14 +13,6 @@ export function ensureGatherResult(
     items: ensureArray(result.items, ensureItemQuantity),
     levelRequirement: result.levelRequirement,
     tradeskillIds: result.tradeskillIds ?? [],
-  };
-}
-
-export function ensureGatherLevelCost(
-  levelCost: Partial<GatherLevelCost> = {},
-): GatherLevelCost {
-  return {
-    costs: ensureArray(levelCost.costs, ensureCostItem),
   };
 }
 
@@ -47,6 +34,6 @@ export function ensureGathering(
     invisibleUntilCollectibleIdsFound:
       gathering.invisibleUntilCollectibleIdsFound ?? [],
     workerLevelRange: gathering.workerLevelRange ?? { min: 1, max: 99 },
-    levelCost: ensureArray(gathering.levelCost, ensureGatherLevelCost),
+    levels: ensureArray(gathering.levels, ensureWorldNodeDevelopmentLevel),
   };
 }

@@ -96,10 +96,19 @@ export type GameStateActiveAstralProjectorSpell = {
 // Keyed by Tiled node name (no branded id for world nodes). Scopes auto-mode's material picker to sources the player has actually found.
 export type GameStateDiscoveredGatherNodes = Ledger;
 
+// Set while the next level is being developed; the level only increments once this tick is reached.
+export type GameStateWorldNodeLevel = {
+  level: number;
+  developCompletesAtTick?: number;
+};
+
 // Keyed by Tiled node name; shared by every developable node type.
 export type GameStateWorldNodeLevels = {
-  [key: string]: { level: number };
+  [key: string]: GameStateWorldNodeLevel;
 };
+
+export type GameStateWorldNodeDevelopmentSlice =
+  'gatherNodeLevels' | 'shrines' | 'outposts';
 
 export type GameStateGatherNodeLevels = GameStateWorldNodeLevels;
 

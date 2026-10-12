@@ -1,9 +1,12 @@
 import type { TradeskillId } from '@interfaces/content-tradeskill';
-import type { CostItem, ItemQuantity } from '@interfaces/cost';
+import type { ItemQuantity } from '@interfaces/cost';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { LevelRange } from '@interfaces/level-range';
 import type { HasDescription } from '@interfaces/traits';
-import type { WorldNodeHideable } from '@interfaces/world-nodes';
+import type {
+  WorldNodeDevelopable,
+  WorldNodeHideable,
+} from '@interfaces/world-nodes';
 
 export type GatheringId = Branded<string, 'GatheringId'>;
 
@@ -20,13 +23,10 @@ export type GatherResult = {
   tradeskillIds: TradeskillId[];
 };
 
-export type GatherLevelCost = {
-  costs: CostItem[];
-};
-
 export type GatheringContent = IsContentItem &
   HasDescription &
-  WorldNodeHideable & {
+  WorldNodeHideable &
+  WorldNodeDevelopable & {
     id: GatheringId;
     __type: 'gathering';
 
@@ -42,7 +42,4 @@ export type GatheringContent = IsContentItem &
 
     // Gates whether a worker gains XP gathering here.
     workerLevelRange: LevelRange;
-
-    // levelCost[N-1] buys level N, so gatherResults' levelRequirement values are authored 0..levelCost.length.
-    levelCost: GatherLevelCost[];
   };

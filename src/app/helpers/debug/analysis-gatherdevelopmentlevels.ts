@@ -1,11 +1,12 @@
 /**
- * Validates that a GatherNode's levelCost and gatherResults tiers line up: base
- * level 0 is free and levelCost[N-1] buys level N, so every level 0..levelCost.length
+ * Validates that a GatherNode's development levels and gatherResults tiers line up:
+ * base level 0 is free and levels[N-1] buys level N, so every level 0..levels.length
  * needs at least one available result (unrestricted, or levelRequirement matching
- * exactly), and no result may require a level past levelCost.length (unreachable).
+ * exactly), and no result may require a level past levels.length (unreachable).
  */
 
 import { getEntriesByType } from '@helpers/content/content';
+import { worldNodeDevelopmentMaxLevel } from '@helpers/world-node/world-node-development';
 import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
 import type {
   AnalysisCheck,
@@ -15,7 +16,7 @@ import type {
 import { range, uniq } from 'es-toolkit/compat';
 
 function emptyLevels(gathering: GatheringContent): number[] {
-  return range(0, gathering.levelCost.length + 1).filter(
+  return range(0, worldNodeDevelopmentMaxLevel(gathering) + 1).filter(
     (level) => gatheringResultsAtLevel(gathering, level).length === 0,
   );
 }
@@ -25,13 +26,13 @@ function unreachableLevels(gathering: GatheringContent): number[] {
   return uniq(
     requirements.filter(
       (level): level is number =>
-        level !== undefined && level > gathering.levelCost.length,
+        level !== undefined && level > worldNodeDevelopmentMaxLevel(gathering),
     ),
   );
 }
 
 function checkGathering(gathering: GatheringContent): AnalysisCheck {
-  const maxLevel = gathering.levelCost.length;
+  const maxLevel = worldNodeDevelopmentMaxLevel(gathering);
   const empty = emptyLevels(gathering);
   const unreachable = unreachableLevels(gathering);
   const problems = [
@@ -49,7 +50,7 @@ function checkGathering(gathering: GatheringContent): AnalysisCheck {
     status: problems.length > 0 ? 'fail' : 'pass',
     message:
       problems.length > 0
-        ? `${gathering.name} has ${maxLevel} levelCost entries (levels 0..${maxLevel}), but ${problems.join('; ')}.`
+        ? `${gathering.name} has ${maxLevel} development level(s) (levels 0..${maxLevel}), but ${problems.join('; ')}.`
         : `${gathering.name}: every level 0..${maxLevel} has at least one available gatherResults entry.`,
   };
 }
@@ -64,7 +65,7 @@ export function runGatherDevelopmentLevelsAnalysis(): AnalysisRunResult {
     checks,
     summary:
       failures === 0
-        ? 'Every gather node has available results at each level its levelCost entries can buy.'
-        : `${failures} gather node(s) have levelCost entries that don't line up with their gatherResults tiers.`,
+        ? 'Every gather node has available results at each level its development levels can buy.'
+        : `${failures} gather node(s) have development levels that don't line up with their gatherResults tiers.`,
   };
 }

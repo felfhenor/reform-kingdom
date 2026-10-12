@@ -3,7 +3,8 @@
   description: An outpost overtaken by the desert sands near the deadwoods of the Larsian Desert. It can provide great boon to any adventurer tenacious enough to repair it.
 
   levels:
-    - costs:
+    - developTime: 300
+      costs:
         - itemId: Gold Coin
           required: 7500
 
@@ -19,7 +20,8 @@
         - itemId: Cactspine
           required: 10
 
-    - costs:
+    - developTime: 600
+      costs:
         - itemId: Gold Coin
           required: 20000
 
@@ -35,7 +37,8 @@
         - itemId: Cactspine
           required: 25
 
-    - costs:
+    - developTime: 900
+      costs:
         - itemId: Gold Coin
           required: 35000
 
@@ -51,7 +54,8 @@
         - itemId: Strongreed
           required: 50
 
-    - costs:
+    - developTime: 1200
+      costs:
         - itemId: Gold Coin
           required: 65000
 
@@ -67,7 +71,8 @@
         - itemId: Strongreed
           required: 75
 
-    - costs:
+    - developTime: 1500
+      costs:
         - itemId: Gold Coin
           required: 125000
 

@@ -6,27 +6,14 @@ import {
 } from '@helpers/engine/analytics';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { applyGlobalEffectAdd } from '@helpers/hero/global-effect-state';
-import { isGlobalEffectActive } from '@helpers/hero/global-effects';
 import { updateGamestate } from '@helpers/state-game';
 import { isPartyAtNode } from '@helpers/world';
-import {
-  worldNodeCanAffordCost,
-  worldNodeSpendCost,
-} from '@helpers/world-node/world-node-cost';
-import {
-  worldNodeDevelopmentIsMaxLevel,
-  worldNodeDevelopmentLevelUpCost,
-} from '@helpers/world-node/world-node-development';
-import {
-  worldNodeShrineCurrentTier,
-  worldNodeShrineLevel,
-} from '@helpers/world-node/world-node-shrine';
+import { worldNodeShrineCurrentTier } from '@helpers/world-node/world-node-shrine';
 import {
   worldNodeByName,
   worldNodeShrine,
 } from '@helpers/world-node/world-nodes';
 import type { GlobalEffectContent } from '@interfaces';
-import { taskEventShrineLevel } from '@helpers/task/task-events';
 
 // Every isShrineBuff effect is removed first (not just this shrine's), so re-praying refreshes rather than duplicates.
 export function shrinePray(nodeName: string): boolean {
@@ -65,47 +52,5 @@ export function shrinePray(nodeName: string): boolean {
   analyticsSendDesignEvent(
     `World:Shrine:Pray:${analyticsSafeSegment(shrine.name)}`,
   );
-  return true;
-}
-
-// Awaits its own updateGamestate call so the level bump lands before the re-pray below reads it back.
-export async function shrineLevelUp(nodeName: string): Promise<boolean> {
-  const node = worldNodeByName(nodeName);
-  if (!node) return false;
-
-  const shrine = worldNodeShrine(node);
-  if (!shrine) return false;
-
-  const level = worldNodeShrineLevel(nodeName);
-  if (worldNodeDevelopmentIsMaxLevel(shrine, level)) return false;
-  if (!isPartyAtNode(nodeName)) return false;
-
-  const cost = worldNodeDevelopmentLevelUpCost(shrine, level);
-  if (!worldNodeCanAffordCost(cost)) return false;
-
-  // Matches by effect id, so no two shrines should ever share a globalEffectId (unenforced).
-  const currentTier = worldNodeShrineCurrentTier(shrine, nodeName);
-  const hadActiveBuffFromThisShrine =
-    !!currentTier && isGlobalEffectActive(currentTier.globalEffectId);
-
-  let newLevel = 0;
-  await updateGamestate((state) => {
-    worldNodeSpendCost(state, cost);
-
-    const existing = state.shrines[nodeName];
-    newLevel = (existing?.level ?? 0) + 1;
-    state.shrines[nodeName] = { level: newLevel };
-    return state;
-  });
-  void taskEventShrineLevel(nodeName, newLevel);
-
-  analyticsSendDesignEvent(
-    `World:Shrine:LevelUp:${analyticsSafeSegment(nodeName)}`,
-  );
-
-  if (hadActiveBuffFromThisShrine) {
-    shrinePray(nodeName);
-  }
-
   return true;
 }

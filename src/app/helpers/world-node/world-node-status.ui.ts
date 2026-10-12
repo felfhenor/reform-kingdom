@@ -9,10 +9,11 @@ import { worldNodeCaravanTimerText } from '@helpers/world-node/world-node-carava
 import { worldNodeCaravanVisitedTraderName } from '@helpers/world-node/world-node-caravan.ui';
 import { worldNodeExploreRandomTimerText } from '@helpers/world-node/world-node-encounter';
 import { worldNodeExploreRandomIsCompleted } from '@helpers/world-node/world-node-encounter.ui';
-import { worldNodeLevel } from '@helpers/world-node/world-node-level';
-import { worldNodeOutpostLevel } from '@helpers/world-node/world-node-outpost';
+import {
+  worldNodeDevelopmentLevel,
+  worldNodeDevelopmentTimerText,
+} from '@helpers/world-node/world-node-development-state';
 import { worldNodeCompletionRewardProgress } from '@helpers/world-node/world-node-rewards';
-import { worldNodeShrineLevel } from '@helpers/world-node/world-node-shrine';
 import {
   worldNodeInteractionKind,
   worldNodeLevelRange,
@@ -26,22 +27,9 @@ import type {
   DifficultyTier,
   ExploreNodeFarmOption,
   WorldNodeEntry,
-  WorldNodeInteractionKind,
   WorldNodeLabelInfo,
   WorldNodeStatusInfo,
 } from '@interfaces';
-
-// Each leveled node type gets its own branch, so a future one is a one-line addition.
-function nodeNameSuffixLevel(
-  kind: WorldNodeInteractionKind,
-  entry: WorldNodeEntry,
-): number {
-  let level = 0;
-  if (kind === 'Gather') level = worldNodeLevel(entry.nodeName);
-  if (kind === 'Shrine') level = worldNodeShrineLevel(entry.nodeName);
-  if (kind === 'Outpost') level = worldNodeOutpostLevel(entry.nodeName);
-  return level;
-}
 
 // `(obtained/total)` suffix for the map label, hidden once every reward's been found (or if there are none).
 function nodeRewardProgressSuffix(entry: WorldNodeEntry): string {
@@ -74,7 +62,7 @@ export function worldNodeLabelInfo(
 
   const levelRange = worldNodeLevelRange(entry);
   // Caravan names are authored as "<Brand> - <Branch>"; the branch is just the map, so drop it here.
-  const suffixLevel = nodeNameSuffixLevel(kind, entry);
+  const suffixLevel = worldNodeDevelopmentLevel(entry.nodeName);
   const nodeNameLine =
     (suffixLevel > 0 ? `${entry.nodeName} +${suffixLevel}` : entry.nodeName) +
     nodeRewardProgressSuffix(entry);
@@ -84,6 +72,9 @@ export function worldNodeLabelInfo(
   if (levelRange && kind !== 'Trade') {
     lines.push(`Lv. ${rangeLabel(levelRange)}`);
   }
+
+  const developTimerText = worldNodeDevelopmentTimerText(entry.nodeName);
+  if (developTimerText) lines.unshift(developTimerText);
 
   if (kind === 'ExploreRandom') {
     const timerText = worldNodeExploreRandomTimerText(entry);
