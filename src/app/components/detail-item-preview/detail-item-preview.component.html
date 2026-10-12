@@ -8,9 +8,13 @@
     [backdropSprite]="item.backdropSprite"
   />
 
-  <div>
-    <div class="type-entity-name mb-1 text-{{ item.rarity }}">
-      {{ item.name }}
+  <div class="grow">
+    <div class="flex items-start justify-between gap-2">
+      <div class="type-entity-name mb-1 text-{{ item.rarity }}">
+        {{ item.name }}
+      </div>
+
+      <ng-content select="[preview-corner]"></ng-content>
     </div>
 
     @if (item.levelRequirement) {

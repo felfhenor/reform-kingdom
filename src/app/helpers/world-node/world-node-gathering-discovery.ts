@@ -6,22 +6,40 @@ import {
   worldNodeGathering,
   worldNodesOfType,
 } from '@helpers/world-node/world-nodes';
-import type { ItemId, WorldNodeEntry } from '@interfaces';
+import type {
+  GatherResult,
+  ItemId,
+  TradeskillId,
+  WorldNodeEntry,
+} from '@interfaces';
+import { uniq } from 'es-toolkit/compat';
 
 // Split out of world-node-gathering.ts so its pure lookups stay free of gamestate/discovery.
 
-export function worldNodeGatherMaterialIds(entry: WorldNodeEntry): ItemId[] {
+function worldNodeGatherResults(entry: WorldNodeEntry): GatherResult[] {
   const gathering = worldNodeGathering(entry);
   if (!gathering) return [];
 
-  const ids = new Set<ItemId>();
-  gatheringResultsAtLevel(gathering, worldNodeLevel(entry.nodeName)).forEach(
-    (result) => {
-      result.items.forEach((item) => ids.add(item.itemId));
-    },
-  );
+  return gatheringResultsAtLevel(gathering, worldNodeLevel(entry.nodeName));
+}
 
-  return [...ids];
+export function worldNodeGatherMaterialIds(entry: WorldNodeEntry): ItemId[] {
+  return uniq(
+    worldNodeGatherResults(entry).flatMap((result) =>
+      result.items.map((item) => item.itemId),
+    ),
+  );
+}
+
+export function worldNodeGatherMaterialTradeskillIds(
+  entry: WorldNodeEntry,
+  itemId: ItemId,
+): TradeskillId[] {
+  return uniq(
+    worldNodeGatherResults(entry)
+      .filter((result) => result.items.some((item) => item.itemId === itemId))
+      .flatMap((result) => result.tradeskillIds),
+  );
 }
 
 export function discoveredGatherNodes(): WorldNodeEntry[] {

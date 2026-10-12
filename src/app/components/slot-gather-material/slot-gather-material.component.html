@@ -1,7 +1,21 @@
 @if (isDiscovered() && item(); as material) {
-  <app-tooltip-item-preview #preview [display]="display()" />
+  <ng-template #tooltip>
+    @if (display(); as preview) {
+      <app-detail-item-preview [display]="preview">
+        <div preview-corner class="flex gap-1">
+          @for (tradeskill of tradeskills(); track tradeskill.id) {
+            <app-atlas-image
+              spritesheet="tradeskill"
+              class="zoom-inline"
+              [assetName]="tradeskill.sprite"
+            />
+          }
+        </div>
+      </app-detail-item-preview>
+    }
+  </ng-template>
 
-  <div [tp]="preview.template()" [tpPlacement]="'top'">
+  <div [tp]="tooltip" [tpPlacement]="'top'">
     <app-slot-rarity-outline
       spritesheet="item"
       [entry]="material"

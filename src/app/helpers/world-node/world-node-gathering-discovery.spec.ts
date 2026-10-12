@@ -7,8 +7,14 @@ import {
 import {
   discoveredGatherNodesFor,
   worldNodeGatherMaterialIds,
+  worldNodeGatherMaterialTradeskillIds,
 } from '@helpers/world-node/world-node-gathering-discovery';
-import type { GatheringId, GatherResult, ItemId } from '@interfaces';
+import type {
+  GatheringId,
+  GatherResult,
+  ItemId,
+  TradeskillId,
+} from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
 import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
@@ -69,6 +75,50 @@ describe('worldNodeGatherMaterialIds', () => {
     const nodes = seedWoods([result('wood')]);
 
     expect(materialsAt(nodes, 'Signpost')).toEqual([]);
+  });
+});
+
+describe('worldNodeGatherMaterialTradeskillIds', () => {
+  const tradeskillsFor = (
+    nodes: ReturnType<typeof seedWoods>,
+    itemId: string,
+  ) =>
+    sortBy(
+      worldNodeGatherMaterialTradeskillIds(
+        nodes['Wergen Woods'],
+        itemId as ItemId,
+      ),
+    );
+
+  it('merges the tradeskills of every result that yields the item, once each', () => {
+    const nodes = seedWoods([
+      result('wood', { tradeskillIds: ['woodworking' as TradeskillId] }),
+      result('wood', {
+        tradeskillIds: [
+          'woodworking' as TradeskillId,
+          'artificing' as TradeskillId,
+        ],
+      }),
+      result('sap', { tradeskillIds: ['tailoring' as TradeskillId] }),
+    ]);
+
+    expect(tradeskillsFor(nodes, 'wood')).toEqual([
+      'artificing',
+      'woodworking',
+    ]);
+    expect(tradeskillsFor(nodes, 'sap')).toEqual(['tailoring']);
+  });
+
+  it('ignores results the node is not yet levelled for', () => {
+    const nodes = seedWoods([
+      result('wood', { tradeskillIds: ['woodworking' as TradeskillId] }),
+      result('wood', {
+        levelRequirement: 2,
+        tradeskillIds: ['artificing' as TradeskillId],
+      }),
+    ]);
+
+    expect(tradeskillsFor(nodes, 'wood')).toEqual(['woodworking']);
   });
 });
 

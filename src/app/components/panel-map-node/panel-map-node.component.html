@@ -61,7 +61,7 @@
         @if (materialIds.length > 0) {
           <div class="flex flex-wrap gap-2">
             @for (materialId of materialIds; track materialId) {
-              <app-slot-gather-material [itemId]="materialId" />
+              <app-slot-gather-material [node]="entry" [itemId]="materialId" />
             }
           </div>
         }
