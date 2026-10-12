@@ -7,7 +7,7 @@ import type { CostItem } from '@interfaces';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CurrencyCostComponent],
   template: `
-    <div class="flex flex-wrap items-center gap-2">
+    <div class="flex flex-wrap items-center gap-2 pointer-events-auto">
       @for (cost of costs(); track cost.itemId) {
         <app-currency-cost
           [type]="cost.itemId"
