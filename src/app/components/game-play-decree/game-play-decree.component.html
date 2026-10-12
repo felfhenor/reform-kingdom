@@ -68,11 +68,52 @@
             bindValue="value"
             [clearable]="false"
             [disabled]="isEditing()"
-            [ngModel]="draftType()"
+            [ngModel]="draftFormType()"
             (change)="setDraftType($event)"
           ></ng-select>
 
-          @if (draftType() === 'GatherMaterial') {
+          @if (draftFormType() === 'GatherMaterial') {
+            <ng-select
+              class="w-56"
+              [items]="materialOptions()"
+              bindLabel="name"
+              bindValue="id"
+              [clearable]="false"
+              placeholder="Material"
+              [ngModel]="draftMaterialId()"
+              (change)="setDraftMaterialId($event)"
+            >
+              <ng-template ng-option-tmp let-item="item">
+                <app-option-reward [reward]="item" />
+              </ng-template>
+
+              <ng-template ng-label-tmp let-item="item">
+                <app-option-reward [reward]="item" />
+              </ng-template>
+            </ng-select>
+
+            <ng-select
+              class="w-64"
+              [items]="gatherNodeOptions()"
+              bindLabel="nodeName"
+              bindValue="nodeName"
+              [clearable]="false"
+              [disabled]="!draftMaterialId()"
+              placeholder="Location"
+              [ngModel]="draftNodeName()"
+              (change)="setDraftGatherNodeName($event)"
+            >
+              <ng-template ng-option-tmp let-item="item">
+                <app-option-world-node [option]="item" [showLevel]="true" />
+              </ng-template>
+
+              <ng-template ng-label-tmp let-item="item">
+                <app-option-world-node [option]="item" />
+              </ng-template>
+            </ng-select>
+          }
+
+          @if (draftFormType() === 'GatherFromNode') {
             <ng-select
               class="w-64"
               [items]="gatherNodeOptions()"
@@ -84,24 +125,11 @@
               (change)="setDraftNodeName($event)"
             >
               <ng-template ng-option-tmp let-item="item">
-                <div class="flex items-center gap-2">
-                  <app-sprite-node class="zoom-row" [entry]="item.entry" />
-                  <div>
-                    <div class="type-label">{{ item.nodeName }}</div>
-                    <div
-                      class="type-meta text-difficulty-{{ item.difficulty }}"
-                    >
-                      Lv. {{ item.levelLabel }}
-                    </div>
-                  </div>
-                </div>
+                <app-option-world-node [option]="item" [showLevel]="true" />
               </ng-template>
 
               <ng-template ng-label-tmp let-item="item">
-                <div class="flex items-center gap-2">
-                  <app-sprite-node class="zoom-row" [entry]="item.entry" />
-                  {{ item.nodeName }}
-                </div>
+                <app-option-world-node [option]="item" />
               </ng-template>
             </ng-select>
 
@@ -124,16 +152,6 @@
                 <app-option-reward [reward]="item" />
               </ng-template>
             </ng-select>
-
-            <input
-              type="number"
-              min="1"
-              class="input input-bordered input-sm w-28"
-              [value]="draftTargetQuantity()"
-              (change)="
-                draftTargetQuantity.set($any($event.target).valueAsNumber)
-              "
-            />
           }
 
           @if (draftType() === 'FarmNode') {
@@ -148,24 +166,11 @@
               (change)="setDraftNodeName($event)"
             >
               <ng-template ng-option-tmp let-item="item">
-                <div class="flex items-center gap-2">
-                  <app-sprite-node class="zoom-row" [entry]="item.entry" />
-                  <div>
-                    <div class="type-label">{{ item.nodeName }}</div>
-                    <div
-                      class="type-meta text-difficulty-{{ item.difficulty }}"
-                    >
-                      Lv. {{ item.levelLabel }}
-                    </div>
-                  </div>
-                </div>
+                <app-option-world-node [option]="item" [showLevel]="true" />
               </ng-template>
 
               <ng-template ng-label-tmp let-item="item">
-                <div class="flex items-center gap-2">
-                  <app-sprite-node class="zoom-row" [entry]="item.entry" />
-                  {{ item.nodeName }}
-                </div>
+                <app-option-world-node [option]="item" />
               </ng-template>
             </ng-select>
 
@@ -188,7 +193,9 @@
                 <app-option-reward [reward]="item" />
               </ng-template>
             </ng-select>
+          }
 
+          @if (draftType() === 'GatherMaterial' || draftType() === 'FarmNode') {
             <input
               type="number"
               min="1"

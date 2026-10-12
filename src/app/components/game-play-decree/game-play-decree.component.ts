@@ -13,8 +13,8 @@ import { FormsModule } from '@angular/forms';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { OptionRewardComponent } from '@components/option-reward/option-reward.component';
+import { OptionWorldNodeComponent } from '@components/option-world-node/option-world-node.component';
 import { RowDecreeClauseComponent } from '@components/row-decree-clause/row-decree-clause.component';
-import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
 import { ListReflowDragDirective } from '@directives/list-reflow-drag.directive';
 import { ListReflowDirective } from '@directives/list-reflow.directive';
 import { SFXDirective } from '@directives/sfx.directive';
@@ -49,7 +49,9 @@ import {
 import { RISK_BAND_DIFFICULTY } from '@helpers/engine/difficulty-tier';
 import { homeNodeGet } from '@helpers/town/town-spawn';
 import {
+  gatherableDiscoveredMaterialIds,
   gatherNodeFarmOptions,
+  gatherNodeFarmOptionsFor,
   gatherNodeMaterialIds,
 } from '@helpers/world-node/world-node-gathering-discovery.ui';
 import { rewardKey } from '@helpers/world-node/world-node-rewards';
@@ -75,12 +77,16 @@ import { TippyDirective } from '@ngneat/helipopper';
 import { AnimationService } from '@services/animation.service';
 import { sortBy } from 'es-toolkit/compat';
 
+// GatherFromNode is a node-first form for the same GatherMaterial clause; GatherMaterial picks the material first.
+type ClauseFormType = DecreeClauseAction['type'] | 'GatherFromNode';
+
 const CLAUSE_TYPE_OPTIONS: {
-  value: DecreeClauseAction['type'];
+  value: ClauseFormType;
   label: string;
 }[] = sortBy(
   [
     { value: 'GatherMaterial', label: 'Gather Material' },
+    { value: 'GatherFromNode', label: 'Gather from Node' },
     { value: 'FarmNode', label: 'Farm Node' },
     { value: 'FinishUnfinishedAreas', label: 'Finish Unfinished Areas' },
     { value: 'LevelUpParty', label: 'Level Up Party' },
@@ -123,6 +129,21 @@ const RISK_TOLERANCE_OPTIONS: RiskToleranceOption[] = [
   },
 ];
 
+function materialOptionsFor(ids: MaterialId[]): MaterialOption[] {
+  return sortBy(
+    ids
+      .map((id) => getEntry<ItemContent>(id))
+      .filter((item): item is ItemContent => !!item)
+      .map((item) => ({
+        id: item.id as MaterialId,
+        name: item.name,
+        sprite: item.sprite,
+        spritesheet: 'item',
+      })),
+    (item) => item.name,
+  );
+}
+
 @Component({
   selector: 'app-game-play-decree',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -137,8 +158,8 @@ const RISK_TOLERANCE_OPTIONS: RiskToleranceOption[] = [
     NgLabelTemplateDirective,
     DragDropModule,
     RowDecreeClauseComponent,
-    SpriteNodeComponent,
     OptionRewardComponent,
+    OptionWorldNodeComponent,
     IconComponent,
     TippyDirective,
     SFXDirective,
@@ -172,27 +193,19 @@ export class GamePlayDecreeComponent {
   public readonly riskToleranceOptions = RISK_TOLERANCE_OPTIONS;
 
   public materialOptions = computed<MaterialOption[]>(() => {
+    if (this.isGatherByMaterial()) {
+      return materialOptionsFor(gatherableDiscoveredMaterialIds());
+    }
+
     const nodeName = this.draftNodeName();
     const currentMaterialId = this.draftMaterialId();
-
     const ids = nodeName ? gatherNodeMaterialIds(nodeName) : [];
     const scopedIds =
       currentMaterialId && !ids.includes(currentMaterialId)
         ? [...ids, currentMaterialId]
         : ids;
 
-    return sortBy(
-      scopedIds
-        .map((id) => getEntry<ItemContent>(id))
-        .filter((item): item is ItemContent => !!item)
-        .map((item) => ({
-          id: item.id as MaterialId,
-          name: item.name,
-          sprite: item.sprite,
-          spritesheet: 'item',
-        })),
-      (item) => item.name,
-    );
+    return materialOptionsFor(scopedIds);
   });
 
   public exploreNodeOptions = computed(() => exploreNodeFarmOptions());
@@ -202,9 +215,20 @@ export class GamePlayDecreeComponent {
       ? farmNodeActiveWarning(nodeName)
       : undefined;
   });
-  public gatherNodeOptions = computed(() => gatherNodeFarmOptions());
+  public gatherNodeOptions = computed(() => {
+    if (!this.isGatherByMaterial()) return gatherNodeFarmOptions();
+    const materialId = this.draftMaterialId();
+    return materialId ? gatherNodeFarmOptionsFor(materialId) : [];
+  });
 
-  public draftType = signal<DecreeClauseAction['type']>('GatherMaterial');
+  public draftFormType = signal<ClauseFormType>('GatherMaterial');
+  public draftType = computed<DecreeClauseAction['type']>(() => {
+    const formType = this.draftFormType();
+    return formType === 'GatherFromNode' ? 'GatherMaterial' : formType;
+  });
+  public isGatherByMaterial = computed(
+    () => this.draftFormType() === 'GatherMaterial',
+  );
   public draftMaterialId = signal<MaterialId | undefined>(undefined);
   public draftNodeName = signal<string | undefined>(undefined);
   public draftRewardKey = signal<string | undefined>(undefined);
@@ -323,8 +347,8 @@ export class GamePlayDecreeComponent {
     this.draftRiskTolerance.set(option.value);
   }
 
-  public setDraftType(option: { value: DecreeClauseAction['type'] }): void {
-    this.draftType.set(option.value);
+  public setDraftType(option: { value: ClauseFormType }): void {
+    this.draftFormType.set(option.value);
     this.draftNodeName.set(undefined);
     this.draftMaterialId.set(undefined);
     this.draftRewardKey.set(undefined);
@@ -332,6 +356,17 @@ export class GamePlayDecreeComponent {
 
   public setDraftMaterialId(option: MaterialOption | null): void {
     this.draftMaterialId.set(option ? option.id : undefined);
+    if (!this.isGatherByMaterial()) return;
+
+    const nodeOptions = this.gatherNodeOptions();
+    this.draftNodeName.set(
+      nodeOptions.length === 1 ? nodeOptions[0].nodeName : undefined,
+    );
+  }
+
+  // Keeps the material - it was picked first and scopes these nodes.
+  public setDraftGatherNodeName(option: { nodeName: string } | null): void {
+    this.draftNodeName.set(option ? option.nodeName : undefined);
   }
 
   public setDraftNodeName(option: { nodeName: string } | null): void {
@@ -371,7 +406,7 @@ export class GamePlayDecreeComponent {
   public startEditClause(clause: DecreeClause): void {
     if (clause.type === 'GatherMaterial') {
       this.editingClauseId.set(clause.id);
-      this.draftType.set('GatherMaterial');
+      this.draftFormType.set('GatherFromNode');
       this.draftNodeName.set(clause.nodeName);
       this.draftMaterialId.set(clause.materialId);
       this.draftTargetQuantity.set(clause.targetQuantity);
@@ -380,7 +415,7 @@ export class GamePlayDecreeComponent {
 
     if (clause.type === 'FarmNode') {
       this.editingClauseId.set(clause.id);
-      this.draftType.set('FarmNode');
+      this.draftFormType.set('FarmNode');
       this.draftNodeName.set(clause.nodeName);
       this.draftRewardKey.set(rewardKey(clause.reward));
       this.draftTargetQuantity.set(clause.targetQuantity);
@@ -392,14 +427,14 @@ export class GamePlayDecreeComponent {
       clause.type === 'FinishUnfinishedAreas'
     ) {
       this.editingClauseId.set(clause.id);
-      this.draftType.set(clause.type);
+      this.draftFormType.set(clause.type);
       this.draftRiskTolerance.set(clause.riskTolerance);
       return;
     }
 
     if (clause.type === 'DefendTowns') {
       this.editingClauseId.set(clause.id);
-      this.draftType.set('DefendTowns');
+      this.draftFormType.set('DefendTowns');
       this.draftRiskTolerance.set(clause.riskTolerance);
       this.draftTownName.set(clause.townName);
     }
