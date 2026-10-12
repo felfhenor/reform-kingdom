@@ -10,7 +10,6 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
@@ -70,7 +69,6 @@ import { clamp } from 'es-toolkit/compat';
     BlankSlateComponent,
     BarProgressComponent,
     TextNumberTweenComponent,
-    AtlasImageComponent,
     CardPageComponent,
     DecimalPipe,
     IconItemPreviewComponent,
