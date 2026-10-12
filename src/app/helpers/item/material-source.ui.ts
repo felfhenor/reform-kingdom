@@ -4,7 +4,7 @@ import { farmNodeRewardOptions } from '@helpers/decree/decree-farm-node.ui';
 import { isMaterialDiscovered } from '@helpers/item/materials';
 import { discoveredGatherNodesFor } from '@helpers/world-node/world-node-gathering-discovery';
 import type { ItemId, RecipeContent, WorldNodeEntry } from '@interfaces';
-import { sortBy, uniq } from 'es-toolkit/compat';
+import { sortBy, uniqBy } from 'es-toolkit/compat';
 
 function farmNodesFor(itemId: ItemId): WorldNodeEntry[] {
   return farmableExploreNodes().filter((entry) =>
@@ -15,14 +15,17 @@ function farmNodesFor(itemId: ItemId): WorldNodeEntry[] {
 }
 
 // The nodes a worker gather assignment or a decree GatherMaterial/FarmNode clause can target; empty until found, so it never spoils.
-export function materialSourceNodeNames(itemId: ItemId): string[] {
+export function materialSourceNodes(itemId: ItemId): WorldNodeEntry[] {
   if (!isMaterialDiscovered(itemId)) return [];
 
   const entries = [
     ...discoveredGatherNodesFor(itemId),
     ...farmNodesFor(itemId),
   ];
-  return sortBy(uniq(entries.map((entry) => entry.nodeName)));
+  return sortBy(
+    uniqBy(entries, (entry) => entry.nodeName),
+    (entry) => entry.nodeName,
+  );
 }
 
 export function materialSourceIsCrafting(itemId: ItemId): boolean {
