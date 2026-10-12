@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { recipeResultOwnedQuantity } from '@helpers/crafting/recipes';
 import { tradeskillNameForId } from '@helpers/crafting/tradeskill';
 import { gatherDifficultyTier } from '@helpers/engine/difficulty-tier';
 import { rangeLabel } from '@helpers/engine/leveled-range';
@@ -45,6 +46,7 @@ type RecipeOption = {
   levelRangeLabel: string;
   difficulty: DifficultyTier;
   maxLevel: number;
+  owned: number;
   disabled: boolean;
 };
 
@@ -164,6 +166,7 @@ export class PanelKingdomWorkersAssignmentCraftComponent {
       levelRangeLabel: rangeLabel(range),
       difficulty: gatherDifficultyTier(range, level),
       maxLevel: range.max,
+      owned: recipeResultOwnedQuantity(recipe),
       disabled: stamina < staminaCost,
     };
   }

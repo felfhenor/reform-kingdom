@@ -41,9 +41,17 @@
             </div>
           </div>
 
-          @if (level() > item.maxLevel) {
-            <span class="badge badge-warning text-sm">No XP</span>
-          }
+          <div class="flex items-center gap-2">
+            @if (item.owned > 0) {
+              <span class="badge badge-info text-sm">
+                Owned: {{ item.owned | number }}
+              </span>
+            }
+
+            @if (level() > item.maxLevel) {
+              <span class="badge badge-warning text-sm">No XP</span>
+            }
+          </div>
         </div>
       </ng-template>
 
@@ -61,9 +69,17 @@
             </span>
           </div>
 
-          @if (level() > item.maxLevel) {
-            <span class="badge badge-warning text-sm">No XP</span>
-          }
+          <div class="flex items-center gap-2">
+            @if (item.owned > 0) {
+              <span class="badge badge-info text-sm">
+                Owned: {{ item.owned | number }}
+              </span>
+            }
+
+            @if (level() > item.maxLevel) {
+              <span class="badge badge-warning text-sm">No XP</span>
+            }
+          </div>
         </div>
       </ng-template>
     </ng-select>

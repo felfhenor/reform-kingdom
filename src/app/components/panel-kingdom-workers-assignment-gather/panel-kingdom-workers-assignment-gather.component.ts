@@ -14,6 +14,7 @@ import { getEntry } from '@helpers/content/content';
 import { gatherDifficultyTier } from '@helpers/engine/difficulty-tier';
 import { rangeLabel } from '@helpers/engine/leveled-range';
 import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
+import { getMaterialQuantity } from '@helpers/item/materials';
 import { workersState } from '@helpers/state-game';
 import { workerStatsForLevel } from '@helpers/worker/worker-progression';
 import {
@@ -55,7 +56,7 @@ type NodeOption = {
   disabled: boolean;
 };
 
-type ItemOption = RewardContentInfo & { id: ItemId };
+type ItemOption = RewardContentInfo & { id: ItemId; owned: number };
 
 @Component({
   selector: 'app-panel-kingdom-workers-assignment-gather',
@@ -173,7 +174,9 @@ export class PanelKingdomWorkersAssignmentGatherComponent {
     return worldNodeGatherMaterialIds(node)
       .map((itemId) => {
         const info = rewardContentInfo({ itemId });
-        return info ? { id: itemId, ...info } : undefined;
+        return info
+          ? { id: itemId, owned: getMaterialQuantity(itemId), ...info }
+          : undefined;
       })
       .filter((option): option is ItemOption => !!option);
   });

@@ -79,11 +79,27 @@
         (change)="setDraftItemId($event.id)"
       >
         <ng-template ng-option-tmp let-item="item">
-          <app-option-reward [reward]="item" />
+          <div class="flex flex-row items-center justify-between gap-2">
+            <app-option-reward [reward]="item" />
+
+            @if (item.owned > 0) {
+              <span class="badge badge-info text-sm">
+                Owned: {{ item.owned | number }}
+              </span>
+            }
+          </div>
         </ng-template>
 
         <ng-template ng-label-tmp let-item="item">
-          <app-option-reward [reward]="item" />
+          <div class="flex flex-row items-center justify-between gap-2">
+            <app-option-reward [reward]="item" />
+
+            @if (item.owned > 0) {
+              <span class="badge badge-info text-sm">
+                Owned: {{ item.owned | number }}
+              </span>
+            }
+          </div>
         </ng-template>
       </ng-select>
     }
