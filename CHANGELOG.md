@@ -1,4 +1,54 @@
 
+# [0.11.0](https://github.com/felfhenor/reform-kingdom/compare/v0.10.0...v0.11.0) (2026-10-12)
+
+
+### Bug Fixes
+
+* **analysis:** lifesurge should not give analysis warnings ([f599795](https://github.com/felfhenor/reform-kingdom/commit/f599795a772141dfdfafac21628af4c5cee30873))
+* **armory:** loot filters now have white text buttons ([7409dd9](https://github.com/felfhenor/reform-kingdom/commit/7409dd955cc1c9f2c8f01dc57ee4c19c9ac6e6ec))
+* **ci:** CI should show the correct errors now ([41ceb35](https://github.com/felfhenor/reform-kingdom/commit/41ceb35b7810c346e1f2db98c9810feba5d96f7b))
+* **content:** felway monsters should drop fel essence ([4eebac7](https://github.com/felfhenor/reform-kingdom/commit/4eebac7d8b241b6b4056088ee5733da2c71be173))
+* **core:** add build-barrels, add a bunch of barrels, lazy-load helpers since it's not urgent ([3d4c19a](https://github.com/felfhenor/reform-kingdom/commit/3d4c19a52c2b6d4fc01a24583c74072842d73cd9))
+* **decree:** raid defense will travel through nodes ([121160f](https://github.com/felfhenor/reform-kingdom/commit/121160f7ec349c1fbe59a4f76757432f3a8ed187))
+* **decree:** should reset to 100 even after submitting a clause ([4909eac](https://github.com/felfhenor/reform-kingdom/commit/4909eac7e3bd0f508c0c5705295b8de8ec0194bf))
+* **tradeskill:** adjust math slightly for what recipes should give so the gradient works as expected ([e620394](https://github.com/felfhenor/reform-kingdom/commit/e620394f91e0e8fc5c755656b50cccd6f0017f73))
+* **ui:** ensure tooltips on disabled currency row actions show ([5e65aad](https://github.com/felfhenor/reform-kingdom/commit/5e65aadc7759eaf9df6a3b2401e4abf2043142a2))
+* **ui:** Lv. text consistency in more of the game ([ab8ac9a](https://github.com/felfhenor/reform-kingdom/commit/ab8ac9a26b6ccd291632a370271dd3a3670360d0))
+* **ui:** savefile panels are all the same height ([0a3c91a](https://github.com/felfhenor/reform-kingdom/commit/0a3c91aa1ea7db9a415a76ea642bcd8b9cd250a4))
+* **validate:** add validation to make sure monster drops are not 0% ([f79d3ec](https://github.com/felfhenor/reform-kingdom/commit/f79d3ecc3e56b135e6813952d61e026209e578a3))
+* **world:** diurtar level range fix - prevent this with validation ([1ed8869](https://github.com/felfhenor/reform-kingdom/commit/1ed88697dccd919016a3777a24427c8e585c56b9))
+* **world:** no more 1 xp, always 0 xp if too overleveled ([20ccd86](https://github.com/felfhenor/reform-kingdom/commit/20ccd86e10df9090f7f45c1734ba4f821648f44e))
+* **world:** traveling in the world should not look so janky ([aec707a](https://github.com/felfhenor/reform-kingdom/commit/aec707ac4e5890bc6783072d8a105085f4fd89eb))
+
+
+### Features
+
+* **commission:** commissions now let you click on the icon to navigate to the tradeskill ([b5f0a03](https://github.com/felfhenor/reform-kingdom/commit/b5f0a03bb78d040a7a72c2aa8a743fdd4d1ac847))
+* **content:** felrock -> copper ore is now 5s ([4152b7d](https://github.com/felfhenor/reform-kingdom/commit/4152b7dcd35ce2a8a59c34eef8fb668ec4d67c72))
+* **decree:** add a "gather material" that is "gather from node" but in reverse ([c15fb61](https://github.com/felfhenor/reform-kingdom/commit/c15fb615cf5f2a6d26861ea41d66959e53f47ae3))
+* **equipment:** reroll will now have some unique affixes ([de7f15b](https://github.com/felfhenor/reform-kingdom/commit/de7f15be1797eb5c1554892b3ddc2dd19d13a391))
+* **museum:** museum now has spoilers for unseen map nodes ([56ad2ce](https://github.com/felfhenor/reform-kingdom/commit/56ad2cec6a62c210aed337b87a23af6a80817366))
+* **nav:** add a quick action for trainer access ([8a020d5](https://github.com/felfhenor/reform-kingdom/commit/8a020d5c9cca3335a3e0582e46453ae622f79983))
+* **nav:** rework navbar to have bigger/more readable buttons + move the town button to the right side ([34f5c99](https://github.com/felfhenor/reform-kingdom/commit/34f5c992d5a817c772a4a0d526d3720ec9ab161b))
+* **regalia:** add regalias ([672c6b1](https://github.com/felfhenor/reform-kingdom/commit/672c6b16af56ce8536f5b97484cf6e4716863260))
+* **setup:** show job shorthand in world setup since it's used everywhere in game ([4b953b3](https://github.com/felfhenor/reform-kingdom/commit/4b953b33868a172ba48c3161088a4c5dfb944361))
+* **skill:** add burst skills, add a lot of new skills to enemies, bosses, heroes, trainers ([77c0ad9](https://github.com/felfhenor/reform-kingdom/commit/77c0ad96e95c3eadb111208bac6efa3ef08c6230))
+* **skill:** add tag for reflectable skills ([9f19659](https://github.com/felfhenor/reform-kingdom/commit/9f19659f73d882bde11f8d579d090808dfdeaaab))
+* **ui:** add "clean text" option ([20d8b72](https://github.com/felfhenor/reform-kingdom/commit/20d8b7259791369e724309210e7668fcedbf92e9))
+* **ui:** add a side rail for quicker nav in kingdom area ([5ac0156](https://github.com/felfhenor/reform-kingdom/commit/5ac015639c4f0cdabee3e3ca35377717c9ee3ba5))
+* **ui:** add detailed material sources for tradeskill crafting/astral projector/commissions/general requirement slots ([1e35f93](https://github.com/felfhenor/reform-kingdom/commit/1e35f93aca1b6b32d211c05ea8f8fb455eb82c45))
+* **ui:** currency rows will display sources for items to make them easier to find ([de8a741](https://github.com/felfhenor/reform-kingdom/commit/de8a741a1c616de32fd561db7656baf5580a1fbb))
+* **ui:** display icons for source nodes in material tooltips ([e95d5ca](https://github.com/felfhenor/reform-kingdom/commit/e95d5ca19b7c010438e1bca08800209c79fde278))
+* **ui:** show sprites in class dropdowns for reclass/new game ([1710de3](https://github.com/felfhenor/reform-kingdom/commit/1710de329ab46076788edc5ab0b15cfaad896ea7))
+* **ui:** support 'difficulty colors' for a more consistent UX in anything that requries difficulty ([4142574](https://github.com/felfhenor/reform-kingdom/commit/4142574ccbd639223bb35a1c97c8b30c85435ace))
+* **ux:** consistent hint/etc messages ([f930c00](https://github.com/felfhenor/reform-kingdom/commit/f930c00a593233e120834ef1a609b6a1530e5c26))
+* **ux:** improve tab ux ([77d721b](https://github.com/felfhenor/reform-kingdom/commit/77d721b44051c1eb7643dccc059860742a8232ba))
+* **ux:** remove outlined badges everywhere ([3d1987a](https://github.com/felfhenor/reform-kingdom/commit/3d1987af1c3c439bbabdc8db9d9c7e7e620de96e))
+* **ux:** rework 'reforge' and 'infuse' into 'workshop' - add tutorials, fix other tutorials for bursts ([5fe6c2c](https://github.com/felfhenor/reform-kingdom/commit/5fe6c2c780c9ed6fcd0bd59ea062da3ce107c8a9))
+* **worker:** workers can now craft materials ([92d7abf](https://github.com/felfhenor/reform-kingdom/commit/92d7abfa32dc3b15cc1c8ebe8e75391e144e2748))
+* **world:** add a little background noise to the map ([861f3df](https://github.com/felfhenor/reform-kingdom/commit/861f3dff95325f5d7a578e1002af596e15c252e0))
+* **world:** duchy node should have an action ([866b83f](https://github.com/felfhenor/reform-kingdom/commit/866b83fbe712fa32fdd9714b50dffedcb4b5532d))
+
 # [0.10.0](https://github.com/felfhenor/reform-kingdom/compare/v0.9.0...v0.10.0) (2026-10-09)
 
 
