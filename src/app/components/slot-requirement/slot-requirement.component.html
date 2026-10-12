@@ -1,4 +1,8 @@
-<div class="zoom-row" [tp]="tooltip()" [tpPlacement]="'top'">
+<div
+  class="zoom-row"
+  [tp]="hasDetail() ? detailTooltip : tooltip()"
+  [tpPlacement]="'top'"
+>
   @if (content(); as entry) {
     <app-slot-rarity-outline [entry]="entry" [spritesheet]="spritesheet()">
       @if (owned() >= quantity()) {
@@ -11,3 +15,15 @@
     <app-icon-unknown />
   }
 </div>
+
+<ng-template #detailTooltip>
+  <app-detail-item-preview [display]="previewDisplay()">
+    <div class="type-meta mt-2">
+      Owned: {{ owned() | number }} / {{ quantity() | number }}
+    </div>
+
+    @if (materialId(); as itemId) {
+      <app-detail-material-sources [itemId]="itemId" />
+    }
+  </app-detail-item-preview>
+</ng-template>
