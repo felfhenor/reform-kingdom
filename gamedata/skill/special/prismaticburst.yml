@@ -35,7 +35,7 @@
         Strength: 0.2
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
     - elements: [Water]
       attributes: [DamagesTarget, AllowPlink, CanBeReflected]
@@ -48,7 +48,7 @@
         Strength: 0.2
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
     - elements: [Earth]
       attributes: [DamagesTarget, AllowPlink, CanBeReflected]
@@ -61,7 +61,7 @@
         Strength: 0.2
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
     - elements: [Air]
       attributes: [DamagesTarget, AllowPlink, CanBeReflected]
@@ -74,7 +74,7 @@
         Strength: 0.2
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
 - id: 679ab000-8a76-41b8-9afb-b0b7fff8a916
   name: Prismatic Burst II
@@ -113,7 +113,7 @@
         Strength: 0.4
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
     - elements: [Water]
       attributes: [DamagesTarget, AllowPlink, CanBeReflected]
@@ -126,7 +126,7 @@
         Strength: 0.4
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
     - elements: [Earth]
       attributes: [DamagesTarget, AllowPlink, CanBeReflected]
@@ -139,7 +139,7 @@
         Strength: 0.4
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
     - elements: [Air]
       attributes: [DamagesTarget, AllowPlink, CanBeReflected]
@@ -152,7 +152,7 @@
         Strength: 0.4
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
 - id: 14c253a3-ff0b-40ae-aa54-7a521c42cf00
   name: Prismatic Burst III
@@ -191,7 +191,7 @@
         Strength: 0.6
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
     - elements: [Water]
       attributes: [DamagesTarget, AllowPlink, CanBeReflected]
@@ -204,7 +204,7 @@
         Strength: 0.6
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
     - elements: [Earth]
       attributes: [DamagesTarget, AllowPlink, CanBeReflected]
@@ -217,7 +217,7 @@
         Strength: 0.6
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
     - elements: [Air]
       attributes: [DamagesTarget, AllowPlink, CanBeReflected]
@@ -230,7 +230,7 @@
         Strength: 0.6
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
 - id: bf81da64-09eb-4fba-a5d0-d63f84a9d0fb
   name: Prismatic Burst IV
@@ -269,7 +269,7 @@
         Strength: 0.8
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
     - elements: [Water]
       attributes: [DamagesTarget, AllowPlink, CanBeReflected]
@@ -282,7 +282,7 @@
         Strength: 0.8
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
     - elements: [Earth]
       attributes: [DamagesTarget, AllowPlink, CanBeReflected]
@@ -295,7 +295,7 @@
         Strength: 0.8
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
     - elements: [Air]
       attributes: [DamagesTarget, AllowPlink, CanBeReflected]
@@ -308,7 +308,7 @@
         Strength: 0.8
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
 - id: 8e8b9bbd-7963-4770-98a7-1bbf851cf602
   name: Prismatic Burst V
@@ -347,7 +347,7 @@
         Strength: 1
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
     - elements: [Water]
       attributes: [DamagesTarget, AllowPlink, CanBeReflected]
@@ -360,7 +360,7 @@
         Strength: 1
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
     - elements: [Earth]
       attributes: [DamagesTarget, AllowPlink, CanBeReflected]
@@ -373,7 +373,7 @@
         Strength: 1
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
     - elements: [Air]
       attributes: [DamagesTarget, AllowPlink, CanBeReflected]
@@ -386,4 +386,4 @@
         Strength: 1
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'

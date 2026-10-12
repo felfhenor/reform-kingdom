@@ -23,7 +23,7 @@
       damageScaling:
         Spirit: 5
 
-      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing {{ targetStatus }}.'
 
 - id: 56713773-8a3d-45fc-8638-78eb8a79d620
   name: Lifesurge II
@@ -50,4 +50,4 @@
       damageScaling:
         Spirit: 10
 
-      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing {{ targetStatus }}.'

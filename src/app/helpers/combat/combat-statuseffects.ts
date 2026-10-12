@@ -5,6 +5,7 @@ import {
 } from '@helpers/combat/combat-element';
 import {
   combatantMessageToken,
+  combatantStatusText,
   combatFormatMessage,
   combatMessageLog,
 } from '@helpers/combat/combat-log';
@@ -261,6 +262,7 @@ function combatHandleStatusEffectBehaviors(
     const renderData = {
       ...templateData,
       combatant: { ...combatant, name: combatantMessageToken(combatant) },
+      combatantStatus: combatantStatusText(combatant),
     };
     const message = combatFormatMessage(behavior.combatMessage, renderData);
     combatMessageLog(combat, message, combatant);

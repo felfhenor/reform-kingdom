@@ -24,7 +24,7 @@
       damageScaling:
         Intelligence: 1
 
-      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} energy ({{ target.ep }}/{{ target.totalStats.Energy }} EP remaining).'
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} energy {{ targetStatus }}.'
 
 - id: 10c8f8ce-ec38-4815-a6ce-5a658246eb2e
   name: Refresh II
@@ -52,4 +52,4 @@
       damageScaling:
         Intelligence: 1.5
 
-      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} energy ({{ target.ep }}/{{ target.totalStats.Energy }} EP remaining).'
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} energy {{ targetStatus }}.'

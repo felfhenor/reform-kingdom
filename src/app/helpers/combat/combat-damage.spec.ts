@@ -595,7 +595,7 @@ describe('combatApplySkillToTarget combat message rendering', () => {
     const technique = buildTechnique({
       damageScaling: { ...zeroStats, Strength: 1 },
       combatMessage:
-        '**{{ combatant.name }}** hits **{{ target.name }}** for {{ damage }} damage ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).',
+        '**{{ combatant.name }}** hits **{{ target.name }}** for {{ damage }} damage {{ targetStatus }}.',
     });
 
     combatApplySkillToTarget(
@@ -610,7 +610,7 @@ describe('combatApplySkillToTarget combat message rendering', () => {
     // reflects the just-applied damage rather than a stale pre-damage snapshot,
     // and that each bolded id token got its icon token hoisted in front of it.
     expect(combatLog()[0].message).toBe(
-      `@@icon-attacker@@**${combatantMessageToken(attacker)}** hits @@icon-target@@**${combatantMessageToken(target)}** for 30 damage (70/100 HP remaining).`,
+      `@@icon-attacker@@**${combatantMessageToken(attacker)}** hits @@icon-target@@**${combatantMessageToken(target)}** for 30 damage [70&#x2F;100 HP] [10&#x2F;0 EP].`,
     );
   });
 });

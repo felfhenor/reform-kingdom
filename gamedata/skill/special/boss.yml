@@ -36,7 +36,7 @@
           chance: 90
           duration: 3
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
 - id: 708c919b-987a-4e90-aba4-554c82ca7f20
   name: Brood Frenzy
@@ -76,7 +76,7 @@
           chance: 50
           duration: 4
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
 - id: ec0054d2-bb4d-40f7-a3cf-b27f46e8e700
   name: Burrowing Fang
@@ -104,7 +104,7 @@
         Strength: 1
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
 - id: c52dfe27-f9d5-465b-8643-5d8fc5687235
   name: Gale Volley
@@ -141,7 +141,7 @@
         Agility: 0.5
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
     - elements: [Air]
       attributes:
@@ -155,7 +155,7 @@
         Agility: 0.5
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
 - id: d7ac4507-dfef-46c2-9f8b-5bd230c74464
   name: Verdant Barrage
@@ -190,4 +190,4 @@
         Strength: 2.5
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'

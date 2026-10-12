@@ -24,7 +24,7 @@
         Strength: 5.5
       statusEffects: []
       accuracy: 70
-      combatMessage: '**{{ combatant.name }}** slams **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** slams **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
 - id: e62f4b5f-8e84-4b6d-850a-351c8eca9879
   name: Charged Strike II
@@ -52,7 +52,7 @@
         Strength: 10
       statusEffects: []
       accuracy: 75
-      combatMessage: '**{{ combatant.name }}** slams **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** slams **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
 - id: cf22f057-4b5f-40f1-bb1e-a0628f791ee9
   name: Charged Strike III
@@ -80,4 +80,4 @@
         Strength: 15
       statusEffects: []
       accuracy: 80
-      combatMessage: '**{{ combatant.name }}** slams **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** slams **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'

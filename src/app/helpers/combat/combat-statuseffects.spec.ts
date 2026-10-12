@@ -77,7 +77,7 @@ describe('combatApplyStatusEffectToTarget combat message rendering', () => {
           {
             type: 'TakeDamage',
             combatMessage:
-              '**{{ combatant.name }}** is burning for {{ damage }} damage ({{ combatant.hp }}/{{ combatant.totalStats.Health }} HP remaining).',
+              '**{{ combatant.name }}** is burning for {{ damage }} damage {{ combatantStatus }}.',
           },
         ],
         statScaling: { ...defaultStats(), Strength: 1 },
@@ -93,7 +93,7 @@ describe('combatApplyStatusEffectToTarget combat message rendering', () => {
     // reflects the just-applied burn damage rather than a stale snapshot, and
     // that the bolded id token got its icon token hoisted in front of it.
     expect(combatLog()[0].message).toBe(
-      `@@icon-combatant-1@@**${combatantMessageToken(combatant)}** is burning for 10 damage (90/100 HP remaining).`,
+      `@@icon-combatant-1@@**${combatantMessageToken(combatant)}** is burning for 10 damage [90&#x2F;100 HP] [10&#x2F;100 EP].`,
     );
   });
 });

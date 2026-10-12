@@ -22,7 +22,7 @@
       damageScaling:
         Strength: 0.9
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
 - id: 94483e46-4a41-49f8-a2b2-29270ad0fde4
   name: Double Strike II
@@ -48,7 +48,7 @@
       damageScaling:
         Strength: 1.9
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
 - id: 2234554d-373b-49b4-a290-37fafcd885c6
   name: Double Strike III
@@ -74,7 +74,7 @@
       damageScaling:
         Strength: 3
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
 - id: 62714dc0-1f4f-43d2-9dde-ee1c66cd5695
   name: Double Strike IV
@@ -100,4 +100,4 @@
       damageScaling:
         Strength: 4.5
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** strikes **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'

@@ -89,6 +89,8 @@ Skills are self-contained. They can be attached to gear or affixes.
 
 Damaging techniques should write `{{ damageText }}` (e.g. "12 Fire damage") in their `combatMessage` rather than `{{ damage }} damage`, so the log names the element - including elements given by gear. `npm run validate` flags the old form.
 
+End the message with `{{ targetStatus }}` (renders `[X/Y HP] [X/Y EP]` for the target after the hit) - status effect messages use `{{ combatantStatus }}` for the affected combatant.
+
 ## Equipment
 
 Equipment is fairly self-explanatory, but there are a lot of knobs that can be twisted for equipment. They can have some of the following options:

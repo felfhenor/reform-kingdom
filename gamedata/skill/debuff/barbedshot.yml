@@ -32,7 +32,7 @@
           chance: 50
           duration: 3
 
-      combatMessage: '**{{ combatant.name }}** fires a barbed arrow at **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** fires a barbed arrow at **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
 - id: beb8da82-9ccb-46a5-b55f-eab82a85eecc
   name: Barbed Shot II
@@ -68,4 +68,4 @@
           chance: 65
           duration: 3
 
-      combatMessage: '**{{ combatant.name }}** fires a barbed arrow at **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** fires a barbed arrow at **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'

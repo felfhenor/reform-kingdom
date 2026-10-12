@@ -24,7 +24,7 @@
         Agility: 1
         Strength: 1
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** bites **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** bites **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
     - attributes: [BypassDefense, NeverMisses, HealsTarget]
       elements: []
@@ -36,4 +36,4 @@
       damageScaling:
         Vitality: 0.5
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** drains life force, healing for {{ absdamage }} HP ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** drains life force, healing for {{ absdamage }} HP {{ targetStatus }}.'

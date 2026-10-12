@@ -25,7 +25,7 @@
         Agility: 1
         Intelligence: 0.5
 
-      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing {{ targetStatus }}.'
 
     - elements: [Water]
       attributes: [BypassDefense, NeverMisses, HealsTarget]
@@ -38,7 +38,7 @@
         Agility: 0.5
         Intelligence: 0.25
 
-      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing {{ targetStatus }}.'
 
 - id: a1d5adcd-f7f8-4add-8c78-25f6ab973d83
   name: Regrowth II
@@ -67,7 +67,7 @@
         Agility: 1.5
         Intelligence: 0.75
 
-      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing {{ targetStatus }}.'
 
     - elements: [Water]
       attributes: [BypassDefense, NeverMisses, HealsTarget]
@@ -80,4 +80,4 @@
         Agility: 1
         Intelligence: 0.5
 
-      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing {{ targetStatus }}.'

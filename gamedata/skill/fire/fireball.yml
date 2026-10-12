@@ -28,7 +28,7 @@
           chance: 20
           duration: 3
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
 - id: fbd7b6f8-5efe-417b-b45e-efbf715da8d3
   name: Fireball II
@@ -60,7 +60,7 @@
           chance: 30
           duration: 4
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
 - id: a939d2e6-74b8-46d0-8e95-dff99a754567
   name: Fireball III
@@ -92,7 +92,7 @@
           chance: 40
           duration: 5
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
 - id: d6d3c453-9a96-48a8-80f7-e32bc49dc9cd
   name: Fireball IV
@@ -124,4 +124,4 @@
           chance: 50
           duration: 6
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'

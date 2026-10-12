@@ -25,7 +25,7 @@
         Intelligence: 1
         Vitality: 0.5
 
-      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing {{ targetStatus }}.'
 
 - id: 3e19fc85-32ab-4869-87f2-2aafc274bb69
   name: Starshine II
@@ -54,7 +54,7 @@
         Intelligence: 1.5
         Vitality: 1
 
-      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing {{ targetStatus }}.'
 
 - id: b1e172e0-d4e1-429e-95bd-37194a136023
   name: Starshine III
@@ -83,7 +83,7 @@
         Intelligence: 2
         Vitality: 1.5
 
-      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing {{ targetStatus }}.'
 
 - id: a7ffa3b6-609f-44fc-9556-3acd7c2fc1ae
   name: Starshine IV
@@ -113,4 +113,4 @@
         Vitality: 2.25
         Spirit: 3
 
-      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing {{ targetStatus }}.'

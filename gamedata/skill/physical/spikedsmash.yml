@@ -29,7 +29,7 @@
           chance: 25
           duration: 1
 
-      combatMessage: '**{{ combatant.name }}** crushes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** crushes **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
 - id: 5877438e-89c9-44f7-b9b2-d811e4c63640
   name: Spiked Smash II
@@ -62,4 +62,4 @@
           chance: 50
           duration: 1
 
-      combatMessage: '**{{ combatant.name }}** crushes **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** crushes **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'

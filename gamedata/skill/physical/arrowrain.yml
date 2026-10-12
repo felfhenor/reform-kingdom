@@ -25,7 +25,7 @@
         Strength: 0.5
         Agility: 0.5
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
@@ -37,7 +37,7 @@
         Strength: 0.25
         Agility: 0.25
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
 - id: 9d674f44-9924-438e-b233-675e10562c05
   name: Arrow Rain II
@@ -66,7 +66,7 @@
         Strength: 0.75
         Agility: 0.75
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
@@ -78,7 +78,7 @@
         Strength: 0.5
         Agility: 0.5
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
@@ -90,7 +90,7 @@
         Strength: 0.25
         Agility: 0.25
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
 - id: 931fdb56-41e9-4051-9598-5b2e947d5fd6
   name: Arrow Rain III
@@ -119,7 +119,7 @@
         Strength: 1
         Agility: 1
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
@@ -131,7 +131,7 @@
         Strength: 0.75
         Agility: 0.75
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
       elements: []
@@ -143,4 +143,4 @@
         Strength: 0.5
         Agility: 0.5
       statusEffects: []
-      combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** rains arrows on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'

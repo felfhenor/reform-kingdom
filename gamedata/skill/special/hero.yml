@@ -34,7 +34,7 @@
           chance: 100
           duration: 3
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
 - id: 5b913e17-0617-434d-a17d-3abc89d9e378
   name: Tidal Grace
@@ -70,7 +70,7 @@
         Vitality: 0.75
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing {{ targetStatus }}.'
 
 - id: ff5b2a3e-9f70-4b66-b542-a3ab86f07c6f
   name: Landslide
@@ -109,7 +109,7 @@
           chance: 60
           duration: 3
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
 - id: 780997a3-20b0-4eb9-880f-7d4c9cb96319
   name: Tempest
@@ -144,7 +144,7 @@
         Intelligence: 0.25
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
     - elements: [Air]
       attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
@@ -157,7 +157,7 @@
         Intelligence: 0.25
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
     - elements: [Air]
       attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
@@ -170,7 +170,7 @@
         Intelligence: 0.25
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
 
     - elements: [Air]
       attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
@@ -183,4 +183,4 @@
         Intelligence: 0.25
       statusEffects: []
 
-      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} ({{ target.hp }}/{{ target.totalStats.Health }} HP remaining).'
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'

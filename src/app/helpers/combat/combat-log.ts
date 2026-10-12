@@ -100,6 +100,10 @@ export function combatMessageLog(
   });
 }
 
+export function combatantStatusText(combatant: Combatant): string {
+  return `[${combatant.hp}/${combatant.totalStats.Health} HP] [${combatant.ep}/${combatant.totalStats.Energy} EP]`;
+}
+
 // Stands in for a combatant's name.
 export function combatantMessageToken(combatant: Combatant): string {
   return `@@${combatant.id}@@`;

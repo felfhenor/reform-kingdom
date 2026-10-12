@@ -5,6 +5,7 @@ import {
   beginCombatLogCommits,
   categoryMessageLog,
   combatantMessageToken,
+  combatantStatusText,
   combatLog,
   combatLogReset,
   combatMessageLog,
@@ -178,6 +179,18 @@ describe('combatantMessageToken', () => {
   });
 });
 
+describe('combatantStatusText', () => {
+  it('shows current/max HP and EP', () => {
+    const combatant = {
+      ...jala,
+      ep: 3,
+      totalStats: { ...jala.totalStats, Energy: 5 },
+    };
+
+    expect(combatantStatusText(combatant)).toBe('[12/20 HP] [3/5 EP]');
+  });
+});
+
 describe('adventureLogMessageHtml', () => {
   it('renders markdown emphasis inline, without wrapping paragraph tags', () => {
     expect(
@@ -190,6 +203,12 @@ describe('adventureLogMessageHtml', () => {
   it('renders italic markdown', () => {
     expect(adventureLogMessageHtml('_Combat round 2._')).toBe(
       '<em>Combat round 2.</em>',
+    );
+  });
+
+  it('keeps a combatant status as literal brackets, not a markdown link', () => {
+    expect(adventureLogMessageHtml('for 8 damage [12/20 HP] [3/5 EP].')).toBe(
+      'for 8 damage [12/20 HP] [3/5 EP].',
     );
   });
 

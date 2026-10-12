@@ -12,6 +12,7 @@ import {
 } from '@helpers/combat/combat-element';
 import {
   combatantMessageToken,
+  combatantStatusText,
   combatFormatMessage,
   combatMessageLog,
 } from '@helpers/combat/combat-log';
@@ -311,6 +312,8 @@ export function combatApplySkillToTarget(
       summon: summon
         ? { ...summon, name: combatantMessageToken(summon) }
         : undefined,
+      combatantStatus: combatantStatusText(combatant),
+      targetStatus: combatantStatusText(target),
     };
     const message = combatFormatMessage(technique.combatMessage, renderData);
     const critSuffix = isCriticalHit ? ' **Critical hit (2x)!**' : '';
@@ -322,7 +325,7 @@ export function combatApplySkillToTarget(
 
     combatMessageLog(
       combat,
-      `**${combatantMessageToken(combatant)}** took ${retaliationDamage} damage in retaliation (${combatant.hp}/${combatant.totalStats.Health} HP remaining)!`,
+      `**${combatantMessageToken(combatant)}** took ${retaliationDamage} damage in retaliation ${combatantStatusText(combatant)}!`,
       combatant,
     );
   }
