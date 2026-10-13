@@ -1,4 +1,5 @@
 export * from './encounter';
+export * from './encounter-auto-win';
 export * from './encounter-random';
 export * from './encounter-random-combat';
 export * from './encounter-random-generate';

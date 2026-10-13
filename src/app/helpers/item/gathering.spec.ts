@@ -22,7 +22,7 @@ import {
 import { ensureItem } from '@helpers/content/ensure-item';
 import { gatherVfx$ } from '@helpers/engine/gather-vfx';
 import { partyGainXp } from '@helpers/hero/character-progress';
-import { luckRollSucceeds, partyMaxLuck } from '@helpers/hero/luck';
+import { luckRollSucceeds } from '@helpers/hero/luck';
 import { partyGatherYieldBonuses } from '@helpers/hero/party';
 import {
   canEnterGatherNode,
@@ -41,17 +41,20 @@ import { rngSucceedsChance } from '@helpers/rng';
 import { gamestate, worldGatheringState } from '@helpers/state-game';
 import { taskRecordGather } from '@helpers/task/task-progress';
 import type {
+  Character,
   GameState,
   GatherResult,
   GatheringContent,
   GatheringId,
   GatherVfxEvent,
+  IsContentItem,
   ItemId,
   TradeskillId,
 } from '@interfaces';
 import { buildCharacter } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 import { inTick, seedGamestate } from '@/testing/gamestate';
+import { abilityJobContent, buildAbilityHero } from '@/testing/job-ability';
 import { seedWorldNodes } from '@/testing/world';
 
 const nodeName = 'Wergen Woods';
@@ -64,6 +67,7 @@ const tailoring = 'tailoring' as TradeskillId;
 
 function seedGathering(
   overrides: Partial<GatheringContent> = {},
+  extraContent: IsContentItem[] = [],
 ): GatheringContent {
   const gathering = ensureGathering({
     id: gatheringId,
@@ -78,6 +82,7 @@ function seedGathering(
     ensureItem({ id: woodId, name: 'Wergen Wood', sprite: 'wood-sprite' }),
     ensureItem({ id: stickId, name: 'Wergen Stick', sprite: 'stick-sprite' }),
     ensureItem({ id: hideId, name: 'Hide' }),
+    ...extraContent,
   ]);
   return gathering;
 }
@@ -332,18 +337,45 @@ describe('gatheringProcessTick', () => {
     ]);
   });
 
-  it('doubles item quantities on a successful luck roll at the party max luck', () => {
-    seedGathering({
-      gatherResults: [result([{ itemId: woodId, quantity: 2 }])],
+  describe('Explorer luck', () => {
+    const jobs = [
+      ...abilityJobContent('Explorer', [['GatherYieldLuck', 1, 1]]),
+      ...abilityJobContent('Warrior', []),
+    ];
+
+    function seedLuckyGather(party: Character[]): void {
+      seedGathering(
+        { gatherResults: [result([{ itemId: woodId, quantity: 2 }])] },
+        jobs,
+      );
+      seedGatheringAt(4, (state) => (state.world.party = party));
+      vi.mocked(luckRollSucceeds).mockReturnValue(true);
+    }
+
+    it('never doubles without an Explorer, however lucky the party is', () => {
+      seedLuckyGather([buildAbilityHero('Warrior', 10, { Luck: 100 })]);
+
+      inTick(gatheringProcessTick);
+
+      expect(luckRollSucceeds).not.toHaveBeenCalled();
+      expect(material(woodId)).toBe(2);
     });
-    seedGatheringAt(4);
-    vi.mocked(partyMaxLuck).mockReturnValue(50);
-    vi.mocked(luckRollSucceeds).mockReturnValue(true);
 
-    inTick(gatheringProcessTick);
+    it('rolls once at the luckiest Explorer and names them when the haul doubles', () => {
+      seedLuckyGather([
+        buildAbilityHero('Explorer', 10, { Luck: 20 }, { name: 'Ada' }),
+        buildAbilityHero('Explorer', 10, { Luck: 40 }, { name: 'Bram' }),
+        buildAbilityHero('Warrior', 10, { Luck: 90 }),
+      ]);
 
-    expect(luckRollSucceeds).toHaveBeenCalledWith(50);
-    expect(material(woodId)).toBe(4);
+      inTick(gatheringProcessTick);
+
+      expect(luckRollSucceeds).toHaveBeenCalledTimes(1);
+      expect(luckRollSucceeds).toHaveBeenCalledWith(40);
+      expect(material(woodId)).toBe(4);
+      expect(combatLog()[0].message).toContain('Bram');
+      expect(combatLog()[0].message).toContain('luck doubled the haul!');
+    });
   });
 
   it("adds a GatherYield bonus matching any of the rolled result's tradeskills, once per cycle", () => {

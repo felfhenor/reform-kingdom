@@ -24,6 +24,8 @@ export * from './content-gathering';
 export * from './content-globaleffect';
 export * from './content-item';
 export * from './content-job';
+export * from './content-jobability';
+export * from './content-jobability.ui';
 export * from './content-monster';
 export * from './content-node-override';
 export * from './content-outpost';

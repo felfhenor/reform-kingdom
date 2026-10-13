@@ -4,6 +4,7 @@ import { isRecipeTownUnique } from '@helpers/crafting/recipes';
 import { tradeskillBuildingIn } from '@helpers/crafting/tradeskill';
 import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
 import { rangeAtLevel } from '@helpers/engine/leveled-range';
+import { jobAbilityValue } from '@helpers/hero/job-ability';
 import { applyCollectibleGrant } from '@helpers/item/collectibles';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import { applyMaterialDelta } from '@helpers/item/materials';
@@ -22,9 +23,12 @@ import type {
 } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
-// Flat percent from the precomputed global effect sums cache - 0 with nothing active/owned.
+// Flat percent from the precomputed global effect sums cache plus the party's CombatDropRateBoost - 0 with neither.
 export function combatItemDropRateBoost(): number {
-  return globalEffectSumsState().combatItemDropRateBoost;
+  return (
+    globalEffectSumsState().combatItemDropRateBoost +
+    jobAbilityValue('CombatDropRateBoost')
+  );
 }
 
 // Shared exhaustiveness helper for `switch (x.kind)` blocks over

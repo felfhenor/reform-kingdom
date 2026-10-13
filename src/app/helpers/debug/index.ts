@@ -12,6 +12,7 @@ export * from './analysis-herostats';
 export * from './analysis-infusiongaps';
 export * from './analysis-inputs.ui';
 export * from './analysis-item-sources';
+export * from './analysis-jobabilities';
 export * from './analysis-materialutilization';
 export * from './analysis-monsterdrops';
 export * from './analysis-monsterstats';

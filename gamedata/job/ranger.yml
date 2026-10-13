@@ -114,3 +114,18 @@
       levels:
         - level: 26
           skillId: Static Gust I
+
+  abilities:
+    - jobAbilityId: Pathfinder
+      level: 1
+      value: 0.1
+    - jobAbilityId: Pathfinder
+      level: 25
+      value: 0.2
+
+    - jobAbilityId: Ambush
+      level: 1
+      value: 10
+    - jobAbilityId: Ambush
+      level: 25
+      value: 20

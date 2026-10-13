@@ -1,7 +1,4 @@
-import {
-  commissionOfferReputationReward,
-  commissionRequirementsSatisfied,
-} from '@helpers/commission/commission-requirement';
+import { commissionRequirementsSatisfied } from '@helpers/commission/commission-requirement';
 import { spendCommissionRequirements } from '@helpers/commission/commission-turn-in';
 import { getEntry } from '@helpers/content/content';
 import {
@@ -101,9 +98,7 @@ export async function townCommissionFulfill(
 
     const offer = getEntry<CommissionOfferContent>(slot.commissionOfferId);
     offerName = offer?.name;
-    reputationAmount = offer
-      ? commissionOfferReputationReward(offer, townId, s)
-      : 0;
+    reputationAmount = townCommissionReputationReward(townId, slotId, s);
 
     spendCommissionRequirements(s, slot.requirements);
     depositCommissionRequirementsToTown(s, townId, slot.requirements);

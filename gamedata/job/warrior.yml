@@ -117,3 +117,18 @@
       levels:
         - level: 20
           skillId: Taunt I
+
+  abilities:
+    - jobAbilityId: Trailbreaker
+      level: 1
+      value: 0.1
+    - jobAbilityId: Trailbreaker
+      level: 25
+      value: 0.2
+
+    - jobAbilityId: Intimidation
+      level: 1
+      value: -15
+    - jobAbilityId: Intimidation
+      level: 25
+      value: -12

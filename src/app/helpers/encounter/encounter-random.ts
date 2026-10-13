@@ -13,14 +13,23 @@ export function encounterRandomState(
   return worldExploreRandomState()[id];
 }
 
+// The current cycle's length - stored at generation, so a party change mid-cycle doesn't move it.
+export function encounterRandomResetTime(
+  content: EncounterRandomContent,
+  state: EncounterRandomNodeState | undefined,
+): number {
+  return state?.resetTime ?? content.resetTime;
+}
+
 export function encounterRandomTicksUntilReset(
   content: EncounterRandomContent,
   state: EncounterRandomNodeState | undefined,
 ): number {
-  if (!state) return content.resetTime;
+  const resetTime = encounterRandomResetTime(content, state);
+  if (!state) return resetTime;
 
   const ticksSinceGenerated = timerTicksElapsed() - state.generatedAtTick;
-  return clamp(content.resetTime - ticksSinceGenerated, 0, content.resetTime);
+  return clamp(resetTime - ticksSinceGenerated, 0, resetTime);
 }
 
 // A node is only enterable once it has a generated fight list and hasn't

@@ -7,6 +7,7 @@ import { runFieldNodesAnalysis } from '@helpers/debug/analysis-fieldnodes';
 import { runGatherDevelopmentLevelsAnalysis } from '@helpers/debug/analysis-gatherdevelopmentlevels';
 import { runHeroStatsAnalysis } from '@helpers/debug/analysis-herostats';
 import { runInfusionGapsAnalysis } from '@helpers/debug/analysis-infusiongaps';
+import { runJobAbilitiesAnalysis } from '@helpers/debug/analysis-jobabilities';
 import { runMaterialUtilizationAnalysis } from '@helpers/debug/analysis-materialutilization';
 import { runMonsterDropsAnalysis } from '@helpers/debug/analysis-monsterdrops';
 import { runMonsterStatsAnalysis } from '@helpers/debug/analysis-monsterstats';
@@ -332,6 +333,16 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     strict: true,
     inputKeys: ['expanded'],
     run: runSkillsAnalysis,
+  },
+  {
+    id: 'jobabilities',
+    title: 'Job Abilities',
+    description:
+      'Every job ability reference resolves, has a valid type, strictly increasing rank levels, no duplicate type per job, and is used by a job.',
+    category: 'Skills',
+    strict: true,
+    inputKeys: [],
+    run: runJobAbilitiesAnalysis,
   },
   {
     id: 'skillbonuses',

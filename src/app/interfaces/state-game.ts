@@ -50,6 +50,8 @@ export type GameStateWorld = {
   towns: GameStateTowns;
   // The node name recalled to on Deaths Door - undefined means the Duchy.
   homeNodeName?: string;
+  // Tick of the last Intimidation auto-win - undefined until the first one.
+  intimidationLastTick?: number;
 };
 
 export type MaterialId = ItemId;

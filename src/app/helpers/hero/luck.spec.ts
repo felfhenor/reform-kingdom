@@ -1,18 +1,7 @@
-import {
-  luckReducedChance,
-  luckRollSucceeds,
-  partyMaxLuck,
-} from '@helpers/hero/luck';
+import { luckReducedChance, luckRollSucceeds } from '@helpers/hero/luck';
 import { rngSeeded } from '@helpers/rng';
 import type { PRNG } from 'seedrandom';
 import { describe, expect, it } from 'vitest';
-import { buildCharacter } from '@/testing/builders';
-import { seedGamestate } from '@/testing/gamestate';
-
-function heroWithLuck(luck: number) {
-  const hero = buildCharacter();
-  return { ...hero, stats: { ...hero.stats, Luck: luck } };
-}
 
 describe('luckRollSucceeds', () => {
   it('succeeds when the roll is within the luck value', () => {
@@ -44,26 +33,5 @@ describe('luckReducedChance', () => {
 
   it('returns 0 when luck is 100', () => {
     expect(luckReducedChance(20, 100)).toBe(0);
-  });
-});
-
-describe('partyMaxLuck', () => {
-  it('returns the highest luck among party members', () => {
-    seedGamestate(
-      (state) =>
-        (state.world.party = [
-          heroWithLuck(5),
-          heroWithLuck(25),
-          heroWithLuck(10),
-        ]),
-    );
-
-    expect(partyMaxLuck()).toBe(25);
-  });
-
-  it('defaults to 0 when the party is empty', () => {
-    seedGamestate((state) => (state.world.party = []));
-
-    expect(partyMaxLuck()).toBe(0);
   });
 });

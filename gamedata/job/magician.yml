@@ -27,7 +27,7 @@
     Resistance: 0.5
     Agility: 0.4
     Constitution: 0.1
-    Spirit: 0.2
+    Spirit: 0.3
 
   statPriority:
     - stat: Intelligence
@@ -115,3 +115,25 @@
 
         - level: 45
           skillId: Refresh II
+
+  abilities:
+    - jobAbilityId: Spiritual Energy
+      level: 1
+      value: 0.5
+    - jobAbilityId: Spiritual Energy
+      level: 25
+      value: 1
+
+    - jobAbilityId: Astral Resonance
+      level: 1
+      value: 0.25
+    - jobAbilityId: Astral Resonance
+      level: 25
+      value: 0.5
+
+    - jobAbilityId: Mystical Insight
+      level: 1
+      value: 0.25
+    - jobAbilityId: Mystical Insight
+      level: 25
+      value: 0.4

@@ -6,6 +6,8 @@ import {
 import { ensureStats } from '@helpers/content/ensure-helpers-stats';
 import type {
   EquipmentSkillId,
+  JobAbilityId,
+  JobAbilityLevel,
   JobContent,
   JobId,
   JobSkillPath,
@@ -25,6 +27,16 @@ function ensureJobSkillPath(path: Partial<JobSkillPath> = {}): JobSkillPath {
   return {
     pathName: path.pathName ?? 'UNKNOWN',
     levels: ensureArray(path.levels, ensureJobSkillPathLevel),
+  };
+}
+
+function ensureJobAbilityLevel(
+  level: Partial<JobAbilityLevel> = {},
+): JobAbilityLevel {
+  return {
+    jobAbilityId: level.jobAbilityId ?? ('UNKNOWN' as JobAbilityId),
+    level: level.level ?? 1,
+    value: level.value ?? 0,
   };
 }
 
@@ -48,5 +60,6 @@ export function ensureJob(job: Partial<JobContent>): Required<JobContent> {
       multiplier: prio.multiplier ?? 1,
     })),
     skillPath: ensureArray(job.skillPath, ensureJobSkillPath),
+    abilities: ensureArray(job.abilities, ensureJobAbilityLevel),
   };
 }

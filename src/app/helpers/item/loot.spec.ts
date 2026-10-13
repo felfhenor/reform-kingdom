@@ -35,6 +35,7 @@ import { sortBy } from 'es-toolkit/compat';
 import { buildEquipmentItem } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
+import { abilityJobContent, buildAbilityHero } from '@/testing/job-ability';
 
 const goldCoinId = 'gold-coin' as ItemId;
 const cloakId = 'cloak' as EquipmentId;
@@ -195,6 +196,16 @@ describe('combatItemDropRateBoost', () => {
     );
 
     expect(combatItemDropRateBoost()).toBe(9);
+  });
+
+  it("adds the party's Explorer bonus on top of the global sum", () => {
+    seedContent(abilityJobContent('Explorer', [['CombatDropRateBoost', 1, 5]]));
+    seedGamestate((state) => {
+      state.globalEffectSums.combatItemDropRateBoost = 9;
+      state.world.party = [buildAbilityHero('Explorer', 1)];
+    });
+
+    expect(combatItemDropRateBoost()).toBe(14);
   });
 });
 

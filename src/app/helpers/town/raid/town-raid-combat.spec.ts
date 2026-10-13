@@ -25,6 +25,7 @@ import {
 } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 import { inTick, seedGamestate } from '@/testing/gamestate';
+import { abilityJobContent, buildAbilityHero } from '@/testing/job-ability';
 import { locationOf, seedWorldNodes } from '@/testing/world';
 
 const townId = 'larsia' as TownId;
@@ -109,6 +110,22 @@ describe('raidEngageCombat', () => {
       'The raid on Larsia begins!',
     );
     expect(events).toContain('Town:Raid:Engage:Larsia');
+  });
+
+  it('rolls a Ranger ambush like any other fight', () => {
+    seedContent([
+      town,
+      moth,
+      guard,
+      ...abilityJobContent('Ranger', [['Ambush', 1, 100]]),
+    ]);
+    seedRaid(telegraphed, {
+      edit: (state) => (state.world.party = [buildAbilityHero('Ranger', 1)]),
+    });
+
+    inTick(() => raidEngageCombat(townId));
+
+    expect(worldCombatState()?.ambushedBy).toBeDefined();
   });
 
   it('clears the telegraph once engaged, leaving the defense request to other raided towns', () => {

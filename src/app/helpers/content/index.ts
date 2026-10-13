@@ -15,6 +15,7 @@ export * from './ensure-helpers-quests';
 export * from './ensure-helpers-stats';
 export * from './ensure-item';
 export * from './ensure-job';
+export * from './ensure-jobability';
 export * from './ensure-monster';
 export * from './ensure-nodeoverride';
 export * from './ensure-outpost';

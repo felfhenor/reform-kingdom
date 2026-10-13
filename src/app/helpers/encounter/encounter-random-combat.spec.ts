@@ -32,6 +32,7 @@ import {
 } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 import { inTick, seedGamestate } from '@/testing/gamestate';
+import { abilityJobContent, buildAbilityHero } from '@/testing/job-ability';
 import { seedWorldNodes } from '@/testing/world';
 
 const encounterId = 'gobslime-shrine' as EncounterRandomId;
@@ -117,6 +118,27 @@ describe('encounterRandomStartFight', () => {
     ]);
     expect(combatLog()[0].message).toContain('#2');
     expect(events).toEqual(['Combat:Encounter:Random']);
+  });
+
+  it("rolls a Ranger's ambush for the fight", () => {
+    seedContent([
+      encounter,
+      goblin,
+      slime,
+      ...abilityJobContent('Ranger', [['Ambush', 1, 100]]),
+    ]);
+    seedGamestate((state) => {
+      state.world.party = [buildAbilityHero('Ranger', 1, {}, { name: 'Rin' })];
+      state.world.exploreRandom[encounterId] = {
+        fights: [fight(12, goblin.id)],
+        generatedAtTick: 0,
+        completedThisCycle: false,
+      };
+    });
+
+    inTick(() => encounterRandomStartFight(node, 0));
+
+    expect(worldCombatState()?.ambushedBy).toBe('Rin');
   });
 
   it('skips monsters no longer in content', () => {

@@ -13,6 +13,7 @@ export type ContentType =
   | 'globaleffect'
   | 'item'
   | 'job'
+  | 'jobability'
   | 'monster'
   | 'nodeoverride'
   | 'outpost'

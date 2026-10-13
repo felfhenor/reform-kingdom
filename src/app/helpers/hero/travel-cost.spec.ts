@@ -9,7 +9,9 @@ import {
   travelStepTicksCostWithBonus,
 } from '@helpers/hero/travel-cost-base';
 import type { CurrentLocation, TravelStep } from '@interfaces';
+import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
+import { abilityJobContent, buildAbilityHero } from '@/testing/job-ability';
 import { seedWorldNodes } from '@/testing/world';
 
 const origin: CurrentLocation = { mapName: 'Carrina', x: 0, y: 0 };
@@ -58,5 +60,31 @@ describe('travelStepTicksCost / travelPathTotalTicks', () => {
     expect(travelStepTicksCost(offPathStep, origin)).toBe(
       travelStepBaseTicksCost(offPathStep, origin),
     );
+  });
+
+  it('adds the Warrior and Ranger bonuses on top of the global bonuses, leaving the base cost alone', () => {
+    seedContent([
+      ...abilityJobContent('Warrior', [['OnPathTravelSpeed', 1, 0.1]]),
+      ...abilityJobContent('Ranger', [['OffPathTravelSpeed', 1, 0.2]]),
+    ]);
+    seedGamestate((state) => {
+      state.globalEffectSums.onPathTravelSpeedBonus = 0.25;
+      state.globalEffectSums.offPathTravelSpeedBonus = 0.5;
+      state.world.party = [
+        buildAbilityHero('Warrior', 1),
+        buildAbilityHero('Ranger', 1),
+      ];
+    });
+    const boosted = (step: TravelStep) =>
+      travelStepTicksCostWithBonus(step, origin, 0.35, 0.7);
+
+    [onPathStep, offPathStep].forEach((step) => {
+      expect(travelStepTicksCost(step, origin)).toBe(boosted(step));
+    });
+    [onPathStep, offPathStep].forEach((step) => {
+      expect(travelStepBaseTicksCost(step, origin)).toBe(
+        travelStepTicksCostWithBonus(step, origin, 0, 0),
+      );
+    });
   });
 });

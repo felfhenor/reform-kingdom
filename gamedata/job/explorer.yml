@@ -113,3 +113,12 @@
 
         - level: 45
           skillId: Zephyr II
+
+  abilities:
+    - jobAbilityId: Fortunate Finds
+      level: 1
+      value: 1
+
+    - jobAbilityId: Loot Goblin
+      level: 1
+      value: 5

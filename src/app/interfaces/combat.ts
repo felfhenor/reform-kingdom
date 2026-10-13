@@ -213,6 +213,8 @@ export type Combat = {
   summonCount?: number;
   // Shared by both sides; optional so mid-combat saves still load.
   elements?: ElementBlock;
+  // The hero whose Ambush succeeded; set means the heroes' free round hasn't run yet.
+  ambushedBy?: string;
 };
 
 // A combatant HP change; amount is signed for display (positive = heal).

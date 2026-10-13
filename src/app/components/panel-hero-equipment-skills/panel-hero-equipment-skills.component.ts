@@ -10,12 +10,14 @@ import { ButtonGlowComponent } from '@components/button-glow/button-glow.compone
 import { SlotButtonContainerComponent } from '@components/slot-button-container/slot-button-container.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
+import { TooltipJobAbilityComponent } from '@components/tooltip-job-ability/tooltip-job-ability.component';
 import { TooltipSkillPreviewComponent } from '@components/tooltip-skill-preview/tooltip-skill-preview.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { TutorialTargetDirective } from '@directives/tutorial-target.directive';
 import { combatantFromCharacter } from '@helpers/combat/combat-create';
 import { getEntry } from '@helpers/content/content';
 import { heroBurstSkillsModalOpen } from '@helpers/engine/ui';
+import { characterJobAbilityRows } from '@helpers/hero/job-ability.ui';
 import {
   characterBurstSkillOptions,
   characterChosenBurstSkills,
@@ -26,6 +28,7 @@ import type {
   Character,
   EquipmentItemType,
   EquipmentSkillContent,
+  JobAbilityRow,
   JobContent,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -38,6 +41,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     TippyDirective,
     SlotRarityOutlineComponent,
     TooltipSkillPreviewComponent,
+    TooltipJobAbilityComponent,
     ButtonGlowComponent,
     SlotIconBlankComponent,
     SFXDirective,
@@ -60,6 +64,10 @@ export class PanelHeroEquipmentSkillsComponent {
 
   public heroSkills = computed<EquipmentSkillContent[]>(() =>
     characterNormalSkills(this.character()),
+  );
+
+  public jobAbilities = computed<JobAbilityRow[]>(() =>
+    characterJobAbilityRows(this.character()),
   );
 
   public hasBurstOptions = computed(

@@ -16,6 +16,7 @@ export type AtlasedImage =
   | 'globaleffect'
   | 'item'
   | 'job'
+  | 'jobability'
   | 'monster'
   | 'skill'
   | 'statuseffect'
