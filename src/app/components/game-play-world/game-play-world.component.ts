@@ -25,10 +25,7 @@ import {
   PARTY_FORMATION_JITTER_MIN_TILES,
 } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
-import {
-  uiTextFontFamily,
-  uiTextLetterSpacing,
-} from '@helpers/engine/font.ui';
+import { uiTextFontFamily, uiTextLetterSpacing } from '@helpers/engine/font.ui';
 import { gatherVfx$ } from '@helpers/engine/gather-vfx';
 import {
   isWorldCameraPanned,
@@ -542,6 +539,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     );
     this.mapContainer.addChild(renderedMap.container);
     this.nodeLabels = renderedMap.nodeLabels;
+    containers.nodeLabelLayer.attach(...renderedMap.nodeLabels.values());
     this.nodeWrappers = renderedMap.nodeWrappers;
     this.nodeStatusIcons = renderedMap.nodeStatusIcons;
     this.updateNodeLabels();

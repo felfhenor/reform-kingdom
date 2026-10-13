@@ -9,16 +9,18 @@
   <span header>Armory</span>
 
   <div toolbar-actions class="flex items-center gap-2">
-    <span class="badge badge-sm tabular-nums {{ badgeColor() }}">
+    <span class="badge tabular-nums {{ badgeColor() }}">
       {{ armorySize() }}/{{ armoryCapValue() }}
     </span>
 
     @if (sellMode()) {
-      <span class="text-sm min-w-[80px] tabular-nums">
+      <span class="badge badge-secondary min-w-[80px] tabular-nums">
         {{ selectedCount() }} selected
       </span>
 
-      <span class="text-sm flex items-center gap-2 min-w-[100px]">
+      <span
+        class="badge badge-secondary text-sm flex items-center gap-2 min-w-[120px]"
+      >
         <app-currency-cost
           [type]="goldCoinItemId"
           [amount]="selectedGoldTotal()"
