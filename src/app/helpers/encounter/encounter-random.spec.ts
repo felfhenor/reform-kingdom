@@ -60,6 +60,16 @@ describe('encounterRandomTicksUntilReset', () => {
 
     expect(encounterRandomTicksUntilReset(shrine(1800), undefined)).toBe(1800);
   });
+
+  it("counts down from the cycle's stored reset time when it has one", () => {
+    atTick(100);
+    expect(
+      encounterRandomTicksUntilReset(
+        shrine(100),
+        nodeState({ generatedAtTick: 40, resetTime: 75 }),
+      ),
+    ).toBe(15);
+  });
 });
 
 describe('encounterRandomIsAvailable', () => {

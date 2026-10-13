@@ -23,11 +23,15 @@ import {
   TICKS_PER_STEP_ON_PATH,
 } from '@helpers/config';
 import { ensureCaravan } from '@helpers/content/ensure-caravan';
-import { ensureEncounter } from '@helpers/content/ensure-encounternode';
+import {
+  ensureEncounter,
+  ensureEncounterRandom,
+} from '@helpers/content/ensure-encounternode';
 import { ensureGathering } from '@helpers/content/ensure-gathernode';
 import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
 import { ensureOutpost } from '@helpers/content/ensure-outpost';
 import { encounterStartFight } from '@helpers/encounter/encounter';
+import { encounterRandomStartFight } from '@helpers/encounter/encounter-random-combat';
 import { mapNodeAutoShowOnArrival } from '@helpers/engine/ui';
 import {
   canPartyTravel,
@@ -47,6 +51,7 @@ import {
   worldTravelState,
 } from '@helpers/state-game';
 import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation-buff';
+import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';
 import { outpostDeathPenaltyMultiplier } from '@helpers/world-node/world-node-outpost';
 import type {
   CaravanId,
@@ -54,6 +59,7 @@ import type {
   Combat,
   CurrentLocation,
   EncounterId,
+  EncounterRandomId,
   GameState,
   GatheringId,
   GlobalEffectId,
@@ -65,6 +71,7 @@ import type {
 import { captureAnalyticsEvents } from '@/testing/analytics';
 import { seedContent } from '@/testing/content';
 import { inTick, seedGamestate } from '@/testing/gamestate';
+import { abilityJobContent, buildAbilityHero } from '@/testing/job-ability';
 import { locationOf, seedWorldNodes } from '@/testing/world';
 
 const ORIGIN: CurrentLocation = { mapName: 'Carrina', x: 0, y: 0 };
@@ -99,6 +106,12 @@ function seedWorld(pathTiles: { x: number; y: number }[] = []): void {
       { name: 'Signpost', type: 'ExploreNode', mapName: 'Carrina', x: 8 },
       { name: 'Carrina Outpost', type: 'Outpost', mapName: 'Carrina', x: 9 },
       { name: 'Spider Tower', type: 'ExploreNode', mapName: 'Carrina', x: 10 },
+      {
+        name: 'Gobslime Shrine',
+        type: 'ExploreRandomNode',
+        mapName: 'Carrina',
+        x: 11,
+      },
     ],
     pathTiles.map((tile) => ({ mapName: 'Carrina', ...tile })),
   );
@@ -155,6 +168,11 @@ beforeEach(() => {
     ensureGathering({ id: 'wergen' as GatheringId, name: 'Wergen Woods' }),
     ensureCaravan({ id: 'duchy-caravan' as CaravanId, name: 'Caravan' }),
     ensureOutpost({ id: 'outpost' as OutpostId, name: 'Carrina Outpost' }),
+    ensureEncounterRandom({
+      id: 'gobslime-shrine' as EncounterRandomId,
+      name: 'Gobslime Shrine',
+    }),
+    ...abilityJobContent('Warrior', [['Intimidation', 1, -15]]),
   ]);
 });
 
@@ -541,14 +559,23 @@ describe('travelProcessTick', () => {
   });
 
   describe('arriving at the destination', () => {
-    function arriveAt(name: string): void {
+    function arriveAt(
+      name: string,
+      edit: (state: GameState) => void = () => undefined,
+    ): void {
       const node = nodes[name];
       seedTravel(
         { destinationNodeName: name, path: [move(node.x)] },
-        (state) => (state.world.currentLocation = at(node.x - 1)),
+        (state) => {
+          state.world.currentLocation = at(node.x - 1);
+          edit(state);
+        },
       );
       tick();
     }
+
+    const withWarrior = (state: GameState) =>
+      (state.world.party = [buildAbilityHero('Warrior', 30)]);
 
     it('settles idle, logs the arrival and shows the node', () => {
       arriveAt('Signpost');
@@ -573,6 +600,41 @@ describe('travelProcessTick', () => {
         0,
         'Field Ruins',
       );
+    });
+
+    it('lets a strong enough Warrior intimidate an encounter instead of fighting', () => {
+      arriveAt('Field Ruins', withWarrior);
+
+      expect(encounterStartFight).not.toHaveBeenCalled();
+      expect(gamestate().world.intimidationLastTick).toBeDefined();
+      expect(messages()).toContain(
+        '**Warrior 30** intimidated the enemies at Field Ruins into surrendering!',
+      );
+    });
+
+    it('starts the fight normally while Intimidation is on cooldown', () => {
+      arriveAt('Field Ruins', (state) => {
+        withWarrior(state);
+        state.world.intimidationLastTick = state.clock.numTicks;
+      });
+
+      expect(encounterStartFight).toHaveBeenCalledWith(
+        'field-ruins',
+        0,
+        'Field Ruins',
+      );
+    });
+
+    it('never intimidates a mystical node', () => {
+      vi.mocked(worldNodeExploreRandomIsAvailable).mockReturnValue(true);
+
+      arriveAt('Gobslime Shrine', withWarrior);
+
+      expect(encounterRandomStartFight).toHaveBeenCalledWith(
+        nodes['Gobslime Shrine'],
+        0,
+      );
+      expect(gamestate().world.intimidationLastTick).toBeUndefined();
     });
 
     it('discovers and starts gathering at a gather node', () => {

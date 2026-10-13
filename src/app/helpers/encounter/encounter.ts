@@ -1,3 +1,4 @@
+import { combatRollAmbush } from '@helpers/combat/combat-ambush';
 import { combatCreateForEncounter } from '@helpers/combat/combat-create';
 import { combatMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
@@ -10,16 +11,17 @@ import type {
   MonsterContent,
 } from '@interfaces';
 
-export function encounterStartFight(
+// Shared by a real fight and an auto-win, so both build the same monsters at the same rolled level.
+export function encounterCreateFightCombat(
   encounterId: EncounterId,
   fightIndex: number,
   locationName: string,
-): void {
+): Combat | undefined {
   const encounter = getEntry<EncounterContent>(encounterId);
-  if (!encounter) return;
+  if (!encounter) return undefined;
 
   const fight = encounter.fights[fightIndex];
-  if (!fight) return;
+  if (!fight) return undefined;
 
   const monsters = fight.monsters
     .map((entry) => getEntry<MonsterContent>(entry.monsterId))
@@ -30,7 +32,7 @@ export function encounterStartFight(
     encounter.levelRange.max,
   );
 
-  const combat: Combat = {
+  return {
     ...combatCreateForEncounter(
       worldPartyState(),
       monsters,
@@ -40,6 +42,22 @@ export function encounterStartFight(
     encounterId,
     fightIndex,
   };
+}
+
+export function encounterStartFight(
+  encounterId: EncounterId,
+  fightIndex: number,
+  locationName: string,
+): void {
+  const created = encounterCreateFightCombat(
+    encounterId,
+    fightIndex,
+    locationName,
+  );
+  if (!created) return;
+
+  // Rolled per real fight only - auto-wins never fight.
+  const combat: Combat = { ...created, ambushedBy: combatRollAmbush() };
 
   combatMessageLog(combat, `Encountering monster group #${fightIndex + 1}...`);
 

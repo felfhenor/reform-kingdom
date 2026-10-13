@@ -19,6 +19,7 @@ import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputa
 import { buildTownNodeState } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
+import { abilityJobContent, buildAbilityHero } from '@/testing/job-ability';
 
 const townId = 'larsia' as TownId;
 const slotId = 'slot-1' as TownCommissionSlotId;
@@ -90,6 +91,17 @@ describe('townCommissionReputationReward', () => {
     ]);
 
     expect(townCommissionReputationReward(townId, slotId)).toBe(50);
+  });
+
+  it("adds a healer's boost on top of the tiered reward", () => {
+    seedSlot((state) => (state.world.party = [buildAbilityHero('Healer', 1)]));
+    seedContent([
+      stick,
+      offer,
+      ...abilityJobContent('Healer', [['CommissionReputationBoost', 1, 0.1]]),
+    ]);
+
+    expect(townCommissionReputationReward(townId, slotId)).toBe(28);
   });
 });
 

@@ -1,3 +1,4 @@
+import { combatRollAmbush } from '@helpers/combat/combat-ambush';
 import { combatCreateForEncounter } from '@helpers/combat/combat-create';
 import { combatMessageLog } from '@helpers/combat/combat-log';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
@@ -50,6 +51,7 @@ export function encounterRandomStartFight(
     ),
     encounterRandomId: content.id,
     fightIndex,
+    ambushedBy: combatRollAmbush(),
   };
 
   combatMessageLog(combat, `Encountering monster group #${fightIndex + 1}...`);

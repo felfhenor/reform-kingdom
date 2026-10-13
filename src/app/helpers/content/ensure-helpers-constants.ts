@@ -16,6 +16,7 @@ import type {
   EquipmentSkillTargetType,
   GameElement,
   GameStat,
+  JobAbilityType,
   MonsterType,
   StatusEffectTag,
 } from '@interfaces';
@@ -76,6 +77,21 @@ export const VALID_MONSTER_TYPES: MonsterType[] = [
   'Humanoid',
   'Insect',
   'Spirit',
+];
+
+export const VALID_JOB_ABILITY_TYPES: JobAbilityType[] = [
+  'RestoreHealthOOC',
+  'RestoreEnergyOOC',
+  'ShrineDurationBoost',
+  'CommissionReputationBoost',
+  'AstralDurationBoost',
+  'EncounterResetReduction',
+  'OnPathTravelSpeed',
+  'Intimidation',
+  'OffPathTravelSpeed',
+  'Ambush',
+  'GatherYieldLuck',
+  'CombatDropRateBoost',
 ];
 
 export const VALID_CARAVAN_TRADE_TYPES: CaravanTradeType[] = ['sell', 'buy'];

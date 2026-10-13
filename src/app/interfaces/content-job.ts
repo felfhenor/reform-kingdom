@@ -1,4 +1,5 @@
 import type { HasAnimation } from '@interfaces/artable';
+import type { JobAbilityId } from '@interfaces/content-jobability';
 import type { EquipmentSkillId } from '@interfaces/content-skill';
 import type { EquipmentItemType } from '@interfaces/equipment';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
@@ -15,6 +16,13 @@ export type JobSkillPathLevel = {
 export type JobSkillPath = {
   pathName: string;
   levels: JobSkillPathLevel[];
+};
+
+// One rank of a job ability; a hero uses the highest rank at or below their level.
+export type JobAbilityLevel = {
+  jobAbilityId: JobAbilityId;
+  level: number;
+  value: number;
 };
 
 export type JobStatPriority = {
@@ -38,4 +46,6 @@ export type JobContent = IsContentItem &
     statPriority: JobStatPriority[];
 
     skillPath: JobSkillPath[];
+
+    abilities: JobAbilityLevel[];
   };

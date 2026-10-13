@@ -28,6 +28,7 @@
     "./schemas/globaleffect.schema.json": "gamedata/globaleffect/**/*.yml",
     "./schemas/item.schema.json": "gamedata/item/**/*.yml",
     "./schemas/job.schema.json": "gamedata/job/**/*.yml",
+    "./schemas/jobability.schema.json": "gamedata/jobability/**/*.yml",
     "./schemas/monster.schema.json": "gamedata/monster/**/*.yml",
     "./schemas/nodeoverride.schema.json": "gamedata/nodeoverride/**/*.yml",
     "./schemas/outpost.schema.json": "gamedata/outpost/**/*.yml",

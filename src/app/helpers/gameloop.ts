@@ -13,6 +13,7 @@ import { debug, error } from '@helpers/engine/logging';
 import { schedulerYield } from '@helpers/engine/scheduler';
 import { timerLastSaveTick, timerTicksElapsed } from '@helpers/engine/timer';
 import { globalEffectsProcessTick } from '@helpers/hero/global-effects';
+import { jobAbilityRegenProcessTick } from '@helpers/hero/job-ability-regen';
 import { restingProcessTick } from '@helpers/hero/resting';
 import { travelProcessTick } from '@helpers/hero/travel';
 import { gatheringProcessTick } from '@helpers/item/gathering';
@@ -91,6 +92,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
       autoModeProcessTick();
       craftProcessTick();
       restingProcessTick();
+      jobAbilityRegenProcessTick();
       workersProcessTick();
       townWorkerProcessTick();
       townSpecialtyPriorityProcessTick();

@@ -6,6 +6,7 @@ import {
 } from '@helpers/engine/analytics';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { applyGlobalEffectAdd } from '@helpers/hero/global-effect-state';
+import { jobAbilityValue } from '@helpers/hero/job-ability';
 import { updateGamestate } from '@helpers/state-game';
 import { isPartyAtNode } from '@helpers/world';
 import { worldNodeShrineCurrentTier } from '@helpers/world-node/world-node-shrine';
@@ -28,17 +29,16 @@ export function shrinePray(nodeName: string): boolean {
   if (!tier) return false;
 
   const currentTick = timerTicksElapsed();
+  // Fixed at prayer time - a later party change doesn't stretch or shrink it.
+  const duration = Math.round(
+    tier.globalEffectDuration * (1 + jobAbilityValue('ShrineDurationBoost')),
+  );
 
   updateGamestate((state) => {
     state.globalEffects = state.globalEffects.filter(
       (effect) => !effect.isShrineBuff,
     );
-    applyGlobalEffectAdd(
-      state,
-      tier.globalEffectId,
-      tier.globalEffectDuration,
-      currentTick,
-    );
+    applyGlobalEffectAdd(state, tier.globalEffectId, duration, currentTick);
     return state;
   });
 

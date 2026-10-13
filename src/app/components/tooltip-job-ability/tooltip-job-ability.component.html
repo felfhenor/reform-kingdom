@@ -1,0 +1,30 @@
+<ng-template #tooltipContent>
+  @let row = display();
+
+  <div class="flex flex-row gap-4 p-2">
+    <div class="tooltip-job-ability-image">
+      <app-icon-item-preview [sprite]="row.sprite" spritesheet="jobability" />
+    </div>
+
+    <div>
+      <div class="type-entity-name mb-1 text-{{ row.rarity }}">
+        {{ row.name }}
+      </div>
+
+      <div class="text-sm">{{ row.ability.description }}</div>
+
+      <div class="flex flex-col gap-1 mt-2 text-xs">
+        @if (row.current; as current) {
+          <div>{{ jobAbilityValueLabel(row.ability, current.value) }}</div>
+        }
+
+        @if (row.next; as next) {
+          <div class="type-meta">
+            Lv. {{ next.level | number }}:
+            {{ jobAbilityValueLabel(row.ability, next.value) }}
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</ng-template>

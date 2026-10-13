@@ -1,3 +1,4 @@
+import { combatRollAmbush } from '@helpers/combat/combat-ambush';
 import {
   combatantsFromTownGuardians,
   combatCreateForEncounter,
@@ -50,6 +51,7 @@ export function raidEngageCombat(townId: TownId): boolean {
       helpers,
     ),
     raidTownId: townId,
+    ambushedBy: combatRollAmbush(),
   };
 
   combatMessageLog(combat, `The raid on ${town.name} begins!`);

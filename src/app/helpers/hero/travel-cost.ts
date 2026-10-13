@@ -1,3 +1,4 @@
+import { jobAbilityValue } from '@helpers/hero/job-ability';
 import { globalEffectSumsState } from '@helpers/state-game';
 import {
   travelPathSumTicks,
@@ -15,8 +16,8 @@ export function travelStepTicksCost(
   return travelStepTicksCostWithBonus(
     step,
     originTile,
-    onPathTravelSpeedBonus,
-    offPathTravelSpeedBonus,
+    onPathTravelSpeedBonus + jobAbilityValue('OnPathTravelSpeed'),
+    offPathTravelSpeedBonus + jobAbilityValue('OffPathTravelSpeed'),
   );
 }
 

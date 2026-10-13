@@ -4,6 +4,7 @@ import {
   commissionRequirementsSatisfied,
 } from '@helpers/commission/commission-requirement';
 import { getEntry } from '@helpers/content/content';
+import { jobAbilityValue } from '@helpers/hero/job-ability';
 import { worldTownsState } from '@helpers/state-game';
 import type {
   CommissionOfferContent,
@@ -40,17 +41,20 @@ export function townCommissionRequirementEntries(
   return slot ? buildCommissionRequirementEntries(slot.requirements) : [];
 }
 
-// Towns pay reputation instead of the offer's normal rewards (scrip/materials).
+// Towns pay reputation instead of the offer's normal rewards (scrip/materials). Shared by the preview and the grant so they always match.
 export function townCommissionReputationReward(
   townId: TownId,
   slotId: TownCommissionSlotId,
+  state?: GameState,
 ): number {
-  const slot = findSlot(townId, slotId);
+  const slot = findSlot(townId, slotId, state);
   const offer = slot
     ? getEntry<CommissionOfferContent>(slot.commissionOfferId)
     : undefined;
+  if (!offer) return 0;
 
-  return offer ? commissionOfferReputationReward(offer, townId) : 0;
+  const base = commissionOfferReputationReward(offer, townId, state);
+  return Math.round(base * (1 + jobAbilityValue('CommissionReputationBoost')));
 }
 
 export function townCommissionCanFulfill(

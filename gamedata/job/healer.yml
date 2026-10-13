@@ -26,7 +26,7 @@
     Vitality: 0.5
     Resistance: 0.6
     Agility: 0.5
-    Constitution: 0.1
+    Constitution: 0.2
     Spirit: 0.2
 
   statPriority:
@@ -126,3 +126,25 @@
 
         - level: 49
           skillId: Lifesurge II
+
+  abilities:
+    - jobAbilityId: Healing Aura
+      level: 1
+      value: 0.5
+    - jobAbilityId: Healing Aura
+      level: 25
+      value: 1
+
+    - jobAbilityId: Sanctified Incantations
+      level: 1
+      value: 0.25
+    - jobAbilityId: Sanctified Incantations
+      level: 25
+      value: 0.5
+
+    - jobAbilityId: Town Favor
+      level: 1
+      value: 0.1
+    - jobAbilityId: Town Favor
+      level: 25
+      value: 0.2

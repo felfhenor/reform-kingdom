@@ -18,6 +18,7 @@ import {
   ensureItem,
 } from '@helpers/content/ensure-item';
 import { ensureJob } from '@helpers/content/ensure-job';
+import { ensureJobAbility } from '@helpers/content/ensure-jobability';
 import { ensureMonster } from '@helpers/content/ensure-monster';
 import { ensureNodeOverride } from '@helpers/content/ensure-nodeoverride';
 import { ensureOutpost } from '@helpers/content/ensure-outpost';
@@ -55,6 +56,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   globaleffect: ensureGlobalEffect,
   item: ensureItem,
   job: ensureJob,
+  jobability: ensureJobAbility,
   monster: ensureMonster,
   nodeoverride: ensureNodeOverride,
   outpost: ensureOutpost,

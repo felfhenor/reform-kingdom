@@ -190,6 +190,39 @@ function recordEncounterClear(combat: Combat): void {
   taskRecordEncounterClear(combat.locationName);
 }
 
+// The last fight also rolls completion rewards and records the clear.
+function grantEncounterFightDrops(
+  combat: Combat,
+  monsterDrops: ResolvedDrop[],
+  isFinalFight: boolean,
+): void {
+  if (!isFinalFight) {
+    grantResolvedDrops(combat, monsterDrops);
+    return;
+  }
+
+  grantResolvedDrops(combat, [
+    ...monsterDrops,
+    ...rollEncounterCompletionRewards(combat),
+  ]);
+  recordEncounterClear(combat);
+}
+
+// A fight won without being fought (e.g. Intimidation): full rewards, but the party's HP/EP and combat state are untouched.
+export function combatResolveAutoWin(
+  combat: Combat,
+  isFinalFight: boolean,
+): void {
+  grantVictoryRewards(combat);
+  grantEncounterFightDrops(combat, rollMonsterDrops(combat), isFinalFight);
+
+  // Once per encounter, so the decree counts the whole auto-win as one success.
+  if (isFinalFight) {
+    autoModeRecordClauseSuccess();
+    autoModeRecordNodeSuccess(combat.locationName);
+  }
+}
+
 // The fight after this one within the same encounter, if there is one -
 // encounters can chain several escalating fights.
 function nextFightFor(
@@ -231,16 +264,9 @@ function handleCombatVictory(combat: Combat): boolean {
   }
 
   const nextFight = nextFightFor(combat);
-  if (!nextFight) {
-    grantResolvedDrops(combat, [
-      ...monsterDrops,
-      ...rollEncounterCompletionRewards(combat),
-    ]);
-    recordEncounterClear(combat);
-    return false;
-  }
+  grantEncounterFightDrops(combat, monsterDrops, !nextFight);
+  if (!nextFight) return false;
 
-  grantResolvedDrops(combat, monsterDrops);
   encounterStartFight(
     nextFight.encounterId,
     nextFight.fightIndex,

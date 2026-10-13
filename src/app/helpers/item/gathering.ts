@@ -7,7 +7,8 @@ import { getEntry } from '@helpers/content/content';
 import { defaultGatheringState } from '@helpers/defaults';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { partyGainXp } from '@helpers/hero/character-progress';
-import { luckRollSucceeds, partyMaxLuck } from '@helpers/hero/luck';
+import { jobAbilityHighest } from '@helpers/hero/job-ability';
+import { luckRollSucceeds } from '@helpers/hero/luck';
 import { partyGatherYieldBonuses } from '@helpers/hero/party';
 import { addMaterial } from '@helpers/item/materials';
 import { rngChoiceWeighted, rngSucceedsChance } from '@helpers/rng';
@@ -204,8 +205,18 @@ function resolveGatherCycle(content: GatheringContent, nodeName: string): void {
 
   const result = gatheringRollResult(content, worldNodeLevel(nodeName));
   if (result) {
-    const yieldMultiplier = luckRollSucceeds(partyMaxLuck()) ? 2 : 1;
-    grantGatherItems(result, nodeName, yieldMultiplier);
+    // Only GatherYieldLuck can double the haul - one roll, at the best Luck x value in the party.
+    const lucky = jobAbilityHighest('GatherYieldLuck');
+    const doubled = !!lucky && luckRollSucceeds(lucky.amount);
+    grantGatherItems(result, nodeName, doubled ? 2 : 1);
+
+    if (doubled) {
+      categoryMessageLog(
+        'Gather',
+        nodeName,
+        `**${lucky.character.name}**'s luck doubled the haul!`,
+      );
+    }
   }
 
   updateGamestate((state) => {

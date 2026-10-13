@@ -343,23 +343,54 @@ export function combatDoCombatIteration(): void {
 
   beginCombatLogCommits();
 
+  if (combat.ambushedBy) {
+    combatDoAmbushRound(combat);
+  } else {
+    combatDoRound(combat);
+  }
+
+  updateGamestate((state) => {
+    state.world.combat = combat;
+    return state;
+  });
+
+  combatCheckIfOver(combat);
+
+  endCombatLogCommits();
+}
+
+// A summon replaced earlier this round no longer acts; an elemental blessing grants one extra turn.
+function combatantTakeRoundTurn(combat: Combat, char: Combatant): void {
+  if (!combatHasCombatant(combat, char)) return;
+
+  const res = combatantTakeTurn(combat, char);
+
+  if (res?.takeAnotherTurn) {
+    combatMessageLog(
+      combat,
+      `**${combatantMessageToken(char)}** was blessed by the elements, and gets to go again!`,
+    );
+    combatantTakeTurn(combat, char);
+  }
+}
+
+// Only living heroes act, and it isn't a counted round, so the exhaustion timer doesn't move.
+function combatDoAmbushRound(combat: Combat): void {
+  combatMessageLog(combat, `**${combat.ambushedBy}** sprung an ambush!`);
+
+  orderCombatantsByAgility(combat)
+    .filter((char) => combat.heroes.includes(char) && !combatantIsDead(char))
+    .forEach((char) => combatantTakeRoundTurn(combat, char));
+
+  combat.ambushedBy = undefined;
+}
+
+function combatDoRound(combat: Combat): void {
   combatMessageLog(combat, `_Combat round ${combat.rounds + 1}._`);
 
-  const turnOrder = orderCombatantsByAgility(combat);
-  turnOrder.forEach((char) => {
-    // A summon replaced earlier this round no longer acts.
-    if (!combatHasCombatant(combat, char)) return;
-
-    const res = combatantTakeTurn(combat, char);
-
-    if (res?.takeAnotherTurn) {
-      combatMessageLog(
-        combat,
-        `**${combatantMessageToken(char)}** was blessed by the elements, and gets to go again!`,
-      );
-      combatantTakeTurn(combat, char);
-    }
-  });
+  orderCombatantsByAgility(combat).forEach((char) =>
+    combatantTakeRoundTurn(combat, char),
+  );
 
   const previousRounds = combat.rounds;
   combat.rounds++;
@@ -377,13 +408,4 @@ export function combatDoCombatIteration(): void {
       `Due to exhaustion, damage received is increased by ${damageIncreasePercent}% for all combatants.`,
     );
   }
-
-  updateGamestate((state) => {
-    state.world.combat = combat;
-    return state;
-  });
-
-  combatCheckIfOver(combat);
-
-  endCombatLogCommits();
 }

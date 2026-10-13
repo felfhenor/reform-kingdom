@@ -1,0 +1,10 @@
+@reference 'tailwindcss';
+
+// Headless - the host would otherwise still take part in a parent flex layout as an empty item.
+:host {
+  @apply hidden;
+}
+
+.tooltip-job-ability-image {
+  @apply relative w-[64px] h-[64px] min-w-[64px] min-h-[64px] shrink-0;
+}

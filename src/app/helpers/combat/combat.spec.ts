@@ -27,6 +27,8 @@ import {
   techniqueHasAttribute,
 } from '@helpers/combat/combat-damage';
 import { combatantDamageEvents } from '@helpers/combat/combat-damage-events';
+import { combatCheckIfOver } from '@helpers/combat/combat-end';
+import { combatLog } from '@helpers/combat/combat-log';
 import { pickSkillFromCombatOrders } from '@helpers/combat/combat-order-evaluation';
 import { combatantSkillCastEvents } from '@helpers/combat/combat-skill-events';
 import {
@@ -170,6 +172,43 @@ describe('combatDoCombatIteration', () => {
     expect(combatantSkillCastEvents().map((e) => e.combatantId)).toEqual([
       'caster-1',
     ]);
+  });
+
+  it('runs one free hero-only round for an ambush, without counting it', () => {
+    const hero = caster({ id: 'hero-1' });
+    const helper = caster({ id: 'helper-1' });
+    const guardian = caster({ id: 'guardian-1', isEnemy: true });
+    available(skill('weighted'));
+    seedGamestate(
+      (state) =>
+        (state.world.combat = buildCombat({
+          rounds: 3,
+          heroes: [hero],
+          helpers: [helper],
+          guardians: [guardian],
+          ambushedBy: 'Rin',
+        })),
+    );
+
+    inTick(combatDoCombatIteration);
+
+    expect(combatantSkillCastEvents().map((e) => e.combatantId)).toEqual([
+      'hero-1',
+    ]);
+    expect(worldCombatState()).toMatchObject({ rounds: 3 });
+    expect(worldCombatState()?.ambushedBy).toBeUndefined();
+    expect(combatLog().map(({ message }) => message)).toContain(
+      '**Rin** sprung an ambush!',
+    );
+    expect(combatCheckIfOver).toHaveBeenCalled();
+
+    combatantSkillCastEvents.set([]);
+    inTick(combatDoCombatIteration);
+
+    expect(worldCombatState()?.rounds).toBe(4);
+    expect(
+      sortBy(combatantSkillCastEvents().map((e) => e.combatantId)),
+    ).toEqual(['guardian-1', 'helper-1', 'hero-1']);
   });
 
   it('does nothing when there is no combat', () => {

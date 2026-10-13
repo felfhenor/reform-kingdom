@@ -1,0 +1,71 @@
+- id: a4088326-296b-453a-8422-5b51f47070cf
+  name: Healing Aura
+  description: While this Healer is in the party, they heal their party outside of combat based on their CON. Stacks with other Healers.
+  type: RestoreHealthOOC
+  sprite: '0000'
+
+- id: 79017fbb-c235-456e-8132-1b2375e9913f
+  name: Sanctified Incantations
+  description: While this Healer is in the party, shrine buffs last longer. Does not stack with other Healers.
+  type: ShrineDurationBoost
+  sprite: '0001'
+
+- id: 2f6f33f2-0807-4255-9ebd-7a2b03712c49
+  name: Town Favor
+  description: While this Healer is in the party, town commissions give more reputation. Does not stack with other Healers.
+  type: CommissionReputationBoost
+  sprite: '0002'
+
+- id: 1a8fdffe-427e-4955-80b1-bc75108f5908
+  name: Spiritual Energy
+  description: While this Magician is in the party, they energize their party outside of combat based on their SPR. Stacks with other Magicians.
+  type: RestoreEnergyOOC
+  sprite: '0003'
+
+- id: 560af57d-851f-429d-89c7-bd757835bd15
+  name: Astral Resonance
+  description: While this Magician is in the party, Astral Projector spells last longer. Does not stack with other Magicians.
+  type: AstralDurationBoost
+  sprite: '0004'
+
+- id: df210272-2716-43fc-891f-815046f5af5d
+  name: Mystical Insight
+  description: While this Magician is in the party, Mystical locations reset faster. Does not stack with other Magicians.
+  type: EncounterResetReduction
+  sprite: '0005'
+
+- id: b9f4d504-cf93-45c6-9cee-0c42797853c6
+  name: Trailbreaker
+  description: While this Warrior is in the party, on-path travel is faster. Does not stack with other Warriors.
+  type: OnPathTravelSpeed
+  sprite: '0006'
+
+- id: 520c8108-5701-43c0-bb31-99512f41aad3
+  name: Intimidation
+  description: While this Warrior is in the party, monsters that are too weak will surrender instead of fighting. Can only happen once every 15 seconds. Does not stack with other Warriors.
+  type: Intimidation
+  sprite: '0007'
+
+- id: b0e265ce-1e03-4a45-95a5-cd7ccfa34d1e
+  name: Pathfinder
+  description: While this Ranger is in the party, off-path travel is faster. Does not stack with other Rangers.
+  type: OffPathTravelSpeed
+  sprite: '0008'
+
+- id: 22e8bf9b-1ef5-4163-88d4-bb476735f645
+  name: Ambush
+  description: Each Ranger has a chance to catch enemies unaware at the start of combat, giving the whole party a free round of combat. More Rangers mean more chances, but there is only one ambush per fight.
+  type: Ambush
+  sprite: '0009'
+
+- id: 0f899a50-20bb-4b34-b357-e58f9d7e70bf
+  name: Fortunate Finds
+  description: The luckiest Explorer in the party has a chance, based on their Luck, to double each gathering haul. Does not stack with other Explorers.
+  type: GatherYieldLuck
+  sprite: '0010'
+
+- id: a691048d-8e0d-4291-a3d0-329f1bb1b115
+  name: Loot Goblin
+  description: Explorers have a higher chance of getting combat loot. Does not stack with other Explorers.
+  type: CombatDropRateBoost
+  sprite: '0011'

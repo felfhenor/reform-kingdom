@@ -10,6 +10,7 @@ import {
   autoModeToggle,
 } from '@helpers/decree/auto-mode-state';
 import { encounterStartFight } from '@helpers/encounter/encounter';
+import { encounterTryIntimidate } from '@helpers/encounter/encounter-auto-win';
 import { encounterRandomStartFight } from '@helpers/encounter/encounter-random-combat';
 import {
   analyticsSafeSegment,
@@ -247,6 +248,8 @@ function travelArriveAtNode(
 
   const encounter = worldNodeEncounter(node);
   if (encounter) {
+    if (encounterTryIntimidate(encounter, destinationNodeName)) return;
+
     encounterStartFight(encounter.id, 0, destinationNodeName);
     return;
   }

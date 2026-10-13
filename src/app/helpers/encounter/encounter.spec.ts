@@ -5,18 +5,20 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('@helpers/rng', async (importOriginal) => ({
   ...(await importOriginal<typeof RngHelper>()),
   rngNumberRange: vi.fn((_min: number, max: number) => max),
+  rngSucceedsChance: vi.fn(() => false),
 }));
 
 import { combatLog } from '@helpers/combat/combat-log';
 import { ensureEncounter } from '@helpers/content/ensure-encounternode';
 import { ensureMonster } from '@helpers/content/ensure-monster';
 import { encounterStartFight } from '@helpers/encounter/encounter';
-import { rngNumberRange } from '@helpers/rng';
+import { rngNumberRange, rngSucceedsChance } from '@helpers/rng';
 import { worldCombatState } from '@helpers/state-game';
 import type { EncounterId, MonsterId } from '@interfaces';
 import { buildCharacter } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 import { inTick, seedGamestate } from '@/testing/gamestate';
+import { abilityJobContent, buildAbilityHero } from '@/testing/job-ability';
 
 const goblin = ensureMonster({ id: 'goblin' as MonsterId, name: 'Goblin' });
 const slime = ensureMonster({ id: 'slime' as MonsterId, name: 'Slime' });
@@ -79,5 +81,29 @@ describe('encounterStartFight', () => {
     start(ruins.fights.length);
 
     expect(worldCombatState()).toBeUndefined();
+  });
+
+  it("rolls a Ranger's ambush afresh for every fight", () => {
+    seedContent([
+      ruins,
+      goblin,
+      slime,
+      ...abilityJobContent('Ranger', [['Ambush', 1, 10]]),
+    ]);
+    seedGamestate(
+      (state) =>
+        (state.world.party = [
+          buildAbilityHero('Ranger', 1, {}, { name: 'Rin' }),
+        ]),
+    );
+    vi.mocked(rngSucceedsChance)
+      .mockReturnValueOnce(true)
+      .mockReturnValueOnce(false);
+
+    start(0);
+    expect(worldCombatState()?.ambushedBy).toBe('Rin');
+
+    start(1);
+    expect(worldCombatState()?.ambushedBy).toBeUndefined();
   });
 });
