@@ -1,6 +1,6 @@
 - id: abada04f-1132-47c6-8555-4864e691227b
   name: Fel Demon
-  description: A strong demon, often found serving Fel's commander.
+  description: A strong demon, often found serving Fel.
 
   types: [Demon]
   elementalResistances:
