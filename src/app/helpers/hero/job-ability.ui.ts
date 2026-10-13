@@ -22,17 +22,18 @@ const JOB_ABILITY_VALUE_LABELS: Record<
   JobAbilityType,
   (value: number) => string
 > = {
-  RestoreHealthOOC: (value) => `${value}× CON per second`,
-  RestoreEnergyOOC: (value) => `${value}× SPR per second`,
+  RestoreHealthOOC: (value) => `${value}x CON per second`,
+  RestoreEnergyOOC: (value) => `${value}x SPR per second`,
   ShrineDurationBoost: (value) => `+${percent(value)} duration`,
   CommissionReputationBoost: (value) => `+${percent(value)} reputation`,
   AstralDurationBoost: (value) => `+${percent(value)} duration`,
   EncounterResetReduction: (value) => `-${percent(value)} reset time`,
   OnPathTravelSpeed: (value) => `+${percent(value)} on-path speed`,
   OffPathTravelSpeed: (value) => `+${percent(value)} off-path speed`,
-  Intimidation: (value) => `Surrender ${Math.abs(value)}+ levels below`,
+  Intimidation: (value) =>
+    `Enemies surrender when ${Math.abs(value)}+ levels under`,
   Ambush: (value) => `${value}% chance`,
-  GatherYieldLuck: (value) => `${value}× LUK chance`,
+  GatherYieldLuck: (value) => `${value}x LUK chance`,
   CombatDropRateBoost: (value) => `+${value}% drop rate`,
 };
 
