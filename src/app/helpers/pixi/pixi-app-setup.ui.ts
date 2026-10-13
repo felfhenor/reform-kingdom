@@ -1,6 +1,6 @@
 import { warn } from '@helpers/engine/logging';
 import type { PixiAppConfig } from '@interfaces';
-import { Application, Container } from 'pixi.js';
+import { Application, Container, RenderLayer } from 'pixi.js';
 
 export async function pixiAppInitialize(
   container: HTMLElement,
@@ -56,6 +56,7 @@ export function pixiWorldContainersCreate(app: Application): {
   gatherProgressContainer: Container;
   encounterProgressContainer: Container;
   nodeSelectionContainer: Container;
+  nodeLabelLayer: RenderLayer;
   floatingTextContainer: Container;
 } {
   const mapContainer = new Container();
@@ -65,6 +66,7 @@ export function pixiWorldContainersCreate(app: Application): {
   const gatherProgressContainer = new Container();
   const encounterProgressContainer = new Container();
   const nodeSelectionContainer = new Container();
+  const nodeLabelLayer = new RenderLayer();
   const floatingTextContainer = new Container();
 
   app.stage.addChild(mapContainer);
@@ -75,6 +77,8 @@ export function pixiWorldContainersCreate(app: Application): {
   app.stage.addChild(gatherProgressContainer);
   app.stage.addChild(encounterProgressContainer);
   app.stage.addChild(nodeSelectionContainer);
+  // Node labels stay parented in the map for positioning but draw here, above the party/worker tokens.
+  app.stage.addChild(nodeLabelLayer);
   // Added last so gather/reward popups render above every other map overlay.
   app.stage.addChild(floatingTextContainer);
 
@@ -98,6 +102,7 @@ export function pixiWorldContainersCreate(app: Application): {
     gatherProgressContainer,
     encounterProgressContainer,
     nodeSelectionContainer,
+    nodeLabelLayer,
     floatingTextContainer,
   };
 }
