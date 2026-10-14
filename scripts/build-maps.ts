@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import fs from 'fs-extra';
 import path from 'path';
+import { writeJsonIfChanged } from './write-json-if-changed';
 
 fs.ensureDirSync('./public/json');
 
@@ -60,7 +61,5 @@ mapFiles.forEach((file: string) => {
 });
 
 // Bundled into one file (rather than fetched per-map) so the client makes a single request at load instead of one per map.
-fs.writeJsonSync('./public/json/all-maps.json', allMaps);
-console.info(
-  `Wrote ${mapFiles.length} map(s) to public/json/all-maps.json`,
-);
+writeJsonIfChanged('./public/json/all-maps.json', allMaps);
+console.info(`Wrote ${mapFiles.length} map(s) to public/json/all-maps.json`);

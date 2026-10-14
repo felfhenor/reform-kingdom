@@ -4,6 +4,7 @@ import { isArray, isObject, isString, sortBy } from 'es-toolkit/compat';
 import fs from 'fs-extra';
 import * as yaml from 'js-yaml';
 import rec from 'recursive-readdir';
+import { writeJsonIfChanged } from './write-json-if-changed';
 
 fs.ensureDirSync('./public/json');
 
@@ -14,52 +15,53 @@ const idToName: Record<string, Record<string, string>> = {};
 
 // preload
 const processFiles = async () => {
-  const allFiles = fs.readdirSync('gamedata');
+  const allFiles = sortBy(fs.readdirSync('gamedata'));
 
-  await Promise.all(
-    allFiles.map(async (folder: string) => {
-      const allFilesInSubfolder = await rec(`gamedata/${folder}`);
-
-      allFilesInSubfolder.forEach((file: string) => {
-        try {
-          const doc = yaml.load(fs.readFileSync(file, 'utf-8')) as any[];
-
-          idToName[folder] ??= {};
-          allData[folder] ??= [];
-          allData[folder].push(...doc);
-
-          doc.forEach((entry: any) => {
-            if (!entry.name) {
-              console.error(`Entry "${entry.id}" has no name.`);
-              return;
-            }
-
-            if (trackedNames[entry.name]) {
-              console.error(
-                `Name "${entry.name}" already exists somewhere in the content.`,
-              );
-              process.exit(1);
-            }
-
-            if (trackedIds[entry.id]) {
-              console.error(
-                `Id "${entry.id}" already exists somewhere in the content.`,
-              );
-              process.exit(1);
-            }
-
-            trackedIds[entry.id] = true;
-            trackedNames[entry.name] = true;
-            idToName[folder][entry.name] = entry.id;
-          });
-
-          // console.log(`Loaded ${folder}/${file} - ${doc.length} entries...`);
-        } catch (e) {
-          console.error(e);
-        }
-      });
-    }),
+  // Read concurrently but process in sorted order, so output is stable across rebuilds.
+  const filesPerFolder = await Promise.all(
+    allFiles.map((folder: string) => rec(`gamedata/${folder}`)),
   );
+
+  allFiles.forEach((folder: string, i: number) => {
+    sortBy(filesPerFolder[i]).forEach((file: string) => {
+      try {
+        const doc = yaml.load(fs.readFileSync(file, 'utf-8')) as any[];
+
+        idToName[folder] ??= {};
+        allData[folder] ??= [];
+        allData[folder].push(...doc);
+
+        doc.forEach((entry: any) => {
+          if (!entry.name) {
+            console.error(`Entry "${entry.id}" has no name.`);
+            return;
+          }
+
+          if (trackedNames[entry.name]) {
+            console.error(
+              `Name "${entry.name}" already exists somewhere in the content.`,
+            );
+            process.exit(1);
+          }
+
+          if (trackedIds[entry.id]) {
+            console.error(
+              `Id "${entry.id}" already exists somewhere in the content.`,
+            );
+            process.exit(1);
+          }
+
+          trackedIds[entry.id] = true;
+          trackedNames[entry.name] = true;
+          idToName[folder][entry.name] = entry.id;
+        });
+
+        // console.log(`Loaded ${folder}/${file} - ${doc.length} entries...`);
+      } catch (e) {
+        console.error(e);
+      }
+    });
+  });
 
   console.log(
     `Loaded ${allFiles.length} files - ${Object.keys(trackedIds).length} entries...`,
@@ -151,10 +153,10 @@ const rewriteDataIds = () => {
 
   // write
   allIds.forEach((key) => {
-    fs.writeJsonSync(`./public/json/${key}.json`, allData[key]);
+    writeJsonIfChanged(`./public/json/${key}.json`, allData[key]);
   });
 
-  fs.writeJsonSync('public/json/all.json', allData);
+  writeJsonIfChanged('public/json/all.json', allData);
 };
 
 const run = async () => {
