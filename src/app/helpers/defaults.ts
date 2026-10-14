@@ -31,6 +31,7 @@ export function defaultGameState(): GameState {
       isSetup: false,
       isPaused: false,
       createdAt: Date.now(),
+      titleCrawlPending: false,
     },
     gameId: rngUuid() as GameId,
     clock: {
@@ -77,6 +78,7 @@ export function defaultGameState(): GameState {
     discoveredAstralProjectorSpells: {},
     activeAstralProjectorSpells: [],
     tutorials: {},
+    regionIntros: {},
     tasks: {},
   };
 }

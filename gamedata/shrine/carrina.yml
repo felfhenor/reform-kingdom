@@ -1,6 +1,7 @@
 - id: 8e7cc8d1-ffce-4ec9-876e-a194713bf08a
   name: Shrine of the Founder
-  description: A shrine dedicated to the founder of the Duchy of Carrina. It helps new adventurers and old ones alike to recognize their experiences and learn more from them.
+  description: A shrine dedicated to the Founder. It helps new adventurers and old ones alike to recognize their experiences and learn more from them.
+  legendName: Legend of the Founder
 
   levels:
     - developTime: 300
@@ -10,6 +11,7 @@
 
       globalEffectId: Wisdom of the Founder I
       globalEffectDuration: 1800
+      legend: Before the kingdom, there wasn't anything worth naming. The Founder saw a different world, a different way.
 
     - developTime: 600
       costs:
@@ -27,6 +29,7 @@
 
       globalEffectId: Wisdom of the Founder II
       globalEffectDuration: 3600
+      legend: With the light of the Founding Stone, the second sun, the Founder saw the world as it could be. The world remembered; the Founder could rest easier.
 
     - developTime: 900
       costs:
@@ -44,6 +47,7 @@
 
       globalEffectId: Wisdom of the Founder III
       globalEffectDuration: 7200
+      legend: The Founder brought in those who could help the lands grow. Under their combined leadership, the lands prospered. Their shrines still stand, their wisdom burning bright.
 
     - developTime: 1200
       costs:
@@ -61,6 +65,7 @@
 
       globalEffectId: Wisdom of the Founder IV
       globalEffectDuration: 14400
+      legend: The cracking of the stone - the Sundering - did not happen all at once. Every crack was another river lost, another path forgotten.
 
     - developTime: 1500
       costs:
@@ -81,10 +86,12 @@
 
       globalEffectId: Wisdom of the Founder V
       globalEffectDuration: 31536000
+      legend: To this day, none have laid eyes on the Founder. Those who serve the Founder hear the whispers on the wind. For them, this suffices.
 
 - id: 21a576a8-b4d2-467c-8a06-d7020757ec25
   name: Shrine of Izchak
   description: A shrine erected by local merchants. They say that praying here increases your wealth.
+  legendName: Legend of the Magnate
 
   levels:
     - developTime: 300
@@ -92,37 +99,42 @@
         - itemId: Gold Coin
           required: 500
 
-      globalEffectId: Triumph of the Merchants I
+      globalEffectId: Triumph of the Magnate I
       globalEffectDuration: 1800
+      legend: Izchak was the most trusted merchant in the kingdom. He knew how to value anything with coin - even a promise from the Founder.
 
     - developTime: 600
       costs:
         - itemId: Gold Coin
           required: 25000
 
-      globalEffectId: Triumph of the Merchants II
+      globalEffectId: Triumph of the Magnate II
       globalEffectDuration: 3600
+      legend: Building the kingdom was no easy task. Izchak made sure the funds were there. No one knows how.
 
     - developTime: 900
       costs:
         - itemId: Gold Coin
           required: 100000
 
-      globalEffectId: Triumph of the Merchants III
+      globalEffectId: Triumph of the Magnate III
       globalEffectDuration: 7200
+      legend: Folk tales say that Izchak tried to teach economics to the goblins. They just took the coins. Now, every creature in the land has coin.
 
     - developTime: 1200
       costs:
         - itemId: Gold Coin
           required: 250000
 
-      globalEffectId: Triumph of the Merchants IV
+      globalEffectId: Triumph of the Magnate IV
       globalEffectDuration: 14400
+      legend: The distant lands may have forgotten themselves with the Sundering, but Izchak's ledgers prove they existed. A shame they outlived him.
 
     - developTime: 1500
       costs:
         - itemId: Gold Coin
           required: 1000000
 
-      globalEffectId: Triumph of the Merchants V
+      globalEffectId: Triumph of the Magnate V
       globalEffectDuration: 31536000
+      legend: Passing merchants leave a coin here for good luck. Mysteriously, there's never too much money at the shrine.

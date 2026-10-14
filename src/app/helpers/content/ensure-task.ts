@@ -99,5 +99,6 @@ export function ensureTask(task: Partial<TaskContent>): Required<TaskContent> {
     order: task.order ?? 0,
     requirement: ensureTaskRequirement(task.requirement),
     rewards: ensureArray(task.rewards, ensureItemQuantity),
+    whisper: task.whisper ?? '',
   };
 }

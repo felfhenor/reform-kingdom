@@ -1,6 +1,7 @@
 - id: 577ebd9d-0a3e-43d4-b54e-c887d4795bc9
   name: Shrine of Culcula
   description: A shrine dedicated to Culcula, the explorer. They were known for their extraordinary mobility.
+  legendName: Legend of the Pioneer
 
   levels:
     - developTime: 300
@@ -8,8 +9,9 @@
         - itemId: Crimson Lucre
           required: 500
 
-      globalEffectId: Mobility of the Explorer I
+      globalEffectId: Mobility of the Pioneer I
       globalEffectDuration: 1800
+      legend: Culcula walked places no one else could. Others tried to follow, but none were able. Not even the Founder knew where Culcula went, but Culcula always came back with a map and a story.
 
     - developTime: 600
       costs:
@@ -25,8 +27,9 @@
         - itemId: Crimson Ruby
           required: 25
 
-      globalEffectId: Mobility of the Explorer II
+      globalEffectId: Mobility of the Pioneer II
       globalEffectDuration: 3600
+      legend: No person was simultaneously lost and found as often as Culcula. Some speculated that, where there was no path, Culcula simply made one.
 
     - developTime: 900
       costs:
@@ -42,8 +45,9 @@
         - itemId: Strong Spider Silk
           required: 25
 
-      globalEffectId: Mobility of the Explorer III
+      globalEffectId: Mobility of the Pioneer III
       globalEffectDuration: 7200
+      legend: Everyone needed Culcula's maps. They were carried by Parcilyte's tacticians, Izchak's merchants, and even the Founder.
 
     - developTime: 1200
       costs:
@@ -59,8 +63,9 @@
         - itemId: Hawk Feather
           required: 25
 
-      globalEffectId: Mobility of the Explorer IV
+      globalEffectId: Mobility of the Pioneer IV
       globalEffectDuration: 14400
+      legend: When the Sundering happened, Culcula traveled the roads to ensure they went where the maps said they did. This time, they never came back - they were lost to the world.
 
     - developTime: 1500
       costs:
@@ -76,5 +81,6 @@
         - itemId: Gold Ingot
           required: 25
 
-      globalEffectId: Mobility of the Explorer V
+      globalEffectId: Mobility of the Pioneer V
       globalEffectDuration: 31536000
+      legend: Explorers and adventurers pray here in the hopes that they don't meet the same fate as Culcula.

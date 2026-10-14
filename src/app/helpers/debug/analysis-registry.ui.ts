@@ -20,6 +20,7 @@ import { runRecipeIngredientOrderAnalysis } from '@helpers/debug/analysis-recipe
 import { runRecipeNamesAnalysis } from '@helpers/debug/analysis-recipenames';
 import { runRecipeRewardsAnalysis } from '@helpers/debug/analysis-reciperewards';
 import { runExchangeNodesAnalysis } from '@helpers/debug/analysis-exchangenodes';
+import { runRegionsAnalysis } from '@helpers/debug/analysis-regions';
 import { runShrinesAnalysis } from '@helpers/debug/analysis-shrines';
 import { runSkillBonusesAnalysis } from '@helpers/debug/analysis-skillbonuses';
 import { runAffixesAnalysis } from '@helpers/debug/analysis-affixes';
@@ -230,6 +231,16 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     strict: true,
     inputKeys: [],
     run: runShrinesAnalysis,
+  },
+  {
+    id: 'regions',
+    title: 'Regions',
+    description:
+      'Every region intro points at a real map that no other region claims, and every map has a region intro.',
+    category: 'World & Maps',
+    strict: true,
+    inputKeys: [],
+    run: runRegionsAnalysis,
   },
   {
     id: 'exchangenodes',

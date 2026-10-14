@@ -17,6 +17,7 @@
   name: Clear the Mired Ruins
   description: Pass through Craggled Cave, west of the Duchy of Carrina, into the Craggled Mire and defeat every fight in the Mired Ruins.
   order: 250
+  whisper: The Mire will fight you every step you take. Keep fighting back.
   requirement:
     kind: ClearEncounter
     nodeName: Mired Ruins
@@ -105,6 +106,7 @@
   name: Upgrade the Shrine of Parcilyte
   description: Make an offering at the Shrine of Parcilyte to raise it to level 1, then pray there for its blessing.
   order: 310
+  whisper: The orcs remember Parcilyte. She was my champion, and she was a damn good general.
   requirement:
     kind: ShrineLevel
     nodeName: Shrine of Parcilyte
@@ -117,6 +119,7 @@
   name: Rescue Dekar Anten
   description: Clear the Mystical Gobslime Shrine to rescue Dekar Anten.
   order: 320
+  whisper: Some would say he got lost in the ruins. I say the ruins lost him.
   requirement:
     kind: RescueWorker
     workerId: Dekar Anten
@@ -130,6 +133,7 @@
 - id: 883535da-f8a5-4d93-a0ef-78b238a5a14c
   name: Earn Your First Trader Scrip
   description: Fulfill a caravan commission to earn Trader Scrip.
+  whisper: The traders may seem unscrupulous, but they're your allies. They were mine, too.
   order: 330
   requirement:
     kind: FulfillCommission

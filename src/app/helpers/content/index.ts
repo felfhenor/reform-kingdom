@@ -20,6 +20,7 @@ export * from './ensure-monster';
 export * from './ensure-nodeoverride';
 export * from './ensure-outpost';
 export * from './ensure-recipe';
+export * from './ensure-region';
 export * from './ensure-shrine';
 export * from './ensure-skill';
 export * from './ensure-statuseffect';

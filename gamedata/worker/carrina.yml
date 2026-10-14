@@ -1,6 +1,7 @@
 - id: 6aa84bbe-0d78-4936-8d78-0f1b89269f87
   name: Weaver Welch
   description: Welch was once stuck in the tower, lost while gathering spider silk. She knows how to gather a thing or two, despite how clumsy she appears.
+  rescueText: I was so lost in the tangled maze, I couldn't tell up from down! Thank you!
   sprite: '0000'
   frames: 4
 
@@ -19,6 +20,7 @@
 - id: 5d6e1292-0ccc-40f2-a2b4-929074579cf1
   name: Dekar Anten
   description: Dekar got lost exploring the Gobslime Shrine, but now that he's saved, he'll go do all of the gathering requested of him.
+  rescueText: I'm so glad you found me. There were so many slimes...
   sprite: '0004'
   frames: 4
 

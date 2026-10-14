@@ -263,6 +263,10 @@ export function migrateGameState() {
     newState.discoveredMaps,
     (mapName) => !!getMap(mapName),
   );
+  newState.regionIntros = ledgerPrune(
+    newState.regionIntros,
+    (mapName) => !!getMap(mapName),
+  );
 
   newState.world.party = retrofitPartyXp(newState.world.party);
   newState.tradeskills = retrofitTradeskillXp(newState.tradeskills);

@@ -3,3 +3,7 @@
 <div class="page-container playing">
   <router-outlet></router-outlet>
 </div>
+
+@if (isTitleCrawlPending()) {
+  <app-screen-title-crawl />
+}

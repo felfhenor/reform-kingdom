@@ -61,3 +61,10 @@
   top: calc(1rem + var(--status-bubble-expanded-height) + 2rem);
   z-index: 20;
 }
+
+// Clears the adventure log on the left and the status bubbles on the right.
+.region-intro-layer {
+  @apply absolute left-1/2 -translate-x-1/2 w-[28rem] max-w-[calc(100%-2rem)];
+  top: 20%;
+  z-index: 12;
+}

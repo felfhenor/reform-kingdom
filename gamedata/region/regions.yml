@@ -1,0 +1,29 @@
+- id: ff86b254-4fab-48b8-830d-5e0c21bbdc3b
+  name: Carrina
+  mapName: Carrina
+  description: Home of the Founder, and the only place that remembers itself. Filled with flowery fields, mines ripe for the taking, and woods ready to be felled. The resources are plentiful, but so are the goblins. At least they're not all bad.
+
+- id: 8c8691c8-28d4-4fde-97c9-dd81ab18fe2b
+  name: Craggled Mire
+  mapName: CraggledMire
+  description: A bog seated between the mountains, and a place where the dead come back to haunt the world. Home of the orcs, who pursue greater knowledge and a relationship with the dead. Such an act bears questionable fruit, but fruit all the same.
+
+- id: 6996ff96-7bda-4584-9c3a-96cc769a5132
+  name: Erden Woodland
+  mapName: ErdenWoodland
+  description: A serene woodland, and home of the elves. Elfheim sits at the center, but demons lurk around every corner, waiting for their chance to disrupt the peace and corrupt more to their way of life. It's hard to escape when there's nowhere to go.
+
+- id: 01e4b746-cbc1-4997-9514-abad030f2439
+  name: Larsian Desert
+  mapName: LarsianDesert
+  description: Once lush, the land has forgotten all but desolation. This is what the Larsian people call home. A home filled with dwindling water supplies, and the constant threat of being raided by the Akroki. What a life it is.
+
+- id: adda378a-5ffd-46b2-94d2-75caa0eb4819
+  name: Templar's Retreat
+  mapName: TemplarsRetreat
+  description: 'A ghostly cavern, a mystical shrine. Here, templars worship, research, and summon the spirits of the lost. Lost in many ways: lost in time, lost in space, and yet they find their way back somehow. They always do.'
+
+- id: 5b8ae87a-5612-4ac0-ae1a-56d8ac12686d
+  name: Felway
+  mapName: Felway
+  description: Frontline of the Fel, the demons who caused the Sundering. Here, they live ordinary lives. They cook, they hunt, they farm, and they live in harmony with their pets. It's a shame you can't coexist.

@@ -28,6 +28,7 @@ export * from './content-jobability';
 export * from './content-jobability.ui';
 export * from './content-monster';
 export * from './content-node-override';
+export * from './content-region';
 export * from './content-outpost';
 export * from './content-recipe';
 export * from './content-shrine';

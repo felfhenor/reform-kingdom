@@ -18,6 +18,7 @@ export type ContentType =
   | 'nodeoverride'
   | 'outpost'
   | 'recipe'
+  | 'region'
   | 'shrine'
   | 'skill'
   | 'statuseffect'

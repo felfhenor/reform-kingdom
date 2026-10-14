@@ -27,5 +27,6 @@ export function ensureWorker(
     rarity: worker.rarity ?? 'Common',
     statsPerLevel: ensureWorkerStats(worker.statsPerLevel),
     canUseTeleports: worker.canUseTeleports ?? true,
+    rescueText: worker.rescueText ?? '',
   };
 }

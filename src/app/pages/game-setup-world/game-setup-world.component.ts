@@ -17,7 +17,8 @@ import {
   discordSetMainStatus,
   discordSetStatus,
 } from '@helpers/engine/discord';
-import { gameReset } from '@helpers/game-init';
+import { gameReset, gameStart } from '@helpers/game-init';
+import { titleCrawlQueue } from '@helpers/lore/title-crawl.ui';
 import { getUnlockedJobs } from '@helpers/hero/job';
 import { createCharacter, setParty } from '@helpers/hero/party';
 import { rngChoiceIdentifiable } from '@helpers/rng';
@@ -159,7 +160,9 @@ export class GameSetupWorldComponent implements OnInit {
 
     gameReset();
     setParty(party);
+    await titleCrawlQueue();
+    await gameStart();
 
-    await this.router.navigate(['/setup', 'generate']);
+    await this.router.navigate(['/game']);
   }
 }

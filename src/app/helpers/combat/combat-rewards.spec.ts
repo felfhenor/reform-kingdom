@@ -161,6 +161,20 @@ describe('grantResolvedDrops', () => {
     expect(gatherVfxEmit).not.toHaveBeenCalled();
   });
 
+  it("logs and floats a rescued worker's thanks", () => {
+    const bram = ensureWorker({
+      id: 'bram' as WorkerId,
+      name: 'Bram',
+      rescueText: 'Thank you!',
+    });
+    seedContent([bram]);
+
+    grant([{ kind: 'Worker', workerId: bram.id }]);
+
+    expect(logMessages()).toContain('**Bram**: *"Thank you!"*');
+    expect(vi.mocked(gatherVfxEmit).mock.calls[0][0].quote).toBe('Thank you!');
+  });
+
   it('adds up repeated item drops into one grant and one log line', () => {
     grant([
       { kind: 'Item', itemId: ore.id, quantity: 2 },

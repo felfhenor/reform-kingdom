@@ -9,12 +9,15 @@ import { applyGlobalEffectAdd } from '@helpers/hero/global-effect-state';
 import { jobAbilityValue } from '@helpers/hero/job-ability';
 import { updateGamestate } from '@helpers/state-game';
 import { isPartyAtNode } from '@helpers/world';
-import { worldNodeShrineCurrentTier } from '@helpers/world-node/world-node-shrine';
+import {
+  worldNodeShrineCurrentTier,
+  worldNodeShrineLevel,
+} from '@helpers/world-node/world-node-shrine';
 import {
   worldNodeByName,
   worldNodeShrine,
 } from '@helpers/world-node/world-nodes';
-import type { GlobalEffectContent } from '@interfaces';
+import type { GlobalEffectContent, ShrineContent } from '@interfaces';
 
 // Every isShrineBuff effect is removed first (not just this shrine's), so re-praying refreshes rather than duplicates.
 export function shrinePray(nodeName: string): boolean {
@@ -53,4 +56,18 @@ export function shrinePray(nodeName: string): boolean {
     `World:Shrine:Pray:${analyticsSafeSegment(shrine.name)}`,
   );
   return true;
+}
+
+export function worldNodeShrineLegendVerses(
+  shrine: ShrineContent,
+  nodeName: string,
+): string[] {
+  return shrine.levels
+    .slice(0, worldNodeShrineLevel(nodeName))
+    .map((level) => level.legend)
+    .filter((verse) => verse.length > 0);
+}
+
+export function worldNodeShrineLegendVerseCount(shrine: ShrineContent): number {
+  return shrine.levels.filter((level) => level.legend.length > 0).length;
 }

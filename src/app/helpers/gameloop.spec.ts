@@ -140,7 +140,7 @@ describe('gameloop', () => {
     expect(numTicks()).toBe(7 + 3600);
   });
 
-  it('does nothing before setup, before the save is ready, off the game page, or while paused', async () => {
+  it('does nothing before setup, before the save is ready, off the game page, while paused, or during the title crawl', async () => {
     seedGamestate();
     await gameloop(1);
 
@@ -154,6 +154,13 @@ describe('gameloop', () => {
 
     window.history.pushState({}, '', '/game');
     useOptions({ gameloopPaused: true });
+    await gameloop(1);
+
+    useOptions();
+    seedGamestate((state) => {
+      state.meta.isSetup = true;
+      state.meta.titleCrawlPending = true;
+    });
     await gameloop(1);
 
     expect(numTicks()).toBe(0);

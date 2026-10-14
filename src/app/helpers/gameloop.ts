@@ -18,6 +18,7 @@ import { restingProcessTick } from '@helpers/hero/resting';
 import { travelProcessTick } from '@helpers/hero/travel';
 import { gatheringProcessTick } from '@helpers/item/gathering';
 import { astralProjectorProcessTick } from '@helpers/kingdom/astral-projector';
+import { isTitleCrawlPending } from '@helpers/lore/title-crawl';
 import { isSetup } from '@helpers/setup';
 import {
   gamestateTickEnd,
@@ -58,6 +59,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
   if (!isGameStateReady()) return;
   if (!gameloopShouldRun()) return;
   if (isGameloopPaused()) return;
+  if (isTitleCrawlPending()) return;
   if (isProcessingTicks) return;
 
   isProcessingTicks = true;

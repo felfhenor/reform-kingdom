@@ -34,10 +34,11 @@ function emitRewardVfx(
   combat: Combat,
   info: RewardContentInfo | undefined,
   quantity: number,
+  quote?: string,
 ): void {
   if (!info) return;
 
-  gatherVfxEmit({ nodeName: combat.locationName, quantity, ...info });
+  gatherVfxEmit({ nodeName: combat.locationName, quantity, quote, ...info });
 }
 
 function goldGainMultiplier(): number {
@@ -146,7 +147,13 @@ export function grantResolvedDrops(
           undefined,
           info,
         );
-        emitRewardVfx(combat, info, 1);
+        if (worker.rescueText) {
+          combatMessageLog(
+            combat,
+            `**${worker.name}**: *"${worker.rescueText}"*`,
+          );
+        }
+        emitRewardVfx(combat, info, 1, worker.rescueText || undefined);
         return;
       }
 

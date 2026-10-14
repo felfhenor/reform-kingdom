@@ -2,6 +2,7 @@
   name: Rescue Sefirah Hornacis
   description: Head to the Craggled Mire and rescue Sefirah Hornacis from the Miserable Mire.
   order: 400
+  whisper: No explorer is truly safe from the Mire. The fault lies entirely with Fel, that fiend.
   requirement:
     kind: RescueWorker
     workerId: Sefirah Hornacis
@@ -16,6 +17,7 @@
   name: Visit Larsia
   description: Cross the Larsian Traverse into the Larsian Desert and visit the town of Larsia.
   order: 410
+  whisper: Ah, Larsia. It looks so different now. It seems even I've forgotten what it used to be.
   requirement:
     kind: VisitTown
     townId: Larsia
@@ -85,6 +87,7 @@
   name: Upgrade the Shrine of Medina
   description: Make an offering at the Shrine of Medina to raise it to level 1, then pray there for its blessing.
   order: 460
+  whisper: Ah, Medina. An immeasurable talent for growth. I see her sunflowers persist even to this day. A shame that she's no longer around.
   requirement:
     kind: ShrineLevel
     nodeName: Shrine of Medina
@@ -127,6 +130,7 @@
   name: Clear the Cimmerian Temple
   description: Defeat every Akroki and magical creature in the Cimmerian Temple in the Larsian Desert.
   order: 490
+  whisper: A temple once filled with people who are now lost to time. It's strange to think they've just vanished.
   requirement:
     kind: ClearEncounter
     nodeName: Cimmerian Temple

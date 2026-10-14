@@ -138,4 +138,7 @@ export type TaskContent = IsContentItem &
     order: number;
     requirement: TaskRequirement;
     rewards: ItemQuantity[];
+
+    // The Founder's whisper, logged when the task completes; empty for none.
+    whisper: string;
   };

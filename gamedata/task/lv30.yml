@@ -28,6 +28,7 @@
   name: Rescue Selan Rose
   description: Enter Sandhenge and seek Selan Rose, a Larsian citizen captured by the Akroki.
   order: 600
+  whisper: She walked the sands and landed on an Akroki altar. Another one saved.
   requirement:
     kind: RescueWorker
     workerId: Selan Rose
@@ -42,6 +43,7 @@
   name: Clear the Demon Foray
   description: Take the Elfway into the Erden Woodland and defeat the demons of the Demon Foray.
   order: 530
+  whisper: Remember their color - the pale blue. The Pale is not natural. It does not belong in this world.
   requirement:
     kind: ClearEncounter
     nodeName: Demon Foray
@@ -54,6 +56,7 @@
   name: Visit Elfheim
   description: Visit the elven town of Elfheim in the Erden Woodland.
   order: 540
+  whisper: Elfheim hasn't changed in all this time. They've waited patiently for my help; I only wish I could've given it to them sooner.
   requirement:
     kind: VisitTown
     townId: Elfheim
@@ -65,6 +68,7 @@
   name: Upgrade the Shrine of Culcula
   description: Make an offering at the Shrine of Culcula to raise it to level 1, then pray there for its blessing.
   order: 550
+  whisper: I remember Culcula. They were the first cartographer the realm had. Their talent for getting lost made them exceptional at it.
   requirement:
     kind: ShrineLevel
     nodeName: Shrine of Culcula

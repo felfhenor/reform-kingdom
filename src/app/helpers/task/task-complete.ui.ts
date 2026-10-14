@@ -10,6 +10,9 @@ export function tasksAnnounceCompleted(tasks: TaskContent[]): void {
   tasks.forEach((task) => {
     notifySuccess(`Task complete: ${task.name}`);
     miscellaneousMessageLog(`Task complete: **${task.name}**`);
+    if (task.whisper) {
+      miscellaneousMessageLog(`*The Founder whispers: "${task.whisper}"*`);
+    }
     analyticsSendDesignEvent('Task:Complete');
     analyticsSendDesignEvent(
       `Task:Complete:${analyticsSafeSegment(task.name)}`,

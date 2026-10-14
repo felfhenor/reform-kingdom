@@ -27,9 +27,7 @@ export async function gameStart(): Promise<void> {
     return state;
   });
 
-  setTimeout(() => {
-    setupFinish();
-  }, 0);
+  await setupFinish();
 }
 
 export function gameReset(): void {

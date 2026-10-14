@@ -16,6 +16,7 @@ export function ensureShrineLevel(
     ...ensureWorldNodeDevelopmentLevel(level),
     globalEffectId: level.globalEffectId ?? ('UNKNOWN' as GlobalEffectId),
     globalEffectDuration: level.globalEffectDuration ?? 0,
+    legend: level.legend ?? '',
   };
 }
 
@@ -30,6 +31,7 @@ export function ensureShrine(
     hidden: shrine.hidden ?? false,
     invisibleUntilCollectibleIdsFound:
       shrine.invisibleUntilCollectibleIdsFound ?? [],
+    legendName: shrine.legendName ?? 'Legend of the Shrine',
     levels: ensureArray(shrine.levels, ensureShrineLevel),
   };
 }

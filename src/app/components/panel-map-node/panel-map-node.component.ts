@@ -7,6 +7,7 @@ import { PanelMapNodeActionsExchangeComponent } from '@components/panel-map-node
 import { PanelMapNodeActionsExploreComponent } from '@components/panel-map-node-actions-explore/panel-map-node-actions-explore.component';
 import { PanelMapNodeActionsOutpostComponent } from '@components/panel-map-node-actions-outpost/panel-map-node-actions-outpost.component';
 import { PanelMapNodeActionsShrineComponent } from '@components/panel-map-node-actions-shrine/panel-map-node-actions-shrine.component';
+import { PanelMapNodeLegendShrineComponent } from '@components/panel-map-node-legend-shrine/panel-map-node-legend-shrine.component';
 import { PanelMapNodeActionsTownComponent } from '@components/panel-map-node-actions-town/panel-map-node-actions-town.component';
 import { PanelMapNodeActionsTrainerComponent } from '@components/panel-map-node-actions-trainer/panel-map-node-actions-trainer.component';
 import { PanelMapNodeBadgesCaravanComponent } from '@components/panel-map-node-badges-caravan/panel-map-node-badges-caravan.component';
@@ -90,6 +91,7 @@ import { sortBy } from 'es-toolkit/compat';
     ButtonWorldNodeDevelopComponent,
     PanelMapNodeActionsOutpostComponent,
     PanelMapNodeActionsShrineComponent,
+    PanelMapNodeLegendShrineComponent,
     PanelMapNodeActionsTownComponent,
     PanelMapNodeActionsTrainerComponent,
     PanelMapNodeActionsExchangeComponent,

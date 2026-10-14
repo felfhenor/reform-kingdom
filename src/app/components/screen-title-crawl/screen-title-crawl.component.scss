@@ -1,0 +1,62 @@
+@reference 'tailwindcss';
+
+:host {
+  @apply fixed inset-0 block;
+  z-index: 40;
+}
+
+.crawl {
+  @apply absolute inset-0 overflow-hidden bg-black text-white;
+
+  &.crawl-fading {
+    @apply pointer-events-none;
+    animation: crawl-fade 2500ms ease-in forwards;
+  }
+
+  // Pausing the game freezes both the scroll and the fade into the map.
+  &.crawl-paused,
+  &.crawl-paused .crawl-text {
+    animation-play-state: paused;
+  }
+}
+
+.crawl-viewport {
+  @apply absolute inset-0 flex justify-center;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 20%,
+    black 80%,
+    transparent 100%
+  );
+}
+
+.crawl-text {
+  @apply absolute top-full flex w-[36rem] max-w-[calc(100%-2rem)] flex-col gap-8 text-center text-xl leading-relaxed;
+  animation-name: crawl-scroll;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+.crawl-skip {
+  @apply absolute bottom-4 right-4 overflow-hidden text-white;
+}
+
+.crawl-skip-progress {
+  @apply absolute bottom-0 left-0 h-0.5 bg-white;
+}
+
+@keyframes crawl-scroll {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(calc(-100% - 100vh));
+  }
+}
+
+@keyframes crawl-fade {
+  to {
+    opacity: 0;
+  }
+}

@@ -2,6 +2,7 @@
   name: Gather 5 Wergen Sticks
   description: Travel to Wergen Woods and gather until you have collected 5 Wergen Sticks.
   order: 10
+  whisper: Everyone starts somewhere. Every kingdom begins with a few sticks. Mine certainly did.
   requirement:
     kind: GatherItem
     nodeName: Wergen Woods
@@ -51,6 +52,7 @@
   name: Acquire the Goblin Ruby
   description: Defeat the Goblins of the Field Ruins, near the Duchy of Carrina, to recover the Goblin Ruby.
   order: 50
+  whisper: The unending praise of wealth leads to their downfall. How predictable.
   requirement:
     kind: OwnCollectible
     collectibleId: Goblin Ruby
@@ -76,6 +78,7 @@
   name: Upgrade the Shrine of the Founder
   description: Make an offering at the Shrine of the Founder to raise it to level 1, then pray there for its blessing.
   order: 70
+  whisper: How quaint - a shrine dedicated to me. I'm right here, you know.
   requirement:
     kind: ShrineLevel
     nodeName: Shrine of the Founder
@@ -199,6 +202,7 @@
   name: Rescue Weaver Welch
   description: Weaver Welch is held captive in the Spider Tower. Rescue her to obtain your first worker.
   order: 165
+  whisper: One of the Lost has been brought back, eh? She'll help you greatly.
   requirement:
     kind: RescueWorker
     workerId: Weaver Welch
@@ -282,6 +286,7 @@
   name: Reach Level 10
   description: Keep adventuring until a hero reaches level 10.
   order: 220
+  whisper: Your strength is growing. It has not gone unnoticed.
   requirement:
     kind: ReachLevel
     level: 10

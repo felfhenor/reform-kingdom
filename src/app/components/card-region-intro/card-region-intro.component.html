@@ -1,0 +1,14 @@
+@if (region(); as currentRegion) {
+  <div
+    class="region-intro card bg-base-100 shadow-xl"
+    [class.region-intro-leaving]="isLeaving()"
+  >
+    <div class="card-body items-center gap-2 p-4 text-center">
+      <h2 class="type-page-title">{{ currentRegion.name }}</h2>
+      <p class="type-flavor">
+        {{ revealedText() }}
+        <span class="invisible">{{ hiddenText() }}</span>
+      </p>
+    </div>
+  </div>
+}

@@ -1,6 +1,7 @@
 - id: a1cfe88b-4380-45fa-b51f-90b2ba456e6b
   name: Sefirah Hornacis
   description: A great explorer, but like most, got lost in the Miserable Mire. She knows her way around the Craggled Mire region.
+  rescueText: I never thought the Mire would get me, too. I'm glad I wasn't a cautionary tale.
   sprite: '0008'
   frames: 4
 

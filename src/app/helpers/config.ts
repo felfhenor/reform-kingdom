@@ -235,6 +235,10 @@ export const NODE_PASS_THROUGH_MOVE_COST = 100_000;
 export const GATHER_VFX_LIFETIME_MS = 1100;
 export const GATHER_VFX_FLOAT_DISTANCE = 40;
 export const GATHER_VFX_JITTER_RANGE = 30;
+// Quotes (e.g. a rescued worker's thanks) stay fully opaque for most of their life so they can be read.
+export const GATHER_VFX_QUOTE_LIFETIME_MS = 6000;
+export const GATHER_VFX_QUOTE_HOLD_FRACTION = 0.75;
+export const GATHER_VFX_QUOTE_WRAP_WIDTH = 220;
 export const INDICATOR_PROGRESS_BAR_HEIGHT = 6;
 export const INDICATOR_PROGRESS_BAR_OFFSET_Y = -50;
 export const NODE_STATUS_ICON_RADIUS = 7;

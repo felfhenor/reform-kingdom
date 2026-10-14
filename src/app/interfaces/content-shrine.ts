@@ -11,6 +11,8 @@ export type ShrineId = Branded<string, 'ShrineId'>;
 export type ShrineLevel = WorldNodeDevelopmentLevel & {
   globalEffectId: GlobalEffectId;
   globalEffectDuration: number;
+  // Revealed in the shrine's legend once this level is reached.
+  legend: string;
 };
 
 export type ShrineContent = IsContentItem &
@@ -19,6 +21,7 @@ export type ShrineContent = IsContentItem &
     id: ShrineId;
     __type: 'shrine';
 
+    legendName: string;
     // Level 0 = no investment (not prayable); level N (1..levels.length) grants
     // levels[N-1]'s buff, unlocked by paying levels[N-1].costs.
     levels: ShrineLevel[];

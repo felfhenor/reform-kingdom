@@ -1,0 +1,36 @@
+<div
+  class="crawl"
+  [class.crawl-paused]="isPaused()"
+  [class.crawl-fading]="isFadingOut()"
+  (animationend)="onFadeEnd($event)"
+>
+  <div class="crawl-viewport">
+    <div
+      class="crawl-text"
+      [style.animation-duration.s]="crawlSeconds"
+      (animationend)="onScrollEnd()"
+    >
+      @for (paragraph of paragraphs; track $index) {
+        <p>{{ paragraph }}</p>
+      }
+    </div>
+  </div>
+
+  @if (!isFadingOut()) {
+    <button
+      type="button"
+      class="crawl-skip btn btn-sm btn-ghost"
+      (pointerdown)="startSkipHold()"
+      (pointerup)="cancelSkipHold()"
+      (pointerleave)="cancelSkipHold()"
+      appSfx="ui-click"
+      [sfxTrigger]="['click', 'hover']"
+    >
+      Hold SPACE to skip
+      <span
+        class="crawl-skip-progress"
+        [style.width.%]="skipProgress() * 100"
+      ></span>
+    </button>
+  }
+</div>

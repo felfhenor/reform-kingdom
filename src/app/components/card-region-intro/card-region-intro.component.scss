@@ -1,0 +1,21 @@
+@reference 'tailwindcss';
+
+:host {
+  @apply block pointer-events-none;
+}
+
+.region-intro {
+  animation: region-intro-enter 400ms ease-out;
+  transition: opacity 400ms ease;
+
+  &.region-intro-leaving {
+    @apply opacity-0;
+  }
+}
+
+@keyframes region-intro-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}

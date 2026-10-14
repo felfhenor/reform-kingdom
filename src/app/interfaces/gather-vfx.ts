@@ -4,4 +4,6 @@ import type { RewardContentInfo } from '@interfaces/world-nodes';
 export type GatherVfxEvent = RewardContentInfo & {
   nodeName: string;
   quantity: number;
+  // Spoken line floated under the reward, e.g. a rescued worker's thanks.
+  quote?: string;
 };

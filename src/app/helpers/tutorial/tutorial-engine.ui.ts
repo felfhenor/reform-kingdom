@@ -6,9 +6,15 @@ import {
   kingdomSubview,
   kingdomSubviewShow,
   setGamePlayView,
+  worldMapReady,
 } from '@helpers/engine/ui';
 import { gameloopShouldRun } from '@helpers/gameloop';
-import { isGameStateReady } from '@helpers/state-game';
+import { regionIntroPending } from '@helpers/lore/region-intro';
+import { isTitleCrawlPending } from '@helpers/lore/title-crawl';
+import {
+  isGameStateReady,
+  worldCurrentLocationState,
+} from '@helpers/state-game';
 import { TUTORIAL_CATALOG } from '@helpers/tutorial/tutorial-catalog';
 import {
   isTutorialSeen,
@@ -150,6 +156,16 @@ export function tutorialTargetRect(key: string): DOMRect | undefined {
   )?.getBoundingClientRect();
 }
 
+// The world view holds tutorials until its map has loaded and any region intro has played.
+function isWorldViewSettling(): boolean {
+  if (gamePlayView() !== 'world') return false;
+
+  return (
+    !worldMapReady() ||
+    !!regionIntroPending(worldCurrentLocationState().mapName)
+  );
+}
+
 // Tracks the last-checked view/subview, to tell "just navigated here" apart from "was already sitting here" below.
 let hasCheckedViewBefore = false;
 let lastCheckedView: GamePlayView | undefined;
@@ -162,7 +178,9 @@ export function tutorialCheckAutoTrigger(): void {
     !isGameStateReady() ||
     !gameloopShouldRun() ||
     activeTutorial() ||
-    modalHasAnyOpen()
+    modalHasAnyOpen() ||
+    isTitleCrawlPending() ||
+    isWorldViewSettling()
   )
     return;
 

@@ -118,6 +118,9 @@ export function heroBurstSkillsModalOpen(characterId: CharacterId): void {
 
 export const isWorldCameraPanned = signal<boolean>(false);
 
+// False while the world view is loading or switching maps.
+export const worldMapReady = signal<boolean>(false);
+
 // Incremented to signal a recenter request; the navbar's button has no direct reference to the map component, so this bridges them.
 export const worldCameraRecenterRequest = signal<number>(0);
 

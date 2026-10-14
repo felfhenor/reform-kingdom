@@ -20,4 +20,7 @@ export type WorkerContent = IsContentItem &
     statsPerLevel: WorkerStatBlock;
 
     canUseTeleports: boolean;
+
+    // Spoken when rescued; empty for town workers, who are never rescued.
+    rescueText: string;
   };

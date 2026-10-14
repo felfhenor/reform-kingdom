@@ -132,6 +132,9 @@ export type GameStateTasks = {
 // One-time ledger of tutorials already shown to the player.
 export type GameStateTutorials = Ledger;
 
+// Keyed by Tiled map name; one-time ledger of region intros already shown.
+export type GameStateRegionIntros = Ledger;
+
 // `kills` keeps counting past the first kill (unlike other discovery slices) for the bestiary's running count. `minLevelFound`/`maxLevelFound` are actual fought levels, not encounter data's theoretical range.
 export type GameStateBestiary = {
   [key: MonsterId]: {
@@ -153,6 +156,8 @@ export type GameStateMeta = {
   isSetup: boolean;
   isPaused: boolean;
   createdAt: number;
+  // Set only by the new-game screen, so saves from before the crawl existed never play it.
+  titleCrawlPending: boolean;
 };
 
 export type GameState = {
@@ -185,5 +190,6 @@ export type GameState = {
   discoveredAstralProjectorSpells: GameStateDiscoveredAstralProjectorSpells;
   activeAstralProjectorSpells: GameStateActiveAstralProjectorSpell[];
   tutorials: GameStateTutorials;
+  regionIntros: GameStateRegionIntros;
   tasks: GameStateTasks;
 };

@@ -53,6 +53,10 @@
           {{ description() ?? 'No information available yet.' }}
         </p>
 
+        @if (isShrineNode()) {
+          <app-panel-map-node-legend-shrine [entry]="entry" />
+        }
+
         @if (townId(); as id) {
           <app-bar-town-reputation [townId]="id" />
         }

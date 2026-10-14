@@ -1,6 +1,7 @@
 - id: 71835f9c-3ecc-4da8-a519-d15c24cfccec
   name: Shrine of Medina
   description: A shrine dedicated to a legendary farmer who was said to turn sand into soil.
+  legendName: Legend of the Grovetender
 
   levels:
     - developTime: 300
@@ -14,8 +15,9 @@
         - itemId: Petrifiwood
           required: 100
 
-      globalEffectId: Bountiful Gathering I
+      globalEffectId: Grovetender's Bounty I
       globalEffectDuration: 1800
+      legend: What the Founder saw as impossible, Medina saw as a challenge. The desert became a place of life, rather than desolation.
 
     - developTime: 600
       costs:
@@ -25,8 +27,9 @@
         - itemId: Firmwater
           required: 300
 
-      globalEffectId: Bountiful Gathering II
+      globalEffectId: Grovetender's Bounty II
       globalEffectDuration: 3600
+      legend: Where she walked, the sand became soil. The soil became flowers. And thus, the flowers became fruit, food, and beauty.
 
     - developTime: 900
       costs:
@@ -42,8 +45,9 @@
         - itemId: Amber
           required: 50
 
-      globalEffectId: Bountiful Gathering III
+      globalEffectId: Grovetender's Bounty III
       globalEffectDuration: 7200
+      legend: Larsia was the center of the kingdom's agriculture, once. Her work was not in vain. She saved many from starvation.
 
     - developTime: 1200
       costs:
@@ -56,8 +60,9 @@
         - itemId: Strongreed
           required: 200
 
-      globalEffectId: Bountiful Gathering IV
+      globalEffectId: Grovetender's Bounty IV
       globalEffectDuration: 14400
+      legend: After the Sundering, her farms forgot. Forgot to grow, forgot to prosper, forgot themselves. Trees turned to stone, life turned to sand.
 
     - developTime: 1500
       costs:
@@ -67,5 +72,6 @@
         - itemId: Star Fragment
           required: 3
 
-      globalEffectId: Bountiful Gathering V
+      globalEffectId: Grovetender's Bounty V
       globalEffectDuration: 31536000
+      legend: The sunflowers won't forget Medina; they grow strongest near her shrine. The sand waits to become soil once again.

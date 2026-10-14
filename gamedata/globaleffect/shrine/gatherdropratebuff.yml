@@ -1,5 +1,5 @@
 - id: 089b8072-0195-449f-84e2-6b128b9d57ac
-  name: Bountiful Gathering I
+  name: Grovetender's Bounty I
   sprite: '0014'
   description: +10% chance of an extra item drop from gathering.
   isShrineBuff: true
@@ -8,7 +8,7 @@
       value: 10
 
 - id: 72e55b35-6cab-4862-ba0d-c832fd5deb7f
-  name: Bountiful Gathering II
+  name: Grovetender's Bounty II
   sprite: '0014'
   description: +20% chance of an extra item drop from gathering.
   isShrineBuff: true
@@ -17,7 +17,7 @@
       value: 20
 
 - id: a5df1339-0c22-4fa7-83e6-60ed0455a9a9
-  name: Bountiful Gathering III
+  name: Grovetender's Bounty III
   sprite: '0014'
   description: +30% chance of an extra item drop from gathering.
   isShrineBuff: true
@@ -26,7 +26,7 @@
       value: 30
 
 - id: 294fc0b5-3bea-41cc-981c-133cee8cbcd5
-  name: Bountiful Gathering IV
+  name: Grovetender's Bounty IV
   sprite: '0014'
   description: +40% chance of an extra item drop from gathering.
   isShrineBuff: true
@@ -35,7 +35,7 @@
       value: 40
 
 - id: 71c8f5d9-24d0-4441-9f96-fe2857e1e97f
-  name: Bountiful Gathering V
+  name: Grovetender's Bounty V
   sprite: '0014'
   description: +50% chance of an extra item drop from gathering.
   isShrineBuff: true

@@ -13,6 +13,7 @@
   name: Gather 25 Felrock
   description: Travel to the Felrock Quarry and acquire 25 Felrock.
   order: 700
+  whisper: I see, they call it Felrock. It wasn't always this color. It wasn't always called this.
   requirement:
     kind: GatherItem
     nodeName: Felrock Quarry
@@ -26,6 +27,7 @@
   name: Clear Sharitsa
   description: Defeat every demon and demonic creature in the town of Sharitsa.
   order: 710
+  whisper: Fel is watching. He knows you're close, and he's trying desperately to forget you, too. He won't succeed, but he'll try.
   requirement:
     kind: ClearEncounter
     nodeName: Sharitsa

@@ -23,6 +23,7 @@ import { ensureMonster } from '@helpers/content/ensure-monster';
 import { ensureNodeOverride } from '@helpers/content/ensure-nodeoverride';
 import { ensureOutpost } from '@helpers/content/ensure-outpost';
 import { ensureRecipe } from '@helpers/content/ensure-recipe';
+import { ensureRegion } from '@helpers/content/ensure-region';
 import { ensureShrine } from '@helpers/content/ensure-shrine';
 import { ensureSkill } from '@helpers/content/ensure-skill';
 import { ensureStatusEffect } from '@helpers/content/ensure-statuseffect';
@@ -61,6 +62,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   nodeoverride: ensureNodeOverride,
   outpost: ensureOutpost,
   recipe: ensureRecipe,
+  region: ensureRegion,
   shrine: ensureShrine,
   skill: ensureSkill,
   statuseffect: ensureStatusEffect,

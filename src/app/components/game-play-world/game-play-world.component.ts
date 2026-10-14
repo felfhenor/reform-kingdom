@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import { AdventureLogOverlayComponent } from '@components/adventure-log-overlay/adventure-log-overlay.component';
 import { BarGlobalEffectComponent } from '@components/bar-global-effect/bar-global-effect.component';
+import { CardRegionIntroComponent } from '@components/card-region-intro/card-region-intro.component';
 import { PanelMapNodeComponent } from '@components/panel-map-node/panel-map-node.component';
 import { StatusCraftingComponent } from '@components/status-crafting/status-crafting.component';
 import { StatusEncounterComponent } from '@components/status-encounter/status-encounter.component';
@@ -33,6 +34,7 @@ import {
   mapNodeSelect,
   selectedMapNode,
   worldCameraRecenterRequest,
+  worldMapReady,
 } from '@helpers/engine/ui';
 import { isGlobalEffectActive } from '@helpers/hero/global-effects';
 import {
@@ -140,6 +142,7 @@ const NODE_STATUS_UPDATE_INTERVAL_MS = 150;
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AdventureLogOverlayComponent,
+    CardRegionIntroComponent,
     PanelMapNodeComponent,
     BarGlobalEffectComponent,
     StatusEncounterComponent,
@@ -173,6 +176,9 @@ const NODE_STATUS_UPDATE_INTERVAL_MS = 150;
       <app-status-tutorial-unlock></app-status-tutorial-unlock>
     </div>
     <app-status-task-list class="task-list-layer"></app-status-task-list>
+    @if (introMapName(); as mapName) {
+      <app-card-region-intro class="region-intro-layer" [mapName]="mapName" />
+    }
   `,
   styleUrl: './game-play-world.component.scss',
 })
@@ -193,6 +199,8 @@ export class GamePlayWorldComponent implements OnDestroy {
 
   public fadeVisible = signal<boolean>(false);
   public isMapLoading = signal<boolean>(true);
+  public introMapName = signal<string | undefined>(undefined);
+  private isDestroyed = false;
 
   public isPanned = computed(() => {
     const offset = this.cameraOffset();
@@ -370,12 +378,16 @@ export class GamePlayWorldComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.isDestroyed = true;
+    worldMapReady.set(false);
     this.teardownPixi();
     this.gatherVfxSubscription?.unsubscribe();
   }
 
   private async transitionToMap(map: TiledMap, mapName: string): Promise<void> {
     const isFirstLoad = this.loadedMapName === undefined;
+    worldMapReady.set(false);
+    this.introMapName.set(undefined);
 
     if (!isFirstLoad) {
       await this.fadeOut();
@@ -393,6 +405,10 @@ export class GamePlayWorldComponent implements OnDestroy {
     } else {
       await this.fadeIn();
     }
+    if (this.isDestroyed) return;
+
+    worldMapReady.set(true);
+    this.introMapName.set(mapName);
   }
 
   private fadeOut(): Promise<void> {

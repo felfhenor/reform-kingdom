@@ -1,6 +1,7 @@
 - id: b5a20feb-f212-439d-a333-ceef70b84705
   name: Shrine of Parcilyte
   description: A shrine dedicated to a war hero whose origins are lost to time. It's said that orcs come here to pray for battle spoils.
+  legendName: Legend of the Champion
 
   levels:
     - developTime: 300
@@ -14,8 +15,9 @@
         - itemId: Mireweed
           required: 100
 
-      globalEffectId: Victor's Harvest I
+      globalEffectId: Champion's Harvest I
       globalEffectDuration: 1800
+      legend: Parcilyte led the Founder's army to expand the kingdom's territories. Every battle won was another land to remember.
 
     - developTime: 600
       costs:
@@ -28,8 +30,9 @@
         - itemId: Oozehide
           required: 50
 
-      globalEffectId: Victor's Harvest II
+      globalEffectId: Champion's Harvest II
       globalEffectDuration: 3600
+      legend: She never lost a battle that mattered. Her name was sung in every hall, her victories celebrated everywhere. A win for her was a win for the kingdom.
 
     - developTime: 900
       costs:
@@ -39,8 +42,9 @@
         - itemId: Mirethread
           required: 150
 
-      globalEffectId: Victor's Harvest III
+      globalEffectId: Champion's Harvest III
       globalEffectDuration: 7200
+      legend: The spoils of war were vast, and Parcilyte made sure her troops were well-provisioned. She was a champion, a fair general, and a role model to all who followed her.
 
     - developTime: 1200
       costs:
@@ -53,8 +57,9 @@
         - itemId: Oozehide
           required: 75
 
-      globalEffectId: Victor's Harvest IV
+      globalEffectId: Champion's Harvest IV
       globalEffectDuration: 14400
+      legend: When the Sundering came, Parcilyte marched on the Mire to defend the kingdom. The Mire forgot itself, and in that moment, Parcilyte was lost to time.
 
     - developTime: 1500
       costs:
@@ -70,5 +75,6 @@
         - itemId: Spirit Gear
           required: 3
 
-      globalEffectId: Victor's Harvest V
+      globalEffectId: Champion's Harvest V
       globalEffectDuration: 31536000
+      legend: Orcs pray to her shrine not for victory, but for the spoils of war. Her name and her victories both live on in their spirits.

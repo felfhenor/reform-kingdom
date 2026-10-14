@@ -2,11 +2,11 @@ import {
   GATHER_VFX_FLOAT_DISTANCE,
   GATHER_VFX_JITTER_RANGE,
   GATHER_VFX_LIFETIME_MS,
+  GATHER_VFX_QUOTE_HOLD_FRACTION,
+  GATHER_VFX_QUOTE_LIFETIME_MS,
+  GATHER_VFX_QUOTE_WRAP_WIDTH,
 } from '@helpers/config';
-import {
-  uiTextFontFamily,
-  uiTextLetterSpacing,
-} from '@helpers/engine/font.ui';
+import { uiTextFontFamily, uiTextLetterSpacing } from '@helpers/engine/font.ui';
 import type { GatherVfxEvent } from '@interfaces';
 import type { Texture } from 'pixi.js';
 import { Container, Sprite, Text } from 'pixi.js';
@@ -14,14 +14,35 @@ import { Container, Sprite, Text } from 'pixi.js';
 // Elapsed-time -> visual state. Returns undefined once the effect's lifetime has passed (caller destroys it).
 export function gatherVfxFloatState(
   elapsedMs: number,
+  lifetimeMs = GATHER_VFX_LIFETIME_MS,
+  holdFraction = 0,
 ): { alpha: number; offsetY: number } | undefined {
-  if (elapsedMs >= GATHER_VFX_LIFETIME_MS) return undefined;
+  if (elapsedMs >= lifetimeMs) return undefined;
 
-  const fraction = elapsedMs / GATHER_VFX_LIFETIME_MS;
+  const fraction = elapsedMs / lifetimeMs;
+  const fadeFraction =
+    Math.max(0, fraction - holdFraction) / (1 - holdFraction);
   return {
-    alpha: 1 - fraction,
+    alpha: 1 - fadeFraction,
     offsetY: -GATHER_VFX_FLOAT_DISTANCE * fraction,
   };
+}
+
+function pixiFloatingQuoteCreate(quote: string, width: number): Text {
+  return new Text({
+    text: `"${quote}"`,
+    style: {
+      fontSize: 11,
+      fontFamily: uiTextFontFamily(),
+      fontStyle: 'italic',
+      fill: 0xffffff,
+      stroke: { color: 0x000000, width: 3 },
+      align: 'center',
+      wordWrap: true,
+      wordWrapWidth: width,
+      letterSpacing: uiTextLetterSpacing(),
+    },
+  });
 }
 
 function pixiFloatingTextLabelCreate(
@@ -85,9 +106,24 @@ export function pixiFloatingTextCreate(
   container.addChild(nameText);
   cursorX += nameText.width;
 
+  if (event.quote) {
+    const quoteText = pixiFloatingQuoteCreate(
+      event.quote,
+      GATHER_VFX_QUOTE_WRAP_WIDTH,
+    );
+    quoteText.anchor.set(0.5, 0);
+    quoteText.position.set(cursorX / 2, qtyText.height + gap);
+    container.addChild(quoteText);
+  }
+
   // Pivot on the row's own horizontal center so `container.x` below lands the row centered on the tile,
   // not its left edge.
   container.pivot.set(cursorX / 2, qtyText.height / 2);
+
+  const lifetimeMs = event.quote
+    ? GATHER_VFX_QUOTE_LIFETIME_MS
+    : GATHER_VFX_LIFETIME_MS;
+  const holdFraction = event.quote ? GATHER_VFX_QUOTE_HOLD_FRACTION : 0;
 
   // Picked once and held for the popup's whole lifetime, so simultaneous popups at one node don't perfectly overlap.
   const jitterX = (Math.random() - 0.5) * GATHER_VFX_JITTER_RANGE;
@@ -96,7 +132,7 @@ export function pixiFloatingTextCreate(
     elapsedMs: number,
     nodePosition: { x: number; y: number },
   ): boolean => {
-    const state = gatherVfxFloatState(elapsedMs);
+    const state = gatherVfxFloatState(elapsedMs, lifetimeMs, holdFraction);
     if (!state) return false;
 
     container.alpha = state.alpha;

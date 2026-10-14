@@ -20,4 +20,10 @@ describe('gatherVfxFloatState', () => {
     expect(gatherVfxFloatState(1100)).toBeUndefined();
     expect(gatherVfxFloatState(5000)).toBeUndefined();
   });
+
+  it('holds full opacity through the hold fraction, then fades', () => {
+    expect(gatherVfxFloatState(500, 1000, 0.5)?.alpha).toBe(1);
+    expect(gatherVfxFloatState(750, 1000, 0.5)?.alpha).toBeCloseTo(0.5, 5);
+    expect(gatherVfxFloatState(1000, 1000, 0.5)).toBeUndefined();
+  });
 });
