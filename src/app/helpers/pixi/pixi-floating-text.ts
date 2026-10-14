@@ -80,7 +80,7 @@ export function pixiFloatingTextCreate(
   container.cullable = true;
 
   const qtyText = pixiFloatingTextLabelCreate(
-    `+${event.quantity}`,
+    `+${event.quantity.toLocaleString()}`,
     0x4ade80,
     13,
   );
