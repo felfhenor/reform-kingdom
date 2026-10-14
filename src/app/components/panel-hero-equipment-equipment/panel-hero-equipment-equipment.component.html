@@ -3,7 +3,7 @@
 @let items = pickerItems();
 @let modifiable = equipmentModifiable();
 
-<div class="flex flex-col gap-2 ps-2 overflow-y-auto">
+<div class="flex flex-col gap-4 ps-2 overflow-y-auto">
   <span class="type-section-title">Gear</span>
 
   <div class="flex flex-col gap-2">
@@ -27,7 +27,7 @@
   </div>
 </div>
 
-<div class="flex flex-col gap-2 h-full min-h-0">
+<div class="flex flex-col gap-4 h-full min-h-0">
   @if (selected) {
     <div class="flex justify-between items-center shrink-0">
       <span class="type-section-title">{{ selected }}</span>
