@@ -1,4 +1,3 @@
-import type { Icon } from '@interfaces/artable';
 import type { Tradeskill } from '@interfaces/tradeskill';
 
 export type DaisyColor =
@@ -45,15 +44,28 @@ export type KingdomFeatureSubview = Exclude<
 export type KingdomNavGroup =
   'reserves' | 'collections' | 'workforce' | 'crafting' | 'actions';
 
+export type KingdomIcon =
+  | KingdomFeatureSubview
+  | 'kingdom'
+  | 'reclass'
+  | 'requesteddefenses'
+  | 'sethome'
+  | 'tasks';
+
 export type KingdomFeatureNav = {
   label: string;
-  icon: Icon;
+  icon: KingdomIcon;
   group: KingdomNavGroup;
   isAvailable?: () => boolean;
 };
 
 export type KingdomNavEntry =
-  | { kind: 'feature'; subview: KingdomSubview; label: string; icon: Icon }
+  | {
+      kind: 'feature';
+      subview: KingdomSubview;
+      label: string;
+      icon: KingdomIcon;
+    }
   | {
       kind: 'tradeskill';
       subview: KingdomSubview;

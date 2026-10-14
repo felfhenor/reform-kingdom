@@ -5,8 +5,8 @@ import { BarProgressComponent } from '@components/bar-progress/bar-progress.comp
 import { TextNumberTweenComponent } from '@components/text-number-tween/text-number-tween.component';
 import { ButtonGlowComponent } from '@components/button-glow/button-glow.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
-import { IconComponent } from '@components/icon/icon.component';
 import { SlotButtonContainerComponent } from '@components/slot-button-container/slot-button-container.component';
+import { IconKingdomComponent } from '@components/icon-kingdom/icon-kingdom.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { commissionCanFulfill } from '@helpers/commission/commission-fulfill';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
@@ -67,7 +67,7 @@ import { clamp, sortBy } from 'es-toolkit/compat';
     ButtonGlowComponent,
     CardPageComponent,
     DecimalPipe,
-    IconComponent,
+    IconKingdomComponent,
     PluralizePipe,
     SFXDirective,
     BarProgressComponent,

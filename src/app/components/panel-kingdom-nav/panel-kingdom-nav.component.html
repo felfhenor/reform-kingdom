@@ -12,7 +12,7 @@
     appSfx="ui-click"
     [sfxTrigger]="['click', 'hover']"
   >
-    <app-icon name="gameCastle" size="nav" />
+    <app-icon-kingdom name="kingdom" class="zoom-row" />
   </button>
 
   @let active = kingdomSubview();
@@ -44,7 +44,7 @@
             />
           </div>
         } @else {
-          <app-icon [name]="item.entry.icon" size="nav" />
+          <app-icon-kingdom [name]="item.entry.icon" class="zoom-row" />
         }
       </button>
     }

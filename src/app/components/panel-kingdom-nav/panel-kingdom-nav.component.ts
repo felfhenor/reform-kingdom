@@ -9,7 +9,7 @@ import {
   LOCALE_ID,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
-import { IconComponent } from '@components/icon/icon.component';
+import { IconKingdomComponent } from '@components/icon-kingdom/icon-kingdom.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { craftQueueTicksRemaining } from '@helpers/crafting/crafting';
 import { craftQueueUnitsRemaining } from '@helpers/crafting/crafting.ui';
@@ -29,7 +29,12 @@ import { AnimationService } from '@services/animation.service';
 @Component({
   selector: 'app-panel-kingdom-nav',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AtlasImageComponent, IconComponent, SFXDirective, TippyDirective],
+  imports: [
+    AtlasImageComponent,
+    IconKingdomComponent,
+    SFXDirective,
+    TippyDirective,
+  ],
   templateUrl: './panel-kingdom-nav.component.html',
 })
 export class PanelKingdomNavComponent {

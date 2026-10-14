@@ -20,31 +20,47 @@ export const KINGDOM_FEATURE_NAV: Record<
   KingdomFeatureSubview,
   KingdomFeatureNav
 > = {
-  storage: { label: 'Storage', icon: 'gameChest', group: 'reserves' },
-  armory: { label: 'Armory', icon: 'gameCrossedSwords', group: 'reserves' },
+  storage: {
+    label: 'Storage',
+    icon: 'storage',
+    group: 'reserves',
+  },
+  armory: {
+    label: 'Armory',
+    icon: 'armory',
+    group: 'reserves',
+  },
   astralprojector: {
     label: 'Astral Projector',
-    icon: 'gameCrystalBall',
+    icon: 'astralprojector',
     group: 'reserves',
     isAvailable: () => unlockedAstralProjectorEntries().length > 0,
   },
-  museum: { label: 'Museum', icon: 'gameTrophyCup', group: 'collections' },
-  bestiary: { label: 'Bestiary', icon: 'gameOpenBook', group: 'collections' },
+  museum: {
+    label: 'Museum',
+    icon: 'museum',
+    group: 'collections',
+  },
+  bestiary: {
+    label: 'Bestiary',
+    icon: 'bestiary',
+    group: 'collections',
+  },
   workers: {
     label: "Quartermaster's Annex",
-    icon: 'gameMeepleGroup',
+    icon: 'workers',
     group: 'workforce',
     isAvailable: () => Object.keys(discoveredWorkersState()).length > 0,
   },
   workshop: {
     label: 'Workshop',
-    icon: 'gameAnvil',
+    icon: 'workshop',
     group: 'actions',
     isAvailable: () => isInfusionUnlocked() || isReforgeUnlocked(),
   },
   commissions: {
     label: 'Commissions',
-    icon: 'gameContract',
+    icon: 'commissions',
     group: 'actions',
     isAvailable: hasAnyCommission,
   },
