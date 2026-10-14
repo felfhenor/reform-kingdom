@@ -29,6 +29,7 @@ import {
 } from '@helpers/engine/ui';
 import {
   characterJobRegalias,
+  regaliaAppliedCharacter,
   regaliaMatchesCharacter,
   regaliaMissingItems,
 } from '@helpers/hero/regalia';
@@ -156,6 +157,14 @@ export class PlayHeroesRegaliaComponent {
         ].map((item) => [item.id, item]),
       ),
   );
+
+  public selectedRegaliaCharacter = computed(() => {
+    const character = this.selectedCharacter();
+    const regalia = this.selectedRegalia();
+    return character && regalia
+      ? regaliaAppliedCharacter(regalia, character, this.availableItems())
+      : undefined;
+  });
 
   public selectedBurstSkill = computed(() => {
     const skillId = this.selectedRegalia()?.burstSkillIds[0];

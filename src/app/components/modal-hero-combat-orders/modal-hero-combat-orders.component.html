@@ -9,7 +9,8 @@
   <span title>Combat Orders</span>
 
   <div body class="flex flex-col gap-4">
-    @if (!character() || !job()) {
+    @let hero = character();
+    @if (!hero || !job()) {
       <app-blank-slate>No hero selected.</app-blank-slate>
     } @else {
       <div class="card shadow-sm">
@@ -369,11 +370,7 @@
 
                 <app-row-combat-order-clause
                   [clause]="clause"
-                  [isFamilyKnown]="isFamilyKnown(clause)"
-                  [isFamilyUsable]="isFamilyUsable(clause)"
-                  [isFamilyEquipmentOnly]="isFamilyEquipmentOnly(clause)"
-                  [isTargetModeUsable]="isTargetModeUsable(clause)"
-                  [heroSkills]="heroSkills()"
+                  [character]="hero"
                   (toggleEnabled)="toggleClauseEnabled(clause)"
                   (remove)="removeClause(clause.id)"
                   (edit)="startEditClause(clause)"
@@ -385,6 +382,7 @@
               <span class="w-[1.2em] shrink-0"></span>
               <app-row-combat-order-clause
                 [clause]="alwaysRandomClause"
+                [character]="hero"
                 [readOnly]="true"
               />
             </li>

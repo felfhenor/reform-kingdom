@@ -13,7 +13,16 @@ import { AtlasImageComponent } from '@components/atlas-image/atlas-image.compone
 import { IconComponent } from '@components/icon/icon.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { combatOrderClauseSummary } from '@helpers/combat/combat-order.ui';
-import type { CombatOrderClause, EquipmentSkillContent } from '@interfaces';
+import {
+  isCombatOrderFamilyEquipmentOnly,
+  isCombatOrderFamilyKnown,
+  isCombatOrderFamilyUsable,
+  isCombatOrderTargetModeUsable,
+} from '@helpers/combat/combat-order-evaluation.ui';
+import { defaultEquipment } from '@helpers/defaults';
+import { characterCombatSkills, characterSkills } from '@helpers/hero/job';
+import { equippedItemTypes } from '@helpers/item/equipment';
+import type { Character, CombatOrderClause } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { AnimationService } from '@services/animation.service';
 
@@ -30,6 +39,7 @@ export class RowCombatOrderClauseComponent {
   private hasInitialized = false;
 
   public clause = input.required<CombatOrderClause>();
+  public character = input.required<Character>();
 
   constructor() {
     // Same clause id, new params - combatOrderClauseUpdate replaces the clause object in
@@ -50,31 +60,63 @@ export class RowCombatOrderClauseComponent {
   // like any other row but isn't a real stored clause - no toggle/edit/remove.
   public readOnly = input<boolean>(false);
 
-  // Only meaningful for CastSkillFamily clauses.
-  public isFamilyKnown = input<boolean>(true);
-  public isFamilyUsable = input<boolean>(true);
-  public isFamilyEquipmentOnly = input<boolean>(false);
-  public isTargetModeUsable = input<boolean>(true);
-
-  // The hero's currently-resolved skills, used to look up a representative
-  // sprite for the clause's family.
-  public heroSkills = input<EquipmentSkillContent[]>([]);
-
   public toggleEnabled = output<void>();
   public remove = output<void>();
   public edit = output<void>();
 
   public summary = computed(() => combatOrderClauseSummary(this.clause()));
 
-  // Only CastSkillFamily clauses have a skill icon to show - RandomSkill has
-  // nothing specific to display.
-  public icon = computed<{ name: string; sprite: string } | undefined>(() => {
+  // RandomSkill has no family, so there's nothing to resolve or warn about.
+  private family = computed(() => {
     const action = this.clause().action;
-    if (action.type !== 'CastSkillFamily') return undefined;
+    return action.type === 'CastSkillFamily' ? action.family : undefined;
+  });
 
-    const skill = this.heroSkills().find(
-      (skill) => skill.family === action.family,
+  private heroSkills = computed(() => characterSkills(this.character()));
+
+  public icon = computed(() =>
+    this.heroSkills().find((skill) => skill.family === this.family()),
+  );
+
+  public isFamilyKnown = computed(() => {
+    const family = this.family();
+    return !family || isCombatOrderFamilyKnown(family, this.heroSkills());
+  });
+
+  // Burst skills only count as usable while chosen.
+  public isFamilyUsable = computed(() => {
+    const family = this.family();
+    const character = this.character();
+    return (
+      !family ||
+      isCombatOrderFamilyUsable(
+        family,
+        characterCombatSkills(character),
+        equippedItemTypes(character.equipment),
+      )
     );
-    return skill ? { name: skill.family, sprite: skill.sprite } : undefined;
+  });
+
+  public isFamilyEquipmentOnly = computed(() => {
+    const family = this.family();
+    if (!family) return false;
+
+    const jobOnlySkills = characterSkills({
+      ...this.character(),
+      equipment: defaultEquipment(),
+    });
+    return isCombatOrderFamilyEquipmentOnly(family, jobOnlySkills);
+  });
+
+  public isTargetModeUsable = computed(() => {
+    const action = this.clause().action;
+    return (
+      action.type !== 'CastSkillFamily' ||
+      isCombatOrderTargetModeUsable(
+        action.family,
+        this.heroSkills(),
+        action.targetMode,
+      )
+    );
   });
 }

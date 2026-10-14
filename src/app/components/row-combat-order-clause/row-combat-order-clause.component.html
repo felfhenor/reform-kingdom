@@ -1,7 +1,7 @@
 @if (icon(); as skill) {
   <div
     class="min-w-[16px] min-h-[16px]"
-    [tp]="skill.name"
+    [tp]="skill.family"
     [tpPlacement]="'top'"
   >
     <app-atlas-image
@@ -37,7 +37,7 @@
     name="tablerInfoCircle"
     size="row"
     class="text-info shrink-0"
-    [tp]="'Depends on currently equipped gear.'"
+    [tp]="'Depends on equipped gear.'"
     [tpPlacement]="'top'"
   />
 } @else if (!isTargetModeUsable()) {

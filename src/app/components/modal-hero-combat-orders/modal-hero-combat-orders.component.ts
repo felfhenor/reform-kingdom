@@ -30,23 +30,15 @@ import {
   combatOrderClauseSetEnabled,
   combatOrderClauseUpdate,
 } from '@helpers/combat/combat-order.ui';
-import {
-  isCombatOrderFamilyEquipmentOnly,
-  isCombatOrderFamilyKnown,
-  isCombatOrderFamilyUsable,
-  isCombatOrderTargetModeAllowedForCondition,
-  isCombatOrderTargetModeUsable,
-} from '@helpers/combat/combat-order-evaluation.ui';
+import { isCombatOrderTargetModeAllowedForCondition } from '@helpers/combat/combat-order-evaluation.ui';
 import {
   COMBAT_ELEMENT_CHARGES_PER_ELEMENT,
   COMBAT_ORDER_ROW_CAP,
 } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { combatOrdersModalCharacterId } from '@helpers/engine/ui';
-import { defaultEquipment } from '@helpers/defaults';
-import { characterCombatSkills, characterSkills } from '@helpers/hero/job';
+import { characterSkills } from '@helpers/hero/job';
 import { worldPartyState } from '@helpers/state-game';
-import { equippedItemTypes } from '@helpers/item/equipment';
 import type {
   Character,
   CharacterId,
@@ -57,7 +49,6 @@ import type {
   CombatOrderComparator,
   CombatOrderCondition,
   CombatOrderHealthDirection,
-  EquipmentItemType,
   EquipmentSkillContent,
   GameElement,
   JobContent,
@@ -191,21 +182,6 @@ export class ModalHeroCombatOrdersComponent {
     return character ? characterSkills(character) : [];
   });
 
-  // Burst skills only count as usable while chosen.
-  public combatSkills = computed<EquipmentSkillContent[]>(() => {
-    const character = this.character();
-    return character ? characterCombatSkills(character) : [];
-  });
-
-  // The gear-free skill list (job path + teachings) - used to flag rows whose
-  // family only exists because of currently-equipped gear.
-  public jobOnlySkills = computed<EquipmentSkillContent[]>(() => {
-    const character = this.character();
-    return character
-      ? characterSkills({ ...character, equipment: defaultEquipment() })
-      : [];
-  });
-
   // One option per known family, carrying a representative skill's sprite
   // (the family's currently-resolved skill) so the picker can show an icon.
   public familyOptions = computed<FamilyOption[]>(() => {
@@ -217,11 +193,6 @@ export class ModalHeroCombatOrdersComponent {
       label: family,
       sprite: skills.find((skill) => skill.family === family)?.sprite ?? '',
     }));
-  });
-
-  public equippedWeaponTypes = computed<EquipmentItemType[]>(() => {
-    const character = this.character();
-    return character ? equippedItemTypes(character.equipment) : [];
   });
 
   public editingClauseId = signal<CombatOrderClauseId | undefined>(undefined);
@@ -408,37 +379,6 @@ export class ModalHeroCombatOrdersComponent {
 
   public setDraftTargetCharacterId(hero: HeroOption | null): void {
     this.draftTargetCharacterId.set(hero?.id);
-  }
-
-  public isFamilyKnown(clause: CombatOrderClause): boolean {
-    if (clause.action.type !== 'CastSkillFamily') return true;
-    return isCombatOrderFamilyKnown(clause.action.family, this.heroSkills());
-  }
-
-  public isFamilyUsable(clause: CombatOrderClause): boolean {
-    if (clause.action.type !== 'CastSkillFamily') return true;
-    return isCombatOrderFamilyUsable(
-      clause.action.family,
-      this.combatSkills(),
-      this.equippedWeaponTypes(),
-    );
-  }
-
-  public isFamilyEquipmentOnly(clause: CombatOrderClause): boolean {
-    if (clause.action.type !== 'CastSkillFamily') return false;
-    return isCombatOrderFamilyEquipmentOnly(
-      clause.action.family,
-      this.jobOnlySkills(),
-    );
-  }
-
-  public isTargetModeUsable(clause: CombatOrderClause): boolean {
-    if (clause.action.type !== 'CastSkillFamily') return true;
-    return isCombatOrderTargetModeUsable(
-      clause.action.family,
-      this.heroSkills(),
-      clause.action.targetMode,
-    );
   }
 
   public toggleClauseEnabled(clause: CombatOrderClause): void {

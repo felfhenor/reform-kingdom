@@ -3,6 +3,7 @@ import {
   REGALIA_NAME_MAX_LENGTH,
 } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
+import { defaultEquipment } from '@helpers/defaults';
 import { burstSkillIdFor } from '@helpers/hero/burst-skill';
 import {
   backfillEquipmentItem,
@@ -120,18 +121,30 @@ function regaliaUnusableItem(
 }
 
 // `available` is everything a load can pull from besides the hero's own gear: the vault and the armory.
-export function regaliaMissingItems(
+function regaliaPartitionItems(
   regalia: Regalia,
   character: Character,
   available: EquipmentItem[],
-): RegaliaMissingItem[] {
+): [RegaliaMissingItem[], EquipmentArmoryEntry[]] {
   const owned = [...equippedItems(character.equipment), ...available];
-  const [missing, loadable] = partition(
+  return partition(
     regalia.equipmentItemIds.map((id) =>
       regaliaUnusableItem(id, owned, character),
     ),
     (entry): entry is RegaliaMissingItem => 'reason' in entry,
   ) as [RegaliaMissingItem[], EquipmentArmoryEntry[]];
+}
+
+export function regaliaMissingItems(
+  regalia: Regalia,
+  character: Character,
+  available: EquipmentItem[],
+): RegaliaMissingItem[] {
+  const [missing, loadable] = regaliaPartitionItems(
+    regalia,
+    character,
+    available,
+  );
 
   return [
     ...missing,
@@ -140,6 +153,33 @@ export function regaliaMissingItems(
       reason: 'displaced',
     })),
   ];
+}
+
+// The hero as loading this regalia would leave them, so its skills can be previewed without equipping it.
+export function regaliaAppliedCharacter(
+  regalia: Regalia,
+  character: Character,
+  available: EquipmentItem[],
+): Character {
+  const [, loadable] = regaliaPartitionItems(regalia, character, available);
+  const displaced = regaliaDisplacedItemIds(loadable);
+  const equipment = defaultEquipment();
+  loadable
+    .filter(({ item }) => !displaced.includes(item.id))
+    .forEach(({ item, content }) =>
+      EquipmentTypeToSlot[content.type].forEach(
+        (slot) => (equipment[slot] = item),
+      ),
+    );
+
+  return {
+    ...character,
+    equipment,
+    burstSkills: {
+      ...character.burstSkills,
+      [regalia.jobId]: [...regalia.burstSkillIds],
+    },
+  };
 }
 
 export function regaliaNameClean(name: string, fallback: string): string {

@@ -6,6 +6,7 @@ import {
   characterJobRegalias,
   pruneInvalidCurrentRegaliaIds,
   pruneInvalidRegalias,
+  regaliaAppliedCharacter,
   regaliaMatchesCharacter,
   regaliaMissingItems,
   regaliaNameClean,
@@ -14,6 +15,7 @@ import {
 import type {
   CharacterId,
   EquipmentId,
+  EquipmentItemId,
   EquipmentSkillId,
   JobId,
   RegaliaId,
@@ -174,6 +176,62 @@ describe('regaliaMissingItems', () => {
         shield,
       ]),
     ).toEqual([{ id: spear.id, reason: 'gone' }]);
+  });
+});
+
+describe('regaliaAppliedCharacter', () => {
+  it('swaps in the regalia gear and burst skill, leaving the rest of the hero alone', () => {
+    const worn = buildEquipmentItem(hatId);
+    const sword = buildEquipmentItem(swordId);
+    const shield = buildEquipmentItem(shieldId);
+    const character = regaliaHero(
+      { Helmet: worn },
+      { burstSkills: { [mageId]: ['other' as EquipmentSkillId] } },
+    );
+
+    const applied = regaliaAppliedCharacter(
+      buildRegalia([sword.id, shield.id], {
+        burstSkillIds: ['burst' as EquipmentSkillId],
+      }),
+      character,
+      [sword, shield],
+    );
+
+    expect(applied.equipment).toMatchObject({
+      Helmet: undefined,
+      Weapon: sword,
+      Offhand: shield,
+    });
+    expect(applied.burstSkills).toEqual({
+      [mageId]: ['other'],
+      [warriorId]: ['burst'],
+    });
+    expect(applied.name).toBe(character.name);
+  });
+
+  it('leaves out gear that is missing or displaced', () => {
+    const sword = buildEquipmentItem(swordId);
+    const shield = buildEquipmentItem(shieldId);
+    const spear = buildEquipmentItem(spearId);
+    const helm = buildEquipmentItem(heavyHelmId);
+
+    const applied = regaliaAppliedCharacter(
+      buildRegalia([
+        sword.id,
+        shield.id,
+        spear.id,
+        helm.id,
+        'gone' as EquipmentItemId,
+      ]),
+      regaliaHero(),
+      [sword, shield, spear, helm],
+    );
+
+    expect(applied.equipment).toMatchObject({
+      Weapon: spear,
+      Offhand: spear,
+      Helmet: undefined,
+    });
   });
 });
 
