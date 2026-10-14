@@ -1,4 +1,5 @@
 import {
+  type AnimationCallbackEvent,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -13,10 +14,10 @@ import { modalHasAnyOpen } from '@helpers/engine/modal-stack';
 import { regionIntroPending } from '@helpers/lore/region-intro';
 import { isTitleCrawlPending } from '@helpers/lore/title-crawl';
 import { regionIntroMarkSeen } from '@helpers/lore/region-intro.ui';
+import { AnimationService } from '@services/animation.service';
 
 const REVEAL_MS_PER_CHARACTER = 30;
 const LINGER_AFTER_REVEAL_MS = 4000;
-const LEAVE_ANIMATION_MS = 400;
 
 @Component({
   selector: 'app-card-region-intro',
@@ -29,8 +30,8 @@ export class CardRegionIntroComponent {
 
   private isPageShown = signal(!document.hidden);
   private revealedCharacters = signal(0);
-  public isLeaving = signal(false);
-  private leaveTimer?: ReturnType<typeof setTimeout>;
+  private anim = inject(AnimationService);
+  private isDismissing = false;
 
   // Held back (and restarted later) while nobody can read it, so it's never marked seen unread.
   public region = computed(() =>
@@ -52,10 +53,8 @@ export class CardRegionIntroComponent {
       const region = this.region();
       if (!region) return;
 
-      untracked(() => {
-        this.revealedCharacters.set(0);
-        this.isLeaving.set(false);
-      });
+      untracked(() => this.revealedCharacters.set(0));
+      this.isDismissing = false;
 
       const length = region.description.length;
       const revealTimer = setInterval(() => {
@@ -69,13 +68,12 @@ export class CardRegionIntroComponent {
       onCleanup(() => {
         clearInterval(revealTimer);
         clearTimeout(dismissTimer);
-        clearTimeout(this.leaveTimer);
       });
     });
 
     // Capture phase so Escape dismisses the intro instead of also opening the pause menu.
     const onKeydown = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape' || !this.region() || this.isLeaving()) return;
+      if (event.key !== 'Escape' || !this.region() || this.isDismissing) return;
 
       event.preventDefault();
       event.stopImmediatePropagation();
@@ -88,18 +86,26 @@ export class CardRegionIntroComponent {
     inject(DestroyRef).onDestroy(() => {
       window.removeEventListener('keydown', onKeydown, { capture: true });
       document.removeEventListener('visibilitychange', onVisibilityChange);
-      clearTimeout(this.leaveTimer);
     });
   }
 
-  private dismiss(): void {
-    if (this.isLeaving()) return;
+  // Only a real dismissal shatters; a modal or hidden tab hides it instantly so a returning card isn't stacked under the old one.
+  public onLeave(event: AnimationCallbackEvent): void {
+    if (!this.isDismissing) {
+      event.animationComplete();
+      return;
+    }
 
-    const mapName = this.mapName();
-    this.isLeaving.set(true);
-    this.leaveTimer = setTimeout(
-      () => void regionIntroMarkSeen(mapName),
-      LEAVE_ANIMATION_MS,
-    );
+    this.anim
+      .shatterIntoSmoke(event.target)
+      .then(() => event.animationComplete())
+      .catch(() => event.animationComplete());
+  }
+
+  private dismiss(): void {
+    if (this.isDismissing) return;
+
+    this.isDismissing = true;
+    void regionIntroMarkSeen(this.mapName());
   }
 }

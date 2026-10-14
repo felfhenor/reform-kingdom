@@ -11,6 +11,7 @@ import {
   type Signal,
 } from '@angular/core';
 import type { DamageEventVariant } from '@interfaces';
+import { sumBy } from 'es-toolkit/compat';
 import { animate, type DOMTarget, type JSAnimation } from 'animejs';
 
 // hold: fraction of the lifetime spent fully opaque; rise: px travelled; tilt: total random rotation range in degrees.
@@ -27,11 +28,20 @@ const DAMAGE_NUMBER_PROFILES: Record<
   xp: { hold: 0.5, rise: 26, tilt: 0 },
 };
 
+const SHATTER_COLUMNS = 7;
+const SHATTER_ROWS = 4;
+// Outer vertices are pushed out this far so each shard keeps its slice of a shadow-xl.
+const SHATTER_EDGE_BLEED_PX = 48;
+const SHATTER_SHARD_MS = 650;
+const SHATTER_SMOKE_MS = 750;
+
 @Injectable({
   providedIn: 'root',
 })
 export class AnimationService {
   private locale = inject(LOCALE_ID);
+  // Angular can fire a leave handler twice for one element; a second shatter would clone the shards too.
+  private shattering = new WeakMap<Element, Promise<unknown>>();
 
   popIn(target: Element): JSAnimation {
     return animate(target as DOMTarget, {
@@ -360,6 +370,133 @@ export class AnimationService {
   levelUp(target: Element): JSAnimation {
     this.pulse(target);
     return this.goldGlow(target);
+  }
+
+  // Hides `target` and scatters clipped clones of it as shards that dissolve into smoke; meant for a leave handler,
+  // since the shards live inside `target` and go away with it.
+  shatterIntoSmoke(target: Element): Promise<unknown> {
+    const running = this.shattering.get(target);
+    if (running) return running;
+
+    const el = target as HTMLElement;
+    // A CSS animation ending mid-shatter would make Angular treat the leave as finished.
+    el.style.animation = 'none';
+    const source = el.cloneNode(true) as HTMLElement;
+    const points = this.shatterGrid(el.offsetWidth, el.offsetHeight);
+    el.style.visibility = 'hidden';
+
+    const animations = points.slice(1).flatMap((row, r) =>
+      row.slice(1).flatMap((_, c) => {
+        const polygon = [
+          points[r][c],
+          points[r][c + 1],
+          points[r + 1][c + 1],
+          points[r + 1][c],
+        ];
+        const delay = Math.random() * 150;
+        return [
+          this.shatterShard(el, source, polygon, delay),
+          this.smokePuff(el, polygon, delay),
+        ];
+      }),
+    );
+    const done = Promise.all(animations);
+    this.shattering.set(target, done);
+    return done;
+  }
+
+  // Jittered interior vertices make irregular shards that still tile the box with no gaps.
+  private shatterGrid(width: number, height: number): [number, number][][] {
+    const cellWidth = width / SHATTER_COLUMNS;
+    const cellHeight = height / SHATTER_ROWS;
+    const place = (index: number, count: number, cell: number) => {
+      if (index === 0) return -SHATTER_EDGE_BLEED_PX;
+      if (index === count) return count * cell + SHATTER_EDGE_BLEED_PX;
+      return (index + (Math.random() - 0.5) * 0.6) * cell;
+    };
+
+    return Array.from({ length: SHATTER_ROWS + 1 }, (_, r) =>
+      Array.from({ length: SHATTER_COLUMNS + 1 }, (_, c) => [
+        place(c, SHATTER_COLUMNS, cellWidth),
+        place(r, SHATTER_ROWS, cellHeight),
+      ]),
+    );
+  }
+
+  private polygonCenter(polygon: [number, number][]): [number, number] {
+    return [
+      sumBy(polygon, ([x]) => x) / polygon.length,
+      sumBy(polygon, ([, y]) => y) / polygon.length,
+    ];
+  }
+
+  private shatterShard(
+    host: HTMLElement,
+    source: HTMLElement,
+    polygon: [number, number][],
+    delay: number,
+  ): JSAnimation {
+    const [cx, cy] = this.polygonCenter(polygon);
+    const shard = source.cloneNode(true) as HTMLElement;
+    Object.assign(shard.style, {
+      position: 'absolute',
+      inset: '0',
+      margin: '0',
+      visibility: 'visible',
+      animation: 'none',
+      transition: 'none',
+      transformOrigin: `${cx}px ${cy}px`,
+      clipPath: `polygon(${polygon.map(([x, y]) => `${x}px ${y}px`).join(',')})`,
+    });
+    host.appendChild(shard);
+
+    const dx = cx - host.offsetWidth / 2;
+    const dy = cy - host.offsetHeight / 2;
+    return animate(shard, {
+      translateX: dx * 0.4 + (Math.random() - 0.5) * 40,
+      translateY: dy * 0.4 - 10 - Math.random() * 30,
+      rotate: (Math.random() - 0.5) * 50,
+      scale: 0.6,
+      opacity: { to: 0, ease: 'inQuad' },
+      duration: SHATTER_SHARD_MS,
+      delay,
+      ease: 'outCubic',
+    });
+  }
+
+  private smokePuff(
+    host: HTMLElement,
+    polygon: [number, number][],
+    delay: number,
+  ): JSAnimation {
+    const [cx, cy] = this.polygonCenter(polygon);
+    const size = (host.offsetWidth / SHATTER_COLUMNS) * 1.6;
+    const puff = document.createElement('div');
+    Object.assign(puff.style, {
+      position: 'absolute',
+      left: `${cx - size / 2}px`,
+      top: `${cy - size / 2}px`,
+      width: `${size}px`,
+      height: `${size}px`,
+      borderRadius: '9999px',
+      visibility: 'visible',
+      opacity: '0',
+      background:
+        'radial-gradient(circle, color-mix(in oklab, var(--color-base-content) 40%, transparent) 0%, transparent 70%)',
+    });
+    host.appendChild(puff);
+
+    return animate(puff, {
+      translateX: (Math.random() - 0.5) * 50,
+      translateY: -20 - Math.random() * 40,
+      scale: [0.3, 1.8],
+      opacity: [
+        { to: 1, duration: SHATTER_SMOKE_MS * 0.25, ease: 'outQuad' },
+        { to: 0, duration: SHATTER_SMOKE_MS * 0.75, ease: 'inQuad' },
+      ],
+      delay: delay + 60,
+      ease: 'outQuad',
+    });
   }
 }
 

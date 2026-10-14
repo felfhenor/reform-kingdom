@@ -6,11 +6,6 @@
 
 .region-intro {
   animation: region-intro-enter 400ms ease-out;
-  transition: opacity 400ms ease;
-
-  &.region-intro-leaving {
-    @apply opacity-0;
-  }
 }
 
 @keyframes region-intro-enter {
