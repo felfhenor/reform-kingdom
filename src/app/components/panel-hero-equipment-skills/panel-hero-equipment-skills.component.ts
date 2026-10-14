@@ -7,7 +7,6 @@ import {
 } from '@angular/core';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { ButtonGlowComponent } from '@components/button-glow/button-glow.component';
-import { SlotButtonContainerComponent } from '@components/slot-button-container/slot-button-container.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { TooltipJobAbilityComponent } from '@components/tooltip-job-ability/tooltip-job-ability.component';
@@ -23,7 +22,7 @@ import {
   characterChosenBurstSkills,
   characterNormalSkills,
 } from '@helpers/hero/job';
-import { canModifyEquipment, equippedItemTypes } from '@helpers/item/equipment';
+import { equippedItemTypes } from '@helpers/item/equipment';
 import type {
   Character,
   EquipmentItemType,
@@ -47,7 +46,6 @@ import { TippyDirective } from '@ngneat/helipopper';
     SFXDirective,
     TutorialTargetDirective,
     DecimalPipe,
-    SlotButtonContainerComponent,
   ],
   host: {
     class: 'flex flex-col min-h-0 pb-8',
@@ -85,8 +83,6 @@ export class PanelHeroEquipmentSkillsComponent {
   public equippedWeaponTypes = computed<EquipmentItemType[]>(() =>
     equippedItemTypes(this.character().equipment),
   );
-
-  public burstModifiable = computed(() => canModifyEquipment());
 
   public openBurstPicker(): void {
     heroBurstSkillsModalOpen(this.character().id);

@@ -9,39 +9,6 @@
     <span header>Heroes</span>
 
     <span pageactionssecondary class="flex gap-2">
-      @if (currentRegalia()) {
-        <button
-          type="button"
-          class="btn btn-accent btn-sm"
-          [disabled]="regaliaMatches()"
-          (click)="$event.shiftKey || requestRegaliaUpdate()"
-          (click.shift)="requestRegaliaUpdate(true)"
-          appSfx="ui-click"
-          [tp]="
-            regaliaMatches()
-              ? 'This hero already matches their regalia.'
-              : 'Update the current regalia to match this hero.'
-          "
-          [sfxTrigger]="['click', 'hover']"
-        >
-          Update Regalia
-        </button>
-      }
-
-      @if (selectedCharacter(); as character) {
-        <button
-          type="button"
-          class="btn btn-secondary btn-sm"
-          [appHideUntilLevel]="15"
-          (click)="openRegalias(character.id)"
-          appSfx="ui-click"
-          [tp]="'View stored configurations for this character.'"
-          [sfxTrigger]="['click', 'hover']"
-        >
-          Regalias
-        </button>
-      }
-
       <app-slot-button-container
         [disabled]="!equipmentModifiable()"
         [helpText]="'This cannot be done in combat.'"
@@ -100,13 +67,3 @@
     </div>
   </app-card-page>
 }
-
-<swal
-  #regaliaUpdateSwal
-  title="Update this regalia?"
-  text="It will be overwritten with this hero's current gear, combat orders and burst skill."
-  icon="question"
-  confirmButtonText="Yes, update it"
-  cancelButtonText="Cancel"
-  (confirm)="confirmRegaliaUpdate()"
-></swal>

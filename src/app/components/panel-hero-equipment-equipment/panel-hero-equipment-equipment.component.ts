@@ -12,10 +12,7 @@ import { SlotButtonContainerComponent } from '@components/slot-button-container/
 import { SlotEquipmentComponent } from '@components/slot-equipment/slot-equipment.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
-import {
-  characterEquipFromArmory,
-  optimizeCharacterEquipment,
-} from '@helpers/hero/character-equipment';
+import { characterEquipFromArmory } from '@helpers/hero/character-equipment';
 import { characterUnequipToArmory } from '@helpers/hero/character-equipment.ui';
 import {
   canEquipItem,
@@ -32,7 +29,6 @@ import {
   type EquipmentItemId,
   type EquipmentSlot,
 } from '@interfaces';
-import { TippyDirective } from '@ngneat/helipopper';
 import { sortBy } from 'es-toolkit/compat';
 
 const PAPERDOLL_ROWS: EquipmentSlot[][] = [
@@ -52,7 +48,6 @@ const PAPERDOLL_ROWS: EquipmentSlot[][] = [
     ScrollingModule,
     SFXDirective,
     SlotButtonContainerComponent,
-    TippyDirective,
   ],
   host: {
     class: 'contents',
@@ -132,10 +127,5 @@ export class PanelHeroEquipmentEquipmentComponent {
     if (characterUnequipToArmory(this.character().id, slot)) {
       this.selectedSlot.set(undefined);
     }
-  }
-
-  public optimizeEquipment(): void {
-    void optimizeCharacterEquipment(this.character().id);
-    this.selectedSlot.set(undefined);
   }
 }

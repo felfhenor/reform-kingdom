@@ -8,12 +8,9 @@ import type { CharacterId } from '@interfaces';
   selector: 'app-button-hero-combat-orders',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [SFXDirective, TutorialTargetDirective],
-  host: {
-    class: 'w-full',
-  },
   template: `
     <button
-      class="btn btn-block btn-sm btn-secondary"
+      class="btn btn-sm btn-secondary"
       (click)="open()"
       appTutorialTarget="hero-combat-orders"
       appSfx="ui-click"

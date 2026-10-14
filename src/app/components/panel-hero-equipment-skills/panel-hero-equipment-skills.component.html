@@ -1,31 +1,9 @@
 @if (hasBurstOptions()) {
   @let burst = chosenBurstSkill();
-  @let modifiable = burstModifiable();
 
   <div appTutorialTarget="hero-burst-skill">
     <div>
-      <span class="type-section-title">
-        Burst Skill
-
-        @if (burst) {
-          <app-slot-button-container
-            [disabled]="!modifiable"
-            [helpText]="'This cannot be done in combat.'"
-          >
-            <button
-              type="button"
-              class="btn btn-sm btn-primary"
-              [disabled]="!modifiable"
-              (click)="openBurstPicker()"
-              appSfx="ui-click"
-              [sfxOffset]="0"
-              [sfxTrigger]="['click', 'hover']"
-            >
-              Change
-            </button>
-          </app-slot-button-container>
-        }
-      </span>
+      <span class="type-section-title">Burst Skill</span>
     </div>
 
     @if (burst) {

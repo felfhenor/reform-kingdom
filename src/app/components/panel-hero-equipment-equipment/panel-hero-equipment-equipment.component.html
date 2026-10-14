@@ -4,27 +4,7 @@
 @let modifiable = equipmentModifiable();
 
 <div class="flex flex-col gap-2 ps-2 overflow-y-auto">
-  <div class="flex items-center justify-between w-full">
-    <span class="type-section-title">Gear</span>
-
-    <app-slot-button-container
-      [disabled]="!modifiable"
-      [helpText]="'This cannot be done in combat.'"
-    >
-      <button
-        type="button"
-        class="btn btn-sm btn-primary"
-        [disabled]="!modifiable"
-        (click)="optimizeEquipment()"
-        appSfx="ui-click"
-        [tp]="'Optimizing your equipment will automatically equip the best equipment for this hero, based on their class and the stat priorities that class has.'"
-        [sfxOffset]="0"
-        [sfxTrigger]="['click', 'hover']"
-      >
-        Optimize
-      </button>
-    </app-slot-button-container>
-  </div>
+  <span class="type-section-title">Gear</span>
 
   <div class="flex flex-col gap-2">
     @for (row of paperdollRows; track $index) {

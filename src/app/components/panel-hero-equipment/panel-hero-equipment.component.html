@@ -1,97 +1,169 @@
 @let char = character();
 
 <div class="hero-equipment-panel flex flex-col gap-4 h-full min-h-0">
-  <div class="hero-summary flex items-center justify-center gap-4 shrink-0">
-    <div [appHideUntilLevel]="3" class="flex flex-col gap-2">
-      <app-slot-button-container
-        [disabled]="!isAtKingdomCurrently()"
-        [helpText]="'This must be done at the Duchy.'"
-      >
-        <button
-          class="btn btn-accent btn-sm w-full"
-          [disabled]="!isAtKingdomCurrently() || !canPromote()"
-          (click)="promote()"
-          appSfx="ui-click"
-          [sfxTrigger]="['click', 'hover']"
-        >
-          Promote
-        </button>
-      </app-slot-button-container>
-
-      <app-slot-button-container
-        [disabled]="!isAtKingdomCurrently()"
-        [helpText]="'This must be done at the Duchy.'"
-      >
-        <button
-          class="btn btn-accent btn-sm w-full"
-          [disabled]="!isAtKingdomCurrently() || !canDemote()"
-          (click)="demote()"
-          appSfx="ui-click"
-          [sfxTrigger]="['click', 'hover']"
-        >
-          Demote
-        </button>
-      </app-slot-button-container>
-    </div>
-
-    <div class="hero-summary-icon">
-      <app-slot-icon-blank>
-        <app-icon-job [job]="job()" />
-      </app-slot-icon-blank>
-    </div>
-
-    <div
-      class="flex flex-col flex-1 items-start gap-2 min-w-[400px] max-w-[60%]"
-    >
-      <div
-        class="type-entity-heading flex gap-2 justify-between items-center w-full"
-      >
-        <div class="flex gap-2 items-center">
-          {{ char.name }}
-          <span class="type-muted font-normal">
-            Lv. {{ char.level }} {{ job()?.name }} ({{ job()?.shorthand }})
-          </span>
-        </div>
-
-        @if (currentRegalia(); as regalia) {
-          @let missing = regaliaMissingCount();
-
-          <span
-            class="badge"
-            [class.badge-info]="missing === 0"
-            [class.badge-warning]="missing > 0"
-            [tp]="
-              missing > 0
-                ? 'Some of this regalia\'s gear is unavailable.'
-                : 'Current regalia.'
-            "
-          >
-            {{ regalia.name }}
-          </span>
-        }
+  <div
+    class="flex flex-col gap-2 shrink-0 self-center w-full max-w-[60%] min-w-[480px]"
+  >
+    <div class="flex items-center gap-4">
+      <div class="hero-summary-icon">
+        <app-slot-icon-blank>
+          <app-icon-job [job]="job()" />
+        </app-slot-icon-blank>
       </div>
 
-      <app-bar-progress
-        class="w-full"
-        color="xp"
-        [value]="char.xp.current"
-        [max]="char.xp.maximum"
-      >
-        <app-text-number-tween [value]="char.xp.current" />
-        /{{ char.xp.maximum | number }} XP
-      </app-bar-progress>
+      <div class="flex flex-col flex-1 items-start gap-2 min-w-0">
+        <div
+          class="type-entity-heading flex gap-2 justify-between items-center w-full"
+        >
+          <div class="flex gap-2 items-center">
+            {{ char.name }}
+            <span class="type-muted font-normal">
+              Lv. {{ char.level }} {{ job()?.name }} ({{ job()?.shorthand }})
+            </span>
+          </div>
+
+          @if (currentRegalia(); as regalia) {
+            @let missing = regaliaMissingCount();
+
+            <div class="flex items-center gap-2">
+              <span
+                class="badge"
+                [class.badge-info]="missing === 0"
+                [class.badge-warning]="missing > 0"
+                [tp]="
+                  missing > 0
+                    ? 'Some of this regalia\'s gear is unavailable.'
+                    : 'Current regalia.'
+                "
+              >
+                {{ regalia.name }}
+              </span>
+
+              @if (!regaliaMatches()) {
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-xs"
+                  (animate.enter)="onEnter($event)"
+                  (animate.leave)="onLeave($event)"
+                  (click)="$event.shiftKey || requestRegaliaUpdate()"
+                  (click.shift)="requestRegaliaUpdate(true)"
+                  appSfx="ui-click"
+                  [tp]="'Update this regalia to match this hero.'"
+                  [sfxTrigger]="['click', 'hover']"
+                >
+                  Update
+                </button>
+              }
+            </div>
+          }
+        </div>
+
+        <app-bar-progress
+          class="w-full"
+          color="xp"
+          [value]="char.xp.current"
+          [max]="char.xp.maximum"
+        >
+          <app-text-number-tween [value]="char.xp.current" />
+          /{{ char.xp.maximum | number }} XP
+        </app-bar-progress>
+      </div>
     </div>
 
-    <div class="flex flex-col gap-2">
-      <app-button-hero-combat-orders
-        class="w-full"
-        [characterId]="char.id"
-        [appHideUntilLevel]="3"
-      />
+    <div class="flex items-center justify-between gap-2">
+      <div [appHideUntilLevel]="3" class="flex gap-2">
+        <app-slot-button-container
+          [disabled]="!isAtKingdomCurrently()"
+          [helpText]="'This must be done at the Duchy.'"
+        >
+          <button
+            type="button"
+            class="btn btn-sm btn-square"
+            [disabled]="!isAtKingdomCurrently() || !canPromote()"
+            (click)="promote()"
+            appSfx="ui-click"
+            [tp]="'Move earlier in the party order.'"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            <app-icon name="tablerChevronLeft" />
+          </button>
+        </app-slot-button-container>
 
-      @if (teachingsUnlocked()) {
-        <app-button-hero-teachings class="w-full" [characterId]="char.id" />
-      }
+        <app-slot-button-container
+          [disabled]="!isAtKingdomCurrently()"
+          [helpText]="'This must be done at the Duchy.'"
+        >
+          <button
+            type="button"
+            class="btn btn-sm btn-square"
+            [disabled]="!isAtKingdomCurrently() || !canDemote()"
+            (click)="demote()"
+            appSfx="ui-click"
+            [tp]="'Move later in the party order.'"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            <app-icon name="tablerChevronRight" />
+          </button>
+        </app-slot-button-container>
+      </div>
+
+      <div class="flex gap-2 ms-auto">
+        <app-slot-button-container
+          [disabled]="!equipmentModifiable()"
+          [helpText]="'This cannot be done in combat.'"
+        >
+          <button
+            type="button"
+            class="btn btn-sm btn-secondary"
+            [disabled]="!equipmentModifiable()"
+            (click)="optimize()"
+            appSfx="ui-click"
+            [tp]="'Optimizing your equipment will automatically equip the best equipment for this hero, based on their class and the stat priorities that class has.'"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            Optimize
+          </button>
+        </app-slot-button-container>
+
+        <app-button-hero-combat-orders
+          [characterId]="char.id"
+          [appHideUntilLevel]="3"
+        />
+
+        @if (teachingsUnlocked()) {
+          <app-button-hero-teachings [characterId]="char.id" />
+        }
+
+        @if (hasBurstOptions()) {
+          <app-slot-button-container
+            [disabled]="!equipmentModifiable()"
+            [helpText]="'This cannot be done in combat.'"
+          >
+            <button
+              type="button"
+              class="btn btn-sm btn-secondary"
+              [disabled]="!equipmentModifiable()"
+              (click)="openBurstPicker()"
+              appSfx="ui-click"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              Burst Skill
+            </button>
+          </app-slot-button-container>
+        }
+
+        <button
+          type="button"
+          class="btn btn-sm btn-secondary"
+          [appHideUntilLevel]="15"
+          (click)="openRegalias()"
+          appSfx="ui-click"
+          [tp]="'View stored configurations for this hero.'"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Regalias
+        </button>
+      </div>
     </div>
   </div>
 
@@ -107,3 +179,13 @@
     <app-panel-hero-equipment-skills [character]="char" />
   </div>
 </div>
+
+<swal
+  #regaliaUpdateSwal
+  title="Update this regalia?"
+  text="It will be overwritten with this hero's current gear, combat orders and burst skill."
+  icon="question"
+  confirmButtonText="Yes, update it"
+  cancelButtonText="Cancel"
+  (confirm)="confirmRegaliaUpdate()"
+></swal>
