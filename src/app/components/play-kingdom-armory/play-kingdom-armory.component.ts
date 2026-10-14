@@ -60,7 +60,7 @@ export class PlayKingdomArmoryComponent {
   public armoryCapValue = computed(() => armoryCap());
   public badgeColor = computed(() => {
     const ratio = this.armorySize() / armoryCap();
-    if (ratio < ARMORY_ENCUMBERED_THRESHOLD) return 'badge-info';
+    if (ratio < ARMORY_ENCUMBERED_THRESHOLD) return 'badge-data';
     if (ratio < 1) return 'badge-warning';
     return 'badge-error';
   });

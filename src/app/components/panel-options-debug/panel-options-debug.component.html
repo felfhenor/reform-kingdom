@@ -16,7 +16,7 @@
               (change)="
                 setOption('debugTickMultiplier', tickMultiplier.valueAsNumber)
               "
-              class="range range-secondary"
+              class="range"
             />
             <span class="ml-2">{{ getOption('debugTickMultiplier') }}x</span>
           </label>
@@ -34,7 +34,7 @@
               (change)="
                 setOption('debugSaveInterval', saveInterval.valueAsNumber)
               "
-              class="range range-secondary"
+              class="range"
             />
             <span class="ml-2">{{ getOption('debugSaveInterval') }}s</span>
           </label>
@@ -51,7 +51,7 @@
             <input
               type="checkbox"
               [checked]="getOption('debugConsoleLogStateUpdates') === true"
-              class="checkbox checkbox-secondary"
+              class="checkbox"
               appAnalyticsClick="Options:Debug:LogStateUpdates"
               (click)="
                 setOption(
@@ -69,7 +69,7 @@
             <input
               type="checkbox"
               [checked]="getOption('debugGameloopTimerUpdates') === true"
-              class="checkbox checkbox-secondary"
+              class="checkbox"
               appAnalyticsClick="Options:Debug:LogTimerUpdates"
               (click)="
                 setOption(
@@ -93,7 +93,7 @@
             <input
               type="checkbox"
               [checked]="getOption('debugAllowBackgroundOperations') === true"
-              class="checkbox checkbox-secondary"
+              class="checkbox"
               appAnalyticsClick="Options:Debug:AllowBackgroundOperations"
               (click)="
                 setOption(
@@ -133,7 +133,7 @@
           />
           <button
             type="button"
-            class="btn btn-secondary debug-give-btn"
+            class="btn btn-neutral debug-give-btn"
             appAnalyticsClick="Options:Debug:GiveItem"
             (click)="giveItem()"
             appSfx="ui-click"
@@ -160,7 +160,7 @@
           />
           <button
             type="button"
-            class="btn btn-secondary debug-give-btn"
+            class="btn btn-neutral debug-give-btn"
             appAnalyticsClick="Options:Debug:GiveEquipment"
             (click)="giveEquipment()"
             appSfx="ui-click"
@@ -187,7 +187,7 @@
           />
           <button
             type="button"
-            class="btn btn-secondary debug-give-btn"
+            class="btn btn-neutral debug-give-btn"
             appAnalyticsClick="Options:Debug:GiveCollectible"
             (click)="giveCollectible()"
             appSfx="ui-click"
@@ -209,7 +209,7 @@
           <span></span>
           <button
             type="button"
-            class="btn btn-warning debug-give-btn"
+            class="btn btn-error btn-outline debug-give-btn"
             appAnalyticsClick="Options:Debug:UndiscoverRecipe"
             (click)="undiscoverRecipe()"
             appSfx="ui-error"
@@ -245,7 +245,7 @@
           />
           <button
             type="button"
-            class="btn btn-secondary debug-give-btn"
+            class="btn btn-neutral debug-give-btn"
             appAnalyticsClick="Options:Debug:SetCharacterLevel"
             (click)="setCharacterLevel()"
             appSfx="ui-click"
@@ -279,7 +279,7 @@
           />
           <button
             type="button"
-            class="btn btn-secondary debug-give-btn"
+            class="btn btn-neutral debug-give-btn"
             appAnalyticsClick="Options:Debug:SetTradeskillLevel"
             (click)="setTradeskillLevel()"
             appSfx="ui-click"
@@ -309,7 +309,7 @@
 
           <button
             type="button"
-            class="btn btn-secondary debug-give-btn"
+            class="btn btn-neutral debug-give-btn"
             appAnalyticsClick="Options:Debug:RescueWorker"
             (click)="rescueWorker()"
             appSfx="ui-click"
@@ -332,7 +332,7 @@
 
           <button
             type="button"
-            class="btn btn-secondary debug-give-btn"
+            class="btn btn-neutral debug-give-btn"
             appAnalyticsClick="Options:Debug:SetWorkerLevel"
             (click)="setWorkerLevel()"
             appSfx="ui-click"
@@ -360,7 +360,7 @@
           <span></span>
           <button
             type="button"
-            class="btn btn-secondary debug-give-btn"
+            class="btn btn-neutral debug-give-btn"
             appAnalyticsClick="Options:Debug:DiscoverGatherNode"
             (click)="discoverGatherNode()"
             appSfx="ui-click"
@@ -378,7 +378,7 @@
           />
           <button
             type="button"
-            class="btn btn-secondary debug-give-btn"
+            class="btn btn-neutral debug-give-btn"
             appAnalyticsClick="Options:Debug:SetGatherNodeLevel"
             (click)="setGatherNodeLevel()"
             appSfx="ui-click"
@@ -418,7 +418,7 @@
           />
           <button
             type="button"
-            class="btn btn-secondary debug-give-btn"
+            class="btn btn-neutral debug-give-btn"
             appAnalyticsClick="Options:Debug:SetTownReputation"
             (click)="setTownReputation()"
             appSfx="ui-click"
@@ -432,7 +432,7 @@
 
           <button
             type="button"
-            class="btn btn-secondary debug-give-btn"
+            class="btn btn-neutral debug-give-btn"
             appAnalyticsClick="Options:Debug:StartTownDefenseCombat"
             (click)="startTownDefenseCombat()"
             appSfx="ui-click"
@@ -446,7 +446,7 @@
           <span></span>
           <button
             type="button"
-            class="btn btn-secondary debug-give-btn"
+            class="btn btn-neutral debug-give-btn"
             appAnalyticsClick="Options:Debug:TelegraphRaid"
             (click)="telegraphRaid()"
             appSfx="ui-click"
@@ -460,7 +460,7 @@
           <span></span>
           <button
             type="button"
-            class="btn btn-secondary debug-give-btn"
+            class="btn btn-neutral debug-give-btn"
             appAnalyticsClick="Options:Debug:MarkTownVisited"
             (click)="markTownVisited()"
             appSfx="ui-click"
@@ -490,7 +490,7 @@
           <span></span>
           <button
             type="button"
-            class="btn btn-secondary debug-give-btn"
+            class="btn btn-neutral debug-give-btn"
             appAnalyticsClick="Options:Debug:MarkCaravanVisited"
             (click)="markCaravanVisited()"
             appSfx="ui-click"
@@ -508,7 +508,7 @@
 
         <button
           type="button"
-          class="btn btn-warning btn-sm"
+          class="btn btn-error btn-outline btn-sm"
           appAnalyticsClick="Options:Debug:ResetBestiary"
           (click)="resetBestiary()"
           appSfx="ui-error"
@@ -518,7 +518,7 @@
         </button>
         <button
           type="button"
-          class="btn btn-warning btn-sm"
+          class="btn btn-error btn-outline btn-sm"
           appAnalyticsClick="Options:Debug:ResetHeroTeachings"
           (click)="resetHeroTeachings()"
           appSfx="ui-error"
@@ -528,7 +528,7 @@
         </button>
         <button
           type="button"
-          class="btn btn-warning btn-sm"
+          class="btn btn-error btn-outline btn-sm"
           appAnalyticsClick="Options:Debug:ResetCommissions"
           (click)="resetCommissions()"
           appSfx="ui-error"
@@ -538,7 +538,7 @@
         </button>
         <button
           type="button"
-          class="btn btn-warning btn-sm"
+          class="btn btn-error btn-outline btn-sm"
           appAnalyticsClick="Options:Debug:ResetAllTutorials"
           (click)="resetAllTutorials()"
           appSfx="ui-error"
@@ -548,7 +548,7 @@
         </button>
         <button
           type="button"
-          class="btn btn-warning btn-sm"
+          class="btn btn-error btn-outline btn-sm"
           appAnalyticsClick="Options:Debug:ResetTasks"
           (click)="resetTasks()"
           appSfx="ui-error"
@@ -558,7 +558,7 @@
         </button>
         <button
           type="button"
-          class="btn btn-secondary btn-sm"
+          class="btn btn-neutral btn-sm"
           appAnalyticsClick="Options:Debug:FillBestiary"
           (click)="fillBestiary()"
           appSfx="ui-click"
@@ -568,7 +568,7 @@
         </button>
         <button
           type="button"
-          class="btn btn-secondary btn-sm"
+          class="btn btn-neutral btn-sm"
           appAnalyticsClick="Options:Debug:DiscoverAllRecipes"
           (click)="discoverAllRecipes()"
           appSfx="ui-click"

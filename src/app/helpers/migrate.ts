@@ -297,6 +297,7 @@ export function migrateOptionsState() {
   const state = options();
 
   const newState = merge(defaultOptions(), state);
+  delete (newState as Partial<Record<string, unknown>>)['uiTheme'];
 
   setOptions(newState);
 }

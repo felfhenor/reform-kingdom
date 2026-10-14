@@ -14,12 +14,12 @@
     </span>
 
     @if (sellMode()) {
-      <span class="badge badge-secondary min-w-[80px] tabular-nums">
+      <span class="badge badge-data min-w-[80px] tabular-nums">
         {{ selectedCount() }} selected
       </span>
 
       <span
-        class="badge badge-secondary text-sm flex items-center gap-2 min-w-[120px]"
+        class="badge badge-data text-sm flex items-center gap-2 min-w-[120px]"
       >
         <app-currency-cost
           [type]="goldCoinItemId"
@@ -41,7 +41,7 @@
 
       <button
         type="button"
-        class="btn btn-sm btn-neutral"
+        class="btn btn-sm btn-neutral btn-outline"
         (click)="toggleSellMode()"
         appSfx="ui-error"
         [sfxTrigger]="['click', 'hover']"
@@ -63,7 +63,7 @@
     } @else {
       <button
         type="button"
-        class="btn btn-sm btn-primary"
+        class="btn btn-sm btn-neutral"
         (click)="toggleSellMode()"
         appSfx="ui-click"
         [sfxTrigger]="['click', 'hover']"
@@ -73,7 +73,7 @@
 
       <button
         type="button"
-        class="btn btn-sm btn-info"
+        class="btn btn-sm btn-neutral"
         [class.btn-outline]="!lootFilterActive()"
         (click)="openLootFilters()"
         appSfx="ui-click"

@@ -30,7 +30,7 @@
             {{ affixCount | number }}
             {{ 'affix' | pluralize: affixCount !== 1 }}
           } @else {
-            <span class="italic">Common gear cannot be reforged</span>
+            <span class="type-muted">Common gear cannot be reforged</span>
           }
         } @else if (enabled) {
           {{ filledSlotCount(sourceItem) | number }}/{{
@@ -38,7 +38,7 @@
           }}
           infusion slots used
         } @else {
-          <span class="italic">No infusion slots</span>
+          <span class="type-muted">No infusion slots</span>
         }
       </ng-template>
 

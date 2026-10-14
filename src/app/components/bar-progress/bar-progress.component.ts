@@ -7,20 +7,14 @@ import {
   output,
 } from '@angular/core';
 import { ShimmerDirective } from '@directives/shimmer.directive';
-import type {
-  DaisyColor,
-  ProgressBarSize,
-  ResourceBarColor,
-} from '@interfaces';
+import type { ProgressBarColor, ProgressBarSize } from '@interfaces';
 import { injectTweenedNumber } from '@services/animation.service';
 import { clamp } from 'es-toolkit/compat';
 
 // Tailwind's class scanner only picks up literal strings, so the color->class
 // mapping can't be built with a template literal - it would purge every text-* class.
-const PROGRESS_COLOR_CLASSES: Record<DaisyColor | ResourceBarColor, string> = {
+const PROGRESS_COLOR_CLASSES: Record<ProgressBarColor, string> = {
   primary: 'text-primary',
-  secondary: 'text-secondary',
-  accent: 'text-accent',
   neutral: 'text-neutral',
   info: 'text-info',
   success: 'text-success',
@@ -29,6 +23,8 @@ const PROGRESS_COLOR_CLASSES: Record<DaisyColor | ResourceBarColor, string> = {
   hp: 'text-hp',
   ep: 'text-ep',
   xp: 'text-xp',
+  reputation: 'text-reputation',
+  muted: 'text-base-content/40',
 };
 
 const PROGRESS_SIZE_CLASSES: Record<ProgressBarSize, string> = {
@@ -49,7 +45,7 @@ const PROGRESS_SIZE_CLASSES: Record<ProgressBarSize, string> = {
 export class BarProgressComponent {
   public value = input.required<number>();
   public max = input(100);
-  public color = input<DaisyColor | ResourceBarColor>('primary');
+  public color = input<ProgressBarColor>('primary');
   public size = input<ProgressBarSize>('default');
   public shimmer = input(false);
   public filled = output();

@@ -50,7 +50,7 @@ import { AnimationService } from '@services/animation.service';
             <div class="p-2">
               <div class="type-entity-name mb-2">{{ effect.name }}</div>
 
-              <p class="italic">{{ effectDescription(effect) }}</p>
+              <p>{{ effectDescription(effect) }}</p>
 
               @if (effect.extendedDescription) {
                 <p class="type-meta mt-2">

@@ -15,7 +15,8 @@
         }
 
         <span
-          class="badge badge-sm badge-info"
+          class="badge badge-sm"
+          [class.badge-data]="teachingRow.meetsLevel"
           [class.badge-error]="!teachingRow.meetsLevel"
         >
           Lv. {{ teachingRow.teaching.requiredLevel | number }}

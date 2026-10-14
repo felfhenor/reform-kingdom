@@ -9,7 +9,7 @@
             <input
               type="checkbox"
               [checked]="getOption('showBackdropGrid')"
-              class="checkbox checkbox-secondary"
+              class="checkbox"
               (click)="
                 setOption('showBackdropGrid', !getOption('showBackdropGrid'))
               "
@@ -23,7 +23,7 @@
             <input
               type="checkbox"
               [checked]="getOption('partyViewAlwaysExpand')"
-              class="checkbox checkbox-secondary"
+              class="checkbox"
               (click)="
                 setOption(
                   'partyViewAlwaysExpand',
@@ -40,7 +40,7 @@
             <input
               type="checkbox"
               [checked]="getOption('craftingViewAlwaysExpand')"
-              class="checkbox checkbox-secondary"
+              class="checkbox"
               (click)="
                 setOption(
                   'craftingViewAlwaysExpand',
@@ -57,7 +57,7 @@
             <input
               type="checkbox"
               [checked]="getOption('adventureLogOverlay')"
-              class="checkbox checkbox-secondary"
+              class="checkbox"
               (click)="
                 setOption(
                   'adventureLogOverlay',
@@ -77,7 +77,7 @@
                   <input
                     type="checkbox"
                     [checked]="getOption('adventureLogOverlayKinds')[kind]"
-                    class="checkbox checkbox-secondary checkbox-sm"
+                    class="checkbox checkbox-sm"
                     (click)="toggleAdventureLogOverlayKind(kind)"
                   />
                   <span class="label-text">Show {{ kind }} Messages</span>
@@ -99,7 +99,7 @@
               <input
                 type="checkbox"
                 [checked]="getOption('bgmPlay')"
-                class="checkbox checkbox-secondary"
+                class="checkbox"
                 (click)="setOption('bgmPlay', !getOption('bgmPlay'))"
               />
               <span class="label-text">Play Background Music</span>
@@ -120,7 +120,7 @@
                   [step]="0.05"
                   [value]="getOption('bgmVolume')"
                   (change)="setOption('bgmVolume', bgmVolume.valueAsNumber)"
-                  class="range range-secondary"
+                  class="range"
                 />
                 <span class="ml-2">
                   {{ getOption('bgmVolume') * 100 | number: '1.0-0' }}%
@@ -134,7 +134,7 @@
               <input
                 type="checkbox"
                 [checked]="getOption('sfxPlay')"
-                class="checkbox checkbox-secondary"
+                class="checkbox"
                 (click)="setOption('sfxPlay', !getOption('sfxPlay'))"
               />
               <span class="label-text">Play Sound Effects</span>
@@ -153,7 +153,7 @@
                   [step]="0.05"
                   [value]="getOption('sfxVolume')"
                   (change)="setOption('sfxVolume', sfxVolume.valueAsNumber)"
-                  class="range range-secondary"
+                  class="range"
                 />
                 <span class="ml-2">
                   {{ getOption('sfxVolume') * 100 | number: '1.0-0' }}%
@@ -161,31 +161,6 @@
               </label>
             </div>
           }
-        </div>
-      </div>
-    </div>
-
-    <div class="flex-1 flex flex-col gap-4">
-      <div class="card shadow-sm">
-        <div class="card-body p-3 gap-2">
-          <div class="type-section-title">UI Theme</div>
-
-          <label class="label mb-3 whitespace-normal">
-            Change the visuals of the game. Not every theme is tested equally,
-            please report issues with specific themes.
-          </label>
-
-          <select
-            class="select select-bordered select-xs"
-            [(ngModel)]="currentTheme"
-            (ngModelChange)="setOption('uiTheme', $event)"
-          >
-            @for (theme of themes; track $index) {
-              <option [value]="theme.name">
-                {{ theme.name | titlecase }} ({{ theme.type }})
-              </option>
-            }
-          </select>
         </div>
       </div>
     </div>

@@ -10,7 +10,7 @@ import type { CharacterId } from '@interfaces';
   imports: [SFXDirective, TutorialTargetDirective],
   template: `
     <button
-      class="btn btn-sm btn-secondary"
+      class="btn btn-sm btn-neutral"
       (click)="open()"
       appTutorialTarget="hero-combat-orders"
       appSfx="ui-click"

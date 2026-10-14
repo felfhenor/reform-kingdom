@@ -3,19 +3,19 @@
 
 <div class="flex flex-col gap-2">
   @if (reduction > 0) {
-    <p class="text-sm italic">
+    <p class="type-muted">
       While this is your home, Deaths Door and Healing are
       {{ reduction | number }}% shorter.
     </p>
   } @else {
-    <p class="text-sm text-lighter italic">
+    <p class="type-muted">
       Each development after building shortens Deaths Door and Healing by
       {{ reductionPerLevelPercent }}% while this is your home.
     </p>
   }
 
   @if (isTeleportUnlocked()) {
-    <p class="text-sm italic">
+    <p class="type-muted">
       You can teleport from here to any other +{{ teleportLevel }}
       outpost.
     </p>
@@ -32,7 +32,7 @@
     </button>
   } @else {
     @if (nextLevelUnlocksTeleport()) {
-      <p class="text-sm text-lighter italic">
+      <p class="type-muted">
         The next development unlocks teleporting to other +{{ teleportLevel }}
         outposts.
       </p>
@@ -43,7 +43,7 @@
 
   <button
     type="button"
-    class="btn btn-sm btn-secondary"
+    class="btn btn-sm btn-neutral"
     [disabled]="!canSetHome()"
     (click)="setHome.emit()"
     appSfx="ui-success"

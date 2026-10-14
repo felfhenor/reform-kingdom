@@ -25,7 +25,7 @@
 
       <div class="flex gap-2">
         <button
-          class="btn btn-sm btn-warning"
+          class="btn btn-sm btn-error btn-outline"
           [disabled]="isBusy()"
           (click)="recoverSavefile()"
           appAnalyticsClick="Savefile:Recover"
@@ -49,7 +49,7 @@
 
         @if (failure.data !== undefined) {
           <button
-            class="btn btn-sm btn-info"
+            class="btn btn-sm btn-neutral"
             (click)="exportUnloadableSavefile()"
             appAnalyticsClick="Savefile:ExportUnloadable"
             appSfx="ui-click"
@@ -110,7 +110,7 @@
 
           <div class="card-actions">
             <button
-              class="btn btn-error"
+              class="btn btn-error btn-outline"
               (click)="$event.shiftKey || deleteSwal.fire()"
               (click.shift)="deleteSavefile()"
               appAnalyticsClick="Savefile:Delete"
@@ -145,7 +145,7 @@
           </span>
 
           <button
-            class="btn btn-sm btn-error"
+            class="btn btn-sm btn-error btn-outline"
             [disabled]="isBusy()"
             (click)="confirmResetBackups()"
             appAnalyticsClick="Savefile:ResetBackups"
@@ -179,7 +179,7 @@
                 <td>{{ durationText(backup.numTicks) }}</td>
                 <td class="text-right">
                   <button
-                    class="btn btn-sm btn-warning"
+                    class="btn btn-sm btn-error btn-outline"
                     [disabled]="isBusy()"
                     (click)="confirmRestore(backup)"
                     appAnalyticsClick="Savefile:Restore"

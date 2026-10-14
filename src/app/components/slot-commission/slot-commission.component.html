@@ -39,7 +39,7 @@
     <div class="flex flex-col items-end gap-2 shrink-0">
       <div class="flex gap-2">
         @if (r.reputationReward) {
-          <div class="badge badge-secondary">
+          <div class="badge badge-data">
             +{{ r.reputationReward | number }} Reputation
           </div>
         }
@@ -61,7 +61,7 @@
           @if (r.travelEtaSeconds !== undefined) {
             <button
               type="button"
-              class="btn btn-xs btn-secondary tabular-nums"
+              class="btn btn-xs btn-neutral tabular-nums"
               disabled
             >
               {{ etaLabel(r.travelEtaSeconds) }}
@@ -69,7 +69,7 @@
           } @else {
             <button
               type="button"
-              class="btn btn-xs btn-secondary"
+              class="btn btn-xs btn-neutral"
               [disabled]="!r.canTravel"
               (click)="travel.emit()"
               appSfx="ui-click"

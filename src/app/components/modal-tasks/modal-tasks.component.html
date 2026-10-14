@@ -54,7 +54,7 @@
           } @else if (row.isComplete) {
             <button
               type="button"
-              class="btn btn-xs btn-success"
+              class="btn btn-xs btn-primary"
               (click)="claim([row.taskId])"
               appSfx="ui-success"
               [sfxTrigger]="['click', 'hover']"
@@ -72,7 +72,7 @@
     @if (claimableIds.length > 0) {
       <button
         type="button"
-        class="btn btn-sm btn-success"
+        class="btn btn-sm btn-primary"
         (click)="claim(claimableIds)"
         appSfx="ui-success"
         [sfxTrigger]="['click', 'hover']"

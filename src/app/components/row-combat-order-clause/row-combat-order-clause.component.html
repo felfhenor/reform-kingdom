@@ -55,13 +55,13 @@
     <input
       type="checkbox"
       [checked]="clause().enabled"
-      class="checkbox checkbox-sm checkbox-secondary"
+      class="checkbox checkbox-sm"
       (click)="toggleEnabled.emit()"
     />
   </label>
 
   <button
-    class="btn btn-xs btn-secondary"
+    class="btn btn-xs btn-neutral"
     (click)="edit.emit()"
     appSfx="ui-click"
     [sfxOffset]="0"
@@ -70,7 +70,7 @@
     Edit
   </button>
   <button
-    class="btn btn-xs btn-error"
+    class="btn btn-xs btn-error btn-outline"
     (click)="remove.emit()"
     appSfx="ui-error"
     [sfxOffset]="1"

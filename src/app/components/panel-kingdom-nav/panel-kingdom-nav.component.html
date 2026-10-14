@@ -17,17 +17,16 @@
 
   @let active = kingdomSubview();
   @for (section of sections(); track section.group) {
-    <div class="divider my-0 h-0"></div>
+    <div class="divider my-0 h-0" [class]="dividerClass[section.group]"></div>
 
     @for (item of section.items; track item.entry.subview) {
       @let isActive = item.entry.subview === active;
       <button
         (animate.enter)="onEntryEnter($event)"
         type="button"
-        class="btn btn-square"
+        class="btn btn-square relative"
         [class.btn-ghost]="!isActive"
-        [class.btn-primary]="isActive"
-        [class.glow-idle]="item.isIdle"
+        [class.here]="isActive"
         [tp]="item.tooltip"
         [tpPlacement]="'right'"
         [attr.aria-label]="item.entry.label"
@@ -45,6 +44,9 @@
           </div>
         } @else {
           <app-icon-kingdom [name]="item.entry.icon" class="zoom-row" />
+        }
+        @if (item.isIdle) {
+          <i class="attention-dot"></i>
         }
       </button>
     }

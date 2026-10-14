@@ -12,8 +12,6 @@ export function defaultOptions(): GameOptions {
     debugTickMultiplier: 1,
     debugSaveInterval: 15,
 
-    uiTheme: 'dark',
-
     sfxPlay: true,
     sfxVolume: 0.3,
 

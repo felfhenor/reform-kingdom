@@ -44,7 +44,7 @@ body {
   --bg-color: var(--color-base-100);
 }
 
-.btn:not(.btn-untextured):not(.btn-outline):not(
+.btn:not(.btn-untextured):not(.btn-outline):not(.btn-debug):not(.here):not(
     :disabled,
     [disabled],
     .btn-disabled

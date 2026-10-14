@@ -3,8 +3,8 @@
     <ul class="menu menu-horizontal py-0 px-1">
       <li class="flex gap-1 flex-row" appRequireSetup>
         <button
-          class="btn btn-sm btn-info"
-          [class.btn-outline]="activeGamePlayView() !== 'world'"
+          class="btn btn-sm btn-neutral btn-outline"
+          [class.here]="activeGamePlayView() === 'world'"
           tp="World [1]"
           (click)="changeGamePlayView('world')"
           appSfx="ui-click"
@@ -19,8 +19,8 @@
         </button>
 
         <button
-          class="btn btn-sm btn-info"
-          [class.btn-outline]="activeGamePlayView() !== 'kingdom'"
+          class="btn btn-sm btn-neutral btn-outline"
+          [class.here]="activeGamePlayView() === 'kingdom'"
           tp="Kingdom [2]"
           (click)="setKingdomPlayView()"
           appSfx="ui-click"
@@ -35,8 +35,8 @@
         </button>
 
         <button
-          class="btn btn-sm btn-info"
-          [class.btn-outline]="activeGamePlayView() !== 'heroes'"
+          class="btn btn-sm btn-neutral btn-outline"
+          [class.here]="activeGamePlayView() === 'heroes'"
           tp="Heroes [3]"
           (click)="setHeroesPlayView()"
           appSfx="ui-click"
@@ -51,8 +51,8 @@
         </button>
 
         <button
-          class="btn btn-sm btn-info"
-          [class.btn-outline]="activeGamePlayView() !== 'adventurelog'"
+          class="btn btn-sm btn-neutral btn-outline"
+          [class.here]="activeGamePlayView() === 'adventurelog'"
           tp="Adventure Log [4]"
           (click)="changeGamePlayView('adventurelog')"
           appSfx="ui-click"
@@ -69,8 +69,8 @@
         </button>
 
         <button
-          class="btn btn-sm btn-info"
-          [class.btn-outline]="activeGamePlayView() !== 'decree'"
+          class="btn btn-sm btn-neutral btn-outline"
+          [class.here]="activeGamePlayView() === 'decree'"
           tp="Decree [5]"
           (click)="changeGamePlayView('decree')"
           appSfx="ui-click"
@@ -95,7 +95,7 @@
       @for (panel of panelConfigs; track $index) {
         <li class="action-button" appRequireSetup>
           <button
-            class="btn btn-sm btn-secondary"
+            class="btn btn-sm btn-neutral"
             [tp]="panel.name + ' [' + panel.hotkey + ']'"
             (click)="panel.clickCb()"
             [hotkeys]="panel.hotkey"
@@ -112,7 +112,7 @@
 
       @if (currentTownEntry()) {
         <button
-          class="btn btn-sm btn-secondary"
+          class="btn btn-sm btn-neutral"
           appButtonGlow
           [tp]="currentTownName() + ' [T]'"
           (click)="openCurrentTown()"
@@ -130,7 +130,7 @@
       @if (showCaravanTradeButton()) {
         <li class="action-button" appRequireSetup>
           <button
-            class="btn btn-sm btn-secondary"
+            class="btn btn-sm btn-neutral"
             appButtonGlow
             tp="Trade with the Caravan [T]"
             (click)="openCaravanTrade()"
@@ -149,7 +149,7 @@
       @if (currentTrainerEntry()) {
         <li class="action-button" appRequireSetup>
           <button
-            class="btn btn-sm btn-secondary"
+            class="btn btn-sm btn-neutral"
             appButtonGlow
             tp="Visit the Trainer [T]"
             (click)="openCurrentTrainer()"
@@ -168,7 +168,7 @@
       @if (showRecenterButton()) {
         <li class="action-button" appRequireSetup>
           <button
-            class="btn btn-sm btn-secondary"
+            class="btn btn-sm btn-neutral"
             tp="Recenter on Hero [R]"
             (click)="recenterCamera()"
             appSfx="ui-click"
@@ -186,7 +186,7 @@
 
       <li class="action-button" appRequireSetup>
         <button
-          class="btn btn-sm btn-info"
+          class="btn btn-sm btn-neutral"
           [tp]="isPaused() ? 'Resume Game [SPACE]' : 'Pause Game [SPACE]'"
           (click)="togglePause()"
           appSfx="ui-click"
@@ -206,7 +206,7 @@
       <li class="action-button" appRequireNotSetup>
         <button
           type="button"
-          class="btn btn-sm btn-warning"
+          class="btn btn-sm btn-neutral btn-outline"
           [swal]="leaveSwal"
           [tp]="'Go Back [Q]'"
           appSfx="ui-error"
@@ -222,7 +222,7 @@
 
       <li class="action-button" appRequireSetup>
         <button
-          class="btn btn-sm btn-accent"
+          class="btn btn-sm btn-neutral"
           [tp]="'Open Menu [ESC]'"
           (click)="closeAllMenus()"
           appSfx="ui-click"
@@ -263,7 +263,7 @@
   <div body class="flex flex-col gap-2">
     <button
       type="button"
-      class="btn btn-info"
+      class="btn btn-primary"
       (click)="closePauseMenu()"
       appSfx="ui-click"
       [sfxOffset]="0"
@@ -278,7 +278,7 @@
 
     <button
       type="button"
-      class="btn btn-warning"
+      class="btn btn-neutral btn-outline"
       [swal]="leaveSwal"
       appSfx="ui-error"
       [sfxOffset]="2"

@@ -15,7 +15,7 @@
   {{ summary() }}
   @let owned = ownedQuantity();
   @if (owned !== undefined) {
-    <span class="text-lighter italic">(you have {{ owned | number }})</span>
+    <span class="text-lighter">(you have {{ owned | number }})</span>
   }
 
   @if (clause().type === 'LevelUpParty') {
@@ -52,14 +52,14 @@
   <input
     type="checkbox"
     [checked]="clause().enabled"
-    class="checkbox checkbox-sm checkbox-secondary"
+    class="checkbox checkbox-sm"
     (click)="toggleEnabled.emit()"
   />
 </label>
 
 @if (isEditable()) {
   <button
-    class="btn btn-xs btn-secondary"
+    class="btn btn-xs btn-neutral"
     (click)="edit.emit()"
     appSfx="ui-click"
     [sfxOffset]="0"
@@ -70,7 +70,7 @@
 }
 
 <button
-  class="btn btn-xs btn-error"
+  class="btn btn-xs btn-error btn-outline"
   (click)="remove.emit()"
   appSfx="ui-error"
   [sfxOffset]="1"

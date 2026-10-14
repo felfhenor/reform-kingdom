@@ -22,7 +22,7 @@ import {
   uiClockTick,
 } from '@helpers/engine/ui';
 import { kingdomNavSections } from '@helpers/kingdom/kingdom-nav.ui';
-import type { KingdomNavEntry, Tradeskill } from '@interfaces';
+import type { KingdomNavEntry, KingdomNavGroup, Tradeskill } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { AnimationService } from '@services/animation.service';
 
@@ -52,6 +52,15 @@ export class PanelKingdomNavComponent {
   public kingdomSubviewClear = kingdomSubviewClear;
 
   public kingdomSubview = kingdomSubview;
+
+  // Literal class names so Tailwind's scanner picks them up.
+  public dividerClass: Record<KingdomNavGroup, string> = {
+    reserves: 'divider-section-reserves',
+    collections: 'divider-section-collections',
+    workforce: 'divider-section-workforce',
+    crafting: 'divider-section-crafting',
+    actions: '',
+  };
 
   // Ticks once a second so tradeskill queue tooltips never look frozen.
   public sections = computed(() => {

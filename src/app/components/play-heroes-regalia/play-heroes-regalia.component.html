@@ -35,7 +35,7 @@
 
       <button
         type="button"
-        class="btn btn-secondary btn-sm"
+        class="btn btn-neutral btn-sm"
         (click)="rename()"
         appSfx="ui-click"
         [sfxTrigger]="['click', 'hover']"
@@ -45,7 +45,7 @@
 
       <button
         type="button"
-        class="btn btn-error btn-sm"
+        class="btn btn-error btn-outline btn-sm"
         [swal]="removeSwal"
         appSfx="ui-error"
         [sfxTrigger]="['click', 'hover']"
@@ -159,7 +159,7 @@
                 <app-slot-icon-blank>
                   <app-icon name="tablerExclamationCircle" size="nav" />
                 </app-slot-icon-blank>
-                <span class="type-meta italic">Item missing</span>
+                <span class="type-meta">Item missing</span>
               }
 
               @if (reason) {

@@ -87,7 +87,7 @@ export const appConfig: ApplicationConfig = {
               customClass: {
                 confirmButton: 'btn btn-primary',
                 denyButton: 'btn btn-error',
-                cancelButton: 'btn btn-neutral',
+                cancelButton: 'btn btn-neutral btn-outline',
               },
             }),
           ),

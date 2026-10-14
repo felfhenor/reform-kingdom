@@ -13,7 +13,7 @@
       <input
         type="checkbox"
         [checked]="hideUncraftable()"
-        class="checkbox checkbox-sm checkbox-secondary"
+        class="checkbox checkbox-sm"
         (click)="toggleHideUncraftable()"
       />
       Hide uncraftable ({{ uncraftableTotal | number }})
@@ -30,9 +30,7 @@
 
   <div class="flex flex-col gap-4 pt-0 h-full min-h-0">
     <div class="flex flex-col gap-2 flex-shrink-0">
-      <div
-        class="text-xs font-semibold text-error italic text-center mb-2 min-h-4"
-      >
+      <div class="type-blocker font-semibold text-center mb-2 min-h-4">
         @if (gateCollectible(); as collectible) {
           You will not be able to progress to {{ tradeskill() }} Lv.
           {{ gateNextLevel() }} unless you acquire
@@ -43,7 +41,7 @@
       </div>
 
       <app-bar-progress
-        color="primary"
+        color="xp"
         [value]="buildingData.xp.current"
         [max]="buildingData.xp.maximum"
       >
@@ -167,12 +165,12 @@
               </span>
 
               <div class="flex items-center gap-2 flex-wrap">
-                <span class="badge badge-sm badge-info">
+                <span class="badge badge-sm badge-data">
                   Craftable: {{ entry.maxCraftable | number }}
                 </span>
 
                 @if (entry.ownedQuantity > 0) {
-                  <span class="badge badge-sm badge-info">
+                  <span class="badge badge-sm badge-data">
                     Owned: {{ entry.ownedQuantity | number }}
                   </span>
                 }
@@ -227,7 +225,7 @@
             <div class="flex gap-2 items-center">
               <div class="join">
                 <button
-                  class="btn btn-xs btn-secondary"
+                  class="btn btn-xs btn-neutral"
                   [disabled]="uncraftable || full || quantity === 1"
                   (click)="
                     stepQuantity(entry.recipe.id, entry.maxQueueable, -10)
@@ -240,7 +238,7 @@
                 </button>
 
                 <button
-                  class="btn btn-xs btn-secondary"
+                  class="btn btn-xs btn-neutral"
                   [disabled]="uncraftable || full || quantity === 1"
                   (click)="
                     stepQuantity(entry.recipe.id, entry.maxQueueable, -1)
@@ -270,7 +268,7 @@
                 />
 
                 <button
-                  class="btn btn-xs btn-secondary"
+                  class="btn btn-xs btn-neutral"
                   [disabled]="
                     uncraftable || full || quantity === entry.maxQueueable
                   "
@@ -283,7 +281,7 @@
                 </button>
 
                 <button
-                  class="btn btn-xs btn-secondary"
+                  class="btn btn-xs btn-neutral"
                   [disabled]="
                     uncraftable || full || quantity === entry.maxQueueable
                   "
@@ -298,7 +296,7 @@
                 </button>
 
                 <button
-                  class="btn btn-xs btn-secondary"
+                  class="btn btn-xs btn-neutral"
                   [disabled]="
                     uncraftable || full || quantity === entry.maxQueueable
                   "

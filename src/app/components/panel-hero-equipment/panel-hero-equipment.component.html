@@ -28,7 +28,7 @@
             <div class="flex items-center gap-2">
               <span
                 class="badge"
-                [class.badge-info]="missing === 0"
+                [class.badge-data]="missing === 0"
                 [class.badge-warning]="missing > 0"
                 [tp]="
                   missing > 0
@@ -114,7 +114,7 @@
         >
           <button
             type="button"
-            class="btn btn-sm btn-secondary"
+            class="btn btn-sm btn-neutral"
             [disabled]="!equipmentModifiable()"
             (click)="optimize()"
             appSfx="ui-click"
@@ -141,7 +141,7 @@
           >
             <button
               type="button"
-              class="btn btn-sm btn-secondary"
+              class="btn btn-sm btn-neutral"
               [disabled]="!equipmentModifiable()"
               (click)="openBurstPicker()"
               appSfx="ui-click"
@@ -154,7 +154,7 @@
 
         <button
           type="button"
-          class="btn btn-sm btn-secondary"
+          class="btn btn-sm btn-neutral"
           [appHideUntilLevel]="15"
           (click)="openRegalias()"
           appSfx="ui-click"

@@ -38,7 +38,7 @@
         >
           <button
             type="button"
-            class="btn btn-sm btn-secondary"
+            class="btn btn-sm btn-neutral"
             [disabled]="!modifiable"
             (click)="unequip(selected)"
             appSfx="ui-error"
@@ -72,6 +72,7 @@
       }
     </div>
   } @else {
+    <span class="type-section-title shrink-0" aria-hidden="true"></span>
     <app-blank-slate>Select a slot to see available gear.</app-blank-slate>
   }
 </div>

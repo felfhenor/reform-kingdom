@@ -2,25 +2,21 @@
   <span header>Kingdom</span>
 
   <div class="flex flex-col gap-4 p-4 h-full overflow-y-auto">
-    <div class="card shadow-sm">
+    <div class="card shadow-sm bg-section-reserves">
       <div class="card-body p-3 gap-2">
         <h2 class="type-section-title">Reserves</h2>
 
         <div class="grid grid-cols-3 gap-2">
           <button
-            class="btn btn-primary flex flex-col justify-center gap-2 h-28"
+            class="btn btn-neutral flex flex-col justify-center gap-2 h-36"
             (click)="openSubview('storage')"
             appSfx="ui-click"
             [sfxOffset]="0"
             [sfxTrigger]="['click', 'hover']"
           >
             @let count = materialCount();
-            <span
-              class="text-base font-bold flex items-center gap-2 justify-center"
-            >
-              <app-icon-kingdom [name]="nav.storage.icon" class="zoom-inline" />
-              {{ nav.storage.label }}
-            </span>
+            <app-icon-kingdom [name]="nav.storage.icon" class="zoom-tile" />
+            <span class="text-base font-bold">{{ nav.storage.label }}</span>
             <span class="type-meta">
               {{ count }}
               {{ 'material' | pluralize: count > 1 }} stored
@@ -28,19 +24,15 @@
           </button>
 
           <button
-            class="btn btn-primary flex flex-col justify-center gap-2 h-28"
+            class="btn btn-neutral flex flex-col justify-center gap-2 h-36"
             (click)="openSubview('armory')"
             appSfx="ui-click"
             [sfxOffset]="1"
             [sfxTrigger]="['click', 'hover']"
           >
             @let armoryTotal = armoryCount();
-            <span
-              class="text-base font-bold flex items-center gap-2 justify-center"
-            >
-              <app-icon-kingdom [name]="nav.armory.icon" class="zoom-inline" />
-              {{ nav.armory.label }}
-            </span>
+            <app-icon-kingdom [name]="nav.armory.icon" class="zoom-tile" />
+            <span class="text-base font-bold">{{ nav.armory.label }}</span>
 
             <app-bar-progress
               [value]="armoryTotal"
@@ -54,19 +46,17 @@
           @if (isFeatureAvailable('astralprojector')) {
             @let spellCount = unlockedAstralSpellCount();
             <button
-              class="btn btn-primary flex flex-col justify-center gap-2 h-28"
+              class="btn btn-neutral flex flex-col justify-center gap-2 h-36"
               (click)="openSubview('astralprojector')"
               appSfx="ui-click"
               [sfxOffset]="2"
               [sfxTrigger]="['click', 'hover']"
             >
-              <span
-                class="text-base font-bold flex items-center gap-2 justify-center"
-              >
-                <app-icon-kingdom
-                  [name]="nav.astralprojector.icon"
-                  class="zoom-inline"
-                />
+              <app-icon-kingdom
+                [name]="nav.astralprojector.icon"
+                class="zoom-tile"
+              />
+              <span class="text-base font-bold">
                 {{ nav.astralprojector.label }}
               </span>
 
@@ -80,13 +70,13 @@
       </div>
     </div>
 
-    <div class="card shadow-sm">
+    <div class="card shadow-sm bg-section-collections">
       <div class="card-body p-3 gap-2">
         <h2 class="type-section-title">Collections</h2>
 
         <div class="grid grid-cols-2 gap-2">
           <button
-            class="btn btn-accent flex flex-col justify-center gap-2 h-28"
+            class="btn btn-neutral flex flex-col justify-center gap-2 h-36"
             (click)="openSubview('museum')"
             appSfx="ui-click"
             [sfxOffset]="3"
@@ -97,14 +87,11 @@
             @let foundCollectibles = museumCollectiblesFound();
             @let foundRecipes = museumRecipesFound();
 
-            <span
-              class="text-base font-bold flex items-center gap-2 justify-center"
-            >
-              <app-icon-kingdom [name]="nav.museum.icon" class="zoom-inline" />
-              {{ nav.museum.label }}
-            </span>
+            <app-icon-kingdom [name]="nav.museum.icon" class="zoom-tile" />
+            <span class="text-base font-bold">{{ nav.museum.label }}</span>
 
             <app-bar-progress
+              color="muted"
               [value]="foundCollectibles"
               [max]="museumEntries.length"
             >
@@ -112,6 +99,7 @@
             </app-bar-progress>
 
             <app-bar-progress
+              color="muted"
               [value]="foundRecipes"
               [max]="recipeEntries.length"
             >
@@ -120,7 +108,7 @@
           </button>
 
           <button
-            class="btn btn-accent flex flex-col justify-center gap-2 h-28"
+            class="btn btn-neutral flex flex-col justify-center gap-2 h-36"
             (click)="openSubview('bestiary')"
             appSfx="ui-click"
             [sfxOffset]="4"
@@ -129,17 +117,14 @@
             @let bestiaryList = bestiaryEntries();
             @let discovered = bestiaryDiscoveredCount();
 
-            <span
-              class="text-base font-bold flex items-center gap-2 justify-center"
-            >
-              <app-icon-kingdom
-                [name]="nav.bestiary.icon"
-                class="zoom-inline"
-              />
-              {{ nav.bestiary.label }}
-            </span>
+            <app-icon-kingdom [name]="nav.bestiary.icon" class="zoom-tile" />
+            <span class="text-base font-bold">{{ nav.bestiary.label }}</span>
 
-            <app-bar-progress [value]="discovered" [max]="bestiaryList.length">
+            <app-bar-progress
+              color="muted"
+              [value]="discovered"
+              [max]="bestiaryList.length"
+            >
               {{ discovered }}/{{ bestiaryList.length }} discovered
             </app-bar-progress>
           </button>
@@ -148,28 +133,21 @@
     </div>
 
     @if (isFeatureAvailable('workers')) {
-      <div class="card shadow-sm">
+      <div class="card shadow-sm bg-section-workforce">
         <div class="card-body p-3 gap-2">
           <h2 class="type-section-title">Workforce</h2>
 
           <div class="grid grid-cols-3 gap-2">
             <button
-              class="btn btn-secondary flex flex-col justify-center gap-2 h-28"
+              class="btn btn-neutral flex flex-col justify-center gap-2 h-36"
               (click)="openSubview('workers')"
               appSfx="ui-click"
               [sfxOffset]="5"
               [sfxTrigger]="['click', 'hover']"
             >
               @let levelUpReady = workerLevelUpReadyCount();
-              <span
-                class="text-base font-bold flex items-center gap-2 justify-center"
-              >
-                <app-icon-kingdom
-                  [name]="nav.workers.icon"
-                  class="zoom-inline"
-                />
-                {{ nav.workers.label }}
-              </span>
+              <app-icon-kingdom [name]="nav.workers.icon" class="zoom-tile" />
+              <span class="text-base font-bold">{{ nav.workers.label }}</span>
               <span class="type-meta">
                 {{ workerBusyCount() }}/{{ workerTotalCount() }} workers busy
               </span>
@@ -185,7 +163,7 @@
       </div>
     }
 
-    <div class="card shadow-sm">
+    <div class="card shadow-sm bg-section-crafting">
       <div class="card-body p-3 gap-2">
         <h2 class="type-section-title">Crafting</h2>
 
@@ -196,24 +174,23 @@
           ) {
             <button
               type="button"
-              class="btn btn-secondary px-2 flex flex-col justify-center gap-2 h-28"
+              class="btn btn-neutral px-2 flex flex-col justify-center gap-2 h-36"
               (click)="openSubview(tradeskill.subview)"
               appSfx="ui-click"
               [sfxOffset]="$index + 6"
               [sfxTrigger]="['click', 'hover']"
             >
-              <span
-                class="text-base font-bold flex items-center gap-2 justify-center"
-              >
-                <app-atlas-image
-                  spritesheet="tradeskill"
-                  [assetName]="tradeskill.sprite"
-                  class="zoom-inline"
-                />
+              <app-atlas-image
+                spritesheet="tradeskill"
+                [assetName]="tradeskill.sprite"
+                class="zoom-tile"
+              />
+              <span class="text-base font-bold">
                 {{ tradeskill.label }} Lv. {{ tradeskill.level }}
               </span>
 
               <app-bar-progress
+                color="xp"
                 [value]="tradeskill.xpCurrent"
                 [max]="tradeskill.xpMaximum"
               >
@@ -223,7 +200,7 @@
 
               @if (tradeskill.hasQueue) {
                 <app-bar-progress
-                  color="accent"
+                  color="primary"
                   [value]="tradeskill.overallPercent"
                   [max]="tradeskill.activePercent"
                 >
@@ -256,7 +233,7 @@
           @let raidCount = raidDefenseCount();
           @if (raidCount > 0) {
             <button
-              class="btn btn-warning btn-sm"
+              class="btn btn-neutral btn-sm"
               appButtonGlow
               (click)="openRaidDefenseModal()"
               appSfx="ui-click"
@@ -265,13 +242,15 @@
             >
               <app-icon-kingdom name="requesteddefenses" class="zoom-inline" />
               Requested Defenses
-              <span class="badge badge-sm badge-error">{{ raidCount }}</span>
+              <span class="badge badge-sm badge-attention">
+                {{ raidCount }}
+              </span>
             </button>
           }
 
           @let claimableTasks = claimableTaskCount();
           <button
-            class="btn btn-accent btn-sm"
+            class="btn btn-neutral btn-sm"
             appButtonGlow
             [buttonGlowActive]="claimableTasks > 0"
             (click)="openTasksModal()"
@@ -282,7 +261,7 @@
             <app-icon-kingdom name="tasks" class="zoom-inline" />
             Tasks
             @if (claimableTasks > 0) {
-              <span class="badge badge-sm badge-secondary">
+              <span class="badge badge-sm badge-attention">
                 {{ claimableTasks | number }}
               </span>
             }
@@ -290,7 +269,7 @@
 
           @if (isFeatureAvailable('workshop')) {
             <button
-              class="btn btn-accent btn-sm"
+              class="btn btn-neutral btn-sm"
               (click)="openSubview('workshop')"
               appSfx="ui-click"
               [sfxOffset]="2"
@@ -306,7 +285,7 @@
 
           @if (isFeatureAvailable('commissions')) {
             <button
-              class="btn btn-accent btn-sm"
+              class="btn btn-neutral btn-sm"
               (click)="openSubview('commissions')"
               appSfx="ui-click"
               [sfxOffset]="3"
@@ -325,7 +304,7 @@
             [helpText]="'This must be done at the Duchy.'"
           >
             <button
-              class="btn btn-accent btn-sm"
+              class="btn btn-neutral btn-sm"
               [disabled]="!isAtKingdomCurrently()"
               (click)="openReclassModal()"
               appSfx="ui-click"
@@ -343,7 +322,7 @@
               [helpText]="'This must be done at the Duchy.'"
             >
               <button
-                class="btn btn-accent btn-sm"
+                class="btn btn-neutral btn-sm"
                 [disabled]="!isAtKingdomCurrently()"
                 (click)="resetHome()"
                 appSfx="ui-click"

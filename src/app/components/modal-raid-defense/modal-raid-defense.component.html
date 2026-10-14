@@ -27,7 +27,7 @@
             } @else if (row.travelEtaSeconds !== undefined) {
               <button
                 type="button"
-                class="btn btn-xs btn-secondary tabular-nums"
+                class="btn btn-xs btn-neutral tabular-nums"
                 disabled
               >
                 {{ etaLabel(row.travelEtaSeconds) }}
@@ -35,7 +35,7 @@
             } @else {
               <button
                 type="button"
-                class="btn btn-xs btn-secondary"
+                class="btn btn-xs btn-neutral"
                 [disabled]="!row.canTravel"
                 (click)="travelTo(row.nodeName)"
                 appSfx="ui-click"

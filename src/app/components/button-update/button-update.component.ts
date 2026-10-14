@@ -1,11 +1,12 @@
 import { Component, inject } from '@angular/core';
+import { ButtonGlowComponent } from '@components/button-glow/button-glow.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { isInElectron } from '@helpers/engine/discord';
 import { MetaService } from '@services/meta.service';
 
 @Component({
   selector: 'app-button-update',
-  imports: [SFXDirective],
+  imports: [ButtonGlowComponent, SFXDirective],
   templateUrl: './button-update.component.html',
   styleUrl: './button-update.component.scss',
 })

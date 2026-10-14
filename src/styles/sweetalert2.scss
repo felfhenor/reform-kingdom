@@ -81,8 +81,8 @@ div:where(.swal2-container) div:where(.swal2-validation-message)::before {
 }
 
 .swal2-question {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
+  border-color: var(--color-info);
+  color: var(--color-info);
 }
 
 .swal2-success {

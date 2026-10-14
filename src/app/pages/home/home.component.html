@@ -26,7 +26,7 @@
   >
     @if (savefileFailureText()) {
       <button
-        class="btn btn-warning btn-block mt-2"
+        class="btn btn-neutral btn-block mt-2"
         (click)="openSavefileSettings()"
         appAnalyticsClick="Meta:Play:RecoverSavefile"
         appSfx="ui-click"
@@ -38,7 +38,7 @@
 
     @if (showBackupsAvailable()) {
       <button
-        class="btn btn-warning btn-block mt-2"
+        class="btn btn-neutral btn-block mt-2"
         (click)="openSavefileSettings()"
         appAnalyticsClick="Meta:Play:RestoreBackup"
         appSfx="ui-click"
@@ -62,7 +62,9 @@
     }
 
     <button
-      class="btn btn-primary btn-block"
+      class="btn btn-block"
+      [class.btn-primary]="!hasStartedGame()"
+      [class.btn-neutral]="hasStartedGame()"
       (click)="newGame()"
       appAnalyticsClick="Meta:Play:New"
       appSfx="ui-click"

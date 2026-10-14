@@ -23,7 +23,8 @@ import {
 import { tradeskillXpForLevel } from '@helpers/crafting/tradeskill';
 import { defaultGameState, defaultTradeskillBuilding } from '@helpers/defaults';
 import { characterXpForLevel } from '@helpers/hero/party';
-import { migrateGameState } from '@helpers/migrate';
+import { migrateGameState, migrateOptionsState } from '@helpers/migrate';
+import { defaultOptions, options, setOptions } from '@helpers/state-options';
 import { gamestate } from '@helpers/state-game';
 import type {
   AutoModeState,
@@ -34,6 +35,7 @@ import type {
   DecreeClauseId,
   EquipmentId,
   EquipmentSkillId,
+  GameOptions,
   GameState,
   GatheringId,
   ItemId,
@@ -511,5 +513,21 @@ describe('migrateGameState', () => {
     expect(Object.keys(migrated.tasks)).toEqual([task.id]);
     expect(Object.keys(migrated.world.towns)).toEqual([larsia.id]);
     expect(migrated.world.homeNodeName).toBeUndefined();
+  });
+});
+
+describe('migrateOptionsState', () => {
+  it('drops the removed uiTheme option and fills in missing defaults', () => {
+    const stale: Partial<GameOptions> & { uiTheme: string } = {
+      ...defaultOptions(),
+      uiTheme: 'synthwave',
+    };
+    delete stale.sfxVolume;
+    setOptions(stale as GameOptions);
+
+    migrateOptionsState();
+
+    expect(options()).not.toHaveProperty('uiTheme');
+    expect(options().sfxVolume).toBe(defaultOptions().sfxVolume);
   });
 });

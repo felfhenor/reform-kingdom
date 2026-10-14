@@ -10,14 +10,14 @@
       <div class="type-entity-name mb-1 text-{{ skillData.rarity }}">
         {{ skillData.name }}
         @if (isSpecial()) {
-          <span class="badge badge-sm badge-info ml-1">Burst</span>
+          <span class="badge badge-sm badge-data ml-1">Burst</span>
         }
       </div>
 
       <div class="text-sm">{{ skillDescription() }}</div>
 
       @if (skillData.delay > 0) {
-        <div class="text-xs mt-1 italic">
+        <div class="text-xs mt-1">
           Takes effect after {{ skillData.delay | number }}
           {{ 'turn' | pluralize: skillData.delay !== 1 }}
         </div>
@@ -25,7 +25,7 @@
 
       @let cooldownTurns = cooldown();
       @if (cooldownTurns > 0) {
-        <div class="text-xs mt-1 italic">
+        <div class="text-xs mt-1">
           Cooldown: {{ cooldownTurns | number }}
           {{ 'turn' | pluralize: cooldownTurns !== 1 }}
         </div>
@@ -58,7 +58,7 @@
         displayCharacterWeaponTypes().length > 0 &&
         skillData.requiredWeaponTypes.length > 0
       ) {
-        <div class="text-xs mt-2 italic" [class.text-error]="!skillUsable()">
+        <div class="text-xs mt-2" [class.type-blocker]="!skillUsable()">
           Skill only usable with
           {{ skillData.requiredWeaponTypes.join(', ') }}
         </div>

@@ -11,7 +11,7 @@
     <button
       titleActions
       type="button"
-      class="btn btn-sm btn-error"
+      class="btn btn-sm btn-error btn-outline"
       (click)="unset()"
       appSfx="ui-error"
       [sfxTrigger]="['click', 'hover']"
@@ -54,7 +54,7 @@
               {{ skill.name }}
             </span>
 
-            <span class="badge badge-sm badge-info">
+            <span class="badge badge-sm badge-data">
               {{ skill.epCost | number }} EP
             </span>
           </div>

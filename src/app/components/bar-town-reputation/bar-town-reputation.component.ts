@@ -17,7 +17,7 @@ import type { TownId } from '@interfaces';
   template: `
     @if (display(); as repDisplay) {
       <app-bar-progress
-        color="secondary"
+        color="reputation"
         [value]="repDisplay.reputation"
         [max]="repDisplay.nextThreshold ?? repDisplay.reputation"
       >

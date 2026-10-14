@@ -6,17 +6,20 @@ import { equipmentSellValue, getArmoryEntries } from '@helpers/kingdom/armory';
 import { syncArmoryGlobalEffects } from '@helpers/kingdom/armory-global-effects';
 import { updateGamestate } from '@helpers/state-game';
 import type {
-  DaisyColor,
   EquipmentArmoryEntry,
   EquipmentItemId,
+  ProgressBarColor,
 } from '@interfaces';
 import { sum } from 'es-toolkit/compat';
 
-export function armoryFillColor(armorySize: number, cap: number): DaisyColor {
+export function armoryFillColor(
+  armorySize: number,
+  cap: number,
+): ProgressBarColor {
   const ratio = armorySize / cap;
   if (ratio >= 1) return 'error';
   if (ratio >= ARMORY_ENCUMBERED_THRESHOLD) return 'warning';
-  return 'info';
+  return 'muted';
 }
 
 export function filterArmoryEntries(

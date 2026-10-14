@@ -11,7 +11,7 @@
             <input
               type="checkbox"
               [checked]="autoModeEnabled()"
-              class="checkbox checkbox-secondary"
+              class="checkbox"
               (click)="toggleAutoMode()"
             />
             <span class="label-text flex gap-2 items-center">
@@ -33,7 +33,7 @@
             <input
               type="checkbox"
               [checked]="waitForFullHealthBeforeCombat()"
-              class="checkbox checkbox-secondary"
+              class="checkbox"
               (click)="toggleWaitForFullHealthBeforeCombat()"
             />
             <span class="label-text">Wait for Full Health Before Combat</span>
@@ -45,7 +45,7 @@
             <input
               type="checkbox"
               [checked]="waitForFullEnergyBeforeCombat()"
-              class="checkbox checkbox-secondary"
+              class="checkbox"
               (click)="toggleWaitForFullEnergyBeforeCombat()"
             />
             <span class="label-text">Wait for Full Energy Before Combat</span>
@@ -298,7 +298,7 @@
       <div class="card-body p-3 gap-2 flex-1 min-h-0 flex flex-col">
         <div class="type-section-title justify-between">
           Decree
-          <span class="badge badge-sm badge-info tabular-nums">
+          <span class="badge badge-sm badge-data tabular-nums">
             {{ clauses().length | number }}/{{ clauseCap() | number }}
           </span>
         </div>
@@ -319,7 +319,7 @@
               [class.outline-2]="
                 isActiveClause || editingClauseId() === clause.id
               "
-              [class.outline-primary]="editingClauseId() === clause.id"
+              [class.outline-base-content]="editingClauseId() === clause.id"
               [class.outline-success]="
                 isActiveClause && editingClauseId() !== clause.id
               "

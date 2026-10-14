@@ -17,7 +17,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (isHomeNode()) {
-      <div class="badge badge-accent">
+      <div class="badge badge-data">
         <app-icon
           name="gameHouse"
           [tp]="'This location is your home. You will respawn here after dying, and your Decree will bring you here to heal if necessary.'"
@@ -26,7 +26,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     } @else if (canSetHome()) {
       <button
         type="button"
-        class="btn btn-outline btn-accent btn-sm w-fit"
+        class="btn btn-neutral btn-outline btn-sm w-fit"
         (click)="setHome()"
         appSfx="ui-click"
         [sfxTrigger]="['click', 'hover']"

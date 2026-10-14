@@ -13,11 +13,6 @@ import { getOption } from '@helpers/state-options';
 export class ThemeService {
   constructor() {
     effect(() => {
-      const theme = getOption('uiTheme');
-      document.documentElement.setAttribute('data-theme', theme);
-    });
-
-    effect(() => {
       // Options from before this key existed are undefined until the migration merges defaults in.
       const useCleanFont = !!getOption('cleanFont');
       document.body.classList.toggle('clean-font', useCleanFont);

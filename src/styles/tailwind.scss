@@ -1,46 +1,14 @@
 @plugin "daisyui" {
-  themes:
-    light,
-    dark --default --prefersdark,
-    cupcake,
-    synthwave,
-    halloween,
-    forest,
-    black,
-    luxury,
-    dracula,
-    business,
-    night,
-    coffee,
-    sunset,
-    dim,
-    light,
-    cupcake,
-    bumblebee,
-    emerald,
-    corporate,
-    retro,
-    cyberpunk,
-    valentine,
-    garden,
-    lofi,
-    pastel,
-    fantasy,
-    wireframe,
-    cmyk,
-    autumn,
-    acid,
-    lemonade,
-    winter,
-    nord;
+  themes: dark --default;
 }
 
-// daisyUI's default dark-theme accent is light enough that white button
-// text reads as low-contrast against it - darken the accent and lighten
-// its content color to match the primary/secondary pairing instead.
-[data-theme='dark'] {
-  --color-accent: oklch(60% 0.13 181.912);
-  --color-accent-content: oklch(96% 0.02 181.912);
+// daisyUI's dark theme with our palette on top; unlayered, so it beats the plugin's theme variables.
+// Plum stays clear of every rarity, difficulty, element and resource color; see the palette style guide.
+:root {
+  --color-primary: oklch(48% 0.17 340);
+  --color-primary-content: oklch(97% 0.02 340);
+  --color-neutral: oklch(32% 0.02 340);
+  --color-neutral-content: oklch(95% 0.01 340);
 
   --color-info: oklch(60% 0.14561 233.348);
   --color-info-content: oklch(96% 0.066 243.157);
@@ -62,6 +30,16 @@
   --color-heal: #4ade80;
   --color-ep: #978d00;
   --color-xp: #009b65;
+  --color-reputation: oklch(58% 0.16 275);
+}
+
+@theme static {
+  --color-debug: oklch(80% 0.13 200);
+  --color-attention: rgb(251 191 36);
+  --color-section-reserves: oklch(25% 0.035 70);
+  --color-section-collections: oklch(25% 0.035 195);
+  --color-section-workforce: oklch(25% 0.035 30);
+  --color-section-crafting: oklch(25% 0.035 235);
 }
 
 body {
@@ -134,8 +112,9 @@ body {
   @apply card-title;
 }
 
+// At least a small button tall, so a column headed by a title lines up with one headed by a tab bar or button.
 @utility type-section-title {
-  @apply card-title text-base;
+  @apply card-title text-base min-h-8;
 }
 
 @utility type-label {
@@ -164,11 +143,127 @@ body {
 }
 
 @utility type-hint {
-  @apply text-xs italic text-lighter;
+  @apply text-xs text-lighter border-l-2 border-base-content/35 pl-2;
 }
 
 @utility type-flavor {
   @apply text-sm italic text-lighter;
+}
+
+// Why something can't be done right now.
+@utility type-blocker {
+  @apply text-xs text-error;
+}
+
+// Neutral is darker than the dark bases, so an outlined neutral button rests in base-content instead.
+.btn-neutral.btn-outline:not([appListRow]) {
+  --btn-rest-fg: var(--color-base-content);
+  --btn-border: color-mix(in oklab, var(--color-base-content) 35%, transparent);
+}
+
+// "You are here": active tab, navbar view, side-rail item.
+@utility here {
+  --here-bg: color-mix(
+    in oklab,
+    var(--color-primary) 30%,
+    var(--color-base-200)
+  );
+  border-color: var(--color-primary) !important;
+  background:
+    url(/asset/texture-button.png),
+    linear-gradient(to bottom, var(--here-bg), var(--here-bg)) !important;
+  color: var(--color-base-content) !important;
+}
+
+@utility btn-debug {
+  border: 1px dashed var(--color-debug) !important;
+  background: transparent !important;
+  color: var(--color-debug) !important;
+
+  &:hover {
+    background: color-mix(
+      in oklab,
+      var(--color-debug) 15%,
+      transparent
+    ) !important;
+  }
+}
+
+@utility tab-debug {
+  border-style: dashed !important;
+  border-color: var(--color-debug) !important;
+  color: var(--color-debug) !important;
+}
+
+@utility badge-data {
+  --badge-color: color-mix(
+    in oklab,
+    var(--color-base-content) 14%,
+    transparent
+  );
+  --badge-fg: var(--color-base-content);
+}
+
+@utility badge-attention {
+  --badge-color: var(--color-attention);
+  --badge-fg: oklch(22% 0.05 80);
+}
+
+// Amber dot for "needs you" on rail items and tabs; the parent must be position: relative.
+@utility attention-dot {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 8px;
+  height: 8px;
+  background: var(--color-attention);
+  box-shadow: 0 0 6px 1px rgb(251 191 36 / 80%);
+}
+
+// Rail dividers repeat the kingdom page's section tints, brightened so a thin rule still reads.
+@utility divider-section-reserves {
+  &::before,
+  &::after {
+    background-color: oklch(60% 0.07 70);
+  }
+}
+
+@utility divider-section-collections {
+  &::before,
+  &::after {
+    background-color: oklch(60% 0.07 195);
+  }
+}
+
+@utility divider-section-workforce {
+  &::before,
+  &::after {
+    background-color: oklch(60% 0.07 30);
+  }
+}
+
+@utility divider-section-crafting {
+  &::before,
+  &::after {
+    background-color: oklch(60% 0.07 235);
+  }
+}
+
+// Card textures paint from --bg-color, so section tints set that rather than background-color.
+@utility bg-section-reserves {
+  --bg-color: var(--color-section-reserves) !important;
+}
+
+@utility bg-section-collections {
+  --bg-color: var(--color-section-collections) !important;
+}
+
+@utility bg-section-workforce {
+  --bg-color: var(--color-section-workforce) !important;
+}
+
+@utility bg-section-crafting {
+  --bg-color: var(--color-section-crafting) !important;
 }
 
 // Icon zoom sizes, named for where they're applied rather than their raw
@@ -185,11 +280,10 @@ body {
   zoom: 75%;
 }
 
-@utility zoom-header {
-  zoom: 150%;
+@utility zoom-tile {
+  zoom: 75%;
 }
 
-@utility glow-idle {
-  box-shadow: 0 0 6px 2px
-    color-mix(in oklab, var(--color-success) 70%, transparent);
+@utility zoom-header {
+  zoom: 150%;
 }

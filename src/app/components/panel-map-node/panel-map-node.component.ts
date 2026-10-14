@@ -154,7 +154,7 @@ export class PanelMapNodeComponent {
 
     const entry = this.node();
     const difficulty = entry ? worldNodeDifficultyTier(entry) : undefined;
-    return difficulty ? `badge-difficulty-${difficulty}` : 'badge-info';
+    return difficulty ? `badge-difficulty-${difficulty}` : 'badge-data';
   });
 
   public description = computed(() => {
