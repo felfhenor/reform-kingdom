@@ -3,7 +3,11 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { ensureAffix } from '@helpers/content/ensure-affix';
 import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
 import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
-import { defaultGameState, defaultStats } from '@helpers/defaults';
+import {
+  defaultEquipment,
+  defaultGameState,
+  defaultStats,
+} from '@helpers/defaults';
 import {
   addArmoryItems,
   armoryAdd,
@@ -18,6 +22,7 @@ import {
   isEquipmentDiscovered,
   pruneInvalidArmoryItems,
   RARITY_SELL_MULTIPLIER,
+  stateMarkPartyEquipmentDiscovered,
 } from '@helpers/kingdom/armory';
 import { armoryState, gamestate } from '@helpers/state-game';
 import type {
@@ -30,7 +35,7 @@ import type {
   GlobalEffectId,
   ItemId,
 } from '@interfaces';
-import { buildEquipmentItem } from '@/testing/builders';
+import { buildCharacter, buildEquipmentItem } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 import { inTick, seedGamestate } from '@/testing/gamestate';
 
@@ -263,6 +268,25 @@ describe('isEquipmentDiscovered', () => {
 
     expect(isEquipmentDiscovered(swordId)).toBe(true);
     expect(isEquipmentDiscovered(shieldId)).toBe(false);
+  });
+});
+
+describe('stateMarkPartyEquipmentDiscovered', () => {
+  it('marks every equipped item, leaving unequipped gear undiscovered', () => {
+    const state = defaultGameState();
+    state.world.party = [
+      buildCharacter({
+        equipment: {
+          ...defaultEquipment(),
+          Weapon: buildEquipmentItem(swordId),
+        },
+      }),
+    ];
+
+    stateMarkPartyEquipmentDiscovered(state);
+
+    expect(state.discoveredEquipment[swordId]).toBeDefined();
+    expect(state.discoveredEquipment[shieldId]).toBeUndefined();
   });
 });
 

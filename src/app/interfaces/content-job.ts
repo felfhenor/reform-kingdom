@@ -1,4 +1,6 @@
 import type { HasAnimation } from '@interfaces/artable';
+import type { CombatOrderClause } from '@interfaces/combat-order';
+import type { EquipmentId } from '@interfaces/content-equipment';
 import type { JobAbilityId } from '@interfaces/content-jobability';
 import type { EquipmentSkillId } from '@interfaces/content-skill';
 import type { EquipmentItemType } from '@interfaces/equipment';
@@ -25,6 +27,12 @@ export type JobAbilityLevel = {
   value: number;
 };
 
+// A new hero's starting Combat Orders; the id and enabled flag are assigned when the hero is created.
+export type JobDefaultCombatOrder = Pick<
+  CombatOrderClause,
+  'condition' | 'action'
+>;
+
 export type JobStatPriority = {
   stat: BaseStat;
   multiplier: number;
@@ -48,4 +56,9 @@ export type JobContent = IsContentItem &
     skillPath: JobSkillPath[];
 
     abilities: JobAbilityLevel[];
+
+    defaultCombatOrders: JobDefaultCombatOrder[];
+
+    // Only given on new-game hero creation, never on reclass.
+    starterEquipmentIds: EquipmentId[];
   };

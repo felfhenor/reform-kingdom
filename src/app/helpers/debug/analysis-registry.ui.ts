@@ -8,6 +8,7 @@ import { runGatherDevelopmentLevelsAnalysis } from '@helpers/debug/analysis-gath
 import { runHeroStatsAnalysis } from '@helpers/debug/analysis-herostats';
 import { runInfusionGapsAnalysis } from '@helpers/debug/analysis-infusiongaps';
 import { runJobAbilitiesAnalysis } from '@helpers/debug/analysis-jobabilities';
+import { runJobStarterAnalysis } from '@helpers/debug/analysis-jobstarter';
 import { runMaterialUtilizationAnalysis } from '@helpers/debug/analysis-materialutilization';
 import { runMonsterDropsAnalysis } from '@helpers/debug/analysis-monsterdrops';
 import { runMonsterStatsAnalysis } from '@helpers/debug/analysis-monsterstats';
@@ -365,6 +366,16 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     strict: true,
     inputKeys: [],
     run: runJobAbilitiesAnalysis,
+  },
+  {
+    id: 'jobstarter',
+    title: 'Job Starting Kit',
+    description:
+      "Every job's starter equipment is wearable by the job at level 1, and its default Combat Orders cast a level 1 skill at a reachable target without naming a specific hero.",
+    category: 'Skills',
+    strict: true,
+    inputKeys: [],
+    run: runJobStarterAnalysis,
   },
   {
     id: 'skillbonuses',

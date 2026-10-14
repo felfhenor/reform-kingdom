@@ -61,5 +61,7 @@ export function ensureJob(job: Partial<JobContent>): Required<JobContent> {
     })),
     skillPath: ensureArray(job.skillPath, ensureJobSkillPath),
     abilities: ensureArray(job.abilities, ensureJobAbilityLevel),
+    defaultCombatOrders: job.defaultCombatOrders ?? [],
+    starterEquipmentIds: job.starterEquipmentIds ?? [],
   };
 }

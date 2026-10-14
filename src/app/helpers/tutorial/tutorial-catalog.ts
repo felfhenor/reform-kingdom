@@ -111,7 +111,7 @@ export const TUTORIAL_CATALOG: TutorialDefinition[] = [
         targetKey: 'hero-combat-orders',
         view: 'heroes',
         title: 'Combat Orders',
-        body: 'Each hero has a Combat Orders button that you can use to loosely guide their actions in combat.',
+        body: 'Each hero has a set of combat orders that you can use to loosely guide their actions in combat.',
       },
     ],
   },

@@ -17,8 +17,8 @@ import {
   isCombatOrderFamilyEquipmentOnly,
   isCombatOrderFamilyKnown,
   isCombatOrderFamilyUsable,
-  isCombatOrderTargetModeUsable,
 } from '@helpers/combat/combat-order-evaluation.ui';
+import { isCombatOrderTargetModeUsable } from '@helpers/combat/combat-order-target-mode';
 import { defaultEquipment } from '@helpers/defaults';
 import { characterCombatSkills, characterSkills } from '@helpers/hero/job';
 import { equippedItemTypes } from '@helpers/item/equipment';

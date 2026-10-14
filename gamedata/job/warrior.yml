@@ -132,3 +132,16 @@
     - jobAbilityId: Intimidation
       level: 25
       value: -12
+
+  starterEquipmentIds:
+    - Cloak of Adventuring
+    - Hat of Adventuring
+    - Copper Mace
+
+  defaultCombatOrders:
+    - condition:
+        type: Always
+      action:
+        type: CastSkillFamily
+        family: Double Strike
+        targetMode: Strongest

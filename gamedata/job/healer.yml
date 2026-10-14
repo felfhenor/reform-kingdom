@@ -77,7 +77,7 @@
 
     - pathName: Cure
       levels:
-        - level: 3
+        - level: 1
           skillId: Cure I
 
         - level: 10
@@ -148,3 +148,28 @@
     - jobAbilityId: Town Favor
       level: 25
       value: 0.2
+
+  starterEquipmentIds:
+    - Cloak of Adventuring
+    - Hat of Adventuring
+    - Wergen Staff
+
+  defaultCombatOrders:
+    - condition:
+        type: AllyCountHealthPercent
+        healthDirection: Below
+        healthPercent: 50
+        comparator: GreaterThanOrEqual
+        count: 1
+      action:
+        type: CastSkillFamily
+        family: Cure
+        targetMode: MatchingAllies
+
+    - condition:
+        type: SelfEnergyPercent
+        comparator: GreaterThanOrEqual
+        value: 50
+      action:
+        type: CastSkillFamily
+        family: Holy Smite

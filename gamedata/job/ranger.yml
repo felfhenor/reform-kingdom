@@ -129,3 +129,16 @@
     - jobAbilityId: Ambush
       level: 25
       value: 20
+
+  starterEquipmentIds:
+    - Cloak of Adventuring
+    - Hat of Adventuring
+    - Wergen Bow
+
+  defaultCombatOrders:
+    - condition:
+        type: Always
+      action:
+        type: CastSkillFamily
+        family: Snipe
+        targetMode: Strongest

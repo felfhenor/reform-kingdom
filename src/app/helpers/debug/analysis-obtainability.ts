@@ -15,6 +15,7 @@ import type {
   ExchangeNodeContent,
   GatheringContent,
   ItemContent,
+  JobContent,
   MonsterContent,
   RecipeContent,
   TownContent,
@@ -22,11 +23,7 @@ import type {
 } from '@interfaces';
 
 // Granted unconditionally by game code.
-const GUARANTEED_GRANT_NAMES = new Set<string>([
-  'Cloak of Adventuring',
-  'Hat of Adventuring',
-  'Founding Stone',
-]);
+const GUARANTEED_GRANT_NAMES = new Set<string>(['Founding Stone']);
 
 function addIfPresent(set: Set<string>, value?: string): void {
   if (value) set.add(value);
@@ -109,11 +106,16 @@ export function runObtainabilityAnalysis(): AnalysisRunResult {
   const commissionOffers =
     getEntriesByType<CommissionOfferContent>('commissionoffer');
   const exchangeNodes = getEntriesByType<ExchangeNodeContent>('exchangenode');
+  const jobs = getEntriesByType<JobContent>('job');
 
   const obtainableItems = new Set<string>();
   const obtainableEquipment = new Set<string>();
   const obtainableCollectibles = new Set<string>();
   const obtainableWorkers = new Set<string>();
+
+  jobs.forEach((job) =>
+    job.starterEquipmentIds.forEach((id) => obtainableEquipment.add(id)),
+  );
 
   monsters.forEach((monster) =>
     collectFromDroppedRewards(

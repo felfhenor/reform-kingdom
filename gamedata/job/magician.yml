@@ -137,3 +137,17 @@
     - jobAbilityId: Mystical Insight
       level: 25
       value: 0.4
+
+  starterEquipmentIds:
+    - Cloak of Adventuring
+    - Hat of Adventuring
+    - Wergen Staff
+
+  defaultCombatOrders:
+    - condition:
+        type: EnemyCount
+        comparator: GreaterThanOrEqual
+        count: 3
+      action:
+        type: CastSkillFamily
+        family: Fireball

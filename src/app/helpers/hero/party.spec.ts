@@ -36,12 +36,6 @@ import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
 
 const jobId = 'job-explorer' as JobId;
-const job = ensureJob({
-  id: jobId,
-  name: 'Explorer',
-  baseStats: { ...defaultStats(), Health: 100, Energy: 25, Strength: 5 },
-  statsPerLevel: { ...defaultStats(), Health: 10, Strength: 0.5 },
-});
 const cloak = ensureEquipment({
   id: 'cloak' as EquipmentId,
   name: 'Cloak of Adventuring',
@@ -51,6 +45,13 @@ const starterHat = ensureEquipment({
   id: 'starter-hat' as EquipmentId,
   name: 'Hat of Adventuring',
   type: 'Hat',
+});
+const job = ensureJob({
+  id: jobId,
+  name: 'Explorer',
+  baseStats: { ...defaultStats(), Health: 100, Energy: 25, Strength: 5 },
+  statsPerLevel: { ...defaultStats(), Health: 10, Strength: 0.5 },
+  starterEquipmentIds: [cloak.id, starterHat.id],
 });
 const sword = ensureEquipment({
   id: 'sword' as EquipmentId,
@@ -164,7 +165,7 @@ describe('characterStatsForLevel', () => {
 });
 
 describe('createCharacter', () => {
-  it('starts at level 1 with full pools, wearing the starter cloak and hat', () => {
+  it('starts at level 1 with full pools, wearing its job starter gear', () => {
     const jala = createCharacter('Jala', jobId);
 
     expect(jala).toMatchObject({
@@ -184,6 +185,34 @@ describe('createCharacter', () => {
         Helmet: expect.objectContaining({ equipmentId: starterHat.id }),
       }),
     );
+  });
+
+  it('starts with its job default Combat Orders', () => {
+    const condition = { type: 'Always' } as const;
+    const action = { type: 'CastSkillFamily', family: 'Analyze' } as const;
+    seedContent([
+      ensureJob({ ...job, defaultCombatOrders: [{ condition, action }] }),
+    ]);
+
+    expect(createCharacter('Jala', jobId).combatOrders).toEqual({
+      [jobId]: [{ id: expect.any(String), enabled: true, condition, action }],
+    });
+  });
+
+  it('equips its job starter gear into every slot the item fills', () => {
+    const bow = ensureEquipment({
+      id: 'bow' as EquipmentId,
+      name: 'Bow',
+      type: 'Bow',
+    });
+    seedContent([ensureJob({ ...job, starterEquipmentIds: [bow.id] }), bow]);
+
+    const { equipment } = createCharacter('Jala', jobId);
+
+    expect(equipment.Weapon).toEqual(
+      expect.objectContaining({ equipmentId: bow.id }),
+    );
+    expect(equipment.Offhand).toBe(equipment.Weapon);
   });
 
   it('starts empty-handed when the starter gear is not in content', () => {

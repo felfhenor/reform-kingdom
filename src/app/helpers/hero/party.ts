@@ -1,3 +1,4 @@
+import { combatOrdersFromJobDefaults } from '@helpers/combat/combat-order';
 import {
   CHARACTER_MAX_LEVEL,
   CHARACTER_XP_END,
@@ -24,23 +25,21 @@ import {
   characterAllTeachingIds,
   trainerTeachingEffects,
 } from '@helpers/trainer/trainer-teaching';
-import type {
-  AffixEffect,
-  Character,
-  CharacterId,
-  CharacterStatSource,
-  EquipmentBlock,
-  EquipmentContent,
-  GatherYieldBonus,
-  JobContent,
-  JobId,
-  StatBlock,
-  TrainerTeachingId,
+import {
+  EquipmentTypeToSlot,
+  type AffixEffect,
+  type Character,
+  type CharacterId,
+  type CharacterStatSource,
+  type EquipmentBlock,
+  type EquipmentContent,
+  type GatherYieldBonus,
+  type JobContent,
+  type JobId,
+  type StatBlock,
+  type TrainerTeachingId,
 } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
-
-const STARTER_ARMOR_NAME = 'Cloak of Adventuring';
-const STARTER_HAT_NAME = 'Hat of Adventuring';
 
 // `progress ** 1.5` eases in gently at low levels instead of a straight line's constant step dominating a tiny starting value.
 export function characterXpForLevel(level: number): number {
@@ -106,24 +105,27 @@ export function characterRecalculateStats(character: Character): Character {
   };
 }
 
-function starterEquipment(): EquipmentBlock {
+function equipStarterItem(
+  equipment: EquipmentBlock,
+  content: EquipmentContent,
+): void {
+  const item = newEquipmentItem(content.id);
+  EquipmentTypeToSlot[content.type].forEach((slot) => (equipment[slot] = item));
+}
+
+function starterEquipment(jobId: JobId): EquipmentBlock {
   const equipment = defaultEquipment();
-
-  const starterArmor = getEntry<EquipmentContent>(STARTER_ARMOR_NAME);
-  if (starterArmor) {
-    equipment.Armor = newEquipmentItem(starterArmor.id);
-  }
-
-  const starterHat = getEntry<EquipmentContent>(STARTER_HAT_NAME);
-  if (starterHat) {
-    equipment.Helmet = newEquipmentItem(starterHat.id);
-  }
+  const job = getEntry<JobContent>(jobId);
+  (job?.starterEquipmentIds ?? [])
+    .map((equipmentId) => getEntry<EquipmentContent>(equipmentId))
+    .filter((content): content is EquipmentContent => !!content)
+    .forEach((content) => equipStarterItem(equipment, content));
 
   return equipment;
 }
 
 export function createCharacter(name: string, jobId: JobId): Character {
-  const equipment = starterEquipment();
+  const equipment = starterEquipment(jobId);
   const stats = characterStatsForLevel(jobId, 1, equipment, []);
 
   return {
@@ -136,7 +138,7 @@ export function createCharacter(name: string, jobId: JobId): Character {
     },
     jobId,
     jobProgress: {},
-    combatOrders: {},
+    combatOrders: { [jobId]: combatOrdersFromJobDefaults(jobId) },
     teachings: {},
     burstSkills: {},
     currentRegaliaIds: {},

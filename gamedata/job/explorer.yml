@@ -122,3 +122,16 @@
     - jobAbilityId: Loot Goblin
       level: 1
       value: 5
+
+  starterEquipmentIds:
+    - Cloak of Adventuring
+    - Hat of Adventuring
+    - Copper Dagger
+
+  defaultCombatOrders:
+    - condition:
+        type: Always
+      action:
+        type: CastSkillFamily
+        family: Analyze
+        targetMode: Strongest

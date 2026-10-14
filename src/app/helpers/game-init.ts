@@ -6,6 +6,7 @@ import {
   setGamePlayView,
 } from '@helpers/engine/ui';
 import { grantStartingGold } from '@helpers/item/materials';
+import { stateMarkPartyEquipmentDiscovered } from '@helpers/kingdom/armory';
 import { migrateGameState } from '@helpers/migrate';
 import { savefileMarkFresh } from '@helpers/savefile/savefile-load';
 import { setupFinish } from '@helpers/setup';
@@ -23,6 +24,7 @@ export async function gameStart(): Promise<void> {
   setWorld(world);
   await updateGamestate((state) => {
     grantStartingGold(state);
+    stateMarkPartyEquipmentDiscovered(state);
     ledgerMark(state.discoveredMaps, state.world.currentLocation.mapName);
     return state;
   });

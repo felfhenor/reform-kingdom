@@ -15,6 +15,7 @@ export * from './combat-log.ui';
 export * from './combat-order';
 export * from './combat-order-evaluation';
 export * from './combat-order-evaluation.ui';
+export * from './combat-order-target-mode';
 export * from './combat-order.ui';
 export * from './combat-rewards';
 export * from './combat-skill-cooldown';

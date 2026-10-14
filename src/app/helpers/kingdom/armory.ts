@@ -183,6 +183,15 @@ export function armoryAddWithAffixes(
   });
 }
 
+// Starting gear is equipped directly, never passing through the armory where discovery is normally marked.
+export function stateMarkPartyEquipmentDiscovered(state: GameState): void {
+  state.world.party.forEach((character) =>
+    Object.values(character.equipment).forEach((item) => {
+      if (item) ledgerMark(state.discoveredEquipment, item.equipmentId);
+    }),
+  );
+}
+
 // Whether this equipment has ever been found - unlike armory ownership, this
 // is permanent and survives equipping, selling, or breaking the gear down.
 export function isEquipmentDiscovered(equipmentId: EquipmentId): boolean {

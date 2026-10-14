@@ -30,7 +30,7 @@ import {
   combatOrderClauseSetEnabled,
   combatOrderClauseUpdate,
 } from '@helpers/combat/combat-order.ui';
-import { isCombatOrderTargetModeAllowedForCondition } from '@helpers/combat/combat-order-evaluation.ui';
+import { isCombatOrderTargetModeAllowedForCondition } from '@helpers/combat/combat-order-target-mode';
 import {
   COMBAT_ELEMENT_CHARGES_PER_ELEMENT,
   COMBAT_ORDER_ROW_CAP,
