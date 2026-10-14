@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { ButtonGlowComponent } from '@components/button-glow/button-glow.component';
+import { IconComponent } from '@components/icon/icon.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { TooltipJobAbilityComponent } from '@components/tooltip-job-ability/tooltip-job-ability.component';
@@ -14,6 +15,8 @@ import { TooltipSkillPreviewComponent } from '@components/tooltip-skill-preview/
 import { SFXDirective } from '@directives/sfx.directive';
 import { TutorialTargetDirective } from '@directives/tutorial-target.directive';
 import { combatantFromCharacter } from '@helpers/combat/combat-create';
+import { combatOrderBlockedFamilies } from '@helpers/combat/combat-order-evaluation.ui';
+import { combatantSkills } from '@helpers/combat/combat-targetting';
 import { getEntry } from '@helpers/content/content';
 import { heroBurstSkillsModalOpen } from '@helpers/engine/ui';
 import { characterJobAbilityRows } from '@helpers/hero/job-ability.ui';
@@ -46,6 +49,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     SFXDirective,
     TutorialTargetDirective,
     DecimalPipe,
+    IconComponent,
   ],
   host: {
     class: 'flex flex-col min-h-0 pb-8',
@@ -79,6 +83,11 @@ export class PanelHeroEquipmentSkillsComponent {
   public heroCombatant = computed(() =>
     combatantFromCharacter(this.character()),
   );
+
+  public blockedFamilies = computed(() => {
+    const combatant = this.heroCombatant();
+    return combatOrderBlockedFamilies(combatant, combatantSkills(combatant));
+  });
 
   public equippedWeaponTypes = computed<EquipmentItemType[]>(() =>
     equippedItemTypes(this.character().equipment),

@@ -1,4 +1,4 @@
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, NgTemplateOutlet } from '@angular/common';
 import type { TemplateRef } from '@angular/core';
 import {
   ChangeDetectionStrategy,
@@ -37,6 +37,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     DecimalPipe,
+    NgTemplateOutlet,
     PluralizePipe,
     RowSkillTechniqueComponent,
     IconItemPreviewComponent,
@@ -49,6 +50,7 @@ export class TooltipSkillPreviewComponent {
   public display = input.required<EquipmentSkillContent>();
   public displayCombatant = input.required<Combatant>();
   public displayCharacterWeaponTypes = input<EquipmentItemType[]>([]);
+  public footer = input<TemplateRef<unknown>>();
 
   public template = viewChild.required<TemplateRef<unknown>>('tooltipContent');
 

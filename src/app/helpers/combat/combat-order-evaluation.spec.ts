@@ -1,5 +1,7 @@
 import {
+  combatOrderClauseBlockingSkill,
   combatOrderConditionMatches,
+  combatOrderSkillBlockedBy,
   matchingCombatantsForCondition,
   pickSkillFromCombatOrders,
   resolveFamilyToSkill,
@@ -7,6 +9,7 @@ import {
 import type {
   CharacterId,
   Combatant,
+  CombatOrderClause,
   CombatOrderClauseId,
   CombatOrderComparator,
   CombatOrderCondition,
@@ -719,5 +722,154 @@ describe('pickSkillFromCombatOrders', () => {
     });
 
     expect(pickSkillFromCombatOrders(combat, combatant, [])).toBeUndefined();
+  });
+});
+
+describe('combatOrderClauseBlockingSkill', () => {
+  const strike = buildEquipmentSkill({
+    id: 'strike' as EquipmentSkillId,
+    family: 'Strike',
+    techniques: [
+      buildTechnique({
+        targetType: 'Enemies',
+        targetBehaviors: [{ behavior: 'NotZeroHealth' }],
+      }),
+    ],
+  });
+
+  function clause(
+    overrides: Partial<CombatOrderClause> = {},
+  ): CombatOrderClause {
+    return {
+      id: 'clause' as CombatOrderClauseId,
+      enabled: true,
+      condition: { type: 'Always' },
+      action: { type: 'CastSkillFamily', family: 'Strike' },
+      ...overrides,
+    };
+  }
+
+  it('blocks with an enabled Always clause whose skill only EP can stop', () => {
+    expect(combatOrderClauseBlockingSkill(clause(), [strike])).toBe(strike);
+  });
+
+  it('does not block when the clause can be skipped for any other reason', () => {
+    expect(
+      combatOrderClauseBlockingSkill(clause({ enabled: false }), [strike]),
+    ).toBeUndefined();
+    expect(
+      combatOrderClauseBlockingSkill(
+        clause({
+          condition: {
+            type: 'EnemyCount',
+            comparator: 'GreaterThanOrEqual',
+            count: 1,
+          },
+        }),
+        [strike],
+      ),
+    ).toBeUndefined();
+    expect(
+      combatOrderClauseBlockingSkill(
+        clause({
+          action: {
+            type: 'CastSkillFamily',
+            family: 'Strike',
+            targetMode: 'Self',
+          },
+        }),
+        [strike],
+      ),
+    ).toBeUndefined();
+    expect(combatOrderClauseBlockingSkill(clause(), [])).toBeUndefined();
+  });
+
+  it('does not block when the skill runs out, cools down, costs charges or can lack a target', () => {
+    const limited = [
+      { techniques: [buildTechnique({ targetBehaviors: [] })] },
+      { usesPerCombat: 1 },
+      { cooldown: 2 },
+      { elementCosts: { Fire: 1, Water: 0, Earth: 0, Air: 0 } },
+      {
+        techniques: [
+          buildTechnique({
+            targetBehaviors: [
+              {
+                behavior: 'IfNotStatusEffect',
+                statusEffectId: 'Weakspot' as StatusEffectId,
+              },
+            ],
+          }),
+        ],
+      },
+    ];
+
+    limited.forEach((overrides) =>
+      expect(
+        combatOrderClauseBlockingSkill(clause(), [
+          buildEquipmentSkill({ ...strike, ...overrides }),
+        ]),
+      ).toBeUndefined(),
+    );
+  });
+});
+
+describe('combatOrderSkillBlockedBy', () => {
+  function skill(
+    family: string,
+    epCost: number,
+    targetType: EquipmentSkillContentTechnique['targetType'],
+  ) {
+    return buildEquipmentSkill({
+      id: family as EquipmentSkillId,
+      family,
+      epCost,
+      techniques: [
+        buildTechnique({
+          targetType,
+          targetBehaviors: [{ behavior: 'NotZeroHealth' }],
+        }),
+      ],
+    });
+  }
+
+  const combatant = buildTestCombatant();
+  const strike = skill('Strike', 3, 'Enemies');
+
+  it('blocks enemy skills costing at least as much as an enemy-targeting blocker', () => {
+    expect(
+      combatOrderSkillBlockedBy(
+        combatant,
+        strike,
+        skill('Sweep', 3, 'Enemies'),
+      ),
+    ).toBe(true);
+    expect(
+      combatOrderSkillBlockedBy(combatant, strike, skill('Jab', 2, 'Enemies')),
+    ).toBe(false);
+    expect(combatOrderSkillBlockedBy(combatant, strike, strike)).toBe(false);
+  });
+
+  it('spares ally skills, which can still fire after the last enemy falls mid-round', () => {
+    expect(
+      combatOrderSkillBlockedBy(combatant, strike, skill('Heal', 9, 'Allies')),
+    ).toBe(false);
+    expect(
+      combatOrderSkillBlockedBy(
+        combatant,
+        skill('Focus', 3, 'Self'),
+        skill('Heal', 9, 'Allies'),
+      ),
+    ).toBe(true);
+  });
+
+  it('blocks nothing while the hero can be redirected', () => {
+    const confused = buildTestCombatant({
+      combatStats: { ...combatant.combatStats, redirectionChance: 10 },
+    });
+
+    expect(
+      combatOrderSkillBlockedBy(confused, strike, skill('Sweep', 5, 'Enemies')),
+    ).toBe(false);
   });
 });

@@ -1,16 +1,25 @@
 import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
 import { elementPool } from '@helpers/combat/combat-element-pool';
+import { combatOrderTargetModeNeedsValidityCheck } from '@helpers/combat/combat-order-target-mode';
+import { combatCombatantSkillEpCost } from '@helpers/combat/combat-stats';
 import { combatantHasLivingSummon } from '@helpers/combat/combat-summon';
 import { combatSkillHasValidTargetsForMode } from '@helpers/combat/combat-targetting';
+import {
+  skillCooldown,
+  skillHasElementCosts,
+  skillUses,
+} from '@helpers/hero/skill';
 import { rngChoice } from '@helpers/rng';
 import type {
   Combat,
   Combatant,
+  CombatOrderClause,
   CombatOrderComparator,
   CombatOrderCondition,
   CombatOrderHealthCountCondition,
   CombatOrderPick,
   EquipmentSkill,
+  EquipmentSkillContentTechnique,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
 
@@ -180,14 +189,9 @@ export function pickSkillFromCombatOrders(
     }
 
     const targetMode = clause.action.targetMode;
-    const needsValidityCheck =
-      targetMode === 'Self' ||
-      targetMode === 'SpecificHero' ||
-      targetMode === 'MatchingAllies' ||
-      targetMode === 'MatchingEnemies';
-
-    // Only the new modes can resolve to zero targets - others are unchanged from before.
-    if (!needsValidityCheck) return { skill, targetMode };
+    if (!combatOrderTargetModeNeedsValidityCheck(targetMode)) {
+      return { skill, targetMode };
+    }
 
     const matchingCombatants = matchingCombatantsForCondition(
       combat,
@@ -221,4 +225,68 @@ export function pickSkillFromCombatOrders(
   }
 
   return undefined;
+}
+
+// An empty behavior list filters out every target, so it never qualifies.
+function techniqueTargetsAnyLiving(
+  technique: EquipmentSkillContentTechnique,
+): boolean {
+  return (
+    technique.targetBehaviors.length > 0 &&
+    technique.targetBehaviors.every(
+      ({ behavior }) => behavior === 'Always' || behavior === 'NotZeroHealth',
+    )
+  );
+}
+
+function skillOnlyLimitedByEnergy(skill: EquipmentSkill): boolean {
+  return (
+    skillUses(skill) === -1 &&
+    skillCooldown(skill) === 0 &&
+    !skillHasElementCosts(skill) &&
+    skill.techniques.some(techniqueTargetsAnyLiving)
+  );
+}
+
+// The caster is always a living ally or self, but enemies can all fall mid-round while heroes still act.
+function skillAlwaysHasTarget(skill: EquipmentSkill): boolean {
+  return skill.techniques.some(
+    (tech) => techniqueTargetsAnyLiving(tech) && tech.targetType !== 'Enemies',
+  );
+}
+
+// An "Always" clause whose skill is cast on every turn its caster can afford it, so it starves every clause and skill behind it.
+export function combatOrderClauseBlockingSkill(
+  clause: CombatOrderClause,
+  skills: EquipmentSkill[],
+): EquipmentSkill | undefined {
+  if (!clause.enabled || clause.condition.type !== 'Always') return undefined;
+  if (clause.action.type !== 'CastSkillFamily') return undefined;
+  if (combatOrderTargetModeNeedsValidityCheck(clause.action.targetMode)) {
+    return undefined;
+  }
+
+  const skill = resolveFamilyToSkill(clause.action.family, skills);
+  return skill && skillOnlyLimitedByEnergy(skill) ? skill : undefined;
+}
+
+// Skipping the blocker for EP leaves nothing pricier affordable; skipping it for lack of enemies leaves enemy-only skills targetless too.
+export function combatOrderSkillBlockedBy(
+  combatant: Combatant,
+  blocker: EquipmentSkill,
+  skill: EquipmentSkill,
+): boolean {
+  if (skill.family === blocker.family) return false;
+  if ((combatant.combatStats.redirectionChance ?? 0) > 0) return false;
+  if (
+    combatCombatantSkillEpCost(combatant, skill) <
+    combatCombatantSkillEpCost(combatant, blocker)
+  ) {
+    return false;
+  }
+
+  return (
+    skillAlwaysHasTarget(blocker) ||
+    skill.techniques.every((tech) => tech.targetType === 'Enemies')
+  );
 }

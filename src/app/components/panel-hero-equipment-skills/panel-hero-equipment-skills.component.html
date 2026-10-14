@@ -1,3 +1,10 @@
+<ng-template #blockedWarning>
+  <div class="badge badge-sm badge-warning mt-2">
+    <app-icon name="tablerExclamationCircle" size="badge" />
+    Your hero's Combat Orders will not allow them to use this skill.
+  </div>
+</ng-template>
+
 @if (hasBurstOptions()) {
   @let burst = chosenBurstSkill();
 
@@ -12,6 +19,9 @@
         [display]="burst"
         [displayCombatant]="heroCombatant()"
         [displayCharacterWeaponTypes]="equippedWeaponTypes()"
+        [footer]="
+          blockedFamilies().includes(burst.family) ? blockedWarning : undefined
+        "
       />
 
       <div
@@ -31,6 +41,13 @@
           <span class="badge badge-sm badge-data">
             {{ burst.epCost | number }} EP
           </span>
+          @if (blockedFamilies().includes(burst.family)) {
+            <app-icon
+              name="tablerExclamationCircle"
+              size="badge"
+              class="badge badge-sm badge-warning"
+            />
+          }
         </div>
       </div>
     } @else {
@@ -61,6 +78,9 @@
         [display]="skill"
         [displayCombatant]="heroCombatant()"
         [displayCharacterWeaponTypes]="equippedWeaponTypes()"
+        [footer]="
+          blockedFamilies().includes(skill.family) ? blockedWarning : undefined
+        "
       />
 
       <div
@@ -80,6 +100,13 @@
           </div>
 
           <span class="badge badge-sm badge-data">{{ skill.epCost }} EP</span>
+          @if (blockedFamilies().includes(skill.family)) {
+            <app-icon
+              name="tablerExclamationCircle"
+              size="badge"
+              class="badge badge-sm badge-warning"
+            />
+          }
         </div>
       </div>
     } @empty {

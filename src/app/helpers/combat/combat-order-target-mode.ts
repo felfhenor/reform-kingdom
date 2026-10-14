@@ -4,6 +4,18 @@ import type {
   EquipmentSkillContent,
 } from '@interfaces';
 
+// These modes can resolve to zero targets, so the engine checks them before committing to a clause.
+export function combatOrderTargetModeNeedsValidityCheck(
+  targetMode: CombatantTargettingType | undefined,
+): targetMode is CombatantTargettingType {
+  return (
+    targetMode === 'Self' ||
+    targetMode === 'SpecificHero' ||
+    targetMode === 'MatchingAllies' ||
+    targetMode === 'MatchingEnemies'
+  );
+}
+
 // Matching* modes target the condition's own matches, so they only make sense with that condition.
 export function isCombatOrderTargetModeAllowedForCondition(
   targetMode: CombatantTargettingType | undefined,
@@ -24,14 +36,7 @@ export function isCombatOrderTargetModeUsable(
   heroSkills: EquipmentSkillContent[],
   targetMode: CombatantTargettingType | undefined,
 ): boolean {
-  if (
-    targetMode !== 'Self' &&
-    targetMode !== 'SpecificHero' &&
-    targetMode !== 'MatchingAllies' &&
-    targetMode !== 'MatchingEnemies'
-  ) {
-    return true;
-  }
+  if (!combatOrderTargetModeNeedsValidityCheck(targetMode)) return true;
 
   const skill = heroSkills.find((s) => s.family === family);
   if (!skill) return true;

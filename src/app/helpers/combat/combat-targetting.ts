@@ -30,15 +30,19 @@ import type {
 } from '@interfaces';
 import { intersection, sampleSize, sortBy, union } from 'es-toolkit/compat';
 
+export function combatantSkills(combatant: Combatant): EquipmentSkill[] {
+  return [
+    ...combatant.skillIds.map((s) => getEntry<EquipmentSkill>(s)!),
+    ...combatant.skillRefs,
+  ];
+}
+
 export function combatAvailableSkillsForCombatant(
   combat: Combat,
   combatant: Combatant,
 ): EquipmentSkill[] {
   const pool = elementPool(combat);
-  return [
-    ...combatant.skillIds.map((s) => getEntry<EquipmentSkill>(s)!),
-    ...combatant.skillRefs,
-  ].filter(
+  return combatantSkills(combatant).filter(
     (skill) =>
       (skill.usesPerCombat === -1 ||
         (combatant.skillUses[skill.id] ?? 0) < skillUses(skill)) &&

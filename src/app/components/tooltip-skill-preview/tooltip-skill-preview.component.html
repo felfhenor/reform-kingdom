@@ -64,7 +64,7 @@
         </div>
       }
 
-      <ng-content></ng-content>
+      <ng-container [ngTemplateOutlet]="footer() ?? null" />
     </div>
   </div>
 </ng-template>
