@@ -54,9 +54,7 @@
         @let remaining = entry.remaining ?? 0;
 
         @if (remaining > 0) {
-          <span class="badge badge-sm badge-data">
-            Trades Remaining: {{ remaining }}
-          </span>
+          <span class="badge badge-sm badge-data">Stock: {{ remaining }}</span>
         }
 
         @if (entry.soldOut) {
