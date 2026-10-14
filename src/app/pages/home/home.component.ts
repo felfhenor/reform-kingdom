@@ -117,6 +117,8 @@ export class HomeComponent implements OnInit {
       return;
     }
 
+    // Starting a game without answering the consent prompt counts as declining it.
+    setOption('analyticsOptInDismissed', true);
     this.router.navigate(['/setup']);
   }
 

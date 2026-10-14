@@ -22,6 +22,7 @@ import { titleCrawlQueue } from '@helpers/lore/title-crawl.ui';
 import { getUnlockedJobs } from '@helpers/hero/job';
 import { createCharacter, setParty } from '@helpers/hero/party';
 import { rngChoiceIdentifiable } from '@helpers/rng';
+import { setOption } from '@helpers/state-options';
 import type { JobContent, JobId } from '@interfaces';
 import {
   NgLabelTemplateDirective,
@@ -153,6 +154,9 @@ export class GameSetupWorldComponent implements OnInit {
 
   public async createWorld() {
     if (this.partyForm().invalid()) return;
+
+    // Starting a game without answering the consent prompt counts as declining it.
+    setOption('analyticsOptInDismissed', true);
 
     const party = this.heroesModel().map((hero) =>
       createCharacter(hero.name, hero.jobId),
