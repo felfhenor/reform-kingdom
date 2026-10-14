@@ -11,6 +11,7 @@ import {
   untracked,
 } from '@angular/core';
 import { modalHasAnyOpen } from '@helpers/engine/modal-stack';
+import { gamePlayView } from '@helpers/engine/ui';
 import { regionIntroPending } from '@helpers/lore/region-intro';
 import { isTitleCrawlPending } from '@helpers/lore/title-crawl';
 import { regionIntroMarkSeen } from '@helpers/lore/region-intro.ui';
@@ -35,7 +36,10 @@ export class CardRegionIntroComponent {
 
   // Held back (and restarted later) while nobody can read it, so it's never marked seen unread.
   public region = computed(() =>
-    this.isPageShown() && !modalHasAnyOpen() && !isTitleCrawlPending()
+    this.isPageShown() &&
+    gamePlayView() === 'world' &&
+    !modalHasAnyOpen() &&
+    !isTitleCrawlPending()
       ? regionIntroPending(this.mapName())
       : undefined,
   );
@@ -89,7 +93,7 @@ export class CardRegionIntroComponent {
     });
   }
 
-  // Only a real dismissal shatters; a modal or hidden tab hides it instantly so a returning card isn't stacked under the old one.
+  // Only a real dismissal shatters; a modal, hidden tab or other game view hides it instantly so a returning card isn't stacked under the old one.
   public onLeave(event: AnimationCallbackEvent): void {
     if (!this.isDismissing) {
       event.animationComplete();
