@@ -6,8 +6,12 @@
     <div class="card-body items-center gap-2 p-4 text-center">
       <h2 class="type-page-title">{{ currentRegion.name }}</h2>
       <p class="type-flavor">
-        {{ revealedText() }}
-        <span class="invisible">{{ hiddenText() }}</span>
+        @for (character of characters(); track $index) {
+          <span
+            [class.invisible]="$index >= revealedCharacters()"
+            [textContent]="character"
+          ></span>
+        }
       </p>
     </div>
   </div>

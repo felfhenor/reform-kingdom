@@ -19,6 +19,9 @@ import { AnimationService } from '@services/animation.service';
 
 const REVEAL_MS_PER_CHARACTER = 30;
 const LINGER_AFTER_REVEAL_MS = 4000;
+const graphemeSegmenter = new Intl.Segmenter(undefined, {
+  granularity: 'grapheme',
+});
 
 @Component({
   selector: 'app-card-region-intro',
@@ -30,7 +33,7 @@ export class CardRegionIntroComponent {
   public mapName = input.required<string>();
 
   private isPageShown = signal(!document.hidden);
-  private revealedCharacters = signal(0);
+  public revealedCharacters = signal(0);
   private anim = inject(AnimationService);
   private isDismissing = false;
 
@@ -44,23 +47,22 @@ export class CardRegionIntroComponent {
       : undefined,
   );
 
-  public revealedText = computed(
-    () => this.region()?.description.slice(0, this.revealedCharacters()) ?? '',
-  );
-
-  public hiddenText = computed(
-    () => this.region()?.description.slice(this.revealedCharacters()) ?? '',
+  // Every grapheme is laid out from the start and only its visibility flips, so wrapping never shifts mid-reveal.
+  public characters = computed(() =>
+    Array.from(
+      graphemeSegmenter.segment(this.region()?.description ?? ''),
+      ({ segment }) => segment,
+    ),
   );
 
   constructor() {
     effect((onCleanup) => {
-      const region = this.region();
-      if (!region) return;
+      if (!this.region()) return;
 
       untracked(() => this.revealedCharacters.set(0));
       this.isDismissing = false;
 
-      const length = region.description.length;
+      const length = untracked(() => this.characters().length);
       const revealTimer = setInterval(() => {
         this.revealedCharacters.update((count) => Math.min(count + 1, length));
       }, REVEAL_MS_PER_CHARACTER);
