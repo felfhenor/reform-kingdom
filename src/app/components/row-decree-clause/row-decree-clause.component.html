@@ -1,10 +1,11 @@
 @if (icon(); as item) {
   <div class="min-w-[16px] min-h-[16px]" [tp]="item.name" [tpPlacement]="'top'">
-    <app-atlas-image
-      class="zoom-inline"
-      [spritesheet]="item.spritesheet"
-      [assetName]="item.sprite"
-    />
+    <app-slot-icon-blank class="zoom-inline">
+      <app-atlas-image
+        [spritesheet]="item.spritesheet"
+        [assetName]="item.sprite"
+      />
+    </app-slot-icon-blank>
   </div>
 }
 

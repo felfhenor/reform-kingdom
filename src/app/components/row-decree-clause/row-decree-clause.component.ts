@@ -11,6 +11,7 @@ import {
   untracked,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
@@ -41,6 +42,7 @@ const EDITABLE_CLAUSE_TYPES: DecreeClause['type'][] = [
   host: { class: 'flex items-center gap-2 flex-1 min-w-0' },
   imports: [
     AtlasImageComponent,
+    SlotIconBlankComponent,
     TippyDirective,
     SFXDirective,
     DecimalPipe,
