@@ -42,21 +42,21 @@
 
   gatherResults:
     # level 1
-    - chance: 4
+    - chance: 2
       levelRequirement: 0
       tradeskillIds: [Woodworking]
       items:
         - itemId: Wergen Stick
           quantity: 1
 
-    - chance: 3
+    - chance: 1
       levelRequirement: 0
       tradeskillIds: [Woodworking]
       items:
         - itemId: Wergen Wood
           quantity: 1
 
-    - chance: 3
+    - chance: 1
       levelRequirement: 0
       tradeskillIds: [Tailoring]
       items:
