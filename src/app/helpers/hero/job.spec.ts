@@ -13,6 +13,7 @@ import {
   heroSkillsWithEquipment,
   partyFirstBurstSkillHero,
 } from '@helpers/hero/job';
+import { trainerTeachingEffects } from '@helpers/trainer/trainer-teaching';
 import type {
   EquipmentId,
   EquipmentSkillId,
@@ -161,12 +162,26 @@ describe('Job Helper Functions', () => {
       ).toEqual(['Attack', 'Double Strike I', 'Sweep I']);
     });
 
+    it('includes skills granted by debug effects', () => {
+      seedContent([mockJobExplorer, attack, doubleStrike1, sweep1]);
+
+      expect(
+        characterSkills({
+          jobId: mockJobExplorer.id,
+          level: 1,
+          equipment: defaultEquipment(),
+          teachings: {},
+          debugEffects: [{ kind: 'GrantSkill', skillId: sweep1.id }],
+        }).map((skill) => skill.id),
+      ).toContain(sweep1.id);
+    });
+
     it('merges teaching-granted skills alongside equipment grants', () => {
       const skills = heroSkillsWithEquipment(
         mockJobExplorer,
         1,
         defaultEquipment(),
-        [sweepTeaching.id],
+        trainerTeachingEffects([sweepTeaching.id]),
       );
 
       expect(skills.map((skill) => skill.id)).toContain('Sweep I');

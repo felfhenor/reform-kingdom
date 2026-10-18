@@ -4,19 +4,17 @@ import {
   skillIsSpecial,
   skillNameTier,
 } from '@helpers/hero/skill';
+import { characterNonGearEffects } from '@helpers/hero/hero-effect';
+import { affixEffectsOfKind } from '@helpers/item/affix';
 import { equipmentGrantedSkillIds } from '@helpers/item/equipment';
-import {
-  characterAllTeachingIds,
-  trainerTeachingGrantedSkillIds,
-} from '@helpers/trainer/trainer-teaching';
 import type {
   Character,
   CharacterStatSource,
   EquipmentBlock,
   EquipmentSkillContent,
   EquipmentSkillId,
+  HeroEffect,
   JobContent,
-  TrainerTeachingId,
 } from '@interfaces';
 import { sortBy, uniq } from 'es-toolkit/compat';
 
@@ -42,18 +40,24 @@ function resolveSkills(skillIds: EquipmentSkillId[]): EquipmentSkillContent[] {
     .filter((skill): skill is EquipmentSkillContent => !!skill);
 }
 
+function effectGrantedSkillIds(effects: HeroEffect[]): EquipmentSkillId[] {
+  return affixEffectsOfKind(effects, 'GrantSkill').map(
+    (effect) => effect.skillId,
+  );
+}
+
 // A hero's full skill list: their job-path skills at the given level, with
-// any equipment- or teaching-granted skills merged in.
+// any equipment- or effect-granted skills merged in.
 export function heroSkillsWithEquipment(
   job: JobContent,
   level: number,
   equipment: EquipmentBlock,
-  teachingIds: TrainerTeachingId[],
+  effects: HeroEffect[],
 ): EquipmentSkillContent[] {
   const baseSkills = resolveSkills(heroSkillsAtLevel(job, level));
   const grantedSkills = resolveSkills([
     ...equipmentGrantedSkillIds(equipment),
-    ...trainerTeachingGrantedSkillIds(teachingIds),
+    ...effectGrantedSkillIds(effects),
   ]);
 
   return mergeGrantedSkills(baseSkills, grantedSkills);
@@ -70,7 +74,7 @@ export function characterSkills(
     job,
     character.level,
     character.equipment,
-    characterAllTeachingIds(character),
+    characterNonGearEffects(character),
   );
 }
 
@@ -92,7 +96,7 @@ function characterUnmergedSkillIds(
         .map((entry) => entry.skillId),
     ),
     ...equipmentGrantedSkillIds(character.equipment),
-    ...trainerTeachingGrantedSkillIds(characterAllTeachingIds(character)),
+    ...effectGrantedSkillIds(characterNonGearEffects(character)),
   ]);
 }
 

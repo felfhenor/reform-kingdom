@@ -3,6 +3,7 @@ import {
   elementalResistanceClamp,
 } from '@helpers/combat/combat-element';
 import { getEntry } from '@helpers/content/content';
+import { characterNonGearEffects } from '@helpers/hero/hero-effect';
 import {
   affixEffectsOfKind,
   equipmentItemAffixEffects,
@@ -16,7 +17,6 @@ import {
   ELEMENT_BOON_BONUS,
   ELEMENT_RESISTANCE_BONUS,
 } from '@helpers/item/equipment-bonus';
-import { characterTeachingEffects } from '@helpers/trainer/trainer-teaching';
 import type {
   Character,
   ElementBlock,
@@ -34,7 +34,7 @@ function characterElementBlock(
 ): ElementBlock {
   return affixEffectsAddToBlock(
     equipmentDimensionTotals(character.equipment, dimension),
-    characterTeachingEffects(character),
+    characterNonGearEffects(character),
     dimension,
   );
 }

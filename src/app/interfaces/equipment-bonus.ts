@@ -1,6 +1,6 @@
-import type { AffixEffect } from '@interfaces/content-affix';
 import type { EquipmentContent } from '@interfaces/content-equipment';
 import type { ItemContent } from '@interfaces/content-item';
+import type { HeroEffect } from '@interfaces/hero-effect';
 
 // One config per "equipment bonus dimension" (base stats, resistances,
 // combat stats, ...).
@@ -12,5 +12,5 @@ export type EquipmentBonusDimension<K extends string> = {
   infusionBlock: (
     content: ItemContent,
   ) => Partial<Record<K, number>> | undefined;
-  affixBonusFor: (affixEffects: AffixEffect[], key: K) => number;
+  affixBonusFor: (affixEffects: HeroEffect[], key: K) => number;
 };

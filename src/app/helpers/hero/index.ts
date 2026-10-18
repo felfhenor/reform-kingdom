@@ -6,6 +6,7 @@ export * from './character-progress';
 export * from './character-reclass';
 export * from './global-effect-state';
 export * from './global-effects';
+export * from './hero-effect';
 export * from './job';
 export * from './job-ability';
 export * from './job-ability-regen';

@@ -7,12 +7,11 @@ import { ensureSkill } from '@helpers/content/ensure-skill';
 import { ensureStatusEffect } from '@helpers/content/ensure-statuseffect';
 import { defaultStats } from '@helpers/defaults';
 import {
-  characterStatsForLevel,
+  characterStats,
   characterXpForLevel,
   createCharacter,
 } from '@helpers/hero/party';
 import { newEquipmentItem } from '@helpers/item/equipment';
-import { characterAllTeachingIds } from '@helpers/trainer/trainer-teaching';
 import type {
   CaravanNodeState,
   Character,
@@ -120,12 +119,7 @@ export function buildCharacter(overrides: Partial<Character> = {}): Character {
     overrides.jobId ?? ('test-job-without-content' as JobId),
   );
   const level = overrides.level ?? base.level;
-  const stats = characterStatsForLevel(
-    base.jobId,
-    level,
-    overrides.equipment ?? base.equipment,
-    characterAllTeachingIds({ teachings: overrides.teachings ?? {} }),
-  );
+  const stats = characterStats({ ...base, ...overrides, level });
 
   return {
     ...base,

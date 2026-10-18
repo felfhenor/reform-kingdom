@@ -7,6 +7,7 @@ import type {
   DropRarity,
   EquipmentContent,
   EquipmentItem,
+  HeroEffect,
 } from '@interfaces';
 import { AffixCountByRarity, EquipmentTypeToSlot } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
@@ -153,21 +154,21 @@ export function equipmentItemMiscAffixDescriptions(
 }
 
 // The "narrow to one effect kind" primitive every stat/resistance/slot/sell/yield/caravan/skill resolver was reimplementing inline.
-export function affixEffectsOfKind<K extends AffixEffect['kind']>(
-  effects: AffixEffect[],
+export function affixEffectsOfKind<K extends HeroEffect['kind']>(
+  effects: HeroEffect[],
   kind: K,
-): Extract<AffixEffect, { kind: K }>[] {
+): Extract<HeroEffect, { kind: K }>[] {
   return effects.filter(
-    (effect): effect is Extract<AffixEffect, { kind: K }> =>
+    (effect): effect is Extract<HeroEffect, { kind: K }> =>
       effect.kind === kind,
   );
 }
 
 // Sums `.value` across effects of one kind, optionally narrowed further (e.g. by which stat/tag/tradeskill matches).
-export function affixEffectSum<K extends AffixEffect['kind']>(
-  effects: AffixEffect[],
+export function affixEffectSum<K extends HeroEffect['kind']>(
+  effects: HeroEffect[],
   kind: K,
-  matches?: (effect: Extract<AffixEffect, { kind: K }>) => boolean,
+  matches?: (effect: Extract<HeroEffect, { kind: K }>) => boolean,
 ): number {
   const matching = affixEffectsOfKind(effects, kind);
   return sumBy(matches ? matching.filter(matches) : matching, (effect) =>

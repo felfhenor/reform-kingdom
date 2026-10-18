@@ -19,6 +19,7 @@ import type {
   EquipmentItem,
   GameElement,
   GatherYieldBonus,
+  HeroEffect,
   ItemContent,
   ItemId,
   MonsterType,
@@ -212,7 +213,7 @@ export function weightedBlockTotal<K extends string>(
 // Non-gear sources (e.g. trainer teachings) share affix effect shapes, so they fold onto a gear total through the same dimension.
 export function affixEffectsAddToBlock<K extends string>(
   block: Record<K, number>,
-  effects: AffixEffect[],
+  effects: HeroEffect[],
   dimension: EquipmentBonusDimension<K>,
 ): Record<K, number> {
   const combined = { ...block };

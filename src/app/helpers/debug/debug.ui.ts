@@ -63,11 +63,13 @@ import {
   type AffixContent,
   type AffixId,
   type CaravanId,
+  type Character,
   type CharacterId,
   type CollectibleContent,
   type CollectibleId,
   type EquipmentContent,
   type EquipmentId,
+  type HeroEffect,
   type ItemContent,
   type ItemId,
   type MonsterContent,
@@ -159,20 +161,44 @@ export function debugSetCharacterLevel(
     return;
   }
 
-  updateGamestate((state) => {
-    state.world.party = state.world.party.map((character) => {
-      if (character.id !== characterId) return character;
+  debugUpdateCharacter(characterId, (character) => ({
+    ...character,
+    level: clampedLevel,
+    xp: { current: 0, maximum: characterXpForLevel(clampedLevel) },
+  }));
+  void taskEventLevelReached(clampedLevel);
+}
 
-      return characterRecalculateStats({
-        ...character,
-        level: clampedLevel,
-        xp: { current: 0, maximum: characterXpForLevel(clampedLevel) },
-      });
-    });
+function debugUpdateCharacter(
+  characterId: CharacterId,
+  update: (character: Character) => Character,
+): void {
+  updateGamestate((state) => {
+    state.world.party = state.world.party.map((character) =>
+      character.id === characterId
+        ? characterRecalculateStats(update(character))
+        : character,
+    );
 
     return state;
   });
-  void taskEventLevelReached(clampedLevel);
+}
+
+export function debugGrantEffect(
+  characterId: CharacterId,
+  effect: HeroEffect,
+): void {
+  debugUpdateCharacter(characterId, (character) => ({
+    ...character,
+    debugEffects: [...(character.debugEffects ?? []), effect],
+  }));
+}
+
+export function debugClearEffects(characterId: CharacterId): void {
+  debugUpdateCharacter(characterId, (character) => ({
+    ...character,
+    debugEffects: [],
+  }));
 }
 
 export function debugSetTradeskillLevel(

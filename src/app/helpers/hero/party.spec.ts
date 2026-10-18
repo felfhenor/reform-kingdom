@@ -22,6 +22,7 @@ import {
   partyGatherYieldBonuses,
   pruneInvalidPartyEquipment,
 } from '@helpers/hero/party';
+import { trainerTeachingEffects } from '@helpers/trainer/trainer-teaching';
 import type {
   AffixId,
   Character,
@@ -158,9 +159,36 @@ describe('characterStatsForLevel', () => {
     });
 
     expect(characterStats({ ...jala, level: 3 })).toEqual(
-      characterStatsForLevel(jobId, 3, jala.equipment, [drill.id]),
+      characterStatsForLevel(
+        jobId,
+        3,
+        jala.equipment,
+        trainerTeachingEffects([drill.id]),
+      ),
     );
     expect(characterStats(jala).Strength).toBe(5 + 2);
+  });
+
+  it('adds StatPerLevel to job growth, so it covers every level already gained', () => {
+    const effects = [
+      { kind: 'StatPerLevel', stat: 'Strength', value: 0.25 } as const,
+    ];
+
+    expect(
+      characterStatsForLevel(jobId, 1, defaultEquipment(), effects).Strength,
+    ).toBe(5);
+    expect(
+      characterStatsForLevel(jobId, 5, defaultEquipment(), effects).Strength,
+    ).toBe(5 + (0.5 + 0.25) * 4);
+  });
+
+  it('includes debug-granted effects in characterStats', () => {
+    const jala = hero({
+      level: 3,
+      debugEffects: [{ kind: 'StatPerLevel', stat: 'Strength', value: 1 }],
+    });
+
+    expect(characterStats(jala).Strength).toBe(5 + (0.5 + 1) * 2);
   });
 });
 

@@ -34,12 +34,6 @@ export function trainerTeachingEffects(
   );
 }
 
-export function characterTeachingEffects(
-  character: Pick<Character, 'teachings'>,
-): TrainerTeachingEffect[] {
-  return trainerTeachingEffects(characterAllTeachingIds(character));
-}
-
 export function trainerTeachingGrantedSkillIds(
   teachingIds: TrainerTeachingId[],
 ): EquipmentSkillId[] {

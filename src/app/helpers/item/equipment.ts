@@ -1,4 +1,5 @@
 import { getEntry } from '@helpers/content/content';
+import { characterNonGearEffects } from '@helpers/hero/hero-effect';
 import {
   affixEffectsOfKind,
   equipmentItemAffixEffects,
@@ -15,7 +16,6 @@ import {
 } from '@helpers/item/equipment-bonus';
 import { rngUuid } from '@helpers/rng';
 import { worldCombatState } from '@helpers/state-game';
-import { characterTeachingEffects } from '@helpers/trainer/trainer-teaching';
 import type {
   AffixEffect,
   AffixId,
@@ -274,7 +274,7 @@ export function characterTagResistances(
 ): StatusEffectBlock {
   return affixEffectsAddToBlock(
     equipmentTagResistanceTotals(character.equipment),
-    characterTeachingEffects(character),
+    characterNonGearEffects(character),
     RESISTANCE_BONUS,
   );
 }
@@ -285,7 +285,7 @@ export function characterCombatStatBonusTotals(
 ): CombatStatBlock {
   return affixEffectsAddToBlock(
     equipmentCombatStatTotals(character.equipment),
-    characterTeachingEffects(character),
+    characterNonGearEffects(character),
     COMBAT_STAT_BONUS,
   );
 }

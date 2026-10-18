@@ -8,6 +8,8 @@ import {
 import { getEntry } from '@helpers/content/content';
 import { defaultEquipment, defaultStats } from '@helpers/defaults';
 import { roundToNearest10 } from '@helpers/engine/number';
+import { characterNonGearEffects } from '@helpers/hero/hero-effect';
+import { affixEffectSum } from '@helpers/item/affix';
 import {
   equipmentAffixEffects,
   equipmentGatherYieldBonuses,
@@ -22,10 +24,6 @@ import {
 import { rngUuid } from '@helpers/rng';
 import { updateGamestate, worldPartyState } from '@helpers/state-game';
 import {
-  characterAllTeachingIds,
-  trainerTeachingEffects,
-} from '@helpers/trainer/trainer-teaching';
-import {
   EquipmentTypeToSlot,
   type AffixEffect,
   type Character,
@@ -34,10 +32,10 @@ import {
   type EquipmentBlock,
   type EquipmentContent,
   type GatherYieldBonus,
+  type HeroEffect,
   type JobContent,
   type JobId,
   type StatBlock,
-  type TrainerTeachingId,
 } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
@@ -50,29 +48,35 @@ export function characterXpForLevel(level: number): number {
   return roundToNearest10(xp);
 }
 
-function jobStatsAtLevel(jobId: JobId, level: number): StatBlock {
+function jobStatsAtLevel(
+  jobId: JobId,
+  level: number,
+  effects: HeroEffect[],
+): StatBlock {
   const job = getEntry<JobContent>(jobId);
   const stats = { ...(job?.baseStats ?? defaultStats()) };
   const perLevel = job?.statsPerLevel ?? defaultStats();
 
   (Object.keys(stats) as Array<keyof StatBlock>).forEach((stat) => {
-    stats[stat] += perLevel[stat] * (level - 1);
+    const growth =
+      perLevel[stat] +
+      affixEffectSum(effects, 'StatPerLevel', (effect) => effect.stat === stat);
+    stats[stat] += growth * (level - 1);
   });
 
   return stats;
 }
 
-// Equipment and teaching stat bonuses are flat (no per-level scaling). `teachingIds` spans every job, not just `jobId`.
 export function characterStatsForLevel(
   jobId: JobId,
   level: number,
   equipment: EquipmentBlock,
-  teachingIds: TrainerTeachingId[],
+  effects: HeroEffect[],
 ): StatBlock {
-  const stats = jobStatsAtLevel(jobId, level);
+  const stats = jobStatsAtLevel(jobId, level, effects);
   const equipmentStats = affixEffectsAddToBlock(
     equipmentStatTotals(equipment),
-    trainerTeachingEffects(teachingIds),
+    effects,
     STAT_BONUS,
   );
 
@@ -89,7 +93,7 @@ export function characterStats(character: CharacterStatSource): StatBlock {
     character.jobId,
     character.level,
     character.equipment,
-    characterAllTeachingIds(character),
+    characterNonGearEffects(character),
   );
 }
 
