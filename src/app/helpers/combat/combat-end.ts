@@ -28,10 +28,7 @@ import {
   syncPartyHpFromCombat,
 } from '@helpers/hero/character-progress';
 import { travelBeginDeathsDoor } from '@helpers/hero/travel';
-import {
-  combatItemDropRateBoost,
-  rollDroppedRewards,
-} from '@helpers/item/loot';
+import { combatDropChanceBonus, rollDroppedRewards } from '@helpers/item/loot';
 import { monsterRecordKill } from '@helpers/kingdom/bestiary';
 import {
   raidResolveDefeat,
@@ -155,9 +152,9 @@ function grantVictoryRewards(combat: Combat): void {
 }
 
 function rollMonsterDrops(combat: Combat): ResolvedDrop[] {
-  const dropRateBoost = combatItemDropRateBoost();
+  const bonus = combatDropChanceBonus();
   return rewardingMonsters(combat).flatMap(({ monster, level }) =>
-    rollDroppedRewards(monster.drops, level, dropRateBoost),
+    rollDroppedRewards(monster.drops, level, bonus),
   );
 }
 
@@ -177,7 +174,7 @@ function rollEncounterCompletionRewards(combat: Combat): ResolvedDrop[] {
   return rollDroppedRewards(
     encounter.completionRewards,
     level,
-    combatItemDropRateBoost(),
+    combatDropChanceBonus(),
   );
 }
 

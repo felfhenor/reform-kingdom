@@ -8,10 +8,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import {
-  combatItemDropRateBoost,
-  rollDroppedRewards,
-} from '@helpers/item/loot';
+import { combatDropChanceBonus, rollDroppedRewards } from '@helpers/item/loot';
 import { updateGamestate, worldPartyState } from '@helpers/state-game';
 import { taskRecordEncounterClear } from '@helpers/task/task-progress';
 import {
@@ -99,7 +96,7 @@ function grantEncounterRandomCompletionRewards(
   const drops = rollDroppedRewards(
     content.completionRewards,
     level,
-    combatItemDropRateBoost(),
+    combatDropChanceBonus(),
   );
   grantResolvedDrops(combat, [...monsterDrops, ...drops]);
 

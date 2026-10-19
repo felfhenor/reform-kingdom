@@ -51,7 +51,7 @@ export function grantCommissionRewards(
   state: GameState,
   offer: CommissionOfferContent,
 ): ResolvedDrop[] {
-  const drops = rollDroppedRewards(offer.rewards, 1, 0, state);
+  const drops = rollDroppedRewards(offer.rewards, 1, {}, state);
   drops.forEach((drop) => applyResolvedDropToState(state, drop));
   return drops;
 }

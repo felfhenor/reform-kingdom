@@ -16,7 +16,8 @@ export type JobAbilityType =
   | 'OffPathTravelSpeed'
   | 'Ambush'
   | 'GatherYieldLuck'
-  | 'CombatDropRateBoost';
+  | 'EquipmentDropRateBoost'
+  | 'ItemDropRateBoost';
 
 export type JobAbilityContent = IsContentItem &
   HasDescription &

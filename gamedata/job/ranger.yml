@@ -116,6 +116,13 @@
           skillId: Static Gust I
 
   abilities:
+    - jobAbilityId: Scavenger
+      level: 1
+      value: 10
+    - jobAbilityId: Scavenger
+      level: 25
+      value: 20
+
     - jobAbilityId: Pathfinder
       level: 1
       value: 0.1

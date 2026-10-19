@@ -13,6 +13,7 @@ import { rngNumberRange } from '@helpers/rng';
 import { gamestate, globalEffectSumsState } from '@helpers/state-game';
 import { defaultWorkerState } from '@helpers/worker/worker-progression';
 import type {
+  DropChanceBonus,
   DroppedReward,
   GameState,
   RecipeContent,
@@ -23,12 +24,16 @@ import type {
 } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
-// Flat percent from the precomputed global effect sums cache plus the party's CombatDropRateBoost - 0 with neither.
-export function combatItemDropRateBoost(): number {
-  return (
-    globalEffectSumsState().combatItemDropRateBoost +
-    jobAbilityValue('CombatDropRateBoost')
-  );
+// The global boost lifts every combat drop; Loot Goblin only equipment, Scavenger only items.
+export function combatDropChanceBonus(): DropChanceBonus {
+  const global = globalEffectSumsState().combatItemDropRateBoost;
+  return {
+    Item: global + jobAbilityValue('ItemDropRateBoost'),
+    Equipment: global + jobAbilityValue('EquipmentDropRateBoost'),
+    Collectible: global,
+    Recipe: global,
+    Worker: global,
+  };
 }
 
 // Shared exhaustiveness helper for `switch (x.kind)` blocks over
@@ -61,9 +66,9 @@ export function rewardDisplayOrder(reward: DroppedReward): number {
 function resolveDrop(
   drop: DroppedReward,
   level: number,
-  bonusChancePercent: number,
+  bonus: DropChanceBonus,
 ): ResolvedDrop | undefined {
-  const chance = clamp(drop.chance + bonusChancePercent, 0, 100);
+  const chance = clamp(drop.chance + (bonus[drop.kind] ?? 0), 0, 100);
   const shouldDrop = rngNumberRange(0, 99) < chance;
   if (!shouldDrop) return undefined;
 
@@ -116,7 +121,7 @@ export function isRecipeUsable(
 export function rollDroppedRewards(
   rewards: DroppedReward[],
   level: number,
-  bonusChancePercent = 0,
+  bonus: DropChanceBonus = {},
   state: GameState = gamestate(),
 ): ResolvedDrop[] {
   return rewards
@@ -126,7 +131,7 @@ export function rollDroppedRewards(
         (drop.maxLevel ?? CHARACTER_MAX_LEVEL) >= level &&
         isRecipeUsable(drop, state),
     )
-    .map((drop) => resolveDrop(drop, level, bonusChancePercent))
+    .map((drop) => resolveDrop(drop, level, bonus))
     .filter((drop): drop is ResolvedDrop => !!drop);
 }
 

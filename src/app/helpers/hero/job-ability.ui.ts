@@ -34,7 +34,8 @@ const JOB_ABILITY_VALUE_LABELS: Record<
     `Enemies surrender when ${Math.abs(value)}+ levels under`,
   Ambush: (value) => `${value}% chance`,
   GatherYieldLuck: (value) => `${value}x LUK chance`,
-  CombatDropRateBoost: (value) => `+${value}% drop rate`,
+  EquipmentDropRateBoost: (value) => `+${value}% equipment drop rate`,
+  ItemDropRateBoost: (value) => `+${value}% item drop rate`,
 };
 
 export function jobAbilityValueLabel(

@@ -87,6 +87,9 @@ export type DroppedReward =
   | DroppedRecipeReward
   | DroppedWorkerReward;
 
+// Percent points added to a drop's chance, per reward kind.
+export type DropChanceBonus = Partial<Record<DroppedReward['kind'], number>>;
+
 // Bare content identity, without DroppedReward's odds/quantity fields. Used to store/compare a reward target (e.g. a Decree clause) without pinning a roll.
 export type RewardIdentity =
   DropItem | DropEquipment | DropCollectible | DropRecipe | DropWorker;

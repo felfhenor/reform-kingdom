@@ -31,7 +31,8 @@ const JOB_ABILITY_RULES: Record<JobAbilityType, JobAbilityRule> = {
   OnPathTravelSpeed: { stacking: 'Highest', amount: 'Value' },
   OffPathTravelSpeed: { stacking: 'Highest', amount: 'Value' },
   Ambush: { stacking: 'Highest', amount: 'Value' },
-  CombatDropRateBoost: { stacking: 'Highest', amount: 'Value' },
+  EquipmentDropRateBoost: { stacking: 'Highest', amount: 'Value' },
+  ItemDropRateBoost: { stacking: 'Highest', amount: 'Value' },
 };
 
 type JobAbilityPartyEntry = {

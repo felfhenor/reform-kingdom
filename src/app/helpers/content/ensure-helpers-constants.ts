@@ -91,7 +91,8 @@ export const VALID_JOB_ABILITY_TYPES: JobAbilityType[] = [
   'OffPathTravelSpeed',
   'Ambush',
   'GatherYieldLuck',
-  'CombatDropRateBoost',
+  'EquipmentDropRateBoost',
+  'ItemDropRateBoost',
 ];
 
 export const VALID_CARAVAN_TRADE_TYPES: CaravanTradeType[] = ['sell', 'buy'];

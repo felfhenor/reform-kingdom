@@ -66,6 +66,12 @@
 
 - id: a691048d-8e0d-4291-a3d0-329f1bb1b115
   name: Loot Goblin
-  description: Explorers have a higher chance of getting combat loot. Does not stack with other Explorers.
-  type: CombatDropRateBoost
+  description: Explorers have a higher chance of getting equipment from combat. Does not stack with other Explorers.
+  type: EquipmentDropRateBoost
   sprite: '0011'
+
+- id: 1a417f0f-4eda-4d7c-a9f3-4001512a756b
+  name: Scavenger
+  description: Rangers have a higher chance of getting items from combat. Does not stack with other Rangers.
+  type: ItemDropRateBoost
+  sprite: '0020'

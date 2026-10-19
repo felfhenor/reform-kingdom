@@ -19,10 +19,7 @@ import {
 } from '@helpers/engine/analytics';
 import { formatDuration, timerTicksElapsed } from '@helpers/engine/timer';
 import { resolveRewardDisplay } from '@helpers/item/item-preview';
-import {
-  combatItemDropRateBoost,
-  rollDroppedRewards,
-} from '@helpers/item/loot';
+import { combatDropChanceBonus, rollDroppedRewards } from '@helpers/item/loot';
 import { rngNumberRange, rngShuffle } from '@helpers/rng';
 import {
   updateGamestate,
@@ -69,7 +66,7 @@ export function raidResolveVictory(
   const drops = rollDroppedRewards(
     town.defense.rewards,
     town.level,
-    combatItemDropRateBoost(),
+    combatDropChanceBonus(),
   );
   grantResolvedDrops(combat, [...monsterDrops, ...drops]);
 

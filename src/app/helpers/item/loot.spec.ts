@@ -12,7 +12,7 @@ import { ensureTown } from '@helpers/content/ensure-town';
 import { defaultGameState, defaultTradeskillBuilding } from '@helpers/defaults';
 import {
   applyResolvedDropToState,
-  combatItemDropRateBoost,
+  combatDropChanceBonus,
   isClearProofReward,
   rewardDisplayOrder,
   rollDroppedRewards,
@@ -129,12 +129,13 @@ describe('rollDroppedRewards', () => {
     expect(rollDroppedRewards([bounded], 11)).toEqual([]);
   });
 
-  it('adds the bonus chance before rolling', () => {
+  it("adds the bonus for the drop's own kind before rolling", () => {
     forceRolls('highest');
     const unlikely = ensureDroppedReward({ equipmentId: cloakId, chance: 0 });
 
-    expect(rollDroppedRewards([unlikely], 5, 99)).toEqual([]);
-    expect(rollDroppedRewards([unlikely], 5, 100)).toEqual([
+    expect(rollDroppedRewards([unlikely], 5, { Equipment: 99 })).toEqual([]);
+    expect(rollDroppedRewards([unlikely], 5, { Item: 100 })).toEqual([]);
+    expect(rollDroppedRewards([unlikely], 5, { Equipment: 100 })).toEqual([
       { equipmentId: cloakId, kind: 'Equipment' },
     ]);
   });
@@ -167,17 +168,17 @@ describe('rollDroppedRewards', () => {
 
     it('drop once the player can craft them', () => {
       expect(
-        rollDroppedRewards([guaranteed.recipe], 5, 0, seedRecipe(false, 5)),
+        rollDroppedRewards([guaranteed.recipe], 5, {}, seedRecipe(false, 5)),
       ).toHaveLength(1);
       expect(rollDroppedRewards([guaranteed.recipe], 5)).toHaveLength(1);
     });
 
     it('don’t drop below their tradeskill level, or when only a town crafts them', () => {
       expect(
-        rollDroppedRewards([guaranteed.recipe], 5, 0, seedRecipe(false, 4)),
+        rollDroppedRewards([guaranteed.recipe], 5, {}, seedRecipe(false, 4)),
       ).toEqual([]);
       expect(
-        rollDroppedRewards([guaranteed.recipe], 5, 0, seedRecipe(true, 5)),
+        rollDroppedRewards([guaranteed.recipe], 5, {}, seedRecipe(true, 5)),
       ).toEqual([]);
     });
 
@@ -189,23 +190,39 @@ describe('rollDroppedRewards', () => {
   });
 });
 
-describe('combatItemDropRateBoost', () => {
-  it('reads the cached global effect sum', () => {
+describe('combatDropChanceBonus', () => {
+  it('applies the cached global sum to every kind', () => {
     seedGamestate(
       (state) => (state.globalEffectSums.combatItemDropRateBoost = 9),
     );
 
-    expect(combatItemDropRateBoost()).toBe(9);
+    expect(combatDropChanceBonus()).toEqual({
+      Item: 9,
+      Equipment: 9,
+      Collectible: 9,
+      Recipe: 9,
+      Worker: 9,
+    });
   });
 
-  it("adds the party's Explorer bonus on top of the global sum", () => {
-    seedContent(abilityJobContent('Explorer', [['CombatDropRateBoost', 1, 5]]));
+  it('adds Loot Goblin to equipment only and Scavenger to items only', () => {
+    seedContent([
+      ...abilityJobContent('Explorer', [['EquipmentDropRateBoost', 1, 5]]),
+      ...abilityJobContent('Ranger', [['ItemDropRateBoost', 1, 10]]),
+    ]);
     seedGamestate((state) => {
       state.globalEffectSums.combatItemDropRateBoost = 9;
-      state.world.party = [buildAbilityHero('Explorer', 1)];
+      state.world.party = [
+        buildAbilityHero('Explorer', 1),
+        buildAbilityHero('Ranger', 1),
+      ];
     });
 
-    expect(combatItemDropRateBoost()).toBe(14);
+    expect(combatDropChanceBonus()).toMatchObject({
+      Item: 19,
+      Equipment: 14,
+      Recipe: 9,
+    });
   });
 });
 
