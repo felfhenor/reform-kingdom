@@ -35,3 +35,14 @@ export function combatOrdersFromJobDefaults(jobId: JobId): CombatOrderClause[] {
     action: cloneDeep(order.action),
   }));
 }
+
+// A clause casting a family the hero no longer knows; switched off rather than deleted so re-learning it is one click.
+export function combatOrderClauseUsesUnknownFamily(
+  clause: CombatOrderClause,
+  knownFamilies: string[],
+): boolean {
+  return (
+    clause.action.type === 'CastSkillFamily' &&
+    !knownFamilies.includes(clause.action.family)
+  );
+}

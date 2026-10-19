@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  combatOrderClauseUsesUnknownFamily,
   combatOrderClauses,
   combatOrdersFromJobDefaults,
 } from '@helpers/combat/combat-order';
@@ -64,5 +65,24 @@ describe('combatOrdersFromJobDefaults', () => {
     seedContent([]);
 
     expect(combatOrdersFromJobDefaults(ranger)).toEqual([]);
+  });
+});
+
+describe('combatOrderClauseUsesUnknownFamily', () => {
+  const clause = (action: CombatOrderClause['action']): CombatOrderClause => ({
+    id: 'c' as CombatOrderClauseId,
+    enabled: true,
+    condition: { type: 'Always' },
+    action,
+  });
+
+  it('flags only a cast of a family the hero does not know', () => {
+    const cast = clause({ type: 'CastSkillFamily', family: 'Strike' });
+
+    expect(combatOrderClauseUsesUnknownFamily(cast, ['Guard'])).toBe(true);
+    expect(combatOrderClauseUsesUnknownFamily(cast, ['Strike'])).toBe(false);
+    expect(
+      combatOrderClauseUsesUnknownFamily(clause({ type: 'RandomSkill' }), []),
+    ).toBe(false);
   });
 });

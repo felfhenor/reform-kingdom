@@ -182,6 +182,10 @@ export function regaliaAppliedCharacter(
       ...character.burstSkills,
       [regalia.jobId]: [...regalia.burstSkillIds],
     },
+    skillTreeNodes: {
+      ...character.skillTreeNodes,
+      [regalia.jobId]: [...regalia.skillTreeNodeIds],
+    },
   };
 }
 

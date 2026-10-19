@@ -22,6 +22,8 @@ import {
   swordId,
   seedRegaliaContent,
   warriorId,
+  warriorLv1NodeId,
+  warriorLv20NodeId,
 } from '@/testing/regalia';
 
 beforeEach(seedRegaliaContent);
@@ -83,6 +85,19 @@ describe('stateRegaliaLoad', () => {
     expect(state.armory).toEqual([]);
     expect(state.regalias.vault).toEqual([]);
     expect(regaliaMatchesCharacter(saved, loaded)).toBe(true);
+  });
+
+  it("applies the regalia's skill tree, pruned to the hero's level", () => {
+    const saved = buildRegalia([], {
+      skillTreeNodeIds: [warriorLv1NodeId, warriorLv20NodeId],
+    });
+    const state = regaliaStateWith(regaliaHero(), [saved]);
+
+    stateRegaliaLoad(state, 'Jala' as CharacterId, saved);
+
+    expect(state.world.party[0].skillTreeNodes[warriorId]).toEqual([
+      warriorLv1NodeId,
+    ]);
   });
 
   it('fills every slot a two-hander occupies', () => {

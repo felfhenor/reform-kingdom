@@ -1,5 +1,6 @@
 import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
 import { ensureJob } from '@helpers/content/ensure-job';
+import { ensureSkillTreeNode } from '@helpers/content/ensure-skilltreenode';
 import { defaultEquipment, defaultGameState } from '@helpers/defaults';
 import type {
   Character,
@@ -14,12 +15,15 @@ import type {
   JobId,
   Regalia,
   RegaliaId,
+  SkillTreeNodeId,
 } from '@interfaces';
 import { buildCharacter } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 
 export const warriorId = 'job-warrior' as JobId;
 export const mageId = 'job-mage' as JobId;
+export const warriorLv1NodeId = 'warrior-lv1' as SkillTreeNodeId;
+export const warriorLv20NodeId = 'warrior-lv20' as SkillTreeNodeId;
 export const swordId = 'sword' as EquipmentId;
 export const shieldId = 'shield' as EquipmentId;
 export const spearId = 'spear' as EquipmentId;
@@ -57,6 +61,18 @@ export function seedRegaliaContent(): void {
       equippableTypes: ['Sword', 'Shield', 'Spear', 'Hat', 'Helm', 'Ring'],
     }),
     ensureJob({ id: mageId, name: 'Mage', equippableTypes: ['Hat', 'Ring'] }),
+    ensureSkillTreeNode({
+      id: warriorLv1NodeId,
+      name: 'Warrior: Lv1',
+      jobId: warriorId,
+      level: 1,
+    }),
+    ensureSkillTreeNode({
+      id: warriorLv20NodeId,
+      name: 'Warrior: Lv20',
+      jobId: warriorId,
+      level: 20,
+    }),
   ]);
 }
 

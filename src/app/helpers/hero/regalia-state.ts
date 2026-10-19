@@ -13,6 +13,8 @@ import {
 } from '@helpers/hero/regalia';
 import { canEquipItem, equippedItems } from '@helpers/item/equipment';
 import { syncArmoryGlobalEffects } from '@helpers/kingdom/armory-global-effects';
+import { characterJobLevel } from '@helpers/hero/job';
+import { skillTreePrune } from '@helpers/hero/skill-tree';
 import type {
   Character,
   CharacterId,
@@ -98,6 +100,12 @@ export function stateRegaliaLoad(
 
   character.combatOrders[regalia.jobId] = cloneDeep(regalia.combatOrders);
   character.burstSkills[regalia.jobId] = [...regalia.burstSkillIds];
+  // Switching builds is free; pruned in case the hero's level for this job dropped since the snapshot.
+  character.skillTreeNodes[regalia.jobId] = skillTreePrune(
+    regalia.jobId,
+    regalia.skillTreeNodeIds,
+    characterJobLevel(character, regalia.jobId),
+  );
   character.currentRegaliaIds[regalia.jobId] = regalia.id;
   Object.assign(character, characterRecalculateStats(character));
 }

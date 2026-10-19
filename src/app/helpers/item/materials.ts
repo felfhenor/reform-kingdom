@@ -26,6 +26,12 @@ export function traderTokenId(): ItemId {
   return getEntry<ItemContent>(TRADER_TOKEN_NAME)!.id;
 }
 
+const MEMORY_FLUX_NAME = 'Memory Flux';
+
+export function memoryFluxId(): ItemId | undefined {
+  return getEntry<ItemContent>(MEMORY_FLUX_NAME)?.id;
+}
+
 const REFORGE_REAGENT_NAME = 'Duskhall Flux';
 
 export function reforgeReagentId(): ItemId {

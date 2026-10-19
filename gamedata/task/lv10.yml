@@ -68,7 +68,9 @@
     level: 15
   rewards:
     - itemId: Gold Coin
-      quantity: 5000
+      quantity: 2500
+    - itemId: Memory Flux
+      quantity: 1
 
 - id: 98caeb6a-55f1-4565-8aa2-7e874943324b
   name: Gather 25 Miremetal Ore

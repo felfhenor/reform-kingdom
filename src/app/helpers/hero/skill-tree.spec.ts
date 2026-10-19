@@ -8,6 +8,7 @@ import {
   characterSkillTreeAvailableSp,
   characterSkillTreeCanLearn,
   characterSkillTreesMigrate,
+  characterSkillTreeWithAdditions,
   regaliaSkillTreeMigrate,
   skillTreeEarnedSp,
   skillTreePrune,
@@ -120,6 +121,60 @@ describe('characterSkillTreeCanLearn', () => {
     });
 
     expect(characterSkillTreeAvailableSp(multi, jobId)).toBe(2);
+  });
+});
+
+describe('characterSkillTreeWithAdditions', () => {
+  const at = (level: number) =>
+    hero({ level, skillTreeNodes: { [jobId]: ids('strike', 'aura') } });
+
+  it('appends valid additions in level order, letting one unlock the next', () => {
+    expect(
+      characterSkillTreeWithAdditions(
+        at(20),
+        ids('leftPerk', 'strike', 'aura', 'left'),
+      ),
+    ).toEqual(ids('strike', 'aura', 'left', 'leftPerk'));
+  });
+
+  it('rejects removals, unknown ids and locked or excluded nodes', () => {
+    expect(
+      characterSkillTreeWithAdditions(at(20), ids('strike')),
+    ).toBeUndefined();
+    expect(
+      characterSkillTreeWithAdditions(at(20), ids('strike', 'aura', 'gone')),
+    ).toBeUndefined();
+    expect(
+      characterSkillTreeWithAdditions(
+        at(20),
+        ids('strike', 'aura', 'leftPerk'),
+      ),
+    ).toBeUndefined();
+    expect(
+      characterSkillTreeWithAdditions(
+        at(15),
+        ids('strike', 'aura', 'left', 'right'),
+      ),
+    ).toBeUndefined();
+  });
+
+  it('rejects more additions than the free SP covers', () => {
+    // 9 SP at Lv 15; 8 already spent leaves room for one of the two additions.
+    const spent = ids('strike', 'aura', 'a', 'b', 'c', 'd', 'e', 'f');
+    const nearlyFull = hero({ level: 15, skillTreeNodes: { [jobId]: spent } });
+
+    expect(
+      characterSkillTreeWithAdditions(nearlyFull, [
+        ...spent,
+        ...ids('strike2'),
+      ]),
+    ).toBeDefined();
+    expect(
+      characterSkillTreeWithAdditions(nearlyFull, [
+        ...spent,
+        ...ids('strike2', 'left'),
+      ]),
+    ).toBeUndefined();
   });
 });
 

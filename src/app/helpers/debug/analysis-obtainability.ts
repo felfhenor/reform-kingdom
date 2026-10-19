@@ -18,6 +18,7 @@ import type {
   JobContent,
   MonsterContent,
   RecipeContent,
+  TaskContent,
   TownContent,
   WorkerContent,
 } from '@interfaces';
@@ -84,7 +85,7 @@ function checkCandidates(
       id,
       label: candidate.name,
       status: 'fail' as const,
-      message: `${kind} "${candidate.name}" has no drop, completion reward, gather result, recipe result, or exchange that produces it, and is not marked "unobtainable: true".`,
+      message: `${kind} "${candidate.name}" has no drop, completion or task reward, gather result, recipe result, or exchange that produces it, and is not marked "unobtainable: true".`,
     };
   });
 }
@@ -107,6 +108,7 @@ export function runObtainabilityAnalysis(): AnalysisRunResult {
     getEntriesByType<CommissionOfferContent>('commissionoffer');
   const exchangeNodes = getEntriesByType<ExchangeNodeContent>('exchangenode');
   const jobs = getEntriesByType<JobContent>('job');
+  const tasks = getEntriesByType<TaskContent>('task');
 
   const obtainableItems = new Set<string>();
   const obtainableEquipment = new Set<string>();
@@ -154,6 +156,12 @@ export function runObtainabilityAnalysis(): AnalysisRunResult {
       obtainableEquipment,
       obtainableCollectibles,
       obtainableWorkers,
+    ),
+  );
+
+  tasks.forEach((task) =>
+    task.rewards.forEach((reward) =>
+      addIfPresent(obtainableItems, reward.itemId),
     ),
   );
 

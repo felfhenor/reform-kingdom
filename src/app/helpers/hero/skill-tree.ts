@@ -20,7 +20,7 @@ import type {
   SkillTreeNodeContent,
   SkillTreeNodeId,
 } from '@interfaces';
-import { clamp, sortBy } from 'es-toolkit/compat';
+import { clamp, sortBy, uniq } from 'es-toolkit/compat';
 
 export function skillTreeEarnedSp(level: number): number {
   const counted = clamp(level, 1, SKILL_TREE_MAX_COLUMN_LEVEL);
@@ -99,6 +99,47 @@ export function characterSkillTreeCanLearn(
     characterSkillTreeAvailableSp(character, character.jobId) > 0 &&
     skillTreeNodeIsLearnable(nodes, learned, node, character.level)
   );
+}
+
+// Learning the additions in level order, each must be learnable given everything before it.
+function skillTreeAdditionsLearnable(
+  nodes: SkillTreeNodeContent[],
+  current: SkillTreeNodeId[],
+  added: SkillTreeNodeContent[],
+  level: number,
+): boolean {
+  const learned = new Set(current);
+  return added.every((node) => {
+    const learnable = skillTreeNodeIsLearnable(nodes, learned, node, level);
+    learned.add(node.id);
+    return learnable;
+  });
+}
+
+// Confirm only ever adds: undefined if anything learned would be dropped, an id is unknown, or the additions aren't learnable within the free SP.
+export function characterSkillTreeWithAdditions(
+  character: Pick<
+    Character,
+    'jobId' | 'level' | 'jobProgress' | 'skillTreeNodes'
+  >,
+  nodeIds: SkillTreeNodeId[],
+): SkillTreeNodeId[] | undefined {
+  const current = characterSkillTreeNodeIds(character, character.jobId);
+  const nodes = skillTreeJobNodes(character.jobId);
+  const added = sortBy(
+    nodes.filter(
+      (node) => nodeIds.includes(node.id) && !current.includes(node.id),
+    ),
+    (node) => skillTreeNodeLevel(nodes, node),
+  );
+
+  const valid =
+    current.every((id) => nodeIds.includes(id)) &&
+    current.length + added.length === uniq(nodeIds).length &&
+    added.length <= characterSkillTreeAvailableSp(character, character.jobId) &&
+    skillTreeAdditionsLearnable(nodes, current, added, character.level);
+
+  return valid ? [...current, ...added.map((node) => node.id)] : undefined;
 }
 
 // What a hands-off player would buy: lowest level first, an oath's first option, until SP runs out.

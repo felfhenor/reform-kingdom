@@ -13,6 +13,9 @@
     - itemId: Mirethread
       quantity: 25
 
+    - itemId: Memory Flux
+      quantity: 1
+
 - id: 0f6a82b2-f809-494c-bbbf-91306ae053a8
   name: Visit Larsia
   description: Cross the Larsian Traverse into the Larsian Desert and visit the town of Larsia.
@@ -49,7 +52,9 @@
     level: 25
   rewards:
     - itemId: Gold Coin
-      quantity: 15000
+      quantity: 7500
+    - itemId: Memory Flux
+      quantity: 1
 
 - id: bbecb33f-a0b5-4c10-b0a5-758f91739905
   name: Gather 50 Cactspine

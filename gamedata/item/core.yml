@@ -21,7 +21,14 @@
 
 - id: 7dd1f364-c9ed-49d8-b2b9-79a9936ff6c7
   name: Duskhall Flux
-  description: A shimmering reagent that loosens the enchantments bound to a piece of gear, letting a smith reforge them anew.
+  description: A shimmering reagent that unbinds the magical attachments of equipment, gathering new magic to bind when used.
   rarity: Uncommon
 
   sprite: '0073'
+
+- id: 42df9fc0-9859-4001-9d63-1221a1702534
+  name: Memory Flux
+  description: An unglimmering pile of flux that sparkles when applied directly to the forehead.
+  rarity: Rare
+
+  sprite: '0086'
