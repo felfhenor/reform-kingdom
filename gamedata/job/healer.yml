@@ -149,6 +149,10 @@
       level: 25
       value: 0.2
 
+  treeVersion: 1
+  treeRows: [Restoration, Divine Might, Abilities]
+  specializationRows: [Lifegiver, Templar]
+
   starterEquipmentIds:
     - Cloak of Adventuring
     - Hat of Adventuring
@@ -165,11 +169,3 @@
         type: CastSkillFamily
         family: Cure
         targetMode: MatchingAllies
-
-    - condition:
-        type: SelfEnergyPercent
-        comparator: GreaterThanOrEqual
-        value: 50
-      action:
-        type: CastSkillFamily
-        family: Holy Smite

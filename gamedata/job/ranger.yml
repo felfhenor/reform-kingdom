@@ -137,6 +137,10 @@
       level: 25
       value: 20
 
+  treeVersion: 1
+  treeRows: [Marksmanship, Bombardment, Nature, Abilities]
+  specializationRows: [Stalker, Wayfinder]
+
   starterEquipmentIds:
     - Cloak of Adventuring
     - Hat of Adventuring

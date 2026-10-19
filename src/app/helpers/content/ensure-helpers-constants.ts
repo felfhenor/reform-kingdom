@@ -18,6 +18,7 @@ import type {
   GameStat,
   JobAbilityType,
   MonsterType,
+  SkillTreeRow,
   StatusEffectTag,
 } from '@interfaces';
 import { EquipmentTypeToSlot } from '@interfaces';
@@ -99,3 +100,29 @@ export const VALID_JOB_ABILITY_TYPES: JobAbilityType[] = [
 ];
 
 export const VALID_CARAVAN_TRADE_TYPES: CaravanTradeType[] = ['sell', 'buy'];
+
+export const VALID_SKILL_TREE_ROWS: SkillTreeRow[] = [
+  'Abilities',
+  'Weapon Arts',
+  'Shield Arts',
+  'Swashbuckler',
+  'Defender',
+  'Marksmanship',
+  'Bombardment',
+  'Nature',
+  'Stalker',
+  'Wayfinder',
+  'Fieldcraft',
+  'Fortune',
+  'Treasure Hunter',
+  'Dungeon Delver',
+  'Fire Magic',
+  'Storm Magic',
+  'Spellweaving',
+  'Arcanist',
+  'Spellweaver',
+  'Restoration',
+  'Divine Might',
+  'Lifegiver',
+  'Templar',
+];

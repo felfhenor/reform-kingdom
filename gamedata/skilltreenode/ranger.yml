@@ -1,0 +1,237 @@
+# --- Marksmanship / track 0 ---
+
+- id: 7ee6ef6d-e83a-4305-bc70-72912a325d84
+  name: 'Ranger: Snipe I'
+  jobId: Ranger
+  level: 1
+  row: Marksmanship
+  default: true
+  effects:
+    - { kind: GrantSkill, skillId: 'Snipe I' }
+
+- id: 8533e548-dd26-435b-a657-982d77ae74ec
+  name: 'Ranger: Snipe II'
+  jobId: Ranger
+  level: 10
+  row: Marksmanship
+  requiredSkillTreeNodeIds: ['Ranger: Snipe I']
+  effects:
+    - { kind: GrantSkill, skillId: 'Snipe II' }
+
+- id: 160ee79e-ce9a-49d7-8a57-fb27e7e024b6
+  name: 'Ranger: Snipe III'
+  jobId: Ranger
+  level: 20
+  row: Marksmanship
+  requiredSkillTreeNodeIds: ['Ranger: Snipe II']
+  effects:
+    - { kind: GrantSkill, skillId: 'Snipe III' }
+
+- id: 1c8d16b1-87bd-4e90-8ce6-e6dbf367688d
+  name: 'Ranger: Snipe IV'
+  jobId: Ranger
+  level: 35
+  row: Marksmanship
+  requiredSkillTreeNodeIds: ['Ranger: Snipe III']
+  effects:
+    - { kind: GrantSkill, skillId: 'Snipe IV' }
+
+# --- Marksmanship / track 1 ---
+
+- id: ce15c30e-9ce8-4846-9469-f0e35a90f314
+  name: 'Ranger: Rapidfire I'
+  jobId: Ranger
+  level: 5
+  row: Marksmanship
+  track: 1
+  requiredSkillTreeNodeIds: ['Ranger: Snipe I']
+  effects:
+    - { kind: GrantSkill, skillId: 'Rapidfire I' }
+
+- id: f190e900-e1a4-4417-9ff1-f7afd5475d4d
+  name: 'Ranger: Rapidfire II'
+  jobId: Ranger
+  level: 10
+  row: Marksmanship
+  track: 1
+  requiredSkillTreeNodeIds: ['Ranger: Rapidfire I']
+  effects:
+    - { kind: GrantSkill, skillId: 'Rapidfire II' }
+
+- id: e1c5163b-f401-480d-9735-439723eff737
+  name: 'Ranger: Rapidfire III'
+  jobId: Ranger
+  level: 25
+  row: Marksmanship
+  track: 1
+  requiredSkillTreeNodeIds: ['Ranger: Rapidfire II']
+  effects:
+    - { kind: GrantSkill, skillId: 'Rapidfire III' }
+
+# --- Marksmanship / track 2 ---
+
+- id: 61198039-de4b-4a05-a3d3-eb07c99f4889
+  name: 'Ranger: Barbed Shot I'
+  jobId: Ranger
+  level: 30
+  row: Marksmanship
+  track: 2
+  requiredSkillTreeNodeIds: ['Ranger: Rapidfire II']
+  effects:
+    - { kind: GrantSkill, skillId: 'Barbed Shot I' }
+
+- id: 0ccf1e17-da38-413d-98de-f42688fdeaf3
+  name: 'Ranger: Barbed Shot II'
+  jobId: Ranger
+  level: 40
+  row: Marksmanship
+  track: 2
+  requiredSkillTreeNodeIds: ['Ranger: Barbed Shot I']
+  effects:
+    - { kind: GrantSkill, skillId: 'Barbed Shot II' }
+
+# --- Bombardment / track 0 ---
+
+- id: 20f50f74-a1f9-4ce4-a909-c0006e19a185
+  name: 'Ranger: Arrow Rain I'
+  jobId: Ranger
+  level: 5
+  row: Bombardment
+  effects:
+    - { kind: GrantSkill, skillId: 'Arrow Rain I' }
+
+- id: 17c933f8-3443-47a7-a62b-15f6134364ca
+  name: 'Ranger: Arrow Rain II'
+  jobId: Ranger
+  level: 15
+  row: Bombardment
+  requiredSkillTreeNodeIds: ['Ranger: Arrow Rain I']
+  effects:
+    - { kind: GrantSkill, skillId: 'Arrow Rain II' }
+
+- id: 8a7585aa-0eac-4309-9e82-9685a45e0a97
+  name: 'Ranger: Arrow Rain III'
+  jobId: Ranger
+  level: 35
+  row: Bombardment
+  requiredSkillTreeNodeIds: ['Ranger: Arrow Rain II']
+  effects:
+    - { kind: GrantSkill, skillId: 'Arrow Rain III' }
+
+# --- Nature / track 0 ---
+
+- id: 1beb2fe3-3f52-4613-952e-14ad01fe4f9a
+  name: 'Ranger: Regrowth I'
+  jobId: Ranger
+  level: 15
+  row: Nature
+  effects:
+    - { kind: GrantSkill, skillId: 'Regrowth I' }
+
+- id: b0b33ce7-0229-4fa5-a82e-a4835b1f70fb
+  name: 'Ranger: Regrowth II'
+  jobId: Ranger
+  level: 30
+  row: Nature
+  requiredSkillTreeNodeIds: ['Ranger: Regrowth I']
+  effects:
+    - { kind: GrantSkill, skillId: 'Regrowth II' }
+
+# --- Nature / track 1 ---
+
+- id: 07a8fc98-11a5-44b3-bbdb-a92f121b1515
+  name: 'Ranger: Static Gust I'
+  jobId: Ranger
+  level: 25
+  row: Nature
+  track: 1
+  requiredSkillTreeNodeIds: ['Ranger: Regrowth I']
+  effects:
+    - { kind: GrantSkill, skillId: 'Static Gust I' }
+
+# --- Abilities (intrinsic) ---
+
+- id: a4ff7990-6219-4c0c-84cc-dd9d04e06797
+  name: 'Ranger: Scavenger I'
+  jobId: Ranger
+  level: 1
+  row: Abilities
+  default: true
+  effects:
+    - { kind: JobAbility, jobAbilityId: Scavenger, value: 10 }
+
+- id: c4cf0909-5001-4d18-b681-f5b3fb851ca7
+  name: 'Ranger: Scavenger II'
+  jobId: Ranger
+  level: 25
+  row: Abilities
+  requiredSkillTreeNodeIds: ['Ranger: Scavenger I']
+  effects:
+    - { kind: JobAbility, jobAbilityId: Scavenger, value: 20 }
+
+# --- Specialization oath (Lv 15) ---
+
+- id: cec9d1f5-ac23-490a-becf-01e9e242b9c2
+  name: 'Ranger: Oath of the Ranger'
+  jobId: Ranger
+  level: 15
+  row: Stalker
+  optionSkillTreeNodeIds: ['Ranger: Stalker', 'Ranger: Wayfinder']
+
+- id: bf16b2f1-bea2-4c90-a79c-d5803efc90f5
+  name: 'Ranger: Stalker'
+  jobId: Ranger
+  description: 'Swear the Oath of the Stalker. Grants +0.15 Agility, +0.05 Luck per level (applied retroactively).'
+  specIcon: gameHoodedAssassin
+  effects:
+    - { kind: StatPerLevel, stat: Agility, value: 0.15 }
+    - { kind: StatPerLevel, stat: Luck, value: 0.05 }
+
+- id: 106d068a-7e1e-45e4-8877-5dab9538195a
+  name: 'Ranger: Wayfinder'
+  jobId: Ranger
+  description: 'Swear the Oath of the Wayfinder. Grants +0.15 Vitality, +0.1 Spirit per level (applied retroactively).'
+  specIcon: gameCompass
+  effects:
+    - { kind: StatPerLevel, stat: Vitality, value: 0.15 }
+    - { kind: StatPerLevel, stat: Spirit, value: 0.1 }
+
+# --- Stalker ---
+
+- id: 6c5903fe-64ee-493c-9863-caa06a3432fc
+  name: 'Ranger: Ambush I'
+  jobId: Ranger
+  level: 20
+  row: Stalker
+  requiredSkillTreeNodeIds: ['Ranger: Stalker']
+  effects:
+    - { kind: JobAbility, jobAbilityId: Ambush, value: 10 }
+
+- id: 8ca17598-67a9-4c59-990e-0be156512ec1
+  name: 'Ranger: Ambush II'
+  jobId: Ranger
+  level: 25
+  row: Stalker
+  requiredSkillTreeNodeIds: ['Ranger: Ambush I']
+  effects:
+    - { kind: JobAbility, jobAbilityId: Ambush, value: 20 }
+
+# --- Wayfinder ---
+
+- id: 4e896423-5879-4651-871c-ab25f25c18ac
+  name: 'Ranger: Pathfinder I'
+  jobId: Ranger
+  level: 20
+  row: Wayfinder
+  requiredSkillTreeNodeIds: ['Ranger: Wayfinder']
+  effects:
+    - { kind: JobAbility, jobAbilityId: Pathfinder, value: 0.1 }
+
+- id: 39e34b1e-2524-4385-a9ae-d801534b1eb6
+  name: 'Ranger: Pathfinder II'
+  jobId: Ranger
+  level: 25
+  row: Wayfinder
+  requiredSkillTreeNodeIds: ['Ranger: Pathfinder I']
+  effects:
+    - { kind: JobAbility, jobAbilityId: Pathfinder, value: 0.2 }

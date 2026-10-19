@@ -31,6 +31,7 @@ import { runSkillBonusesAnalysis } from '@helpers/debug/analysis-skillbonuses';
 import { runAffixesAnalysis } from '@helpers/debug/analysis-affixes';
 import { runSkillsAnalysis } from '@helpers/debug/analysis-skills';
 import { runJobAbilitiesAnalysis } from '@helpers/debug/analysis-jobabilities';
+import { runSkillTreesAnalysis } from '@helpers/debug/analysis-skilltrees';
 import { runJobStarterAnalysis } from '@helpers/debug/analysis-jobstarter';
 import { runMonsterDropsAnalysis } from '@helpers/debug/analysis-monsterdrops';
 import { loadCompiledContentFromDisk } from './debug/load-compiled-content';
@@ -76,6 +77,7 @@ const ANALYSIS_CHECKS: Array<{ title: string; run: () => AnalysisRunResult }> =
     { title: 'validate:skills', run: runSkillsAnalysis },
     { title: 'validate:skillbonuses', run: runSkillBonusesAnalysis },
     { title: 'validate:jobabilities', run: runJobAbilitiesAnalysis },
+    { title: 'validate:skilltrees', run: runSkillTreesAnalysis },
     { title: 'validate:jobstarter', run: runJobStarterAnalysis },
     { title: 'validate:affixes', run: runAffixesAnalysis },
     { title: 'validate:monsterdrops', run: runMonsterDropsAnalysis },

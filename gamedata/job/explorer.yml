@@ -130,6 +130,10 @@
       level: 35
       value: 2
 
+  treeVersion: 1
+  treeRows: [Fieldcraft, Fortune, Abilities]
+  specializationRows: [Treasure Hunter, Dungeon Delver]
+
   starterEquipmentIds:
     - Cloak of Adventuring
     - Hat of Adventuring

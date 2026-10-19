@@ -18,6 +18,8 @@ import type {
   AffixEffect,
   AffixId,
   EquipmentSkillId,
+  HeroEffect,
+  JobAbilityId,
   TradeskillId,
 } from '@interfaces';
 
@@ -109,6 +111,36 @@ export function ensureAffixEffect(
         stat: ensureEnumValue(effect['stat'], VALID_GAME_STATS, 'Strength'),
         value,
       };
+  }
+}
+
+// Skill-tree-only kinds first, so they never fall through to the affix default.
+export function ensureHeroEffect(
+  effect: Record<string, unknown> = {},
+): HeroEffect {
+  const value = (effect['value'] as number) ?? 0;
+
+  switch (effect['kind']) {
+    case 'StatPerLevel':
+      return {
+        kind: 'StatPerLevel',
+        stat: ensureEnumValue(effect['stat'], VALID_GAME_STATS, 'Strength'),
+        value,
+      };
+    case 'JobAbility':
+      return {
+        kind: 'JobAbility',
+        jobAbilityId: (effect['jobAbilityId'] as JobAbilityId) ?? 'UNKNOWN',
+        value,
+      };
+    case 'DebuffPotency':
+      return {
+        kind: 'DebuffPotency',
+        chance: (effect['chance'] as number) ?? 0,
+        duration: (effect['duration'] as number) ?? 0,
+      };
+    default:
+      return ensureAffixEffect(effect);
   }
 }
 

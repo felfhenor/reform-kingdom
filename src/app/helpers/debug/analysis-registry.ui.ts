@@ -8,6 +8,7 @@ import { runGatherDevelopmentLevelsAnalysis } from '@helpers/debug/analysis-gath
 import { runHeroStatsAnalysis } from '@helpers/debug/analysis-herostats';
 import { runInfusionGapsAnalysis } from '@helpers/debug/analysis-infusiongaps';
 import { runJobAbilitiesAnalysis } from '@helpers/debug/analysis-jobabilities';
+import { runSkillTreesAnalysis } from '@helpers/debug/analysis-skilltrees';
 import { runJobStarterAnalysis } from '@helpers/debug/analysis-jobstarter';
 import { runMaterialUtilizationAnalysis } from '@helpers/debug/analysis-materialutilization';
 import { runMonsterDropsAnalysis } from '@helpers/debug/analysis-monsterdrops';
@@ -366,6 +367,16 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     strict: true,
     inputKeys: [],
     run: runJobAbilitiesAnalysis,
+  },
+  {
+    id: 'skilltrees',
+    title: 'Skill Trees',
+    description:
+      'Every skill tree node sits on a valid column/row/track slot, requires lower-level nodes in its own tree, grants real skills and abilities; oaths have 2 bare options, one spec oath at Lv 15 matches the spec rows, and each job has exactly the starting SP worth of default nodes covering its default Combat Orders.',
+    category: 'Skills',
+    strict: true,
+    inputKeys: [],
+    run: runSkillTreesAnalysis,
   },
   {
     id: 'jobstarter',

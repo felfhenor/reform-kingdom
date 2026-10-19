@@ -138,6 +138,10 @@
       level: 25
       value: 0.4
 
+  treeVersion: 1
+  treeRows: [Fire Magic, Storm Magic, Spellweaving, Abilities]
+  specializationRows: [Arcanist, Spellweaver]
+
   starterEquipmentIds:
     - Cloak of Adventuring
     - Hat of Adventuring

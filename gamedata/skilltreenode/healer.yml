@@ -1,0 +1,268 @@
+# --- Restoration / track 0 ---
+
+- id: d12da260-40f7-42fd-9e5e-29a69b163b80
+  name: 'Healer: Cure I'
+  jobId: Healer
+  level: 1
+  row: Restoration
+  default: true
+  effects:
+    - { kind: GrantSkill, skillId: 'Cure I' }
+
+- id: 7ac31109-a5dd-4fa2-9268-57fe4cb068c5
+  name: 'Healer: Cure II'
+  jobId: Healer
+  level: 10
+  row: Restoration
+  requiredSkillTreeNodeIds: ['Healer: Cure I']
+  effects:
+    - { kind: GrantSkill, skillId: 'Cure II' }
+
+- id: 73568bc8-acbe-41b3-813f-96f63784d8cc
+  name: 'Healer: Cure III'
+  jobId: Healer
+  level: 20
+  row: Restoration
+  requiredSkillTreeNodeIds: ['Healer: Cure II']
+  effects:
+    - { kind: GrantSkill, skillId: 'Cure III' }
+
+- id: 15ee3ef7-6108-4e6b-9a5b-7275e432c7d0
+  name: 'Healer: Cure IV'
+  jobId: Healer
+  level: 40
+  row: Restoration
+  requiredSkillTreeNodeIds: ['Healer: Cure III']
+  effects:
+    - { kind: GrantSkill, skillId: 'Cure IV' }
+
+# --- Restoration / track 1 ---
+
+- id: 46600a6d-0d9f-459a-ac60-1e234f3e51fb
+  name: 'Healer: Starshine I'
+  jobId: Healer
+  level: 5
+  row: Restoration
+  track: 1
+  requiredSkillTreeNodeIds: ['Healer: Cure I']
+  effects:
+    - { kind: GrantSkill, skillId: 'Starshine I' }
+
+- id: b5d46b4d-5eaf-4e49-ad90-672c638dd0eb
+  name: 'Healer: Starshine II'
+  jobId: Healer
+  level: 15
+  row: Restoration
+  track: 1
+  requiredSkillTreeNodeIds: ['Healer: Starshine I']
+  effects:
+    - { kind: GrantSkill, skillId: 'Starshine II' }
+
+- id: b988ca81-0e2b-4d61-88d9-38249fb50d69
+  name: 'Healer: Starshine III'
+  jobId: Healer
+  level: 25
+  row: Restoration
+  track: 1
+  requiredSkillTreeNodeIds: ['Healer: Starshine II']
+  effects:
+    - { kind: GrantSkill, skillId: 'Starshine III' }
+
+- id: 67ed6037-0635-4c4e-997a-991284d0c113
+  name: 'Healer: Starshine IV'
+  jobId: Healer
+  level: 45
+  row: Restoration
+  track: 1
+  requiredSkillTreeNodeIds: ['Healer: Starshine III']
+  effects:
+    - { kind: GrantSkill, skillId: 'Starshine IV' }
+
+# --- Restoration / track 2 ---
+
+- id: 7f57600b-1292-40c3-b36c-5e76a1372cda
+  name: 'Healer: Lifesurge I'
+  jobId: Healer
+  level: 30
+  row: Restoration
+  track: 2
+  requiredSkillTreeNodeIds: ['Healer: Cure III']
+  effects:
+    - { kind: GrantSkill, skillId: 'Lifesurge I' }
+
+- id: f3649769-42bd-474e-b722-607753cb3293
+  name: 'Healer: Lifesurge II'
+  jobId: Healer
+  level: 50
+  row: Restoration
+  track: 2
+  requiredSkillTreeNodeIds: ['Healer: Lifesurge I']
+  effects:
+    - { kind: GrantSkill, skillId: 'Lifesurge II' }
+
+# --- Divine Might / track 0 ---
+
+- id: abd31de8-aa03-40a2-8048-99b8fe40e0b3
+  name: 'Healer: Holy Smite I'
+  jobId: Healer
+  level: 1
+  row: Divine Might
+  effects:
+    - { kind: GrantSkill, skillId: 'Holy Smite I' }
+
+- id: fadb4a51-e397-4abe-b2a6-005220db9b78
+  name: 'Healer: Holy Smite II'
+  jobId: Healer
+  level: 5
+  row: Divine Might
+  requiredSkillTreeNodeIds: ['Healer: Holy Smite I']
+  effects:
+    - { kind: GrantSkill, skillId: 'Holy Smite II' }
+
+- id: 2e293734-0ea9-4fcf-96cf-4c766448079f
+  name: 'Healer: Holy Smite III'
+  jobId: Healer
+  level: 15
+  row: Divine Might
+  requiredSkillTreeNodeIds: ['Healer: Holy Smite II']
+  effects:
+    - { kind: GrantSkill, skillId: 'Holy Smite III' }
+
+- id: b901a096-b748-4336-b954-75f09069c3e7
+  name: 'Healer: Holy Smite IV'
+  jobId: Healer
+  level: 35
+  row: Divine Might
+  requiredSkillTreeNodeIds: ['Healer: Holy Smite III']
+  effects:
+    - { kind: GrantSkill, skillId: 'Holy Smite IV' }
+
+# --- Divine Might / track 1 ---
+
+- id: 2d34033d-8413-405a-a727-3e46574ead71
+  name: 'Healer: Spiked Smash I'
+  jobId: Healer
+  level: 25
+  row: Divine Might
+  track: 1
+  requiredSkillTreeNodeIds: ['Healer: Holy Smite III']
+  effects:
+    - { kind: GrantSkill, skillId: 'Spiked Smash I' }
+
+- id: 3b14b548-c5a5-42c3-876f-4e27dc8fb04f
+  name: 'Healer: Spiked Smash II'
+  jobId: Healer
+  level: 40
+  row: Divine Might
+  track: 1
+  requiredSkillTreeNodeIds: ['Healer: Spiked Smash I']
+  effects:
+    - { kind: GrantSkill, skillId: 'Spiked Smash II' }
+
+# --- Divine Might / track 2 ---
+
+- id: 0c060c7b-0408-49c6-8d41-514bfb5e559b
+  name: 'Healer: Empower I'
+  jobId: Healer
+  level: 5
+  row: Divine Might
+  track: 2
+  effects:
+    - { kind: GrantSkill, skillId: 'Empower I' }
+
+- id: e868aa18-6207-407c-99a7-ec332df195f5
+  name: 'Healer: Empower II'
+  jobId: Healer
+  level: 20
+  row: Divine Might
+  track: 2
+  requiredSkillTreeNodeIds: ['Healer: Empower I']
+  effects:
+    - { kind: GrantSkill, skillId: 'Empower II' }
+
+# --- Abilities (intrinsic) ---
+
+- id: df883512-741b-48ab-a053-a03b4c2058e1
+  name: 'Healer: Healing Aura I'
+  jobId: Healer
+  level: 1
+  row: Abilities
+  default: true
+  effects:
+    - { kind: JobAbility, jobAbilityId: Healing Aura, value: 0.5 }
+
+- id: 7001ec70-83de-409c-b50d-60f557bc2a15
+  name: 'Healer: Healing Aura II'
+  jobId: Healer
+  level: 25
+  row: Abilities
+  requiredSkillTreeNodeIds: ['Healer: Healing Aura I']
+  effects:
+    - { kind: JobAbility, jobAbilityId: Healing Aura, value: 1 }
+
+# --- Specialization oath (Lv 15) ---
+
+- id: 1147cb27-d2f0-48ac-a051-e1716e340380
+  name: 'Healer: Oath of the Healer'
+  jobId: Healer
+  level: 15
+  row: Lifegiver
+  optionSkillTreeNodeIds: ['Healer: Lifegiver', 'Healer: Templar']
+
+- id: 361815c3-ddf7-4ab8-9d8d-631936d4ae02
+  name: 'Healer: Lifegiver'
+  jobId: Healer
+  description: 'Swear the Oath of the Lifegiver. Grants +0.15 Spirit, +0.15 Constitution per level (applied retroactively).'
+  specIcon: gameHeartPlus
+  effects:
+    - { kind: StatPerLevel, stat: Spirit, value: 0.15 }
+    - { kind: StatPerLevel, stat: Constitution, value: 0.15 }
+
+- id: 908133c7-917f-4ed6-a989-b2efa8ec487b
+  name: 'Healer: Templar'
+  jobId: Healer
+  description: 'Swear the Oath of the Templar. Grants +0.15 Strength, +0.15 Vitality per level (applied retroactively).'
+  specIcon: gameTemplarShield
+  effects:
+    - { kind: StatPerLevel, stat: Strength, value: 0.15 }
+    - { kind: StatPerLevel, stat: Vitality, value: 0.15 }
+
+# --- Lifegiver ---
+
+- id: 5f856e1a-d3ec-4c28-b574-d3f30bb39eb4
+  name: 'Healer: Sanctified Incantations I'
+  jobId: Healer
+  level: 20
+  row: Lifegiver
+  requiredSkillTreeNodeIds: ['Healer: Lifegiver']
+  effects:
+    - { kind: JobAbility, jobAbilityId: Sanctified Incantations, value: 0.25 }
+
+- id: 70c99293-32c0-4a55-8806-a80f2cc4ffd4
+  name: 'Healer: Sanctified Incantations II'
+  jobId: Healer
+  level: 25
+  row: Lifegiver
+  requiredSkillTreeNodeIds: ['Healer: Sanctified Incantations I']
+  effects:
+    - { kind: JobAbility, jobAbilityId: Sanctified Incantations, value: 0.5 }
+
+# --- Templar ---
+
+- id: 8775de13-9dfc-4c17-8eeb-5b23218deb81
+  name: 'Healer: Town Favor I'
+  jobId: Healer
+  level: 20
+  row: Templar
+  requiredSkillTreeNodeIds: ['Healer: Templar']
+  effects:
+    - { kind: JobAbility, jobAbilityId: Town Favor, value: 0.1 }
+
+- id: 803ee039-e1ed-40eb-ad9d-eec07e19b046
+  name: 'Healer: Town Favor II'
+  jobId: Healer
+  level: 25
+  row: Templar
+  requiredSkillTreeNodeIds: ['Healer: Town Favor I']
+  effects:
+    - { kind: JobAbility, jobAbilityId: Town Favor, value: 0.2 }

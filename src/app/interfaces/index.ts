@@ -33,6 +33,7 @@ export * from './content-outpost';
 export * from './content-recipe';
 export * from './content-shrine';
 export * from './content-skill';
+export * from './content-skilltreenode';
 export * from './content-statuseffect';
 export * from './content-task';
 export * from './content-town';

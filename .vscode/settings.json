@@ -36,6 +36,7 @@
     "./schemas/region.schema.json": "gamedata/region/**/*.yml",
     "./schemas/shrine.schema.json": "gamedata/shrine/**/*.yml",
     "./schemas/skill.schema.json": "gamedata/skill/**/*.yml",
+    "./schemas/skilltreenode.schema.json": "gamedata/skilltreenode/**/*.yml",
     "./schemas/statuseffect.schema.json": "gamedata/statuseffect/**/*.yml",
     "./schemas/task.schema.json": "gamedata/task/**/*.yml",
     "./schemas/town.schema.json": "gamedata/town/**/*.yml",

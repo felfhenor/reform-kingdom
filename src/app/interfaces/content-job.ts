@@ -3,6 +3,7 @@ import type { CombatOrderClause } from '@interfaces/combat-order';
 import type { EquipmentId } from '@interfaces/content-equipment';
 import type { JobAbilityId } from '@interfaces/content-jobability';
 import type { EquipmentSkillId } from '@interfaces/content-skill';
+import type { SkillTreeRow } from '@interfaces/content-skilltreenode';
 import type { EquipmentItemType } from '@interfaces/equipment';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { BaseStat, StatBlock } from '@interfaces/stat';
@@ -56,6 +57,13 @@ export type JobContent = IsContentItem &
     skillPath: JobSkillPath[];
 
     abilities: JobAbilityLevel[];
+
+    // Bumping it resets every hero's tree for this job on next load.
+    treeVersion: number;
+    // Lanes top to bottom; field names avoid content-folder words the gamedata id rewrite would match.
+    treeRows: SkillTreeRow[];
+    // Drawn under the divider; must match the spec oath option names.
+    specializationRows: SkillTreeRow[];
 
     defaultCombatOrders: JobDefaultCombatOrder[];
 

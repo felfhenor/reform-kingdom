@@ -21,6 +21,7 @@ export type ContentType =
   | 'region'
   | 'shrine'
   | 'skill'
+  | 'skilltreenode'
   | 'statuseffect'
   | 'task'
   | 'town'

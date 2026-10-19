@@ -1,4 +1,7 @@
-import { VALID_EQUIPMENT_ITEM_TYPES } from '@helpers/content/ensure-helpers-constants';
+import {
+  VALID_EQUIPMENT_ITEM_TYPES,
+  VALID_SKILL_TREE_ROWS,
+} from '@helpers/content/ensure-helpers-constants';
 import {
   ensureArray,
   ensureEnumArray,
@@ -61,6 +64,12 @@ export function ensureJob(job: Partial<JobContent>): Required<JobContent> {
     })),
     skillPath: ensureArray(job.skillPath, ensureJobSkillPath),
     abilities: ensureArray(job.abilities, ensureJobAbilityLevel),
+    treeVersion: job.treeVersion ?? 1,
+    treeRows: ensureEnumArray(job.treeRows, VALID_SKILL_TREE_ROWS),
+    specializationRows: ensureEnumArray(
+      job.specializationRows,
+      VALID_SKILL_TREE_ROWS,
+    ),
     defaultCombatOrders: job.defaultCombatOrders ?? [],
     starterEquipmentIds: job.starterEquipmentIds ?? [],
   };

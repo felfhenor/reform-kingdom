@@ -26,6 +26,7 @@ import { ensureRecipe } from '@helpers/content/ensure-recipe';
 import { ensureRegion } from '@helpers/content/ensure-region';
 import { ensureShrine } from '@helpers/content/ensure-shrine';
 import { ensureSkill } from '@helpers/content/ensure-skill';
+import { ensureSkillTreeNode } from '@helpers/content/ensure-skilltreenode';
 import { ensureStatusEffect } from '@helpers/content/ensure-statuseffect';
 import { ensureTask } from '@helpers/content/ensure-task';
 import { ensureTown } from '@helpers/content/ensure-town';
@@ -65,6 +66,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   region: ensureRegion,
   shrine: ensureShrine,
   skill: ensureSkill,
+  skilltreenode: ensureSkillTreeNode,
   statuseffect: ensureStatusEffect,
   task: ensureTask,
   town: ensureTown,

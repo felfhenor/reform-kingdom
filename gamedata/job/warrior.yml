@@ -144,6 +144,10 @@
       level: 30
       value: 5
 
+  treeVersion: 1
+  treeRows: [Weapon Arts, Shield Arts, Abilities]
+  specializationRows: [Swashbuckler, Defender]
+
   starterEquipmentIds:
     - Cloak of Adventuring
     - Hat of Adventuring

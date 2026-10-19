@@ -150,6 +150,15 @@ export const VALUE_MULTIPLIER_PER_RESISTANCE: Record<StatusEffectTag, number> =
     Bleed: 3,
   };
 
+// Skill trees
+
+// Every job has exactly this many default nodes, so a new hero starts fully allocated.
+export const SKILL_TREE_STARTING_SP = 2;
+export const SKILL_TREE_COLUMN_INTERVAL = 5;
+export const SKILL_TREE_MAX_COLUMN_LEVEL = 50;
+export const SKILL_TREE_MAX_TRACKS = 4;
+export const SKILL_TREE_SPEC_OATH_LEVEL = 15;
+
 // Monster Research: what each rank of the DebuffPotency job ability adds.
 export const DEBUFF_POTENCY_PER_RANK: DebuffPotency = {
   chance: 5,
