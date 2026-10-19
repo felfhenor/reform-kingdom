@@ -1,5 +1,7 @@
 import { computed } from '@angular/core';
 import { getEntry } from '@helpers/content/content';
+import { characterNonGearEffects } from '@helpers/hero/hero-effect';
+import { affixEffectsOfKind } from '@helpers/item/affix';
 import { worldPartyState } from '@helpers/state-game';
 import type {
   Character,
@@ -43,25 +45,42 @@ export type CharacterJobAbility = {
   value: number;
 };
 
-// Each ability at the highest rank whose level the hero has reached.
-export function characterJobAbilities(
+function jobAbilityRankValues(
   character: Pick<Character, 'jobId' | 'level'>,
-): CharacterJobAbility[] {
-  const job = getEntry<JobContent>(character.jobId);
-  if (!job) return [];
-
+): Map<JobAbilityId, number> {
   const ranks = new Map<JobAbilityId, { level: number; value: number }>();
-  job.abilities.forEach(({ jobAbilityId, level, value }) => {
-    if (level > character.level) return;
+  getEntry<JobContent>(character.jobId)?.abilities.forEach(
+    ({ jobAbilityId, level, value }) => {
+      if (level > character.level) return;
 
-    const current = ranks.get(jobAbilityId);
-    if (!current || level > current.level) {
-      ranks.set(jobAbilityId, { level, value });
-    }
-  });
+      const current = ranks.get(jobAbilityId);
+      if (!current || level > current.level) {
+        ranks.set(jobAbilityId, { level, value });
+      }
+    },
+  );
 
-  return [...ranks.entries()]
-    .map(([jobAbilityId, { value }]) => ({
+  return new Map([...ranks].map(([id, { value }]) => [id, value]));
+}
+
+// Job ranks pick the highest reached level; granted effects only win when their value is higher.
+export function characterJobAbilities(
+  character: Pick<Character, 'jobId' | 'level' | 'teachings' | 'debugEffects'>,
+): CharacterJobAbility[] {
+  const values = jobAbilityRankValues(character);
+  affixEffectsOfKind(characterNonGearEffects(character), 'JobAbility').forEach(
+    ({ jobAbilityId, value }) => {
+      // Resolved so a grant by name merges with the job's id-keyed rank.
+      const id = getEntry<JobAbilityContent>(jobAbilityId)?.id;
+      if (!id) return;
+
+      const current = values.get(id);
+      values.set(id, current === undefined ? value : Math.max(current, value));
+    },
+  );
+
+  return [...values.entries()]
+    .map(([jobAbilityId, value]) => ({
       ability: getEntry<JobAbilityContent>(jobAbilityId),
       value,
     }))

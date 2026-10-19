@@ -6,7 +6,7 @@ import {
   jobAbilityHighest,
   jobAbilityValue,
 } from '@helpers/hero/job-ability';
-import type { Character } from '@interfaces';
+import type { Character, JobAbilityId } from '@interfaces';
 import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
 import {
@@ -26,6 +26,7 @@ const warrior = abilityJobContent('Warrior', [
   ['OnPathTravelSpeed', 25, 0.2],
 ]);
 const plain = abilityJobContent('Plain', []);
+const onPathId = 'OnPathTravelSpeed-id' as JobAbilityId;
 
 function seedParty(party: Character[]): void {
   seedGamestate((state) => {
@@ -48,6 +49,82 @@ describe('characterJobAbilities', () => {
     ).find(({ ability }) => ability.type === 'OnPathTravelSpeed');
 
     expect(onPath?.value).toBe(expected);
+  });
+
+  it.each([
+    [10, 0.5, 0.5],
+    [30, 0.15, 0.2],
+  ])(
+    'at level %i a granted %s rank resolves Trailbreaker to %s',
+    (level, granted, expected) => {
+      seedContent(warrior);
+      const hero = buildAbilityHero(
+        'Warrior',
+        level,
+        {},
+        {
+          debugEffects: [
+            { kind: 'JobAbility', jobAbilityId: onPathId, value: granted },
+          ],
+        },
+      );
+
+      const onPath = characterJobAbilities(hero).find(
+        ({ ability }) => ability.type === 'OnPathTravelSpeed',
+      );
+
+      expect(onPath?.value).toBe(expected);
+    },
+  );
+
+  it('keeps the highest of several grants instead of stacking them', () => {
+    seedContent(warrior);
+    const hero = buildAbilityHero(
+      'Warrior',
+      1,
+      {},
+      {
+        debugEffects: [
+          { kind: 'JobAbility', jobAbilityId: onPathId, value: 0.3 },
+          {
+            kind: 'JobAbility',
+            jobAbilityId: 'OnPathTravelSpeed' as JobAbilityId,
+            value: 0.4,
+          },
+        ],
+      },
+    );
+
+    expect(
+      characterJobAbilities(hero).filter(
+        ({ ability }) => ability.type === 'OnPathTravelSpeed',
+      ),
+    ).toEqual([expect.objectContaining({ value: 0.4 })]);
+  });
+
+  it("grants an ability the hero's job doesn't have", () => {
+    seedContent([...plain, buildJobAbility('Ambush')]);
+    const hero = buildAbilityHero(
+      'Plain',
+      1,
+      {},
+      {
+        debugEffects: [
+          {
+            kind: 'JobAbility',
+            jobAbilityId: 'Ambush-id' as JobAbilityId,
+            value: 5,
+          },
+        ],
+      },
+    );
+
+    expect(
+      characterJobAbilities(hero).map(({ ability, value }) => [
+        ability.type,
+        value,
+      ]),
+    ).toEqual([['Ambush', 5]]);
   });
 });
 
