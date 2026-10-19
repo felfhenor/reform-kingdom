@@ -39,8 +39,10 @@ const JOB_ABILITY_VALUE_LABELS: Record<
   ItemDropRateBoost: (value) => `+${value}% item drop rate`,
   SkillRepeatChance: (value) => `+${value}% skill repeat chance`,
   CoverChance: (value) => `${value}% chance to cover an ally`,
-  DebuffPotency: (value) =>
-    `+${value * DEBUFF_POTENCY_PER_RANK.chance}% debuff chance, +${value * DEBUFF_POTENCY_PER_RANK.duration} turns`,
+  DebuffPotency: (value) => {
+    const turns = value * DEBUFF_POTENCY_PER_RANK.duration;
+    return `+${value * DEBUFF_POTENCY_PER_RANK.chance}% debuff chance, +${turns} turn${turns === 1 ? '' : 's'}`;
+  },
 };
 
 export function jobAbilityValueLabel(

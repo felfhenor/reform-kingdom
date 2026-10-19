@@ -7,10 +7,8 @@ import {
   type Signal,
 } from '@angular/core';
 import { IconDimensionComponent } from '@components/icon-dimension/icon-dimension.component';
-import {
-  characterCombatStatBonusTotals,
-  characterTagResistances,
-} from '@helpers/item/equipment';
+import { combatStatsForCharacter } from '@helpers/combat/combat-stats';
+import { characterTagResistances } from '@helpers/item/equipment';
 import {
   characterElementalBoons,
   characterElementalResistances,
@@ -56,14 +54,14 @@ export class PanelHeroEquipmentStatsComponent {
   public elementalResistanceDimension = ElementResistanceDimension;
   public elementalBoonDimension = ElementBoonDimension;
 
-  // Gear + teachings, same as the stats above - the temporary Astral Projector
+  // Gear + teachings (+ job abilities for combat stats) - the temporary Astral Projector
   // buff is combat-time only and intentionally not reflected here.
   public resistances = computed(() =>
     characterTagResistances(this.character()),
   );
 
   public combatStats = computed(() =>
-    characterCombatStatBonusTotals(this.character()),
+    combatStatsForCharacter(this.character()),
   );
 
   public elementalResistances = computed(() =>
