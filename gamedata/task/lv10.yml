@@ -70,7 +70,7 @@
     - itemId: Gold Coin
       quantity: 2500
     - itemId: Memory Flux
-      quantity: 1
+      quantity: 3
 
 - id: 98caeb6a-55f1-4565-8aa2-7e874943324b
   name: Gather 25 Miremetal Ore

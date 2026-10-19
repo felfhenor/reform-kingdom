@@ -40,7 +40,7 @@
       quantity: 15
 
     - itemId: Memory Flux
-      quantity: 1
+      quantity: 3
 
 - id: f45c1eda-8ad3-44e7-892f-9652af83c1e5
   name: Clear the Demon Foray
@@ -132,7 +132,7 @@
     - itemId: Gold Coin
       quantity: 25000
     - itemId: Memory Flux
-      quantity: 1
+      quantity: 3
 
 - id: 0be50d27-99f7-4e81-8115-9ec78c0571e7
   name: Gather 25 Crimson Ore

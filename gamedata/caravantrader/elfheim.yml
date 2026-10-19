@@ -46,6 +46,12 @@
       limit: 3
       weight: 2
 
+    - type: sell
+      value: 25000
+      itemId: Memory Flux
+      limit: 5
+      weight: 1
+
 - id: 5cd7a8a6-1030-49cc-891e-c67e2f4ac74c
   name: Renaud Hall
   description: I deal in elvish equipment. You might find some good items here.

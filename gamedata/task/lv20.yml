@@ -14,7 +14,7 @@
       quantity: 25
 
     - itemId: Memory Flux
-      quantity: 1
+      quantity: 3
 
 - id: 0f6a82b2-f809-494c-bbbf-91306ae053a8
   name: Visit Larsia
@@ -54,7 +54,7 @@
     - itemId: Gold Coin
       quantity: 7500
     - itemId: Memory Flux
-      quantity: 1
+      quantity: 3
 
 - id: bbecb33f-a0b5-4c10-b0a5-758f91739905
   name: Gather 50 Cactspine

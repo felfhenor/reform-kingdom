@@ -130,6 +130,12 @@
       limit: 5
       weight: 1
 
+    - type: sell
+      value: 15000
+      itemId: Memory Flux
+      limit: 5
+      weight: 1
+
 - id: 55b17ce9-1178-4e33-a50c-fdd226613610
   name: Alekia Figaro
   description: Greetings, Duchy heroes. I deal in mystical recipes.

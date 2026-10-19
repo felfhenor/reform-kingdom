@@ -47,7 +47,7 @@
     - itemId: Gold Coin
       quantity: 50000
     - itemId: Memory Flux
-      quantity: 2
+      quantity: 3
 
 - id: aa04ba1f-e3f0-420e-a8c4-f7e3962b2bb4
   name: Defeat 30 Beholders
