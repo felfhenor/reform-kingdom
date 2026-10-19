@@ -2,6 +2,7 @@ import {
   combatantIsDead,
   combatCombatantTakeDamage,
 } from '@helpers/combat/combat-combatant-hp';
+import { combatCoveringAlly } from '@helpers/combat/combat-cover';
 import {
   combatApplySkillToTarget,
   techniqueHasAttribute,
@@ -210,8 +211,25 @@ function combatantUseSkill(
       },
     );
 
-    targets.forEach((target) => {
+    targets.forEach((intendedTarget) => {
       if (isCombatOver(combat)) return;
+
+      const cover = combatCoveringAlly(
+        combatant,
+        intendedTarget,
+        baseTargetList,
+        tech,
+        numTargets,
+      );
+      if (cover) {
+        combatMessageLog(
+          combat,
+          `**${combatantMessageToken(cover)}** covers **${combatantMessageToken(intendedTarget)}**!`,
+          cover,
+        );
+      }
+
+      const target = cover ?? intendedTarget;
 
       if (combatTechniqueMisses(combatant, tech)) {
         combatMessageLog(

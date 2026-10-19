@@ -37,7 +37,8 @@ export type CombatStat =
   | 'reviveChance'
   | 'stunChance'
   | 'epCostIncreasePercent'
-  | 'agroValue';
+  | 'agroValue'
+  | 'coverChance';
 
 export type CombatStatBlock = Record<CombatStat, number>;
 
@@ -55,6 +56,7 @@ export const CombatStatDimension: StatDisplayDimension<CombatStat> = {
     'damageReflectPercent',
     'debuffIgnoreChance',
     'reviveChance',
+    'coverChance',
     'agroValue',
     'missChance',
     'stunChance',
@@ -74,6 +76,7 @@ export const CombatStatDimension: StatDisplayDimension<CombatStat> = {
     stunChance: 'Self-Stun Chance',
     epCostIncreasePercent: 'EP Cost Increase',
     agroValue: 'Aggro',
+    coverChance: 'Cover Chance',
   },
   icon: {
     repeatActionChance: 'gameExtraTime',
@@ -87,6 +90,7 @@ export const CombatStatDimension: StatDisplayDimension<CombatStat> = {
     stunChance: 'gameKnockedOutStars',
     epCostIncreasePercent: 'gameNestedEclipses',
     agroValue: 'gameTargeted',
+    coverChance: 'gameShieldImpact',
   },
   color: {
     repeatActionChance: 'text-green-500',
@@ -100,6 +104,7 @@ export const CombatStatDimension: StatDisplayDimension<CombatStat> = {
     stunChance: 'text-yellow-500',
     epCostIncreasePercent: 'text-violet-500',
     agroValue: 'text-orange-600',
+    coverChance: 'text-cyan-600',
   },
   isPercent: {
     repeatActionChance: true,
@@ -113,6 +118,7 @@ export const CombatStatDimension: StatDisplayDimension<CombatStat> = {
     stunChance: true,
     epCostIncreasePercent: true,
     agroValue: false,
+    coverChance: true,
   },
 };
 

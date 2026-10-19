@@ -161,6 +161,7 @@ export const VALUE_MULTIPLIER_PER_COMBAT_STAT: Record<CombatStat, number> = {
   stunChance: 1,
   epCostIncreasePercent: 1,
   agroValue: 2,
+  coverChance: 6,
 };
 
 export const GOLD_PER_MONSTER_TYPE_DAMAGE_POINT = 50;

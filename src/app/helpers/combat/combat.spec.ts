@@ -2,6 +2,7 @@ import type * as RngHelper from '@helpers/rng';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/combat/combat-combatant-hp');
+vi.mock('@helpers/combat/combat-cover');
 vi.mock('@helpers/combat/combat-damage');
 vi.mock('@helpers/combat/combat-end');
 vi.mock('@helpers/combat/combat-order-evaluation');
@@ -26,6 +27,7 @@ import {
   combatApplySkillToTarget,
   techniqueHasAttribute,
 } from '@helpers/combat/combat-damage';
+import { combatCoveringAlly } from '@helpers/combat/combat-cover';
 import { combatantDamageEvents } from '@helpers/combat/combat-damage-events';
 import { combatCheckIfOver } from '@helpers/combat/combat-end';
 import { combatLog } from '@helpers/combat/combat-log';
@@ -368,6 +370,19 @@ describe('combatantTakeTurn targeting', () => {
         .calls[0][4],
     ).toBe(true);
     expect(targetPriorityUsed()).toEqual(priority);
+  });
+
+  it('sends the hit to a covering ally and logs the cover', () => {
+    const guard = caster({ id: 'guard-1', name: 'Guard' });
+    available(skill('weighted'));
+    vi.mocked(combatGetTargetsFromPriorityList).mockReturnValue([target]);
+    vi.mocked(combatCoveringAlly).mockReturnValueOnce(guard);
+
+    combatantTakeTurn(buildCombat(), caster());
+
+    expect(combatApplySkillToTarget).toHaveBeenCalledOnce();
+    expect(vi.mocked(combatApplySkillToTarget).mock.calls[0][2]).toBe(guard);
+    expect(combatLog()[0].message).toContain('covers');
   });
 
   it('emits a miss on the target instead of applying the technique when the miss roll succeeds', () => {

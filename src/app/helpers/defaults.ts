@@ -185,6 +185,7 @@ export function defaultCombatStats(): CombatStatBlock {
     stunChance: 0,
     epCostIncreasePercent: 0,
     agroValue: 0,
+    coverChance: 0,
   };
 }
 
