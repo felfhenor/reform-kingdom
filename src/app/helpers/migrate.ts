@@ -44,6 +44,7 @@ import { pruneInvalidTowns } from '@helpers/town/town-prune';
 import { pruneInvalidBurstSkills } from '@helpers/hero/burst-skill';
 import { stateRegaliaMigrate } from '@helpers/hero/regalia-state';
 import { pruneInvalidCharacterTeachings } from '@helpers/trainer/trainer';
+import { characterSkillTreesMigrate } from '@helpers/hero/skill-tree';
 import { pruneInvalidTasks, retrofitTasks } from '@helpers/task/task-migrate';
 import { TUTORIAL_CATALOG } from '@helpers/tutorial/tutorial-catalog';
 import {
@@ -156,6 +157,7 @@ export function migrateGameState() {
     combatOrders: character.combatOrders ?? {},
     teachings: pruneInvalidCharacterTeachings(character.teachings),
     burstSkills: pruneInvalidBurstSkills(character.burstSkills),
+    ...characterSkillTreesMigrate(character),
   }));
   newState.world.party = newState.world.party.map((character) => {
     const { equipment, extras } = repairSplitEquippedItems(character.equipment);

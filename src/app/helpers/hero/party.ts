@@ -9,6 +9,7 @@ import { getEntry } from '@helpers/content/content';
 import { defaultEquipment, defaultStats } from '@helpers/defaults';
 import { roundToNearest10 } from '@helpers/engine/number';
 import { characterNonGearEffects } from '@helpers/hero/hero-effect';
+import { characterSkillTreeSeeded } from '@helpers/hero/skill-tree-content';
 import { affixEffectSum } from '@helpers/item/affix';
 import {
   equipmentAffixEffects,
@@ -144,6 +145,10 @@ export function createCharacter(name: string, jobId: JobId): Character {
     jobProgress: {},
     combatOrders: { [jobId]: combatOrdersFromJobDefaults(jobId) },
     teachings: {},
+    ...characterSkillTreeSeeded(
+      { skillTreeNodes: {}, skillTreeVersions: {} },
+      jobId,
+    ),
     burstSkills: {},
     currentRegaliaIds: {},
     hp: stats.Health,

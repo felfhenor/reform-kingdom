@@ -3,7 +3,7 @@ import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
 import { characterStats } from '@helpers/hero/party';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { discoveredTrainersState, updateGamestate } from '@helpers/state-game';
-import { characterJobLevel } from '@helpers/hero/character-reclass';
+import { characterJobLevel } from '@helpers/hero/job';
 import { characterTeachingIds } from '@helpers/trainer/trainer-teaching';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
 import { worldNodeTrainer } from '@helpers/world-node/world-nodes';

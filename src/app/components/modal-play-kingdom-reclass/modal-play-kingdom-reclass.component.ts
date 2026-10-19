@@ -21,11 +21,10 @@ import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
 import { modalIsOpen } from '@helpers/engine/modal-stack';
 import {
-  characterJobLevel,
   characterReclassCost,
   charactersReclass,
 } from '@helpers/hero/character-reclass';
-import { getUnlockedJobs } from '@helpers/hero/job';
+import { characterJobLevel, getUnlockedJobs } from '@helpers/hero/job';
 import {
   characterCurrentRegalia,
   regaliaMatchesCharacter,

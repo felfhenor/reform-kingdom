@@ -70,7 +70,10 @@ function jobAbilityRankValues(
 
 // Job ranks pick the highest reached level; granted effects only win when their value is higher.
 export function characterJobAbilities(
-  character: Pick<Character, 'jobId' | 'level' | 'teachings' | 'debugEffects'>,
+  character: Pick<
+    Character,
+    'jobId' | 'level' | 'teachings' | 'skillTreeNodes' | 'debugEffects'
+  >,
 ): CharacterJobAbility[] {
   const values = jobAbilityRankValues(character);
   affixEffectsOfKind(characterNonGearEffects(character), 'JobAbility').forEach(
@@ -94,7 +97,10 @@ export function characterJobAbilities(
 
 // 0 if the hero lacks it.
 export function characterJobAbilityValue(
-  character: Pick<Character, 'jobId' | 'level' | 'teachings' | 'debugEffects'>,
+  character: Pick<
+    Character,
+    'jobId' | 'level' | 'teachings' | 'skillTreeNodes' | 'debugEffects'
+  >,
   type: JobAbilityType,
 ): number {
   return (

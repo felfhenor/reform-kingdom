@@ -145,6 +145,7 @@ describe('Job Helper Functions', () => {
           level: 1,
           equipment: defaultEquipment(),
           teachings: {},
+          skillTreeNodes: {},
         }),
       ).toEqual([]);
     });
@@ -158,6 +159,7 @@ describe('Job Helper Functions', () => {
           level: 4,
           equipment: defaultEquipment(),
           teachings: {},
+          skillTreeNodes: {},
         }).map((skill) => skill.id),
       ).toEqual(['Attack', 'Double Strike I', 'Sweep I']);
     });
@@ -171,6 +173,7 @@ describe('Job Helper Functions', () => {
           level: 1,
           equipment: defaultEquipment(),
           teachings: {},
+          skillTreeNodes: {},
           debugEffects: [{ kind: 'GrantSkill', skillId: sweep1.id }],
         }).map((skill) => skill.id),
       ).toContain(sweep1.id);
@@ -268,6 +271,7 @@ describe('Job Helper Functions', () => {
       level,
       equipment: defaultEquipment(),
       teachings: {},
+      skillTreeNodes: {},
       burstSkills: { [job.id]: chosen as EquipmentSkillId[] },
     });
 

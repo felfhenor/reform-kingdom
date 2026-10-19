@@ -8,6 +8,7 @@ import {
 import { ensureAffix } from '@helpers/content/ensure-affix';
 import { ensureEquipment } from '@helpers/content/ensure-item';
 import { ensureJob } from '@helpers/content/ensure-job';
+import { ensureSkillTreeNode } from '@helpers/content/ensure-skilltreenode';
 import { ensureTrainerTeaching } from '@helpers/content/ensure-trainer';
 import { defaultEquipment, defaultStats } from '@helpers/defaults';
 import {
@@ -29,6 +30,7 @@ import type {
   EquipmentBlock,
   EquipmentId,
   JobId,
+  SkillTreeNodeId,
   TradeskillId,
   TrainerTeachingId,
 } from '@interfaces';
@@ -213,6 +215,21 @@ describe('createCharacter', () => {
         Helmet: expect.objectContaining({ equipmentId: starterHat.id }),
       }),
     );
+  });
+
+  it("starts with its job's default tree nodes, already paid for", () => {
+    const strike = ensureSkillTreeNode({
+      id: 'strike' as SkillTreeNodeId,
+      name: 'Explorer: Strike',
+      jobId,
+      default: true,
+    });
+    seedContent([ensureJob({ ...job, treeVersion: 3 }), strike]);
+
+    expect(createCharacter('Jala', jobId)).toMatchObject({
+      skillTreeNodes: { [jobId]: [strike.id] },
+      skillTreeVersions: { [jobId]: 3 },
+    });
   });
 
   it('starts with its job default Combat Orders', () => {

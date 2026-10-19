@@ -2,6 +2,7 @@ import type { CharacterId } from '@interfaces/character';
 import type { CombatOrderClause } from '@interfaces/combat-order';
 import type { JobId } from '@interfaces/content-job';
 import type { EquipmentSkillId } from '@interfaces/content-skill';
+import type { SkillTreeNodeId } from '@interfaces/content-skilltreenode';
 import type { EquipmentItem, EquipmentItemId } from '@interfaces/equipment';
 import type { Branded } from '@interfaces/identifiable';
 
@@ -16,6 +17,9 @@ export type Regalia = {
   equipmentItemIds: EquipmentItemId[];
   combatOrders: CombatOrderClause[];
   burstSkillIds: EquipmentSkillId[];
+  // This build's tree; switching regalias switches trees for free.
+  skillTreeNodeIds: SkillTreeNodeId[];
+  skillTreeVersion: number;
 };
 
 // `vault` holds regalia gear that is neither equipped nor in the armory.

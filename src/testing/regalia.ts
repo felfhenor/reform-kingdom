@@ -85,6 +85,8 @@ export function buildRegalia(
     equipmentItemIds,
     combatOrders: [],
     burstSkillIds: [],
+    skillTreeNodeIds: [],
+    skillTreeVersion: 0,
     ...overrides,
   };
 }

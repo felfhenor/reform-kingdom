@@ -5,9 +5,10 @@ vi.mock('@helpers/task/task-events');
 import { RECLASS_GOLD_PER_LEVEL } from '@helpers/config';
 import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
 import { ensureJob } from '@helpers/content/ensure-job';
+import { ensureSkillTreeNode } from '@helpers/content/ensure-skilltreenode';
 import { defaultEquipment, defaultStats } from '@helpers/defaults';
+import { characterJobLevel } from '@helpers/hero/job';
 import {
-  characterJobLevel,
   characterReclass,
   characterReclassCost,
   charactersReclass,
@@ -37,6 +38,7 @@ import type {
   JobId,
   Regalia,
   RegaliaId,
+  SkillTreeNodeId,
 } from '@interfaces';
 import { captureAnalyticsEvents } from '@/testing/analytics';
 import { buildCharacter, buildEquipmentItem } from '@/testing/builders';
@@ -45,6 +47,7 @@ import { seedGamestate } from '@/testing/gamestate';
 
 const explorerId = 'job-explorer' as JobId;
 const warriorId = 'job-warrior' as JobId;
+const warriorStrikeNodeId = 'warrior-strike' as SkillTreeNodeId;
 const goldId = 'gold-coin' as ItemId;
 const cloakId = 'cloak' as EquipmentId;
 const hatId = 'hat' as EquipmentId;
@@ -81,6 +84,12 @@ function seedJobs(warrior: Partial<JobContent> = {}): void {
       statsPerLevel: { ...defaultStats(), Health: 10 },
       statPriority: [{ stat: 'Strength', multiplier: 1 }],
       ...warrior,
+    }),
+    ensureSkillTreeNode({
+      id: warriorStrikeNodeId,
+      name: 'Warrior: Strike',
+      jobId: warriorId,
+      default: true,
     }),
   ];
   seedContent(content);
@@ -216,6 +225,21 @@ describe('characterReclass', () => {
     await characterReclass('Jala' as CharacterId, warriorId);
     expect(reclassed().jobId).toBe(warriorId);
     expect(gamestate().materials[goldId]).toBeUndefined();
+  });
+
+  it("gives a never-held job its default tree and keeps the old job's tree", async () => {
+    const explorerTree = ['explorer-node' as SkillTreeNodeId];
+    seedWorld([
+      hero('Jala', { skillTreeNodes: { [explorerId]: explorerTree } }),
+    ]);
+
+    await characterReclass('Jala' as CharacterId, warriorId);
+
+    expect(reclassed().skillTreeNodes).toEqual({
+      [explorerId]: explorerTree,
+      [warriorId]: [warriorStrikeNodeId],
+    });
+    expect(reclassed().skillTreeVersions[warriorId]).toBe(1);
   });
 
   it('leaves other party members alone', async () => {
@@ -356,6 +380,8 @@ describe('regalias', () => {
     equipmentItemIds: items.map((item) => item.id),
     combatOrders: [],
     burstSkillIds: [],
+    skillTreeNodeIds: [],
+    skillTreeVersion: 0,
   });
 
   beforeEach(() => seedJobs({ equippableTypes: ['Sword', 'Spear'] }));

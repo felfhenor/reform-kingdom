@@ -5,8 +5,7 @@ import {
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { notifySuccess } from '@helpers/engine/notify';
-import { characterJobLevel } from '@helpers/hero/character-reclass';
-import { getUnlockedJobs } from '@helpers/hero/job';
+import { characterJobLevel, getUnlockedJobs } from '@helpers/hero/job';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import {
   affixEffectsBlock,

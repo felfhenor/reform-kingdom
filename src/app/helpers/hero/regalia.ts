@@ -5,6 +5,7 @@ import {
 import { getEntry } from '@helpers/content/content';
 import { defaultEquipment } from '@helpers/defaults';
 import { burstSkillIdFor } from '@helpers/hero/burst-skill';
+import { regaliaSkillTreeMigrate } from '@helpers/hero/skill-tree';
 import {
   backfillEquipmentItem,
   canEquipItem,
@@ -67,6 +68,8 @@ export function regaliaSnapshot(
     equipmentItemIds: characterEquippedItemIds(character),
     combatOrders: cloneDeep(character.combatOrders[character.jobId] ?? []),
     burstSkillIds: [...(character.burstSkills[character.jobId] ?? [])],
+    skillTreeNodeIds: [...(character.skillTreeNodes[character.jobId] ?? [])],
+    skillTreeVersion: character.skillTreeVersions[character.jobId] ?? 0,
   };
 }
 
@@ -198,20 +201,21 @@ export function pruneInvalidRegalias(
   regalias: GameStateRegalias,
   party: Character[],
 ): GameStateRegalias {
-  const entries = regalias.entries
-    .filter(
-      (regalia) =>
-        party.some((character) => character.id === regalia.characterId) &&
-        !!getEntry<JobContent>(regalia.jobId),
-    )
-    .map((regalia) => ({
-      ...regalia,
-      equipmentItemIds: uniq(regalia.equipmentItemIds),
-      burstSkillIds: uniq(regalia.burstSkillIds.flatMap(burstSkillIdFor)).slice(
-        0,
-        HERO_BURST_SKILL_SLOTS,
-      ),
-    }));
+  const entries = regalias.entries.flatMap((regalia) => {
+    const character = party.find((c) => c.id === regalia.characterId);
+    if (!character || !getEntry<JobContent>(regalia.jobId)) return [];
+
+    return [
+      {
+        ...regalia,
+        ...regaliaSkillTreeMigrate(regalia, character),
+        equipmentItemIds: uniq(regalia.equipmentItemIds),
+        burstSkillIds: uniq(
+          regalia.burstSkillIds.flatMap(burstSkillIdFor),
+        ).slice(0, HERO_BURST_SKILL_SLOTS),
+      },
+    ];
+  });
 
   return {
     entries,

@@ -2,8 +2,15 @@ import {
   SKILL_TREE_COLUMN_INTERVAL,
   SKILL_TREE_MAX_COLUMN_LEVEL,
 } from '@helpers/config';
-import { getEntriesByType } from '@helpers/content/content';
-import type { JobId, SkillTreeNodeContent, SkillTreeNodeId } from '@interfaces';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
+import type {
+  Character,
+  JobContent,
+  JobId,
+  SkillTreeNodeContent,
+  SkillTreeNodeEffect,
+  SkillTreeNodeId,
+} from '@interfaces';
 
 export function skillTreeJobNodes(jobId: JobId): SkillTreeNodeContent[] {
   return getEntriesByType<SkillTreeNodeContent>('skilltreenode').filter(
@@ -46,4 +53,36 @@ export function skillTreeIsLevelColumn(level: number): boolean {
 // The display name without the '<Job>: ' uniqueness prefix.
 export function skillTreeNodeShortName(node: SkillTreeNodeContent): string {
   return node.name.slice(node.name.indexOf(':') + 1).trim();
+}
+
+export function skillTreeDefaultNodeIds(jobId: JobId): SkillTreeNodeId[] {
+  return skillTreeJobNodes(jobId)
+    .filter((node) => node.default)
+    .map((node) => node.id);
+}
+
+export function skillTreeNodeEffects(
+  nodeIds: SkillTreeNodeId[],
+): SkillTreeNodeEffect[] {
+  return nodeIds.flatMap(
+    (nodeId) => getEntry<SkillTreeNodeContent>(nodeId)?.effects ?? [],
+  );
+}
+
+// A job never held, or built against an older treeVersion, starts over at its defaults.
+export function characterSkillTreeSeeded(
+  character: Pick<Character, 'skillTreeNodes' | 'skillTreeVersions'>,
+  jobId: JobId,
+): Pick<Character, 'skillTreeNodes' | 'skillTreeVersions'> {
+  const version = getEntry<JobContent>(jobId)?.treeVersion ?? 0;
+  const nodeIds = character.skillTreeNodes?.[jobId];
+  const stale = (character.skillTreeVersions?.[jobId] ?? 0) < version;
+
+  return {
+    skillTreeNodes: {
+      ...character.skillTreeNodes,
+      [jobId]: !nodeIds || stale ? skillTreeDefaultNodeIds(jobId) : nodeIds,
+    },
+    skillTreeVersions: { ...character.skillTreeVersions, [jobId]: version },
+  };
 }

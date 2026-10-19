@@ -154,6 +154,8 @@ export const VALUE_MULTIPLIER_PER_RESISTANCE: Record<StatusEffectTag, number> =
 
 // Every job has exactly this many default nodes, so a new hero starts fully allocated.
 export const SKILL_TREE_STARTING_SP = 2;
+// One SP every this many levels, up to the last column's level.
+export const SKILL_TREE_SP_LEVEL_INTERVAL = 2;
 export const SKILL_TREE_COLUMN_INTERVAL = 5;
 export const SKILL_TREE_MAX_COLUMN_LEVEL = 50;
 export const SKILL_TREE_MAX_TRACKS = 4;

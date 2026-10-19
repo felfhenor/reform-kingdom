@@ -21,6 +21,7 @@ export * from './resting';
 export * from './resting.ui';
 export * from './skill';
 export * from './skill-preview';
+export * from './skill-tree';
 export * from './skill-tree-content';
 export * from './travel';
 export * from './travel-cost';

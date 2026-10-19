@@ -267,7 +267,12 @@ describe('pruneInvalidRegalias / pruneInvalidCurrentRegaliaIds', () => {
     );
 
     expect(pruned.entries).toEqual([
-      { ...kept, equipmentItemIds: [sword.id], burstSkillIds: [] },
+      {
+        ...kept,
+        equipmentItemIds: [sword.id],
+        burstSkillIds: [],
+        skillTreeVersion: 1,
+      },
     ]);
     expect(itemIds(pruned.vault)).toEqual([sword.id]);
   });

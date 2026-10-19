@@ -5,6 +5,8 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { characterJobLevel } from '@helpers/hero/job';
+import { characterSkillTreeSeeded } from '@helpers/hero/skill-tree-content';
 import { characterStats, characterXpForLevel } from '@helpers/hero/party';
 import { characterCurrentRegalia } from '@helpers/hero/regalia';
 import {
@@ -30,12 +32,6 @@ import { EquipmentTypeToSlot } from '@interfaces';
 import { partyMaxLevel } from '@helpers/item/gathering';
 import { taskEventLevelReached } from '@helpers/task/task-events';
 import { partition } from 'es-toolkit/compat';
-
-// Level the hero would resume a job at: their current level if it's the active job, else their saved progress, else 1 for a job never held.
-export function characterJobLevel(character: Character, jobId: JobId): number {
-  if (character.jobId === jobId) return character.level;
-  return character.jobProgress[jobId]?.level ?? 1;
-}
 
 // Priced by the level the hero lands on, not the one they're leaving - reclassing back into a high-level job costs more than reclassing out of one.
 export function characterReclassCost(
@@ -109,6 +105,7 @@ function reclassCharacterStart(
 
   const { jobProgress, level, xp } = characterJobProgressSwap(character, jobId);
   Object.assign(character, { jobId, jobProgress, level, xp });
+  Object.assign(character, characterSkillTreeSeeded(character, jobId));
   return true;
 }
 

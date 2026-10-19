@@ -15,11 +15,21 @@ import type {
   EquipmentSkillId,
   HeroEffect,
   JobContent,
+  JobId,
 } from '@interfaces';
 import { sortBy, uniq } from 'es-toolkit/compat';
 
 export function getUnlockedJobs(): JobContent[] {
   return getEntriesByType<JobContent>('job');
+}
+
+// Level the hero would resume a job at: their current level if it's the active job, else their saved progress, else 1 for a job never held.
+export function characterJobLevel(
+  character: Pick<Character, 'jobId' | 'level' | 'jobProgress'>,
+  jobId: JobId,
+): number {
+  if (character.jobId === jobId) return character.level;
+  return character.jobProgress?.[jobId]?.level ?? 1;
 }
 
 export function heroSkillsAtLevel(

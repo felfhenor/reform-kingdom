@@ -23,6 +23,10 @@ import {
   characterRecalculateStats,
   characterXpForLevel,
 } from '@helpers/hero/party';
+import {
+  characterSkillTreeCanLearn,
+  skillTreePrune,
+} from '@helpers/hero/skill-tree';
 import { travelRelocateTo } from '@helpers/hero/travel';
 import { collectiblesAdd } from '@helpers/item/collectibles';
 import { gatherNodeDiscover } from '@helpers/item/gather-node-discovery';
@@ -72,6 +76,7 @@ import {
   type HeroEffect,
   type ItemContent,
   type ItemId,
+  type SkillTreeNodeId,
   type MonsterContent,
   type RecipeContent,
   type RecipeId,
@@ -165,6 +170,14 @@ export function debugSetCharacterLevel(
     ...character,
     level: clampedLevel,
     xp: { current: 0, maximum: characterXpForLevel(clampedLevel) },
+    skillTreeNodes: {
+      ...character.skillTreeNodes,
+      [character.jobId]: skillTreePrune(
+        character.jobId,
+        character.skillTreeNodes[character.jobId] ?? [],
+        clampedLevel,
+      ),
+    },
   }));
   void taskEventLevelReached(clampedLevel);
 }
@@ -182,6 +195,26 @@ function debugUpdateCharacter(
 
     return state;
   });
+}
+
+// Learns a node in the hero's current job tree if it's learnable and an SP is free.
+export function debugLearnSkillTreeNode(
+  characterId: CharacterId,
+  nodeId: SkillTreeNodeId,
+): void {
+  const character = worldPartyState().find((c) => c.id === characterId);
+  if (!character || !characterSkillTreeCanLearn(character, nodeId)) {
+    console.warn(`Skill tree node ${nodeId} can't be learned right now.`);
+    return;
+  }
+
+  debugUpdateCharacter(characterId, (c) => ({
+    ...c,
+    skillTreeNodes: {
+      ...c.skillTreeNodes,
+      [c.jobId]: [...(c.skillTreeNodes[c.jobId] ?? []), nodeId],
+    },
+  }));
 }
 
 export function debugGrantEffect(
