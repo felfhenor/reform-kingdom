@@ -1,5 +1,10 @@
 import { DEBUFF_POTENCY_PER_RANK } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
+import { characterJobAbilities } from '@helpers/hero/job-ability';
+import {
+  skillTreeJobNodes,
+  skillTreeNodeLevel,
+} from '@helpers/hero/skill-tree-content';
 import type {
   Character,
   DropRarity,
@@ -8,10 +13,10 @@ import type {
   JobAbilityRank,
   JobAbilityRow,
   JobAbilityType,
-  JobContent,
+  SkillTreeNodeContent,
 } from '@interfaces';
 import { ROMAN_NUMERAL_REVERSE } from '@interfaces';
-import { clamp, findLast, sortBy } from 'es-toolkit/compat';
+import { clamp, sortBy } from 'es-toolkit/compat';
 
 // Indexed by tier - 1; tiers past the end reuse the last rarity.
 const JOB_ABILITY_TIER_RARITIES: DropRarity[] = ['Common', 'Uncommon'];
@@ -52,51 +57,73 @@ export function jobAbilityValueLabel(
   return JOB_ABILITY_VALUE_LABELS[ability.type]?.(value) ?? `${value}`;
 }
 
-// A not-yet-unlocked ability (tier 0) shows its bare name at the first tier's rarity.
 function jobAbilityRow(
   ability: JobAbilityContent,
-  sortedRanks: JobAbilityRank[],
-  level: number,
+  tier: number,
+  current: JobAbilityRank,
+  next: JobAbilityRank | undefined,
 ): JobAbilityRow {
-  const current = findLast(sortedRanks, (rank) => rank.level <= level);
-  const tier = current ? sortedRanks.indexOf(current) + 1 : 0;
   const rarityIndex = clamp(tier - 1, 0, JOB_ABILITY_TIER_RARITIES.length - 1);
 
   return {
     ability,
-    name:
-      tier > 0
-        ? `${ability.name} ${ROMAN_NUMERAL_REVERSE[tier]}`
-        : ability.name,
+    name: `${ability.name} ${ROMAN_NUMERAL_REVERSE[tier]}`,
     sprite: ability.sprite,
     rarity: JOB_ABILITY_TIER_RARITIES[rarityIndex],
     current,
-    next: sortedRanks.find((rank) => rank.level > level),
+    next,
   };
 }
 
-// Every ability the hero's job lists, with the rank they hold now (if any) and the next one to unlock.
+function nodeAbilityValue(
+  node: SkillTreeNodeContent,
+  abilityId: JobAbilityId,
+): number | undefined {
+  return node.effects.flatMap((effect) =>
+    effect.kind === 'JobAbility' &&
+    getEntry<JobAbilityContent>(effect.jobAbilityId)?.id === abilityId
+      ? [effect.value]
+      : [],
+  )[0];
+}
+
+function abilityRankNodes(
+  nodes: SkillTreeNodeContent[],
+  abilityId: JobAbilityId,
+): SkillTreeNodeContent[] {
+  return sortBy(
+    nodes.filter((node) => nodeAbilityValue(node, abilityId) !== undefined),
+    (node) => skillTreeNodeLevel(nodes, node),
+  );
+}
+
+// Each ability the hero holds; its tier and next rank come from the current job's tree.
 export function characterJobAbilityRows(
-  character: Pick<Character, 'jobId' | 'level'>,
+  character: Pick<
+    Character,
+    'jobId' | 'teachings' | 'skillTreeNodes' | 'debugEffects'
+  >,
 ): JobAbilityRow[] {
-  const job = getEntry<JobContent>(character.jobId);
-  if (!job) return [];
+  const learned = new Set(character.skillTreeNodes?.[character.jobId] ?? []);
+  const nodes = skillTreeJobNodes(character.jobId);
+  const levelOf = (node?: SkillTreeNodeContent) =>
+    node ? skillTreeNodeLevel(nodes, node) : 0;
 
-  const ranksById = new Map<JobAbilityId, JobAbilityRank[]>();
-  job.abilities.forEach(({ jobAbilityId, level, value }) => {
-    ranksById.set(jobAbilityId, [
-      ...(ranksById.get(jobAbilityId) ?? []),
-      { level, value },
-    ]);
+  return characterJobAbilities(character).map(({ ability, value }) => {
+    const ranks = abilityRankNodes(nodes, ability.id);
+    const learnedCount = ranks.filter((node) => learned.has(node.id)).length;
+    const nextNode = ranks[learnedCount];
+
+    return jobAbilityRow(
+      ability,
+      Math.max(learnedCount, 1),
+      { level: levelOf(ranks[learnedCount - 1]), value },
+      nextNode
+        ? {
+            level: levelOf(nextNode),
+            value: nodeAbilityValue(nextNode, ability.id) ?? 0,
+          }
+        : undefined,
+    );
   });
-
-  return [...ranksById.entries()]
-    .map(([jobAbilityId, ranks]) => {
-      const ability = getEntry<JobAbilityContent>(jobAbilityId);
-      if (!ability) return undefined;
-
-      const sorted = sortBy(ranks, (rank) => rank.level);
-      return jobAbilityRow(ability, sorted, character.level);
-    })
-    .filter((row): row is JobAbilityRow => !!row);
 }

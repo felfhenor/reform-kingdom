@@ -7,41 +7,7 @@ import {
   ensureEnumArray,
 } from '@helpers/content/ensure-helpers-core';
 import { ensureStats } from '@helpers/content/ensure-helpers-stats';
-import type {
-  EquipmentSkillId,
-  JobAbilityId,
-  JobAbilityLevel,
-  JobContent,
-  JobId,
-  JobSkillPath,
-  JobSkillPathLevel,
-} from '@interfaces';
-
-function ensureJobSkillPathLevel(
-  level: Partial<JobSkillPathLevel> = {},
-): JobSkillPathLevel {
-  return {
-    level: level.level ?? 1,
-    skillId: level.skillId ?? ('UNKNOWN' as EquipmentSkillId),
-  };
-}
-
-function ensureJobSkillPath(path: Partial<JobSkillPath> = {}): JobSkillPath {
-  return {
-    pathName: path.pathName ?? 'UNKNOWN',
-    levels: ensureArray(path.levels, ensureJobSkillPathLevel),
-  };
-}
-
-function ensureJobAbilityLevel(
-  level: Partial<JobAbilityLevel> = {},
-): JobAbilityLevel {
-  return {
-    jobAbilityId: level.jobAbilityId ?? ('UNKNOWN' as JobAbilityId),
-    level: level.level ?? 1,
-    value: level.value ?? 0,
-  };
-}
+import type { JobContent, JobId } from '@interfaces';
 
 export function ensureJob(job: Partial<JobContent>): Required<JobContent> {
   return {
@@ -62,8 +28,6 @@ export function ensureJob(job: Partial<JobContent>): Required<JobContent> {
       stat: prio.stat ?? 'UNKNOWN',
       multiplier: prio.multiplier ?? 1,
     })),
-    skillPath: ensureArray(job.skillPath, ensureJobSkillPath),
-    abilities: ensureArray(job.abilities, ensureJobAbilityLevel),
     treeVersion: job.treeVersion ?? 1,
     treeRows: ensureEnumArray(job.treeRows, VALID_SKILL_TREE_ROWS),
     specializationRows: ensureEnumArray(

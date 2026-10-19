@@ -12,6 +12,7 @@ import {
   analysisWarn,
 } from '@helpers/debug/analysis-utils';
 import { skillTechniqueStatScaling } from '@helpers/hero/skill';
+import { skillTreeJobSkillGrants } from '@helpers/hero/skill-tree-content';
 import type {
   AffixContent,
   AnalysisIssue,
@@ -25,7 +26,7 @@ import type {
   SkillStatBonusSource,
   TrainerTeachingContent,
 } from '@interfaces';
-import { groupBy, min, sortBy } from 'es-toolkit/compat';
+import { groupBy, min } from 'es-toolkit/compat';
 
 const SKILL_ENHANCEMENT_AFFIX_FAMILY = 'Skill Enhancement';
 
@@ -70,8 +71,8 @@ function familyOfSkill(skillRef: string): string[] {
 }
 
 function jobFamilies(job: JobContent): string[] {
-  return job.skillPath.flatMap((path) =>
-    path.levels.flatMap((level) => familyOfSkill(level.skillId)),
+  return skillTreeJobSkillGrants(job.id).flatMap((grant) =>
+    familyOfSkill(grant.skillId),
   );
 }
 
@@ -200,14 +201,12 @@ function tierTwoLearnLevel(
   jobs: JobContent[],
   family: string,
 ): number | undefined {
-  const levels = jobs.flatMap((job) =>
-    job.skillPath.flatMap((path) => {
-      const tiers = path.levels.filter((entry) =>
-        familyOfSkill(entry.skillId).includes(family),
-      );
-      return tiers.length > 1 ? [sortBy(tiers, 'level')[1].level] : [];
-    }),
-  );
+  const levels = jobs.flatMap((job) => {
+    const tiers = skillTreeJobSkillGrants(job.id).filter((grant) =>
+      familyOfSkill(grant.skillId).includes(family),
+    );
+    return tiers.length > 1 ? [tiers[1].level] : [];
+  });
 
   return min(levels);
 }

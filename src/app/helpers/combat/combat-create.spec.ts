@@ -19,6 +19,7 @@ import {
   ensureMonsterSkill,
 } from '@helpers/content/ensure-monster';
 import { ensureSkill } from '@helpers/content/ensure-skill';
+import { ensureSkillTreeNode } from '@helpers/content/ensure-skilltreenode';
 import {
   defaultAffinities,
   defaultCombatStats,
@@ -34,6 +35,7 @@ import type {
   JobId,
   MonsterContent,
   MonsterId,
+  SkillTreeNodeId,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
 
@@ -41,6 +43,7 @@ const rangerId = 'ranger' as JobId;
 const bowId = 'bow' as EquipmentId;
 const attackId = 'attack' as EquipmentSkillId;
 const snipeId = 'snipe' as EquipmentSkillId;
+const snipeNodeId = 'snipe-node' as SkillTreeNodeId;
 const citizenId = 'larsian-citizen' as MonsterId;
 const guardId = 'larsian-guard' as MonsterId;
 
@@ -53,10 +56,13 @@ function seedRanger(bow: Partial<EquipmentContent> = {}): void {
       id: rangerId,
       name: 'Ranger',
       equippableTypes: ['Bow'],
-      skillPath: [
-        { pathName: 'Attack', levels: [{ level: 1, skillId: attackId }] },
-        { pathName: 'Snipe', levels: [{ level: 1, skillId: snipeId }] },
-      ],
+    }),
+    ensureSkillTreeNode({
+      id: snipeNodeId,
+      name: 'Ranger: Snipe',
+      jobId: rangerId,
+      default: true,
+      effects: [{ kind: 'GrantSkill', skillId: snipeId }],
     }),
     ensureSkill({ id: attackId, name: 'Attack' }),
     ensureSkill({ id: snipeId, name: 'Snipe', requiredWeaponTypes: ['Bow'] }),

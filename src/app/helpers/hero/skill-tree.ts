@@ -101,6 +101,35 @@ export function characterSkillTreeCanLearn(
   );
 }
 
+// What a hands-off player would buy: lowest level first, an oath's first option, until SP runs out.
+export function characterSkillTreeAutoPicks(
+  character: Pick<
+    Character,
+    'jobId' | 'level' | 'jobProgress' | 'skillTreeNodes'
+  >,
+): SkillTreeNodeId[] {
+  let sp = characterSkillTreeAvailableSp(character, character.jobId);
+  if (sp <= 0) return [];
+
+  const nodes = skillTreeJobNodes(character.jobId);
+  const learned = new Set(
+    characterSkillTreeNodeIds(character, character.jobId),
+  );
+  const picks: SkillTreeNodeId[] = [];
+
+  sortBy(nodes, (node) => skillTreeNodeLevel(nodes, node)).forEach((node) => {
+    if (sp <= 0) return;
+    if (!skillTreeNodeIsLearnable(nodes, learned, node, character.level))
+      return;
+
+    learned.add(node.id);
+    picks.push(node.id);
+    sp -= 1;
+  });
+
+  return picks;
+}
+
 // Parents always sit at a lower level, so rebuilding in level order drops unknown, too-high, orphaned and duplicate oath picks in one pass.
 export function skillTreePrune(
   jobId: JobId,

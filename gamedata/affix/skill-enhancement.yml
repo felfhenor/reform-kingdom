@@ -33,7 +33,7 @@
   rarity: Rare
   family: Skill Enhancement
   position: Prefix
-  levelRequirement: 8
+  levelRequirement: 10
   effects:
     - kind: SkillStatBonus
       skillFamily: Snipe
@@ -46,7 +46,7 @@
   rarity: Rare
   family: Skill Enhancement
   position: Prefix
-  levelRequirement: 8
+  levelRequirement: 10
   effects:
     - kind: SkillStatBonus
       skillFamily: Double Strike

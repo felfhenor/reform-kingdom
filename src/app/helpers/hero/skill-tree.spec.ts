@@ -4,6 +4,7 @@ import { ensureJob } from '@helpers/content/ensure-job';
 import { ensureSkillTreeNode } from '@helpers/content/ensure-skilltreenode';
 import { characterNonGearEffects } from '@helpers/hero/hero-effect';
 import {
+  characterSkillTreeAutoPicks,
   characterSkillTreeAvailableSp,
   characterSkillTreeCanLearn,
   characterSkillTreesMigrate,
@@ -119,6 +120,21 @@ describe('characterSkillTreeCanLearn', () => {
     });
 
     expect(characterSkillTreeAvailableSp(multi, jobId)).toBe(2);
+  });
+});
+
+describe('characterSkillTreeAutoPicks', () => {
+  it('buys the lowest-level learnable nodes, first oath option, until SP runs out', () => {
+    const picks = (level: number, learned: string[]) =>
+      characterSkillTreeAutoPicks(
+        hero({ level, skillTreeNodes: { [jobId]: ids(...learned) } }),
+      );
+
+    expect(picks(1, ['strike', 'aura'])).toEqual([]);
+    expect(picks(19, ['strike', 'aura'])).toEqual(ids('strike2', 'left'));
+    expect(picks(50, ['strike', 'aura'])).toEqual(
+      ids('strike2', 'left', 'leftPerk', 'oathChild'),
+    );
   });
 });
 

@@ -7,6 +7,7 @@
 import { combatDamageMitigationExpectedValue } from '@helpers/combat/combat-damage-mitigation';
 import { CHARACTER_MAX_LEVEL } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { defaultEquipment } from '@helpers/defaults';
 import {
   addStats,
   filterByNames,
@@ -14,6 +15,12 @@ import {
   statSum,
   zeroStats,
 } from '@helpers/debug/analysis-utils';
+import { heroSkillsWithEquipment } from '@helpers/hero/job';
+import { characterSkillTreeAutoPicks } from '@helpers/hero/skill-tree';
+import {
+  skillTreeDefaultNodeIds,
+  skillTreeNodeEffects,
+} from '@helpers/hero/skill-tree-content';
 import type {
   AnalysisCheck,
   AnalysisParams,
@@ -155,18 +162,23 @@ function midpoint(min: StatBlock, max: StatBlock): StatBlock {
   return mid;
 }
 
-// Highest-level entry unlocked so far on each skill path.
+// A hands-off build at this level: the defaults plus what the auto-picker buys with the SP so far.
 function heroSkillIdsAtLevel(
   job: JobContent,
   level: number,
 ): EquipmentSkillId[] {
-  return job.skillPath
-    .map((path) => {
-      const unlocked = path.levels.filter((entry) => entry.level <= level);
-      if (unlocked.length === 0) return undefined;
-      return maxBy(unlocked, (entry) => entry.level)?.skillId;
-    })
-    .filter((skillId): skillId is EquipmentSkillId => !!skillId);
+  const defaults = skillTreeDefaultNodeIds(job.id);
+  const picks = characterSkillTreeAutoPicks({
+    jobId: job.id,
+    level,
+    jobProgress: {},
+    skillTreeNodes: { [job.id]: defaults },
+  });
+
+  return heroSkillsWithEquipment(
+    defaultEquipment(),
+    skillTreeNodeEffects([...defaults, ...picks]),
+  ).map((skill) => skill.id);
 }
 
 function techniqueType(technique: EquipmentSkillContentTechnique): string {

@@ -7,6 +7,7 @@ import type {
   AffixEffectStat,
 } from '@interfaces/content-affix';
 import type { JobId } from '@interfaces/content-job';
+import type { EquipmentSkillId } from '@interfaces/content-skill';
 import type {
   HeroEffectDebuffPotency,
   HeroEffectJobAbility,
@@ -90,3 +91,10 @@ export type SkillTreeNodeContent = IsContentItem &
 
     effects: SkillTreeNodeEffect[];
   };
+
+// A skill a job's tree can grant, at the column level its node unlocks.
+export type SkillTreeSkillGrant = {
+  skillId: EquipmentSkillId;
+  level: number;
+  isDefault: boolean;
+};

@@ -9,14 +9,17 @@ import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
   analysisFail,
   analysisIssueChecks,
-  analysisWarn,
 } from '@helpers/debug/analysis-utils';
-import { skillNameTier } from '@helpers/hero/skill';
+import {
+  skillTreeGrantedSkills,
+  skillTreeRankIssues,
+} from '@helpers/debug/analysis-skilltrees-ranks';
 import {
   skillTreeIsLevelColumn,
   skillTreeIsOath,
   skillTreeIsSpecOption,
   skillTreeJobNodes,
+  skillTreeNodeHasAncestor,
   skillTreeNodeLevel,
   skillTreeNodeShortName,
   skillTreeOptionOath,
@@ -146,24 +149,6 @@ function sharedOptionIssues(nodes: SkillTreeNodeContent[]): AnalysisIssue[] {
     );
 }
 
-function hasAncestor(
-  nodes: SkillTreeNodeContent[],
-  node: SkillTreeNodeContent,
-  ancestor: SkillTreeNodeContent,
-  seen = new Set<string>(),
-): boolean {
-  if (seen.has(node.id)) return false;
-  seen.add(node.id);
-
-  return node.requiredSkillTreeNodeIds.some((parentId) => {
-    const parent = nodes.find((candidate) => candidate.id === parentId);
-    return (
-      parentId === ancestor.id ||
-      (!!parent && hasAncestor(nodes, parent, ancestor, seen))
-    );
-  });
-}
-
 // Spec-row nodes must descend from their own row's spec option.
 function specLineageIssues(
   job: JobContent,
@@ -182,7 +167,7 @@ function specLineageIssues(
           skillTreeIsSpecOption(option) &&
           skillTreeNodeShortName(option) === node.row,
       );
-      return spec && hasAncestor(nodes, node, spec)
+      return spec && skillTreeNodeHasAncestor(nodes, node, spec.id)
         ? []
         : [
             analysisFail(
@@ -265,14 +250,6 @@ function effectIssues(node: SkillTreeNodeContent): AnalysisIssue[] {
   });
 }
 
-function grantedSkills(nodes: SkillTreeNodeContent[]): EquipmentSkillContent[] {
-  return nodes
-    .flatMap((node) => node.effects)
-    .flatMap((effect) => (effect.kind === 'GrantSkill' ? [effect.skillId] : []))
-    .map((skillId) => getEntry<EquipmentSkillContent>(skillId))
-    .filter((skill): skill is EquipmentSkillContent => !!skill);
-}
-
 function defaultIssues(
   job: JobContent,
   nodes: SkillTreeNodeContent[],
@@ -299,7 +276,9 @@ function defaultIssues(
     );
   }
 
-  const defaultFamilies = grantedSkills(defaults).map((skill) => skill.family);
+  const defaultFamilies = skillTreeGrantedSkills(defaults).map(
+    (skill) => skill.family,
+  );
   job.defaultCombatOrders.forEach(({ action }) => {
     if ('family' in action && !defaultFamilies.includes(action.family)) {
       issues.push(
@@ -311,29 +290,6 @@ function defaultIssues(
   });
 
   return issues;
-}
-
-// A node granting a skill tier should require the node granting the tier below.
-function tierWarnings(nodes: SkillTreeNodeContent[]): AnalysisIssue[] {
-  const grants = nodes.flatMap((node) =>
-    grantedSkills([node]).map((skill) => ({
-      node,
-      ...skillNameTier(skill.name),
-    })),
-  );
-
-  return grants.flatMap((grant) => {
-    const below = grants.find(
-      (other) => other.family === grant.family && other.tier === grant.tier - 1,
-    );
-    return below && !grant.node.requiredSkillTreeNodeIds.includes(below.node.id)
-      ? [
-          analysisWarn(
-            `${grant.node.name}: does not require ${below.node.name}.`,
-          ),
-        ]
-      : [];
-  });
 }
 
 function jobTreeIssues(job: JobContent): AnalysisIssue[] {
@@ -350,7 +306,7 @@ function jobTreeIssues(job: JobContent): AnalysisIssue[] {
     ...specLineageIssues(job, nodes),
     ...nodes.flatMap(effectIssues),
     ...defaultIssues(job, nodes),
-    ...tierWarnings(nodes),
+    ...skillTreeRankIssues(nodes),
   ];
 }
 

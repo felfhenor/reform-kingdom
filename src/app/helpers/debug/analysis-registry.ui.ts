@@ -362,7 +362,7 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     id: 'jobabilities',
     title: 'Job Abilities',
     description:
-      'Every job ability reference resolves, has a valid type, strictly increasing rank levels, no duplicate type per job, and is used by a job.',
+      'Every job ability has a valid type, no job tree grants two abilities of one type, and every ability is granted by some tree.',
     category: 'Skills',
     strict: true,
     inputKeys: [],

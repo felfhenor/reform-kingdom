@@ -35,6 +35,7 @@ export * from './analysis-skills-skill';
 export * from './analysis-skills-sources';
 export * from './analysis-skills-technique';
 export * from './analysis-skilltrees';
+export * from './analysis-skilltrees-ranks';
 export * from './analysis-sprites';
 export * from './analysis-tasks';
 export * from './analysis-tasks-world';

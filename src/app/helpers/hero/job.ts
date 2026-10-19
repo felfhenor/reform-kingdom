@@ -32,17 +32,8 @@ export function characterJobLevel(
   return character.jobProgress?.[jobId]?.level ?? 1;
 }
 
-export function heroSkillsAtLevel(
-  job: JobContent,
-  level: number,
-): EquipmentSkillId[] {
-  return job.skillPath
-    .map((path) => {
-      const unlocked = path.levels.filter((entry) => entry.level <= level);
-      return sortBy(unlocked, (entry) => -entry.level)[0]?.skillId;
-    })
-    .filter((skillId): skillId is EquipmentSkillId => !!skillId);
-}
+// Every hero always knows Attack; it's never part of a skill tree.
+const HERO_BASE_SKILL_IDS = ['Attack' as EquipmentSkillId];
 
 function resolveSkills(skillIds: EquipmentSkillId[]): EquipmentSkillContent[] {
   return skillIds
@@ -56,15 +47,12 @@ function effectGrantedSkillIds(effects: HeroEffect[]): EquipmentSkillId[] {
   );
 }
 
-// A hero's full skill list: their job-path skills at the given level, with
-// any equipment- or effect-granted skills merged in.
+// Attack plus every equipment- or effect-granted skill, keeping only the highest tier of each family.
 export function heroSkillsWithEquipment(
-  job: JobContent,
-  level: number,
   equipment: EquipmentBlock,
   effects: HeroEffect[],
 ): EquipmentSkillContent[] {
-  const baseSkills = resolveSkills(heroSkillsAtLevel(job, level));
+  const baseSkills = resolveSkills(HERO_BASE_SKILL_IDS);
   const grantedSkills = resolveSkills([
     ...equipmentGrantedSkillIds(equipment),
     ...effectGrantedSkillIds(effects),
@@ -73,16 +61,13 @@ export function heroSkillsWithEquipment(
   return mergeGrantedSkills(baseSkills, grantedSkills);
 }
 
-// A hero's full skill list from their own job, level, gear and every job's teachings.
+// A hero's full skill list from their current job's tree, gear and every job's teachings.
 export function characterSkills(
   character: CharacterStatSource,
 ): EquipmentSkillContent[] {
-  const job = getEntry<JobContent>(character.jobId);
-  if (!job) return [];
+  if (!getEntry<JobContent>(character.jobId)) return [];
 
   return heroSkillsWithEquipment(
-    job,
-    character.level,
     character.equipment,
     characterNonGearEffects(character),
   );
@@ -94,17 +79,12 @@ export function characterNormalSkills(
   return characterSkills(character).filter((skill) => !skillIsSpecial(skill));
 }
 
-// Every unlocked job-path level plus gear and teaching grants, so each learned tier stays pickable.
+// Every granted tier, unmerged, so each learned tier stays pickable.
 function characterUnmergedSkillIds(
   character: CharacterStatSource,
-  job: JobContent,
 ): EquipmentSkillId[] {
   return uniq([
-    ...job.skillPath.flatMap((path) =>
-      path.levels
-        .filter((entry) => entry.level <= character.level)
-        .map((entry) => entry.skillId),
-    ),
+    ...HERO_BASE_SKILL_IDS,
     ...equipmentGrantedSkillIds(character.equipment),
     ...effectGrantedSkillIds(characterNonGearEffects(character)),
   ]);
@@ -113,12 +93,11 @@ function characterUnmergedSkillIds(
 export function characterBurstSkillOptions(
   character: CharacterStatSource,
 ): EquipmentSkillContent[] {
-  const job = getEntry<JobContent>(character.jobId);
-  if (!job) return [];
+  if (!getEntry<JobContent>(character.jobId)) return [];
 
-  const specials = resolveSkills(
-    characterUnmergedSkillIds(character, job),
-  ).filter(skillIsSpecial);
+  const specials = resolveSkills(characterUnmergedSkillIds(character)).filter(
+    skillIsSpecial,
+  );
   return sortBy(specials, [
     (skill) => skill.family,
     (skill) => skillNameTier(skill.name).tier,

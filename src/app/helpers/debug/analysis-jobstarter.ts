@@ -9,6 +9,7 @@ import {
   analysisFail,
   analysisIssueChecks,
 } from '@helpers/debug/analysis-utils';
+import { skillTreeJobSkillGrants } from '@helpers/hero/skill-tree-content';
 import type {
   AnalysisCheck,
   AnalysisIssue,
@@ -50,9 +51,9 @@ function castIssues(
 }
 
 function jobDefaultOrderIssues(job: JobContent): AnalysisIssue[] {
-  const levelOneSkills = job.skillPath
-    .flatMap((path) => path.levels.filter((entry) => entry.level === 1))
-    .map((entry) => getEntry<EquipmentSkillContent>(entry.skillId))
+  const levelOneSkills = skillTreeJobSkillGrants(job.id)
+    .filter((grant) => grant.isDefault)
+    .map((grant) => getEntry<EquipmentSkillContent>(grant.skillId))
     .filter((skill): skill is EquipmentSkillContent => !!skill);
 
   return job.defaultCombatOrders.flatMap((order) => [

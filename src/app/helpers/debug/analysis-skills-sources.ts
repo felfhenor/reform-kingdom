@@ -4,14 +4,13 @@ import {
   monsterStatsAtLevel,
 } from '@helpers/combat/monster';
 import { analysisFail, analysisWarn } from '@helpers/debug/analysis-utils';
-import { skillNameTier } from '@helpers/hero/skill';
+import { skillTreeJobSkillGrants } from '@helpers/hero/skill-tree-content';
 import type {
   AffixContent,
   AnalysisIssue,
   EquipmentContent,
   EquipmentSkillContent as Skill,
   JobContent,
-  JobSkillPath,
   LevelRange,
   MonsterContent,
   MonsterSkill,
@@ -28,12 +27,10 @@ export function resolveSkill(ref: string): Skill | undefined {
 
 function jobReferences(jobs: JobContent[]): SkillReference[] {
   return jobs.flatMap((job) =>
-    job.skillPath.flatMap((path) =>
-      path.levels.map((level) => ({
-        skillRef: level.skillId,
-        source: { kind: 'Job' as const, name: job.name },
-      })),
-    ),
+    skillTreeJobSkillGrants(job.id).map((grant) => ({
+      skillRef: grant.skillId,
+      source: { kind: 'Job' as const, name: job.name },
+    })),
   );
 }
 
@@ -131,82 +128,26 @@ export function unresolvedReferenceIssues(
     }));
 }
 
-function pathOrderIssues(path: JobSkillPath): AnalysisIssue[] {
-  const issues: AnalysisIssue[] = [];
-  const levels = path.levels.map((l) => l.level);
+// Tree layout, tier order and requirements are covered by validate:skilltrees.
+function jobTreeSkillIssues(job: JobContent): AnalysisIssue[] {
+  const grants = skillTreeJobSkillGrants(job.id);
+  if (grants.length === 0) return [analysisFail('has no skill tree skills.')];
 
-  if (path.levels.length === 0) {
-    return [analysisFail(`path "${path.pathName}" has no levels.`)];
-  }
-  if (
-    levels.some((level, i) => level < 1 || (i > 0 && level <= levels[i - 1]))
-  ) {
-    issues.push(
-      analysisFail(
-        `path "${path.pathName}" levels must start at 1+ and strictly ascend (got ${levels.join(', ')}).`,
-      ),
-    );
-  }
-
-  return issues;
+  return grants.some((grant) => grant.isDefault)
+    ? []
+    : [analysisWarn('teaches no skill at level 1.')];
 }
 
-function pathSkillIssues(path: JobSkillPath): AnalysisIssue[] {
-  const skills = path.levels.flatMap((l) => resolveSkill(l.skillId) ?? []);
-  const families = uniq(skills.map((s) => s.family));
-  const issues: AnalysisIssue[] = [];
-
-  if (families.length > 1) {
-    issues.push(
-      analysisFail(
-        `path "${path.pathName}" mixes families: ${families.join(', ')}.`,
-      ),
-    );
-  }
-  if (families.length === 1 && families[0] !== path.pathName) {
-    issues.push(
-      analysisWarn(
-        `path "${path.pathName}" holds family "${families[0]}"; the names normally match.`,
-      ),
-    );
-  }
-
-  const tiers = skills.map((s) => skillNameTier(s.name).tier);
-  if (tiers.some((tier, i) => i > 0 && tier <= tiers[i - 1])) {
-    issues.push(
-      analysisWarn(`path "${path.pathName}" tiers don't ascend with level.`),
-    );
-  }
-
-  return issues;
-}
-
-function jobPathIssues(job: JobContent): AnalysisIssue[] {
-  if (job.skillPath.length === 0) return [analysisFail('has no skillPath.')];
-
-  const pathIssues = job.skillPath.flatMap((path) => [
-    ...pathOrderIssues(path),
-    ...pathSkillIssues(path),
-  ]);
-  const names = job.skillPath.map((p) => p.pathName);
-  const issues = [...pathIssues];
-
-  if (uniq(names).length !== names.length) {
-    issues.push(analysisFail('has two paths with the same pathName.'));
-  }
-  if (!job.skillPath.some((p) => p.levels.some((l) => l.level === 1))) {
-    issues.push(analysisWarn('teaches no skill at level 1.'));
-  }
-
-  return issues;
+function jobSkills(job: JobContent): Skill[] {
+  return uniq(
+    skillTreeJobSkillGrants(job.id).flatMap(
+      (grant) => resolveSkill(grant.skillId) ?? [],
+    ),
+  );
 }
 
 function jobWeaponIssues(job: JobContent): AnalysisIssue[] {
-  const skills = job.skillPath.flatMap((p) =>
-    p.levels.flatMap((l) => resolveSkill(l.skillId) ?? []),
-  );
-
-  return uniq(skills)
+  return jobSkills(job)
     .filter(
       (skill) =>
         skill.requiredWeaponTypes.length > 0 &&
@@ -221,25 +162,23 @@ function jobWeaponIssues(job: JobContent): AnalysisIssue[] {
 }
 
 function jobEnergyIssues(job: JobContent): AnalysisIssue[] {
-  return job.skillPath.flatMap((path) =>
-    path.levels.flatMap(({ level, skillId }) => {
-      const skill = resolveSkill(skillId);
-      const energy =
-        job.baseStats.Energy + job.statsPerLevel.Energy * (level - 1);
-      if (!skill || skill.epCost <= energy) return [];
+  return skillTreeJobSkillGrants(job.id).flatMap(({ level, skillId }) => {
+    const skill = resolveSkill(skillId);
+    const energy =
+      job.baseStats.Energy + job.statsPerLevel.Energy * (level - 1);
+    if (!skill || skill.epCost <= energy) return [];
 
-      return [
-        analysisWarn(
-          `learns "${skill.name}" (${skill.epCost} EP) at level ${level} with only ${energy} Energy before gear.`,
-        ),
-      ];
-    }),
-  );
+    return [
+      analysisWarn(
+        `learns "${skill.name}" (${skill.epCost} EP) at level ${level} with only ${energy} Energy before gear.`,
+      ),
+    ];
+  });
 }
 
 export function jobIssues(job: JobContent): AnalysisIssue[] {
   return [
-    ...jobPathIssues(job),
+    ...jobTreeSkillIssues(job),
     ...jobWeaponIssues(job),
     ...jobEnergyIssues(job),
   ];

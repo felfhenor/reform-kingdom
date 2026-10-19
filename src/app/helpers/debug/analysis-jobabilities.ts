@@ -1,4 +1,4 @@
-// Audits job abilities: every job reference resolves, types are valid, ranks are ordered, and every ability is used.
+// Audits job abilities: types are valid, no job tree has two abilities of one type, and every ability is granted by some tree.
 
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { VALID_JOB_ABILITY_TYPES } from '@helpers/content/ensure-helpers-constants';
@@ -7,6 +7,7 @@ import {
   analysisIssueChecks,
   analysisWarn,
 } from '@helpers/debug/analysis-utils';
+import { skillTreeJobNodes } from '@helpers/hero/skill-tree-content';
 import type {
   AnalysisCheck,
   AnalysisIssue,
@@ -16,47 +17,36 @@ import type {
   JobAbilityType,
   JobContent,
 } from '@interfaces';
-import { groupBy } from 'es-toolkit/compat';
+import { uniq } from 'es-toolkit/compat';
 
+function jobTreeAbilityIds(job: JobContent): JobAbilityId[] {
+  return uniq(
+    skillTreeJobNodes(job.id)
+      .flatMap((node) => node.effects)
+      .flatMap((effect) =>
+        effect.kind === 'JobAbility' ? [effect.jobAbilityId] : [],
+      ),
+  );
+}
+
+// Unknown ability references and rank order are covered by validate:skilltrees.
 function jobAbilityIssues(job: JobContent): AnalysisIssue[] {
-  const issues: AnalysisIssue[] = [];
   const typeOwners = new Map<JobAbilityType, string>();
 
-  const byAbility = groupBy(job.abilities, (entry) => entry.jobAbilityId);
-  Object.entries(byAbility).forEach(([jobAbilityId, ranks]) => {
+  return jobTreeAbilityIds(job).flatMap((jobAbilityId) => {
     const ability = getEntry<JobAbilityContent>(jobAbilityId);
-    if (!ability || ability.__type !== 'jobability') {
-      issues.push(
-        analysisFail(
-          `jobAbilityId "${jobAbilityId}" does not resolve to a JobAbility.`,
-        ),
-      );
-      return;
-    }
-
-    const outOfOrder = ranks.some(
-      (rank, i) => i > 0 && rank.level <= ranks[i - 1].level,
-    );
-    if (outOfOrder) {
-      issues.push(
-        analysisFail(
-          `"${ability.name}" rank levels are not strictly increasing (${ranks.map((rank) => rank.level).join(', ')}).`,
-        ),
-      );
-    }
+    if (!ability) return [];
 
     const owner = typeOwners.get(ability.type);
-    if (owner) {
-      issues.push(
-        analysisFail(
-          `"${ability.name}" and "${owner}" share the type ${ability.type}.`,
-        ),
-      );
-    }
     typeOwners.set(ability.type, ability.name);
+    return owner
+      ? [
+          analysisFail(
+            `"${ability.name}" and "${owner}" share the type ${ability.type}.`,
+          ),
+        ]
+      : [];
   });
-
-  return issues;
 }
 
 function abilityIssues(
@@ -80,9 +70,7 @@ export function runJobAbilitiesAnalysis(): AnalysisRunResult {
   const jobs = getEntriesByType<JobContent>('job');
   const abilities = getEntriesByType<JobAbilityContent>('jobability');
 
-  const usedIds = new Set(
-    jobs.flatMap((job) => job.abilities.map((entry) => entry.jobAbilityId)),
-  );
+  const usedIds = new Set(jobs.flatMap(jobTreeAbilityIds));
 
   const checks: AnalysisCheck[] = [
     ...jobs.flatMap((job) =>
@@ -90,7 +78,7 @@ export function runJobAbilitiesAnalysis(): AnalysisRunResult {
         `jobabilities:job:${job.id}`,
         job.name,
         jobAbilityIssues(job),
-        `${job.name}: ${job.abilities.length} ability rank(s), all valid.`,
+        `${job.name}: ${jobTreeAbilityIds(job).length} abilities, all valid.`,
       ),
     ),
     ...abilities.flatMap((ability) =>

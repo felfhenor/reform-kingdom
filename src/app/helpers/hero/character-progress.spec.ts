@@ -260,17 +260,16 @@ describe('partyGainXp', () => {
     expect(messages()).toEqual(['**Jala** reached level 2!']);
   });
 
-  it('logs each skill newly unlocked by the level-up', () => {
-    seedJob({
-      skillPath: [
-        { pathName: 'Attack', levels: [{ level: 2, skillId: attackId }] },
-      ],
-    });
-    seedParty(hero('Jala'));
+  it('logs the skill points a level-up earns', () => {
+    seedJob();
+    seedParty(hero('Jala', { level: 2, xp: { current: 0, maximum: 1 } }));
 
-    gainXp(toLevel2);
+    gainXp(() => characterXpForLevel(2));
 
-    expect(messages()).toContain('**Jala** learned **Attack**!');
+    expect(messages()).toEqual([
+      '**Jala** gained 1 skill point!',
+      '**Jala** reached level 3!',
+    ]);
   });
 });
 

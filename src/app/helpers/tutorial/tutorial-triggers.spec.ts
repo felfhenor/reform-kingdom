@@ -2,11 +2,12 @@ import { describe, expect, it } from 'vitest';
 
 import { ensureJob } from '@helpers/content/ensure-job';
 import { ensureSkill } from '@helpers/content/ensure-skill';
+import { ensureSkillTreeNode } from '@helpers/content/ensure-skilltreenode';
 import { tutorialTriggerSatisfied } from '@helpers/tutorial/tutorial-triggers';
 import { buildCharacter } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
-import type { EquipmentSkillId, JobId } from '@interfaces';
+import type { EquipmentSkillId, JobId, SkillTreeNodeId } from '@interfaces';
 
 const losingStreak = {
   kind: 'losing-streak',
@@ -44,28 +45,35 @@ describe('tutorialTriggerSatisfied first-burst-skill', () => {
     name: 'Inferno',
     special: true,
   });
-  const job = ensureJob({
-    id: 'job-burst' as JobId,
-    name: 'Burster',
-    skillPath: [
-      { pathName: 'Inferno', levels: [{ level: 5, skillId: burst.id }] },
-    ],
+  const job = ensureJob({ id: 'job-burst' as JobId, name: 'Burster' });
+  const infernoNode = ensureSkillTreeNode({
+    id: 'inferno-node' as SkillTreeNodeId,
+    name: 'Burster: Inferno',
+    jobId: job.id,
+    level: 5,
+    effects: [{ kind: 'GrantSkill', skillId: burst.id }],
   });
 
-  function seedHero(level: number) {
-    seedContent([job, burst]);
+  function seedHero(learned: boolean) {
+    seedContent([job, infernoNode, burst]);
     seedGamestate((state) => {
-      state.world.party = [buildCharacter({ jobId: job.id, level })];
+      state.world.party = [
+        buildCharacter({
+          jobId: job.id,
+          level: 5,
+          skillTreeNodes: { [job.id]: learned ? [infernoNode.id] : [] },
+        }),
+      ];
     });
   }
 
   it('fires once a hero knows a burst skill', () => {
-    seedHero(5);
+    seedHero(true);
     expect(tutorialTriggerSatisfied({ kind: 'first-burst-skill' })).toBe(true);
   });
 
   it('waits until a hero learns one', () => {
-    seedHero(4);
+    seedHero(false);
     expect(tutorialTriggerSatisfied({ kind: 'first-burst-skill' })).toBe(false);
   });
 });

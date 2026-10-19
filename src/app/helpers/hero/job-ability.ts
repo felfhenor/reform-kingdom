@@ -9,7 +9,6 @@ import type {
   JobAbilityContent,
   JobAbilityId,
   JobAbilityType,
-  JobContent,
 } from '@interfaces';
 import { maxBy, sumBy } from 'es-toolkit/compat';
 import { current, isDraft } from 'immer';
@@ -50,35 +49,17 @@ export type CharacterJobAbility = {
   value: number;
 };
 
-function jobAbilityRankValues(
-  character: Pick<Character, 'jobId' | 'level'>,
-): Map<JobAbilityId, number> {
-  const ranks = new Map<JobAbilityId, { level: number; value: number }>();
-  getEntry<JobContent>(character.jobId)?.abilities.forEach(
-    ({ jobAbilityId, level, value }) => {
-      if (level > character.level) return;
-
-      const current = ranks.get(jobAbilityId);
-      if (!current || level > current.level) {
-        ranks.set(jobAbilityId, { level, value });
-      }
-    },
-  );
-
-  return new Map([...ranks].map(([id, { value }]) => [id, value]));
-}
-
-// Job ranks pick the highest reached level; granted effects only win when their value is higher.
+// Every JobAbility grant (tree nodes, teachings, debug) at its highest value; ranks of one ability never stack.
 export function characterJobAbilities(
   character: Pick<
     Character,
-    'jobId' | 'level' | 'teachings' | 'skillTreeNodes' | 'debugEffects'
+    'jobId' | 'teachings' | 'skillTreeNodes' | 'debugEffects'
   >,
 ): CharacterJobAbility[] {
-  const values = jobAbilityRankValues(character);
+  const values = new Map<JobAbilityId, number>();
   affixEffectsOfKind(characterNonGearEffects(character), 'JobAbility').forEach(
     ({ jobAbilityId, value }) => {
-      // Resolved so a grant by name merges with the job's id-keyed rank.
+      // Resolved so a grant by name merges with one by id.
       const id = getEntry<JobAbilityContent>(jobAbilityId)?.id;
       if (!id) return;
 
@@ -99,7 +80,7 @@ export function characterJobAbilities(
 export function characterJobAbilityValue(
   character: Pick<
     Character,
-    'jobId' | 'level' | 'teachings' | 'skillTreeNodes' | 'debugEffects'
+    'jobId' | 'teachings' | 'skillTreeNodes' | 'debugEffects'
   >,
   type: JobAbilityType,
 ): number {

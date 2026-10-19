@@ -5,19 +5,12 @@ import {
   HEALING_MINIMUM_SECONDS,
   HEALING_SECONDS_PER_LEVEL,
 } from '@helpers/config';
-import { getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { heroLevelUpVfxEmit } from '@helpers/engine/hero-level-up-vfx';
-import { heroSkillsAtLevel } from '@helpers/hero/job';
 import { characterStats, characterXpForLevel } from '@helpers/hero/party';
+import { skillTreeEarnedSp } from '@helpers/hero/skill-tree';
 import { globalEffectSumsState, updateGamestate } from '@helpers/state-game';
-import type {
-  Character,
-  CharacterXpGain,
-  Combatant,
-  EquipmentSkillContent,
-  JobContent,
-} from '@interfaces';
+import type { Character, CharacterXpGain, Combatant } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 import { taskEventLevelReached } from '@helpers/task/task-events';
 
@@ -92,26 +85,18 @@ function characterLeveledUp(character: Character, amount: number): Character {
   };
 }
 
-// Skills are derived from job + level, not tracked as "known" state, so diffing before/after ids also announces rank upgrades (e.g. Double Strike I -> II).
 function logCharacterProgress(beforeLevel: number, after: Character): void {
   if (after.level === beforeLevel) return;
 
   miscellaneousMessageLog(`**${after.name}** reached level ${after.level}!`);
 
-  const job = getEntry<JobContent>(after.jobId);
-  if (!job) return;
+  const gainedSp =
+    skillTreeEarnedSp(after.level) - skillTreeEarnedSp(beforeLevel);
+  if (gainedSp <= 0) return;
 
-  const previousSkillIds = new Set(heroSkillsAtLevel(job, beforeLevel));
-  const newSkillIds = heroSkillsAtLevel(job, after.level).filter(
-    (skillId) => !previousSkillIds.has(skillId),
+  miscellaneousMessageLog(
+    `**${after.name}** gained ${gainedSp} skill point${gainedSp === 1 ? '' : 's'}!`,
   );
-
-  newSkillIds.forEach((skillId) => {
-    const skill = getEntry<EquipmentSkillContent>(skillId);
-    if (!skill) return;
-
-    miscellaneousMessageLog(`**${after.name}** learned **${skill.name}**!`);
-  });
 }
 
 function xpProgressForLevel(level: number, currentXp: number): Character['xp'] {

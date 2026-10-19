@@ -3,6 +3,7 @@ import {
   SKILL_TREE_MAX_COLUMN_LEVEL,
 } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { sortBy } from 'es-toolkit/compat';
 import type {
   Character,
   JobContent,
@@ -10,6 +11,7 @@ import type {
   SkillTreeNodeContent,
   SkillTreeNodeEffect,
   SkillTreeNodeId,
+  SkillTreeSkillGrant,
 } from '@interfaces';
 
 export function skillTreeJobNodes(jobId: JobId): SkillTreeNodeContent[] {
@@ -85,4 +87,41 @@ export function characterSkillTreeSeeded(
     },
     skillTreeVersions: { ...character.skillTreeVersions, [jobId]: version },
   };
+}
+
+export function skillTreeJobSkillGrants(jobId: JobId): SkillTreeSkillGrant[] {
+  const nodes = skillTreeJobNodes(jobId);
+  const grants = nodes.flatMap((node) =>
+    node.effects.flatMap((effect) =>
+      effect.kind === 'GrantSkill'
+        ? [
+            {
+              skillId: effect.skillId,
+              level: skillTreeNodeLevel(nodes, node),
+              isDefault: node.default,
+            },
+          ]
+        : [],
+    ),
+  );
+
+  return sortBy(grants, (grant) => grant.level);
+}
+
+export function skillTreeNodeHasAncestor(
+  nodes: SkillTreeNodeContent[],
+  node: SkillTreeNodeContent,
+  ancestorId: SkillTreeNodeId,
+  seen = new Set<SkillTreeNodeId>(),
+): boolean {
+  if (seen.has(node.id)) return false;
+  seen.add(node.id);
+
+  return node.requiredSkillTreeNodeIds.some((parentId) => {
+    const parent = nodes.find((candidate) => candidate.id === parentId);
+    return (
+      parentId === ancestorId ||
+      (!!parent && skillTreeNodeHasAncestor(nodes, parent, ancestorId, seen))
+    );
+  });
 }

@@ -1,6 +1,7 @@
 import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
 import { ensureJob } from '@helpers/content/ensure-job';
 import { ensureSkill } from '@helpers/content/ensure-skill';
+import { ensureSkillTreeNode } from '@helpers/content/ensure-skilltreenode';
 import { ensureTrainerTeaching } from '@helpers/content/ensure-trainer';
 import { defaultEquipment } from '@helpers/defaults';
 import {
@@ -9,7 +10,6 @@ import {
   characterNormalSkills,
   characterSkills,
   getUnlockedJobs,
-  heroSkillsAtLevel,
   heroSkillsWithEquipment,
   partyFirstBurstSkillHero,
 } from '@helpers/hero/job';
@@ -17,36 +17,40 @@ import { trainerTeachingEffects } from '@helpers/trainer/trainer-teaching';
 import type {
   EquipmentId,
   EquipmentSkillId,
+  HeroEffect,
   ItemId,
   JobId,
+  SkillTreeNodeId,
   TrainerTeachingId,
 } from '@interfaces';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { buildCharacter, buildEquipmentItem } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 
+// A tree node granting `skillId`, named after it.
+function skillNode(jobId: JobId, skillId: string, level = 1) {
+  return ensureSkillTreeNode({
+    id: `node-${skillId}` as SkillTreeNodeId,
+    name: `Job: ${skillId}`,
+    jobId,
+    level,
+    effects: [{ kind: 'GrantSkill', skillId: skillId as EquipmentSkillId }],
+  });
+}
+
+function grant(skillId: string): HeroEffect {
+  return { kind: 'GrantSkill', skillId: skillId as EquipmentSkillId };
+}
+
 describe('Job Helper Functions', () => {
   const mockJobExplorer = ensureJob({
     id: 'job-explorer' as JobId,
     name: 'Explorer',
-    skillPath: [
-      {
-        pathName: 'Attack',
-        levels: [{ level: 1, skillId: 'Attack' as EquipmentSkillId }],
-      },
-      {
-        pathName: 'Double Strike',
-        levels: [
-          { level: 1, skillId: 'Double Strike I' as EquipmentSkillId },
-          { level: 6, skillId: 'Double Strike II' as EquipmentSkillId },
-        ],
-      },
-      {
-        pathName: 'Sweep',
-        levels: [{ level: 4, skillId: 'Sweep I' as EquipmentSkillId }],
-      },
-    ],
   });
+  const explorerNodes = [
+    skillNode(mockJobExplorer.id, 'Double Strike I'),
+    skillNode(mockJobExplorer.id, 'Sweep I', 4),
+  ];
 
   describe('getUnlockedJobs', () => {
     it('should return every job in content, since all jobs are currently unlocked', () => {
@@ -60,37 +64,6 @@ describe('Job Helper Functions', () => {
 
     it('should return an empty array when no jobs are loaded', () => {
       expect(getUnlockedJobs()).toEqual([]);
-    });
-  });
-
-  describe('heroSkillsAtLevel', () => {
-    it('should return only the level 1 unlock of each path at level 1', () => {
-      expect(heroSkillsAtLevel(mockJobExplorer, 1)).toEqual([
-        'Attack',
-        'Double Strike I',
-      ]);
-    });
-
-    it('should include a path once its level requirement is met', () => {
-      expect(heroSkillsAtLevel(mockJobExplorer, 4)).toEqual([
-        'Attack',
-        'Double Strike I',
-        'Sweep I',
-      ]);
-    });
-
-    it('should upgrade a path to its latest unlocked rank', () => {
-      expect(heroSkillsAtLevel(mockJobExplorer, 6)).toEqual([
-        'Attack',
-        'Double Strike II',
-        'Sweep I',
-      ]);
-    });
-
-    it('should return an empty array when the job has no skill paths', () => {
-      expect(
-        heroSkillsAtLevel({ ...mockJobExplorer, skillPath: [] }, 10),
-      ).toEqual([]);
     });
   });
 
@@ -150,8 +123,14 @@ describe('Job Helper Functions', () => {
       ).toEqual([]);
     });
 
-    it("resolves a hero's job to its skills at their level", () => {
-      seedContent([mockJobExplorer, attack, doubleStrike1, sweep1]);
+    it('knows Attack plus the skills of its learned tree nodes', () => {
+      seedContent([
+        mockJobExplorer,
+        ...explorerNodes,
+        attack,
+        doubleStrike1,
+        sweep1,
+      ]);
 
       expect(
         characterSkills({
@@ -159,7 +138,9 @@ describe('Job Helper Functions', () => {
           level: 4,
           equipment: defaultEquipment(),
           teachings: {},
-          skillTreeNodes: {},
+          skillTreeNodes: {
+            [mockJobExplorer.id]: explorerNodes.map((node) => node.id),
+          },
         }).map((skill) => skill.id),
       ).toEqual(['Attack', 'Double Strike I', 'Sweep I']);
     });
@@ -181,8 +162,6 @@ describe('Job Helper Functions', () => {
 
     it('merges teaching-granted skills alongside equipment grants', () => {
       const skills = heroSkillsWithEquipment(
-        mockJobExplorer,
-        1,
         defaultEquipment(),
         trainerTeachingEffects([sweepTeaching.id]),
       );
@@ -196,12 +175,14 @@ describe('Job Helper Functions', () => {
         Weapon: buildEquipmentItem(wergenStaff.id),
       };
 
-      const skills = heroSkillsWithEquipment(mockJobExplorer, 1, equipment, []);
+      const skills = heroSkillsWithEquipment(equipment, [
+        grant('Double Strike I'),
+      ]);
 
       expect(skills.map((skill) => skill.id)).toEqual([
         'Attack',
-        'Double Strike I',
         'Starshine II',
+        'Double Strike I',
       ]);
     });
 
@@ -211,7 +192,9 @@ describe('Job Helper Functions', () => {
         Ring: buildEquipmentItem(ringOfDoubleStrike2.id),
       };
 
-      const skills = heroSkillsWithEquipment(mockJobExplorer, 1, equipment, []);
+      const skills = heroSkillsWithEquipment(equipment, [
+        grant('Double Strike I'),
+      ]);
 
       expect(skills.map((skill) => skill.id)).toEqual([
         'Attack',
@@ -225,7 +208,10 @@ describe('Job Helper Functions', () => {
         Ring: buildEquipmentItem(ringOfDoubleStrike1.id),
       };
 
-      const skills = heroSkillsWithEquipment(mockJobExplorer, 6, equipment, []);
+      const skills = heroSkillsWithEquipment(equipment, [
+        grant('Double Strike II'),
+        grant('Sweep I'),
+      ]);
 
       expect(skills.map((skill) => skill.id)).toEqual([
         'Attack',
@@ -251,31 +237,29 @@ describe('Job Helper Functions', () => {
     const inferno1 = burst('Inferno I');
     const inferno2 = burst('Inferno II');
     const tempest = burst('Tempest');
-    const job = ensureJob({
-      id: 'job-burst' as JobId,
-      name: 'Burster',
-      skillPath: [
-        { pathName: 'Strike', levels: [{ level: 1, skillId: strike.id }] },
-        {
-          pathName: 'Inferno',
-          levels: [
-            { level: 1, skillId: inferno1.id },
-            { level: 5, skillId: inferno2.id },
-          ],
-        },
-        { pathName: 'Tempest', levels: [{ level: 1, skillId: tempest.id }] },
-      ],
-    });
+    const job = ensureJob({ id: 'job-burst' as JobId, name: 'Burster' });
+    const nodes = [
+      skillNode(job.id, strike.id),
+      skillNode(job.id, inferno1.id),
+      skillNode(job.id, inferno2.id, 5),
+      skillNode(job.id, tempest.id),
+    ];
     const hero = (chosen: string[], level = 1) => ({
       jobId: job.id,
       level,
       equipment: defaultEquipment(),
       teachings: {},
-      skillTreeNodes: {},
+      skillTreeNodes: {
+        [job.id]: nodes
+          .filter((node) => node.level <= level)
+          .map((node) => node.id),
+      },
       burstSkills: { [job.id]: chosen as EquipmentSkillId[] },
     });
 
-    beforeEach(() => seedContent([job, strike, inferno1, inferno2, tempest]));
+    beforeEach(() =>
+      seedContent([job, ...nodes, strike, inferno1, inferno2, tempest]),
+    );
 
     it('keeps special skills out of the normal list', () => {
       expect(characterNormalSkills(hero([])).map((s) => s.id)).toEqual([
@@ -305,10 +289,10 @@ describe('Job Helper Functions', () => {
 
     it('finds the first party hero with a burst skill', () => {
       const plain = ensureJob({ id: 'job-plain' as JobId, name: 'Plain' });
-      seedContent([job, plain, strike, inferno1, inferno2, tempest]);
+      seedContent([job, ...nodes, plain, strike, inferno1, inferno2, tempest]);
       const party = [
         buildCharacter({ name: 'A', jobId: plain.id }),
-        buildCharacter({ name: 'B', jobId: job.id }),
+        buildCharacter({ name: 'B', ...hero([]) }),
       ];
       expect(partyFirstBurstSkillHero(party)?.name).toBe('B');
       expect(partyFirstBurstSkillHero([party[0]])).toBeUndefined();

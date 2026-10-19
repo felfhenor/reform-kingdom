@@ -29,7 +29,13 @@ import {
 } from '@helpers/item/infusion';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { isRecipeCraftable } from '@helpers/crafting/recipes';
-import { gamestate, worldPartyState } from '@helpers/state-game';
+import {
+  gamestate,
+  updateGamestate,
+  worldPartyState,
+} from '@helpers/state-game';
+import { characterSkillTreeAutoPicks } from '@helpers/hero/skill-tree';
+import { characterRecalculateStats } from '@helpers/hero/party';
 import {
   tradeskillActiveGate,
   tradeskillBuilding,
@@ -705,6 +711,36 @@ export function reoptimizeAllEquipment(): void {
   );
 }
 
+// The tree never allocates itself, so simulated heroes spend free SP like a hands-off player.
+function autoSpendSkillPoints(): void {
+  const picksById = new Map(
+    worldPartyState().map((character) => [
+      character.id,
+      characterSkillTreeAutoPicks(character),
+    ]),
+  );
+  if ([...picksById.values()].every((picks) => picks.length === 0)) return;
+
+  updateGamestate((state) => {
+    state.world.party = state.world.party.map((character) => {
+      const picks = picksById.get(character.id) ?? [];
+      if (picks.length === 0) return character;
+
+      return characterRecalculateStats({
+        ...character,
+        skillTreeNodes: {
+          ...character.skillTreeNodes,
+          [character.jobId]: [
+            ...(character.skillTreeNodes[character.jobId] ?? []),
+            ...picks,
+          ],
+        },
+      });
+    });
+    return state;
+  });
+}
+
 // Called every tick by the driver - internally no-ops except on each
 // strategy's configured cadence, so cheap to call unconditionally.
 export function applyStrategyPolicy(
@@ -716,6 +752,7 @@ export function applyStrategyPolicy(
 
   syncGatherMaterialClauses();
   enforceGatherTimeBudget(tick, tickBudget);
+  autoSpendSkillPoints();
 
   let craftResult: CraftAttemptResult | null = null;
 
