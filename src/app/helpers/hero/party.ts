@@ -131,7 +131,17 @@ function starterEquipment(jobId: JobId): EquipmentBlock {
 
 export function createCharacter(name: string, jobId: JobId): Character {
   const equipment = starterEquipment(jobId);
-  const stats = characterStatsForLevel(jobId, 1, equipment, []);
+  const trees = characterSkillTreeSeeded(
+    { skillTreeNodes: {}, skillTreeVersions: {} },
+    jobId,
+  );
+  const stats = characterStats({
+    jobId,
+    level: 1,
+    equipment,
+    teachings: {},
+    skillTreeNodes: trees.skillTreeNodes,
+  });
 
   return {
     id: rngUuid() as CharacterId,
@@ -145,10 +155,7 @@ export function createCharacter(name: string, jobId: JobId): Character {
     jobProgress: {},
     combatOrders: { [jobId]: combatOrdersFromJobDefaults(jobId) },
     teachings: {},
-    ...characterSkillTreeSeeded(
-      { skillTreeNodes: {}, skillTreeVersions: {} },
-      jobId,
-    ),
+    ...trees,
     burstSkills: {},
     currentRegaliaIds: {},
     hp: stats.Health,

@@ -105,7 +105,9 @@ function reclassCharacterStart(
 
   const { jobProgress, level, xp } = characterJobProgressSwap(character, jobId);
   Object.assign(character, { jobId, jobProgress, level, xp });
-  Object.assign(character, characterSkillTreeSeeded(character, jobId));
+  const seeded = characterSkillTreeSeeded(character, jobId);
+  character.skillTreeNodes[jobId] = seeded.skillTreeNodes[jobId];
+  character.skillTreeVersions[jobId] = seeded.skillTreeVersions[jobId];
   return true;
 }
 

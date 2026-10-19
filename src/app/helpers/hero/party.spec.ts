@@ -217,19 +217,22 @@ describe('createCharacter', () => {
     );
   });
 
-  it("starts with its job's default tree nodes, already paid for", () => {
+  it("starts with its job's default tree nodes, their effects in its stats", () => {
     const strike = ensureSkillTreeNode({
       id: 'strike' as SkillTreeNodeId,
       name: 'Explorer: Strike',
       jobId,
       default: true,
+      effects: [{ kind: 'Stat', stat: 'Strength', value: 3 }],
     });
     seedContent([ensureJob({ ...job, treeVersion: 3 }), strike]);
+    const jala = createCharacter('Jala', jobId);
 
-    expect(createCharacter('Jala', jobId)).toMatchObject({
+    expect(jala).toMatchObject({
       skillTreeNodes: { [jobId]: [strike.id] },
       skillTreeVersions: { [jobId]: 3 },
     });
+    expect(jala.stats.Strength).toBe(job.baseStats.Strength + 3);
   });
 
   it('starts with its job default Combat Orders', () => {
