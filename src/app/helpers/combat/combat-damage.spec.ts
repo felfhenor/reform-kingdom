@@ -573,6 +573,52 @@ describe('combatApplySkillToTarget status effect resistance', () => {
   });
 });
 
+describe('combatApplySkillToTarget debuff potency', () => {
+  const potency = { chance: 5, duration: 1 };
+  const stun = ensureStatusEffect({
+    id: 'potency-stun' as StatusEffectId,
+    effectType: 'Debuff',
+  });
+  const haste = ensureStatusEffect({
+    id: 'potency-haste' as StatusEffectId,
+    effectType: 'Buff',
+  });
+
+  beforeEach(() => {
+    seedContent([stun, haste]);
+    vi.mocked(rngSucceedsChance).mockImplementation((chance) => chance === 65);
+  });
+
+  function castOn(effect: StatusEffectContent): Combatant {
+    const attacker = buildCombatant({ id: 'attacker', debuffPotency: potency });
+    const target = buildCombatant({ id: 'target' });
+    const technique = buildTechnique({
+      statusEffects: [{ statusEffectId: effect.id, chance: 60, duration: 3 }],
+    });
+
+    combatApplySkillToTarget(
+      buildCombat({ heroes: [attacker], guardians: [target] }),
+      attacker,
+      target,
+      buildSkill(),
+      technique,
+    );
+
+    return target;
+  }
+
+  it("adds the caster's potency to a debuff's chance and duration", () => {
+    expect(castOn(stun).statusEffects).toEqual([
+      expect.objectContaining({ id: stun.id, duration: 4 }),
+    ]);
+  });
+
+  it('leaves buffs untouched', () => {
+    expect(castOn(haste).statusEffects).toHaveLength(0);
+    expect(rngSucceedsChance).toHaveBeenCalledWith(60);
+  });
+});
+
 describe('combatApplySkillToTarget combat message rendering', () => {
   beforeEach(() => {
     combatLogReset();

@@ -14,6 +14,7 @@ import {
   defaultStats,
   defaultTagResistances,
 } from '@helpers/defaults';
+import { characterDebuffPotency } from '@helpers/hero/hero-effect';
 import { characterCombatSkills } from '@helpers/hero/job';
 import { skillIsUsableWithEquippedWeapons } from '@helpers/hero/skill';
 import {
@@ -141,6 +142,7 @@ export function combatantFromCharacter(character: Character): Combatant {
       character.equipment,
     ),
     skillStatBonuses: equipmentSkillStatBonuses(character.equipment),
+    debuffPotency: characterDebuffPotency(character),
 
     affinity: characterElementalBoons(character),
     resistance: characterElementalResistances(character),

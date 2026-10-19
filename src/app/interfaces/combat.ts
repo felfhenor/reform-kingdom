@@ -41,6 +41,12 @@ export type CombatStat =
 
 export type CombatStatBlock = Record<CombatStat, number>;
 
+// Flat additions to debuffs a hero lands: chance in percent points, duration in turns.
+export type DebuffPotency = {
+  chance: number;
+  duration: number;
+};
+
 // Only agroValue is a flat weight - every other combat stat is a 0-100 percent chance/modifier.
 export const CombatStatDimension: StatDisplayDimension<CombatStat> = {
   order: [
@@ -155,6 +161,9 @@ export type Combatant = HasAnimation & {
 
   // Gear-granted extra damageScaling per skill family. Only heroes populate this.
   skillStatBonuses?: SkillStatBonus[];
+
+  // Only heroes populate this. Optional so mid-combat saves still load.
+  debuffPotency?: DebuffPotency;
 
   level: number;
   hp: number;

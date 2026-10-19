@@ -35,6 +35,7 @@ import { rngSucceedsChance } from '@helpers/rng';
 import type {
   Combat,
   Combatant,
+  DebuffPotency,
   EquipmentSkill,
   EquipmentSkillAttribute,
   EquipmentSkillContentTechnique,
@@ -46,6 +47,15 @@ import type {
 } from '@interfaces';
 import { MagicalStats, PhysicalStats } from '@interfaces';
 import { sum, sumBy } from 'es-toolkit/compat';
+
+function combatantDebuffPotency(
+  caster: Combatant,
+  effect: StatusEffectContent,
+): DebuffPotency {
+  return effect.effectType === 'Debuff' && caster.debuffPotency
+    ? caster.debuffPotency
+    : { chance: 0, duration: 0 };
+}
 
 export function techniqueHasAttribute(
   technique: EquipmentSkillContentTechnique,
@@ -334,7 +344,9 @@ export function combatApplySkillToTarget(
     const effectContent = getEntry<StatusEffectContent>(effData.statusEffectId);
     if (!effectContent) return;
 
-    const totalChance = skillTechniqueStatusEffectChance(skill, effData);
+    const potency = combatantDebuffPotency(combatant, effectContent);
+    const totalChance =
+      skillTechniqueStatusEffectChance(skill, effData) + potency.chance;
     const luckAdjustedChance = luckReducedChance(
       totalChance,
       target.totalStats.Luck,
@@ -361,7 +373,8 @@ export function combatApplySkillToTarget(
       combatant,
       target,
       {
-        duration: skillTechniqueStatusEffectDuration(skill, effData),
+        duration:
+          skillTechniqueStatusEffectDuration(skill, effData) + potency.duration,
       },
       capturedCreatorStats,
     );

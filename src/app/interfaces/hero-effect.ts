@@ -1,3 +1,4 @@
+import type { DebuffPotency } from '@interfaces/combat';
 import type { AffixEffect } from '@interfaces/content-affix';
 import type { JobAbilityId } from '@interfaces/content-jobability';
 import type { BaseStat } from '@interfaces/stat';
@@ -14,6 +15,13 @@ export type HeroEffectJobAbility = {
   value: number; // the rank's value; the highest grant of an ability wins
 };
 
+export type HeroEffectDebuffPotency = DebuffPotency & {
+  kind: 'DebuffPotency';
+};
+
 // Every effect a hero can carry: gear/teaching affix shapes plus kinds only skill trees grant.
 export type HeroEffect =
-  AffixEffect | HeroEffectStatPerLevel | HeroEffectJobAbility;
+  | AffixEffect
+  | HeroEffectStatPerLevel
+  | HeroEffectJobAbility
+  | HeroEffectDebuffPotency;
