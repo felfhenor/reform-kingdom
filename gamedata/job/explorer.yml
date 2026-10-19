@@ -123,6 +123,13 @@
       level: 1
       value: 5
 
+    - jobAbilityId: Monster Research
+      level: 20
+      value: 1
+    - jobAbilityId: Monster Research
+      level: 35
+      value: 2
+
   starterEquipmentIds:
     - Cloak of Adventuring
     - Hat of Adventuring

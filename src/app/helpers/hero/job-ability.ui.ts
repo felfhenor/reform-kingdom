@@ -1,3 +1,4 @@
+import { DEBUFF_POTENCY_PER_RANK } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import type {
   Character,
@@ -36,6 +37,10 @@ const JOB_ABILITY_VALUE_LABELS: Record<
   GatherYieldLuck: (value) => `${value}x LUK chance`,
   EquipmentDropRateBoost: (value) => `+${value}% equipment drop rate`,
   ItemDropRateBoost: (value) => `+${value}% item drop rate`,
+  SkillRepeatChance: (value) => `+${value}% skill repeat chance`,
+  CoverChance: (value) => `${value}% chance to cover an ally`,
+  DebuffPotency: (value) =>
+    `+${value * DEBUFF_POTENCY_PER_RANK.chance}% debuff chance, +${value * DEBUFF_POTENCY_PER_RANK.duration} turns`,
 };
 
 export function jobAbilityValueLabel(

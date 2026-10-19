@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { buildCharacter, buildEquipmentItem } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
+import { abilityJobContent, buildAbilityHero } from '@/testing/job-ability';
+import { DEBUFF_POTENCY_PER_RANK } from '@helpers/config';
 import {
   combatantFromCharacter,
   combatantFromMonster,
@@ -155,6 +157,23 @@ describe('combatantFromCharacter', () => {
     expect(combatant.combatStats.reviveChance).toBe(2);
     expect(combatant.tagResistance.Accuracy).toBe(5 + 3);
     expect(combatant.tagResistance.Stun).toBe(3);
+  });
+
+  it('adds Monster Research ranks to debuff effects for its debuff potency', () => {
+    seedContent(abilityJobContent('Delver', [['DebuffPotency', 1, 2]]));
+    const delver = buildAbilityHero(
+      'Delver',
+      1,
+      {},
+      {
+        debugEffects: [{ kind: 'DebuffPotency', chance: 1, duration: 1 }],
+      },
+    );
+
+    expect(combatantFromCharacter(delver).debuffPotency).toEqual({
+      chance: 1 + 2 * DEBUFF_POTENCY_PER_RANK.chance,
+      duration: 1 + 2 * DEBUFF_POTENCY_PER_RANK.duration,
+    });
   });
 });
 

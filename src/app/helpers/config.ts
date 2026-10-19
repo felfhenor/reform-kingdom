@@ -7,6 +7,7 @@
 import type {
   BaseStat,
   CombatStat,
+  DebuffPotency,
   GameElement,
   MonsterType,
   StatusEffectTag,
@@ -148,6 +149,12 @@ export const VALUE_MULTIPLIER_PER_RESISTANCE: Record<StatusEffectTag, number> =
     Burn: 5,
     Bleed: 3,
   };
+
+// Monster Research: what each rank of the DebuffPotency job ability adds.
+export const DEBUFF_POTENCY_PER_RANK: DebuffPotency = {
+  chance: 5,
+  duration: 1,
+};
 
 export const VALUE_MULTIPLIER_PER_COMBAT_STAT: Record<CombatStat, number> = {
   repeatActionChance: 5,

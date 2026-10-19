@@ -8,6 +8,7 @@ import {
   monsterSkillsAtLevel,
   monsterStatsAtLevel,
 } from '@helpers/combat/monster';
+import { DEBUFF_POTENCY_PER_RANK } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import {
   defaultAffinities,
@@ -16,6 +17,7 @@ import {
 } from '@helpers/defaults';
 import { characterDebuffPotency } from '@helpers/hero/hero-effect';
 import { characterCombatSkills } from '@helpers/hero/job';
+import { characterJobAbilityValue } from '@helpers/hero/job-ability';
 import { skillIsUsableWithEquippedWeapons } from '@helpers/hero/skill';
 import {
   characterTagResistances,
@@ -36,6 +38,7 @@ import type {
   Combatant,
   CombatId,
   CombatStat,
+  DebuffPotency,
   EquipmentSkillContent,
   EquipmentSkillId,
   GameStat,
@@ -106,6 +109,16 @@ function applyActiveGainCombatStatEffects(combatant: Combatant): void {
   });
 }
 
+function heroDebuffPotency(character: Character): DebuffPotency {
+  const fromEffects = characterDebuffPotency(character);
+  const ranks = characterJobAbilityValue(character, 'DebuffPotency');
+
+  return {
+    chance: fromEffects.chance + ranks * DEBUFF_POTENCY_PER_RANK.chance,
+    duration: fromEffects.duration + ranks * DEBUFF_POTENCY_PER_RANK.duration,
+  };
+}
+
 export function combatantFromCharacter(character: Character): Combatant {
   const job = getEntry<JobContent>(character.jobId);
 
@@ -142,7 +155,7 @@ export function combatantFromCharacter(character: Character): Combatant {
       character.equipment,
     ),
     skillStatBonuses: equipmentSkillStatBonuses(character.equipment),
-    debuffPotency: characterDebuffPotency(character),
+    debuffPotency: heroDebuffPotency(character),
 
     affinity: characterElementalBoons(character),
     resistance: characterElementalResistances(character),

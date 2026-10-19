@@ -1,13 +1,24 @@
 import { defaultCombatStats } from '@helpers/defaults';
+import { characterJobAbilityValue } from '@helpers/hero/job-ability';
 import { skillEpCost } from '@helpers/hero/skill';
 import { characterCombatStatBonusTotals } from '@helpers/item/equipment';
 import { rngSucceedsChance } from '@helpers/rng';
 import type { Character } from '@interfaces/character';
-import type { Combatant, CombatStatBlock } from '@interfaces/combat';
+import type {
+  Combatant,
+  CombatStat,
+  CombatStatBlock,
+} from '@interfaces/combat';
+import type { JobAbilityType } from '@interfaces/content-jobability';
 import type { EquipmentSkill } from '@interfaces/content-skill';
 import { isNumber } from 'es-toolkit/compat';
 
-// Applied once at combat creation - gear and teaching combat-stat bonuses are
+const JOB_ABILITY_COMBAT_STATS: Partial<Record<JobAbilityType, CombatStat>> = {
+  SkillRepeatChance: 'skillStrikeAgainChance',
+  CoverChance: 'coverChance',
+};
+
+// Applied once at combat creation - gear, teaching and job-ability combat-stat bonuses are
 // added to the hero's base value for the whole encounter.
 export function combatStatsForCharacter(character: Character): CombatStatBlock {
   const stats = defaultCombatStats();
@@ -15,6 +26,10 @@ export function combatStatsForCharacter(character: Character): CombatStatBlock {
 
   (Object.keys(stats) as Array<keyof CombatStatBlock>).forEach((stat) => {
     stats[stat] += bonus[stat];
+  });
+
+  Object.entries(JOB_ABILITY_COMBAT_STATS).forEach(([type, stat]) => {
+    stats[stat] += characterJobAbilityValue(character, type as JobAbilityType);
   });
 
   return stats;

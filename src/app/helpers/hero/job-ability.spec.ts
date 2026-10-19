@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   characterJobAbilities,
+  characterJobAbilityValue,
   jobAbilityEntries,
   jobAbilityHighest,
   jobAbilityValue,
@@ -125,6 +126,22 @@ describe('characterJobAbilities', () => {
         value,
       ]),
     ).toEqual([['Ambush', 5]]);
+  });
+});
+
+describe('characterJobAbilityValue', () => {
+  it("reads the hero's own rank, or 0 without the ability", () => {
+    seedContent(warrior);
+
+    expect(
+      characterJobAbilityValue(
+        buildAbilityHero('Warrior', 25),
+        'OnPathTravelSpeed',
+      ),
+    ).toBe(0.2);
+    expect(
+      characterJobAbilityValue(buildAbilityHero('Warrior', 25), 'Ambush'),
+    ).toBe(0);
   });
 });
 

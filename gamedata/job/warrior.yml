@@ -133,6 +133,17 @@
       level: 25
       value: -12
 
+    - jobAbilityId: Follow-up
+      level: 20
+      value: 5
+    - jobAbilityId: Follow-up
+      level: 35
+      value: 10
+
+    - jobAbilityId: Cover
+      level: 30
+      value: 5
+
   starterEquipmentIds:
     - Cloak of Adventuring
     - Hat of Adventuring

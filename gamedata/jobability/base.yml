@@ -75,3 +75,21 @@
   description: Rangers have a higher chance of getting items from combat. Does not stack with other Rangers.
   type: ItemDropRateBoost
   sprite: '0020'
+
+- id: 4c7725e0-ecb7-46d1-8c70-6b1c63936757
+  name: Follow-up
+  description: Each Warrior has a chance to strike again with the skill they just used.
+  type: SkillRepeatChance
+  sprite: '0022'
+
+- id: e80fe15e-b7d3-4b6c-8c1a-f81656c268c7
+  name: Cover
+  description: Each Warrior has a chance to step in and take a single-target attack aimed at an ally.
+  type: CoverChance
+  sprite: '0023'
+
+- id: e3a54096-9d36-46a1-9824-d6f7b3b19fca
+  name: Monster Research
+  description: Each Explorer's debuffs land more often and last longer.
+  type: DebuffPotency
+  sprite: '0021'

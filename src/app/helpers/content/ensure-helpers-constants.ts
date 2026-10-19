@@ -93,6 +93,9 @@ export const VALID_JOB_ABILITY_TYPES: JobAbilityType[] = [
   'GatherYieldLuck',
   'EquipmentDropRateBoost',
   'ItemDropRateBoost',
+  'SkillRepeatChance',
+  'CoverChance',
+  'DebuffPotency',
 ];
 
 export const VALID_CARAVAN_TRADE_TYPES: CaravanTradeType[] = ['sell', 'buy'];

@@ -33,6 +33,10 @@ const JOB_ABILITY_RULES: Record<JobAbilityType, JobAbilityRule> = {
   Ambush: { stacking: 'Highest', amount: 'Value' },
   EquipmentDropRateBoost: { stacking: 'Highest', amount: 'Value' },
   ItemDropRateBoost: { stacking: 'Highest', amount: 'Value' },
+  // Per-hero: combat reads the owner's own rank, never the party value.
+  SkillRepeatChance: { stacking: 'Highest', amount: 'Value' },
+  CoverChance: { stacking: 'Highest', amount: 'Value' },
+  DebuffPotency: { stacking: 'Highest', amount: 'Value' },
 };
 
 type JobAbilityPartyEntry = {
@@ -86,6 +90,18 @@ export function characterJobAbilities(
       value,
     }))
     .filter((entry): entry is CharacterJobAbility => !!entry.ability);
+}
+
+// 0 if the hero lacks it.
+export function characterJobAbilityValue(
+  character: Pick<Character, 'jobId' | 'level' | 'teachings' | 'debugEffects'>,
+  type: JobAbilityType,
+): number {
+  return (
+    characterJobAbilities(character).find(
+      ({ ability }) => ability.type === type,
+    )?.value ?? 0
+  );
 }
 
 function jobAbilityAmount(

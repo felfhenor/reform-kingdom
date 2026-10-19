@@ -17,7 +17,10 @@ export type JobAbilityType =
   | 'Ambush'
   | 'GatherYieldLuck'
   | 'EquipmentDropRateBoost'
-  | 'ItemDropRateBoost';
+  | 'ItemDropRateBoost'
+  | 'SkillRepeatChance'
+  | 'CoverChance'
+  | 'DebuffPotency';
 
 export type JobAbilityContent = IsContentItem &
   HasDescription &

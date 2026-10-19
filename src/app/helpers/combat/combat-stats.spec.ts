@@ -30,6 +30,7 @@ import {
   buildTestCombatant,
 } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
+import { abilityJobContent, buildAbilityHero } from '@/testing/job-ability';
 
 const warrior = 'warrior' as JobId;
 const ranger = 'ranger' as JobId;
@@ -69,6 +70,23 @@ describe('combatStatsForCharacter', () => {
     const armed = buildCharacter();
     armed.equipment.Weapon = buildEquipmentItem(reflectiveSword.id);
     expect(combatStatsForCharacter(armed).damageReflectPercent).toBe(base + 10);
+  });
+
+  it("adds the hero's own Follow-up and Cover ranks", () => {
+    seedContent(
+      abilityJobContent('Guard', [
+        ['SkillRepeatChance', 20, 5],
+        ['CoverChance', 30, 5],
+      ]),
+    );
+
+    expect(combatStatsForCharacter(buildAbilityHero('Guard', 25))).toEqual({
+      ...defaultCombatStats(),
+      skillStrikeAgainChance: 5,
+    });
+    expect(
+      combatStatsForCharacter(buildAbilityHero('Guard', 30)),
+    ).toMatchObject({ skillStrikeAgainChance: 5, coverChance: 5 });
   });
 });
 
