@@ -26,7 +26,7 @@
     "gamedata:build": "ts-node --project tsconfig.scripts.json scripts/gamedata-build",
     "gamedata:art:spritesheets": "ts-node --project tsconfig.scripts.json scripts/gamedata-art-spritesheets",
     "schemas:generate": "npx ts-node --project tsconfig.scripts.json scripts/schema-generate",
-    "validate": "ts-node --project tsconfig.scripts.json -r tsconfig-paths/register scripts/validate",
+    "validate": "npm run gamedata:build && ts-node --project tsconfig.scripts.json -r tsconfig-paths/register scripts/validate",
     "bump:major": "npm version major -m \"chore(release): Major %s\"",
     "bump:minor": "npm version minor -m \"chore(release): Minor %s\"",
     "bump:patch": "npm version patch -m \"chore(release): Patch %s\"",

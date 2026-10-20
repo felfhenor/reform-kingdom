@@ -3,6 +3,7 @@ import {
   combatCombatantTakeDamage,
 } from '@helpers/combat/combat-combatant-hp';
 import { combatCoveringAlly } from '@helpers/combat/combat-cover';
+import { getEntry } from '@helpers/content/content';
 import {
   combatApplySkillToTarget,
   techniqueHasAttribute,
@@ -192,11 +193,14 @@ function combatantUseSkill(
     );
 
     const numTargets = skillTechniqueNumTargets(chosenSkill, tech);
+    const appliedSkill = tech.echoOf
+      ? (getEntry<EquipmentSkill>(tech.echoOf) ?? chosenSkill)
+      : chosenSkill;
 
     // A Combat Order's targetMode is an explicit override - it wins outright rather than
     // joining the combatant's own priority list. Confusion drops it, since it was aimed at the other side.
     const targetPriority =
-      combatOrderPick?.targetMode && !redirected && !tech.echo
+      combatOrderPick?.targetMode && !redirected && !tech.echoOf
         ? [{ type: combatOrderPick.targetMode }]
         : combatant.targetting;
 
@@ -244,7 +248,7 @@ function combatantUseSkill(
         combat,
         combatant,
         target,
-        chosenSkill,
+        appliedSkill,
         tech,
         capturedCreatorStats,
       );
@@ -257,13 +261,13 @@ function combatantUseSkill(
         );
 
       if (shouldApplyAgain && !combatantIsDead(target)) {
-        combatMessageLog(combat, `**${chosenSkill.name}** strikes again!`);
+        combatMessageLog(combat, `**${appliedSkill.name}** strikes again!`);
 
         combatApplySkillToTarget(
           combat,
           combatant,
           target,
-          chosenSkill,
+          appliedSkill,
           tech,
           capturedCreatorStats,
         );

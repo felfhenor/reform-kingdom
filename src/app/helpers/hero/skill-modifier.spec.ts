@@ -119,6 +119,24 @@ describe('skillWithModifiers', () => {
     expect(skill.techniques[1].damageScaling.Spirit).toBe(0);
   });
 
+  it('raises accuracy up to a sure hit', () => {
+    const shaky = {
+      ...frostfire,
+      techniques: frostfire.techniques.map((tech) => ({
+        ...tech,
+        accuracy: 70,
+      })),
+    };
+    const accuracy = modifier({ modifier: 'Accuracy', value: 20 });
+
+    expect(skillWithModifiers(shaky, [accuracy]).techniques[0].accuracy).toBe(
+      90,
+    );
+    expect(
+      skillWithModifiers(shaky, [accuracy, accuracy]).techniques[0].accuracy,
+    ).toBe(100);
+  });
+
   it('stacks potency into the status boosts', () => {
     const potency = modifier({
       modifier: 'Potency',
@@ -141,7 +159,7 @@ describe('skillWithModifiers', () => {
     expect(skill.techniques).toHaveLength(3);
     expect(skill.techniques[2]).toMatchObject({
       targetType: 'Allies',
-      echo: true,
+      echoOf: fortify.id,
     });
     expect(skillOwnTechniques(skill)).toHaveLength(2);
   });

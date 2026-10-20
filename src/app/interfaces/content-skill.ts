@@ -75,8 +75,8 @@ export type EquipmentSkillContentTechnique = {
   accuracy: number;
   // Untyped (not MonsterId) to avoid a circular import.
   summonMonsterId?: string;
-  // Added by an Echo modifier: picks its own targets, ignoring a combat order's target mode.
-  echo?: boolean;
+  // Added by an Echo modifier, from this skill: picks its own targets and logs under that skill's name.
+  echoOf?: EquipmentSkillId;
 
   combatMessage: string;
 };

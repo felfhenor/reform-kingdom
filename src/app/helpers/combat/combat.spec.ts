@@ -69,6 +69,7 @@ import type {
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
 import { buildCombat, buildMonsterCombatant } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
 import { inTick, seedGamestate } from '@/testing/gamestate';
 
 const target = buildMonsterCombatant(ensureMonster({ name: 'Target' }), {
@@ -347,6 +348,60 @@ describe('combatantTakeTurn targeting', () => {
     );
 
     expect(targetPriorityUsed()).toEqual([{ type: 'Weakest' }]);
+  });
+
+  it("keeps the order's targetMode off an echoed hit, which picks its own targets", () => {
+    const ordered = {
+      ...skill('ordered'),
+      techniques: [
+        { targets: 1 } as EquipmentSkillContentTechnique,
+        {
+          targets: 1,
+          echoOf: 'echoed' as EquipmentSkillId,
+        } as EquipmentSkillContentTechnique,
+      ],
+    };
+    available(ordered);
+    vi.mocked(pickSkillFromCombatOrders).mockReturnValue({
+      skill: ordered,
+      targetMode: 'Weakest',
+    });
+
+    combatantTakeTurn(
+      buildCombat(),
+      caster({
+        targetting: [{ type: 'Random' }],
+        combatOrders: [castFireball],
+      }),
+    );
+
+    const priorities = vi
+      .mocked(combatGetTargetsFromPriorityList)
+      .mock.calls.map((call) => call[1]);
+    expect(priorities).toEqual([[{ type: 'Weakest' }], [{ type: 'Random' }]]);
+  });
+
+  it('applies an echoed hit as the echoed skill, so it logs and boosts as that skill', () => {
+    const echoed = skill('echoed');
+    seedContent([echoed]);
+    const host = {
+      ...skill('host'),
+      techniques: [
+        { targets: 1 } as EquipmentSkillContentTechnique,
+        {
+          targets: 1,
+          echoOf: echoed.id,
+        } as EquipmentSkillContentTechnique,
+      ],
+    };
+    available(host);
+    vi.mocked(combatGetTargetsFromPriorityList).mockReturnValue([target]);
+
+    combatantTakeTurn(buildCombat(), caster());
+
+    expect(
+      vi.mocked(combatApplySkillToTarget).mock.calls.map((call) => call[3].id),
+    ).toEqual([host.id, echoed.id]);
   });
 
   it("drops the order's targetMode override when confusion redirects the technique", () => {

@@ -56,6 +56,12 @@ export type HeroEffectSkillModifierScaling = HeroEffectSkillModifierBase & {
   value: number;
 };
 
+// Raises a hit's chance to land, up to a sure hit.
+export type HeroEffectSkillModifierAccuracy = HeroEffectSkillModifierBase & {
+  modifier: 'Accuracy';
+  value: number;
+};
+
 export type HeroEffectSkillModifierElement = HeroEffectSkillModifierBase & {
   modifier: 'Element';
   element: GameElement;
@@ -72,6 +78,7 @@ export type HeroEffectSkillModifier =
   | HeroEffectSkillModifierInflict
   | HeroEffectSkillModifierPotency
   | HeroEffectSkillModifierScaling
+  | HeroEffectSkillModifierAccuracy
   | HeroEffectSkillModifierElement
   | HeroEffectSkillModifierEcho;
 

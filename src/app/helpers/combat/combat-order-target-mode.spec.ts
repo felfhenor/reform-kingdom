@@ -61,7 +61,7 @@ describe('isCombatOrderTargetModeUsable', () => {
         ...smite.techniques,
         {
           ...ensureEquipmentSkillTechnique({ targetType: 'Allies' }),
-          echo: true,
+          echoOf: 'scream' as EquipmentSkillId,
         },
       ],
     };

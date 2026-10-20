@@ -67,6 +67,8 @@ export function skillModifierText(
       return potencyText(modifier, format);
     case 'Scaling':
       return `+${format(modifier.value)}x ${modifier.stat} scaling`;
+    case 'Accuracy':
+      return `+${format(modifier.value)}% accuracy`;
     case 'Echo':
       return `Also casts ${getEntry<EquipmentSkillContent>(modifier.skillId)?.name ?? 'UNKNOWN'}`;
   }

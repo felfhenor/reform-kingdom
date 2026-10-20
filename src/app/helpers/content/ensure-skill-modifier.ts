@@ -55,6 +55,8 @@ export function ensureSkillModifierEffect(
       const stat = ensureEnumValue(effect['stat'], VALID_GAME_STATS, 'Spirit');
       return { kind, family, modifier: 'Scaling', stat, value };
     }
+    case 'Accuracy':
+      return { kind, family, modifier: 'Accuracy', value };
     case 'Element': {
       const element = ensureElement(effect['element']);
       return { kind, family, modifier: 'Element', element };

@@ -57,6 +57,11 @@ function techniqueWithModifier(
       };
     case 'Inflict':
       return techniqueInflicted(technique, modifier);
+    case 'Accuracy':
+      return {
+        ...technique,
+        accuracy: Math.min(100, technique.accuracy + modifier.value),
+      };
     case 'Scaling':
       return skillTechniqueWithStatBonuses(skill, technique, [
         {
@@ -101,7 +106,7 @@ function echoedTechniques(
   const echoed = getEntry<EquipmentSkillContent>(modifier.skillId);
   return (echoed?.techniques ?? []).map((technique) => ({
     ...technique,
-    echo: true,
+    echoOf: modifier.skillId,
   }));
 }
 
@@ -145,5 +150,5 @@ export function skillWithModifiers(
 export function skillOwnTechniques(
   skill: EquipmentSkillContent,
 ): EquipmentSkillContentTechnique[] {
-  return skill.techniques.filter((technique) => !technique.echo);
+  return skill.techniques.filter((technique) => !technique.echoOf);
 }

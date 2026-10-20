@@ -23,9 +23,9 @@
 - id: 0a093cbd-4730-4063-a044-90afbb0dc4a6
   name: 'Warrior: Double Strike III'
   jobId: Warrior
-  level: 20
+  level: 25
   row: Weapon Arts
-  requiredSkillTreeNodeIds: ['Warrior: Double Strike II']
+  requiredSkillTreeNodeIds: ['Warrior: Oath of the Twin Blade']
   effects:
     - kind: GrantSkill
       skillId: 'Double Strike III'
@@ -70,7 +70,7 @@
   level: 25
   row: Weapon Arts
   track: 1
-  requiredSkillTreeNodeIds: ['Warrior: Sweep II']
+  requiredSkillTreeNodeIds: ['Warrior: Oath of the Sweep']
   effects:
     - kind: GrantSkill
       skillId: 'Sweep III'
@@ -116,7 +116,7 @@
   level: 45
   row: Weapon Arts
   track: 2
-  requiredSkillTreeNodeIds: ['Warrior: Charged Strike II']
+  requiredSkillTreeNodeIds: ['Warrior: Oath of the Charge']
   effects:
     - kind: GrantSkill
       skillId: 'Charged Strike III'
@@ -147,7 +147,7 @@
   jobId: Warrior
   level: 30
   row: Shield Arts
-  requiredSkillTreeNodeIds: ['Warrior: Smashing Board II']
+  requiredSkillTreeNodeIds: ['Warrior: Oath of the Shield']
   effects:
     - kind: GrantSkill
       skillId: 'Smashing Board III'
@@ -171,7 +171,8 @@
   name: 'Warrior: Trailbreaker I'
   jobId: Warrior
   level: 1
-  row: Abilities
+  row: Shield Arts
+  track: 2
   default: true
   effects:
     - kind: JobAbility
@@ -182,7 +183,8 @@
   name: 'Warrior: Trailbreaker II'
   jobId: Warrior
   level: 25
-  row: Abilities
+  row: Shield Arts
+  track: 2
   requiredSkillTreeNodeIds: ['Warrior: Trailbreaker I']
   effects:
     - kind: JobAbility
@@ -282,3 +284,149 @@
     - kind: JobAbility
       jobAbilityId: Cover
       value: 5
+
+# --- Skill oaths ---
+
+- id: fc44c5b6-f614-48f4-bddd-ada0b9cfdc62
+  name: 'Warrior: Oath of the Twin Blade'
+  jobId: Warrior
+  level: 15
+  row: Weapon Arts
+  track: 0
+  requiredSkillTreeNodeIds: ['Warrior: Double Strike II']
+  optionSkillTreeNodeIds: ['Warrior: Rending Strikes', 'Warrior: Third Strike']
+
+- id: 28324d9d-4344-40fe-9d4e-cf44a534920e
+  name: 'Warrior: Rending Strikes'
+  jobId: Warrior
+  effects:
+    - kind: SkillModifier
+      family: 'Double Strike'
+      modifier: Inflict
+      statusEffectId: Bleeding
+      chance: 30
+      duration: 3
+
+- id: c0aefbb6-f7f6-427d-b6c4-68e798ed7f94
+  name: 'Warrior: Third Strike'
+  jobId: Warrior
+  effects:
+    - kind: SkillModifier
+      family: 'Double Strike'
+      modifier: Targets
+      value: 1
+
+- id: 620d7f9d-e8f6-482f-a004-da1cc7c388ec
+  name: 'Warrior: Oath of the Sweep'
+  jobId: Warrior
+  level: 20
+  row: Weapon Arts
+  track: 1
+  requiredSkillTreeNodeIds: ['Warrior: Sweep II']
+  optionSkillTreeNodeIds: ['Warrior: Heavy Sweep', 'Warrior: Hamstring']
+
+- id: d5a2079e-2384-47d9-aba7-070aefbfe87a
+  name: 'Warrior: Heavy Sweep'
+  jobId: Warrior
+  effects:
+    - kind: SkillModifier
+      family: Sweep
+      modifier: Scaling
+      stat: Strength
+      value: 0.5
+
+- id: 51b4a1a3-257b-4720-a80a-24f1ede2c925
+  name: 'Warrior: Hamstring'
+  jobId: Warrior
+  effects:
+    - kind: SkillModifier
+      family: Sweep
+      modifier: Inflict
+      statusEffectId: Slowed
+      chance: 35
+      duration: 3
+
+- id: cc8171f3-54dd-4fa0-b74a-4af5fb59c092
+  name: 'Warrior: Oath of the Charge'
+  jobId: Warrior
+  level: 35
+  row: Weapon Arts
+  track: 2
+  requiredSkillTreeNodeIds: ['Warrior: Charged Strike II']
+  optionSkillTreeNodeIds: ['Warrior: Steady Charge', 'Warrior: Sunder']
+
+- id: d01886c6-b04c-4194-a38f-b45dbc3d7190
+  name: 'Warrior: Steady Charge'
+  jobId: Warrior
+  effects:
+    - kind: SkillModifier
+      family: 'Charged Strike'
+      modifier: Accuracy
+      value: 15
+
+- id: 13a243b6-5990-4f55-9a46-d6df30770923
+  name: 'Warrior: Sunder'
+  jobId: Warrior
+  effects:
+    - kind: SkillModifier
+      family: 'Charged Strike'
+      modifier: Inflict
+      statusEffectId: Weakspot
+      chance: 60
+      duration: 3
+
+- id: e028e47f-fbdc-4ae3-9a52-cd61b78c9f8d
+  name: 'Warrior: Oath of the Shield'
+  jobId: Warrior
+  level: 25
+  row: Shield Arts
+  track: 0
+  requiredSkillTreeNodeIds: ['Warrior: Smashing Board II']
+  optionSkillTreeNodeIds: ['Warrior: Concussive Board', 'Warrior: Rallying Board']
+
+- id: 0466b715-a0a3-4b55-ad01-38fcb8554d05
+  name: 'Warrior: Concussive Board'
+  jobId: Warrior
+  effects:
+    - kind: SkillModifier
+      family: 'Smashing Board'
+      modifier: Inflict
+      statusEffectId: Stunned
+      chance: 15
+      duration: 1
+
+- id: b29bb0a2-6896-42bb-8239-8fdc15251e92
+  name: 'Warrior: Rallying Board'
+  jobId: Warrior
+  effects:
+    - kind: SkillModifier
+      family: 'Smashing Board'
+      modifier: Echo
+      skillId: 'Fortify I'
+
+- id: cb476729-967c-4ed1-bd52-6f652e501c5c
+  name: 'Warrior: Oath of Provocation'
+  jobId: Warrior
+  level: 35
+  row: Shield Arts
+  track: 1
+  requiredSkillTreeNodeIds: ['Warrior: Taunt I']
+  optionSkillTreeNodeIds: ['Warrior: Stand Firm', 'Warrior: Goading Roar']
+
+- id: 26f841cb-bc0a-468b-bbd4-07aca1b9be8e
+  name: 'Warrior: Stand Firm'
+  jobId: Warrior
+  effects:
+    - kind: SkillModifier
+      family: Taunt
+      modifier: Echo
+      skillId: 'Fortify I'
+
+- id: c8e86159-1db9-461d-a93b-7cfc57e4ffbc
+  name: 'Warrior: Goading Roar'
+  jobId: Warrior
+  effects:
+    - kind: SkillModifier
+      family: Taunt
+      modifier: Echo
+      skillId: 'Sonic Screech I'

@@ -151,8 +151,9 @@ export function combatGetPossibleCombatantTargetsForSkill(
   combatant: Combatant,
   skill: EquipmentSkillContent,
 ): Combatant[] {
+  // Only its own hits: an echo always has someone to land on, which would keep a spent skill (an active Taunt) castable.
   return union(
-    skill.techniques.flatMap((t) =>
+    skillOwnTechniques(skill).flatMap((t) =>
       combatGetPossibleCombatantTargetsForSkillTechnique(
         combat,
         combatant,

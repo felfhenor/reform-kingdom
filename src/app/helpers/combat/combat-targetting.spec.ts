@@ -1,5 +1,6 @@
 import {
   combatAvailableSkillsForCombatant,
+  combatGetPossibleCombatantTargetsForSkill,
   combatGetTargetsFromListBasedOnType,
   combatGetTargetsFromPriorityList,
   combatSkillHasValidTargetsForMode,
@@ -415,6 +416,44 @@ describe('combatGetTargetsFromPriorityList', () => {
     );
 
     expect(result).toEqual([]);
+  });
+});
+
+describe('combatGetPossibleCombatantTargetsForSkill', () => {
+  it('ignores echoed hits, so an active Taunt stays spent', () => {
+    const taunting = 'Taunting' as StatusEffectId;
+    const caster = buildTestCombatant({
+      id: 'caster',
+      statusEffects: [buildStatusEffect({ id: taunting, duration: 2 })],
+    });
+    const enemy = buildTestCombatant({ id: 'enemy', isEnemy: true });
+    const combat = buildCombat({ heroes: [caster], guardians: [enemy] });
+    // Built first: content validation would strip echoOf off the hit.
+    const skill = {
+      ...buildEquipmentSkill(),
+      techniques: [
+        buildTechnique({
+          targetType: 'Self',
+          targetBehaviors: [
+            { behavior: 'IfNotStatusEffect', statusEffectId: taunting },
+          ],
+        }),
+        {
+          ...buildTechnique({ targetType: 'Enemies' }),
+          echoOf: 'scream' as EquipmentSkillId,
+        },
+      ],
+    };
+
+    expect(
+      combatGetPossibleCombatantTargetsForSkill(combat, caster, skill),
+    ).toEqual([]);
+    expect(
+      combatGetPossibleCombatantTargetsForSkill(combat, caster, {
+        ...skill,
+        techniques: [buildTechnique({ targetType: 'Enemies' })],
+      }).map((target) => target.id),
+    ).toEqual(['enemy']);
   });
 });
 
