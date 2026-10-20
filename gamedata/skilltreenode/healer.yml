@@ -6,7 +6,6 @@
   level: 30
   row: Restoration
   track: 0
-  requiredSkillTreeNodeIds: ['Healer: Cure III']
   effects:
     - kind: GrantSkill
       skillId: 'Lifesurge I'
@@ -17,7 +16,7 @@
   level: 50
   row: Restoration
   track: 0
-  requiredSkillTreeNodeIds: ['Healer: Lifesurge I']
+  requiredSkillTreeNodeIds: ['Healer: Oath of Revival']
   effects:
     - kind: GrantSkill
       skillId: 'Lifesurge II'
@@ -63,7 +62,7 @@
   level: 40
   row: Restoration
   track: 1
-  requiredSkillTreeNodeIds: ['Healer: Cure III']
+  requiredSkillTreeNodeIds: ['Healer: Oath of Mending']
   effects:
     - kind: GrantSkill
       skillId: 'Cure IV'
@@ -109,7 +108,7 @@
   level: 45
   row: Restoration
   track: 2
-  requiredSkillTreeNodeIds: ['Healer: Starshine III']
+  requiredSkillTreeNodeIds: ['Healer: Oath of the Stars']
   effects:
     - kind: GrantSkill
       skillId: 'Starshine IV'
@@ -140,7 +139,7 @@
   jobId: Healer
   level: 15
   row: Divine Might
-  requiredSkillTreeNodeIds: ['Healer: Holy Smite II']
+  requiredSkillTreeNodeIds: ['Healer: Oath of Judgement']
   effects:
     - kind: GrantSkill
       skillId: 'Holy Smite III'
@@ -174,7 +173,7 @@
   level: 40
   row: Divine Might
   track: 1
-  requiredSkillTreeNodeIds: ['Healer: Spiked Smash I']
+  requiredSkillTreeNodeIds: ['Healer: Oath of the Mace']
   effects:
     - kind: GrantSkill
       skillId: 'Spiked Smash II'
@@ -197,18 +196,18 @@
   level: 20
   row: Divine Might
   track: 2
-  requiredSkillTreeNodeIds: ['Healer: Empower I']
+  requiredSkillTreeNodeIds: ['Healer: Oath of Zeal']
   effects:
     - kind: GrantSkill
       skillId: 'Empower II'
 
-# --- Abilities (intrinsic) ---
+# --- Abilities (intrinsic, on Restoration's first track) ---
 
 - id: df883512-741b-48ab-a053-a03b4c2058e1
   name: 'Healer: Healing Aura I'
   jobId: Healer
   level: 1
-  row: Abilities
+  row: Restoration
   default: true
   effects:
     - kind: JobAbility
@@ -219,7 +218,7 @@
   name: 'Healer: Healing Aura II'
   jobId: Healer
   level: 25
-  row: Abilities
+  row: Restoration
   requiredSkillTreeNodeIds: ['Healer: Healing Aura I']
   effects:
     - kind: JobAbility
@@ -308,3 +307,185 @@
     - kind: JobAbility
       jobAbilityId: Town Favor
       value: 0.2
+
+# --- Skill oaths ---
+
+- id: 9c6ab3f1-0264-4a57-bc23-bcf4e192c6ee
+  name: 'Healer: Oath of Mending'
+  jobId: Healer
+  level: 35
+  row: Restoration
+  track: 1
+  requiredSkillTreeNodeIds: ['Healer: Cure III']
+  optionSkillTreeNodeIds: ['Healer: Fortifying Cure', 'Healer: Twin Cure']
+
+- id: 1dcb17ec-42aa-4cf1-ae27-b4b6362f588f
+  name: 'Healer: Fortifying Cure'
+  jobId: Healer
+  effects:
+    - kind: SkillModifier
+      family: Cure
+      modifier: Inflict
+      statusEffectId: Invigorated
+      chance: 100
+      duration: 2
+
+- id: 648dae74-fa35-4307-9303-420483bb9d2e
+  name: 'Healer: Twin Cure'
+  jobId: Healer
+  effects:
+    - kind: SkillModifier
+      family: Cure
+      modifier: Targets
+      value: 1
+
+- id: 27fb3785-d001-41af-890f-3dd6fb91a221
+  name: 'Healer: Oath of the Stars'
+  jobId: Healer
+  level: 30
+  row: Restoration
+  track: 2
+  requiredSkillTreeNodeIds: ['Healer: Starshine III']
+  optionSkillTreeNodeIds: ['Healer: Starfall', 'Healer: Starlit Ward']
+
+- id: 98e04a0a-8bf3-4cf2-b9ca-ce50e67d12b2
+  name: 'Healer: Starfall'
+  jobId: Healer
+  effects:
+    - kind: SkillModifier
+      family: Starshine
+      modifier: Scaling
+      stat: Spirit
+      value: 5
+
+- id: 365d1a7d-3b1b-489a-b939-a903c05fe7d9
+  name: 'Healer: Starlit Ward'
+  jobId: Healer
+  effects:
+    - kind: SkillModifier
+      family: Starshine
+      modifier: Inflict
+      statusEffectId: 'Slime Skin'
+      chance: 100
+      duration: 2
+
+- id: 676f3909-8731-4b21-87a1-ae409fc1c39a
+  name: 'Healer: Oath of Revival'
+  jobId: Healer
+  level: 45
+  row: Restoration
+  track: 0
+  requiredSkillTreeNodeIds: ['Healer: Lifesurge I']
+  optionSkillTreeNodeIds: ['Healer: Swift Revival', 'Healer: Second Chance']
+
+- id: aa0cd1a2-1930-40b9-96d2-ee2cad52be32
+  name: 'Healer: Swift Revival'
+  jobId: Healer
+  effects:
+    - kind: SkillModifier
+      family: Lifesurge
+      modifier: EpCost
+      value: 30
+
+- id: 2f04fe2f-9243-4ee4-9d3e-3f23143c1eb7
+  name: 'Healer: Second Chance'
+  jobId: Healer
+  effects:
+    - kind: SkillModifier
+      family: Lifesurge
+      modifier: Targets
+      value: 1
+
+- id: 106a2e18-4d0b-4c7a-8fcd-50a400b89b1f
+  name: 'Healer: Oath of Judgement'
+  jobId: Healer
+  level: 10
+  row: Divine Might
+  track: 0
+  requiredSkillTreeNodeIds: ['Healer: Holy Smite II']
+  optionSkillTreeNodeIds: ['Healer: Sacred Flame', 'Healer: Righteous Fury']
+
+- id: c09a8197-2456-4d83-8fa2-c8413d8c593f
+  name: 'Healer: Sacred Flame'
+  jobId: Healer
+  effects:
+    - kind: SkillModifier
+      family: 'Holy Smite'
+      modifier: Element
+      element: Fire
+    - kind: SkillModifier
+      family: 'Holy Smite'
+      modifier: Inflict
+      statusEffectId: Burning
+      chance: 20
+      duration: 3
+
+- id: 36da8430-50de-4258-98e1-30dfb956bc96
+  name: 'Healer: Righteous Fury'
+  jobId: Healer
+  effects:
+    - kind: SkillModifier
+      family: 'Holy Smite'
+      modifier: Scaling
+      stat: Spirit
+      value: 5
+
+- id: ac563d19-e91f-46c8-aebe-a8be283f3ef4
+  name: 'Healer: Oath of the Mace'
+  jobId: Healer
+  level: 30
+  row: Divine Might
+  track: 1
+  requiredSkillTreeNodeIds: ['Healer: Spiked Smash I']
+  optionSkillTreeNodeIds: ['Healer: Skullcracker', 'Healer: Spiked Wounds']
+
+- id: c00c49ae-8383-4479-a203-5923cb67a1d4
+  name: 'Healer: Skullcracker'
+  jobId: Healer
+  effects:
+    - kind: SkillModifier
+      family: 'Spiked Smash'
+      modifier: Potency
+      statusEffectId: Stunned
+      chance: 15
+      duration: 0
+
+- id: 98eb4103-4429-462d-ae1a-c78c7aba211b
+  name: 'Healer: Spiked Wounds'
+  jobId: Healer
+  effects:
+    - kind: SkillModifier
+      family: 'Spiked Smash'
+      modifier: Inflict
+      statusEffectId: Bleeding
+      chance: 40
+      duration: 3
+
+- id: 210e6118-4756-4afb-b325-a30ec9b1be72
+  name: 'Healer: Oath of Zeal'
+  jobId: Healer
+  level: 15
+  row: Divine Might
+  track: 2
+  requiredSkillTreeNodeIds: ['Healer: Empower I']
+  optionSkillTreeNodeIds: ['Healer: Rally', 'Healer: Invigorate']
+
+- id: 99256e07-4293-4544-9ccd-0b6ff8098823
+  name: 'Healer: Rally'
+  jobId: Healer
+  effects:
+    - kind: SkillModifier
+      family: Empower
+      modifier: Targets
+      value: 1
+
+- id: 31ec2f7d-a3f4-46e4-b6d8-ade3dd3b541d
+  name: 'Healer: Invigorate'
+  jobId: Healer
+  effects:
+    - kind: SkillModifier
+      family: Empower
+      modifier: Inflict
+      statusEffectId: Invigorated
+      chance: 100
+      duration: 3

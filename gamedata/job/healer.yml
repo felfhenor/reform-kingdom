@@ -55,8 +55,8 @@
     - Mace
     - Staff
 
-  treeVersion: 1
-  treeRows: [Restoration, Divine Might, Abilities]
+  treeVersion: 2
+  treeRows: [Restoration, Divine Might]
   specializationRows: [Lifegiver, Templar]
 
   starterEquipmentIds:
