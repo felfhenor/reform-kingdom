@@ -50,3 +50,8 @@
 
     - workerId: Selan Rose
       chance: 100
+
+    - itemId: Memory Flux
+      min: 1
+      max: 1
+      chance: 25
