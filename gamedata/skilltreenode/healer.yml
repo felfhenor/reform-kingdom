@@ -267,6 +267,7 @@
   jobId: Healer
   level: 20
   row: Lifegiver
+  track: 1
   requiredSkillTreeNodeIds: ['Healer: Lifegiver']
   effects:
     - kind: JobAbility
@@ -278,6 +279,7 @@
   jobId: Healer
   level: 35
   row: Lifegiver
+  track: 1
   requiredSkillTreeNodeIds: ['Healer: Sanctified Incantations I']
   effects:
     - kind: JobAbility
@@ -291,6 +293,7 @@
   jobId: Healer
   level: 20
   row: Templar
+  track: 1
   requiredSkillTreeNodeIds: ['Healer: Templar']
   effects:
     - kind: JobAbility
@@ -302,6 +305,7 @@
   jobId: Healer
   level: 35
   row: Templar
+  track: 1
   requiredSkillTreeNodeIds: ['Healer: Town Favor I']
   effects:
     - kind: JobAbility
@@ -488,3 +492,71 @@
       statusEffectId: Invigorated
       chance: 100
       duration: 3
+
+# --- Traits (standalone) ---
+
+- id: bf2e7073-b747-4cac-b6b3-a5d2c8fc0865
+  name: 'Healer: Focused Eye'
+  jobId: Healer
+  description: '+20 Energy.'
+  sprite: '0013'
+  level: 5
+  row: Divine Might
+  track: 1
+  effects:
+    - kind: Stat
+      stat: Energy
+      value: 20
+
+- id: eddf3d99-7d38-40ad-aeda-2bf9642db073
+  name: 'Healer: Waterward'
+  jobId: Healer
+  description: '+15% Water resistance.'
+  sprite: '0016'
+  level: 25
+  row: Divine Might
+  track: 2
+  effects:
+    - kind: ElementalResistance
+      element: Water
+      value: 15
+
+- id: ef1a14e0-4428-4fd4-aee3-41b6cdb47f8a
+  name: 'Healer: Iron Will'
+  jobId: Healer
+  description: '+10% Stun resistance.'
+  sprite: '0012'
+  level: 45
+  row: Divine Might
+  effects:
+    - kind: Resistance
+      tag: Stun
+      value: 10
+
+# --- Spec passives ---
+
+- id: c9a9d333-9fea-472f-9345-66d34ba5edab
+  name: 'Healer: Undying Light'
+  jobId: Healer
+  description: 'While defeated, 5% chance each turn to revive at full health.'
+  sprite: '0011'
+  level: 45
+  row: Lifegiver
+  requiredSkillTreeNodeIds: ['Healer: Lifegiver']
+  effects:
+    - kind: CombatStat
+      stat: reviveChance
+      value: 5
+
+- id: 83db2f03-32db-4e06-9f30-6b9eae5c8177
+  name: 'Healer: Demonbane'
+  jobId: Healer
+  description: '+20% damage against Demons.'
+  sprite: '0014'
+  level: 45
+  row: Templar
+  requiredSkillTreeNodeIds: ['Healer: Templar']
+  effects:
+    - kind: MonsterTypeDamage
+      monsterType: Demon
+      value: 20

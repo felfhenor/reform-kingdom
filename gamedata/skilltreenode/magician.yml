@@ -231,6 +231,7 @@
   jobId: Magician
   level: 20
   row: Arcanist
+  track: 1
   requiredSkillTreeNodeIds: ['Magician: Arcanist']
   effects:
     - kind: JobAbility
@@ -242,6 +243,7 @@
   jobId: Magician
   level: 35
   row: Arcanist
+  track: 1
   requiredSkillTreeNodeIds: ['Magician: Mystical Insight I']
   effects:
     - kind: JobAbility
@@ -255,6 +257,7 @@
   jobId: Magician
   level: 20
   row: Celestar
+  track: 1
   requiredSkillTreeNodeIds: ['Magician: Celestar']
   effects:
     - kind: JobAbility
@@ -266,6 +269,7 @@
   jobId: Magician
   level: 35
   row: Celestar
+  track: 1
   requiredSkillTreeNodeIds: ['Magician: Astral Resonance I']
   effects:
     - kind: JobAbility
@@ -438,3 +442,71 @@
       family: Refresh
       modifier: Element
       element: Air
+
+# --- Traits (standalone) ---
+
+- id: e0fe5657-7867-4959-90cf-dee57f43ee6f
+  name: 'Magician: Focused Eye'
+  jobId: Magician
+  description: '+20 Energy.'
+  sprite: '0013'
+  level: 10
+  row: Spellweaving
+  track: 1
+  effects:
+    - kind: Stat
+      stat: Energy
+      value: 20
+
+- id: b7b41672-5176-45fa-b481-098ff0fc0f3c
+  name: 'Magician: Fireward'
+  jobId: Magician
+  description: '+15% Fire resistance.'
+  sprite: '0015'
+  level: 30
+  row: Spellweaving
+  track: 2
+  effects:
+    - kind: ElementalResistance
+      element: Fire
+      value: 15
+
+- id: 820e82d7-7a1d-42f3-8e5a-709653d9bc57
+  name: 'Magician: Spirit Bane'
+  jobId: Magician
+  description: '+15% damage against Spirits.'
+  sprite: '0017'
+  level: 45
+  row: Evocation
+  effects:
+    - kind: MonsterTypeDamage
+      monsterType: Spirit
+      value: 15
+
+# --- Spec passives ---
+
+- id: f87ad505-e2d2-4187-b8d7-236228c1d734
+  name: 'Magician: Candlelit Focus'
+  jobId: Magician
+  description: '+30 Energy.'
+  sprite: '0018'
+  level: 45
+  row: Arcanist
+  requiredSkillTreeNodeIds: ['Magician: Arcanist']
+  effects:
+    - kind: Stat
+      stat: Energy
+      value: 30
+
+- id: 11528838-39c1-4656-a12d-eff1979270aa
+  name: 'Magician: Starbane'
+  jobId: Magician
+  description: '+20% damage against Spirits.'
+  sprite: '0019'
+  level: 45
+  row: Celestar
+  requiredSkillTreeNodeIds: ['Magician: Celestar']
+  effects:
+    - kind: MonsterTypeDamage
+      monsterType: Spirit
+      value: 20

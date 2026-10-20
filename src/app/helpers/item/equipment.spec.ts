@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { ensureAffix } from '@helpers/content/ensure-affix';
 import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
 import { ensureJob } from '@helpers/content/ensure-job';
+import { ensureSkillTreeNode } from '@helpers/content/ensure-skilltreenode';
 import { ensureTrainerTeaching } from '@helpers/content/ensure-trainer';
 import {
   defaultCombatStats,
@@ -16,6 +17,7 @@ import {
   canEquipItem,
   canModifyEquipment,
   characterCombatStatBonusTotals,
+  characterMonsterTypeDamageTotals,
   characterTagResistances,
   equipmentAffixEffects,
   equipmentCombatStatTotals,
@@ -46,6 +48,7 @@ import type {
   IsContentItem,
   ItemId,
   JobId,
+  SkillTreeNodeId,
   TradeskillId,
   TrainerTeachingId,
 } from '@interfaces';
@@ -219,6 +222,7 @@ describe('the other bonus dimensions', () => {
 
 describe('character bonus totals', () => {
   const steelskinId = 'steelskin' as TrainerTeachingId;
+  const slayerId = 'slayer' as SkillTreeNodeId;
 
   beforeEach(() =>
     seedContent([
@@ -228,6 +232,13 @@ describe('character bonus totals', () => {
         effects: [
           { kind: 'Resistance', tag: 'Bleed', value: 3 },
           { kind: 'CombatStat', stat: 'missChance', value: 2 },
+        ],
+      }),
+      ensureSkillTreeNode({
+        id: slayerId,
+        jobId: rangerId,
+        effects: [
+          { kind: 'MonsterTypeDamage', monsterType: 'Humanoid', value: 15 },
         ],
       }),
     ]),
@@ -249,6 +260,19 @@ describe('character bonus totals', () => {
       ...defaultCombatStats(),
       damageReflectPercent: 10,
       missChance: 2,
+    });
+  });
+
+  it("adds the current job's tree to the gear's monster-type damage", () => {
+    const character = buildCharacter({
+      jobId: rangerId,
+      equipment: equipped({ Weapon: item(swordId) }),
+      skillTreeNodes: { [rangerId]: [slayerId] },
+    });
+
+    expect(characterMonsterTypeDamageTotals(character)).toEqual({
+      ...defaultMonsterTypeDamageBonus(),
+      Humanoid: 40,
     });
   });
 });

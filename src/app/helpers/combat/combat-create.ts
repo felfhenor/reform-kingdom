@@ -20,8 +20,8 @@ import { characterCombatSkills } from '@helpers/hero/job';
 import { characterJobAbilityValue } from '@helpers/hero/job-ability';
 import { skillIsUsableWithEquippedWeapons } from '@helpers/hero/skill';
 import {
+  characterMonsterTypeDamageTotals,
   characterTagResistances,
-  equipmentMonsterTypeDamageTotals,
   equippedItemTypes,
 } from '@helpers/item/equipment';
 import {
@@ -149,9 +149,7 @@ export function combatantFromCharacter(character: Character): Combatant {
     combatOrders: character.combatOrders[character.jobId] ?? [],
 
     combatStats: combatStatsForCharacter(character),
-    monsterTypeDamageBonus: equipmentMonsterTypeDamageTotals(
-      character.equipment,
-    ),
+    monsterTypeDamageBonus: characterMonsterTypeDamageTotals(character),
     skillStatBonuses: equipmentSkillStatBonuses(character.equipment),
     debuffPotency: heroDebuffPotency(character),
 

@@ -116,4 +116,26 @@
       </span>
     </div>
   }
+
+  @if (monsterTypeDamageRows().length > 0) {
+    <div class="mt-2">
+      <span class="type-section-title">Monster Damage</span>
+    </div>
+  }
+
+  @for (type of monsterTypeDamageRows(); track type) {
+    @let value = tweenedMonsterTypeDamageValue(type);
+
+    <div class="flex items-center gap-2">
+      <app-icon-dimension
+        [dimension]="monsterTypeDimension"
+        [key]="type"
+        size="stat"
+      />
+      <span class="text-base">{{ monsterTypeDimension.label[type] }}</span>
+      <span class="ml-auto font-semibold text-lg tabular-nums">
+        {{ value | number: '1.0-0' }}%
+      </span>
+    </div>
+  }
 </div>

@@ -8,7 +8,10 @@ import {
 } from '@angular/core';
 import { IconDimensionComponent } from '@components/icon-dimension/icon-dimension.component';
 import { combatStatsForCharacter } from '@helpers/combat/combat-stats';
-import { characterTagResistances } from '@helpers/item/equipment';
+import {
+  characterMonsterTypeDamageTotals,
+  characterTagResistances,
+} from '@helpers/item/equipment';
 import {
   characterElementalBoons,
   characterElementalResistances,
@@ -18,6 +21,7 @@ import {
   CombatStatDimension,
   ElementBoonDimension,
   ElementResistanceDimension,
+  MonsterTypeDimension,
   StatDimension,
   StatInformation,
   StatOrder,
@@ -27,6 +31,7 @@ import {
   type Character,
   type CombatStat,
   type GameElement,
+  type MonsterType,
   type StatDisplayDimension,
   type StatusEffectTag,
 } from '@interfaces';
@@ -53,8 +58,9 @@ export class PanelHeroEquipmentStatsComponent {
   public combatStatDimension = CombatStatDimension;
   public elementalResistanceDimension = ElementResistanceDimension;
   public elementalBoonDimension = ElementBoonDimension;
+  public monsterTypeDimension = MonsterTypeDimension;
 
-  // Gear + teachings (+ job abilities for combat stats) - the temporary Astral Projector
+  // Gear + teachings + skill tree (+ job abilities for combat stats) - the temporary Astral Projector
   // buff is combat-time only and intentionally not reflected here.
   public resistances = computed(() =>
     characterTagResistances(this.character()),
@@ -70,6 +76,14 @@ export class PanelHeroEquipmentStatsComponent {
 
   public elementalBoons = computed(() =>
     characterElementalBoons(this.character()),
+  );
+
+  public monsterTypeDamage = computed(() =>
+    characterMonsterTypeDamageTotals(this.character()),
+  );
+
+  public monsterTypeDamageRows = computed(() =>
+    this.nonzeroRows(this.monsterTypeDimension, this.monsterTypeDamage()),
   );
 
   public gearElements = computed(() =>
@@ -139,6 +153,13 @@ export class PanelHeroEquipmentStatsComponent {
     ]),
   ) as Record<GameElement, Signal<number>>;
 
+  private tweenedMonsterTypeDamage = Object.fromEntries(
+    MonsterTypeDimension.order.map((type) => [
+      type,
+      injectTweenedNumber(() => this.monsterTypeDamage()[type]),
+    ]),
+  ) as Record<MonsterType, Signal<number>>;
+
   public tweenedStatValue(stat: BaseStat): number {
     return this.tweenedStats[stat]();
   }
@@ -157,6 +178,10 @@ export class PanelHeroEquipmentStatsComponent {
 
   public tweenedElementalBoonValue(element: GameElement): number {
     return this.tweenedElementalBoons[element]();
+  }
+
+  public tweenedMonsterTypeDamageValue(type: MonsterType): number {
+    return this.tweenedMonsterTypeDamage[type]();
   }
 
   public suffix(dimension: StatDisplayDimension, key: string): string {

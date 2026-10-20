@@ -259,6 +259,16 @@ export function equipmentMonsterTypeDamageTotals(
   return equipmentDimensionTotals(equipment, MONSTER_TYPE_DAMAGE_BONUS);
 }
 
+export function characterMonsterTypeDamageTotals(
+  character: Character,
+): Record<MonsterType, number> {
+  return affixEffectsAddToBlock(
+    equipmentMonsterTypeDamageTotals(character.equipment),
+    characterNonGearEffects(character),
+    MONSTER_TYPE_DAMAGE_BONUS,
+  );
+}
+
 // Base + infusion + affix gather yield bonuses across every equipped item - TradeskillId is dynamic content, so this can't be a fixed-key `EquipmentBonusDimension` like the others.
 export function equipmentGatherYieldBonuses(
   equipment: EquipmentBlock,

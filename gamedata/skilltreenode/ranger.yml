@@ -235,6 +235,7 @@
   jobId: Ranger
   level: 20
   row: Stalker
+  track: 1
   requiredSkillTreeNodeIds: ['Ranger: Stalker']
   effects:
     - kind: JobAbility
@@ -246,6 +247,7 @@
   jobId: Ranger
   level: 35
   row: Stalker
+  track: 1
   requiredSkillTreeNodeIds: ['Ranger: Ambush I']
   effects:
     - kind: JobAbility
@@ -259,6 +261,7 @@
   jobId: Ranger
   level: 20
   row: Wayfinder
+  track: 1
   requiredSkillTreeNodeIds: ['Ranger: Wayfinder']
   effects:
     - kind: JobAbility
@@ -270,6 +273,7 @@
   jobId: Ranger
   level: 35
   row: Wayfinder
+  track: 1
   requiredSkillTreeNodeIds: ['Ranger: Pathfinder I']
   effects:
     - kind: JobAbility
@@ -474,3 +478,74 @@
       family: 'Static Gust'
       modifier: Targets
       value: 2
+
+# --- Traits (standalone) ---
+
+- id: 48cb70a2-50e1-4192-af9f-abbc9c35ffd3
+  name: 'Ranger: Nimble'
+  jobId: Ranger
+  description: '+5 Agility.'
+  sprite: '0022'
+  level: 10
+  row: Marksmanship
+  track: 2
+  effects:
+    - kind: Stat
+      stat: Agility
+      value: 5
+
+- id: 6cfb4bda-1559-4f26-951b-2d6d16bbaa76
+  name: 'Ranger: Nature Knowledge'
+  jobId: Ranger
+  description: '+10% damage against Beasts and Insects.'
+  sprite: '0020'
+  level: 35
+  row: Nature
+  effects:
+    - kind: MonsterTypeDamage
+      monsterType: Beast
+      value: 10
+    - kind: MonsterTypeDamage
+      monsterType: Insect
+      value: 10
+
+- id: 20d87cf5-c0d1-4089-8790-6ff157ba4dff
+  name: 'Ranger: Aeroward'
+  jobId: Ranger
+  description: '+15% Air resistance.'
+  sprite: '0021'
+  level: 45
+  row: Nature
+  track: 2
+  effects:
+    - kind: ElementalResistance
+      element: Air
+      value: 15
+
+# --- Spec passives ---
+
+- id: efab3837-38cc-497e-9fa0-bf5d978b3a0f
+  name: 'Ranger: Apex Predator'
+  jobId: Ranger
+  description: '+20% damage against Beasts.'
+  sprite: '0023'
+  level: 45
+  row: Stalker
+  requiredSkillTreeNodeIds: ['Ranger: Stalker']
+  effects:
+    - kind: MonsterTypeDamage
+      monsterType: Beast
+      value: 20
+
+- id: 5262450b-6cc4-4806-9500-3c51538f0aec
+  name: 'Ranger: Wandering Way'
+  jobId: Ranger
+  description: '15% chance to ignore a debuff.'
+  sprite: '0024'
+  level: 45
+  row: Wayfinder
+  requiredSkillTreeNodeIds: ['Ranger: Wayfinder']
+  effects:
+    - kind: CombatStat
+      stat: debuffIgnoreChance
+      value: 15

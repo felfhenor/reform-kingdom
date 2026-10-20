@@ -232,6 +232,7 @@
   jobId: Explorer
   level: 20
   row: Treasure Hunter
+  track: 1
   requiredSkillTreeNodeIds: ['Explorer: Treasure Hunter']
   effects:
     - kind: JobAbility
@@ -243,6 +244,7 @@
   jobId: Explorer
   level: 35
   row: Treasure Hunter
+  track: 1
   requiredSkillTreeNodeIds: ['Explorer: Loot Goblin I']
   effects:
     - kind: JobAbility
@@ -256,6 +258,7 @@
   jobId: Explorer
   level: 20
   row: Dungeon Delver
+  track: 1
   requiredSkillTreeNodeIds: ['Explorer: Dungeon Delver']
   effects:
     - kind: JobAbility
@@ -267,6 +270,7 @@
   jobId: Explorer
   level: 35
   row: Dungeon Delver
+  track: 1
   requiredSkillTreeNodeIds: ['Explorer: Monster Research I']
   effects:
     - kind: JobAbility
@@ -410,4 +414,72 @@
     - kind: SkillModifier
       family: Zephyr
       modifier: EpCost
+      value: 40
+
+# --- Traits (standalone) ---
+
+- id: 7ebfcbf3-0861-411e-900d-286db73edbe9
+  name: 'Explorer: Stout'
+  jobId: Explorer
+  description: '+5 Vitality.'
+  sprite: '0025'
+  level: 5
+  row: Fortune
+  effects:
+    - kind: Stat
+      stat: Vitality
+      value: 5
+
+- id: b75ed738-7d31-4dae-a6a3-d02815220ae0
+  name: 'Explorer: Bug Hunter'
+  jobId: Explorer
+  description: '+15% damage against Insects.'
+  sprite: '0010'
+  level: 30
+  row: Fortune
+  track: 2
+  effects:
+    - kind: MonsterTypeDamage
+      monsterType: Insect
+      value: 15
+
+- id: 8993d680-ded1-4da3-9cf0-be137f2a3d6b
+  name: 'Explorer: Earthward'
+  jobId: Explorer
+  description: '+15% Earth resistance.'
+  sprite: '0026'
+  level: 45
+  row: Fieldcraft
+  track: 1
+  effects:
+    - kind: ElementalResistance
+      element: Earth
+      value: 15
+
+# --- Spec passives ---
+
+- id: 1e4d0eac-5244-4207-ac88-7b89add63058
+  name: 'Explorer: Holy Artificer'
+  jobId: Explorer
+  description: '+20% damage against Demons.'
+  sprite: '0027'
+  level: 45
+  row: Dungeon Delver
+  requiredSkillTreeNodeIds: ['Explorer: Dungeon Delver']
+  effects:
+    - kind: MonsterTypeDamage
+      monsterType: Demon
+      value: 20
+
+- id: dcff32c1-9a08-4e96-ac1a-a67001ef9c61
+  name: 'Explorer: Wall Chicken'
+  jobId: Explorer
+  description: '+40 Health.'
+  sprite: '0000'
+  level: 45
+  row: Treasure Hunter
+  requiredSkillTreeNodeIds: ['Explorer: Treasure Hunter']
+  effects:
+    - kind: Stat
+      stat: Health
       value: 40

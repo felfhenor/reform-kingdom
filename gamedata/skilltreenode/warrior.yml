@@ -233,6 +233,7 @@
   jobId: Warrior
   level: 20
   row: Swashbuckler
+  track: 1
   requiredSkillTreeNodeIds: ['Warrior: Swashbuckler']
   effects:
     - kind: JobAbility
@@ -244,6 +245,7 @@
   jobId: Warrior
   level: 35
   row: Swashbuckler
+  track: 1
   requiredSkillTreeNodeIds: ['Warrior: Intimidation I']
   effects:
     - kind: JobAbility
@@ -257,6 +259,7 @@
   jobId: Warrior
   level: 20
   row: Bastion
+  track: 1
   requiredSkillTreeNodeIds: ['Warrior: Bastion']
   effects:
     - kind: JobAbility
@@ -268,6 +271,7 @@
   jobId: Warrior
   level: 35
   row: Bastion
+  track: 1
   requiredSkillTreeNodeIds: ['Warrior: Cover I']
   effects:
     - kind: JobAbility
@@ -420,3 +424,70 @@
       family: Taunt
       modifier: Echo
       skillId: 'Sonic Screech I'
+
+# --- Traits (standalone) ---
+
+- id: 92029ad9-2bce-4739-b1e6-09a808f33210
+  name: 'Warrior: Hardy'
+  jobId: Warrior
+  description: '+25 Health.'
+  sprite: '0028'
+  level: 5
+  row: Shield Arts
+  track: 1
+  effects:
+    - kind: Stat
+      stat: Health
+      value: 25
+
+- id: 1aacc221-96fe-40e6-ae73-fcca75fca097
+  name: 'Warrior: Iron Will'
+  jobId: Warrior
+  description: '+10% Stun resistance.'
+  sprite: '0012'
+  level: 40
+  row: Shield Arts
+  track: 2
+  effects:
+    - kind: Resistance
+      tag: Stun
+      value: 10
+
+- id: 76acebc4-d3bb-482c-8c88-7397f9052e89
+  name: 'Warrior: Follow-up'
+  jobId: Warrior
+  level: 45
+  row: Weapon Arts
+  track: 0
+  effects:
+    - kind: JobAbility
+      jobAbilityId: Follow-up
+      value: 10
+
+# --- Spec passives ---
+
+- id: 938e045b-8f0a-4284-8c33-fe0f479ba2fb
+  name: 'Warrior: Spiked Armor'
+  jobId: Warrior
+  description: 'Reflect 15% of damage taken.'
+  sprite: '0030'
+  level: 45
+  row: Bastion
+  requiredSkillTreeNodeIds: ['Warrior: Bastion']
+  effects:
+    - kind: CombatStat
+      stat: damageReflectPercent
+      value: 15
+
+- id: e96067f7-5e2f-4082-8efb-0687159916d9
+  name: 'Warrior: Light Slashes'
+  jobId: Warrior
+  description: '+8 Agility.'
+  sprite: '0029'
+  level: 45
+  row: Swashbuckler
+  requiredSkillTreeNodeIds: ['Warrior: Swashbuckler']
+  effects:
+    - kind: Stat
+      stat: Agility
+      value: 8

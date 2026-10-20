@@ -142,7 +142,7 @@ function getDeadlockPreventionDamageMultiplier(rounds: number): number {
   return 1 + 0.25 * multiplierTiers;
 }
 
-// Sums the attacker's MonsterTypeDamage affix bonuses across every type the target's monster content carries - 0 for non-monster targets or gearless attackers (e.g. monsters).
+// Sums the attacker's MonsterTypeDamage bonuses across every type the target's monster content carries - 0 for non-monster targets or monsters attacking.
 function attackerMonsterTypeDamageBonusPercent(
   attacker: Combatant,
   target: Combatant,

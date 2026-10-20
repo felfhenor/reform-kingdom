@@ -3,6 +3,7 @@ import type {
   AffixEffectElementalBoon,
   AffixEffectElementalResistance,
   AffixEffectGrantSkill,
+  AffixEffectMonsterTypeDamage,
   AffixEffectResistance,
   AffixEffectStat,
 } from '@interfaces/content-affix';
@@ -51,6 +52,7 @@ export type SkillTreeNodeEffect =
   | AffixEffectElementalResistance
   | AffixEffectElementalBoon
   | AffixEffectGrantSkill
+  | AffixEffectMonsterTypeDamage
   | HeroEffectJobAbility
   | HeroEffectStatPerLevel
   | HeroEffectDebuffPotency
@@ -63,6 +65,7 @@ export const SkillTreeNodeEffectKinds: SkillTreeNodeEffect['kind'][] = [
   'ElementalResistance',
   'ElementalBoon',
   'GrantSkill',
+  'MonsterTypeDamage',
   'JobAbility',
   'StatPerLevel',
   'DebuffPotency',
