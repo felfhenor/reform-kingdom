@@ -33,7 +33,9 @@ export function combatCoveringAlly(
   numTargets: number,
 ): Combatant | undefined {
   if (numTargets !== 1 || target === attacker) return undefined;
-  if (target.combatStats.agroValue > 0) return undefined;
+  if (combatantIsDead(target) || target.combatStats.agroValue > 0) {
+    return undefined;
+  }
   if (!techniqueHasAttribute(technique, 'DamagesTarget')) return undefined;
 
   return combatCoverCandidates(attacker, target, validTargets)[0];

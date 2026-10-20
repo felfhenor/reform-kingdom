@@ -64,6 +64,10 @@ describe('combatCoveringAlly', () => {
     ).toBeUndefined();
   });
 
+  it('never covers a dead target', () => {
+    expect(cover([hero('t', 0, { hp: 0 }), hero('a', 100)])).toBeUndefined();
+  });
+
   it('never covers a taunting target', () => {
     const taunter = wounded('t', {
       combatStats: { ...defaultCombatStats(), agroValue: 10 },

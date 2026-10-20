@@ -2,11 +2,13 @@ import type { Combatant, EquipmentSkill } from '@interfaces';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import {
+  combatantHealthPercent,
   combatantIsDead,
   combatCombatantTakeDamage,
   combatCombatantTakeEnergyDamage,
 } from '@helpers/combat/combat-combatant-hp';
 import { combatantDamageEvents } from '@helpers/combat/combat-damage-events';
+import { defaultStats } from '@helpers/defaults';
 import { buildTestCombatant } from '@/testing/builders';
 
 function buildCombatant(hp: number, isEnemy = false): Combatant {
@@ -20,6 +22,27 @@ describe('combatantIsDead', () => {
 
   it('is alive with any hp left', () => {
     expect(combatantIsDead(buildCombatant(1))).toBe(false);
+  });
+});
+
+describe('combatantHealthPercent', () => {
+  it('is current hp as a percent of max', () => {
+    expect(
+      combatantHealthPercent(
+        buildTestCombatant({
+          hp: 25,
+          totalStats: { ...defaultStats(), Health: 200 },
+        }),
+      ),
+    ).toBe(12.5);
+  });
+
+  it('is 0 when max health is 0', () => {
+    expect(
+      combatantHealthPercent(
+        buildTestCombatant({ totalStats: { ...defaultStats(), Health: 0 } }),
+      ),
+    ).toBe(0);
   });
 });
 
