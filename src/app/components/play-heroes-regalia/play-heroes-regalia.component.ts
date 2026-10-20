@@ -6,6 +6,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { IconSpecComponent } from '@components/icon-spec/icon-spec.component';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
@@ -67,6 +68,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   selector: 'app-play-heroes-regalia',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    IconSpecComponent,
     BlankSlateComponent,
     ButtonKingdomBackComponent,
     CardPageComponent,

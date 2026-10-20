@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
+import { LabelJobComponent } from '@components/label-job/label-job.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
 import { characterSkillTreeAvailableSp } from '@helpers/hero/skill-tree';
@@ -17,7 +18,7 @@ import type { Character, CharacterId, JobContent, JobId } from '@interfaces';
 @Component({
   selector: 'app-tabs-hero',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DecimalPipe, IconJobComponent, SFXDirective],
+  imports: [DecimalPipe, IconJobComponent, LabelJobComponent, SFXDirective],
   templateUrl: './tabs-hero.component.html',
   styleUrl: './tabs-hero.component.scss',
 })

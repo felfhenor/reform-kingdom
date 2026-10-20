@@ -74,6 +74,15 @@ export function skillTreeNodeEffects(
   );
 }
 
+// Built against an older treeVersion than the job has now.
+export function characterSkillTreeStale(
+  character: Pick<Character, 'skillTreeVersions'>,
+  jobId: JobId,
+): boolean {
+  const version = getEntry<JobContent>(jobId)?.treeVersion ?? 0;
+  return (character.skillTreeVersions?.[jobId] ?? 0) < version;
+}
+
 // A job never held, or built against an older treeVersion, starts over at its defaults.
 export function characterSkillTreeSeeded(
   character: Pick<Character, 'skillTreeNodes' | 'skillTreeVersions'>,
@@ -81,7 +90,7 @@ export function characterSkillTreeSeeded(
 ): Pick<Character, 'skillTreeNodes' | 'skillTreeVersions'> {
   const version = getEntry<JobContent>(jobId)?.treeVersion ?? 0;
   const nodeIds = character.skillTreeNodes?.[jobId];
-  const stale = (character.skillTreeVersions?.[jobId] ?? 0) < version;
+  const stale = characterSkillTreeStale(character, jobId);
 
   return {
     skillTreeNodes: {

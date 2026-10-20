@@ -17,9 +17,11 @@
         >
           <div class="flex gap-2 items-center">
             {{ char.name }}
-            <span class="type-muted font-normal">
-              Lv. {{ char.level }} {{ job()?.name }} ({{ job()?.shorthand }})
-            </span>
+            <app-label-job
+              class="type-muted font-normal"
+              [character]="char"
+              [long]="true"
+            />
           </div>
 
           @if (currentRegalia(); as regalia) {

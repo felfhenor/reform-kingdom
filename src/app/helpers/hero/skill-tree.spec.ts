@@ -9,6 +9,7 @@ import {
   characterSkillTreeCanLearn,
   characterSkillTreesMigrate,
   characterSkillTreeWithAdditions,
+  characterSpecNode,
   regaliaSkillTreeMigrate,
   skillTreeEarnedSp,
   skillTreePrune,
@@ -306,5 +307,45 @@ describe('learned node effects', () => {
         hero({ jobId: otherJobId, skillTreeNodes: { [jobId]: ids('aura') } }),
       ),
     ).toEqual([]);
+  });
+});
+
+describe('characterSpecNode', () => {
+  it('finds the learned spec option, ignoring unknown ids', () => {
+    const jala = hero({
+      skillTreeNodes: { [jobId]: ids('strike', 'gone', 'left') },
+      skillTreeVersions: { [jobId]: 2 },
+    });
+
+    expect(characterSpecNode(jala)?.id).toBe('left');
+  });
+
+  it('is undefined without a learned spec option', () => {
+    const jala = hero({
+      skillTreeNodes: { [jobId]: ids('strike', 'oath') },
+      skillTreeVersions: { [jobId]: 2 },
+    });
+
+    expect(characterSpecNode(jala)).toBeUndefined();
+  });
+
+  it('reads another job when asked', () => {
+    const jala = hero({
+      jobId: otherJobId,
+      skillTreeNodes: { [jobId]: ids('right') },
+      skillTreeVersions: { [jobId]: 2 },
+    });
+
+    expect(characterSpecNode(jala)).toBeUndefined();
+    expect(characterSpecNode(jala, jobId)?.id).toBe('right');
+  });
+
+  it('ignores a tree built against an older treeVersion', () => {
+    const jala = hero({
+      skillTreeNodes: { [jobId]: ids('left') },
+      skillTreeVersions: { [jobId]: 1 },
+    });
+
+    expect(characterSpecNode(jala)).toBeUndefined();
   });
 });

@@ -5,6 +5,7 @@ import {
   input,
 } from '@angular/core';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
+import { LabelJobComponent } from '@components/label-job/label-job.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { getEntry } from '@helpers/content/content';
 import type { Character, JobContent } from '@interfaces';
@@ -12,7 +13,7 @@ import type { Character, JobContent } from '@interfaces';
 @Component({
   selector: 'app-row-hero-summary',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconJobComponent, SlotIconBlankComponent],
+  imports: [IconJobComponent, LabelJobComponent, SlotIconBlankComponent],
   host: { class: 'contents' },
   template: `
     @let job = heroJob();
@@ -24,7 +25,7 @@ import type { Character, JobContent } from '@interfaces';
     <div class="flex flex-col min-w-0">
       <span class="type-entity-name truncate">{{ hero().name }}</span>
       <span class="type-meta">
-        Lv. {{ hero().level }} {{ job?.shorthand ?? 'JOB' }}
+        <app-label-job [character]="hero()" />
       </span>
     </div>
   `,

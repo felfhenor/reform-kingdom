@@ -18,6 +18,7 @@ import { characterCurrentRegalia } from '@helpers/hero/regalia';
 import {
   characterSkillTreeAvailableSp,
   characterSkillTreeNodeIds,
+  characterSpecNode,
   skillTreeEarnedSp,
 } from '@helpers/hero/skill-tree';
 import { regaliasState } from '@helpers/state-game';
@@ -313,9 +314,7 @@ export function skillTreeResetPromptText(
   format: (value: number) => string,
 ): string {
   const learned = characterSkillTreeNodeIds(character, job.id);
-  const spec = learned
-    .map((id) => getEntry<SkillTreeNodeContent>(id))
-    .find((node) => !!node && skillTreeIsSpecOption(node));
+  const spec = characterSpecNode(character, job.id);
   const regalia = characterCurrentRegalia(regaliasState().entries, character);
   const refund =
     learned.length + characterSkillTreeAvailableSp(character, job.id);
@@ -343,7 +342,7 @@ export function skillTreeBuildSummary(
   const spec = nodes.find(skillTreeIsSpecOption);
 
   return {
-    spec: spec ? skillTreeNodeShortName(spec) : undefined,
+    spec: spec ? skillTreeNodeSummary(spec, job) : undefined,
     spent: nodeIds.length,
     earned: skillTreeEarnedSp(level),
     nodes: sortBy(

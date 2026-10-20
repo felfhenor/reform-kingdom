@@ -218,8 +218,11 @@
             <span class="type-label">Skill Tree</span>
 
             <div class="flex items-center gap-2">
-              @if (tree.spec) {
-                <span class="badge badge-sm badge-data">{{ tree.spec }}</span>
+              @if (tree.spec; as spec) {
+                <span class="badge badge-sm badge-data gap-2">
+                  <app-icon-spec [spec]="spec.node" />
+                  {{ spec.name }}
+                </span>
               }
               <span class="badge badge-sm badge-data tabular-nums">
                 {{ tree.spent | number }}/{{ tree.earned | number }} SP

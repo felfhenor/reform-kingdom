@@ -16,6 +16,7 @@ import {
 } from '@angular/forms/signals';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
+import { LabelJobComponent } from '@components/label-job/label-job.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
@@ -57,6 +58,7 @@ const reclassPickSchema = schema<ReclassPick>((pick) => {
   selector: 'app-modal-play-kingdom-reclass',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    LabelJobComponent,
     ModalComponent,
     IconJobComponent,
     CurrencyCostComponent,

@@ -14,6 +14,7 @@ import { ButtonHeroCombatOrdersComponent } from '@components/button-hero-combat-
 import { ButtonHeroTeachingsComponent } from '@components/button-hero-teachings/button-hero-teachings.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
+import { LabelJobComponent } from '@components/label-job/label-job.component';
 import { ModalHeroCombatOrdersComponent } from '@components/modal-hero-combat-orders/modal-hero-combat-orders.component';
 import { ModalHeroBurstSkillsComponent } from '@components/modal-hero-burst-skills/modal-hero-burst-skills.component';
 import { ModalHeroTeachingsComponent } from '@components/modal-hero-teachings/modal-hero-teachings.component';
@@ -55,6 +56,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   selector: 'app-panel-hero-equipment',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    LabelJobComponent,
     PanelHeroEquipmentEquipmentComponent,
     PanelHeroEquipmentSkillsComponent,
     PanelHeroEquipmentStatsComponent,

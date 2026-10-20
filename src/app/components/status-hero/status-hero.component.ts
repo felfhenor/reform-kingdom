@@ -6,6 +6,7 @@ import {
   input,
   untracked,
 } from '@angular/core';
+import { characterSpecNode } from '@helpers/hero/skill-tree';
 import { CardStatusCombatantComponent } from '@components/card-status-combatant/card-status-combatant.component';
 import { combatantDamageEventEmit } from '@helpers/combat/combat-damage-events';
 import { combatantStatusEffectPreviews } from '@helpers/combat/combat-statuseffects.ui';
@@ -71,6 +72,7 @@ export class StatusHeroComponent {
         name: character.name,
         subtitleLevel: character.level,
         subtitleLabel: job?.shorthand ?? '',
+        subtitleSpec: characterSpecNode(character),
         spritesheet: 'job',
         spriteAssetName: job?.sprite ?? '',
         spriteFrames: job?.frames ?? 4,

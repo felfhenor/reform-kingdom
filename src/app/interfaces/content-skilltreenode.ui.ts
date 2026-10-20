@@ -69,7 +69,7 @@ export type SkillTreeNodeSummary = {
 };
 
 export type SkillTreeBuildSummary = {
-  spec?: string;
+  spec?: SkillTreeNodeSummary;
   spent: number;
   earned: number;
   nodes: SkillTreeNodeSummary[];

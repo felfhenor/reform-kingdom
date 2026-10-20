@@ -1,4 +1,5 @@
 import type { AtlasedImage } from '@interfaces/artable';
+import type { SkillTreeNodeContent } from '@interfaces/content-skilltreenode';
 import type { StatusEffectPreview } from '@interfaces/statuseffect-preview.ui';
 
 export type StatusCardBar = {
@@ -15,6 +16,7 @@ export type StatusCardEntry = {
   // already baked into `name`.
   subtitleLevel?: number;
   subtitleLabel?: string;
+  subtitleSpec?: SkillTreeNodeContent;
   spritesheet: AtlasedImage;
   spriteAssetName: string;
   spriteFrames: number;

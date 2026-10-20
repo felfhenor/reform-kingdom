@@ -30,7 +30,13 @@
           <div class="zoom-row">
             <app-icon-job [job]="tab.job" />
           </div>
-          {{ tab.job.shorthand }}
+          @if (character(); as hero) {
+            <app-label-job
+              [character]="hero"
+              [jobId]="tab.job.id"
+              [showLevel]="false"
+            />
+          }
           <span class="badge badge-sm badge-data tabular-nums">
             {{ tab.learned | number }}/{{ tab.total | number }}
           </span>

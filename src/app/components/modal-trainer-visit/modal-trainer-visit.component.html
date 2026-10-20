@@ -29,7 +29,7 @@
                 {{ character.name }}
               </span>
               <span class="type-meta">
-                Lv. {{ character.level }} {{ job?.shorthand }}
+                <app-label-job [character]="character" />
               </span>
             </div>
           </button>

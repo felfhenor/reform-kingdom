@@ -7,7 +7,9 @@ import { getEntry } from '@helpers/content/content';
 import { characterJobLevel } from '@helpers/hero/job';
 import {
   characterSkillTreeSeeded,
+  characterSkillTreeStale,
   skillTreeIsOath,
+  skillTreeIsSpecOption,
   skillTreeJobNodes,
   skillTreeNodeLevel,
   skillTreeOptionOath,
@@ -35,6 +37,18 @@ export function characterSkillTreeNodeIds(
   jobId: JobId,
 ): SkillTreeNodeId[] {
   return character.skillTreeNodes?.[jobId] ?? [];
+}
+
+// A stale tree is about to reset to its defaults, so its spec no longer counts.
+export function characterSpecNode(
+  character: Pick<Character, 'jobId' | 'skillTreeNodes' | 'skillTreeVersions'>,
+  jobId: JobId = character.jobId,
+): SkillTreeNodeContent | undefined {
+  if (characterSkillTreeStale(character, jobId)) return undefined;
+
+  return characterSkillTreeNodeIds(character, jobId)
+    .map((id) => getEntry<SkillTreeNodeContent>(id))
+    .find((node) => !!node && skillTreeIsSpecOption(node));
 }
 
 export function characterSkillTreeAvailableSp(

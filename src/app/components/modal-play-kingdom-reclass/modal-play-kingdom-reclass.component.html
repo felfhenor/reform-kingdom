@@ -16,7 +16,7 @@
           <div class="flex flex-col flex-1">
             <span class="type-entity-name">{{ character.name }}</span>
             <span class="type-meta">
-              Lv. {{ character.level }} {{ jobFor(character.jobId)?.shorthand }}
+              <app-label-job [character]="character" />
             </span>
           </div>
 

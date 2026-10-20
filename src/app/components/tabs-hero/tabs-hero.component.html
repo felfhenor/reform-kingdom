@@ -18,9 +18,7 @@
         <app-icon-job [job]="job" />
       </div>
       {{ character.name }}
-      <span class="text-lighter">
-        Lv. {{ character.level }} {{ job?.shorthand ?? 'JOB' }}
-      </span>
+      <app-label-job class="text-lighter" [character]="character" />
 
       @if (sp > 0) {
         <span

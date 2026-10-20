@@ -6,6 +6,7 @@ import {
 } from '@angular/core';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
+import { LabelJobComponent } from '@components/label-job/label-job.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { RowCurrencyCostComponent } from '@components/row-currency-cost/row-currency-cost.component';
 import { RowTrainerTeachingComponent } from '@components/row-trainer-teaching/row-trainer-teaching.component';
@@ -29,6 +30,7 @@ import type {
   selector: 'app-modal-trainer-visit',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    LabelJobComponent,
     IconJobComponent,
     ModalComponent,
     RowCurrencyCostComponent,

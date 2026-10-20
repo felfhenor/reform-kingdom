@@ -8,6 +8,7 @@ import {
   input,
   viewChild,
 } from '@angular/core';
+import { IconSpecComponent } from '@components/icon-spec/icon-spec.component';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
@@ -30,6 +31,7 @@ const COLLAPSED_X_JITTER_PERCENT = 18;
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     DecimalPipe,
+    IconSpecComponent,
     TextNumberTweenComponent,
     AtlasAnimationComponent,
     AtlasImageComponent,
