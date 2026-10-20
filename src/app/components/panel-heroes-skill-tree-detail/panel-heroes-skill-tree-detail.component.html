@@ -43,7 +43,7 @@
         <span class="text-sm">{{ info.effect }}</span>
       }
 
-      @for (line of info.modifierLines; track line.label) {
+      @for (line of info.modifierLines; track $index) {
         <app-row-skill-modifier [line]="line" />
       }
 

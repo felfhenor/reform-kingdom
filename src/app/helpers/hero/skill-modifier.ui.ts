@@ -11,9 +11,12 @@ import type {
   EquipmentSkill,
   EquipmentSkillContent,
   HeroEffectSkillModifier,
+  HeroEffectSkillModifierEcho,
   HeroEffectSkillModifierInflict,
   HeroEffectSkillModifierPotency,
   SkillModifierLine,
+  SkillModifierLineSegment,
+  SkillTreeNodeArt,
   SkillTreeNodeContent,
   SkillTreeNodeId,
   StatusEffectContent,
@@ -26,49 +29,74 @@ function turnsText(
   return `${format(duration)} turn${duration === 1 ? '' : 's'}`;
 }
 
-function statusName(modifier: { statusEffectId: string }): string {
-  return (
-    getEntry<StatusEffectContent>(modifier.statusEffectId)?.name ??
-    modifier.statusEffectId
-  );
+// A status or skill name with its icon, so the line reads "inflict [icon] Burning".
+function namedSegment(
+  name: string,
+  art: SkillTreeNodeArt,
+): SkillModifierLineSegment {
+  return { text: name, art };
 }
 
-function inflictText(
+function statusSegment(
+  modifier: { statusEffectId: string },
+  suffix = '',
+): SkillModifierLineSegment {
+  const status = getEntry<StatusEffectContent>(modifier.statusEffectId);
+  return status
+    ? namedSegment(`${status.name}${suffix}`, {
+        sprite: status.sprite,
+        spritesheet: 'statuseffect',
+      })
+    : { text: `${modifier.statusEffectId}${suffix}` };
+}
+
+function inflictSegments(
   modifier: HeroEffectSkillModifierInflict,
   format: (value: number) => string,
-): string {
+): SkillModifierLineSegment[] {
   const hits = modifier.onElement ? ` on ${modifier.onElement} hits` : '';
   const isBuff =
     getEntry<StatusEffectContent>(modifier.statusEffectId)?.effectType ===
     'Buff';
-  const verb = isBuff ? 'grant' : 'inflict';
-  return `${format(modifier.chance)}% chance to ${verb} ${statusName(modifier)} for ${turnsText(modifier.duration, format)}${hits}`;
+  return [
+    {
+      text: `${format(modifier.chance)}% chance to ${isBuff ? 'grant' : 'inflict'}`,
+    },
+    statusSegment(modifier),
+    { text: `for ${turnsText(modifier.duration, format)}${hits}` },
+  ];
 }
 
-function potencyText(
+function potencySegments(
   modifier: HeroEffectSkillModifierPotency,
   format: (value: number) => string,
-): string {
+): SkillModifierLineSegment[] {
   const parts = [
     modifier.chance ? `+${format(modifier.chance)}% chance` : '',
     modifier.duration ? `+${turnsText(modifier.duration, format)}` : '',
   ].filter((part) => part !== '');
-  return `${statusName(modifier)}: ${parts.join(', ')}`;
+  return [statusSegment(modifier, ':'), { text: parts.join(', ') }];
 }
 
-export function skillModifierText(
+function echoSegments(
+  modifier: HeroEffectSkillModifierEcho,
+): SkillModifierLineSegment[] {
+  const skill = getEntry<EquipmentSkillContent>(modifier.skillId);
+  return [
+    { text: 'Also casts' },
+    skill
+      ? namedSegment(skill.name, { sprite: skill.sprite, spritesheet: 'skill' })
+      : { text: 'UNKNOWN' },
+  ];
+}
+
+function skillModifierText(
   modifier: HeroEffectSkillModifier,
   format: (value: number) => string,
 ): string {
   switch (modifier.modifier) {
     case 'Targets':
       return `+${format(modifier.value)} target${modifier.value === 1 ? '' : 's'}`;
-    case 'Element':
-      return `+ ${modifier.element} element`;
-    case 'Inflict':
-      return inflictText(modifier, format);
-    case 'Potency':
-      return potencyText(modifier, format);
     case 'Scaling':
       return `+${format(modifier.value)}x ${modifier.stat} scaling`;
     case 'Accuracy':
@@ -77,8 +105,24 @@ export function skillModifierText(
       return `-${format(modifier.value)}% EP cost`;
     case 'Attribute':
       return modifier.attribute.replace(/([a-z])([A-Z])/g, '$1 $2');
+    default:
+      return '';
+  }
+}
+
+export function skillModifierSegments(
+  modifier: HeroEffectSkillModifier,
+  format: (value: number) => string,
+): SkillModifierLineSegment[] {
+  switch (modifier.modifier) {
+    case 'Inflict':
+      return inflictSegments(modifier, format);
+    case 'Potency':
+      return potencySegments(modifier, format);
     case 'Echo':
-      return `Also casts ${getEntry<EquipmentSkillContent>(modifier.skillId)?.name ?? 'UNKNOWN'}`;
+      return echoSegments(modifier);
+    default:
+      return [{ text: skillModifierText(modifier, format) }];
   }
 }
 
@@ -90,9 +134,14 @@ function skillModifierLinesBy(
   const lines = new Map<string, SkillModifierLine>();
   modifiers.forEach((modifier) => {
     const label = labelOf(modifier);
-    const line = lines.get(label) ?? { label, elements: [], texts: [] };
+    const line = lines.get(label) ?? {
+      label,
+      elements: [],
+      entries: [],
+    };
     if (modifier.modifier === 'Element') line.elements.push(modifier.element);
-    else line.texts.push(skillModifierText(modifier, format));
+    else
+      line.entries.push({ segments: skillModifierSegments(modifier, format) });
     lines.set(label, line);
   });
   return [...lines.values()];
@@ -110,15 +159,19 @@ export function skillModifierLines(
   );
 }
 
-// What an oath option node changes, one line per skill family, e.g. "Fireball: +1 target".
+// What an oath option node changes, one line per change; the panel already shows the skill, so no label.
 export function skillTreeNodeModifierLines(
   node: SkillTreeNodeContent,
   format: (value: number) => string,
 ): SkillModifierLine[] {
-  return skillModifierLinesBy(
-    skillTreeNodeModifiers(node),
-    (modifier) => modifier.family,
-    format,
+  return skillTreeNodeModifiers(node).map((modifier) =>
+    modifier.modifier === 'Element'
+      ? { label: '', elements: [modifier.element], entries: [] }
+      : {
+          label: '',
+          elements: [],
+          entries: [{ segments: skillModifierSegments(modifier, format) }],
+        },
   );
 }
 

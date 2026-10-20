@@ -60,10 +60,16 @@ export type SkillTreeLayout = {
 };
 
 // One label's skill modifiers; added elements are kept apart so they can show as badges.
+// A run of text; a status or skill name carries its icon, drawn just before it.
+export type SkillModifierLineSegment = { text: string; art?: SkillTreeNodeArt };
+
+export type SkillModifierLineEntry = { segments: SkillModifierLineSegment[] };
+
+// label is the oath option's name, or empty where the panel already shows the skill.
 export type SkillModifierLine = {
   label: string;
   elements: GameElement[];
-  texts: string[];
+  entries: SkillModifierLineEntry[];
 };
 
 // The option picked for an oath, confirmed or only staged.

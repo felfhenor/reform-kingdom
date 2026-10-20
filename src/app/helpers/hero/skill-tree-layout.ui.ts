@@ -271,6 +271,13 @@ export function skillTreeNodeArt(
   const skill = skillTreeNodeSkill(node);
   if (skill) return { sprite: skill.sprite, spritesheet: 'skill' };
 
+  // An oath has no art of its own; its first option's stands in (e.g. a required skill oath shows that skill).
+  const firstOption = node.optionSkillTreeNodeIds[0];
+  const option = firstOption
+    ? getEntry<SkillTreeNodeContent>(firstOption)
+    : undefined;
+  if (option) return skillTreeNodeArt(option, job);
+
   const ability = nodeAbility(node);
   if (ability) return { sprite: ability.sprite, spritesheet: 'jobability' };
 
