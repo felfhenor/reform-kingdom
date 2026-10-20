@@ -259,10 +259,10 @@
   row: Fieldcraft
   track: 0
   requiredSkillTreeNodeIds: ['Explorer: Analyze II']
-  optionSkillTreeNodeIds: ['Explorer: Expose', 'Explorer: Field Notes']
+  optionSkillTreeNodeIds: ['Explorer: Slimy Expose', 'Explorer: Libra']
 
 - id: 53e2f75a-c1eb-4701-bef2-42e91ced47ec
-  name: 'Explorer: Expose'
+  name: 'Explorer: Slimy Expose'
   jobId: Explorer
   effects:
     - kind: SkillModifier
@@ -273,7 +273,7 @@
       duration: 3
 
 - id: 592f5baa-364d-44e7-a352-98246ee0cb10
-  name: 'Explorer: Field Notes'
+  name: 'Explorer: Libra'
   jobId: Explorer
   effects:
     - kind: SkillModifier
@@ -296,10 +296,9 @@
   effects:
     - kind: SkillModifier
       family: Earthshake
-      modifier: Potency
-      statusEffectId: Trembling
-      chance: 15
-      duration: 1
+      modifier: Scaling
+      stat: Strength
+      value: 0.5
 
 - id: a3a76057-a988-4a29-8989-1127ec1b5110
   name: 'Explorer: Landslide'
@@ -319,16 +318,16 @@
   row: Fortune
   track: 0
   requiredSkillTreeNodeIds: ['Explorer: Lucky Charm II']
-  optionSkillTreeNodeIds: ['Explorer: Charmed Life', 'Explorer: Lingering Luck']
+  optionSkillTreeNodeIds: ['Explorer: Lucky Winds', 'Explorer: Lingering Luck']
 
 - id: a78cbd6a-eca1-4bd7-9f81-2c8bb43cc6b1
-  name: 'Explorer: Charmed Life'
+  name: 'Explorer: Lucky Winds'
   jobId: Explorer
   effects:
     - kind: SkillModifier
       family: 'Lucky Charm'
       modifier: Inflict
-      statusEffectId: Invigorated
+      statusEffectId: 'Zephyr Boost I'
       chance: 100
       duration: 3
 

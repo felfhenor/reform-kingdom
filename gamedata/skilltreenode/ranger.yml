@@ -285,7 +285,7 @@
   row: Marksmanship
   track: 0
   requiredSkillTreeNodeIds: ['Ranger: Snipe II']
-  optionSkillTreeNodeIds: ['Ranger: Deadeye', 'Ranger: Hunter''s Mark']
+  optionSkillTreeNodeIds: ['Ranger: Deadeye', "Ranger: Hunter's Mark"]
 
 - id: 6cda208d-aed9-4e14-be53-c53664ade61f
   name: 'Ranger: Deadeye'
@@ -297,7 +297,7 @@
       attribute: NeverMisses
 
 - id: 2794d119-0c12-40b9-88eb-179d42198e4c
-  name: 'Ranger: Hunter''s Mark'
+  name: "Ranger: Hunter's Mark"
   jobId: Ranger
   effects:
     - kind: SkillModifier
@@ -343,10 +343,10 @@
   row: Marksmanship
   track: 2
   requiredSkillTreeNodeIds: ['Ranger: Barbed Shot I']
-  optionSkillTreeNodeIds: ['Ranger: Serrated', 'Ranger: Pocket Sand']
+  optionSkillTreeNodeIds: ['Ranger: Serrated Barbs', 'Ranger: Blinding Shot']
 
 - id: c713a36e-6410-49ae-ba01-0002a1320b36
-  name: 'Ranger: Serrated'
+  name: 'Ranger: Serrated Barbs'
   jobId: Ranger
   effects:
     - kind: SkillModifier
@@ -357,7 +357,7 @@
       duration: 2
 
 - id: cdae6a6d-7129-44ca-b7d2-ba9dca1e9871
-  name: 'Ranger: Pocket Sand'
+  name: 'Ranger: Blinding Shot'
   jobId: Ranger
   effects:
     - kind: SkillModifier
@@ -372,10 +372,10 @@
   row: Nature
   track: 0
   requiredSkillTreeNodeIds: ['Ranger: Regrowth I']
-  optionSkillTreeNodeIds: ['Ranger: Deep Roots', 'Ranger: Rooted']
+  optionSkillTreeNodeIds: ['Ranger: Learned Roots', 'Ranger: Earthen Power']
 
 - id: 50fbc145-8961-4bda-baa0-e6ca780abf20
-  name: 'Ranger: Deep Roots'
+  name: 'Ranger: Learned Roots'
   jobId: Ranger
   effects:
     - kind: SkillModifier
@@ -385,7 +385,7 @@
       value: 0.5
 
 - id: d110e188-2ebf-44b9-ab63-bc855ecee381
-  name: 'Ranger: Rooted'
+  name: 'Ranger: Earthen Power'
   jobId: Ranger
   effects:
     - kind: SkillModifier

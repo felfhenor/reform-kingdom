@@ -310,7 +310,8 @@
   row: Evocation
   track: 2
   requiredSkillTreeNodeIds: ['Magician: Thunderbolt III']
-  optionSkillTreeNodeIds: ['Magician: Chain Lightning', 'Magician: Thunderstorm']
+  optionSkillTreeNodeIds:
+    ['Magician: Chain Lightning', 'Magician: Thunderstorm']
 
 - id: 737a3323-6aa9-4eb1-b4d7-bc9284885f44
   name: 'Magician: Chain Lightning'
@@ -417,10 +418,10 @@
   row: Spellweaving
   track: 1
   requiredSkillTreeNodeIds: ['Magician: Refresh I']
-  optionSkillTreeNodeIds: ['Magician: Clarity', 'Magician: Storm Attunement']
+  optionSkillTreeNodeIds: ['Magician: Dark Clarity', 'Magician: Storm Surge']
 
 - id: 1c223a15-8d44-4dff-834b-fb838fcef7be
-  name: 'Magician: Clarity'
+  name: 'Magician: Dark Clarity'
   jobId: Magician
   effects:
     - kind: SkillModifier
@@ -430,7 +431,7 @@
       value: 5
 
 - id: 35efad25-b97b-4a7c-afc9-9cd8e87bf5f6
-  name: 'Magician: Storm Attunement'
+  name: 'Magician: Storm Surge'
   jobId: Magician
   effects:
     - kind: SkillModifier

@@ -317,18 +317,16 @@
   row: Restoration
   track: 1
   requiredSkillTreeNodeIds: ['Healer: Cure III']
-  optionSkillTreeNodeIds: ['Healer: Fortifying Cure', 'Healer: Twin Cure']
+  optionSkillTreeNodeIds: ['Healer: Mending Cure', 'Healer: Twin Cure']
 
 - id: 1dcb17ec-42aa-4cf1-ae27-b4b6362f588f
-  name: 'Healer: Fortifying Cure'
+  name: 'Healer: Mending Cure'
   jobId: Healer
   effects:
     - kind: SkillModifier
       family: Cure
-      modifier: Inflict
-      statusEffectId: Invigorated
-      chance: 100
-      duration: 2
+      modifier: Echo
+      skillId: 'Regrowth II'
 
 - id: 648dae74-fa35-4307-9303-420483bb9d2e
   name: 'Healer: Twin Cure'
@@ -346,7 +344,7 @@
   row: Restoration
   track: 2
   requiredSkillTreeNodeIds: ['Healer: Starshine III']
-  optionSkillTreeNodeIds: ['Healer: Starfall', 'Healer: Starlit Ward']
+  optionSkillTreeNodeIds: ['Healer: Starfall', 'Healer: Starslime Ward']
 
 - id: 98e04a0a-8bf3-4cf2-b9ca-ce50e67d12b2
   name: 'Healer: Starfall'
@@ -359,7 +357,7 @@
       value: 5
 
 - id: 365d1a7d-3b1b-489a-b939-a903c05fe7d9
-  name: 'Healer: Starlit Ward'
+  name: 'Healer: Starslime Ward'
   jobId: Healer
   effects:
     - kind: SkillModifier
@@ -376,10 +374,11 @@
   row: Restoration
   track: 0
   requiredSkillTreeNodeIds: ['Healer: Lifesurge I']
-  optionSkillTreeNodeIds: ['Healer: Swift Revival', 'Healer: Second Chance']
+  optionSkillTreeNodeIds:
+    ['Healer: Economical Revival', 'Healer: Second Chance']
 
 - id: aa0cd1a2-1930-40b9-96d2-ee2cad52be32
-  name: 'Healer: Swift Revival'
+  name: 'Healer: Economical Revival'
   jobId: Healer
   effects:
     - kind: SkillModifier
@@ -437,7 +436,7 @@
   row: Divine Might
   track: 1
   requiredSkillTreeNodeIds: ['Healer: Spiked Smash I']
-  optionSkillTreeNodeIds: ['Healer: Skullcracker', 'Healer: Spiked Wounds']
+  optionSkillTreeNodeIds: ['Healer: Skullcracker', 'Healer: Bloody Spikes']
 
 - id: c00c49ae-8383-4479-a203-5923cb67a1d4
   name: 'Healer: Skullcracker'
@@ -451,7 +450,7 @@
       duration: 0
 
 - id: 98eb4103-4429-462d-ae1a-c78c7aba211b
-  name: 'Healer: Spiked Wounds'
+  name: 'Healer: Bloody Spikes'
   jobId: Healer
   effects:
     - kind: SkillModifier
