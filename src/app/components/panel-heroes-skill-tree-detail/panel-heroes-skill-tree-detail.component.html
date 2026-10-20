@@ -1,0 +1,100 @@
+@let info = details();
+@let nodeState = state();
+
+@if (info) {
+  <div class="flex flex-col gap-4">
+    <span class="type-section-title">{{ info.name }}</span>
+
+    <div class="flex items-center gap-4">
+      <div
+        class="relative overflow-hidden shrink-0 bg-base-200"
+        [style.width.px]="nodeSize"
+        [style.height.px]="nodeSize"
+      >
+        <app-icon-item-preview
+          [sprite]="info.art.sprite"
+          [spritesheet]="info.art.spritesheet"
+          cssClass="zoom-tile"
+        />
+      </div>
+
+      <div class="flex flex-col items-start gap-2">
+        <span class="type-meta">{{ info.kind }}</span>
+
+        <div class="flex gap-2">
+          <span class="badge badge-sm badge-data">1 SP</span>
+
+          @if (nodeState === 'learned') {
+            <span
+              class="badge badge-sm badge-success"
+              (animate.enter)="onEnter($event)"
+              (animate.leave)="onLeave($event)"
+            >
+              Learned
+            </span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <span class="type-label">Effect</span>
+      <span class="text-sm">{{ info.effect }}</span>
+
+      @if (info.value) {
+        <span class="badge badge-data self-start tabular-nums">
+          {{ info.value }}
+        </span>
+      }
+    </div>
+
+    @if (info.requires.length > 0) {
+      <div class="flex flex-col gap-2">
+        <span class="type-label">Requires</span>
+
+        @for (required of info.requires; track required.node.id) {
+          <span class="flex items-center gap-2 text-sm">
+            <span class="relative overflow-hidden shrink-0 w-8 h-8 bg-base-200">
+              <app-icon-item-preview
+                [sprite]="required.art.sprite"
+                [spritesheet]="required.art.spritesheet"
+                cssClass="zoom-row"
+              />
+            </span>
+            {{ required.name }}
+          </span>
+        }
+      </div>
+    }
+
+    @if (nodeState === 'available') {
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        (animate.enter)="onEnter($event)"
+        (animate.leave)="onLeave($event)"
+        (click)="learn.emit(info.node.id)"
+        appSfx="ui-success"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        Learn
+      </button>
+    }
+
+    @if (nodeState === 'pending') {
+      <button
+        type="button"
+        class="btn btn-neutral btn-outline btn-sm"
+        (animate.enter)="onEnter($event)"
+        (animate.leave)="onLeave($event)"
+        (click)="unlearn.emit(info.node.id)"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        Unlearn
+      </button>
+    }
+  </div>
+} @else {
+  <app-blank-slate>Select a node to see what it does.</app-blank-slate>
+}

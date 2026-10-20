@@ -4,6 +4,12 @@
   } @placeholder {
     <app-page-blank />
   }
+} @else if (activeSubview() === 'skilltree') {
+  @defer (on immediate) {
+    <app-play-heroes-skill-tree />
+  } @placeholder {
+    <app-page-blank />
+  }
 } @else {
   <app-card-page heightProfile="full">
     <span header>Heroes</span>
@@ -31,31 +37,11 @@
       @if (party().length === 0) {
         <app-blank-slate size="page">No heroes yet.</app-blank-slate>
       } @else {
-        <div role="tablist" class="tabs tabs-box">
-          @for (character of party(); track character.id) {
-            <button
-              type="button"
-              role="tab"
-              class="tab gap-2"
-              [class.tab-active]="character.id === selectedCharacterId()"
-              [class.font-bold]="character.id === selectedCharacterId()"
-              (click)="selectCharacter(character.id)"
-              appSfx="ui-click"
-              [sfxOffset]="$index"
-              [sfxTrigger]="['click', 'hover']"
-            >
-              @let job = jobFor(character.jobId);
-
-              <div class="hero-tab-icon">
-                <app-icon-job [job]="job" />
-              </div>
-              {{ character.name }}
-              <span class="text-lighter">
-                Lv. {{ character.level }} {{ job?.shorthand ?? 'JOB' }}
-              </span>
-            </button>
-          }
-        </div>
+        <app-tabs-hero
+          [party]="party()"
+          [selectedId]="selectedCharacterId()"
+          (selected)="selectCharacter($event)"
+        />
 
         @if (selectedCharacter(); as character) {
           <app-panel-hero-equipment

@@ -1,5 +1,5 @@
 import type { ElementRef } from '@angular/core';
-import { signal } from '@angular/core';
+import { signal, untracked } from '@angular/core';
 import { modalHasAnyOpen } from '@helpers/engine/modal-stack';
 import {
   gamePlayView,
@@ -126,6 +126,12 @@ export async function tutorialSkip(): Promise<void> {
   await tutorialFinish(active.tutorialId);
 }
 
+export async function tutorialTargetClicked(key: string): Promise<void> {
+  const step = activeTutorialStepView()?.step;
+  if (!step?.advanceOnTargetClick || step.targetKey !== key) return;
+  await tutorialAdvance();
+}
+
 export function tutorialTargetRegister(
   key: string,
   elementRef: ElementRef,
@@ -144,7 +150,10 @@ export function tutorialRestoreActiveTarget(): void {
   tutorialTargetRegistryVersion();
   const step = activeTutorialStepView()?.step;
   if (!step?.targetKey || tutorialTargets.has(step.targetKey)) return;
-  step.prepare?.();
+  // Its target leaves on click while the finish is still saving; re-preparing would undo the click.
+  if (step.advanceOnTargetClick) return;
+  // Untracked so whatever prepare reads (e.g. the party) can't re-run it every tick.
+  untracked(() => step.prepare?.());
 }
 
 // Reads the version signal unconditionally so computed()/effect() callers re-run once a target (re)registers.

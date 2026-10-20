@@ -24,10 +24,16 @@ import { SlotButtonContainerComponent } from '@components/slot-button-container/
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { HideUntilLevelDirective } from '@directives/hide-until-level.directive';
 import { SFXDirective } from '@directives/sfx.directive';
+import { TutorialTargetDirective } from '@directives/tutorial-target.directive';
 import { getEntry } from '@helpers/content/content';
-import { heroBurstSkillsModalOpen, regaliaPageOpen } from '@helpers/engine/ui';
+import {
+  heroBurstSkillsModalOpen,
+  regaliaPageOpen,
+  skillTreePageOpen,
+} from '@helpers/engine/ui';
 import { optimizeCharacterEquipment } from '@helpers/hero/character-equipment';
 import { characterBurstSkillOptions } from '@helpers/hero/job';
+import { characterSkillTreeAvailableSp } from '@helpers/hero/skill-tree';
 import { demoteHero, promoteHero } from '@helpers/hero/position-swapping';
 import {
   characterCurrentRegalia,
@@ -66,6 +72,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     HideUntilLevelDirective,
     SlotButtonContainerComponent,
     SFXDirective,
+    TutorialTargetDirective,
     TippyDirective,
     SweetAlert2Module,
   ],
@@ -134,6 +141,15 @@ export class PanelHeroEquipmentComponent {
 
   public openRegalias(): void {
     regaliaPageOpen(this.character().id);
+  }
+
+  public freeSp = computed(() => {
+    const character = this.character();
+    return characterSkillTreeAvailableSp(character, character.jobId);
+  });
+
+  public openSkillTree(): void {
+    skillTreePageOpen(this.character().id);
   }
 
   public requestRegaliaUpdate(skipConfirm = false): void {

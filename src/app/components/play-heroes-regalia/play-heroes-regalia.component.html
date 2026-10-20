@@ -212,6 +212,36 @@
             </li>
           </ul>
         </div>
+
+        @if (treeSummary(); as tree) {
+          <div class="flex flex-col gap-2 shrink-0">
+            <span class="type-label">Skill Tree</span>
+
+            <div class="flex items-center gap-2">
+              @if (tree.spec) {
+                <span class="badge badge-sm badge-data">{{ tree.spec }}</span>
+              }
+              <span class="badge badge-sm badge-data tabular-nums">
+                {{ tree.spent | number }}/{{ tree.earned | number }} SP
+              </span>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              @for (entry of tree.nodes; track entry.node.id) {
+                <div
+                  class="relative overflow-hidden w-8 h-8 bg-base-200"
+                  [tp]="entry.name"
+                >
+                  <app-icon-item-preview
+                    [sprite]="entry.art.sprite"
+                    [spritesheet]="entry.art.spritesheet"
+                    cssClass="zoom-row"
+                  />
+                </div>
+              }
+            </div>
+          </div>
+        }
       } @else {
         <app-blank-slate>
           Select a regalia, or create one from this hero's current loadout.
@@ -226,6 +256,15 @@
   title="Rename regalia"
   input="text"
   confirmButtonText="Rename"
+  cancelButtonText="Cancel"
+></swal>
+
+<swal
+  #equipSwal
+  title="Replace this skill tree?"
+  icon="warning"
+  [showCancelButton]="true"
+  confirmButtonText="Equip anyway"
   cancelButtonText="Cancel"
 ></swal>
 

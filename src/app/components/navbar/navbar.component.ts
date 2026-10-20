@@ -33,6 +33,7 @@ import {
   isWorldCameraPanned,
   kingdomSubview,
   heroesSubviewClear,
+  navigationGuarded,
   kingdomSubviewClear,
   setGamePlayView,
   townOpen,
@@ -143,7 +144,7 @@ export class NavbarComponent {
     const entry = this.currentTownEntry();
     if (!entry) return;
 
-    townOpen(entry);
+    navigationGuarded(() => townOpen(entry));
   }
 
   public currentTrainerEntry = computed(() => {
@@ -159,21 +160,23 @@ export class NavbarComponent {
   }
 
   public changeGamePlayView(view: GamePlayView): void {
-    setGamePlayView(view);
+    navigationGuarded(() => setGamePlayView(view));
   }
 
   public setHeroesPlayView(): void {
-    if (gamePlayView() === 'heroes') heroesSubviewClear();
-
-    this.changeGamePlayView('heroes');
+    navigationGuarded(() => {
+      if (gamePlayView() === 'heroes') heroesSubviewClear();
+      setGamePlayView('heroes');
+    });
   }
 
   public setKingdomPlayView(): void {
-    if (gamePlayView() === 'kingdom' && kingdomSubview()) {
-      kingdomSubviewClear();
-    }
-
-    this.changeGamePlayView('kingdom');
+    navigationGuarded(() => {
+      if (gamePlayView() === 'kingdom' && kingdomSubview()) {
+        kingdomSubviewClear();
+      }
+      setGamePlayView('kingdom');
+    });
   }
 
   public readonly panelConfigs: Array<{

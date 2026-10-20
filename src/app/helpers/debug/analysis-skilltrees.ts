@@ -1,7 +1,9 @@
 // Audits skill trees: node placement, requirements, oaths, the spec oath, effect references and default nodes.
 
 import {
+  SKILL_TREE_BASE_COLUMNS,
   SKILL_TREE_MAX_TRACKS,
+  SKILL_TREE_SPEC_COLUMNS,
   SKILL_TREE_SPEC_OATH_LEVEL,
   SKILL_TREE_STARTING_SP,
 } from '@helpers/config';
@@ -215,9 +217,9 @@ function specIssues(
       ),
     );
   }
-  if (!options.every(skillTreeIsSpecOption)) {
+  if (options.some((option) => option.sprite === '')) {
     issues.push(
-      analysisFail(`${oath.name}: every spec option needs a specIcon.`),
+      analysisFail(`${oath.name}: every spec option needs a sprite.`),
     );
   }
 
@@ -292,11 +294,31 @@ function defaultIssues(
   return issues;
 }
 
+function columnCountIssues(job: JobContent): AnalysisIssue[] {
+  const issues: AnalysisIssue[] = [];
+  if (job.treeRows.length !== SKILL_TREE_BASE_COLUMNS) {
+    issues.push(
+      analysisFail(
+        `has ${job.treeRows.length} treeRows, expected ${SKILL_TREE_BASE_COLUMNS}.`,
+      ),
+    );
+  }
+  if (job.specializationRows.length !== SKILL_TREE_SPEC_COLUMNS) {
+    issues.push(
+      analysisFail(
+        `has ${job.specializationRows.length} specializationRows, expected ${SKILL_TREE_SPEC_COLUMNS}.`,
+      ),
+    );
+  }
+  return issues;
+}
+
 function jobTreeIssues(job: JobContent): AnalysisIssue[] {
   const nodes = skillTreeJobNodes(job.id);
   const placed = placedNodes(nodes);
 
   return [
+    ...columnCountIssues(job),
     ...placed.flatMap((node) => placementIssues(job, node)),
     ...slotIssues(placed),
     ...placed.flatMap((node) => requirementIssues(nodes, node)),

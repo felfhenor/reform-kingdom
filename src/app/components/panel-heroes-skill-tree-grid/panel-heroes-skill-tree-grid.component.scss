@@ -1,0 +1,64 @@
+@reference 'tailwindcss';
+
+:host {
+  @apply block min-h-0 min-w-0;
+}
+
+.skill-tree-node {
+  outline: 1px solid
+    color-mix(in oklch, var(--color-base-content) 25%, transparent);
+  outline-offset: 1px;
+}
+
+.skill-tree-node-learned {
+  outline: 2px solid
+    color-mix(in oklch, var(--color-base-content) 60%, transparent);
+}
+
+.skill-tree-node-learned.skill-tree-node-skill {
+  outline-color: var(--color-primary);
+}
+
+.skill-tree-node-pending {
+  outline: 2px dashed var(--color-warning);
+}
+
+.skill-tree-node-locked {
+  filter: grayscale(1);
+  opacity: 0.5;
+}
+
+.skill-tree-node-excluded {
+  filter: grayscale(1);
+  opacity: 0.2;
+}
+
+.skill-tree-arrow {
+  fill: none;
+  stroke-width: 2;
+}
+
+.skill-tree-arrow-learned {
+  stroke: var(--color-primary);
+}
+
+.skill-tree-arrow-pending {
+  stroke: var(--color-warning);
+  stroke-dasharray: 4 3;
+}
+
+.skill-tree-arrow-idle {
+  stroke: color-mix(in oklch, var(--color-base-content) 30%, transparent);
+}
+
+.skill-tree-arrow-head-learned {
+  fill: var(--color-primary);
+}
+
+.skill-tree-arrow-head-pending {
+  fill: var(--color-warning);
+}
+
+.skill-tree-arrow-head-idle {
+  fill: color-mix(in oklch, var(--color-base-content) 30%, transparent);
+}

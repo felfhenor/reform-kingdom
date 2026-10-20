@@ -24,8 +24,11 @@ export function skillTreeIsOath(node: SkillTreeNodeContent): boolean {
   return node.optionSkillTreeNodeIds.length > 0;
 }
 
+// An oath option named after one of its job's specialization columns.
 export function skillTreeIsSpecOption(node: SkillTreeNodeContent): boolean {
-  return node.specIcon !== '';
+  const specRows: string[] =
+    getEntry<JobContent>(node.jobId)?.specializationRows ?? [];
+  return node.row === '' && specRows.includes(skillTreeNodeShortName(node));
 }
 
 export function skillTreeOptionOath(

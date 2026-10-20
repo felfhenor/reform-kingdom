@@ -8,6 +8,8 @@ export type TutorialStep = {
   body: string;
   // Runs before navigating, to put the target on screen (e.g. selecting the hero it lives on).
   prepare?: () => void;
+  // For a target that navigates away, so the step can't be left waiting on it.
+  advanceOnTargetClick?: boolean;
 } & (
   | { targetKey: string; view: GamePlayView; subview?: KingdomSubview }
   | { targetKey?: undefined; view?: undefined; subview?: undefined }
@@ -23,6 +25,7 @@ export type TutorialTrigger =
   | { kind: 'first-caravan-visit' }
   | { kind: 'first-trainer-visit' }
   | { kind: 'first-burst-skill' }
+  | { kind: 'first-skill-point' }
   | { kind: 'losing-streak'; losses: number; belowLevel: number };
 
 export type TutorialDefinition = {

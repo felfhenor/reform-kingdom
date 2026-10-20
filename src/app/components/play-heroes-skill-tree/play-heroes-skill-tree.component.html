@@ -1,0 +1,121 @@
+@let hero = character();
+@let heroJob = job();
+@let pending = staged().length;
+@let sp = freeSp();
+@let flux = fluxOwned();
+
+<app-card-page heightProfile="full">
+  <span header>Skill Tree</span>
+
+  <app-button-kingdom-back pageactions [onBack]="back" />
+
+  <div pageactionssecondary class="flex gap-2">
+    <button
+      type="button"
+      class="btn btn-primary btn-sm"
+      [disabled]="pending === 0"
+      (click)="confirm()"
+      appSfx="ui-success"
+      [sfxTrigger]="['click', 'hover']"
+    >
+      Confirm
+    </button>
+
+    <button
+      type="button"
+      class="btn btn-neutral btn-outline btn-sm"
+      [disabled]="pending === 0"
+      (click)="discard()"
+      appSfx="ui-click"
+      [sfxTrigger]="['click', 'hover']"
+    >
+      Discard
+    </button>
+
+    <app-slot-button-container
+      [disabled]="!hasLearned()"
+      [helpText]="'There is nothing to reset.'"
+    >
+      <button
+        type="button"
+        class="btn btn-error btn-outline btn-sm"
+        [disabled]="flux === 0 || !hasLearned()"
+        (click)="requestReset()"
+        appSfx="ui-error"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        Reset Tree for
+        <app-row-currency-cost [costs]="resetCost()" />
+      </button>
+    </app-slot-button-container>
+  </div>
+
+  <div class="h-full flex flex-col gap-4 min-h-0">
+    <app-tabs-hero
+      [party]="party()"
+      [selectedId]="hero?.id"
+      (selected)="selectHero($event)"
+    />
+
+    @if (hero && heroJob) {
+      <div class="grid grid-cols-[minmax(0,1fr)_300px] gap-4 flex-1 min-h-0">
+        <div class="flex flex-col gap-2 min-h-0">
+          <app-panel-heroes-skill-tree-grid
+            class="flex-1"
+            [job]="heroJob"
+            [heroLevel]="hero.level"
+            [states]="states()"
+            [selectedId]="selectedNodeId()"
+            (selected)="selectNode($event)"
+            (learnRequested)="learnIfAvailable($event)"
+          />
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <span class="text-sm py-4">
+            <span
+              class="badge badge-sm tabular-nums w-full"
+              [class.badge-attention]="sp > 0"
+              [class.badge-data]="sp === 0"
+            >
+              {{ sp | number }} SP remaining
+            </span>
+          </span>
+
+          <hr class="opacity-50" />
+
+          <app-panel-heroes-skill-tree-detail
+            class="mt-2"
+            [node]="selectedNode()"
+            [state]="selectedState()"
+            [job]="heroJob"
+            [character]="hero"
+            (learn)="learn($event)"
+            (unlearn)="unlearn($event)"
+          />
+        </div>
+      </div>
+    } @else {
+      <app-blank-slate size="page">No heroes yet.</app-blank-slate>
+    }
+  </div>
+</app-card-page>
+
+<swal
+  #leaveSwal
+  title="Stop without confirming?"
+  icon="warning"
+  [showDenyButton]="true"
+  [showCancelButton]="true"
+  confirmButtonText="Save changes"
+  denyButtonText="Discard changes"
+  cancelButtonText="Keep editing"
+></swal>
+
+<swal
+  #resetSwal
+  icon="warning"
+  [showCancelButton]="true"
+  confirmButtonText="Yes, reset it"
+  cancelButtonText="Cancel"
+></swal>

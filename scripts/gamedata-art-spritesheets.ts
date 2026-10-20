@@ -36,13 +36,14 @@ const build = async () => {
         animateContent = content;
       }
 
+      // An entry without art of its own has an empty sprite, which would otherwise match every file.
       const usedSprites = [
         ...new Set([
           ...content.flatMap((c: any) =>
             c.frames ? generateSpriteArray(c.sprite, c.frames) : [c.sprite],
           ),
         ]),
-      ];
+      ].filter((sprite) => !!sprite);
 
       copyFiles = copyFiles.filter((f) =>
         usedSprites.find((s) => f.includes(s)),

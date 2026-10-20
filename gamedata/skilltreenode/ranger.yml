@@ -90,13 +90,14 @@
   effects:
     - { kind: GrantSkill, skillId: 'Barbed Shot II' }
 
-# --- Bombardment / track 0 ---
+# --- Nature / track 2 ---
 
 - id: 20f50f74-a1f9-4ce4-a909-c0006e19a185
   name: 'Ranger: Arrow Rain I'
   jobId: Ranger
   level: 5
-  row: Bombardment
+  row: Nature
+  track: 2
   effects:
     - { kind: GrantSkill, skillId: 'Arrow Rain I' }
 
@@ -104,7 +105,8 @@
   name: 'Ranger: Arrow Rain II'
   jobId: Ranger
   level: 15
-  row: Bombardment
+  row: Nature
+  track: 2
   requiredSkillTreeNodeIds: ['Ranger: Arrow Rain I']
   effects:
     - { kind: GrantSkill, skillId: 'Arrow Rain II' }
@@ -113,7 +115,8 @@
   name: 'Ranger: Arrow Rain III'
   jobId: Ranger
   level: 35
-  row: Bombardment
+  row: Nature
+  track: 2
   requiredSkillTreeNodeIds: ['Ranger: Arrow Rain II']
   effects:
     - { kind: GrantSkill, skillId: 'Arrow Rain III' }
@@ -181,8 +184,8 @@
 - id: bf16b2f1-bea2-4c90-a79c-d5803efc90f5
   name: 'Ranger: Stalker'
   jobId: Ranger
-  description: 'Swear the Oath of the Stalker. Grants +0.15 Agility, +0.05 Luck per level (applied retroactively).'
-  specIcon: gameHoodedAssassin
+  description: 'Become a Stalker, an expert tracker and hunter. Grants +0.15 Agility, +0.05 Luck per level.'
+  sprite: '0007'
   effects:
     - { kind: StatPerLevel, stat: Agility, value: 0.15 }
     - { kind: StatPerLevel, stat: Luck, value: 0.05 }
@@ -190,8 +193,8 @@
 - id: 106d068a-7e1e-45e4-8877-5dab9538195a
   name: 'Ranger: Wayfinder'
   jobId: Ranger
-  description: 'Swear the Oath of the Wayfinder. Grants +0.15 Vitality, +0.1 Spirit per level (applied retroactively).'
-  specIcon: gameCompass
+  description: 'Become a Wayfinder, an expert of wilderness navigation. Grants +0.15 Vitality, +0.1 Spirit per level.'
+  sprite: '0006'
   effects:
     - { kind: StatPerLevel, stat: Vitality, value: 0.15 }
     - { kind: StatPerLevel, stat: Spirit, value: 0.1 }

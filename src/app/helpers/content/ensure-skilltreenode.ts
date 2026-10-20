@@ -40,7 +40,7 @@ export function ensureSkillTreeNode(
     requiredSkillTreeNodeIds: node.requiredSkillTreeNodeIds ?? [],
     optionSkillTreeNodeIds: node.optionSkillTreeNodeIds ?? [],
     default: node.default ?? false,
-    specIcon: node.specIcon ?? '',
+    sprite: node.sprite ?? '',
     effects: ensureArray(
       (node.effects ?? []).filter(isSkillTreeNodeEffect),
       ensureHeroEffect,

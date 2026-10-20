@@ -77,3 +77,31 @@ describe('tutorialTriggerSatisfied first-burst-skill', () => {
     expect(tutorialTriggerSatisfied({ kind: 'first-burst-skill' })).toBe(false);
   });
 });
+
+describe('tutorialTriggerSatisfied first-skill-point', () => {
+  const job = ensureJob({ id: 'job-sp' as JobId, name: 'Pointer' });
+
+  // Lv 1 earns 2 SP, so two learned nodes leave nothing to spend.
+  function seedHero(level: number) {
+    seedContent([job]);
+    seedGamestate((state) => {
+      state.world.party = [
+        buildCharacter({
+          jobId: job.id,
+          level,
+          skillTreeNodes: { [job.id]: ['a', 'b'] as SkillTreeNodeId[] },
+        }),
+      ];
+    });
+  }
+
+  it('fires once a hero has a skill point to spend', () => {
+    seedHero(3);
+    expect(tutorialTriggerSatisfied({ kind: 'first-skill-point' })).toBe(true);
+  });
+
+  it('waits while every point is spent', () => {
+    seedHero(1);
+    expect(tutorialTriggerSatisfied({ kind: 'first-skill-point' })).toBe(false);
+  });
+});

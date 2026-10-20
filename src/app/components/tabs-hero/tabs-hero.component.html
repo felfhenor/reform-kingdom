@@ -1,0 +1,36 @@
+<div role="tablist" class="tabs tabs-box">
+  @for (character of party(); track character.id) {
+    @let job = jobFor(character.jobId);
+    @let sp = freeSp(character);
+
+    <button
+      type="button"
+      role="tab"
+      class="tab gap-2"
+      [class.tab-active]="character.id === selectedId()"
+      [class.font-bold]="character.id === selectedId()"
+      (click)="selected.emit(character.id)"
+      appSfx="ui-click"
+      [sfxOffset]="$index"
+      [sfxTrigger]="['click', 'hover']"
+    >
+      <div class="hero-tab-icon">
+        <app-icon-job [job]="job" />
+      </div>
+      {{ character.name }}
+      <span class="text-lighter">
+        Lv. {{ character.level }} {{ job?.shorthand ?? 'JOB' }}
+      </span>
+
+      @if (sp > 0) {
+        <span
+          class="badge badge-sm badge-attention tabular-nums"
+          (animate.enter)="onEnter($event)"
+          (animate.leave)="onLeave($event)"
+        >
+          {{ sp | number }} SP
+        </span>
+      }
+    </button>
+  }
+</div>

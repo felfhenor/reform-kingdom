@@ -1,5 +1,6 @@
 import { heroesSelectCharacter } from '@helpers/engine/ui';
 import { partyFirstBurstSkillHero } from '@helpers/hero/job';
+import { partyFirstHeroWithFreeSp } from '@helpers/hero/skill-tree';
 import { worldPartyState } from '@helpers/state-game';
 import type { TutorialDefinition } from '@interfaces';
 
@@ -169,6 +170,24 @@ export const TUTORIAL_CATALOG: TutorialDefinition[] = [
         },
         title: 'Burst Skills',
         body: 'This hero has learned a burst skill - a powerful special attack. Each hero can slot one burst skill per job here, and it will be used in combat alongside their normal skills.',
+      },
+    ],
+  },
+  {
+    id: 'skill-trees',
+    name: 'Skill Trees',
+    trigger: { kind: 'first-skill-point' },
+    steps: [
+      {
+        targetKey: 'hero-skill-tree',
+        view: 'heroes',
+        advanceOnTargetClick: true,
+        prepare: () => {
+          const hero = partyFirstHeroWithFreeSp(worldPartyState());
+          if (hero) heroesSelectCharacter(hero.id);
+        },
+        title: 'Skill Trees',
+        body: 'This hero has skill points to spend. Heroes earn skill points when they level up. They can be spent in the skill tree on new skills, abilities and a specialization.',
       },
     ],
   },

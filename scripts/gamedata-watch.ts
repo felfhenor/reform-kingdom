@@ -46,6 +46,14 @@ const rebuildMaps = batched(async () => {
   console.info('[helpers] Rebuilt maps.');
 });
 
+const buildArt = async () => {
+  console.info('[helpers] Rebuilding art...');
+  await runCommand('npm run gamedata:art:spritesheets');
+  console.info('[helpers] Rebuilt art.');
+};
+
+const rebuildArt = batched(buildArt);
+
 const rebuildGamedata = batched(async () => {
   console.info('[helpers] Rebuilding gamedata...');
   await runCommand('npm run gamedata:build');
@@ -58,9 +66,7 @@ const rebuildGamedata = batched(async () => {
       allUsedSpritesheetKeys.length ||
     allUsedSprites.length !== allUsedSpritesheetKeys.length
   ) {
-    console.info('[helpers] Rebuilding art due to new assets...');
-    await runCommand('npm run gamedata:art:spritesheets');
-    console.info('[helpers] Rebuilt art.');
+    await buildArt();
   }
 
   allUsedSpritesheetKeys = allUsedSprites;
@@ -87,7 +93,7 @@ const getAllUsedSprites = () => {
 };
 
 const startWatch = async () => {
-  console.info(`[helpers] Watching gamedata & gamemaps changes...`);
+  console.info(`[helpers] Watching gamedata, gameassets & gamemaps changes...`);
   allUsedSpritesheetKeys = getAllUsedSprites();
 
   chokidar
@@ -104,6 +110,15 @@ const startWatch = async () => {
     console.info(`[helpers] ${name} changed.`);
     rebuildGamedata();
   });
+
+  // Added, replaced or removed art changes the packed sheets even when no content changed.
+  chokidar
+    .watch('gameassets', { ignoreInitial: true })
+    .on('all', (event: string, name: string) => {
+      if (!['add', 'change', 'unlink'].includes(event)) return;
+      console.info(`[helpers] ${name} ${event}.`);
+      rebuildArt();
+    });
 };
 
 startWatch();

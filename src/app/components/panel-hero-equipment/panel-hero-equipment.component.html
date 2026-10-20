@@ -125,6 +125,28 @@
           </button>
         </app-slot-button-container>
 
+        @let sp = freeSp();
+        <button
+          type="button"
+          class="btn btn-sm btn-neutral"
+          (click)="openSkillTree()"
+          appTutorialTarget="hero-skill-tree"
+          appSfx="ui-click"
+          [tp]="'Spend skill points on skills, abilities and a specialization.'"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Skill Tree
+          @if (sp > 0) {
+            <span
+              class="badge badge-sm badge-attention tabular-nums"
+              (animate.enter)="onEnter($event)"
+              (animate.leave)="onLeave($event)"
+            >
+              {{ sp | number }} SP
+            </span>
+          }
+        </button>
+
         <app-button-hero-combat-orders
           [characterId]="char.id"
           [appHideUntilLevel]="3"

@@ -13,6 +13,7 @@ import type {
   HeroEffectJobAbility,
   HeroEffectStatPerLevel,
 } from '@interfaces/hero-effect';
+import type { HasSprite } from '@interfaces/artable';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { HasDescription } from '@interfaces/traits';
 
@@ -24,9 +25,8 @@ export type SkillTreeRow =
   | 'Weapon Arts'
   | 'Shield Arts'
   | 'Swashbuckler'
-  | 'Defender'
+  | 'Bastion'
   | 'Marksmanship'
-  | 'Bombardment'
   | 'Nature'
   | 'Stalker'
   | 'Wayfinder'
@@ -34,11 +34,10 @@ export type SkillTreeRow =
   | 'Fortune'
   | 'Treasure Hunter'
   | 'Dungeon Delver'
-  | 'Fire Magic'
-  | 'Storm Magic'
+  | 'Evocation'
   | 'Spellweaving'
   | 'Arcanist'
-  | 'Spellweaver'
+  | 'Celestar'
   | 'Restoration'
   | 'Divine Might'
   | 'Lifegiver'
@@ -68,8 +67,10 @@ export const SkillTreeNodeEffectKinds: SkillTreeNodeEffect['kind'][] = [
 ];
 
 // Names are '<Job>: <Name>' to stay globally unique; an oath lists two options and carries no effects itself.
+// Only nodes with art of their own (spec options) set a sprite; others borrow their skill's, ability's or job's.
 export type SkillTreeNodeContent = IsContentItem &
-  HasDescription & {
+  HasDescription &
+  HasSprite & {
     id: SkillTreeNodeId;
     __type: 'skilltreenode';
 
@@ -86,9 +87,6 @@ export type SkillTreeNodeContent = IsContentItem &
     // Pre-allocated on new heroes; still costs SP.
     default: boolean;
 
-    // Marks a spec oath option; a game-icons name for the job label.
-    specIcon: string;
-
     effects: SkillTreeNodeEffect[];
   };
 
@@ -98,3 +96,7 @@ export type SkillTreeSkillGrant = {
   level: number;
   isDefault: boolean;
 };
+
+// learned = confirmed; pending = staged, not confirmed; excluded = locked out by an oath pick.
+export type SkillTreeNodeState =
+  'learned' | 'pending' | 'available' | 'locked' | 'excluded';

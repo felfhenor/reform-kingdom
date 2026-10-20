@@ -158,8 +158,23 @@ export const SKILL_TREE_STARTING_SP = 2;
 export const SKILL_TREE_SP_LEVEL_INTERVAL = 2;
 export const SKILL_TREE_COLUMN_INTERVAL = 5;
 export const SKILL_TREE_MAX_COLUMN_LEVEL = 50;
-export const SKILL_TREE_MAX_TRACKS = 4;
+// Every tree draws as this many equal-width columns, so its width is predictable.
+export const SKILL_TREE_BASE_COLUMNS = 3;
+export const SKILL_TREE_SPEC_COLUMNS = 2;
+export const SKILL_TREE_MAX_TRACKS = 3;
 export const SKILL_TREE_SPEC_OATH_LEVEL = 15;
+
+// Skill tree layout, in pixels.
+export const SKILL_TREE_NODE_SIZE = 48;
+export const SKILL_TREE_LEVEL_LABEL_WIDTH = 56;
+export const SKILL_TREE_GROUP_TITLE_HEIGHT = 20;
+export const SKILL_TREE_LANE_TITLE_HEIGHT = 32;
+export const SKILL_TREE_ROW_HEIGHT = 84;
+export const SKILL_TREE_COLUMN_GAP = 16;
+// Keeps side-by-side nodes on adjacent tracks from touching; narrower trees scroll instead.
+export const SKILL_TREE_TRACK_MIN_WIDTH = 56;
+export const SKILL_TREE_OATH_PADDING = 4;
+export const SKILL_TREE_OATH_BORDER = 2;
 
 // Monster Research: what each rank of the DebuffPotency job ability adds.
 export const DEBUFF_POTENCY_PER_RANK: DebuffPotency = {

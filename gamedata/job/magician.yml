@@ -56,8 +56,8 @@
     - Staff
 
   treeVersion: 1
-  treeRows: [Fire Magic, Storm Magic, Spellweaving, Abilities]
-  specializationRows: [Arcanist, Spellweaver]
+  treeRows: [Evocation, Spellweaving, Abilities]
+  specializationRows: [Arcanist, Celestar]
 
   starterEquipmentIds:
     - Cloak of Adventuring

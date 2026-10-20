@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
-import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { PageBlankComponent } from '@components/page-blank/page-blank.component';
 import { PanelHeroEquipmentComponent } from '@components/panel-hero-equipment/panel-hero-equipment.component';
 import { PlayHeroesRegaliaComponent } from '@components/play-heroes-regalia/play-heroes-regalia.component';
+import { PlayHeroesSkillTreeComponent } from '@components/play-heroes-skill-tree/play-heroes-skill-tree.component';
 import { SlotButtonContainerComponent } from '@components/slot-button-container/slot-button-container.component';
+import { TabsHeroComponent } from '@components/tabs-hero/tabs-hero.component';
 import { SFXDirective } from '@directives/sfx.directive';
-import { getEntry } from '@helpers/content/content';
 import {
   heroesSelectCharacter,
   heroesSelectedCharacterId,
@@ -16,7 +16,7 @@ import {
 import { optimizeCharacterEquipment } from '@helpers/hero/character-equipment';
 import { canModifyEquipment } from '@helpers/item/equipment';
 import { worldPartyState } from '@helpers/state-game';
-import type { CharacterId, JobContent, JobId } from '@interfaces';
+import type { CharacterId } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
@@ -26,15 +26,15 @@ import { TippyDirective } from '@ngneat/helipopper';
     CardPageComponent,
     BlankSlateComponent,
     PanelHeroEquipmentComponent,
-    IconJobComponent,
     PageBlankComponent,
     PlayHeroesRegaliaComponent,
+    PlayHeroesSkillTreeComponent,
     SFXDirective,
     SlotButtonContainerComponent,
+    TabsHeroComponent,
     TippyDirective,
   ],
   templateUrl: './game-play-heroes.component.html',
-  styleUrl: './game-play-heroes.component.scss',
 })
 export class GamePlayHeroesComponent {
   public activeSubview = computed(() => heroesSubview());
@@ -51,10 +51,6 @@ export class GamePlayHeroesComponent {
   public selectedCharacterId = computed(() => this.selectedCharacter()?.id);
 
   public equipmentModifiable = computed(() => canModifyEquipment());
-
-  public jobFor(jobId: JobId): JobContent | undefined {
-    return getEntry<JobContent>(jobId);
-  }
 
   public selectCharacter(characterId: CharacterId): void {
     heroesSelectCharacter(characterId);

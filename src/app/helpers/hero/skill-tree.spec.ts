@@ -51,8 +51,8 @@ const tree = [
     effects: [{ kind: 'Stat', stat: 'Strength', value: 3 }],
   }),
   node('oath', { level: 15, optionSkillTreeNodeIds: ids('left', 'right') }),
-  node('left', { level: 0, row: '', specIcon: 'gameFencer' }),
-  node('right', { level: 0, row: '', specIcon: 'gameCompass' }),
+  node('left', { name: 'Job: Stalker', level: 0, row: '' }),
+  node('right', { name: 'Job: Wayfinder', level: 0, row: '' }),
   node('leftPerk', { level: 20, requiredSkillTreeNodeIds: ids('left') }),
   node('oathChild', { level: 20, requiredSkillTreeNodeIds: ids('oath') }),
 ];
@@ -63,7 +63,12 @@ function hero(overrides: Partial<Character> = {}): Character {
 
 beforeEach(() => {
   seedContent([
-    ensureJob({ id: jobId, name: 'Job', treeVersion: 2 }),
+    ensureJob({
+      id: jobId,
+      name: 'Job',
+      treeVersion: 2,
+      specializationRows: ['Stalker', 'Wayfinder'],
+    }),
     ensureJob({ id: otherJobId, name: 'Other', treeVersion: 1 }),
     ...tree,
   ]);

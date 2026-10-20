@@ -1,10 +1,10 @@
-# --- Fire Magic / track 0 ---
+# --- Evocation / track 0 ---
 
 - id: ecd879bd-a6fd-4a02-9ace-30f728e90fba
   name: 'Magician: Fireball I'
   jobId: Magician
   level: 1
-  row: Fire Magic
+  row: Evocation
   default: true
   effects:
     - { kind: GrantSkill, skillId: 'Fireball I' }
@@ -13,7 +13,7 @@
   name: 'Magician: Fireball II'
   jobId: Magician
   level: 5
-  row: Fire Magic
+  row: Evocation
   requiredSkillTreeNodeIds: ['Magician: Fireball I']
   effects:
     - { kind: GrantSkill, skillId: 'Fireball II' }
@@ -22,7 +22,7 @@
   name: 'Magician: Fireball III'
   jobId: Magician
   level: 20
-  row: Fire Magic
+  row: Evocation
   requiredSkillTreeNodeIds: ['Magician: Fireball II']
   effects:
     - { kind: GrantSkill, skillId: 'Fireball III' }
@@ -31,18 +31,18 @@
   name: 'Magician: Fireball IV'
   jobId: Magician
   level: 35
-  row: Fire Magic
+  row: Evocation
   requiredSkillTreeNodeIds: ['Magician: Fireball III']
   effects:
     - { kind: GrantSkill, skillId: 'Fireball IV' }
 
-# --- Fire Magic / track 1 ---
+# --- Evocation / track 1 ---
 
 - id: d7e4228a-af4d-4aaf-96d3-3a564fc6ab87
   name: 'Magician: Broil I'
   jobId: Magician
   level: 25
-  row: Fire Magic
+  row: Evocation
   track: 1
   requiredSkillTreeNodeIds: ['Magician: Fireball II']
   effects:
@@ -52,19 +52,20 @@
   name: 'Magician: Broil II'
   jobId: Magician
   level: 40
-  row: Fire Magic
+  row: Evocation
   track: 1
   requiredSkillTreeNodeIds: ['Magician: Broil I']
   effects:
     - { kind: GrantSkill, skillId: 'Broil II' }
 
-# --- Storm Magic / track 0 ---
+# --- Evocation / track 2 ---
 
 - id: 3803fa2a-717d-4a57-9ed8-eb25c52b7205
   name: 'Magician: Thunderbolt I'
   jobId: Magician
   level: 5
-  row: Storm Magic
+  row: Evocation
+  track: 2
   effects:
     - { kind: GrantSkill, skillId: 'Thunderbolt I' }
 
@@ -72,7 +73,8 @@
   name: 'Magician: Thunderbolt II'
   jobId: Magician
   level: 10
-  row: Storm Magic
+  row: Evocation
+  track: 2
   requiredSkillTreeNodeIds: ['Magician: Thunderbolt I']
   effects:
     - { kind: GrantSkill, skillId: 'Thunderbolt II' }
@@ -81,7 +83,8 @@
   name: 'Magician: Thunderbolt III'
   jobId: Magician
   level: 20
-  row: Storm Magic
+  row: Evocation
+  track: 2
   requiredSkillTreeNodeIds: ['Magician: Thunderbolt II']
   effects:
     - { kind: GrantSkill, skillId: 'Thunderbolt III' }
@@ -90,7 +93,8 @@
   name: 'Magician: Thunderbolt IV'
   jobId: Magician
   level: 40
-  row: Storm Magic
+  row: Evocation
+  track: 2
   requiredSkillTreeNodeIds: ['Magician: Thunderbolt III']
   effects:
     - { kind: GrantSkill, skillId: 'Thunderbolt IV' }
@@ -171,22 +175,22 @@
   jobId: Magician
   level: 15
   row: Arcanist
-  optionSkillTreeNodeIds: ['Magician: Arcanist', 'Magician: Spellweaver']
+  optionSkillTreeNodeIds: ['Magician: Arcanist', 'Magician: Celestar']
 
 - id: 586f3c02-0e5e-4c4e-9393-0d17faf44abb
   name: 'Magician: Arcanist'
   jobId: Magician
-  description: 'Swear the Oath of the Arcanist. Grants +0.2 Intelligence, +0.1 Agility per level (applied retroactively).'
-  specIcon: gameMagicSwirl
+  description: 'Become an Arcanist, a mysticism expert. Grants +0.2 Intelligence, +0.1 Agility per level.'
+  sprite: '0005'
   effects:
     - { kind: StatPerLevel, stat: Intelligence, value: 0.2 }
     - { kind: StatPerLevel, stat: Agility, value: 0.1 }
 
 - id: 28021991-7ee4-4677-995a-500327942fd0
-  name: 'Magician: Spellweaver'
+  name: 'Magician: Celestar'
   jobId: Magician
-  description: 'Swear the Oath of the Spellweaver. Grants +0.15 Spirit, +0.15 Resistance per level (applied retroactively).'
-  specIcon: gameSpellBook
+  description: 'Become a Celestar, an astral magic expert. Grants +0.15 Spirit, +0.15 Resistance per level.'
+  sprite: '0004'
   effects:
     - { kind: StatPerLevel, stat: Spirit, value: 0.15 }
     - { kind: StatPerLevel, stat: Resistance, value: 0.15 }
@@ -211,14 +215,14 @@
   effects:
     - { kind: JobAbility, jobAbilityId: Mystical Insight, value: 0.4 }
 
-# --- Spellweaver ---
+# --- Celestar ---
 
 - id: 98d83a9d-69c0-496e-8b79-10203bafbbe0
   name: 'Magician: Astral Resonance I'
   jobId: Magician
   level: 20
-  row: Spellweaver
-  requiredSkillTreeNodeIds: ['Magician: Spellweaver']
+  row: Celestar
+  requiredSkillTreeNodeIds: ['Magician: Celestar']
   effects:
     - { kind: JobAbility, jobAbilityId: Astral Resonance, value: 0.25 }
 
@@ -226,7 +230,7 @@
   name: 'Magician: Astral Resonance II'
   jobId: Magician
   level: 25
-  row: Spellweaver
+  row: Celestar
   requiredSkillTreeNodeIds: ['Magician: Astral Resonance I']
   effects:
     - { kind: JobAbility, jobAbilityId: Astral Resonance, value: 0.5 }

@@ -177,22 +177,22 @@
   jobId: Warrior
   level: 15
   row: Swashbuckler
-  optionSkillTreeNodeIds: ['Warrior: Swashbuckler', 'Warrior: Defender']
+  optionSkillTreeNodeIds: ['Warrior: Swashbuckler', 'Warrior: Bastion']
 
 - id: 870a427d-1539-4697-a657-9fc462b25b40
   name: 'Warrior: Swashbuckler'
   jobId: Warrior
-  description: 'Swear the Oath of the Swashbuckler. Grants +0.15 Strength, +0.1 Agility per level (applied retroactively).'
-  specIcon: gameFencer
+  description: 'Become a Swashbuckler, a master of combat. Grants +0.15 Strength, +0.1 Agility per level.'
+  sprite: '0000'
   effects:
     - { kind: StatPerLevel, stat: Strength, value: 0.15 }
     - { kind: StatPerLevel, stat: Agility, value: 0.1 }
 
 - id: 08ef6b16-d580-41bc-a96c-e3764b32b634
-  name: 'Warrior: Defender'
+  name: 'Warrior: Bastion'
   jobId: Warrior
-  description: 'Swear the Oath of the Defender. Grants +0.2 Vitality, +2 Health per level (applied retroactively).'
-  specIcon: gameCheckedShield
+  description: 'Become a Bastion, an expert in defense. Grants +0.2 Vitality, +2 Health per level.'
+  sprite: '0001'
   effects:
     - { kind: StatPerLevel, stat: Vitality, value: 0.2 }
     - { kind: StatPerLevel, stat: Health, value: 2 }
@@ -217,14 +217,14 @@
   effects:
     - { kind: JobAbility, jobAbilityId: Follow-up, value: 10 }
 
-# --- Defender ---
+# --- Bastion ---
 
 - id: 96dc1fe8-3ee6-4899-8388-eb606939c74b
   name: 'Warrior: Intimidation I'
   jobId: Warrior
   level: 20
-  row: Defender
-  requiredSkillTreeNodeIds: ['Warrior: Defender']
+  row: Bastion
+  requiredSkillTreeNodeIds: ['Warrior: Bastion']
   effects:
     - { kind: JobAbility, jobAbilityId: Intimidation, value: -15 }
 
@@ -232,7 +232,7 @@
   name: 'Warrior: Intimidation II'
   jobId: Warrior
   level: 25
-  row: Defender
+  row: Bastion
   requiredSkillTreeNodeIds: ['Warrior: Intimidation I']
   effects:
     - { kind: JobAbility, jobAbilityId: Intimidation, value: -12 }
@@ -241,7 +241,7 @@
   name: 'Warrior: Cover I'
   jobId: Warrior
   level: 30
-  row: Defender
+  row: Bastion
   requiredSkillTreeNodeIds: ['Warrior: Intimidation II']
   effects:
     - { kind: JobAbility, jobAbilityId: Cover, value: 5 }

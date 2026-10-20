@@ -53,7 +53,7 @@
     - Bow
 
   treeVersion: 1
-  treeRows: [Marksmanship, Bombardment, Nature, Abilities]
+  treeRows: [Marksmanship, Nature, Abilities]
   specializationRows: [Stalker, Wayfinder]
 
   starterEquipmentIds:

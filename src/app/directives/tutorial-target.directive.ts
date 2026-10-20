@@ -1,11 +1,13 @@
 import { Directive, ElementRef, effect, inject, input } from '@angular/core';
 import {
+  tutorialTargetClicked,
   tutorialTargetRegister,
   tutorialTargetUnregister,
 } from '@helpers/tutorial/tutorial-engine.ui';
 
 @Directive({
   selector: '[appTutorialTarget]',
+  host: { '(click)': 'onClick()' },
 })
 export class TutorialTargetDirective {
   public appTutorialTarget = input.required<string>();
@@ -18,5 +20,9 @@ export class TutorialTargetDirective {
       tutorialTargetRegister(key, this.elementRef);
       onCleanup(() => tutorialTargetUnregister(key));
     });
+  }
+
+  public onClick(): void {
+    void tutorialTargetClicked(this.appTutorialTarget());
   }
 }

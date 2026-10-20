@@ -10,6 +10,7 @@ import { BlankSlateComponent } from '@components/blank-slate/blank-slate.compone
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconComponent } from '@components/icon/icon.component';
+import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { RowCombatOrderClauseComponent } from '@components/row-combat-order-clause/row-combat-order-clause.component';
 import { RowEquipmentItemSummaryComponent } from '@components/row-equipment-item-summary/row-equipment-item-summary.component';
 import { RowHeroSummaryComponent } from '@components/row-hero-summary/row-hero-summary.component';
@@ -45,6 +46,9 @@ import {
   regaliasState,
   worldPartyState,
 } from '@helpers/state-game';
+import { characterJobLevel } from '@helpers/hero/job';
+import { skillTreeBuildSummary } from '@helpers/hero/skill-tree-layout.ui';
+import { regaliaEquipLosesLiveTree } from '@helpers/hero/skill-tree.ui';
 import type {
   CharacterId,
   EquipmentItem,
@@ -53,6 +57,7 @@ import type {
   Regalia,
   RegaliaId,
   RegaliaMissingReason,
+  JobContent,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
@@ -67,6 +72,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     CardPageComponent,
     DecimalPipe,
     IconComponent,
+    IconItemPreviewComponent,
     ListReflowDirective,
     ListRowDirective,
     RowCombatOrderClauseComponent,
@@ -83,6 +89,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 })
 export class PlayHeroesRegaliaComponent {
   private renameSwal = viewChild<SwalComponent>('renameSwal');
+  private equipSwal = viewChild<SwalComponent>('equipSwal');
 
   public readonly maxRegalias = REGALIA_MAX_PER_JOB;
   public readonly alwaysRandomClause = COMBAT_ORDER_ALWAYS_RANDOM_CLAUSE;
@@ -198,11 +205,38 @@ export class PlayHeroesRegaliaComponent {
     if (id) this.explicitRegaliaId.set(id);
   }
 
-  public equip(): void {
+  public async equip(): Promise<void> {
     const character = this.selectedCharacter();
     const regalia = this.selectedRegalia();
-    if (character && regalia) void regaliaEquip(character.id, regalia.id);
+    if (!character || !regalia) return;
+
+    const swal = this.equipSwal();
+    if (
+      swal &&
+      regaliaEquipLosesLiveTree(regaliasState().entries, character, regalia)
+    ) {
+      swal.swalOptions = {
+        text: `${character.name}'s current skill tree isn't saved in any regalia. Equipping "${regalia.name}" replaces it, and rebuilding it later would cost a Memory Flux.`,
+      };
+      const result = await swal.fire();
+      if (!result.isConfirmed) return;
+    }
+
+    await regaliaEquip(character.id, regalia.id);
   }
+
+  public treeSummary = computed(() => {
+    const character = this.selectedCharacter();
+    const regalia = this.selectedRegalia();
+    const job = regalia ? getEntry<JobContent>(regalia.jobId) : undefined;
+    return character && regalia && job
+      ? skillTreeBuildSummary(
+          regalia.skillTreeNodeIds,
+          job,
+          characterJobLevel(character, regalia.jobId),
+        )
+      : undefined;
+  });
 
   public async rename(): Promise<void> {
     const regalia = this.selectedRegalia();

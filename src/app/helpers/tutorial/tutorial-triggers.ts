@@ -1,4 +1,5 @@
 import { partyFirstBurstSkillHero } from '@helpers/hero/job';
+import { partyFirstHeroWithFreeSp } from '@helpers/hero/skill-tree';
 import { partyMaxLevel } from '@helpers/item/gathering';
 import { isInfusionUnlocked } from '@helpers/item/infusion';
 import { isReforgeUnlocked } from '@helpers/item/reforge';
@@ -35,6 +36,8 @@ export function tutorialTriggerSatisfied(trigger: TutorialTrigger): boolean {
       return isAnyTrainerDiscovered();
     case 'first-burst-skill':
       return !!partyFirstBurstSkillHero(worldPartyState());
+    case 'first-skill-point':
+      return !!partyFirstHeroWithFreeSp(worldPartyState());
     case 'losing-streak':
       return (
         partyMaxLevel() < trigger.belowLevel &&

@@ -1,0 +1,201 @@
+@let tree = layout();
+@let lockedRow = lockedFromRow();
+
+<ng-template #nodeButton let-node>
+  @let state = stateOf(node.id);
+  @let nodeArt = art(node);
+  @let isSelected = node.id === selectedId();
+
+  <button
+    #box
+    type="button"
+    class="relative overflow-hidden cursor-pointer skill-tree-node skill-tree-node-{{
+      state
+    }}"
+    [attr.data-box-id]="node.id"
+    [class.skill-tree-node-skill]="isSkill(node)"
+    [class.ring-2]="isSelected"
+    [class.ring-base-content]="isSelected"
+    [style.width.px]="nodeSize"
+    [style.height.px]="nodeSize"
+    [tp]="name(node)"
+    (click)="selected.emit(node.id)"
+    (dblclick)="learnRequested.emit(node.id)"
+    appSfx="ui-click"
+    [sfxTrigger]="['click', 'hover']"
+  >
+    <app-icon-item-preview
+      [sprite]="nodeArt.sprite"
+      [spritesheet]="nodeArt.spritesheet"
+      cssClass="zoom-tile"
+    />
+  </button>
+</ng-template>
+
+<ng-template #oathBadge>
+  <span
+    class="badge badge-xs bg-oath border-oath text-base-300 absolute top-full left-1/2 -translate-x-1/2"
+  >
+    Oath
+  </span>
+</ng-template>
+
+<div class="overflow-auto h-full">
+  <div
+    class="grid"
+    [style.grid-template-columns]="tree.columns"
+    [style.grid-template-rows]="tree.rows"
+    [style.column-gap.px]="columnGap"
+  >
+    @if (tree.specColumns) {
+      <span
+        class="type-section-title text-center row-start-1"
+        [style.grid-column]="tree.specColumns"
+      ></span>
+    }
+
+    @for (lane of tree.lanes; track lane.row) {
+      <div
+        class="bg-base-200 row-start-3 -row-end-1"
+        [style.grid-column]="lane.gridColumn"
+      ></div>
+
+      <div
+        class="flex items-end justify-center pb-1 text-center text-sm leading-tight row-start-2"
+        [style.grid-column]="lane.gridColumn"
+      >
+        {{ lane.row }}
+      </div>
+    }
+
+    <div
+      class="border-l border-base-content/20 row-start-1 -row-end-1"
+      [style.grid-column]="tree.dividerColumn"
+    ></div>
+
+    @for (level of tree.levels; track level.level) {
+      <div
+        class="flex items-center px-1 text-sm font-bold col-start-1"
+        [class.text-lighter]="level.level > heroLevel()"
+        [style.grid-row]="level.gridRow"
+      >
+        Lv. {{ level.level }}
+      </div>
+
+      <div
+        class="self-center border-t border-dashed border-base-content/15 col-start-2 -col-end-1"
+        [style.grid-row]="level.gridRow"
+      ></div>
+    }
+
+    @if (lockedRow) {
+      <div
+        class="bg-base-300 opacity-50 pointer-events-none col-start-2 -col-end-1 -row-end-1"
+        [style.grid-row-start]="lockedRow"
+      ></div>
+    }
+
+    <div
+      #overlay
+      class="pointer-events-none col-start-1 -col-end-1 row-start-1 -row-end-1"
+    >
+      <svg class="w-full h-full overflow-visible">
+        <defs>
+          @for (kind of arrowKinds; track kind) {
+            <marker
+              [attr.id]="'skill-tree-arrow-' + kind"
+              markerWidth="8"
+              markerHeight="8"
+              refX="7"
+              refY="4"
+              orient="auto"
+            >
+              <path
+                d="M0,0 L8,4 L0,8 z"
+                class="skill-tree-arrow-head-{{ kind }}"
+              />
+            </marker>
+          }
+        </defs>
+
+        @for (arrow of arrows(); track arrow.fromId + arrow.toId) {
+          @let kind = arrowState(arrow);
+
+          <polyline
+            [attr.points]="arrow.points"
+            [attr.marker-end]="'url(#skill-tree-arrow-' + kind + ')'"
+            class="skill-tree-arrow skill-tree-arrow-{{ kind }}"
+          />
+        }
+      </svg>
+    </div>
+
+    @for (lane of tree.lanes; track lane.row) {
+      <div
+        class="grid row-start-3 -row-end-1"
+        [style.grid-column]="lane.gridColumn"
+        [style.grid-template-rows]="tree.laneRows"
+        [style.grid-template-columns]="lane.trackColumns"
+      >
+        @for (item of lane.items; track item.node.id) {
+          <div
+            class="justify-self-center self-center"
+            [style.grid-row]="item.laneRow"
+            [style.grid-column]="item.track + 1"
+          >
+            @if (item.options.length > 0) {
+              <div
+                #box
+                class="relative flex gap-2 border-oath"
+                [attr.data-box-id]="item.node.id"
+                [style.padding.px]="oathPadding"
+                [style.border-width.px]="oathBorder"
+              >
+                @for (option of item.options; track option.id) {
+                  <ng-container
+                    *ngTemplateOutlet="
+                      nodeButton;
+                      context: { $implicit: option }
+                    "
+                  />
+                }
+                <ng-container *ngTemplateOutlet="oathBadge" />
+              </div>
+            } @else {
+              <ng-container
+                *ngTemplateOutlet="
+                  nodeButton;
+                  context: { $implicit: item.node }
+                "
+              />
+            }
+          </div>
+        }
+      </div>
+    }
+
+    @for (oath of tree.specOaths; track oath.node.id) {
+      <div
+        class="self-center"
+        [style.grid-row]="oath.gridRow"
+        [style.grid-column]="tree.specColumns"
+      >
+        <div
+          #box
+          class="relative flex justify-between border-oath"
+          [attr.data-box-id]="oath.node.id"
+          [style.margin-inline]="tree.specOathInset"
+          [style.padding.px]="oathPadding"
+          [style.border-width.px]="oathBorder"
+        >
+          @for (option of oath.options; track option.id) {
+            <ng-container
+              *ngTemplateOutlet="nodeButton; context: { $implicit: option }"
+            />
+          }
+          <ng-container *ngTemplateOutlet="oathBadge" />
+        </div>
+      </div>
+    }
+  </div>
+</div>

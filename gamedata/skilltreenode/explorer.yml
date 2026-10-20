@@ -172,8 +172,8 @@
 - id: c97ee7ae-aef7-4057-9f63-c146e1954093
   name: 'Explorer: Treasure Hunter'
   jobId: Explorer
-  description: 'Swear the Oath of the Treasure Hunter. Grants +0.05 Luck, +0.1 Agility per level (applied retroactively).'
-  specIcon: gameOpenTreasureChest
+  description: 'Become a Treasure Hunter, not a thief. Grants +0.05 Luck, +0.1 Agility per level.'
+  sprite: '0009'
   effects:
     - { kind: StatPerLevel, stat: Luck, value: 0.05 }
     - { kind: StatPerLevel, stat: Agility, value: 0.1 }
@@ -181,8 +181,8 @@
 - id: 73a19faf-42ac-4bb5-b73c-422523953fb3
   name: 'Explorer: Dungeon Delver'
   jobId: Explorer
-  description: 'Swear the Oath of the Dungeon Delver. Grants +0.15 Intelligence, +0.1 Resistance per level (applied retroactively).'
-  specIcon: gameDungeonGate
+  description: 'Become a Dungeon Delver, an expert in dungeon exploration. Grants +0.15 Intelligence, +0.1 Resistance per level.'
+  sprite: '0008'
   effects:
     - { kind: StatPerLevel, stat: Intelligence, value: 0.15 }
     - { kind: StatPerLevel, stat: Resistance, value: 0.1 }

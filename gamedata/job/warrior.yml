@@ -59,7 +59,7 @@
 
   treeVersion: 1
   treeRows: [Weapon Arts, Shield Arts, Abilities]
-  specializationRows: [Swashbuckler, Defender]
+  specializationRows: [Swashbuckler, Bastion]
 
   starterEquipmentIds:
     - Cloak of Adventuring

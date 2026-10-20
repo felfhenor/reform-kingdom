@@ -106,6 +106,26 @@ export function regaliaPageOpen(characterId: CharacterId): void {
   heroesSubview.set('regalia');
 }
 
+export function skillTreePageOpen(characterId: CharacterId): void {
+  heroesSelectCharacter(characterId);
+  heroesSubview.set('skilltree');
+}
+
+// Set by a page holding unconfirmed work; navigating away asks it first, and it calls `proceed` if the player agrees.
+export const navigationLeaveGuard = signal<
+  ((proceed: () => void) => void) | undefined
+>(undefined);
+
+export function navigationGuarded(proceed: () => void): void {
+  const guard = navigationLeaveGuard();
+  if (guard) {
+    guard(proceed);
+    return;
+  }
+
+  proceed();
+}
+
 // Not cleared on close - clearing it would collapse the modal's DOM mid-transition.
 export const heroBurstSkillsModalCharacterId = signal<CharacterId | undefined>(
   undefined,

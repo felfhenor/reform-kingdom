@@ -241,3 +241,15 @@ export function regaliaSkillTreeMigrate(
     skillTreeVersion: seeded.skillTreeVersions[jobId] ?? 0,
   };
 }
+
+export function partyFirstHeroWithFreeSp<
+  T extends Pick<
+    Character,
+    'jobId' | 'level' | 'jobProgress' | 'skillTreeNodes'
+  >,
+>(party: T[]): T | undefined {
+  return party.find(
+    (character) =>
+      characterSkillTreeAvailableSp(character, character.jobId) > 0,
+  );
+}
