@@ -39,10 +39,14 @@ describe('combatCoveringAlly', () => {
     expect(cover([hero('t', 0, { hp: 10 }), guard])).toBeUndefined();
   });
 
-  it('picks the first eligible ally', () => {
-    const [low, first, second] = [hero('l', 3), hero('a', 10), hero('b', 10)];
+  it('picks the healthiest eligible ally', () => {
+    const [low, hurt, healthy] = [
+      hero('l', 3),
+      hero('h', 10, { hp: 40 }),
+      hero('ok', 10, { hp: 90 }),
+    ];
 
-    expect(cover([wounded('t'), low, first, second])).toBe(first);
+    expect(cover([wounded('t'), low, hurt, healthy])).toBe(healthy);
   });
 
   it('only uses living, able-to-act allies with a threshold', () => {

@@ -5,6 +5,7 @@ import {
 import { techniqueHasAttribute } from '@helpers/combat/combat-damage';
 import { combatCanTakeTurn } from '@helpers/combat/combat-statuseffects';
 import type { Combatant, EquipmentSkillContentTechnique } from '@interfaces';
+import { maxBy } from 'es-toolkit/compat';
 
 function combatCoverCandidates(
   attacker: Combatant,
@@ -38,5 +39,8 @@ export function combatCoveringAlly(
   }
   if (!techniqueHasAttribute(technique, 'DamagesTarget')) return undefined;
 
-  return combatCoverCandidates(attacker, target, validTargets)[0];
+  return maxBy(
+    combatCoverCandidates(attacker, target, validTargets),
+    combatantHealthPercent,
+  );
 }
