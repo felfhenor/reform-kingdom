@@ -36,6 +36,7 @@ import type {
 } from '@interfaces';
 import { buildCharacter, buildEquipmentItem } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
+import { buildEffectNode, heroLearning } from '@/testing/skill-tree';
 import { seedGamestate } from '@/testing/gamestate';
 
 const jobId = 'job-explorer' as JobId;
@@ -96,17 +97,19 @@ function hero(overrides: Partial<Character> = {}): Character {
   return buildCharacter({ jobId, ...overrides });
 }
 
+const baseContent = [
+  job,
+  cloak,
+  starterHat,
+  sword,
+  cursedRing,
+  trinket,
+  mighty,
+  drill,
+];
+
 beforeEach(() => {
-  seedContent([
-    job,
-    cloak,
-    starterHat,
-    sword,
-    cursedRing,
-    trinket,
-    mighty,
-    drill,
-  ]);
+  seedContent(baseContent);
 });
 
 describe('characterXpForLevel', () => {
@@ -184,11 +187,12 @@ describe('characterStatsForLevel', () => {
     ).toBe(5 + (0.5 + 0.25) * 4);
   });
 
-  it('includes debug-granted effects in characterStats', () => {
-    const jala = hero({
-      level: 3,
-      debugEffects: [{ kind: 'StatPerLevel', stat: 'Strength', value: 1 }],
-    });
+  it('includes learned node effects in characterStats', () => {
+    const grant = buildEffectNode('grant', [
+      { kind: 'StatPerLevel', stat: 'Strength', value: 1 },
+    ]);
+    seedContent([...baseContent, grant]);
+    const jala = heroLearning(hero({ level: 3 }), grant);
 
     expect(characterStats(jala).Strength).toBe(5 + (0.5 + 1) * 2);
   });

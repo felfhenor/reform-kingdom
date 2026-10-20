@@ -4,6 +4,7 @@ import { buildCharacter, buildEquipmentItem } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
 import { abilityJobContent, buildAbilityHero } from '@/testing/job-ability';
+import { buildEffectNode, heroLearning } from '@/testing/skill-tree';
 import { DEBUFF_POTENCY_PER_RANK } from '@helpers/config';
 import {
   combatantFromCharacter,
@@ -166,15 +167,14 @@ describe('combatantFromCharacter', () => {
   });
 
   it('adds Monster Research ranks to debuff effects for its debuff potency', () => {
-    seedContent(abilityJobContent('Delver', [['DebuffPotency', 1, 2]]));
-    const delver = buildAbilityHero(
-      'Delver',
-      1,
-      {},
-      {
-        debugEffects: [{ kind: 'DebuffPotency', chance: 1, duration: 1 }],
-      },
-    );
+    const potency = buildEffectNode('potency', [
+      { kind: 'DebuffPotency', chance: 1, duration: 1 },
+    ]);
+    seedContent([
+      ...abilityJobContent('Delver', [['DebuffPotency', 1, 2]]),
+      potency,
+    ]);
+    const delver = heroLearning(buildAbilityHero('Delver', 1), potency);
 
     expect(combatantFromCharacter(delver).debuffPotency).toEqual({
       chance: 1 + 2 * DEBUFF_POTENCY_PER_RANK.chance,

@@ -4,7 +4,6 @@ import type { EquipmentSkillId } from '@interfaces/content-skill';
 import type { SkillTreeNodeId } from '@interfaces/content-skilltreenode';
 import type { TrainerTeachingId } from '@interfaces/content-trainer-teaching';
 import type { EquipmentBlock } from '@interfaces/equipment';
-import type { HeroEffect } from '@interfaces/hero-effect';
 import type { Branded } from '@interfaces/identifiable';
 import type { RegaliaId } from '@interfaces/regalia';
 import type { StatBlock } from '@interfaces/stat';
@@ -45,8 +44,6 @@ export type Character = {
   burstSkills: Partial<Record<JobId, EquipmentSkillId[]>>;
   // The regalia last loaded for each job, re-equipped when reclassing back into that job.
   currentRegaliaIds: Partial<Record<JobId, RegaliaId>>;
-  // Granted by debug helpers to try effects before any content grants them.
-  debugEffects?: HeroEffect[];
 
   hp: number;
   ep: number;
@@ -58,12 +55,7 @@ export type Character = {
 // Everything a hero's stats and skills are derived from - spread over a hero to preview a change, e.g. `{ ...character, level }`.
 export type CharacterStatSource = Pick<
   Character,
-  | 'jobId'
-  | 'level'
-  | 'equipment'
-  | 'teachings'
-  | 'skillTreeNodes'
-  | 'debugEffects'
+  'jobId' | 'level' | 'equipment' | 'teachings' | 'skillTreeNodes'
 >;
 
 export type CharacterXpGain = {

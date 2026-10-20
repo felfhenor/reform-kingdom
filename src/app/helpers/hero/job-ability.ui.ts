@@ -99,10 +99,7 @@ function abilityRankNodes(
 
 // Each ability the hero holds; its tier and next rank come from the current job's tree.
 export function characterJobAbilityRows(
-  character: Pick<
-    Character,
-    'jobId' | 'teachings' | 'skillTreeNodes' | 'debugEffects'
-  >,
+  character: Pick<Character, 'jobId' | 'teachings' | 'skillTreeNodes'>,
 ): JobAbilityRow[] {
   const learned = new Set(character.skillTreeNodes?.[character.jobId] ?? []);
   const nodes = skillTreeJobNodes(character.jobId);

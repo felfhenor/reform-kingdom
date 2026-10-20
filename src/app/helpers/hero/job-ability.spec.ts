@@ -15,6 +15,7 @@ import {
   buildAbilityHero,
   buildJobAbility,
 } from '@/testing/job-ability';
+import { buildEffectNode, heroLearning } from '@/testing/skill-tree';
 
 const healer = abilityJobContent('Healer', [
   ['RestoreHealthOOC', 1, 0.5],
@@ -58,17 +59,11 @@ describe('characterJobAbilities', () => {
   ])(
     'at level %i a granted %s rank resolves Trailbreaker to %s',
     (level, granted, expected) => {
-      seedContent(warrior);
-      const hero = buildAbilityHero(
-        'Warrior',
-        level,
-        {},
-        {
-          debugEffects: [
-            { kind: 'JobAbility', jobAbilityId: onPathId, value: granted },
-          ],
-        },
-      );
+      const grant = buildEffectNode('grant', [
+        { kind: 'JobAbility', jobAbilityId: onPathId, value: granted },
+      ]);
+      seedContent([...warrior, grant]);
+      const hero = heroLearning(buildAbilityHero('Warrior', level), grant);
 
       const onPath = characterJobAbilities(hero).find(
         ({ ability }) => ability.type === 'OnPathTravelSpeed',
@@ -79,22 +74,16 @@ describe('characterJobAbilities', () => {
   );
 
   it('keeps the highest of several grants instead of stacking them', () => {
-    seedContent(warrior);
-    const hero = buildAbilityHero(
-      'Warrior',
-      1,
-      {},
+    const grant = buildEffectNode('grant', [
+      { kind: 'JobAbility', jobAbilityId: onPathId, value: 0.3 },
       {
-        debugEffects: [
-          { kind: 'JobAbility', jobAbilityId: onPathId, value: 0.3 },
-          {
-            kind: 'JobAbility',
-            jobAbilityId: 'OnPathTravelSpeed' as JobAbilityId,
-            value: 0.4,
-          },
-        ],
+        kind: 'JobAbility',
+        jobAbilityId: 'OnPathTravelSpeed' as JobAbilityId,
+        value: 0.4,
       },
-    );
+    ]);
+    seedContent([...warrior, grant]);
+    const hero = heroLearning(buildAbilityHero('Warrior', 1), grant);
 
     expect(
       characterJobAbilities(hero).filter(
@@ -104,21 +93,15 @@ describe('characterJobAbilities', () => {
   });
 
   it("grants an ability the hero's job doesn't have", () => {
-    seedContent([...plain, buildJobAbility('Ambush')]);
-    const hero = buildAbilityHero(
-      'Plain',
-      1,
-      {},
+    const grant = buildEffectNode('grant', [
       {
-        debugEffects: [
-          {
-            kind: 'JobAbility',
-            jobAbilityId: 'Ambush-id' as JobAbilityId,
-            value: 5,
-          },
-        ],
+        kind: 'JobAbility',
+        jobAbilityId: 'Ambush-id' as JobAbilityId,
+        value: 5,
       },
-    );
+    ]);
+    seedContent([...plain, buildJobAbility('Ambush'), grant]);
+    const hero = heroLearning(buildAbilityHero('Plain', 1), grant);
 
     expect(
       characterJobAbilities(hero).map(({ ability, value }) => [

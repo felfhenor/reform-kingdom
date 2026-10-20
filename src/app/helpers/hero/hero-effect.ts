@@ -9,23 +9,16 @@ import { sumBy } from 'es-toolkit/compat';
 
 // Gear is excluded: equipment totals already fold its affixes in. Only the current job's tree applies.
 export function characterNonGearEffects(
-  character: Pick<
-    Character,
-    'jobId' | 'teachings' | 'skillTreeNodes' | 'debugEffects'
-  >,
+  character: Pick<Character, 'jobId' | 'teachings' | 'skillTreeNodes'>,
 ): HeroEffect[] {
   return [
     ...trainerTeachingEffects(characterAllTeachingIds(character)),
     ...skillTreeNodeEffects(character.skillTreeNodes?.[character.jobId] ?? []),
-    ...(character.debugEffects ?? []),
   ];
 }
 
 export function characterDebuffPotency(
-  character: Pick<
-    Character,
-    'jobId' | 'teachings' | 'skillTreeNodes' | 'debugEffects'
-  >,
+  character: Pick<Character, 'jobId' | 'teachings' | 'skillTreeNodes'>,
 ): DebuffPotency {
   const effects = affixEffectsOfKind(
     characterNonGearEffects(character),

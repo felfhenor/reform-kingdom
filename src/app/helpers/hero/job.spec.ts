@@ -145,21 +145,6 @@ describe('Job Helper Functions', () => {
       ).toEqual(['Attack', 'Double Strike I', 'Sweep I']);
     });
 
-    it('includes skills granted by debug effects', () => {
-      seedContent([mockJobExplorer, attack, doubleStrike1, sweep1]);
-
-      expect(
-        characterSkills({
-          jobId: mockJobExplorer.id,
-          level: 1,
-          equipment: defaultEquipment(),
-          teachings: {},
-          skillTreeNodes: {},
-          debugEffects: [{ kind: 'GrantSkill', skillId: sweep1.id }],
-        }).map((skill) => skill.id),
-      ).toContain(sweep1.id);
-    });
-
     it('merges teaching-granted skills alongside equipment grants', () => {
       const skills = heroSkillsWithEquipment(
         defaultEquipment(),

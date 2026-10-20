@@ -73,7 +73,6 @@ import {
   type CollectibleId,
   type EquipmentContent,
   type EquipmentId,
-  type HeroEffect,
   type ItemContent,
   type ItemId,
   type SkillTreeNodeId,
@@ -214,23 +213,6 @@ export function debugLearnSkillTreeNode(
       ...c.skillTreeNodes,
       [c.jobId]: [...(c.skillTreeNodes[c.jobId] ?? []), nodeId],
     },
-  }));
-}
-
-export function debugGrantEffect(
-  characterId: CharacterId,
-  effect: HeroEffect,
-): void {
-  debugUpdateCharacter(characterId, (character) => ({
-    ...character,
-    debugEffects: [...(character.debugEffects ?? []), effect],
-  }));
-}
-
-export function debugClearEffects(characterId: CharacterId): void {
-  debugUpdateCharacter(characterId, (character) => ({
-    ...character,
-    debugEffects: [],
   }));
 }
 

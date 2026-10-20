@@ -49,12 +49,9 @@ export type CharacterJobAbility = {
   value: number;
 };
 
-// Every JobAbility grant (tree nodes, teachings, debug) at its highest value; ranks of one ability never stack.
+// Every JobAbility grant (tree nodes, teachings) at its highest value; ranks of one ability never stack.
 export function characterJobAbilities(
-  character: Pick<
-    Character,
-    'jobId' | 'teachings' | 'skillTreeNodes' | 'debugEffects'
-  >,
+  character: Pick<Character, 'jobId' | 'teachings' | 'skillTreeNodes'>,
 ): CharacterJobAbility[] {
   const values = new Map<JobAbilityId, number>();
   affixEffectsOfKind(characterNonGearEffects(character), 'JobAbility').forEach(
@@ -78,10 +75,7 @@ export function characterJobAbilities(
 
 // 0 if the hero lacks it.
 export function characterJobAbilityValue(
-  character: Pick<
-    Character,
-    'jobId' | 'teachings' | 'skillTreeNodes' | 'debugEffects'
-  >,
+  character: Pick<Character, 'jobId' | 'teachings' | 'skillTreeNodes'>,
   type: JobAbilityType,
 ): number {
   return (
