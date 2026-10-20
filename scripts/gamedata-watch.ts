@@ -92,28 +92,42 @@ const getAllUsedSprites = () => {
   }
 };
 
+// An 'error' event with no listener throws and kills the watcher (e.g. EPERM on a locked file mid-save on Windows).
+const logWatchError = (error: unknown) =>
+  console.error('[helpers] Watcher error:', error);
+
+// Skips editors' temp files (e.g. paint.net's locked `*.pdnSave`), which fs.watch can't open while they're being written.
+const onlyFilesEndingWith =
+  (extension: string) => (file: string, stats?: { isFile: () => boolean }) =>
+    !!(stats?.isFile() && !file.endsWith(extension));
+
 const startWatch = async () => {
   console.info(`[helpers] Watching gamedata, gameassets & gamemaps changes...`);
   allUsedSpritesheetKeys = getAllUsedSprites();
 
   chokidar
-    .watch('gamemaps', {
-      ignored: (file: string, stats?: { isFile: () => boolean }) =>
-        !!(stats?.isFile() && !file.endsWith('.json')),
-    })
+    .watch('gamemaps', { ignored: onlyFilesEndingWith('.json') })
+    .on('error', logWatchError)
     .on('change', (name: string) => {
       console.info(`[helpers] ${name} changed.`);
       rebuildMaps();
     });
 
-  chokidar.watch('gamedata').on('change', (name: string) => {
-    console.info(`[helpers] ${name} changed.`);
-    rebuildGamedata();
-  });
+  chokidar
+    .watch('gamedata', { ignored: onlyFilesEndingWith('.yml') })
+    .on('error', logWatchError)
+    .on('change', (name: string) => {
+      console.info(`[helpers] ${name} changed.`);
+      rebuildGamedata();
+    });
 
   // Added, replaced or removed art changes the packed sheets even when no content changed.
   chokidar
-    .watch('gameassets', { ignoreInitial: true })
+    .watch('gameassets', {
+      ignoreInitial: true,
+      ignored: onlyFilesEndingWith('.png'),
+    })
+    .on('error', logWatchError)
     .on('all', (event: string, name: string) => {
       if (!['add', 'change', 'unlink'].includes(event)) return;
       console.info(`[helpers] ${name} ${event}.`);
