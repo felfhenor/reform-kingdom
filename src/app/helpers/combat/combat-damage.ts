@@ -347,16 +347,19 @@ export function combatApplySkillToTarget(
     const potency = combatantDebuffPotency(combatant, effectContent);
     const totalChance =
       skillTechniqueStatusEffectChance(skill, effData) + potency.chance;
-    const luckAdjustedChance = luckReducedChance(
-      totalChance,
-      target.totalStats.Luck,
-    );
+    // Luck and gear only shrug off harm: a buff lands at its own chance.
+    const isBuff = effectContent.effectType === 'Buff';
+    const rollChance = isBuff
+      ? totalChance
+      : luckReducedChance(totalChance, target.totalStats.Luck);
 
-    if (!rngSucceedsChance(luckAdjustedChance)) return;
+    if (!rngSucceedsChance(rollChance)) return;
 
     // Independent second roll - gear resistance doesn't multiply into the
     // LUK roll above, it's a separate chance to shrug the effect off.
-    const tagResistance = statusEffectTagResistance(target, effectContent.tags);
+    const tagResistance = isBuff
+      ? 0
+      : statusEffectTagResistance(target, effectContent.tags);
 
     if (tagResistance > 0 && rngSucceedsChance(tagResistance)) {
       combatMessageLog(

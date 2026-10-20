@@ -556,6 +556,36 @@ describe('combatApplySkillToTarget status effect resistance', () => {
     expect(rngSucceedsChance).toHaveBeenNthCalledWith(2, 25);
   });
 
+  it('lands a buff at its own chance, ignoring Luck and gear resistance', () => {
+    const buff = ensureStatusEffect({
+      id: 'test-buff' as StatusEffectId,
+      name: 'Test Buff',
+      effectType: 'Buff',
+      tags: ['Stun'],
+    });
+    seedContent([buff]);
+    vi.mocked(rngSucceedsChance).mockReturnValueOnce(true);
+
+    const ally = buildCombatant({
+      id: 'ally',
+      tagResistance: { ...defaultTagResistances(), Stun: 100 },
+    });
+    ally.totalStats.Luck = 500;
+    const caster = buildCombatant({ id: 'caster' });
+    combatApplySkillToTarget(
+      buildCombat({ heroes: [caster, ally] }),
+      caster,
+      ally,
+      buildSkill(),
+      buildTechnique({
+        statusEffects: [{ statusEffectId: buff.id, chance: 100, duration: 3 }],
+      }),
+    );
+
+    expect(ally.statusEffects).toHaveLength(1);
+    expect(rngSucceedsChance).toHaveBeenNthCalledWith(1, 100);
+  });
+
   it("skips the gear roll entirely when the target has no resistance to the effect's tags", () => {
     vi.mocked(rngSucceedsChance).mockReturnValueOnce(true); // LUK roll: not resisted
 
