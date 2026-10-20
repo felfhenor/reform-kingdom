@@ -32,11 +32,16 @@
   </button>
 </ng-template>
 
-<ng-template #oathBadge>
+<ng-template #oathBadge let-oath>
+  @let choice = oathChoice(oath);
+
   <span
-    class="badge badge-xs bg-oath border-oath text-base-300 absolute top-full left-1/2 -translate-x-1/2"
+    class="badge badge-xs whitespace-nowrap text-base-300 absolute top-full left-1/2 -translate-x-1/2 z-10"
+    [class.bg-oath]="choice?.state !== 'pending'"
+    [class.border-oath]="choice?.state !== 'pending'"
+    [class.badge-warning]="choice?.state === 'pending'"
   >
-    Oath
+    {{ choice?.name ?? 'Oath' }}
   </span>
 </ng-template>
 
@@ -136,6 +141,7 @@
         [style.grid-column]="lane.gridColumn"
         [style.grid-template-rows]="tree.laneRows"
         [style.grid-template-columns]="lane.trackColumns"
+        [style.padding-inline.px]="tree.lanePadding"
       >
         @for (item of lane.items; track item.node.id) {
           <div
@@ -146,8 +152,9 @@
             @if (item.options.length > 0) {
               <div
                 #box
-                class="relative flex gap-2 border-oath"
+                class="relative flex border-oath"
                 [attr.data-box-id]="item.node.id"
+                [style.column-gap.px]="oathOptionGap"
                 [style.padding.px]="oathPadding"
                 [style.border-width.px]="oathBorder"
               >
@@ -159,7 +166,12 @@
                     "
                   />
                 }
-                <ng-container *ngTemplateOutlet="oathBadge" />
+                <ng-container
+                  *ngTemplateOutlet="
+                    oathBadge;
+                    context: { $implicit: item.node }
+                  "
+                />
               </div>
             } @else {
               <ng-container
@@ -193,7 +205,9 @@
               *ngTemplateOutlet="nodeButton; context: { $implicit: option }"
             />
           }
-          <ng-container *ngTemplateOutlet="oathBadge" />
+          <ng-container
+            *ngTemplateOutlet="oathBadge; context: { $implicit: oath.node }"
+          />
         </div>
       </div>
     }

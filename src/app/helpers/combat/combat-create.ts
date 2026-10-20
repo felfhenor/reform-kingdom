@@ -39,7 +39,6 @@ import type {
   CombatId,
   CombatStat,
   DebuffPotency,
-  EquipmentSkillContent,
   EquipmentSkillId,
   GameStat,
   JobContent,
@@ -48,18 +47,21 @@ import type {
   TownDefenseGuardianEntry,
 } from '@interfaces';
 
-function heroUsableSkillIds(
+// Skills changed by skill tree oaths travel as full copies; content lookups by id would drop the changes.
+function heroCombatSkills(
   character: Character,
-  skillIds: EquipmentSkillId[],
-): EquipmentSkillId[] {
+): Pick<Combatant, 'skillIds' | 'skillRefs'> {
   const equippedWeaponTypes = equippedItemTypes(character.equipment);
+  const usable = characterCombatSkills(character).filter((skill) =>
+    skillIsUsableWithEquippedWeapons(skill, equippedWeaponTypes),
+  );
 
-  return skillIds.filter((skillId) => {
-    const skill = getEntry<EquipmentSkillContent>(skillId);
-    return (
-      !skill || skillIsUsableWithEquippedWeapons(skill, equippedWeaponTypes)
-    );
-  });
+  return {
+    skillIds: usable
+      .filter((skill) => !skill.modifiers)
+      .map((skill) => skill.id),
+    skillRefs: usable.filter((skill) => !!skill.modifiers),
+  };
 }
 
 // Applied once here rather than read live, so the buff holds for the whole encounter even if its timer expires mid-fight.
@@ -139,13 +141,9 @@ export function combatantFromCharacter(character: Character): Combatant {
     sprite: job?.sprite ?? '',
     frames: job?.frames ?? 4,
 
-    skillIds: job
-      ? heroUsableSkillIds(
-          character,
-          characterCombatSkills(character).map((skill) => skill.id),
-        )
-      : ['Attack' as EquipmentSkillId],
-    skillRefs: [],
+    ...(job
+      ? heroCombatSkills(character)
+      : { skillIds: ['Attack' as EquipmentSkillId], skillRefs: [] }),
     skillWeights: {},
 
     combatOrders: character.combatOrders[character.jobId] ?? [],

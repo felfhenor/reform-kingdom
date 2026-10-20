@@ -8,7 +8,8 @@ import type {
   EquipmentSkillContentTechnique,
   GameElement,
 } from '@interfaces';
-import { clamp, mean } from 'es-toolkit/compat';
+import { GameElementCombinationNames } from '@interfaces';
+import { clamp, mean, sortBy, uniq } from 'es-toolkit/compat';
 
 export function elementalResistanceClamp(block: ElementBlock): ElementBlock {
   return mapElementBlock(block, (value) =>
@@ -72,11 +73,24 @@ export function elementalDamageMultiplier(
   );
 }
 
+export function elementCombinationName(
+  elements: GameElement[],
+): string | undefined {
+  return GameElementCombinationNames[sortBy(uniq(elements)).join('/')];
+}
+
+// e.g. "Steam" for Fire/Water, or "Fire/Earth/Air" for a mix with no name.
+export function elementsLabel(elements: GameElement[]): string {
+  const joined = elements.join('/');
+  const name = elementCombinationName(elements);
+  return name ?? joined;
+}
+
 export function elementalDamageText(
   damage: number,
   elements: GameElement[],
 ): string {
   return elements.length > 0
-    ? `${damage} ${elements.join('/')} damage`
+    ? `${damage} ${elementsLabel(elements)} damage`
     : `${damage} damage`;
 }

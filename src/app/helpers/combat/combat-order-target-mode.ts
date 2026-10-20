@@ -3,6 +3,7 @@ import type {
   CombatOrderCondition,
   EquipmentSkillContent,
 } from '@interfaces';
+import { skillOwnTechniques } from '@helpers/hero/skill-modifier';
 
 // These modes can resolve to zero targets, so the engine checks them before committing to a clause.
 export function combatOrderTargetModeNeedsValidityCheck(
@@ -41,12 +42,13 @@ export function isCombatOrderTargetModeUsable(
   const skill = heroSkills.find((s) => s.family === family);
   if (!skill) return true;
 
+  const techniques = skillOwnTechniques(skill);
   if (targetMode === 'Self') {
-    return skill.techniques.some((tech) => tech.targetType !== 'Enemies');
+    return techniques.some((tech) => tech.targetType !== 'Enemies');
   }
 
   const side = targetMode === 'MatchingEnemies' ? 'Enemies' : 'Allies';
-  return skill.techniques.some(
+  return techniques.some(
     (tech) => tech.targetType === side || tech.targetType === 'All',
   );
 }

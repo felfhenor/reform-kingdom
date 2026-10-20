@@ -6,6 +6,7 @@ import {
   elementPool,
   elementPoolCanPay,
 } from '@helpers/combat/combat-element-pool';
+import { skillOwnTechniques } from '@helpers/hero/skill-modifier';
 import { combatantSkillOnCooldown } from '@helpers/combat/combat-skill-cooldown';
 import { combatantHasActiveStatusEffect } from '@helpers/combat/combat-statuseffects';
 import { combatantHasLivingSummon } from '@helpers/combat/combat-summon';
@@ -255,7 +256,7 @@ export function combatSkillHasValidTargetsForMode(
   mode: CombatantTargettingType,
   context: CombatTargetModeContext,
 ): boolean {
-  return skill.techniques.some((tech) => {
+  return skillOwnTechniques(skill).some((tech) => {
     const baseList = combatGetPossibleCombatantTargetsForSkillTechnique(
       combat,
       combatant,

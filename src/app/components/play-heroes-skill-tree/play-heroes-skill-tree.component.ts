@@ -114,11 +114,6 @@ export class PlayHeroesSkillTreeComponent {
       : 0;
   });
 
-  public selectedState = computed(() => {
-    const id = this.selectedNodeId();
-    return id ? this.states().get(id) : undefined;
-  });
-
   public selectedNode = computed(() => {
     const id = this.selectedNodeId();
     return id ? getEntry<SkillTreeNodeContent>(id) : undefined;

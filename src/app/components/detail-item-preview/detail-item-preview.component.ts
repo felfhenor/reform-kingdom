@@ -6,6 +6,7 @@ import { RowSkillStatBonusesComponent } from '@components/row-skill-stat-bonuses
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
+import { elementsLabel } from '@helpers/combat/combat-element';
 import {
   type CombatStatBlock,
   type ElementBlock,
@@ -32,6 +33,7 @@ import {
 })
 export class DetailItemPreviewComponent {
   public display = input.required<ItemPreviewDisplay>();
+  public readonly elementsLabel = elementsLabel;
   // Extra flat bonus (e.g. infusions), shown as its own row - unset for non-equipment.
   public bonusStats = input<StatBlock>();
   public bonusResistances = input<StatusEffectBlock>();

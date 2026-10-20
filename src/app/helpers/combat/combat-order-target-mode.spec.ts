@@ -54,6 +54,23 @@ describe('isCombatOrderTargetModeUsable', () => {
     ).toBe(true);
   });
 
+  it('ignores echoed hits, which pick their own targets', () => {
+    const echoing = {
+      ...smite,
+      techniques: [
+        ...smite.techniques,
+        {
+          ...ensureEquipmentSkillTechnique({ targetType: 'Allies' }),
+          echo: true,
+        },
+      ],
+    };
+
+    expect(isCombatOrderTargetModeUsable('Smite', [echoing], 'Self')).toBe(
+      false,
+    );
+  });
+
   it('allows the HP-based modes and unknown families', () => {
     expect(isCombatOrderTargetModeUsable('Smite', [smite], 'Weakest')).toBe(
       true,

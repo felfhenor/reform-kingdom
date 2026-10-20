@@ -16,6 +16,7 @@ import {
 import {
   skillTreeJobNodes,
   skillTreeNodeLevel,
+  skillTreeNodeShortName,
   skillTreeOptionOath,
 } from '@helpers/hero/skill-tree-content';
 import { updateGamestate } from '@helpers/state-game';
@@ -29,6 +30,7 @@ import type {
   SkillTreeNodeContent,
   SkillTreeNodeId,
   SkillTreeNodeState,
+  SkillTreeOathChoice,
 } from '@interfaces';
 import { isEqual, sortBy } from 'es-toolkit/compat';
 
@@ -134,6 +136,22 @@ export function characterSkillTreeNodeStates(
   return new Map(
     nodes.map((node) => [node.id, skillTreeNodeStateOf(node, nodes, context)]),
   );
+}
+
+export function skillTreeOathChoice(
+  oath: SkillTreeNodeContent,
+  states: Map<SkillTreeNodeId, SkillTreeNodeState>,
+): SkillTreeOathChoice | undefined {
+  const chosen = oath.optionSkillTreeNodeIds
+    .map((id) => getEntry<SkillTreeNodeContent>(id))
+    .find((option) => {
+      const state = option ? states.get(option.id) : undefined;
+      return state === 'learned' || state === 'pending';
+    });
+  const state = chosen ? states.get(chosen.id) : undefined;
+  return chosen && state
+    ? { name: skillTreeNodeShortName(chosen), state }
+    : undefined;
 }
 
 // Unstaging a node also unstages anything staged that depended on it.

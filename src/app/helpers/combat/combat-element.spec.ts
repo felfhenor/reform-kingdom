@@ -4,6 +4,7 @@ import {
   elementalBoonMultiplier,
   elementalDamageMultiplier,
   elementalDamageText,
+  elementsLabel,
   elementalResistanceClamp,
   elementalResistMultiplier,
 } from '@helpers/combat/combat-element';
@@ -80,12 +81,19 @@ describe('elemental multipliers', () => {
   });
 });
 
+describe('elementsLabel', () => {
+  it('names a pair or all four in any order, and lists other mixes', () => {
+    expect(elementsLabel(['Water', 'Earth'])).toBe('Mud');
+    expect(elementsLabel(['Air', 'Fire', 'Water', 'Earth'])).toBe('Holy');
+    expect(elementsLabel(['Fire', 'Earth', 'Air'])).toBe('Fire/Earth/Air');
+    expect(elementsLabel(['Fire'])).toBe('Fire');
+  });
+});
+
 describe('elementalDamageText', () => {
   it('names the element(s), or falls back to plain damage', () => {
     expect(elementalDamageText(12, ['Fire'])).toBe('12 Fire damage');
-    expect(elementalDamageText(12, ['Fire', 'Water'])).toBe(
-      '12 Fire/Water damage',
-    );
+    expect(elementalDamageText(12, ['Fire', 'Water'])).toBe('12 Steam damage');
     expect(elementalDamageText(0, [])).toBe('0 damage');
   });
 });

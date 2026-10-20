@@ -1,7 +1,9 @@
 import type { AtlasedImage } from '@interfaces/artable';
+import type { GameElement } from '@interfaces/element';
 import type {
   SkillTreeNodeContent,
   SkillTreeNodeId,
+  SkillTreeNodeState,
   SkillTreeRow,
 } from '@interfaces/content-skilltreenode';
 
@@ -48,6 +50,7 @@ export type SkillTreeLayout = {
   columns: string;
   rows: string;
   laneRows: string;
+  lanePadding: number;
   levels: SkillTreeLayoutLevel[];
   lanes: SkillTreeLayoutLane[];
   dividerColumn: number;
@@ -56,8 +59,18 @@ export type SkillTreeLayout = {
   specOathInset: string;
 };
 
+// One label's skill modifiers; added elements are kept apart so they can show as badges.
+export type SkillModifierLine = {
+  label: string;
+  elements: GameElement[];
+  texts: string[];
+};
+
+// The option picked for an oath, confirmed or only staged.
+export type SkillTreeOathChoice = { name: string; state: SkillTreeNodeState };
+
 export type SkillTreeNodeKind =
-  'Skill' | 'Job Ability' | 'Specialization' | 'Perk';
+  'Skill' | 'Job Ability' | 'Skill Modifier' | 'Specialization' | 'Perk';
 
 export type SkillTreeNodeArt = { sprite: string; spritesheet: AtlasedImage };
 

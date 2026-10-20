@@ -7,7 +7,8 @@
   row: Weapon Arts
   default: true
   effects:
-    - { kind: GrantSkill, skillId: 'Double Strike I' }
+    - kind: GrantSkill
+      skillId: 'Double Strike I'
 
 - id: 853247b9-75c1-4b81-834f-f3e1b7f3b25f
   name: 'Warrior: Double Strike II'
@@ -16,7 +17,8 @@
   row: Weapon Arts
   requiredSkillTreeNodeIds: ['Warrior: Double Strike I']
   effects:
-    - { kind: GrantSkill, skillId: 'Double Strike II' }
+    - kind: GrantSkill
+      skillId: 'Double Strike II'
 
 - id: 0a093cbd-4730-4063-a044-90afbb0dc4a6
   name: 'Warrior: Double Strike III'
@@ -25,7 +27,8 @@
   row: Weapon Arts
   requiredSkillTreeNodeIds: ['Warrior: Double Strike II']
   effects:
-    - { kind: GrantSkill, skillId: 'Double Strike III' }
+    - kind: GrantSkill
+      skillId: 'Double Strike III'
 
 - id: b8f4a489-baeb-4154-aead-43b792532db5
   name: 'Warrior: Double Strike IV'
@@ -34,7 +37,8 @@
   row: Weapon Arts
   requiredSkillTreeNodeIds: ['Warrior: Double Strike III']
   effects:
-    - { kind: GrantSkill, skillId: 'Double Strike IV' }
+    - kind: GrantSkill
+      skillId: 'Double Strike IV'
 
 # --- Weapon Arts / track 1 ---
 
@@ -46,7 +50,8 @@
   track: 1
   requiredSkillTreeNodeIds: ['Warrior: Double Strike I']
   effects:
-    - { kind: GrantSkill, skillId: 'Sweep I' }
+    - kind: GrantSkill
+      skillId: 'Sweep I'
 
 - id: 1e46fbd5-bdb6-4ed5-9638-a33598f552d4
   name: 'Warrior: Sweep II'
@@ -56,7 +61,8 @@
   track: 1
   requiredSkillTreeNodeIds: ['Warrior: Sweep I']
   effects:
-    - { kind: GrantSkill, skillId: 'Sweep II' }
+    - kind: GrantSkill
+      skillId: 'Sweep II'
 
 - id: b8e81d21-0741-4dbb-99fb-cd3d65be0591
   name: 'Warrior: Sweep III'
@@ -66,7 +72,8 @@
   track: 1
   requiredSkillTreeNodeIds: ['Warrior: Sweep II']
   effects:
-    - { kind: GrantSkill, skillId: 'Sweep III' }
+    - kind: GrantSkill
+      skillId: 'Sweep III'
 
 - id: 23dce1c6-4b24-4d4e-82d0-80a4bd37b39d
   name: 'Warrior: Sweep IV'
@@ -76,7 +83,8 @@
   track: 1
   requiredSkillTreeNodeIds: ['Warrior: Sweep III']
   effects:
-    - { kind: GrantSkill, skillId: 'Sweep IV' }
+    - kind: GrantSkill
+      skillId: 'Sweep IV'
 
 # --- Weapon Arts / track 2 ---
 
@@ -88,7 +96,8 @@
   track: 2
   requiredSkillTreeNodeIds: ['Warrior: Double Strike I']
   effects:
-    - { kind: GrantSkill, skillId: 'Charged Strike I' }
+    - kind: GrantSkill
+      skillId: 'Charged Strike I'
 
 - id: 6c14b4b1-edea-4a4d-9285-a987676d4f75
   name: 'Warrior: Charged Strike II'
@@ -98,7 +107,8 @@
   track: 2
   requiredSkillTreeNodeIds: ['Warrior: Charged Strike I']
   effects:
-    - { kind: GrantSkill, skillId: 'Charged Strike II' }
+    - kind: GrantSkill
+      skillId: 'Charged Strike II'
 
 - id: 97f2fb06-9704-475a-a128-4c44fd5a5123
   name: 'Warrior: Charged Strike III'
@@ -108,7 +118,8 @@
   track: 2
   requiredSkillTreeNodeIds: ['Warrior: Charged Strike II']
   effects:
-    - { kind: GrantSkill, skillId: 'Charged Strike III' }
+    - kind: GrantSkill
+      skillId: 'Charged Strike III'
 
 # --- Shield Arts / track 0 ---
 
@@ -118,7 +129,8 @@
   level: 5
   row: Shield Arts
   effects:
-    - { kind: GrantSkill, skillId: 'Smashing Board I' }
+    - kind: GrantSkill
+      skillId: 'Smashing Board I'
 
 - id: c464f3cf-3646-4fe4-bb1e-0d2ef509ddb9
   name: 'Warrior: Smashing Board II'
@@ -127,7 +139,8 @@
   row: Shield Arts
   requiredSkillTreeNodeIds: ['Warrior: Smashing Board I']
   effects:
-    - { kind: GrantSkill, skillId: 'Smashing Board II' }
+    - kind: GrantSkill
+      skillId: 'Smashing Board II'
 
 - id: d4341855-50a0-4e98-8a2f-66b7aa6da0fa
   name: 'Warrior: Smashing Board III'
@@ -136,7 +149,8 @@
   row: Shield Arts
   requiredSkillTreeNodeIds: ['Warrior: Smashing Board II']
   effects:
-    - { kind: GrantSkill, skillId: 'Smashing Board III' }
+    - kind: GrantSkill
+      skillId: 'Smashing Board III'
 
 # --- Shield Arts / track 1 ---
 
@@ -148,7 +162,8 @@
   track: 1
   requiredSkillTreeNodeIds: ['Warrior: Smashing Board I']
   effects:
-    - { kind: GrantSkill, skillId: 'Taunt I' }
+    - kind: GrantSkill
+      skillId: 'Taunt I'
 
 # --- Abilities (intrinsic) ---
 
@@ -159,7 +174,9 @@
   row: Abilities
   default: true
   effects:
-    - { kind: JobAbility, jobAbilityId: Trailbreaker, value: 0.1 }
+    - kind: JobAbility
+      jobAbilityId: Trailbreaker
+      value: 0.1
 
 - id: f7ad068f-1371-4538-bccd-8a63e8572b50
   name: 'Warrior: Trailbreaker II'
@@ -168,7 +185,9 @@
   row: Abilities
   requiredSkillTreeNodeIds: ['Warrior: Trailbreaker I']
   effects:
-    - { kind: JobAbility, jobAbilityId: Trailbreaker, value: 0.2 }
+    - kind: JobAbility
+      jobAbilityId: Trailbreaker
+      value: 0.2
 
 # --- Specialization oath (Lv 15) ---
 
@@ -185,8 +204,12 @@
   description: 'Become a Swashbuckler, a master of combat. Grants +0.15 Strength, +0.1 Agility per level.'
   sprite: '0000'
   effects:
-    - { kind: StatPerLevel, stat: Strength, value: 0.15 }
-    - { kind: StatPerLevel, stat: Agility, value: 0.1 }
+    - kind: StatPerLevel
+      stat: Strength
+      value: 0.15
+    - kind: StatPerLevel
+      stat: Agility
+      value: 0.1
 
 - id: 08ef6b16-d580-41bc-a96c-e3764b32b634
   name: 'Warrior: Bastion'
@@ -194,8 +217,12 @@
   description: 'Become a Bastion, an expert in defense. Grants +0.2 Vitality, +2 Health per level.'
   sprite: '0001'
   effects:
-    - { kind: StatPerLevel, stat: Vitality, value: 0.2 }
-    - { kind: StatPerLevel, stat: Health, value: 2 }
+    - kind: StatPerLevel
+      stat: Vitality
+      value: 0.2
+    - kind: StatPerLevel
+      stat: Health
+      value: 2
 
 # --- Swashbuckler ---
 
@@ -206,7 +233,9 @@
   row: Swashbuckler
   requiredSkillTreeNodeIds: ['Warrior: Swashbuckler']
   effects:
-    - { kind: JobAbility, jobAbilityId: Follow-up, value: 5 }
+    - kind: JobAbility
+      jobAbilityId: Follow-up
+      value: 5
 
 - id: 6c93d325-2186-4c02-aaac-69cee2ba6701
   name: 'Warrior: Follow-up II'
@@ -215,7 +244,9 @@
   row: Swashbuckler
   requiredSkillTreeNodeIds: ['Warrior: Follow-up I']
   effects:
-    - { kind: JobAbility, jobAbilityId: Follow-up, value: 10 }
+    - kind: JobAbility
+      jobAbilityId: Follow-up
+      value: 10
 
 # --- Bastion ---
 
@@ -226,7 +257,9 @@
   row: Bastion
   requiredSkillTreeNodeIds: ['Warrior: Bastion']
   effects:
-    - { kind: JobAbility, jobAbilityId: Intimidation, value: -15 }
+    - kind: JobAbility
+      jobAbilityId: Intimidation
+      value: -15
 
 - id: 27bf4461-505f-4003-9691-d777ca582ce4
   name: 'Warrior: Intimidation II'
@@ -235,7 +268,9 @@
   row: Bastion
   requiredSkillTreeNodeIds: ['Warrior: Intimidation I']
   effects:
-    - { kind: JobAbility, jobAbilityId: Intimidation, value: -12 }
+    - kind: JobAbility
+      jobAbilityId: Intimidation
+      value: -12
 
 - id: 71885e23-cb29-43f5-885a-670daaf6fae2
   name: 'Warrior: Cover I'
@@ -244,4 +279,6 @@
   row: Bastion
   requiredSkillTreeNodeIds: ['Warrior: Intimidation II']
   effects:
-    - { kind: JobAbility, jobAbilityId: Cover, value: 5 }
+    - kind: JobAbility
+      jobAbilityId: Cover
+      value: 5

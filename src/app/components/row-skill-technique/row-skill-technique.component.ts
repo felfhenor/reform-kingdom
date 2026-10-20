@@ -6,6 +6,7 @@ import {
   input,
 } from '@angular/core';
 import { IconElementChargeComponent } from '@components/icon-element-charge/icon-element-charge.component';
+import { elementsLabel } from '@helpers/combat/combat-element';
 import { TippyDirective } from '@ngneat/helipopper';
 import type { SkillTechniqueKind, SkillTechniquePreview } from '@interfaces';
 import { StatShorthand } from '@interfaces';
@@ -34,7 +35,7 @@ export class RowSkillTechniqueComponent {
   public kindClass = computed(() => kindClasses[this.technique().kind]);
   public kindLabel = computed(() => {
     const { elements, kind } = this.technique();
-    return [...elements, kind].join(' ');
+    return elements.length > 0 ? `${elementsLabel(elements)} ${kind}` : kind;
   });
   public statusVerb = computed(() =>
     this.technique().kind === 'Buff' ? 'Grants' : 'Inflicts',

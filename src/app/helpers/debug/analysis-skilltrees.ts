@@ -1,7 +1,7 @@
-// Audits skill trees: node placement, requirements, oaths, the spec oath, effect references and default nodes.
+// Audits skill trees: node placement, requirements, oaths, the spec oath, effect references, skill modifiers and default nodes.
 
 import {
-  SKILL_TREE_BASE_COLUMNS,
+  SKILL_TREE_MAX_BASE_COLUMNS,
   SKILL_TREE_MAX_TRACKS,
   SKILL_TREE_SPEC_COLUMNS,
   SKILL_TREE_SPEC_OATH_LEVEL,
@@ -12,6 +12,7 @@ import {
   analysisFail,
   analysisIssueChecks,
 } from '@helpers/debug/analysis-utils';
+import { skillTreeModifierIssues } from '@helpers/debug/analysis-skilltrees-modifiers';
 import {
   skillTreeGrantedSkills,
   skillTreeRankIssues,
@@ -296,10 +297,13 @@ function defaultIssues(
 
 function columnCountIssues(job: JobContent): AnalysisIssue[] {
   const issues: AnalysisIssue[] = [];
-  if (job.treeRows.length !== SKILL_TREE_BASE_COLUMNS) {
+  if (
+    job.treeRows.length === 0 ||
+    job.treeRows.length > SKILL_TREE_MAX_BASE_COLUMNS
+  ) {
     issues.push(
       analysisFail(
-        `has ${job.treeRows.length} treeRows, expected ${SKILL_TREE_BASE_COLUMNS}.`,
+        `has ${job.treeRows.length} treeRows, expected 1 to ${SKILL_TREE_MAX_BASE_COLUMNS}.`,
       ),
     );
   }
@@ -329,6 +333,7 @@ function jobTreeIssues(job: JobContent): AnalysisIssue[] {
     ...nodes.flatMap(effectIssues),
     ...defaultIssues(job, nodes),
     ...skillTreeRankIssues(nodes),
+    ...skillTreeModifierIssues(nodes),
   ];
 }
 

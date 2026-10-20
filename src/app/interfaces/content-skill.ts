@@ -5,6 +5,7 @@ import type { ElementBlock, GameElement } from '@interfaces/element';
 import type { EquipmentItemType } from '@interfaces/equipment';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { StatBlock } from '@interfaces/stat';
+import type { HeroEffectSkillModifier } from '@interfaces/hero-effect';
 import type { HasDescription } from '@interfaces/traits';
 
 export type SkillId = Branded<string, 'SkillId'>;
@@ -74,6 +75,8 @@ export type EquipmentSkillContentTechnique = {
   accuracy: number;
   // Untyped (not MonsterId) to avoid a circular import.
   summonMonsterId?: string;
+  // Added by an Echo modifier: picks its own targets, ignoring a combat order's target mode.
+  echo?: boolean;
 
   combatMessage: string;
 };
@@ -111,4 +114,6 @@ export type EquipmentSkillContent = IsContentItem &
 
 export type EquipmentSkill = EquipmentSkillContent & {
   mods?: Partial<EquipmentSkillContentModifiable>;
+  // The skill tree modifiers folded into this copy, for its description.
+  modifiers?: HeroEffectSkillModifier[];
 };

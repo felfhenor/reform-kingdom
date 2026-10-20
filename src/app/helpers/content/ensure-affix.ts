@@ -13,6 +13,7 @@ import {
   ensureEnumValue,
 } from '@helpers/content/ensure-helpers-core';
 import { ensureSkillStatBonus } from '@helpers/content/ensure-helpers-stats';
+import { ensureSkillModifierEffect } from '@helpers/content/ensure-skill-modifier';
 import type {
   AffixContent,
   AffixEffect,
@@ -139,6 +140,8 @@ export function ensureHeroEffect(
         chance: (effect['chance'] as number) ?? 0,
         duration: (effect['duration'] as number) ?? 0,
       };
+    case 'SkillModifier':
+      return ensureSkillModifierEffect(effect);
     default:
       return ensureAffixEffect(effect);
   }

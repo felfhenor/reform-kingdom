@@ -4,6 +4,7 @@ import { getEntry } from '@helpers/content/content';
 import { analysisFail, analysisWarn } from '@helpers/debug/analysis-utils';
 import { skillNameTier } from '@helpers/hero/skill';
 import {
+  skillTreeIsOath,
   skillTreeNodeHasAncestor,
   skillTreeNodeLevel,
 } from '@helpers/hero/skill-tree-content';
@@ -12,6 +13,7 @@ import type {
   EquipmentSkillContent,
   JobAbilityContent,
   SkillTreeNodeContent,
+  SkillTreeNodeId,
 } from '@interfaces';
 import { groupBy, sortBy } from 'es-toolkit/compat';
 
@@ -25,7 +27,23 @@ export function skillTreeGrantedSkills(
     .filter((skill): skill is EquipmentSkillContent => !!skill);
 }
 
-// A node granting a skill tier should require the node granting the tier below.
+function skillTreeRequiresThroughOath(
+  nodes: SkillTreeNodeContent[],
+  node: SkillTreeNodeContent,
+  requiredId: SkillTreeNodeId,
+): boolean {
+  return node.requiredSkillTreeNodeIds.some((id) => {
+    if (id === requiredId) return true;
+    const parent = nodes.find((entry) => entry.id === id);
+    return (
+      !!parent &&
+      skillTreeIsOath(parent) &&
+      parent.requiredSkillTreeNodeIds.includes(requiredId)
+    );
+  });
+}
+
+// A node granting a skill tier should require the node granting the tier below, directly or through an oath.
 function skillTierWarnings(nodes: SkillTreeNodeContent[]): AnalysisIssue[] {
   const grants = nodes.flatMap((node) =>
     skillTreeGrantedSkills([node]).map((skill) => ({
@@ -38,7 +56,8 @@ function skillTierWarnings(nodes: SkillTreeNodeContent[]): AnalysisIssue[] {
     const below = grants.find(
       (other) => other.family === grant.family && other.tier === grant.tier - 1,
     );
-    return below && !grant.node.requiredSkillTreeNodeIds.includes(below.node.id)
+    return below &&
+      !skillTreeRequiresThroughOath(nodes, grant.node, below.node.id)
       ? [
           analysisWarn(
             `${grant.node.name}: does not require ${below.node.name}.`,

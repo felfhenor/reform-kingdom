@@ -11,6 +11,7 @@ import type { EquipmentSkillId } from '@interfaces/content-skill';
 import type {
   HeroEffectDebuffPotency,
   HeroEffectJobAbility,
+  HeroEffectSkillModifier,
   HeroEffectStatPerLevel,
 } from '@interfaces/hero-effect';
 import type { HasSprite } from '@interfaces/artable';
@@ -52,7 +53,8 @@ export type SkillTreeNodeEffect =
   | AffixEffectGrantSkill
   | HeroEffectJobAbility
   | HeroEffectStatPerLevel
-  | HeroEffectDebuffPotency;
+  | HeroEffectDebuffPotency
+  | HeroEffectSkillModifier;
 
 export const SkillTreeNodeEffectKinds: SkillTreeNodeEffect['kind'][] = [
   'Stat',
@@ -64,6 +66,7 @@ export const SkillTreeNodeEffectKinds: SkillTreeNodeEffect['kind'][] = [
   'JobAbility',
   'StatPerLevel',
   'DebuffPotency',
+  'SkillModifier',
 ];
 
 // Names are '<Job>: <Name>' to stay globally unique; an oath lists two options and carries no effects itself.

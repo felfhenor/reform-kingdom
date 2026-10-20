@@ -87,7 +87,8 @@
           <app-panel-heroes-skill-tree-detail
             class="mt-2"
             [node]="selectedNode()"
-            [state]="selectedState()"
+            [states]="states()"
+            [staged]="staged()"
             [job]="heroJob"
             [character]="hero"
             (learn)="learn($event)"

@@ -7,7 +7,8 @@
   row: Fieldcraft
   default: true
   effects:
-    - { kind: GrantSkill, skillId: 'Analyze I' }
+    - kind: GrantSkill
+      skillId: 'Analyze I'
 
 - id: 62e9c48f-5806-4c50-a469-6e70dc256233
   name: 'Explorer: Analyze II'
@@ -16,7 +17,8 @@
   row: Fieldcraft
   requiredSkillTreeNodeIds: ['Explorer: Analyze I']
   effects:
-    - { kind: GrantSkill, skillId: 'Analyze II' }
+    - kind: GrantSkill
+      skillId: 'Analyze II'
 
 - id: 6ada76cc-90d9-4d95-935a-bb58728ef274
   name: 'Explorer: Analyze III'
@@ -25,7 +27,8 @@
   row: Fieldcraft
   requiredSkillTreeNodeIds: ['Explorer: Analyze II']
   effects:
-    - { kind: GrantSkill, skillId: 'Analyze III' }
+    - kind: GrantSkill
+      skillId: 'Analyze III'
 
 - id: 6e4c358a-8f14-4e00-9a43-e7b6bec8337e
   name: 'Explorer: Analyze IV'
@@ -34,7 +37,8 @@
   row: Fieldcraft
   requiredSkillTreeNodeIds: ['Explorer: Analyze III']
   effects:
-    - { kind: GrantSkill, skillId: 'Analyze IV' }
+    - kind: GrantSkill
+      skillId: 'Analyze IV'
 
 # --- Fieldcraft / track 1 ---
 
@@ -45,7 +49,8 @@
   row: Fieldcraft
   track: 1
   effects:
-    - { kind: GrantSkill, skillId: 'Earthshake I' }
+    - kind: GrantSkill
+      skillId: 'Earthshake I'
 
 - id: 649875cc-ad0f-43c7-afa6-b57a23dbdb67
   name: 'Explorer: Earthshake II'
@@ -55,7 +60,8 @@
   track: 1
   requiredSkillTreeNodeIds: ['Explorer: Earthshake I']
   effects:
-    - { kind: GrantSkill, skillId: 'Earthshake II' }
+    - kind: GrantSkill
+      skillId: 'Earthshake II'
 
 - id: b926916d-8470-4611-945f-cd68472e072b
   name: 'Explorer: Earthshake III'
@@ -65,7 +71,8 @@
   track: 1
   requiredSkillTreeNodeIds: ['Explorer: Earthshake II']
   effects:
-    - { kind: GrantSkill, skillId: 'Earthshake III' }
+    - kind: GrantSkill
+      skillId: 'Earthshake III'
 
 - id: 0fd14805-1807-4529-bb43-d6957d39ceb3
   name: 'Explorer: Earthshake IV'
@@ -75,7 +82,8 @@
   track: 1
   requiredSkillTreeNodeIds: ['Explorer: Earthshake III']
   effects:
-    - { kind: GrantSkill, skillId: 'Earthshake IV' }
+    - kind: GrantSkill
+      skillId: 'Earthshake IV'
 
 # --- Fortune / track 0 ---
 
@@ -85,7 +93,8 @@
   level: 10
   row: Fortune
   effects:
-    - { kind: GrantSkill, skillId: 'Lucky Charm I' }
+    - kind: GrantSkill
+      skillId: 'Lucky Charm I'
 
 - id: f87de27b-9969-420c-a9af-d41d73fbd14e
   name: 'Explorer: Lucky Charm II'
@@ -94,7 +103,8 @@
   row: Fortune
   requiredSkillTreeNodeIds: ['Explorer: Lucky Charm I']
   effects:
-    - { kind: GrantSkill, skillId: 'Lucky Charm II' }
+    - kind: GrantSkill
+      skillId: 'Lucky Charm II'
 
 - id: 8db1484b-cf70-496a-ada0-e859e6515757
   name: 'Explorer: Lucky Charm III'
@@ -103,7 +113,8 @@
   row: Fortune
   requiredSkillTreeNodeIds: ['Explorer: Lucky Charm II']
   effects:
-    - { kind: GrantSkill, skillId: 'Lucky Charm III' }
+    - kind: GrantSkill
+      skillId: 'Lucky Charm III'
 
 # --- Fortune / track 1 ---
 
@@ -115,7 +126,8 @@
   track: 1
   requiredSkillTreeNodeIds: ['Explorer: Lucky Charm II']
   effects:
-    - { kind: GrantSkill, skillId: 'Zephyr I' }
+    - kind: GrantSkill
+      skillId: 'Zephyr I'
 
 - id: 05007e5b-fddf-4c27-8c3d-03acee1170b3
   name: 'Explorer: Zephyr II'
@@ -125,7 +137,8 @@
   track: 1
   requiredSkillTreeNodeIds: ['Explorer: Zephyr I']
   effects:
-    - { kind: GrantSkill, skillId: 'Zephyr II' }
+    - kind: GrantSkill
+      skillId: 'Zephyr II'
 
 # --- Fortune / track 2 ---
 
@@ -136,7 +149,8 @@
   row: Fortune
   track: 2
   effects:
-    - { kind: GrantSkill, skillId: 'Look for Trouble I' }
+    - kind: GrantSkill
+      skillId: 'Look for Trouble I'
 
 - id: 0a716553-4885-4596-bf45-3d8107a7200a
   name: 'Explorer: Look for Trouble II'
@@ -146,7 +160,8 @@
   track: 2
   requiredSkillTreeNodeIds: ['Explorer: Look for Trouble I']
   effects:
-    - { kind: GrantSkill, skillId: 'Look for Trouble II' }
+    - kind: GrantSkill
+      skillId: 'Look for Trouble II'
 
 # --- Abilities (intrinsic) ---
 
@@ -157,7 +172,9 @@
   row: Abilities
   default: true
   effects:
-    - { kind: JobAbility, jobAbilityId: Fortunate Finds, value: 1 }
+    - kind: JobAbility
+      jobAbilityId: Fortunate Finds
+      value: 1
 
 # --- Specialization oath (Lv 15) ---
 
@@ -175,8 +192,12 @@
   description: 'Become a Treasure Hunter, not a thief. Grants +0.05 Luck, +0.1 Agility per level.'
   sprite: '0009'
   effects:
-    - { kind: StatPerLevel, stat: Luck, value: 0.05 }
-    - { kind: StatPerLevel, stat: Agility, value: 0.1 }
+    - kind: StatPerLevel
+      stat: Luck
+      value: 0.05
+    - kind: StatPerLevel
+      stat: Agility
+      value: 0.1
 
 - id: 73a19faf-42ac-4bb5-b73c-422523953fb3
   name: 'Explorer: Dungeon Delver'
@@ -184,8 +205,12 @@
   description: 'Become a Dungeon Delver, an expert in dungeon exploration. Grants +0.15 Intelligence, +0.1 Resistance per level.'
   sprite: '0008'
   effects:
-    - { kind: StatPerLevel, stat: Intelligence, value: 0.15 }
-    - { kind: StatPerLevel, stat: Resistance, value: 0.1 }
+    - kind: StatPerLevel
+      stat: Intelligence
+      value: 0.15
+    - kind: StatPerLevel
+      stat: Resistance
+      value: 0.1
 
 # --- Treasure Hunter ---
 
@@ -196,7 +221,9 @@
   row: Treasure Hunter
   requiredSkillTreeNodeIds: ['Explorer: Treasure Hunter']
   effects:
-    - { kind: JobAbility, jobAbilityId: Loot Goblin, value: 5 }
+    - kind: JobAbility
+      jobAbilityId: Loot Goblin
+      value: 5
 
 # --- Dungeon Delver ---
 
@@ -207,7 +234,9 @@
   row: Dungeon Delver
   requiredSkillTreeNodeIds: ['Explorer: Dungeon Delver']
   effects:
-    - { kind: JobAbility, jobAbilityId: Monster Research, value: 1 }
+    - kind: JobAbility
+      jobAbilityId: Monster Research
+      value: 1
 
 - id: c4e441fe-d1e2-42e5-98c3-c6757b66162e
   name: 'Explorer: Monster Research II'
@@ -216,4 +245,6 @@
   row: Dungeon Delver
   requiredSkillTreeNodeIds: ['Explorer: Monster Research I']
   effects:
-    - { kind: JobAbility, jobAbilityId: Monster Research, value: 2 }
+    - kind: JobAbility
+      jobAbilityId: Monster Research
+      value: 2

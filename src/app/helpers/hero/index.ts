@@ -20,6 +20,8 @@ export * from './regalia.ui';
 export * from './resting';
 export * from './resting.ui';
 export * from './skill';
+export * from './skill-modifier';
+export * from './skill-modifier.ui';
 export * from './skill-preview';
 export * from './skill-tree';
 export * from './skill-tree-content';

@@ -19,6 +19,17 @@ export const GameElementIcon: Record<GameElement, Icon> = {
   Air: 'gameSwanBreeze',
 };
 
+// Named element combinations (from Glowrift Duskhall), keyed by the elements sorted alphabetically.
+export const GameElementCombinationNames: Record<string, string> = {
+  'Fire/Water': 'Steam',
+  'Air/Fire': 'Arid',
+  'Earth/Fire': 'Molten',
+  'Earth/Water': 'Mud',
+  'Air/Water': 'Storm',
+  'Air/Earth': 'Sand',
+  'Air/Earth/Fire/Water': 'Holy',
+};
+
 export const GameElementTextColor: Record<GameElement, string> = {
   Fire: 'text-element-Fire',
   Water: 'text-element-Water',

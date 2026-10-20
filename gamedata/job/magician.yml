@@ -55,8 +55,8 @@
     - Whip
     - Staff
 
-  treeVersion: 1
-  treeRows: [Evocation, Spellweaving, Abilities]
+  treeVersion: 2
+  treeRows: [Evocation, Spellweaving]
   specializationRows: [Arcanist, Celestar]
 
   starterEquipmentIds:

@@ -72,7 +72,7 @@
 
     @if (item.elements?.length) {
       <div class="type-meta my-2">
-        Attacks deal {{ item.elements!.join('/') }} damage
+        Attacks deal {{ elementsLabel(item.elements!) }} damage
       </div>
     }
 

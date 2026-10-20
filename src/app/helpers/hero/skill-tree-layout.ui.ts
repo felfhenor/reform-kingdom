@@ -8,12 +8,15 @@ import {
   SKILL_TREE_MAX_TRACKS,
   SKILL_TREE_NODE_SIZE,
   SKILL_TREE_OATH_BORDER,
+  SKILL_TREE_OATH_OPTION_GAP,
   SKILL_TREE_OATH_PADDING,
   SKILL_TREE_ROW_HEIGHT,
   SKILL_TREE_TRACK_MIN_WIDTH,
 } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { jobAbilityValueLabel } from '@helpers/hero/job-ability.ui';
+import { skillTreeNodeModifiers } from '@helpers/hero/skill-modifier';
+import { skillModifierFamilySkill } from '@helpers/hero/skill-modifier.ui';
 import { characterCurrentRegalia } from '@helpers/hero/regalia';
 import {
   characterSkillTreeAvailableSp,
@@ -52,7 +55,17 @@ import type {
 import { max, range, sortBy } from 'es-toolkit/compat';
 
 const HEADER_ROWS = 2;
-const LANE_MIN_WIDTH = SKILL_TREE_MAX_TRACKS * SKILL_TREE_TRACK_MIN_WIDTH;
+const OATH_FRAME_WIDTH =
+  SKILL_TREE_NODE_SIZE * 2 +
+  SKILL_TREE_OATH_OPTION_GAP +
+  (SKILL_TREE_OATH_PADDING + SKILL_TREE_OATH_BORDER) * 2;
+// Room on each side of a lane for an oath framed on its edge track.
+const LANE_PADDING = Math.max(
+  0,
+  (OATH_FRAME_WIDTH - SKILL_TREE_TRACK_MIN_WIDTH) / 2,
+);
+const LANE_MIN_WIDTH =
+  SKILL_TREE_MAX_TRACKS * SKILL_TREE_TRACK_MIN_WIDTH + LANE_PADDING * 2;
 const ARROW_BEND = (SKILL_TREE_ROW_HEIGHT - SKILL_TREE_NODE_SIZE) / 4;
 
 function skillTreeLevels(): SkillTreeLayoutLevel[] {
@@ -172,6 +185,7 @@ export function skillTreeLayout(job: JobContent): SkillTreeLayout {
     columns: skillTreeColumns(job),
     rows: `${SKILL_TREE_GROUP_TITLE_HEIGHT}px ${SKILL_TREE_LANE_TITLE_HEIGHT}px repeat(${levels.length}, ${SKILL_TREE_ROW_HEIGHT}px)`,
     laneRows: `repeat(${levels.length}, ${SKILL_TREE_ROW_HEIGHT}px)`,
+    lanePadding: LANE_PADDING,
     levels,
     lanes: [
       ...job.treeRows.map((row, i) =>
@@ -245,6 +259,7 @@ export function skillTreeNodeKind(
 ): SkillTreeNodeKind {
   if (skillTreeNodeSkill(node)) return 'Skill';
   if (nodeAbility(node)) return 'Job Ability';
+  if (skillTreeNodeModifiers(node).length > 0) return 'Skill Modifier';
   return skillTreeIsSpecOption(node) ? 'Specialization' : 'Perk';
 }
 
@@ -262,6 +277,12 @@ export function skillTreeNodeArt(
   if (node.sprite !== '') {
     return { sprite: node.sprite, spritesheet: 'skilltreenode' };
   }
+
+  const [modifier] = skillTreeNodeModifiers(node);
+  const modified = modifier
+    ? skillModifierFamilySkill(modifier.family)
+    : undefined;
+  if (modified) return { sprite: modified.sprite, spritesheet: 'skill' };
 
   return { sprite: job.sprite, spritesheet: 'job' };
 }

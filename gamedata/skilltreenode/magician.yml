@@ -7,7 +7,8 @@
   row: Evocation
   default: true
   effects:
-    - { kind: GrantSkill, skillId: 'Fireball I' }
+    - kind: GrantSkill
+      skillId: 'Fireball I'
 
 - id: 63689025-1b2c-4b0b-9404-717eed90ea80
   name: 'Magician: Fireball II'
@@ -16,25 +17,28 @@
   row: Evocation
   requiredSkillTreeNodeIds: ['Magician: Fireball I']
   effects:
-    - { kind: GrantSkill, skillId: 'Fireball II' }
+    - kind: GrantSkill
+      skillId: 'Fireball II'
 
 - id: a24e8aa9-41f2-4e0f-a6ac-b155124ca909
   name: 'Magician: Fireball III'
   jobId: Magician
   level: 20
   row: Evocation
-  requiredSkillTreeNodeIds: ['Magician: Fireball II']
+  requiredSkillTreeNodeIds: ['Magician: Oath of Flame']
   effects:
-    - { kind: GrantSkill, skillId: 'Fireball III' }
+    - kind: GrantSkill
+      skillId: 'Fireball III'
 
 - id: 9d9a80ff-07d8-4999-a866-dbdc2c9e70f3
   name: 'Magician: Fireball IV'
   jobId: Magician
-  level: 35
+  level: 30
   row: Evocation
   requiredSkillTreeNodeIds: ['Magician: Fireball III']
   effects:
-    - { kind: GrantSkill, skillId: 'Fireball IV' }
+    - kind: GrantSkill
+      skillId: 'Fireball IV'
 
 # --- Evocation / track 1 ---
 
@@ -46,7 +50,8 @@
   track: 1
   requiredSkillTreeNodeIds: ['Magician: Fireball II']
   effects:
-    - { kind: GrantSkill, skillId: 'Broil I' }
+    - kind: GrantSkill
+      skillId: 'Broil I'
 
 - id: 53ac1811-c36e-40ca-8cac-725305c183fb
   name: 'Magician: Broil II'
@@ -54,9 +59,10 @@
   level: 40
   row: Evocation
   track: 1
-  requiredSkillTreeNodeIds: ['Magician: Broil I']
+  requiredSkillTreeNodeIds: ['Magician: Oath of Embers']
   effects:
-    - { kind: GrantSkill, skillId: 'Broil II' }
+    - kind: GrantSkill
+      skillId: 'Broil II'
 
 # --- Evocation / track 2 ---
 
@@ -67,7 +73,8 @@
   row: Evocation
   track: 2
   effects:
-    - { kind: GrantSkill, skillId: 'Thunderbolt I' }
+    - kind: GrantSkill
+      skillId: 'Thunderbolt I'
 
 - id: fcaa241b-e59e-429e-871c-2beae9f31c3b
   name: 'Magician: Thunderbolt II'
@@ -77,7 +84,8 @@
   track: 2
   requiredSkillTreeNodeIds: ['Magician: Thunderbolt I']
   effects:
-    - { kind: GrantSkill, skillId: 'Thunderbolt II' }
+    - kind: GrantSkill
+      skillId: 'Thunderbolt II'
 
 - id: 713ecf9a-69c7-4549-bc5e-447f5d02fb4f
   name: 'Magician: Thunderbolt III'
@@ -87,7 +95,8 @@
   track: 2
   requiredSkillTreeNodeIds: ['Magician: Thunderbolt II']
   effects:
-    - { kind: GrantSkill, skillId: 'Thunderbolt III' }
+    - kind: GrantSkill
+      skillId: 'Thunderbolt III'
 
 - id: 87892efb-7b8a-4066-a880-bbf51b6d9aad
   name: 'Magician: Thunderbolt IV'
@@ -95,9 +104,10 @@
   level: 40
   row: Evocation
   track: 2
-  requiredSkillTreeNodeIds: ['Magician: Thunderbolt III']
+  requiredSkillTreeNodeIds: ['Magician: Oath of Storms']
   effects:
-    - { kind: GrantSkill, skillId: 'Thunderbolt IV' }
+    - kind: GrantSkill
+      skillId: 'Thunderbolt IV'
 
 # --- Spellweaving / track 0 ---
 
@@ -107,7 +117,8 @@
   level: 10
   row: Spellweaving
   effects:
-    - { kind: GrantSkill, skillId: 'Frostfire Bolt I' }
+    - kind: GrantSkill
+      skillId: 'Frostfire Bolt I'
 
 - id: d49e576b-6c70-434d-b01e-6a7a981a898a
   name: 'Magician: Frostfire Bolt II'
@@ -116,16 +127,18 @@
   row: Spellweaving
   requiredSkillTreeNodeIds: ['Magician: Frostfire Bolt I']
   effects:
-    - { kind: GrantSkill, skillId: 'Frostfire Bolt II' }
+    - kind: GrantSkill
+      skillId: 'Frostfire Bolt II'
 
 - id: cc024165-5797-4d54-8aa0-4443c2a80525
   name: 'Magician: Frostfire Bolt III'
   jobId: Magician
   level: 30
   row: Spellweaving
-  requiredSkillTreeNodeIds: ['Magician: Frostfire Bolt II']
+  requiredSkillTreeNodeIds: ['Magician: Oath of Frostfire']
   effects:
-    - { kind: GrantSkill, skillId: 'Frostfire Bolt III' }
+    - kind: GrantSkill
+      skillId: 'Frostfire Bolt III'
 
 # --- Spellweaving / track 1 ---
 
@@ -136,7 +149,8 @@
   row: Spellweaving
   track: 1
   effects:
-    - { kind: GrantSkill, skillId: 'Refresh I' }
+    - kind: GrantSkill
+      skillId: 'Refresh I'
 
 - id: 1800d21d-f6f1-434e-aac3-d8acb85fc520
   name: 'Magician: Refresh II'
@@ -144,9 +158,10 @@
   level: 45
   row: Spellweaving
   track: 1
-  requiredSkillTreeNodeIds: ['Magician: Refresh I']
+  requiredSkillTreeNodeIds: ['Magician: Oath of Insight']
   effects:
-    - { kind: GrantSkill, skillId: 'Refresh II' }
+    - kind: GrantSkill
+      skillId: 'Refresh II'
 
 # --- Abilities (intrinsic) ---
 
@@ -154,19 +169,25 @@
   name: 'Magician: Spiritual Energy I'
   jobId: Magician
   level: 1
-  row: Abilities
+  row: Spellweaving
+  track: 2
   default: true
   effects:
-    - { kind: JobAbility, jobAbilityId: Spiritual Energy, value: 0.5 }
+    - kind: JobAbility
+      jobAbilityId: Spiritual Energy
+      value: 0.5
 
 - id: cbf7b29e-9c25-45de-acf2-a0ce8e022bac
   name: 'Magician: Spiritual Energy II'
   jobId: Magician
   level: 25
-  row: Abilities
+  row: Spellweaving
+  track: 2
   requiredSkillTreeNodeIds: ['Magician: Spiritual Energy I']
   effects:
-    - { kind: JobAbility, jobAbilityId: Spiritual Energy, value: 1 }
+    - kind: JobAbility
+      jobAbilityId: Spiritual Energy
+      value: 1
 
 # --- Specialization oath (Lv 15) ---
 
@@ -183,17 +204,25 @@
   description: 'Become an Arcanist, a mysticism expert. Grants +0.2 Intelligence, +0.1 Agility per level.'
   sprite: '0005'
   effects:
-    - { kind: StatPerLevel, stat: Intelligence, value: 0.2 }
-    - { kind: StatPerLevel, stat: Agility, value: 0.1 }
+    - kind: StatPerLevel
+      stat: Intelligence
+      value: 0.2
+    - kind: StatPerLevel
+      stat: Agility
+      value: 0.1
 
 - id: 28021991-7ee4-4677-995a-500327942fd0
   name: 'Magician: Celestar'
   jobId: Magician
-  description: 'Become a Celestar, an astral magic expert. Grants +0.15 Spirit, +0.15 Resistance per level.'
+  description: 'Become a Celestar, an astral magic expert. Grants +0.15 Spirit, +0.15 Constitution per level.'
   sprite: '0004'
   effects:
-    - { kind: StatPerLevel, stat: Spirit, value: 0.15 }
-    - { kind: StatPerLevel, stat: Resistance, value: 0.15 }
+    - kind: StatPerLevel
+      stat: Spirit
+      value: 0.15
+    - kind: StatPerLevel
+      stat: Constitution
+      value: 0.15
 
 # --- Arcanist ---
 
@@ -204,7 +233,9 @@
   row: Arcanist
   requiredSkillTreeNodeIds: ['Magician: Arcanist']
   effects:
-    - { kind: JobAbility, jobAbilityId: Mystical Insight, value: 0.25 }
+    - kind: JobAbility
+      jobAbilityId: Mystical Insight
+      value: 0.25
 
 - id: b606dc81-b8bd-4948-aa19-4dddbfec6b9f
   name: 'Magician: Mystical Insight II'
@@ -213,7 +244,9 @@
   row: Arcanist
   requiredSkillTreeNodeIds: ['Magician: Mystical Insight I']
   effects:
-    - { kind: JobAbility, jobAbilityId: Mystical Insight, value: 0.4 }
+    - kind: JobAbility
+      jobAbilityId: Mystical Insight
+      value: 0.4
 
 # --- Celestar ---
 
@@ -224,7 +257,9 @@
   row: Celestar
   requiredSkillTreeNodeIds: ['Magician: Celestar']
   effects:
-    - { kind: JobAbility, jobAbilityId: Astral Resonance, value: 0.25 }
+    - kind: JobAbility
+      jobAbilityId: Astral Resonance
+      value: 0.25
 
 - id: a7144d97-90ed-4199-899c-957fe20056e4
   name: 'Magician: Astral Resonance II'
@@ -233,4 +268,172 @@
   row: Celestar
   requiredSkillTreeNodeIds: ['Magician: Astral Resonance I']
   effects:
-    - { kind: JobAbility, jobAbilityId: Astral Resonance, value: 0.5 }
+    - kind: JobAbility
+      jobAbilityId: Astral Resonance
+      value: 0.5
+
+# --- Skill oaths ---
+
+- id: 6b8ed2ee-c59b-41ec-910a-1dd2dedc179d
+  name: 'Magician: Oath of Flame'
+  jobId: Magician
+  level: 15
+  row: Evocation
+  track: 0
+  requiredSkillTreeNodeIds: ['Magician: Fireball II']
+  optionSkillTreeNodeIds: ['Magician: Conflagration', 'Magician: Searing']
+
+- id: ab2382f6-c79d-4821-9808-ada1e802c2ba
+  name: 'Magician: Conflagration'
+  jobId: Magician
+  effects:
+    - kind: SkillModifier
+      family: Fireball
+      modifier: Targets
+      value: 1
+
+- id: a975db62-688b-4a59-808d-ef048b82cf56
+  name: 'Magician: Searing'
+  jobId: Magician
+  effects:
+    - kind: SkillModifier
+      family: Fireball
+      modifier: Inflict
+      statusEffectId: Scorched
+      chance: 25
+      duration: 3
+
+- id: a2902967-c782-49a0-9db6-d28121c411b3
+  name: 'Magician: Oath of Storms'
+  jobId: Magician
+  level: 30
+  row: Evocation
+  track: 2
+  requiredSkillTreeNodeIds: ['Magician: Thunderbolt III']
+  optionSkillTreeNodeIds: ['Magician: Chain Lightning', 'Magician: Thunderstorm']
+
+- id: 737a3323-6aa9-4eb1-b4d7-bc9284885f44
+  name: 'Magician: Chain Lightning'
+  jobId: Magician
+  effects:
+    - kind: SkillModifier
+      family: Thunderbolt
+      modifier: Targets
+      value: 1
+
+- id: 43444336-7599-4111-b0fc-dac3bd90d192
+  name: 'Magician: Thunderstorm'
+  jobId: Magician
+  effects:
+    - kind: SkillModifier
+      family: Thunderbolt
+      modifier: Element
+      element: Water
+    - kind: SkillModifier
+      family: Thunderbolt
+      modifier: Inflict
+      statusEffectId: Stunned
+      chance: 20
+      duration: 1
+
+- id: b1ea332d-cb07-4cfa-91e2-49610e7a717f
+  name: 'Magician: Oath of Embers'
+  jobId: Magician
+  level: 35
+  row: Evocation
+  track: 1
+  requiredSkillTreeNodeIds: ['Magician: Broil I']
+  optionSkillTreeNodeIds: ['Magician: Slow Roast', 'Magician: Magma Broil']
+
+- id: 11346235-e4f5-41a0-98b1-4f863647668d
+  name: 'Magician: Slow Roast'
+  jobId: Magician
+  effects:
+    - kind: SkillModifier
+      family: Broil
+      modifier: Potency
+      statusEffectId: Burning
+      chance: 0
+      duration: 2
+    - kind: SkillModifier
+      family: Broil
+      modifier: Potency
+      statusEffectId: Scorched
+      chance: 0
+      duration: 2
+
+- id: 68137a99-443c-41d8-a03a-66bf45dcbf2f
+  name: 'Magician: Magma Broil'
+  jobId: Magician
+  effects:
+    - kind: SkillModifier
+      family: Broil
+      modifier: Element
+      element: Earth
+    - kind: SkillModifier
+      family: Broil
+      modifier: Inflict
+      statusEffectId: Trembling
+      chance: 30
+      duration: 3
+
+- id: e2775690-b5af-415f-8ee3-d4d936423e21
+  name: 'Magician: Oath of Frostfire'
+  jobId: Magician
+  level: 20
+  row: Spellweaving
+  track: 0
+  requiredSkillTreeNodeIds: ['Magician: Frostfire Bolt II']
+  optionSkillTreeNodeIds: ['Magician: Deep Freeze', 'Magician: Shadowfire']
+
+- id: 15a11803-ab26-49eb-83d5-bcc2515039fb
+  name: 'Magician: Deep Freeze'
+  jobId: Magician
+  effects:
+    - kind: SkillModifier
+      family: Frostfire Bolt
+      modifier: Inflict
+      statusEffectId: Brittle I
+      chance: 40
+      duration: 3
+      onElement: Water
+
+- id: de487d50-f2c4-4150-9204-efe8381a2e9b
+  name: 'Magician: Shadowfire'
+  jobId: Magician
+  effects:
+    - kind: SkillModifier
+      family: Frostfire Bolt
+      modifier: Inflict
+      statusEffectId: Blind I
+      chance: 25
+      duration: 2
+      onElement: Fire
+
+- id: 79113073-270f-4f73-bdf7-4bfa3e6995ca
+  name: 'Magician: Oath of Insight'
+  jobId: Magician
+  level: 35
+  row: Spellweaving
+  track: 1
+  requiredSkillTreeNodeIds: ['Magician: Refresh I']
+  optionSkillTreeNodeIds: ['Magician: Clarity', 'Magician: Storm Attunement']
+
+- id: 1c223a15-8d44-4dff-834b-fb838fcef7be
+  name: 'Magician: Clarity'
+  jobId: Magician
+  effects:
+    - kind: SkillModifier
+      family: Refresh
+      modifier: Scaling
+      stat: Spirit
+      value: 5
+
+- id: 35efad25-b97b-4a7c-afc9-9cd8e87bf5f6
+  name: 'Magician: Storm Attunement'
+  jobId: Magician
+  effects:
+    - kind: SkillModifier
+      family: Refresh
+      modifier: Element
+      element: Air

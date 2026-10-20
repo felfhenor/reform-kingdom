@@ -23,6 +23,7 @@ export * from './ensure-recipe';
 export * from './ensure-region';
 export * from './ensure-shrine';
 export * from './ensure-skill';
+export * from './ensure-skill-modifier';
 export * from './ensure-skilltreenode';
 export * from './ensure-statuseffect';
 export * from './ensure-task';

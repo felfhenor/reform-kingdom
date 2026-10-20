@@ -196,7 +196,7 @@ function combatantUseSkill(
     // A Combat Order's targetMode is an explicit override - it wins outright rather than
     // joining the combatant's own priority list. Confusion drops it, since it was aimed at the other side.
     const targetPriority =
-      combatOrderPick?.targetMode && !redirected
+      combatOrderPick?.targetMode && !redirected && !tech.echo
         ? [{ type: combatOrderPick.targetMode }]
         : combatant.targetting;
 

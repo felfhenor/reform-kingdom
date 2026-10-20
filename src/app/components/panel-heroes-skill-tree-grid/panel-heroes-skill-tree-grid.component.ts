@@ -20,6 +20,7 @@ import {
   SKILL_TREE_COLUMN_GAP,
   SKILL_TREE_NODE_SIZE,
   SKILL_TREE_OATH_BORDER,
+  SKILL_TREE_OATH_OPTION_GAP,
   SKILL_TREE_OATH_PADDING,
 } from '@helpers/config';
 import {
@@ -32,6 +33,7 @@ import {
   skillTreeNodeArt,
   skillTreeNodeKind,
 } from '@helpers/hero/skill-tree-layout.ui';
+import { skillTreeOathChoice } from '@helpers/hero/skill-tree.ui';
 import type {
   JobContent,
   SkillTreeLayoutArrow,
@@ -66,6 +68,7 @@ export class PanelHeroesSkillTreeGridComponent {
   public readonly columnGap = SKILL_TREE_COLUMN_GAP;
   public readonly oathPadding = SKILL_TREE_OATH_PADDING;
   public readonly oathBorder = SKILL_TREE_OATH_BORDER;
+  public readonly oathOptionGap = SKILL_TREE_OATH_OPTION_GAP;
   public readonly arrowKinds = ['learned', 'pending', 'idle'];
   public layout = computed(() => skillTreeLayout(this.job()));
 
@@ -127,6 +130,10 @@ export class PanelHeroesSkillTreeGridComponent {
 
   public isSkill(node: SkillTreeNodeContent): boolean {
     return skillTreeNodeKind(node) === 'Skill';
+  }
+
+  public oathChoice(oath: SkillTreeNodeContent) {
+    return skillTreeOathChoice(oath, this.states());
   }
 
   public name(node: SkillTreeNodeContent): string {

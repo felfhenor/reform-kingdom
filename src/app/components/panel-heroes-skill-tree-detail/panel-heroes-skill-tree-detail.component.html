@@ -39,7 +39,13 @@
 
     <div class="flex flex-col gap-2">
       <span class="type-label">Effect</span>
-      <span class="text-sm">{{ info.effect }}</span>
+      @if (info.effect) {
+        <span class="text-sm">{{ info.effect }}</span>
+      }
+
+      @for (line of info.modifierLines; track line.label) {
+        <app-row-skill-modifier [line]="line" />
+      }
 
       @if (info.value) {
         <span class="badge badge-data self-start tabular-nums">

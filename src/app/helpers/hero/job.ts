@@ -5,12 +5,17 @@ import {
   skillNameTier,
 } from '@helpers/hero/skill';
 import { characterNonGearEffects } from '@helpers/hero/hero-effect';
+import {
+  skillModifiersForFamily,
+  skillWithModifiers,
+} from '@helpers/hero/skill-modifier';
 import { affixEffectsOfKind } from '@helpers/item/affix';
 import { equipmentGrantedSkillIds } from '@helpers/item/equipment';
 import type {
   Character,
   CharacterStatSource,
   EquipmentBlock,
+  EquipmentSkill,
   EquipmentSkillContent,
   EquipmentSkillId,
   HeroEffect,
@@ -51,20 +56,22 @@ function effectGrantedSkillIds(effects: HeroEffect[]): EquipmentSkillId[] {
 export function heroSkillsWithEquipment(
   equipment: EquipmentBlock,
   effects: HeroEffect[],
-): EquipmentSkillContent[] {
+): EquipmentSkill[] {
   const baseSkills = resolveSkills(HERO_BASE_SKILL_IDS);
   const grantedSkills = resolveSkills([
     ...equipmentGrantedSkillIds(equipment),
     ...effectGrantedSkillIds(effects),
   ]);
 
-  return mergeGrantedSkills(baseSkills, grantedSkills);
+  return mergeGrantedSkills(baseSkills, grantedSkills).map((skill) =>
+    skillWithModifiers(skill, skillModifiersForFamily(effects, skill.family)),
+  );
 }
 
 // A hero's full skill list from their current job's tree, gear and every job's teachings.
 export function characterSkills(
   character: CharacterStatSource,
-): EquipmentSkillContent[] {
+): EquipmentSkill[] {
   if (!getEntry<JobContent>(character.jobId)) return [];
 
   return heroSkillsWithEquipment(
@@ -75,7 +82,7 @@ export function characterSkills(
 
 export function characterNormalSkills(
   character: CharacterStatSource,
-): EquipmentSkillContent[] {
+): EquipmentSkill[] {
   return characterSkills(character).filter((skill) => !skillIsSpecial(skill));
 }
 
@@ -92,12 +99,15 @@ function characterUnmergedSkillIds(
 
 export function characterBurstSkillOptions(
   character: CharacterStatSource,
-): EquipmentSkillContent[] {
+): EquipmentSkill[] {
   if (!getEntry<JobContent>(character.jobId)) return [];
 
-  const specials = resolveSkills(characterUnmergedSkillIds(character)).filter(
-    skillIsSpecial,
-  );
+  const effects = characterNonGearEffects(character);
+  const specials = resolveSkills(characterUnmergedSkillIds(character))
+    .filter(skillIsSpecial)
+    .map((skill) =>
+      skillWithModifiers(skill, skillModifiersForFamily(effects, skill.family)),
+    );
   return sortBy(specials, [
     (skill) => skill.family,
     (skill) => skillNameTier(skill.name).tier,
@@ -115,7 +125,7 @@ export function partyFirstBurstSkillHero(
 // Drops a chosen skill the hero no longer knows, e.g. after unequipping the gear that granted it.
 export function characterChosenBurstSkills(
   character: CharacterStatSource & Pick<Character, 'burstSkills'>,
-): EquipmentSkillContent[] {
+): EquipmentSkill[] {
   const chosen = character.burstSkills?.[character.jobId] ?? [];
   return characterBurstSkillOptions(character).filter((skill) =>
     chosen.includes(skill.id),
@@ -124,7 +134,7 @@ export function characterChosenBurstSkills(
 
 export function characterCombatSkills(
   character: CharacterStatSource & Pick<Character, 'burstSkills'>,
-): EquipmentSkillContent[] {
+): EquipmentSkill[] {
   return [
     ...characterNormalSkills(character),
     ...characterChosenBurstSkills(character),

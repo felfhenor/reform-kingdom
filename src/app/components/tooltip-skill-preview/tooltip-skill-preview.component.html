@@ -16,6 +16,10 @@
 
       <div class="text-sm">{{ skillDescription() }}</div>
 
+      @for (line of modifierLines(); track line.label) {
+        <div><app-row-skill-modifier [line]="line" /></div>
+      }
+
       @if (skillData.delay > 0) {
         <div class="text-xs mt-1">
           Takes effect after {{ skillData.delay | number }}

@@ -1,3 +1,4 @@
+import { skillOwnTechniques } from '@helpers/hero/skill-modifier';
 import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
 import { elementPool } from '@helpers/combat/combat-element-pool';
 import { combatOrderTargetModeNeedsValidityCheck } from '@helpers/combat/combat-order-target-mode';
@@ -250,7 +251,7 @@ function skillOnlyLimitedByEnergy(skill: EquipmentSkill): boolean {
 
 // The caster is always a living ally or self, but enemies can all fall mid-round while heroes still act.
 function skillAlwaysHasTarget(skill: EquipmentSkill): boolean {
-  return skill.techniques.some(
+  return skillOwnTechniques(skill).some(
     (tech) => techniqueTargetsAnyLiving(tech) && tech.targetType !== 'Enemies',
   );
 }

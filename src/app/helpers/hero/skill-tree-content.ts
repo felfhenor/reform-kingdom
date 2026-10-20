@@ -66,12 +66,20 @@ export function skillTreeDefaultNodeIds(jobId: JobId): SkillTreeNodeId[] {
     .map((node) => node.id);
 }
 
+// Skill modifiers carry their node's name, so a skill's description can say where each came from.
 export function skillTreeNodeEffects(
   nodeIds: SkillTreeNodeId[],
 ): SkillTreeNodeEffect[] {
-  return nodeIds.flatMap(
-    (nodeId) => getEntry<SkillTreeNodeContent>(nodeId)?.effects ?? [],
-  );
+  return nodeIds.flatMap((nodeId) => {
+    const node = getEntry<SkillTreeNodeContent>(nodeId);
+    if (!node) return [];
+
+    return node.effects.map((effect) =>
+      effect.kind === 'SkillModifier'
+        ? { ...effect, source: skillTreeNodeShortName(node) }
+        : effect,
+    );
+  });
 }
 
 // Built against an older treeVersion than the job has now.
