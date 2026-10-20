@@ -147,7 +147,7 @@
   jobId: Explorer
   level: 5
   row: Fortune
-  track: 2
+  track: 1
   effects:
     - kind: GrantSkill
       skillId: 'Look for Trouble I'
@@ -155,9 +155,9 @@
 - id: 0a716553-4885-4596-bf45-3d8107a7200a
   name: 'Explorer: Look for Trouble II'
   jobId: Explorer
-  level: 25
+  level: 20
   row: Fortune
-  track: 2
+  track: 1
   requiredSkillTreeNodeIds: ['Explorer: Look for Trouble I']
   effects:
     - kind: GrantSkill
@@ -170,12 +170,24 @@
   jobId: Explorer
   level: 1
   row: Fortune
-  track: 1
+  track: 2
   default: true
   effects:
     - kind: JobAbility
       jobAbilityId: Fortunate Finds
       value: 1
+
+- id: 8c0c96b1-55ac-4b1d-8036-7fa5a5dc3963
+  name: 'Explorer: Fortunate Finds II'
+  jobId: Explorer
+  level: 25
+  row: Fortune
+  track: 2
+  requiredSkillTreeNodeIds: ['Explorer: Fortunate Finds I']
+  effects:
+    - kind: JobAbility
+      jobAbilityId: Fortunate Finds
+      value: 1.5
 
 # --- Specialization oath (Lv 15) ---
 
@@ -225,6 +237,17 @@
     - kind: JobAbility
       jobAbilityId: Loot Goblin
       value: 5
+
+- id: 84818e9f-bc28-4de6-998a-1a21fe2f3d4b
+  name: 'Explorer: Loot Goblin II'
+  jobId: Explorer
+  level: 35
+  row: Treasure Hunter
+  requiredSkillTreeNodeIds: ['Explorer: Loot Goblin I']
+  effects:
+    - kind: JobAbility
+      jobAbilityId: Loot Goblin
+      value: 10
 
 # --- Dungeon Delver ---
 

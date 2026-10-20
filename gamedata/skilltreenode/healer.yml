@@ -276,7 +276,7 @@
 - id: 70c99293-32c0-4a55-8806-a80f2cc4ffd4
   name: 'Healer: Sanctified Incantations II'
   jobId: Healer
-  level: 25
+  level: 35
   row: Lifegiver
   requiredSkillTreeNodeIds: ['Healer: Sanctified Incantations I']
   effects:
@@ -300,7 +300,7 @@
 - id: 803ee039-e1ed-40eb-ad9d-eec07e19b046
   name: 'Healer: Town Favor II'
   jobId: Healer
-  level: 25
+  level: 35
   row: Templar
   requiredSkillTreeNodeIds: ['Healer: Town Favor I']
   effects:

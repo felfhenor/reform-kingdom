@@ -244,7 +244,7 @@
 - id: 8ca17598-67a9-4c59-990e-0be156512ec1
   name: 'Ranger: Ambush II'
   jobId: Ranger
-  level: 25
+  level: 35
   row: Stalker
   requiredSkillTreeNodeIds: ['Ranger: Ambush I']
   effects:
@@ -268,7 +268,7 @@
 - id: 39e34b1e-2524-4385-a9ae-d801534b1eb6
   name: 'Ranger: Pathfinder II'
   jobId: Ranger
-  level: 25
+  level: 35
   row: Wayfinder
   requiredSkillTreeNodeIds: ['Ranger: Pathfinder I']
   effects:

@@ -228,36 +228,12 @@
 
 # --- Swashbuckler ---
 
-- id: 808d85c8-de1c-4ff2-9ad6-6c635c11ad42
-  name: 'Warrior: Follow-up I'
-  jobId: Warrior
-  level: 20
-  row: Swashbuckler
-  requiredSkillTreeNodeIds: ['Warrior: Swashbuckler']
-  effects:
-    - kind: JobAbility
-      jobAbilityId: Follow-up
-      value: 5
-
-- id: 6c93d325-2186-4c02-aaac-69cee2ba6701
-  name: 'Warrior: Follow-up II'
-  jobId: Warrior
-  level: 35
-  row: Swashbuckler
-  requiredSkillTreeNodeIds: ['Warrior: Follow-up I']
-  effects:
-    - kind: JobAbility
-      jobAbilityId: Follow-up
-      value: 10
-
-# --- Bastion ---
-
 - id: 96dc1fe8-3ee6-4899-8388-eb606939c74b
   name: 'Warrior: Intimidation I'
   jobId: Warrior
   level: 20
-  row: Bastion
-  requiredSkillTreeNodeIds: ['Warrior: Bastion']
+  row: Swashbuckler
+  requiredSkillTreeNodeIds: ['Warrior: Swashbuckler']
   effects:
     - kind: JobAbility
       jobAbilityId: Intimidation
@@ -266,20 +242,33 @@
 - id: 27bf4461-505f-4003-9691-d777ca582ce4
   name: 'Warrior: Intimidation II'
   jobId: Warrior
-  level: 25
-  row: Bastion
+  level: 35
+  row: Swashbuckler
   requiredSkillTreeNodeIds: ['Warrior: Intimidation I']
   effects:
     - kind: JobAbility
       jobAbilityId: Intimidation
       value: -12
 
+# --- Bastion ---
+
 - id: 71885e23-cb29-43f5-885a-670daaf6fae2
   name: 'Warrior: Cover I'
   jobId: Warrior
-  level: 30
+  level: 20
   row: Bastion
-  requiredSkillTreeNodeIds: ['Warrior: Intimidation II']
+  requiredSkillTreeNodeIds: ['Warrior: Bastion']
+  effects:
+    - kind: JobAbility
+      jobAbilityId: Cover
+      value: 5
+
+- id: 1cf5f8d2-580d-4cf3-871b-bb13afb4653c
+  name: 'Warrior: Cover II'
+  jobId: Warrior
+  level: 35
+  row: Bastion
+  requiredSkillTreeNodeIds: ['Warrior: Cover I']
   effects:
     - kind: JobAbility
       jobAbilityId: Cover
@@ -382,7 +371,8 @@
   row: Shield Arts
   track: 0
   requiredSkillTreeNodeIds: ['Warrior: Smashing Board II']
-  optionSkillTreeNodeIds: ['Warrior: Concussive Board', 'Warrior: Rallying Board']
+  optionSkillTreeNodeIds:
+    ['Warrior: Concussive Board', 'Warrior: Rallying Board']
 
 - id: 0466b715-a0a3-4b55-ad01-38fcb8554d05
   name: 'Warrior: Concussive Board'

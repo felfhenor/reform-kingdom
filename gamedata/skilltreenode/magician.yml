@@ -240,7 +240,7 @@
 - id: b606dc81-b8bd-4948-aa19-4dddbfec6b9f
   name: 'Magician: Mystical Insight II'
   jobId: Magician
-  level: 25
+  level: 35
   row: Arcanist
   requiredSkillTreeNodeIds: ['Magician: Mystical Insight I']
   effects:
@@ -264,7 +264,7 @@
 - id: a7144d97-90ed-4199-899c-957fe20056e4
   name: 'Magician: Astral Resonance II'
   jobId: Magician
-  level: 25
+  level: 35
   row: Celestar
   requiredSkillTreeNodeIds: ['Magician: Astral Resonance I']
   effects:
