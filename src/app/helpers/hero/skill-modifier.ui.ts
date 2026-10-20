@@ -37,17 +37,21 @@ function namedSegment(
   return { text: name, art };
 }
 
-function statusSegment(
-  modifier: { statusEffectId: string },
-  suffix = '',
-): SkillModifierLineSegment {
+function statusSegment(modifier: {
+  statusEffectId: string;
+}): SkillModifierLineSegment {
   const status = getEntry<StatusEffectContent>(modifier.statusEffectId);
   return status
-    ? namedSegment(`${status.name}${suffix}`, {
+    ? namedSegment(status.name, {
         sprite: status.sprite,
         spritesheet: 'statuseffect',
       })
-    : { text: `${modifier.statusEffectId}${suffix}` };
+    : { text: modifier.statusEffectId };
+}
+
+function statusVerb(modifier: { statusEffectId: string }): string {
+  const status = getEntry<StatusEffectContent>(modifier.statusEffectId);
+  return status?.effectType === 'Buff' ? 'grant' : 'inflict';
 }
 
 function inflictSegments(
@@ -55,27 +59,29 @@ function inflictSegments(
   format: (value: number) => string,
 ): SkillModifierLineSegment[] {
   const hits = modifier.onElement ? ` on ${modifier.onElement} hits` : '';
-  const isBuff =
-    getEntry<StatusEffectContent>(modifier.statusEffectId)?.effectType ===
-    'Buff';
   return [
-    {
-      text: `${format(modifier.chance)}% chance to ${isBuff ? 'grant' : 'inflict'}`,
-    },
+    { text: `${format(modifier.chance)}% chance to ${statusVerb(modifier)}` },
     statusSegment(modifier),
     { text: `for ${turnsText(modifier.duration, format)}${hits}` },
   ];
 }
 
+// Same sentence as an inflict line, with + marking a boost to a status the skill already has.
 function potencySegments(
   modifier: HeroEffectSkillModifierPotency,
   format: (value: number) => string,
 ): SkillModifierLineSegment[] {
-  const parts = [
-    modifier.chance ? `+${format(modifier.chance)}% chance` : '',
-    modifier.duration ? `+${turnsText(modifier.duration, format)}` : '',
-  ].filter((part) => part !== '');
-  return [statusSegment(modifier, ':'), { text: parts.join(', ') }];
+  const turns = `+${turnsText(modifier.duration, format)}`;
+  if (!modifier.chance) {
+    return [{ text: `${turns} of` }, statusSegment(modifier)];
+  }
+
+  const chance = {
+    text: `+${format(modifier.chance)}% chance to ${statusVerb(modifier)}`,
+  };
+  return modifier.duration
+    ? [chance, statusSegment(modifier), { text: `for ${turns}` }]
+    : [chance, statusSegment(modifier)];
 }
 
 function echoSegments(
