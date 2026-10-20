@@ -76,7 +76,7 @@ describe('combatStatsForCharacter', () => {
     seedContent(
       abilityJobContent('Guard', [
         ['SkillRepeatChance', 20, 5],
-        ['CoverChance', 30, 5],
+        ['CoverThreshold', 30, 5],
       ]),
     );
 
@@ -86,7 +86,7 @@ describe('combatStatsForCharacter', () => {
     });
     expect(
       combatStatsForCharacter(buildAbilityHero('Guard', 30)),
-    ).toMatchObject({ skillStrikeAgainChance: 5, coverChance: 5 });
+    ).toMatchObject({ skillStrikeAgainChance: 5, coverThreshold: 5 });
   });
 });
 

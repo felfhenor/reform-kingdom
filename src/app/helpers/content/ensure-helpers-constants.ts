@@ -95,7 +95,7 @@ export const VALID_JOB_ABILITY_TYPES: JobAbilityType[] = [
   'EquipmentDropRateBoost',
   'ItemDropRateBoost',
   'SkillRepeatChance',
-  'CoverChance',
+  'CoverThreshold',
   'DebuffPotency',
 ];
 

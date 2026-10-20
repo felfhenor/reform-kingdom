@@ -19,7 +19,7 @@ export type JobAbilityType =
   | 'EquipmentDropRateBoost'
   | 'ItemDropRateBoost'
   | 'SkillRepeatChance'
-  | 'CoverChance'
+  | 'CoverThreshold'
   | 'DebuffPotency';
 
 export type JobAbilityContent = IsContentItem &

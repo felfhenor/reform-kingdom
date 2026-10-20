@@ -15,7 +15,7 @@ import { isNumber } from 'es-toolkit/compat';
 
 const JOB_ABILITY_COMBAT_STATS: Partial<Record<JobAbilityType, CombatStat>> = {
   SkillRepeatChance: 'skillStrikeAgainChance',
-  CoverChance: 'coverChance',
+  CoverThreshold: 'coverThreshold',
 };
 
 // Applied once at combat creation - gear, teaching and job-ability combat-stat bonuses are

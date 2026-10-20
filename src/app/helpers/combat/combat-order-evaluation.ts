@@ -1,5 +1,8 @@
 import { skillOwnTechniques } from '@helpers/hero/skill-modifier';
-import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
+import {
+  combatantHealthPercent,
+  combatantIsDead,
+} from '@helpers/combat/combat-combatant-hp';
 import { elementPool } from '@helpers/combat/combat-element-pool';
 import { combatOrderTargetModeNeedsValidityCheck } from '@helpers/combat/combat-order-target-mode';
 import { combatCombatantSkillEpCost } from '@helpers/combat/combat-stats';
@@ -43,11 +46,6 @@ function compareNumbers(
   }
 }
 
-function healthPercent(combatant: Combatant): number {
-  if (combatant.totalStats.Health <= 0) return 0;
-  return (combatant.hp / combatant.totalStats.Health) * 100;
-}
-
 function energyPercent(combatant: Combatant): number {
   if (combatant.totalStats.Energy <= 0) return 0;
   return (combatant.ep / combatant.totalStats.Energy) * 100;
@@ -80,8 +78,8 @@ function combatantsMatchingHealthCount(
 
   return pool.filter((c) =>
     condition.healthDirection === 'Above'
-      ? healthPercent(c) > condition.healthPercent
-      : healthPercent(c) < condition.healthPercent,
+      ? combatantHealthPercent(c) > condition.healthPercent
+      : combatantHealthPercent(c) < condition.healthPercent,
   );
 }
 
@@ -95,7 +93,7 @@ export function combatOrderConditionMatches(
       return true;
     case 'SelfHealthPercent':
       return compareNumbers(
-        healthPercent(combatant),
+        combatantHealthPercent(combatant),
         condition.comparator,
         condition.value,
       );
@@ -132,7 +130,7 @@ export function combatOrderConditionMatches(
       );
       if (!hero) return false;
       return compareNumbers(
-        healthPercent(hero),
+        combatantHealthPercent(hero),
         condition.comparator,
         condition.value,
       );
@@ -155,8 +153,8 @@ export function matchingCombatantsForCondition(
 
   const matches = combatantsMatchingHealthCount(combat, combatant, condition);
   return condition.healthDirection === 'Below'
-    ? sortBy(matches, (c) => healthPercent(c))
-    : sortBy(matches, (c) => -healthPercent(c));
+    ? sortBy(matches, (c) => combatantHealthPercent(c))
+    : sortBy(matches, (c) => -combatantHealthPercent(c));
 }
 
 // Resolves a skill family (stable across tiers/source) to a currently castable skill.

@@ -1,7 +1,9 @@
-import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
+import {
+  combatantHealthPercent,
+  combatantIsDead,
+} from '@helpers/combat/combat-combatant-hp';
 import { techniqueHasAttribute } from '@helpers/combat/combat-damage';
 import { combatCanTakeTurn } from '@helpers/combat/combat-statuseffects';
-import { rngSucceedsChance } from '@helpers/rng';
 import type { Combatant, EquipmentSkillContentTechnique } from '@interfaces';
 
 function combatCoverCandidates(
@@ -9,6 +11,8 @@ function combatCoverCandidates(
   target: Combatant,
   validTargets: Combatant[],
 ): Combatant[] {
+  const targetHealthPercent = combatantHealthPercent(target);
+
   return validTargets.filter(
     (ally) =>
       ally.isEnemy === target.isEnemy &&
@@ -16,7 +20,7 @@ function combatCoverCandidates(
       ally !== attacker &&
       !combatantIsDead(ally) &&
       combatCanTakeTurn(ally) &&
-      (ally.combatStats.coverChance ?? 0) > 0,
+      (ally.combatStats.coverThreshold ?? 0) > targetHealthPercent,
   );
 }
 
@@ -32,7 +36,5 @@ export function combatCoveringAlly(
   if (target.combatStats.agroValue > 0) return undefined;
   if (!techniqueHasAttribute(technique, 'DamagesTarget')) return undefined;
 
-  return combatCoverCandidates(attacker, target, validTargets).find((ally) =>
-    rngSucceedsChance(ally.combatStats.coverChance),
-  );
+  return combatCoverCandidates(attacker, target, validTargets)[0];
 }

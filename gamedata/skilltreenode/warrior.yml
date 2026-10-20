@@ -264,7 +264,7 @@
   effects:
     - kind: JobAbility
       jobAbilityId: Cover
-      value: 5
+      value: 15
 
 - id: 1cf5f8d2-580d-4cf3-871b-bb13afb4653c
   name: 'Warrior: Cover II'
@@ -276,7 +276,7 @@
   effects:
     - kind: JobAbility
       jobAbilityId: Cover
-      value: 5
+      value: 25
 
 # --- Skill oaths ---
 

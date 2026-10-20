@@ -84,8 +84,8 @@
 
 - id: e80fe15e-b7d3-4b6c-8c1a-f81656c268c7
   name: Cover
-  description: Each Warrior has a chance to step in and take a single-target attack aimed at an ally.
-  type: CoverChance
+  description: Each Warrior steps in to take single-target attacks aimed at badly wounded allies.
+  type: CoverThreshold
   sprite: '0015'
 
 - id: e3a54096-9d36-46a1-9824-d6f7b3b19fca

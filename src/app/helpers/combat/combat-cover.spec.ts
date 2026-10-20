@@ -1,31 +1,28 @@
-import type * as RngHelper from '@helpers/rng';
 import type { Combatant } from '@interfaces';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-vi.mock('@helpers/rng', async (importOriginal) => ({
-  ...(await importOriginal<typeof RngHelper>()),
-  rngSucceedsChance: vi.fn(),
-}));
+import { describe, expect, it } from 'vitest';
 
 import { combatCoveringAlly } from '@helpers/combat/combat-cover';
 import { ensureEquipmentSkillTechnique } from '@helpers/content/ensure-skill';
 import { defaultCombatStats } from '@helpers/defaults';
-import { rngSucceedsChance } from '@helpers/rng';
 import { buildTestCombatant } from '@/testing/builders';
 
 const attack = ensureEquipmentSkillTechnique({ attributes: ['DamagesTarget'] });
 
 function hero(
   id: string,
-  coverChance = 0,
+  coverThreshold = 0,
   overrides: Partial<Combatant> = {},
 ): Combatant {
   return buildTestCombatant({
     id,
-    combatStats: { ...defaultCombatStats(), coverChance },
+    combatStats: { ...defaultCombatStats(), coverThreshold },
     ...overrides,
   });
 }
+
+// Test combatants have 100 max HP, so hp reads as a percentage.
+const wounded = (id: string, overrides: Partial<Combatant> = {}) =>
+  hero(id, 0, { hp: 5, ...overrides });
 
 const monster = buildTestCombatant({ id: 'monster', isEnemy: true });
 
@@ -34,42 +31,41 @@ function cover(party: Combatant[], numTargets = 1, technique = attack) {
   return combatCoveringAlly(monster, party[0], party, technique, numTargets);
 }
 
-beforeEach(() => {
-  vi.mocked(rngSucceedsChance).mockReset().mockReturnValue(true);
-});
-
 describe('combatCoveringAlly', () => {
-  it('returns the first ally whose cover roll lands', () => {
-    vi.mocked(rngSucceedsChance).mockReturnValueOnce(false);
-    const [target, first, second] = [hero('t'), hero('a', 5), hero('b', 5)];
+  it('covers a target strictly below the threshold', () => {
+    const guard = hero('g', 10);
 
-    expect(cover([target, first, second])).toBe(second);
-    expect(rngSucceedsChance).toHaveBeenCalledWith(5);
+    expect(cover([hero('t', 0, { hp: 9 }), guard])).toBe(guard);
+    expect(cover([hero('t', 0, { hp: 10 }), guard])).toBeUndefined();
   });
 
-  it('only rolls for living, able-to-act allies with cover chance', () => {
+  it('picks the first eligible ally', () => {
+    const [low, first, second] = [hero('l', 3), hero('a', 10), hero('b', 10)];
+
+    expect(cover([wounded('t'), low, first, second])).toBe(first);
+  });
+
+  it('only uses living, able-to-act allies with a threshold', () => {
     const party = [
-      hero('t', 50),
+      wounded('t'),
       hero('dead', 50, { hp: 0 }),
       hero('frozen', 50, { statusEffectData: { isFrozen: true } }),
       hero('none'),
     ];
 
     expect(cover(party)).toBeUndefined();
-    expect(rngSucceedsChance).not.toHaveBeenCalled();
   });
 
   it("skips allies the technique couldn't have targeted", () => {
-    const target = hero('t');
+    const target = wounded('t');
 
     expect(
       combatCoveringAlly(monster, target, [target], attack, 1),
     ).toBeUndefined();
-    expect(rngSucceedsChance).not.toHaveBeenCalled();
   });
 
   it('never covers a taunting target', () => {
-    const taunter = hero('t', 0, {
+    const taunter = wounded('t', {
       combatStats: { ...defaultCombatStats(), agroValue: 10 },
     });
 
@@ -78,8 +74,8 @@ describe('combatCoveringAlly', () => {
 
   it("lets a confused attacker's side-mates cover, but never the attacker", () => {
     const [confused, target, guard] = [
-      hero('c', 100),
-      hero('t'),
+      hero('c', 100, { hp: 5 }),
+      wounded('t'),
       hero('g', 100),
     ];
     const pool = [confused, target, guard];
@@ -91,11 +87,11 @@ describe('combatCoveringAlly', () => {
   });
 
   it('only covers with side-mates of the target, on either side', () => {
-    const goblin = buildTestCombatant({ id: 'goblin', isEnemy: true });
+    const goblin = buildTestCombatant({ id: 'goblin', isEnemy: true, hp: 5 });
     const brute = buildTestCombatant({
       id: 'brute',
       isEnemy: true,
-      combatStats: { ...defaultCombatStats(), coverChance: 10 },
+      combatStats: { ...defaultCombatStats(), coverThreshold: 10 },
     });
     const attacker = hero('h', 100);
 
@@ -111,15 +107,10 @@ describe('combatCoveringAlly', () => {
   });
 
   it('ignores multi-target and non-damaging techniques', () => {
-    const party = [hero('t'), hero('a', 100)];
+    const party = [wounded('t'), hero('a', 100)];
     const buff = ensureEquipmentSkillTechnique({ attributes: [] });
 
     expect(cover(party, 2)).toBeUndefined();
     expect(cover(party, 1, buff)).toBeUndefined();
-  });
-
-  it('is undefined when every roll fails', () => {
-    vi.mocked(rngSucceedsChance).mockReturnValue(false);
-    expect(cover([hero('t'), hero('a', 5)])).toBeUndefined();
   });
 });

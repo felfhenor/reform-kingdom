@@ -7,6 +7,11 @@ export function combatantIsDead(combatant: Combatant): boolean {
   return combatant.hp <= 0;
 }
 
+export function combatantHealthPercent(combatant: Combatant): number {
+  if (combatant.totalStats.Health <= 0) return 0;
+  return (combatant.hp / combatant.totalStats.Health) * 100;
+}
+
 export function combatCombatantTakeDamage(
   combatant: Combatant,
   damage: number,

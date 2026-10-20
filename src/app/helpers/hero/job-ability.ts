@@ -34,7 +34,7 @@ const JOB_ABILITY_RULES: Record<JobAbilityType, JobAbilityRule> = {
   ItemDropRateBoost: { stacking: 'Highest', amount: 'Value' },
   // Per-hero: combat reads the owner's own rank, never the party value.
   SkillRepeatChance: { stacking: 'Highest', amount: 'Value' },
-  CoverChance: { stacking: 'Highest', amount: 'Value' },
+  CoverThreshold: { stacking: 'Highest', amount: 'Value' },
   DebuffPotency: { stacking: 'Highest', amount: 'Value' },
 };
 
