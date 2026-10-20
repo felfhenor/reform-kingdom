@@ -1,7 +1,6 @@
 <div role="tablist" class="tabs tabs-box">
   @for (character of party(); track character.id) {
     @let job = jobFor(character.jobId);
-    @let sp = freeSp(character);
 
     <button
       type="button"
@@ -20,15 +19,7 @@
       {{ character.name }}
       <app-label-job class="text-lighter" [character]="character" />
 
-      @if (sp > 0) {
-        <span
-          class="badge badge-sm badge-attention tabular-nums"
-          (animate.enter)="onEnter($event)"
-          (animate.leave)="onLeave($event)"
-        >
-          {{ sp | number }} SP
-        </span>
-      }
+      <app-badge-skill-points [character]="character" />
     </button>
   }
 </div>

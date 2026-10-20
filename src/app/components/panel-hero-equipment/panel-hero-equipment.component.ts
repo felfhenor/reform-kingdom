@@ -9,6 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
+import { BadgeSkillPointsComponent } from '@components/badge-skill-points/badge-skill-points.component';
 import { TextNumberTweenComponent } from '@components/text-number-tween/text-number-tween.component';
 import { ButtonHeroCombatOrdersComponent } from '@components/button-hero-combat-orders/button-hero-combat-orders.component';
 import { ButtonHeroTeachingsComponent } from '@components/button-hero-teachings/button-hero-teachings.component';
@@ -34,7 +35,6 @@ import {
 } from '@helpers/engine/ui';
 import { optimizeCharacterEquipment } from '@helpers/hero/character-equipment';
 import { characterBurstSkillOptions } from '@helpers/hero/job';
-import { characterSkillTreeAvailableSp } from '@helpers/hero/skill-tree';
 import { demoteHero, promoteHero } from '@helpers/hero/position-swapping';
 import {
   characterCurrentRegalia,
@@ -56,6 +56,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   selector: 'app-panel-hero-equipment',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    BadgeSkillPointsComponent,
     LabelJobComponent,
     PanelHeroEquipmentEquipmentComponent,
     PanelHeroEquipmentSkillsComponent,
@@ -144,11 +145,6 @@ export class PanelHeroEquipmentComponent {
   public openRegalias(): void {
     regaliaPageOpen(this.character().id);
   }
-
-  public freeSp = computed(() => {
-    const character = this.character();
-    return characterSkillTreeAvailableSp(character, character.jobId);
-  });
 
   public openSkillTree(): void {
     skillTreePageOpen(this.character().id);

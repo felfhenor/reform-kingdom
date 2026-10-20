@@ -127,7 +127,6 @@
           </button>
         </app-slot-button-container>
 
-        @let sp = freeSp();
         <button
           type="button"
           class="btn btn-sm btn-neutral"
@@ -138,15 +137,7 @@
           [sfxTrigger]="['click', 'hover']"
         >
           Skill Tree
-          @if (sp > 0) {
-            <span
-              class="badge badge-sm badge-attention tabular-nums"
-              (animate.enter)="onEnter($event)"
-              (animate.leave)="onLeave($event)"
-            >
-              {{ sp | number }} SP
-            </span>
-          }
+          <app-badge-skill-points [character]="char" />
         </button>
 
         <app-button-hero-combat-orders
