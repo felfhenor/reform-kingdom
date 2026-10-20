@@ -1,7 +1,10 @@
 import type { DebuffPotency } from '@interfaces/combat';
 import type { AffixEffect } from '@interfaces/content-affix';
 import type { JobAbilityId } from '@interfaces/content-jobability';
-import type { EquipmentSkillId } from '@interfaces/content-skill';
+import type {
+  EquipmentSkillAttribute,
+  EquipmentSkillId,
+} from '@interfaces/content-skill';
 import type { StatusEffectId } from '@interfaces/content-statuseffect';
 import type { GameElement } from '@interfaces/element';
 import type { BaseStat } from '@interfaces/stat';
@@ -56,6 +59,12 @@ export type HeroEffectSkillModifierScaling = HeroEffectSkillModifierBase & {
   value: number;
 };
 
+// Gives the skill's own hits an attribute, e.g. NeverMisses.
+export type HeroEffectSkillModifierAttribute = HeroEffectSkillModifierBase & {
+  modifier: 'Attribute';
+  attribute: EquipmentSkillAttribute;
+};
+
 // Raises a hit's chance to land, up to a sure hit.
 export type HeroEffectSkillModifierAccuracy = HeroEffectSkillModifierBase & {
   modifier: 'Accuracy';
@@ -79,6 +88,7 @@ export type HeroEffectSkillModifier =
   | HeroEffectSkillModifierPotency
   | HeroEffectSkillModifierScaling
   | HeroEffectSkillModifierAccuracy
+  | HeroEffectSkillModifierAttribute
   | HeroEffectSkillModifierElement
   | HeroEffectSkillModifierEcho;
 

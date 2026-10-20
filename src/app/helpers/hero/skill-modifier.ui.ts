@@ -38,7 +38,11 @@ function inflictText(
   format: (value: number) => string,
 ): string {
   const hits = modifier.onElement ? ` on ${modifier.onElement} hits` : '';
-  return `${format(modifier.chance)}% chance to inflict ${statusName(modifier)} for ${turnsText(modifier.duration, format)}${hits}`;
+  const isBuff =
+    getEntry<StatusEffectContent>(modifier.statusEffectId)?.effectType ===
+    'Buff';
+  const verb = isBuff ? 'grant' : 'inflict';
+  return `${format(modifier.chance)}% chance to ${verb} ${statusName(modifier)} for ${turnsText(modifier.duration, format)}${hits}`;
 }
 
 function potencyText(
@@ -69,6 +73,8 @@ export function skillModifierText(
       return `+${format(modifier.value)}x ${modifier.stat} scaling`;
     case 'Accuracy':
       return `+${format(modifier.value)}% accuracy`;
+    case 'Attribute':
+      return modifier.attribute.replace(/([a-z])([A-Z])/g, '$1 $2');
     case 'Echo':
       return `Also casts ${getEntry<EquipmentSkillContent>(modifier.skillId)?.name ?? 'UNKNOWN'}`;
   }

@@ -23,9 +23,9 @@
 - id: 160ee79e-ce9a-49d7-8a57-fb27e7e024b6
   name: 'Ranger: Snipe III'
   jobId: Ranger
-  level: 20
+  level: 25
   row: Marksmanship
-  requiredSkillTreeNodeIds: ['Ranger: Snipe II']
+  requiredSkillTreeNodeIds: ['Ranger: Oath of the Deadeye']
   effects:
     - kind: GrantSkill
       skillId: 'Snipe III'
@@ -70,7 +70,7 @@
   level: 25
   row: Marksmanship
   track: 1
-  requiredSkillTreeNodeIds: ['Ranger: Rapidfire II']
+  requiredSkillTreeNodeIds: ['Ranger: Oath of the Volley']
   effects:
     - kind: GrantSkill
       skillId: 'Rapidfire III'
@@ -94,7 +94,7 @@
   level: 40
   row: Marksmanship
   track: 2
-  requiredSkillTreeNodeIds: ['Ranger: Barbed Shot I']
+  requiredSkillTreeNodeIds: ['Ranger: Oath of the Barb']
   effects:
     - kind: GrantSkill
       skillId: 'Barbed Shot II'
@@ -128,7 +128,7 @@
   level: 35
   row: Nature
   track: 2
-  requiredSkillTreeNodeIds: ['Ranger: Arrow Rain II']
+  requiredSkillTreeNodeIds: ['Ranger: Oath of the Storm']
   effects:
     - kind: GrantSkill
       skillId: 'Arrow Rain III'
@@ -149,7 +149,7 @@
   jobId: Ranger
   level: 30
   row: Nature
-  requiredSkillTreeNodeIds: ['Ranger: Regrowth I']
+  requiredSkillTreeNodeIds: ['Ranger: Oath of Renewal']
   effects:
     - kind: GrantSkill
       skillId: 'Regrowth II'
@@ -159,21 +159,22 @@
 - id: 07a8fc98-11a5-44b3-bbdb-a92f121b1515
   name: 'Ranger: Static Gust I'
   jobId: Ranger
-  level: 25
+  level: 35
   row: Nature
   track: 1
-  requiredSkillTreeNodeIds: ['Ranger: Regrowth I']
+  requiredSkillTreeNodeIds: ['Ranger: Regrowth II']
   effects:
     - kind: GrantSkill
       skillId: 'Static Gust I'
 
-# --- Abilities (intrinsic) ---
+# --- Abilities (intrinsic, on Nature's middle track) ---
 
 - id: a4ff7990-6219-4c0c-84cc-dd9d04e06797
   name: 'Ranger: Scavenger I'
   jobId: Ranger
   level: 1
-  row: Abilities
+  row: Nature
+  track: 1
   default: true
   effects:
     - kind: JobAbility
@@ -184,7 +185,8 @@
   name: 'Ranger: Scavenger II'
   jobId: Ranger
   level: 25
-  row: Abilities
+  row: Nature
+  track: 1
   requiredSkillTreeNodeIds: ['Ranger: Scavenger I']
   effects:
     - kind: JobAbility
@@ -273,3 +275,202 @@
     - kind: JobAbility
       jobAbilityId: Pathfinder
       value: 0.2
+
+# --- Skill oaths ---
+
+- id: 013e24b5-4b3f-4c1b-ad8d-7a39cf7c4368
+  name: 'Ranger: Oath of the Deadeye'
+  jobId: Ranger
+  level: 15
+  row: Marksmanship
+  track: 0
+  requiredSkillTreeNodeIds: ['Ranger: Snipe II']
+  optionSkillTreeNodeIds: ['Ranger: Deadeye', 'Ranger: Hunter''s Mark']
+
+- id: 6cda208d-aed9-4e14-be53-c53664ade61f
+  name: 'Ranger: Deadeye'
+  jobId: Ranger
+  effects:
+    - kind: SkillModifier
+      family: Snipe
+      modifier: Attribute
+      attribute: NeverMisses
+
+- id: 2794d119-0c12-40b9-88eb-179d42198e4c
+  name: 'Ranger: Hunter''s Mark'
+  jobId: Ranger
+  effects:
+    - kind: SkillModifier
+      family: Snipe
+      modifier: Inflict
+      statusEffectId: Weakspot
+      chance: 40
+      duration: 3
+
+- id: 4fae9abd-b186-4334-a76e-e626b5f2440b
+  name: 'Ranger: Oath of the Volley'
+  jobId: Ranger
+  level: 20
+  row: Marksmanship
+  track: 1
+  requiredSkillTreeNodeIds: ['Ranger: Rapidfire II']
+  optionSkillTreeNodeIds: ['Ranger: Envenomed Tips', 'Ranger: Scatter Shot']
+
+- id: 8b7b96f1-49cb-4059-9621-078258afa161
+  name: 'Ranger: Envenomed Tips'
+  jobId: Ranger
+  effects:
+    - kind: SkillModifier
+      family: Rapidfire
+      modifier: Inflict
+      statusEffectId: 'Venom I'
+      chance: 10
+      duration: 3
+
+- id: e9c5b5fc-3a27-4dd8-9f2e-e4ed7d3aba90
+  name: 'Ranger: Scatter Shot'
+  jobId: Ranger
+  effects:
+    - kind: SkillModifier
+      family: Rapidfire
+      modifier: Targets
+      value: 1
+
+- id: d7e8db75-d193-44ca-9f99-c46542f45a1b
+  name: 'Ranger: Oath of the Barb'
+  jobId: Ranger
+  level: 35
+  row: Marksmanship
+  track: 2
+  requiredSkillTreeNodeIds: ['Ranger: Barbed Shot I']
+  optionSkillTreeNodeIds: ['Ranger: Serrated', 'Ranger: Pocket Sand']
+
+- id: c713a36e-6410-49ae-ba01-0002a1320b36
+  name: 'Ranger: Serrated'
+  jobId: Ranger
+  effects:
+    - kind: SkillModifier
+      family: 'Barbed Shot'
+      modifier: Potency
+      statusEffectId: Bleeding
+      chance: 25
+      duration: 2
+
+- id: cdae6a6d-7129-44ca-b7d2-ba9dca1e9871
+  name: 'Ranger: Pocket Sand'
+  jobId: Ranger
+  effects:
+    - kind: SkillModifier
+      family: 'Barbed Shot'
+      modifier: Echo
+      skillId: 'Pocket Sand'
+
+- id: 947173de-8bba-473f-8bd5-3e8b0710015d
+  name: 'Ranger: Oath of Renewal'
+  jobId: Ranger
+  level: 20
+  row: Nature
+  track: 0
+  requiredSkillTreeNodeIds: ['Ranger: Regrowth I']
+  optionSkillTreeNodeIds: ['Ranger: Deep Roots', 'Ranger: Rooted']
+
+- id: 50fbc145-8961-4bda-baa0-e6ca780abf20
+  name: 'Ranger: Deep Roots'
+  jobId: Ranger
+  effects:
+    - kind: SkillModifier
+      family: Regrowth
+      modifier: Scaling
+      stat: Intelligence
+      value: 0.5
+
+- id: d110e188-2ebf-44b9-ab63-bc855ecee381
+  name: 'Ranger: Rooted'
+  jobId: Ranger
+  effects:
+    - kind: SkillModifier
+      family: Regrowth
+      modifier: Inflict
+      statusEffectId: Invigorated
+      chance: 100
+      duration: 2
+
+- id: 9dcd9fa3-673d-4210-97cb-4ab455523054
+  name: 'Ranger: Oath of the Storm'
+  jobId: Ranger
+  level: 30
+  row: Nature
+  track: 2
+  requiredSkillTreeNodeIds: ['Ranger: Arrow Rain II']
+  optionSkillTreeNodeIds: ['Ranger: Gale Arrows', 'Ranger: Fire Arrows']
+
+- id: dbf3bca0-e47f-4a32-a9bd-5e271c4fe600
+  name: 'Ranger: Gale Arrows'
+  jobId: Ranger
+  effects:
+    - kind: SkillModifier
+      family: 'Arrow Rain'
+      modifier: Element
+      element: Air
+    - kind: SkillModifier
+      family: 'Arrow Rain'
+      modifier: Inflict
+      statusEffectId: Redirect
+      chance: 20
+      duration: 2
+
+- id: 908e8b59-267a-4681-bbdb-77f4343f830c
+  name: 'Ranger: Fire Arrows'
+  jobId: Ranger
+  effects:
+    - kind: SkillModifier
+      family: 'Arrow Rain'
+      modifier: Element
+      element: Fire
+    - kind: SkillModifier
+      family: 'Arrow Rain'
+      modifier: Inflict
+      statusEffectId: Burning
+      chance: 20
+      duration: 3
+
+- id: 374298b4-f7a8-4e38-91b5-519e5782f71a
+  name: 'Ranger: Oath of the Gale'
+  jobId: Ranger
+  level: 40
+  row: Nature
+  track: 1
+  requiredSkillTreeNodeIds: ['Ranger: Static Gust I']
+  optionSkillTreeNodeIds: ['Ranger: Focused Gust', 'Ranger: Tempest']
+
+- id: 7c6d4f9c-7c5c-422d-9b74-cb84ee87e8ab
+  name: 'Ranger: Focused Gust'
+  jobId: Ranger
+  effects:
+    - kind: SkillModifier
+      family: 'Static Gust'
+      modifier: Potency
+      statusEffectId: Trembling
+      chance: 20
+      duration: 0
+    - kind: SkillModifier
+      family: 'Static Gust'
+      modifier: Potency
+      statusEffectId: Gravity
+      chance: 20
+      duration: 0
+    - kind: SkillModifier
+      family: 'Static Gust'
+      modifier: Potency
+      statusEffectId: Redirect
+      chance: 20
+      duration: 0
+
+- id: e2f4882b-ccca-4f2f-8d65-2833c5a5d43a
+  name: 'Ranger: Tempest'
+  jobId: Ranger
+  effects:
+    - kind: SkillModifier
+      family: 'Static Gust'
+      modifier: Targets
+      value: 2

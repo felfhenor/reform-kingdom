@@ -1,6 +1,7 @@
 import {
   VALID_GAME_ELEMENTS,
   VALID_GAME_STATS,
+  VALID_SKILL_ATTRIBUTES,
 } from '@helpers/content/ensure-helpers-constants';
 import { ensureEnumValue } from '@helpers/content/ensure-helpers-core';
 import type {
@@ -57,6 +58,14 @@ export function ensureSkillModifierEffect(
     }
     case 'Accuracy':
       return { kind, family, modifier: 'Accuracy', value };
+    case 'Attribute': {
+      const attribute = ensureEnumValue(
+        effect['attribute'],
+        VALID_SKILL_ATTRIBUTES,
+        'NeverMisses',
+      );
+      return { kind, family, modifier: 'Attribute', attribute };
+    }
     case 'Element': {
       const element = ensureElement(effect['element']);
       return { kind, family, modifier: 'Element', element };

@@ -2,6 +2,7 @@ import { getEntry } from '@helpers/content/content';
 import { skillTechniqueWithStatBonuses } from '@helpers/hero/skill';
 import type {
   EquipmentSkill,
+  EquipmentSkillAttribute,
   EquipmentSkillContent,
   EquipmentSkillContentTechnique,
   HeroEffect,
@@ -40,6 +41,21 @@ function techniqueInflicted(
   };
 }
 
+// A sure hit also can't be dodged: the target's Luck dodge is a separate roll from missing.
+function techniqueWithAttribute(
+  technique: EquipmentSkillContentTechnique,
+  attribute: EquipmentSkillAttribute,
+): EquipmentSkillContentTechnique {
+  const attributes = uniq([...technique.attributes, attribute]);
+  return {
+    ...technique,
+    attributes:
+      attribute === 'NeverMisses'
+        ? attributes.filter((entry) => entry !== 'AllowLuckDodge')
+        : attributes,
+  };
+}
+
 function techniqueWithModifier(
   skill: EquipmentSkillContent,
   technique: EquipmentSkillContentTechnique,
@@ -57,6 +73,8 @@ function techniqueWithModifier(
       };
     case 'Inflict':
       return techniqueInflicted(technique, modifier);
+    case 'Attribute':
+      return techniqueWithAttribute(technique, modifier.attribute);
     case 'Accuracy':
       return {
         ...technique,

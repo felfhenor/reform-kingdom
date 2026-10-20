@@ -52,8 +52,8 @@
     - Dagger
     - Bow
 
-  treeVersion: 1
-  treeRows: [Marksmanship, Nature, Abilities]
+  treeVersion: 2
+  treeRows: [Marksmanship, Nature]
   specializationRows: [Stalker, Wayfinder]
 
   starterEquipmentIds:

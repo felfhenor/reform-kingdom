@@ -119,6 +119,40 @@ describe('skillWithModifiers', () => {
     expect(skill.techniques[1].damageScaling.Spirit).toBe(0);
   });
 
+  it('makes a sure hit undodgeable too', () => {
+    const dodgeable = {
+      ...frostfire,
+      techniques: frostfire.techniques.map((tech) => ({
+        ...tech,
+        attributes: [
+          'DamagesTarget',
+          'AllowLuckDodge',
+        ] as typeof tech.attributes,
+      })),
+    };
+    const skill = skillWithModifiers(dodgeable, [
+      modifier({ modifier: 'Attribute', attribute: 'NeverMisses' }),
+    ]);
+
+    expect(skill.techniques[0].attributes).toEqual([
+      'DamagesTarget',
+      'NeverMisses',
+    ]);
+  });
+
+  it('gives its own hits an attribute once', () => {
+    const skill = skillWithModifiers(frostfire, [
+      modifier({ modifier: 'Attribute', attribute: 'NeverMisses' }),
+      modifier({ modifier: 'Attribute', attribute: 'NeverMisses' }),
+    ]);
+
+    expect(
+      skill.techniques.map((tech) =>
+        tech.attributes.filter((attribute) => attribute === 'NeverMisses'),
+      ),
+    ).toEqual([['NeverMisses'], ['NeverMisses']]);
+  });
+
   it('raises accuracy up to a sure hit', () => {
     const shaky = {
       ...frostfire,
