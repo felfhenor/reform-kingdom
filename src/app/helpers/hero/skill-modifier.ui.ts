@@ -73,6 +73,8 @@ export function skillModifierText(
       return `+${format(modifier.value)}x ${modifier.stat} scaling`;
     case 'Accuracy':
       return `+${format(modifier.value)}% accuracy`;
+    case 'EpCost':
+      return `-${format(modifier.value)}% EP cost`;
     case 'Attribute':
       return modifier.attribute.replace(/([a-z])([A-Z])/g, '$1 $2');
     case 'Echo':

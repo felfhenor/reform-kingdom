@@ -153,6 +153,22 @@ describe('skillWithModifiers', () => {
     ).toEqual([['NeverMisses'], ['NeverMisses']]);
   });
 
+  it('cuts the EP cost by a percent of the tier cost', () => {
+    const pricey = { ...frostfire, epCost: 25 };
+    const skill = skillWithModifiers(pricey, [
+      modifier({ modifier: 'EpCost', value: 40 }),
+    ]);
+
+    expect(skillEpCost(skill)).toBe(15);
+  });
+
+  it('never cuts the EP cost below free', () => {
+    const cheap = { ...frostfire, epCost: 10 };
+    const cut = modifier({ modifier: 'EpCost', value: 60 });
+
+    expect(skillEpCost(skillWithModifiers(cheap, [cut, cut]))).toBe(0);
+  });
+
   it('raises accuracy up to a sure hit', () => {
     const shaky = {
       ...frostfire,

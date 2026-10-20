@@ -39,7 +39,7 @@
           <div class="text-{{ burst.rarity }}">{{ burst.name }}</div>
 
           <span class="badge badge-sm badge-data">
-            {{ burst.epCost | number }} EP
+            {{ epCost(burst) | number }} EP
           </span>
           @if (blockedFamilies().includes(burst.family)) {
             <app-icon
@@ -99,7 +99,9 @@
             {{ skill.name }}
           </div>
 
-          <span class="badge badge-sm badge-data">{{ skill.epCost }} EP</span>
+          <span class="badge badge-sm badge-data">
+            {{ epCost(skill) | number }} EP
+          </span>
           @if (blockedFamilies().includes(skill.family)) {
             <app-icon
               name="tablerExclamationCircle"

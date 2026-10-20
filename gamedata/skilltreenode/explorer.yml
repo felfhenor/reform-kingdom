@@ -23,9 +23,9 @@
 - id: 6ada76cc-90d9-4d95-935a-bb58728ef274
   name: 'Explorer: Analyze III'
   jobId: Explorer
-  level: 20
+  level: 25
   row: Fieldcraft
-  requiredSkillTreeNodeIds: ['Explorer: Analyze II']
+  requiredSkillTreeNodeIds: ['Explorer: Oath of the Scholar']
   effects:
     - kind: GrantSkill
       skillId: 'Analyze III'
@@ -69,7 +69,7 @@
   level: 25
   row: Fieldcraft
   track: 1
-  requiredSkillTreeNodeIds: ['Explorer: Earthshake II']
+  requiredSkillTreeNodeIds: ['Explorer: Oath of the Quake']
   effects:
     - kind: GrantSkill
       skillId: 'Earthshake III'
@@ -111,7 +111,7 @@
   jobId: Explorer
   level: 40
   row: Fortune
-  requiredSkillTreeNodeIds: ['Explorer: Lucky Charm II']
+  requiredSkillTreeNodeIds: ['Explorer: Oath of Fortune']
   effects:
     - kind: GrantSkill
       skillId: 'Lucky Charm III'
@@ -135,7 +135,7 @@
   level: 45
   row: Fortune
   track: 1
-  requiredSkillTreeNodeIds: ['Explorer: Zephyr I']
+  requiredSkillTreeNodeIds: ['Explorer: Oath of the Wind']
   effects:
     - kind: GrantSkill
       skillId: 'Zephyr II'
@@ -169,7 +169,8 @@
   name: 'Explorer: Fortunate Finds I'
   jobId: Explorer
   level: 1
-  row: Abilities
+  row: Fortune
+  track: 1
   default: true
   effects:
     - kind: JobAbility
@@ -248,3 +249,143 @@
     - kind: JobAbility
       jobAbilityId: Monster Research
       value: 2
+
+# --- Skill oaths ---
+
+- id: b7e86df0-87c0-4e20-b9ce-99b79d6e513b
+  name: 'Explorer: Oath of the Scholar'
+  jobId: Explorer
+  level: 15
+  row: Fieldcraft
+  track: 0
+  requiredSkillTreeNodeIds: ['Explorer: Analyze II']
+  optionSkillTreeNodeIds: ['Explorer: Expose', 'Explorer: Field Notes']
+
+- id: 53e2f75a-c1eb-4701-bef2-42e91ced47ec
+  name: 'Explorer: Expose'
+  jobId: Explorer
+  effects:
+    - kind: SkillModifier
+      family: Analyze
+      modifier: Inflict
+      statusEffectId: Slimed
+      chance: 50
+      duration: 3
+
+- id: 592f5baa-364d-44e7-a352-98246ee0cb10
+  name: 'Explorer: Field Notes'
+  jobId: Explorer
+  effects:
+    - kind: SkillModifier
+      family: Analyze
+      modifier: Targets
+      value: 1
+
+- id: 05164737-39af-4d24-ae15-c167971ec64e
+  name: 'Explorer: Oath of the Quake'
+  jobId: Explorer
+  level: 20
+  row: Fieldcraft
+  track: 1
+  requiredSkillTreeNodeIds: ['Explorer: Earthshake II']
+  optionSkillTreeNodeIds: ['Explorer: Aftershock', 'Explorer: Landslide']
+
+- id: 6ce22127-4c8d-41c4-977c-619315e66ea4
+  name: 'Explorer: Aftershock'
+  jobId: Explorer
+  effects:
+    - kind: SkillModifier
+      family: Earthshake
+      modifier: Potency
+      statusEffectId: Trembling
+      chance: 15
+      duration: 1
+
+- id: a3a76057-a988-4a29-8989-1127ec1b5110
+  name: 'Explorer: Landslide'
+  jobId: Explorer
+  effects:
+    - kind: SkillModifier
+      family: Earthshake
+      modifier: Inflict
+      statusEffectId: 'Dazed I'
+      chance: 20
+      duration: 2
+
+- id: 5a765771-5c27-45f8-9dda-92720c493b8b
+  name: 'Explorer: Oath of Fortune'
+  jobId: Explorer
+  level: 30
+  row: Fortune
+  track: 0
+  requiredSkillTreeNodeIds: ['Explorer: Lucky Charm II']
+  optionSkillTreeNodeIds: ['Explorer: Charmed Life', 'Explorer: Lingering Luck']
+
+- id: a78cbd6a-eca1-4bd7-9f81-2c8bb43cc6b1
+  name: 'Explorer: Charmed Life'
+  jobId: Explorer
+  effects:
+    - kind: SkillModifier
+      family: 'Lucky Charm'
+      modifier: Inflict
+      statusEffectId: Invigorated
+      chance: 100
+      duration: 3
+
+- id: 848fc9ff-23f1-47bd-bff1-059164a8172d
+  name: 'Explorer: Lingering Luck'
+  jobId: Explorer
+  effects:
+    - kind: SkillModifier
+      family: 'Lucky Charm'
+      modifier: Potency
+      statusEffectId: 'Lucky I'
+      chance: 0
+      duration: 2
+    - kind: SkillModifier
+      family: 'Lucky Charm'
+      modifier: Potency
+      statusEffectId: 'Lucky II'
+      chance: 0
+      duration: 2
+    - kind: SkillModifier
+      family: 'Lucky Charm'
+      modifier: Potency
+      statusEffectId: 'Lucky III'
+      chance: 0
+      duration: 2
+
+- id: 6f907802-0b00-476f-b763-4d8701987313
+  name: 'Explorer: Oath of the Wind'
+  jobId: Explorer
+  level: 35
+  row: Fortune
+  track: 1
+  requiredSkillTreeNodeIds: ['Explorer: Zephyr I']
+  optionSkillTreeNodeIds: ['Explorer: Tailwind', 'Explorer: Light Breeze']
+
+- id: c1056bd4-33db-44ef-a303-4992f622ffbd
+  name: 'Explorer: Tailwind'
+  jobId: Explorer
+  effects:
+    - kind: SkillModifier
+      family: Zephyr
+      modifier: Potency
+      statusEffectId: 'Zephyr Boost I'
+      chance: 0
+      duration: 2
+    - kind: SkillModifier
+      family: Zephyr
+      modifier: Potency
+      statusEffectId: 'Zephyr Boost II'
+      chance: 0
+      duration: 2
+
+- id: a3182209-aa7f-4bf1-98e7-7515684898d0
+  name: 'Explorer: Light Breeze'
+  jobId: Explorer
+  effects:
+    - kind: SkillModifier
+      family: Zephyr
+      modifier: EpCost
+      value: 40

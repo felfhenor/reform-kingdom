@@ -18,6 +18,7 @@ import { equippedItemTypes } from '@helpers/item/equipment';
 import { worldPartyState } from '@helpers/state-game';
 import type { EquipmentSkillContent } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
+import { skillEpCost } from '@helpers/hero/skill';
 
 @Component({
   selector: 'app-modal-hero-burst-skills',
@@ -36,6 +37,9 @@ import { TippyDirective } from '@ngneat/helipopper';
   templateUrl: './modal-hero-burst-skills.component.html',
 })
 export class ModalHeroBurstSkillsComponent {
+  // Includes skill tree discounts, which live in the skill's mods.
+  public readonly epCost = skillEpCost;
+
   public character = computed(() =>
     worldPartyState().find((c) => c.id === heroBurstSkillsModalCharacterId()),
   );

@@ -58,6 +58,8 @@ export function ensureSkillModifierEffect(
     }
     case 'Accuracy':
       return { kind, family, modifier: 'Accuracy', value };
+    case 'EpCost':
+      return { kind, family, modifier: 'EpCost', value };
     case 'Attribute': {
       const attribute = ensureEnumValue(
         effect['attribute'],

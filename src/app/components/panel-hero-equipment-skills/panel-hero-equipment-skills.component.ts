@@ -34,6 +34,7 @@ import type {
   JobContent,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
+import { skillEpCost } from '@helpers/hero/skill';
 
 @Component({
   selector: 'app-panel-hero-equipment-skills',
@@ -58,6 +59,9 @@ import { TippyDirective } from '@ngneat/helipopper';
   styleUrl: './panel-hero-equipment-skills.component.scss',
 })
 export class PanelHeroEquipmentSkillsComponent {
+  // Includes skill tree discounts, which live in the skill's mods.
+  public readonly epCost = skillEpCost;
+
   public character = input.required<Character>();
 
   public job = computed<JobContent | undefined>(() =>

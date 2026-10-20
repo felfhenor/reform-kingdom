@@ -8,6 +8,7 @@ import type {
   HeroEffect,
   HeroEffectSkillModifier,
   HeroEffectSkillModifierInflict,
+  HeroEffectSkillModifierEpCost,
   HeroEffectSkillModifierPotency,
   SkillTreeNodeContent,
 } from '@interfaces';
@@ -137,6 +138,32 @@ export function skillTreeNodeModifiers(
   );
 }
 
+// Rides the existing EP cost mod that combat already reads; never below free, or a cast would refund EP.
+function skillWithEpCost(
+  skill: EquipmentSkill,
+  modifier: HeroEffectSkillModifierEpCost,
+): EquipmentSkill {
+  const current = skill.epCost + (skill.mods?.epCost ?? 0);
+  const cut = Math.min(
+    current,
+    Math.round((skill.epCost * modifier.value) / 100),
+  );
+  return {
+    ...skill,
+    mods: { ...skill.mods, epCost: (skill.mods?.epCost ?? 0) - cut },
+  };
+}
+
+// Modifiers that change the skill itself rather than its hits.
+function skillWithSkillLevelModifier(
+  skill: EquipmentSkill,
+  modifier: HeroEffectSkillModifier,
+): EquipmentSkill {
+  if (modifier.modifier === 'Potency') return skillWithPotency(skill, modifier);
+  if (modifier.modifier === 'EpCost') return skillWithEpCost(skill, modifier);
+  return skill;
+}
+
 // A copy of the skill with its family's modifiers folded in; echoed hits come after its own.
 export function skillWithModifiers(
   skill: EquipmentSkillContent,
@@ -156,12 +183,7 @@ export function skillWithModifiers(
     techniques: [...techniques, ...modifiers.flatMap(echoedTechniques)],
   };
 
-  return modifiers
-    .filter(
-      (modifier): modifier is HeroEffectSkillModifierPotency =>
-        modifier.modifier === 'Potency',
-    )
-    .reduce(skillWithPotency, modified);
+  return modifiers.reduce(skillWithSkillLevelModifier, modified);
 }
 
 // Only a skill's own hits; echoed hits always pick their own targets.

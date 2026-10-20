@@ -53,8 +53,8 @@
     - Dirk
     - Whip
 
-  treeVersion: 1
-  treeRows: [Fieldcraft, Fortune, Abilities]
+  treeVersion: 2
+  treeRows: [Fieldcraft, Fortune]
   specializationRows: [Treasure Hunter, Dungeon Delver]
 
   starterEquipmentIds:

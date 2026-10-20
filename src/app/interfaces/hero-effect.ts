@@ -65,6 +65,12 @@ export type HeroEffectSkillModifierAttribute = HeroEffectSkillModifierBase & {
   attribute: EquipmentSkillAttribute;
 };
 
+// Cuts each tier's EP cost by this percent.
+export type HeroEffectSkillModifierEpCost = HeroEffectSkillModifierBase & {
+  modifier: 'EpCost';
+  value: number;
+};
+
 // Raises a hit's chance to land, up to a sure hit.
 export type HeroEffectSkillModifierAccuracy = HeroEffectSkillModifierBase & {
   modifier: 'Accuracy';
@@ -88,6 +94,7 @@ export type HeroEffectSkillModifier =
   | HeroEffectSkillModifierPotency
   | HeroEffectSkillModifierScaling
   | HeroEffectSkillModifierAccuracy
+  | HeroEffectSkillModifierEpCost
   | HeroEffectSkillModifierAttribute
   | HeroEffectSkillModifierElement
   | HeroEffectSkillModifierEcho;
