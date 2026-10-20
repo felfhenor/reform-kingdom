@@ -36,7 +36,8 @@ import {
   trainerVisitOpen,
 } from '@helpers/engine/ui';
 
-import { canPartyTravel, travelStart } from '@helpers/hero/travel';
+import { travelStart } from '@helpers/hero/travel';
+import { travelCanStartTo } from '@helpers/hero/travel.ui';
 import { travelTicksRemaining } from '@helpers/hero/travel-progress';
 import {
   canEnterGatherNode,
@@ -294,20 +295,7 @@ export class PanelMapNodeComponent {
 
   public canTravelHere = computed(() => {
     const entry = this.node();
-    const path = this.travelPath();
-    const travel = this.travelState();
-    const isCurrentDestination =
-      travel.status === 'Traveling' &&
-      travel.destinationNodeName === entry?.nodeName;
-
-    return (
-      !!path &&
-      (path.length > 0 || travel.status === 'Traveling') &&
-      !isCurrentDestination &&
-      canPartyTravel() &&
-      this.meetsGatherLevelRequirement() &&
-      this.meetsCaravanAvailability()
-    );
+    return entry ? travelCanStartTo(entry) : false;
   });
 
   public travel(): void {

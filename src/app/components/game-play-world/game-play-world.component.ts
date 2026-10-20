@@ -37,6 +37,8 @@ import {
   worldMapReady,
 } from '@helpers/engine/ui';
 import { isGlobalEffectActive } from '@helpers/hero/global-effects';
+import { travelStart } from '@helpers/hero/travel';
+import { travelCanStartTo } from '@helpers/hero/travel.ui';
 import {
   gatheringProgressFraction,
   isGathering,
@@ -551,7 +553,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       map,
       mapName,
       textures,
-      (object) => this.onNodeClick(object),
+      (object, clickCount) => this.onNodeClick(object, clickCount),
       (object) => this.resolveNodeLabel(object),
       (object) => this.resolveNodeStatus(object),
     );
@@ -617,13 +619,16 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.positionCamera();
   }
 
-  private onNodeClick(object: TiledObject): void {
+  private onNodeClick(object: TiledObject, clickCount: number): void {
     const entry = worldNodeByName(object.name);
     if (!entry) return;
     if (!isWorldNodeCollectibleGateMet(entry)) return;
 
     worldNodeDiscoverIfHidden(entry);
     mapNodeSelect(entry);
+
+    if (clickCount === 2 && travelCanStartTo(entry))
+      travelStart(entry.nodeName);
   }
 
   private maybeUpdateNodeStatus(now: number): void {

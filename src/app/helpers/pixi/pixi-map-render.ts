@@ -172,7 +172,7 @@ function pixiTiledObjectRender(
     wrapper.on('pointertap', (event: FederatedPointerEvent) => {
       // Stop the tap from also reaching the background handler and deselecting the node just selected.
       event.stopPropagation();
-      onNodeClick(object);
+      onNodeClick(object, event.detail);
     });
   }
 

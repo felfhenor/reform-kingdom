@@ -32,3 +32,4 @@ export * from './travel';
 export * from './travel-cost';
 export * from './travel-cost-base';
 export * from './travel-progress';
+export * from './travel.ui';

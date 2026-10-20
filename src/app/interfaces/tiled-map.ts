@@ -111,4 +111,7 @@ export type TiledMap = {
   tilesets: TiledTileset[];
 };
 
-export type PixiNodeClickHandler = (object: TiledObject) => void;
+export type PixiNodeClickHandler = (
+  object: TiledObject,
+  clickCount: number,
+) => void;
