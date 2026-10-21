@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { ModalChangelogComponent } from '@components/modal-changelog/modal-changelog.component';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
+import { HideInElectronDirective } from '@directives/hide-in-electron.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import {
@@ -19,6 +20,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     TippyDirective,
     ModalChangelogComponent,
     AnalyticsClickDirective,
+    HideInElectronDirective,
     SFXDirective,
   ],
   providers: [
