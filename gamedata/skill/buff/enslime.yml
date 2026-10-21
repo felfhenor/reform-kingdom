@@ -14,7 +14,7 @@
   statusEffectChanceBoost: {}
 
   techniques:
-    - attributes: [Buff]
+    - attributes: [Buff, NeverMisses]
       elements: []
       targets: 2
       targetType: Allies

@@ -12,7 +12,7 @@
 
   techniques:
     - elements: [Earth]
-      attributes: [Buff]
+      attributes: [Buff, NeverMisses]
       targets: 1
       targetType: Allies
       targetBehaviors:

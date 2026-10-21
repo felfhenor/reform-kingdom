@@ -12,7 +12,7 @@
 
   techniques:
     - elements: []
-      attributes: [Buff]
+      attributes: [Buff, NeverMisses]
       targets: 4
       targetType: Allies
       targetBehaviors:
@@ -41,7 +41,7 @@
 
   techniques:
     - elements: []
-      attributes: [Buff]
+      attributes: [Buff, NeverMisses]
       targets: 4
       targetType: Allies
       targetBehaviors:
@@ -70,7 +70,7 @@
 
   techniques:
     - elements: []
-      attributes: [Buff]
+      attributes: [Buff, NeverMisses]
       targets: 4
       targetType: Allies
       targetBehaviors:
