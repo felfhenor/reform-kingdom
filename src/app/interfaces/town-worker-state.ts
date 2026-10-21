@@ -73,6 +73,7 @@ export type TownWorkerRosterEntry = {
   sprite: string;
   frames: number;
   level: number;
+  location: CurrentLocation;
   status: TownWorkerStatus;
 };
 

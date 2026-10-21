@@ -33,7 +33,7 @@ import {
 } from '@helpers/worker/worker-progression';
 import { workerLevelUp } from '@helpers/worker/worker-progression.ui';
 import { workerRecall } from '@helpers/worker/worker-travel';
-import { workerTravelRemainingTicks } from '@helpers/worker/worker-travel.ui';
+import { travelTicksRemaining } from '@helpers/hero/travel-progress';
 import {
   kingdomNodeGet,
   worldNodeByName,
@@ -137,16 +137,24 @@ export class PlayKingdomWorkersComponent {
       case 'Crafting':
         return this.craftingLabel(entry.id, status);
       case 'TravelingTo': {
-        const remaining = workerTravelRemainingTicks(entry.id);
-        return `Traveling to ${status.nodeName} (${remaining !== undefined ? formatDuration(remaining) : '?'} remaining)`;
+        const remaining = travelTicksRemaining(
+          status.path,
+          entry.state.location,
+          status.ticksIntoStep,
+        );
+        return `Traveling to ${status.nodeName} (${formatDuration(remaining)} remaining)`;
       }
       case 'Gathering': {
         const item = getEntry<ItemContent>(status.itemId);
         return `At ${status.nodeName} (${status.itemsGathered}/${this.capacityDisplay()} ${item?.name ?? '???'})`;
       }
       case 'TravelingBack': {
-        const remaining = workerTravelRemainingTicks(entry.id);
-        return `Returning to the Duchy (${remaining !== undefined ? formatDuration(remaining) : '?'} remaining)`;
+        const remaining = travelTicksRemaining(
+          status.path,
+          entry.state.location,
+          status.ticksIntoStep,
+        );
+        return `Returning to the Duchy (${formatDuration(remaining)} remaining)`;
       }
     }
   });
@@ -163,9 +171,13 @@ export class PlayKingdomWorkersComponent {
           locationEntry: kingdomNodeGet(),
         };
       case 'TravelingTo': {
-        const remaining = workerTravelRemainingTicks(entry.id);
+        const remaining = travelTicksRemaining(
+          status.path,
+          entry.state.location,
+          status.ticksIntoStep,
+        );
         return {
-          label: `Traveling... (${remaining !== undefined ? formatDuration(remaining) : '?'})`,
+          label: `Traveling... (${formatDuration(remaining)})`,
           locationEntry: worldNodeByName(status.nodeName),
         };
       }
@@ -180,9 +192,13 @@ export class PlayKingdomWorkersComponent {
         };
       }
       case 'TravelingBack': {
-        const remaining = workerTravelRemainingTicks(entry.id);
+        const remaining = travelTicksRemaining(
+          status.path,
+          entry.state.location,
+          status.ticksIntoStep,
+        );
         return {
-          label: `Returning... (${remaining !== undefined ? formatDuration(remaining) : '?'})`,
+          label: `Returning... (${formatDuration(remaining)})`,
           locationEntry: kingdomNodeGet(),
         };
       }

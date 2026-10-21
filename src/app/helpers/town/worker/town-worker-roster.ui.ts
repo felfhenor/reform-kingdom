@@ -1,9 +1,10 @@
 import { getEntry } from '@helpers/content/content';
 import { formatDuration } from '@helpers/engine/timer';
+import { travelTicksRemaining } from '@helpers/hero/travel-progress';
 import { worldTownsState } from '@helpers/state-game';
-import { townWorkerTravelRemainingTicks } from '@helpers/town/worker/town-worker-travel.ui';
 import { worldNodeByName } from '@helpers/world-node/world-nodes';
 import type {
+  CurrentLocation,
   TownContent,
   TownId,
   TownWorkerRosterEntry,
@@ -30,6 +31,7 @@ export function townWorkerRosterEntries(
         sprite: content.sprite,
         frames: content.frames,
         level: state.level,
+        location: state.location,
         status: state.status,
       };
     })
@@ -39,16 +41,20 @@ export function townWorkerRosterEntries(
 // A label plus the node the worker is currently at (or heading to/returning to).
 export function townWorkerStatusDisplay(
   town: TownContent,
-  workerId: WorkerId,
   status: TownWorkerStatus,
+  location: CurrentLocation,
 ): TownWorkerStatusDisplay {
   const atTownEntry = worldNodeByName(town.name);
 
   switch (status.kind) {
     case 'TravelingTo': {
-      const remaining = townWorkerTravelRemainingTicks(town.id, workerId);
+      const remaining = travelTicksRemaining(
+        status.path,
+        location,
+        status.ticksIntoStep,
+      );
       return {
-        label: `Traveling to ${status.nodeName} (${remaining !== undefined ? formatDuration(remaining) : '?'} remaining)`,
+        label: `Traveling to ${status.nodeName} (${formatDuration(remaining)} remaining)`,
         locationEntry: worldNodeByName(status.nodeName),
       };
     }
@@ -60,9 +66,13 @@ export function townWorkerStatusDisplay(
     case 'Resting':
       return { label: 'Resting', locationEntry: atTownEntry };
     case 'TravelingBack': {
-      const remaining = townWorkerTravelRemainingTicks(town.id, workerId);
+      const remaining = travelTicksRemaining(
+        status.path,
+        location,
+        status.ticksIntoStep,
+      );
       return {
-        label: `Returning to town (${remaining !== undefined ? formatDuration(remaining) : '?'} remaining)`,
+        label: `Returning to town (${formatDuration(remaining)} remaining)`,
         locationEntry: atTownEntry,
       };
     }
