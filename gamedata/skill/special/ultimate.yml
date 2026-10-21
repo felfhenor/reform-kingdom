@@ -395,7 +395,7 @@
 - id: 6a3542f8-58be-4d42-a4f1-f0777c434938
   name: Vanish
   family: Vanish
-  description: Disappear from sight, taking extra turns while hidden.
+  description: Disappear from sight, becoming the lowest target priority for enemies, and taking extra turns while hidden.
 
   sprite: '0064'
 

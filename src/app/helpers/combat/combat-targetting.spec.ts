@@ -121,6 +121,131 @@ describe('combatAvailableSkillsForCombatant', () => {
   });
 });
 
+describe('combatGetTargetsFromListBasedOnType negative agro', () => {
+  const monster = buildTestCombatant({ id: 'monster', isEnemy: true });
+  const context: CombatTargetModeContext = { combatant: monster };
+  const hidden = (hp = 1) =>
+    buildTestCombatant({
+      id: 'hidden',
+      hp,
+      combatStats: { ...defaultCombatStats(), agroValue: -100 },
+    });
+
+  // Hidden HP sits on the side the mode would otherwise prefer.
+  it.each([
+    ['Random', 1],
+    ['Weakest', 1],
+    ['Strongest', 100],
+  ] as const)(
+    '%s picks a hidden foe only after every other foe',
+    (mode, hiddenHp) => {
+      const vanished = hidden(hiddenHp);
+      const visible = buildTestCombatant({ id: 'visible', hp: 50 });
+
+      expect(
+        combatGetTargetsFromListBasedOnType(
+          [vanished, visible],
+          mode,
+          1,
+          context,
+        ),
+      ).toEqual([visible]);
+      expect(
+        combatGetTargetsFromListBasedOnType(
+          [vanished, visible],
+          mode,
+          2,
+          context,
+        ),
+      ).toEqual([visible, vanished]);
+    },
+  );
+
+  it('orders taunters, then visible foes, then hidden ones', () => {
+    const vanished = hidden();
+    const visible = buildTestCombatant({ id: 'visible', hp: 50 });
+    const taunter = buildTestCombatant({
+      id: 'taunter',
+      combatStats: { ...defaultCombatStats(), agroValue: 10 },
+    });
+
+    expect(
+      combatGetTargetsFromListBasedOnType(
+        [vanished, visible, taunter],
+        'Weakest',
+        3,
+        context,
+      ),
+    ).toEqual([taunter, visible, vanished]);
+  });
+
+  it('skips a priority entry that only found hidden foes', () => {
+    const vanishedHealer = buildTestCombatant({
+      id: 'hidden-healer',
+      jobId: 'healer' as JobId,
+      combatStats: { ...defaultCombatStats(), agroValue: -100 },
+    });
+    const visible = buildTestCombatant({ id: 'visible' });
+    const priority = [
+      { type: 'Random', jobId: 'healer' as JobId },
+      { type: 'Random' },
+    ] as const;
+
+    expect(
+      combatGetTargetsFromPriorityList(
+        [vanishedHealer, visible],
+        [...priority],
+        1,
+        context,
+      ),
+    ).toEqual([visible]);
+    expect(
+      combatGetTargetsFromPriorityList(
+        [vanishedHealer],
+        [...priority],
+        1,
+        context,
+      ),
+    ).toEqual([vanishedHealer]);
+  });
+
+  it('still picks a hidden foe when it is the only one left', () => {
+    const vanished = hidden();
+
+    expect(
+      combatGetTargetsFromListBasedOnType([vanished], 'Weakest', 1, context),
+    ).toEqual([vanished]);
+  });
+
+  it('MatchingEnemies puts a hidden match after visible ones', () => {
+    const vanished = hidden();
+    const visible = buildTestCombatant({ id: 'visible', hp: 50 });
+
+    expect(
+      combatGetTargetsFromListBasedOnType(
+        [vanished, visible],
+        'MatchingEnemies',
+        1,
+        {
+          combatant: monster,
+          matchingCombatants: [vanished, visible],
+        },
+      ),
+    ).toEqual([visible]);
+  });
+
+  it('does not hide a combatant from its own side', () => {
+    const vanished = hidden();
+    const ally = buildTestCombatant({ id: 'ally', hp: 50 });
+
+    expect(
+      combatGetTargetsFromListBasedOnType([vanished, ally], 'Weakest', 1, {
+        combatant: ally,
+      }),
+    ).toEqual([vanished]);
+  });
+});
+
 describe('combatGetTargetsFromListBasedOnType', () => {
   it('Self returns only the caster from the given list', () => {
     const caster = buildTestCombatant({ id: 'caster' });

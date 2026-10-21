@@ -353,6 +353,10 @@
       combatStat: repeatActionChance
       value: 100
 
+    - type: AddCombatStatNumber
+      combatStat: agroValue
+      value: -100
+
   onUnapply:
     - type: SendMessage
       combatMessage: '**{{ combatant.name }}** steps back into view.'
@@ -360,3 +364,7 @@
     - type: TakeCombatStatNumber
       combatStat: repeatActionChance
       value: 100
+
+    - type: TakeCombatStatNumber
+      combatStat: agroValue
+      value: -100

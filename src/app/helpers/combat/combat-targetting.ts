@@ -172,6 +172,18 @@ export function combatGetPossibleCombatantTargetsForSkill(
   );
 }
 
+// Negative agro hides a combatant from the other side, so it's only picked once no one else is.
+function combatantHiddenFrom(
+  combatant: Combatant,
+  context?: CombatTargetModeContext,
+): boolean {
+  return (
+    combatant.combatStats.agroValue < 0 &&
+    !!context &&
+    combatant.isEnemy !== context.combatant.isEnemy
+  );
+}
+
 export function combatGetTargetsFromListBasedOnType(
   combatants: Combatant[],
   type: CombatantTargettingType,
@@ -182,8 +194,9 @@ export function combatGetTargetsFromListBasedOnType(
     combatants.filter((c) => c.combatStats.agroValue > 0),
     (c) => -c.combatStats.agroValue,
   );
-  const targetsWithoutAgro = combatants.filter(
-    (c) => c.combatStats.agroValue <= 0,
+  const [targetsHidden, targetsWithoutAgro] = partition(
+    combatants.filter((c) => c.combatStats.agroValue <= 0),
+    (c) => combatantHiddenFrom(c, context),
   );
 
   // intersection() keeps the matches' most-relevant-first order while dropping any no longer in the pool.
@@ -196,6 +209,7 @@ export function combatGetTargetsFromListBasedOnType(
         [
           ...targetsWithAgro,
           ...sampleSize(targetsWithoutAgro, select - targetsWithAgro.length),
+          ...sampleSize(targetsHidden, select),
         ].slice(0, select),
       Strongest: () =>
         [
@@ -204,6 +218,7 @@ export function combatGetTargetsFromListBasedOnType(
             0,
             Math.max(0, select - targetsWithAgro.length),
           ),
+          ...sortBy(targetsHidden, (c) => -c.hp),
         ].slice(0, select),
       Weakest: () =>
         [
@@ -212,6 +227,7 @@ export function combatGetTargetsFromListBasedOnType(
             0,
             Math.max(0, select - targetsWithAgro.length),
           ),
+          ...sortBy(targetsHidden, (c) => c.hp),
         ].slice(0, select),
       Self: () => combatants.filter((c) => c === context?.combatant),
       SpecificHero: () =>
@@ -224,6 +240,7 @@ export function combatGetTargetsFromListBasedOnType(
             (c) => c.isEnemy !== context?.combatant.isEnemy,
           ),
           ...matchesIn(targetsWithoutAgro),
+          ...matchesIn(targetsHidden),
         ].slice(0, select),
     };
 
@@ -232,13 +249,15 @@ export function combatGetTargetsFromListBasedOnType(
 
 // Tries each priority entry in order, narrowing to entry.jobId (if set) before entry.type
 // picks from the narrowed pool - e.g. Weakest + jobId: Healer targets the weakest healer.
-// Returns the first entry's non-empty result.
+// Returns the first entry's non-empty result; one that only found hidden combatants waits until no entry finds anyone else.
 export function combatGetTargetsFromPriorityList(
   combatants: Combatant[],
   priority: TargettingPriorityEntry[],
   select: number,
   context: CombatTargetModeContext,
 ): Combatant[] {
+  let hiddenOnly: Combatant[] = [];
+
   for (const entry of priority) {
     const pool = entry.jobId
       ? combatants.filter((c) => c.jobId === entry.jobId)
@@ -249,10 +268,11 @@ export function combatGetTargetsFromPriorityList(
       select,
       context,
     );
-    if (targets.length > 0) return targets;
+    if (targets.some((c) => !combatantHiddenFrom(c, context))) return targets;
+    if (hiddenOnly.length === 0) hiddenOnly = targets;
   }
 
-  return [];
+  return hiddenOnly;
 }
 
 // PreferHeroes only reorders: summons and town helpers get the slots heroes can't fill.
