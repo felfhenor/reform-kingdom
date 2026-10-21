@@ -250,6 +250,17 @@
       jobAbilityId: Mystical Insight
       value: 0.4
 
+- id: 9950855a-04a7-4bab-a79d-25f477a51005
+  name: 'Magician: Arcane Drain'
+  jobId: Magician
+  level: 50
+  row: Arcanist
+  track: 2
+  requiredSkillTreeNodeIds: ['Magician: Arcanist']
+  effects:
+    - kind: GrantSkill
+      skillId: 'Arcane Drain'
+
 # --- Celestar ---
 
 - id: 98d83a9d-69c0-496e-8b79-10203bafbbe0

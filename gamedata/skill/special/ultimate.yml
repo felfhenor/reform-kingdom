@@ -428,3 +428,41 @@
           duration: 6
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}**.'
+
+- id: 3136d6f9-44aa-4a43-a3ac-93bd52e3fe41
+  name: Arcane Drain
+  family: Arcane Drain
+  description: Siphon up to {{ value }} EP from every enemy.
+
+  sprite: '0070'
+
+  rarity: Legendary
+
+  epCost: 0
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 5
+
+  elementCosts:
+    Fire: 1
+    Water: 1
+    Earth: 1
+    Air: 1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: []
+      attributes: [DrainsTargetEnergy, BypassDefense, NeverMisses]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: NotZeroEnergy
+      damageScaling:
+        Spirit: 3
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** drains {{ absdamage }} EP from **{{ target.name }}** {{ targetStatus }}.'
