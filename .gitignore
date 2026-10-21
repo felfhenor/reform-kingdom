@@ -47,6 +47,7 @@ public/art
 public/maps
 
 public/version.json
+public/updates.json
 public/*.md
 
 electron/browser
