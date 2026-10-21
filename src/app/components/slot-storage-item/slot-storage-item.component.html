@@ -4,7 +4,11 @@
   <div class="type-meta mt-2">Quantity: {{ entry().quantity | number }}</div>
 </app-tooltip-item-preview>
 
-<div class="storage-item-slot" [tp]="preview.template()" [tpPlacement]="'top'">
+<div
+  class="relative w-[64px] h-[64px] cursor-default"
+  [tp]="preview.template()"
+  [tpPlacement]="'top'"
+>
   <app-slot-rarity-outline [entry]="item" spritesheet="item">
     <span text-br>{{ displayQuantity() }}</span>
   </app-slot-rarity-outline>

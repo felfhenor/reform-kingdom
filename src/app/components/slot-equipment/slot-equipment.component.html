@@ -2,17 +2,22 @@
 
 <button
   type="button"
-  class="equipment-slot outline-2 bg-gray-400 {{
+  class="relative flex items-center justify-center cursor-pointer overflow-hidden bg-gray-400 {{
     content ? 'outline-' + content.rarity : 'outline-gray-500'
   }}"
-  [class.equipment-slot-selected]="isSelected()"
+  [class.outline-2]="!isSelected()"
+  [class.outline-4]="isSelected()"
   (click)="slotClick.emit()"
   appSfx="ui-click"
   [sfxTrigger]="['click', 'hover']"
 >
   @if (!content) {
     <app-slot-icon-blank>
-      <span class="equipment-slot-label text-lighter">{{ slot() }}</span>
+      <span
+        class="absolute inset-0 flex items-center justify-center text-center text-[10px] leading-tight pointer-events-none text-lighter"
+      >
+        {{ slot() }}
+      </span>
     </app-slot-icon-blank>
   }
 
@@ -44,13 +49,14 @@
       }
     </app-tooltip-item-preview>
 
+    <!-- A multi-slot item's secondary slot is faded so it reads as the same item, not a second piece. -->
     <app-atlas-image
       [tp]="content ? preview.template() : undefined"
       [tpPlacement]="'top'"
       spritesheet="equipment"
       [assetName]="content.sprite"
-      class="equipment-slot-image"
-      [class.equipment-slot-image-secondary]="isSecondarySlot()"
+      class="relative z-10"
+      [class.opacity-50]="isSecondarySlot()"
     />
   }
 </button>

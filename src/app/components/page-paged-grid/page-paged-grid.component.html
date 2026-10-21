@@ -17,17 +17,17 @@
     </div>
   }
 
-  <div class="paged-grid-page">
+  <div class="flex flex-col gap-2 h-full">
     <ng-content select="[before-toolbar]" />
 
     @if (showToolbar()) {
-      <div class="paged-grid-toolbar">
-        <div class="paged-grid-toolbar-search">
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2 w-full">
           <ng-content select="[toolbar-actions]" />
         </div>
 
         @if (totalPages() > 1) {
-          <div class="paged-grid-pagination">
+          <div class="flex items-center gap-2">
             <button
               type="button"
               class="btn btn-xs"
@@ -63,14 +63,14 @@
     }
 
     <div
-      class="paged-grid-grid p-2"
+      class="flex-1 grid content-start justify-items-center overflow-hidden grid-cols-[repeat(auto-fill,64px)] auto-rows-[64px] gap-2 p-2"
       #gridContainer
       appListReflow
       [appListReflowEnabled]="reflow()"
     >
       @if (showGrid()) {
         @if (pagedEntries().length === 0) {
-          <app-blank-slate class="paged-grid-empty">
+          <app-blank-slate class="col-span-full text-center">
             {{ emptyMessage() }}
           </app-blank-slate>
         }

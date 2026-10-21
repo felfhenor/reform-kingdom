@@ -1,5 +1,5 @@
 @if (entries().length > 0) {
-  <div class="hero-status">
+  <div class="flex items-end gap-2 pointer-events-auto">
     @for (entry of entries(); track entry.combatantId) {
       <app-card-status-combatant
         [entry]="entry"

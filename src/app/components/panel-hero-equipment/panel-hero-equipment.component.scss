@@ -3,12 +3,3 @@
 :host {
   @apply block h-full;
 }
-
-// Native 64px sprite size, unscaled - as a compact top banner this doesn't
-// need to match the enlarged 80px paperdoll slots, and keeping it smaller
-// leaves more of the panel's limited height for the Stats/Equipment columns.
-.hero-summary-icon {
-  @apply relative overflow-hidden shrink-0;
-  width: 64px;
-  height: 64px;
-}

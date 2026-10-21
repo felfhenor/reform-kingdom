@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  signal,
+} from '@angular/core';
 import { CardStatusTutorialUnlockComponent } from '@components/card-status-tutorial-unlock/card-status-tutorial-unlock.component';
 import { tutorialsPendingEntries } from '@helpers/tutorial/tutorial-engine.ui';
 
@@ -9,7 +14,7 @@ import { tutorialsPendingEntries } from '@helpers/tutorial/tutorial-engine.ui';
   template: `
     @if (entries().length > 0) {
       <div
-        class="tutorial-unlock-status"
+        class="flex gap-2 pointer-events-auto"
         (mouseenter)="setHovered(true)"
         (mouseleave)="setHovered(false)"
       >
@@ -26,12 +31,6 @@ import { tutorialsPendingEntries } from '@helpers/tutorial/tutorial-engine.ui';
     :host {
       display: block;
       pointer-events: none;
-    }
-
-    .tutorial-unlock-status {
-      display: flex;
-      gap: 8px;
-      pointer-events: auto;
     }
   `,
 })

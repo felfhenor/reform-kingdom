@@ -4,10 +4,6 @@
   @apply block;
 }
 
-.statuseffect-icon {
-  @apply relative flex bg-black/60;
-}
-
 .statuseffect-turns {
   @apply absolute font-bold text-white leading-none pointer-events-none;
   right: -2px;

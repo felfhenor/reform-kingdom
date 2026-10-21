@@ -14,7 +14,7 @@ import { workersReadyToLevelUpEntries } from '@helpers/worker/worker-progression
   template: `
     @if (entries().length > 0) {
       <div
-        class="worker-levelup-status"
+        class="flex gap-2 pointer-events-auto"
         (mouseenter)="setHovered(true)"
         (mouseleave)="setHovered(false)"
       >
@@ -31,12 +31,6 @@ import { workersReadyToLevelUpEntries } from '@helpers/worker/worker-progression
     :host {
       display: block;
       pointer-events: none;
-    }
-
-    .worker-levelup-status {
-      display: flex;
-      gap: 8px;
-      pointer-events: auto;
     }
   `,
 })

@@ -1,7 +1,3 @@
-.update-button {
-  bottom: -20px;
-}
-
 .navbar {
   min-height: 2rem;
   max-height: 40px;
@@ -10,12 +6,4 @@
 .navbar-start,
 .navbar-end {
   width: auto;
-}
-
-.resource-bar-wrapper {
-  position: absolute;
-  top: 40px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 30;
 }

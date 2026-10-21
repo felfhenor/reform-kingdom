@@ -38,14 +38,6 @@
   animation-fill-mode: forwards;
 }
 
-.crawl-skip {
-  @apply absolute bottom-4 right-4 overflow-hidden text-white;
-}
-
-.crawl-skip-progress {
-  @apply absolute bottom-0 left-0 h-0.5 bg-white;
-}
-
 @keyframes crawl-scroll {
   from {
     transform: translateY(0);

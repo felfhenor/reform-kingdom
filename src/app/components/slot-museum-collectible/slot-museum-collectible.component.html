@@ -2,7 +2,11 @@
 @let source = e.source;
 
 @if (e.discovered) {
-  <div class="museum-collectible-slot" [tp]="tooltip" [tpPlacement]="'top'">
+  <div
+    class="relative w-[64px] h-[64px] cursor-default"
+    [tp]="tooltip"
+    [tpPlacement]="'top'"
+  >
     <app-slot-rarity-outline [entry]="e.collectible" spritesheet="collectible">
       <span text-br>{{ displayQuantity() }}</span>
     </app-slot-rarity-outline>
@@ -19,7 +23,7 @@
       <app-atlas-image
         spritesheet="collectible"
         [assetName]="e.collectible.sprite"
-        class="museum-collectible-tooltip-image"
+        class="shrink-0"
       />
     }
 

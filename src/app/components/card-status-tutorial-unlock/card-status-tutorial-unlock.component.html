@@ -3,21 +3,25 @@
 
 <button
   type="button"
-  class="status-entry select-none text-start"
+  class="status-bubble select-none text-start cursor-pointer"
   [class.expanded]="isExpanded"
   appButtonGlow
   (click)="select()"
   appSfx="ui-click"
   [sfxTrigger]="['click', 'hover']"
 >
-  <div class="entry-icon">
+  <div
+    class="relative flex items-center justify-center shrink-0 overflow-hidden w-[32px] h-[32px]"
+  >
     <app-icon name="gameHelp" size="nav" />
   </div>
 
   @if (isExpanded) {
-    <div class="entry-details">
-      <span class="entry-subtitle text-lighter">New feature unlocked</span>
-      <span class="entry-name truncate">{{ data.name }}</span>
+    <div class="flex flex-col justify-center text-white overflow-hidden">
+      <span class="truncate text-[0.65rem] text-lighter">
+        New feature unlocked
+      </span>
+      <span class="type-entity-name text-xs truncate">{{ data.name }}</span>
     </div>
   }
 </button>

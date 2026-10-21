@@ -5,7 +5,8 @@
     class="flex flex-col gap-2 shrink-0 self-center w-full max-w-[60%] min-w-[480px]"
   >
     <div class="flex items-center gap-4">
-      <div class="hero-summary-icon">
+      <!-- Native 64px, not the 80px paperdoll size, to leave height for the Stats/Equipment columns. -->
+      <div class="relative overflow-hidden shrink-0 w-[64px] h-[64px]">
         <app-slot-icon-blank>
           <app-icon-job [job]="job()" />
         </app-slot-icon-blank>

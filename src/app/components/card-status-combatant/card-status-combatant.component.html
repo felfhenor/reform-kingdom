@@ -3,7 +3,10 @@
 
 @if (isExpanded && data.statusEffects) {
   <!-- Always rendered in combat (min height) so the first effect landing doesn't nudge the card down. -->
-  <div class="status-effects">
+  <!-- Zero width + min-w-full wraps at the card's width instead of widening the host past it. -->
+  <div
+    class="flex flex-wrap items-end gap-2 w-0 min-w-full min-h-[18px] mb-[2px]"
+  >
     @for (effect of data.statusEffects; track effect.id) {
       <app-icon-statuseffect
         [effect]="effect"
@@ -22,7 +25,10 @@
 >
   @let damageNumbers = damageNumbersByCombatant().get(data.combatantId);
   @if (damageNumbers && damageNumbers.length > 0) {
-    <div class="damage-numbers">
+    <!-- Spans the full card width so each number's left jitter is relative to the card at any expand state. -->
+    <div
+      class="absolute flex flex-col-reverse items-center pointer-events-none left-0 right-0 bottom-full z-30"
+    >
       @for (num of damageNumbers; track num.event.id) {
         <span
           class="damage-number tabular-nums"
@@ -64,7 +70,7 @@
     </div>
   }
 
-  <div class="entry-top">
+  <div class="flex flex-row items-center gap-2">
     <div class="entry-sprite">
       <app-atlas-animation
         [spritesheet]="data.spritesheet"
@@ -74,10 +80,10 @@
     </div>
 
     @if (isExpanded) {
-      <div class="entry-details">
-        <span class="entry-name">{{ data.name }}</span>
+      <div class="flex flex-col justify-center text-white overflow-hidden">
+        <span class="type-entity-name text-xs">{{ data.name }}</span>
         @if (data.subtitleLabel) {
-          <span class="entry-subtitle text-lighter">
+          <span class="truncate text-[0.65rem] text-lighter">
             Lv.
             <span class="tabular-nums">{{ data.subtitleLevel | number }}</span>
             {{ data.subtitleLabel }}
@@ -86,7 +92,7 @@
         }
 
         <!-- Always rendered (fixed height) so a skill flashing in/out never reflows the name/subtitle above it. -->
-        <span class="skill-cast-slot">
+        <span class="flex items-center h-[16px]">
           @let skillCast = skillCastByCombatant().get(data.combatantId);
           @if (skillCast) {
             <span class="skill-cast">

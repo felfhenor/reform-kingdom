@@ -16,7 +16,7 @@ import { getOption } from '@helpers/state-options';
   template: `
     @if (entries().length > 0) {
       <div
-        class="crafting-status"
+        class="flex gap-2 pointer-events-auto"
         (mouseenter)="setHovered(true)"
         (mouseleave)="setHovered(false)"
       >
@@ -33,12 +33,6 @@ import { getOption } from '@helpers/state-options';
     :host {
       display: block;
       pointer-events: none;
-    }
-
-    .crafting-status {
-      display: flex;
-      gap: 8px;
-      pointer-events: auto;
     }
   `,
 })

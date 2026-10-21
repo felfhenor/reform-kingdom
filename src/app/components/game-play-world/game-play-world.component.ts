@@ -154,7 +154,9 @@ const NODE_STATUS_UPDATE_INTERVAL_MS = 150;
   template: `
     <div #pixiContainer class="h-full w-full"></div>
     @if (isMapLoading()) {
-      <div class="map-loading-overlay bg-base-100">
+      <div
+        class="absolute inset-0 flex flex-col items-center justify-center gap-4 z-[15] bg-base-100"
+      >
         <span
           class="loading loading-spinner loading-lg text-base-content"
         ></span>
@@ -164,12 +166,15 @@ const NODE_STATUS_UPDATE_INTERVAL_MS = 150;
     <div class="fade-overlay" [class.fade-active]="fadeVisible()"></div>
     <div class="death-overlay" [class.death-active]="isPartyDead()"></div>
     <div class="hud-frame ui-scaled">
-      <div class="top-left-layer">
+      <div
+        class="absolute top-0 left-0 right-0 flex flex-col pointer-events-none z-[11]"
+      >
         <app-bar-global-effect
-          class="global-effect-bar"
+          class="pointer-events-auto"
         ></app-bar-global-effect>
+        <!-- In flow under the effect bar, since the bar's height depends on whether any effects are active. -->
         <app-adventure-log-overlay
-          class="adventure-log-overlay-layer"
+          class="mx-2 mt-2 w-[32rem] max-w-[calc(100%-2rem)]"
         ></app-adventure-log-overlay>
       </div>
       <app-panel-map-node></app-panel-map-node>
@@ -177,7 +182,7 @@ const NODE_STATUS_UPDATE_INTERVAL_MS = 150;
       <app-status-encounter
         class="encounter-status-layer"
       ></app-status-encounter>
-      <div class="top-right-status-layer">
+      <div class="absolute top-8 right-4 flex gap-2 pointer-events-auto z-[20]">
         <app-status-worker-levelup></app-status-worker-levelup>
         <app-status-crafting></app-status-crafting>
         <app-status-tutorial-unlock></app-status-tutorial-unlock>

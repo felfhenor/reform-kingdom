@@ -3,25 +3,3 @@
 :host {
   @apply block h-full;
 }
-
-// Flex-col wrapper for the discovered-count subtitle + the two-column layout below it, so the
-// layout gets its remaining share of height via flex-1 rather than fighting the subtitle for h-full.
-.bestiary-page {
-  @apply flex flex-col h-full min-h-0;
-}
-
-.bestiary-layout {
-  @apply flex gap-4 min-h-0 flex-1;
-}
-
-.bestiary-list {
-  @apply flex flex-col gap-2 w-[300px] shrink-0 min-h-0;
-}
-
-.bestiary-list-scroll {
-  @apply flex-1 flex flex-col gap-2 overflow-y-auto min-h-0;
-}
-
-.bestiary-detail {
-  @apply flex-1 overflow-y-auto min-h-0;
-}

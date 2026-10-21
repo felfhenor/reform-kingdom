@@ -1,7 +1,8 @@
 @if (rows().length > 0) {
-  <div class="combatant-rows">
+  <!-- flex-col-reverse stacks row 0 (nearest the hero row) at the bottom. -->
+  <div class="flex flex-col-reverse gap-2 pointer-events-auto">
     @for (row of rows(); track $index) {
-      <div class="combatant-row">
+      <div class="flex items-end gap-2">
         @for (entry of row; track entry.combatantId) {
           <app-card-status-combatant
             [entry]="entry"

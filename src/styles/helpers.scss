@@ -78,3 +78,22 @@
 .search-bar {
   min-width: 300px;
 }
+
+// Corner status bubbles (crafting, worker level-up, tutorial unlock): an icon that widens to show details on hover.
+.status-bubble {
+  @apply relative flex flex-row items-center bg-black/60 border border-black/50;
+  width: 40px;
+  height: 40px;
+  padding: 2px;
+  gap: 6px;
+  transition:
+    width 150ms ease,
+    padding 150ms ease;
+
+  &.expanded {
+    @apply items-stretch;
+    width: 190px;
+    height: auto;
+    padding: 6px 8px;
+  }
+}

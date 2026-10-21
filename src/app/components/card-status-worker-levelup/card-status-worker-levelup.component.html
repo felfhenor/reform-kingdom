@@ -2,11 +2,13 @@
 @let data = entry();
 
 <div
-  class="status-entry select-none cursor-pointer"
+  class="status-bubble select-none cursor-pointer"
   [class.expanded]="isExpanded"
   (click)="goToWorker()"
 >
-  <div class="entry-icon">
+  <div
+    class="relative flex items-center justify-center shrink-0 overflow-hidden w-[32px] h-[32px]"
+  >
     <div class="zoom-row">
       <app-atlas-animation
         spritesheet="worker"
@@ -15,14 +17,21 @@
       />
     </div>
     @if (!isExpanded) {
-      <span class="entry-timer">Lv. {{ data.level }}</span>
+      <!-- Level badge over the icon stays readable without expanding the card. -->
+      <span
+        class="absolute inset-x-0 bottom-0 text-center bg-black/70 text-[0.55rem] leading-[1.2]"
+      >
+        Lv. {{ data.level }}
+      </span>
     }
   </div>
 
   @if (isExpanded) {
-    <div class="entry-details">
-      <span class="entry-subtitle text-lighter">Ready to level up</span>
-      <span class="entry-name truncate">{{ data.name }}</span>
+    <div class="flex flex-col justify-center text-white overflow-hidden">
+      <span class="truncate text-[0.65rem] text-lighter">
+        Ready to level up
+      </span>
+      <span class="type-entity-name text-xs truncate">{{ data.name }}</span>
     </div>
   }
 </div>

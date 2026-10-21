@@ -16,11 +16,6 @@
   }
 }
 
-.map-loading-overlay {
-  @apply absolute inset-0 flex flex-col items-center justify-center gap-4;
-  z-index: 15;
-}
-
 .death-overlay {
   @apply absolute inset-0 pointer-events-none bg-gray-500 opacity-0;
   transition: opacity 300ms ease;
@@ -37,40 +32,22 @@
   max-width: calc(max(1920px, 100vh * 16 / 9) / var(--ui-zoom));
 }
 
-.top-left-layer {
-  @apply absolute top-0 left-0 right-0 flex flex-col pointer-events-none;
-  z-index: 11;
-}
-
-.global-effect-bar {
-  pointer-events: auto;
-}
-
-// Stacked under the effect bar in flow, since the bar's height depends on whether any effects are active.
-.adventure-log-overlay-layer {
-  @apply mx-2 mt-2 w-[32rem] max-w-[calc(100%-2rem)];
-}
-
-.encounter-status-layer {
-  @apply absolute bottom-4 right-4 pointer-events-auto;
-  z-index: 20;
-}
-
-.top-right-status-layer {
-  @apply absolute top-8 right-4 flex gap-2 pointer-events-auto;
-  z-index: 20;
-}
-
-// Pinned below the bubbles' expanded height so it doesn't shift as bubbles appear or expand on hover.
+// Pinned below the bubbles' expanded height so it doesn't shift as bubbles appear or expand on hover; a class so it beats the host's pointer-events: none.
 .task-list-layer {
   @apply absolute right-4 pointer-events-auto;
   top: calc(1rem + var(--status-bubble-expanded-height) + 2rem);
   z-index: 20;
 }
 
-// Clears the adventure log on the left and the status bubbles on the right.
+// Clears the adventure log and status bubbles; a class so it beats the host's pointer-events: none.
 .region-intro-layer {
   @apply absolute left-1/2 -translate-x-1/2 w-[28rem] max-w-[calc(100%-2rem)] pointer-events-auto;
   top: 20%;
   z-index: 12;
+}
+
+// A class, not utilities: it must beat the host's own `:host { pointer-events: none }`.
+.encounter-status-layer {
+  @apply absolute bottom-4 right-4 pointer-events-auto;
+  z-index: 20;
 }

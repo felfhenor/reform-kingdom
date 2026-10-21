@@ -2,11 +2,13 @@
 @let data = entry();
 
 <div
-  class="status-entry select-none cursor-pointer"
+  class="status-bubble select-none cursor-pointer"
   [class.expanded]="isExpanded"
   (click)="goToTradeskill()"
 >
-  <div class="entry-icon">
+  <div
+    class="relative flex items-center justify-center shrink-0 overflow-hidden w-[32px] h-[32px]"
+  >
     <div class="zoom-row">
       <app-atlas-image
         [spritesheet]="data.resultSpritesheet"
@@ -14,21 +16,24 @@
       />
     </div>
     @if (!isExpanded) {
-      <span class="entry-timer tabular-nums">
+      <!-- Timer badge over the icon stays readable without expanding the card. -->
+      <span
+        class="absolute inset-x-0 bottom-0 text-center bg-black/70 text-[0.55rem] leading-[1.2] tabular-nums"
+      >
         {{ formatDuration(data.remainingTicks) }}
       </span>
     }
   </div>
 
   @if (isExpanded) {
-    <div class="entry-details">
-      <span class="entry-subtitle text-lighter">
+    <div class="flex flex-col justify-center text-white overflow-hidden">
+      <span class="truncate text-[0.65rem] text-lighter">
         <span class="tabular-nums">
           {{ formatDuration(data.remainingTicks) }}
         </span>
         remaining
       </span>
-      <span class="entry-name truncate">{{ data.itemName }}</span>
+      <span class="type-entity-name text-xs truncate">{{ data.itemName }}</span>
     </div>
   }
 </div>

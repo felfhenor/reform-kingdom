@@ -18,10 +18,14 @@
     />
   </div>
 
-  <div class="bestiary-page">
-    <div class="bestiary-layout">
-      <div class="bestiary-list">
-        <div class="bestiary-list-scroll" appListReflow>
+  <!-- The layout takes its share of height via flex-1, so it doesn't fight the subtitle for h-full. -->
+  <div class="flex flex-col h-full min-h-0">
+    <div class="flex gap-4 min-h-0 flex-1">
+      <div class="flex flex-col gap-2 w-[300px] shrink-0 min-h-0">
+        <div
+          class="flex-1 flex flex-col gap-2 overflow-y-auto min-h-0"
+          appListReflow
+        >
           @let selected = selectedEntry();
 
           @for (entry of filteredEntries(); track entry.monster.id) {
@@ -64,7 +68,7 @@
         </div>
       </div>
 
-      <div class="bestiary-detail">
+      <div class="flex-1 overflow-y-auto min-h-0">
         @if (selectedEntry(); as entry) {
           <app-detail-bestiary-monster [entry]="entry" />
         } @else {

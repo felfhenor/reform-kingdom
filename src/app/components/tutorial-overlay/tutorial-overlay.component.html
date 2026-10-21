@@ -4,7 +4,7 @@
     @let position = calloutPosition();
 
     <div
-      class="tutorial-backdrop"
+      class="fixed inset-0 z-[200] pointer-events-none"
       (animate.enter)="onBackdropEnter($event)"
       (animate.leave)="onBackdropLeave($event)"
     >
@@ -45,7 +45,7 @@
           [style.height.px]="rect.height"
         ></div>
       } @else {
-        <div class="spot-frame spot-full"></div>
+        <div class="spot-frame inset-0"></div>
       }
 
       <div
@@ -56,14 +56,14 @@
         [style.left.px]="position?.left"
       >
         <p class="type-label">{{ view.step.title }}</p>
-        <p class="callout-body">{{ view.step.body }}</p>
-        <div class="callout-footer">
-          <span class="callout-progress text-lighter">
+        <p class="text-xs mt-[6px]">{{ view.step.body }}</p>
+        <div class="flex items-center justify-between mt-[10px]">
+          <span class="text-[0.7rem] text-lighter">
             @if (view.totalSteps !== 1) {
               Step {{ view.stepIndex + 1 }} of {{ view.totalSteps }}
             }
           </span>
-          <div class="callout-actions">
+          <div class="flex gap-2">
             @if (view.totalSteps !== 1) {
               <button
                 type="button"

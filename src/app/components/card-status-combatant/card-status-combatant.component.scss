@@ -28,20 +28,6 @@
   }
 }
 
-// Zero width + min-width 100% wraps at the card's width instead of widening the host past it.
-.status-effects {
-  @apply flex flex-wrap items-end gap-2;
-  width: 0;
-  min-width: 100%;
-  min-height: 18px;
-  margin-bottom: 2px;
-}
-
-.entry-top {
-  @apply flex flex-row items-center;
-  gap: 6px;
-}
-
 .entry-sprite {
   @apply relative overflow-hidden shrink-0;
   width: 32px;
@@ -63,26 +49,6 @@
   }
 }
 
-.entry-details {
-  @apply flex flex-col justify-center text-white overflow-hidden;
-}
-
-.entry-name {
-  @apply font-semibold text-xs;
-}
-
-.entry-subtitle {
-  @apply truncate;
-  font-size: 0.65rem;
-}
-
-// Always occupies its final height (icon + line), even with no active skill
-// cast, so a flash fading in/out never pushes the name/subtitle above it.
-.skill-cast-slot {
-  @apply flex items-center;
-  height: 16px;
-}
-
 .skill-cast {
   @apply flex items-center gap-2 truncate text-amber-300;
   font-size: 0.6rem;
@@ -97,16 +63,6 @@
   app-bar-progress {
     @apply flex;
   }
-}
-
-// Spans the full card width (not just the sprite) so each number's `left`
-// jitter is relative to the card's own width at any expand state.
-.damage-numbers {
-  @apply absolute flex flex-col-reverse items-center pointer-events-none;
-  left: 0;
-  right: 0;
-  bottom: 100%;
-  z-index: 30;
 }
 
 .damage-number {

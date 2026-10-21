@@ -1,14 +1,14 @@
 @if (backdropSprite(); as backdrop) {
-  <div class="icon-item-preview-stack {{ cssClass() }}">
+  <div class="relative w-full h-full {{ cssClass() }}">
     <app-atlas-image
       spritesheet="item"
       [assetName]="backdrop"
-      class="icon-item-preview-backdrop"
+      class="absolute z-0"
     />
     <app-atlas-image
       [spritesheet]="spritesheet()"
       [assetName]="sprite()"
-      class="icon-item-preview-result"
+      class="absolute z-10"
     />
   </div>
 } @else {

@@ -33,7 +33,7 @@
 <ng-template #tooltip>
   <div class="flex gap-2 p-2">
     @if (e.discovered && result) {
-      <div class="museum-recipe-tooltip-icon">
+      <div class="relative w-[64px] h-[64px] shrink-0">
         <app-icon-item-preview
           [sprite]="result.sprite"
           [spritesheet]="resultSpritesheet()"

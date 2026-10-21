@@ -3,12 +3,3 @@
 :host {
   @apply block pointer-events-none;
 }
-
-// `column-reverse` stacks row 0 (nearest the hero row) at the bottom.
-.combatant-rows {
-  @apply flex flex-col-reverse gap-2 pointer-events-auto;
-}
-
-.combatant-row {
-  @apply flex items-end gap-2;
-}
