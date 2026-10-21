@@ -9,6 +9,7 @@ import {
   workerIsReadyToLevelUp,
   workerLevelUpCost,
   workerXpForLevel,
+  workerXpIsFull,
 } from '@helpers/worker/worker-progression';
 import type {
   WorkerContent,
@@ -16,14 +17,14 @@ import type {
   WorkerLevelUpStatusEntry,
 } from '@interfaces';
 
-// One entry per rescued worker ready to level up right now - built for the corner status indicator.
-export function workersReadyToLevelUpEntries(): WorkerLevelUpStatusEntry[] {
+// One entry per rescued worker with full xp, affordable or not - built for the corner status indicator.
+export function workersLevelUpStatusEntries(): WorkerLevelUpStatusEntry[] {
   const workers = workersState();
 
   return (Object.keys(workers) as WorkerId[])
     .map((workerId) => {
       const worker = workers[workerId];
-      if (!workerIsReadyToLevelUp(worker)) return undefined;
+      if (!workerXpIsFull(worker)) return undefined;
 
       const content = getEntry<WorkerContent>(workerId);
       if (!content) return undefined;
@@ -34,6 +35,8 @@ export function workersReadyToLevelUpEntries(): WorkerLevelUpStatusEntry[] {
         sprite: content.sprite,
         frames: content.frames,
         level: worker.level,
+        cost: workerLevelUpCost(worker.level),
+        affordable: workerIsReadyToLevelUp(worker),
       };
     })
     .filter((entry): entry is WorkerLevelUpStatusEntry => !!entry);

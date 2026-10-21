@@ -5,7 +5,7 @@ import {
   signal,
 } from '@angular/core';
 import { CardStatusWorkerLevelupComponent } from '@components/card-status-worker-levelup/card-status-worker-levelup.component';
-import { workersReadyToLevelUpEntries } from '@helpers/worker/worker-progression.ui';
+import { workersLevelUpStatusEntries } from '@helpers/worker/worker-progression.ui';
 
 @Component({
   selector: 'app-status-worker-levelup',
@@ -37,7 +37,7 @@ import { workersReadyToLevelUpEntries } from '@helpers/worker/worker-progression
 export class StatusWorkerLevelupComponent {
   public isHovered = signal(false);
 
-  public entries = computed(() => workersReadyToLevelUpEntries());
+  public entries = computed(() => workersLevelUpStatusEntries());
 
   public setHovered(hovered: boolean): void {
     this.isHovered.set(hovered);

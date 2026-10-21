@@ -8,6 +8,7 @@
 >
   <div
     class="relative flex items-center justify-center shrink-0 overflow-hidden w-[32px] h-[32px]"
+    [class.opacity-50]="!data.affordable"
   >
     <div class="zoom-row">
       <app-atlas-animation
@@ -18,17 +19,20 @@
     </div>
   </div>
   @if (!isExpanded) {
-    <!-- Level badge spans the whole bubble, so it stays readable without expanding the card. -->
-    <span
-      class="absolute inset-x-0 bottom-0 text-center bg-black/70 type-meta whitespace-nowrap"
-    >
+    <span class="status-bubble-badge type-meta">
       Lv. {{ data.level | number }}
     </span>
   }
 
   @if (isExpanded) {
     <div class="flex flex-col justify-center text-white overflow-hidden">
-      <span class="type-meta truncate">Ready to level up</span>
+      @if (data.affordable) {
+        <span class="type-meta truncate">Ready to level up</span>
+      } @else {
+        <span class="type-blocker truncate">
+          Need {{ data.cost | number }} gold
+        </span>
+      }
       <span class="type-entity-name text-xs truncate">{{ data.name }}</span>
     </div>
   }

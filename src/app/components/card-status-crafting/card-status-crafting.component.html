@@ -17,10 +17,7 @@
     </div>
   </div>
   @if (!isExpanded) {
-    <!-- Timer badge spans the whole bubble, so it stays readable without expanding the card. -->
-    <span
-      class="absolute inset-x-0 bottom-0 text-center bg-black/70 type-meta whitespace-nowrap tabular-nums"
-    >
+    <span class="status-bubble-badge type-meta tabular-nums">
       {{ formatDurationBadge(data.remainingTicks) }}
     </span>
   }

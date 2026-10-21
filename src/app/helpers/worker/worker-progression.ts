@@ -100,11 +100,13 @@ export function workerLevelUpCost(currentLevel: number): number {
   return workerXpForLevel(currentLevel + 1) * 10;
 }
 
+export function workerXpIsFull(worker: WorkerState): boolean {
+  return (
+    worker.level < WORKER_MAX_LEVEL && worker.xp.current >= worker.xp.maximum
+  );
+}
+
 // Xp maxed, gold affordable, and under the level cap - the full gate `workerLevelUp` enforces.
 export function workerIsReadyToLevelUp(worker: WorkerState): boolean {
-  return (
-    worker.level < WORKER_MAX_LEVEL &&
-    worker.xp.current >= worker.xp.maximum &&
-    hasGold(workerLevelUpCost(worker.level))
-  );
+  return workerXpIsFull(worker) && hasGold(workerLevelUpCost(worker.level));
 }

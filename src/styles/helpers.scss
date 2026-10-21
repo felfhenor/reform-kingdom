@@ -81,10 +81,13 @@
 
 // Corner status bubbles (crafting, worker level-up, tutorial unlock): an icon that widens to show details on hover.
 .status-bubble {
+  // Collapsed width; the side padding (which centers the 32px icon) and the badge both derive from it.
+  --status-bubble-width: 44px;
+
   @apply relative flex flex-row items-center bg-black/60 border border-black/50;
-  width: 40px;
+  width: var(--status-bubble-width);
   height: 40px;
-  padding: 2px;
+  padding: 2px calc((var(--status-bubble-width) - 34px) / 2);
   gap: 6px;
   transition:
     width 150ms ease,
@@ -96,4 +99,10 @@
     height: auto;
     padding: 6px 8px;
   }
+}
+
+// Sized to the collapsed bubble rather than its live width, so it doesn't stretch while the bubble animates.
+.status-bubble-badge {
+  @apply absolute left-0 bottom-0 text-center bg-black/70 whitespace-nowrap;
+  width: calc(var(--status-bubble-width) - 2px);
 }

@@ -94,6 +94,8 @@ export type WorkerLevelUpStatusEntry = {
   sprite: string;
   frames: number;
   level: number;
+  cost: number;
+  affordable: boolean;
 };
 
 // Display-only shape for one half-size worker craft square beside a tradeskill queue.

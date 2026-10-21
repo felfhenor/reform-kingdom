@@ -14,6 +14,7 @@ import {
   defaultWorkerState,
   workerGainXp,
   workerIsReadyToLevelUp,
+  workerXpIsFull,
   workerLevelInRange,
   workerLevelUpCost,
   workerMinLevelForStamina,
@@ -125,6 +126,21 @@ describe('workerGainXp', () => {
     expect(gain(4, 0)).toBe(4);
     expect(gain(100, 8)).toBe(10);
     expect(gain(-5, 8)).toBe(8);
+  });
+});
+
+describe('workerXpIsFull', () => {
+  it('needs maxed xp and room under the level cap, ignoring gold', () => {
+    const maxed = { current: 10, maximum: 10 };
+    seedGamestate();
+
+    expect(workerXpIsFull(worker({ xp: maxed }))).toBe(true);
+    expect(workerXpIsFull(worker({ xp: { current: 9, maximum: 10 } }))).toBe(
+      false,
+    );
+    expect(workerXpIsFull(worker({ level: WORKER_MAX_LEVEL, xp: maxed }))).toBe(
+      false,
+    );
   });
 });
 

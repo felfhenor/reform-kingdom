@@ -44,7 +44,7 @@ import {
 import { raidDefenseRowViewModels } from '@helpers/town/raid/town-raid-defense.ui';
 import { tasksClaimableIds } from '@helpers/task/task.ui';
 import { homeNodeResetToDuchy } from '@helpers/town/town-spawn.ui';
-import { workersReadyToLevelUpEntries } from '@helpers/worker/worker-progression.ui';
+import { workersLevelUpStatusEntries } from '@helpers/worker/worker-progression.ui';
 import { isPlayerAtKingdom } from '@helpers/world';
 import {
   worldNodeCaravan,
@@ -121,7 +121,8 @@ export class PlayKingdomHomeComponent {
       ).length,
   );
   public workerLevelUpReadyCount = computed(
-    () => workersReadyToLevelUpEntries().length,
+    () =>
+      workersLevelUpStatusEntries().filter((entry) => entry.affordable).length,
   );
 
   public raidDefenseCount = computed(() => raidDefenseRowViewModels().length);
