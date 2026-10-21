@@ -47,7 +47,7 @@ import {
   combatAvailableSkillsForCombatant,
   combatGetPossibleCombatantTargetsForSkill,
   combatGetPossibleCombatantTargetsForSkillTechnique,
-  combatGetTargetsFromPriorityList,
+  combatGetTargetsForTechnique,
 } from '@helpers/combat/combat-targetting';
 import { ensureMonster } from '@helpers/content/ensure-monster';
 import {
@@ -129,7 +129,7 @@ beforeEach(() => {
   vi.mocked(combatGetPossibleCombatantTargetsForSkillTechnique).mockReturnValue(
     [target],
   );
-  vi.mocked(combatGetTargetsFromPriorityList).mockReturnValue([]);
+  vi.mocked(combatGetTargetsForTechnique).mockReturnValue([]);
   vi.mocked(pickSkillFromCombatOrders).mockReturnValue(undefined);
   available();
   vi.mocked(rngChoiceWeighted).mockImplementation((skills) => skills[0]);
@@ -158,7 +158,7 @@ describe('combatDoCombatIteration', () => {
     });
     const summon = caster({ id: 'summon-1', summonerId: 'caster-1' });
     available(skill('weighted'));
-    vi.mocked(combatGetTargetsFromPriorityList).mockReturnValue([target]);
+    vi.mocked(combatGetTargetsForTechnique).mockReturnValue([target]);
     vi.mocked(combatApplySkillToTarget).mockImplementation((combat) => {
       combat.helpers = [];
     });
@@ -316,7 +316,7 @@ describe('combatantTakeTurn skill selection', () => {
 
 describe('combatantTakeTurn targeting', () => {
   function targetPriorityUsed() {
-    return vi.mocked(combatGetTargetsFromPriorityList).mock.calls[0][1];
+    return vi.mocked(combatGetTargetsForTechnique).mock.calls[0][3];
   }
 
   it("targets by the combatant's own priority list without an order override", () => {
@@ -376,8 +376,8 @@ describe('combatantTakeTurn targeting', () => {
     );
 
     const priorities = vi
-      .mocked(combatGetTargetsFromPriorityList)
-      .mock.calls.map((call) => call[1]);
+      .mocked(combatGetTargetsForTechnique)
+      .mock.calls.map((call) => call[3]);
     expect(priorities).toEqual([[{ type: 'Weakest' }], [{ type: 'Random' }]]);
   });
 
@@ -395,7 +395,7 @@ describe('combatantTakeTurn targeting', () => {
       ],
     };
     available(host);
-    vi.mocked(combatGetTargetsFromPriorityList).mockReturnValue([target]);
+    vi.mocked(combatGetTargetsForTechnique).mockReturnValue([target]);
 
     combatantTakeTurn(buildCombat(), caster());
 
@@ -430,7 +430,7 @@ describe('combatantTakeTurn targeting', () => {
   it('sends the hit to a covering ally and logs the cover', () => {
     const guard = caster({ id: 'guard-1', name: 'Guard' });
     available(skill('weighted'));
-    vi.mocked(combatGetTargetsFromPriorityList).mockReturnValue([target]);
+    vi.mocked(combatGetTargetsForTechnique).mockReturnValue([target]);
     vi.mocked(combatCoveringAlly).mockReturnValueOnce(guard);
 
     combatantTakeTurn(buildCombat(), caster());
@@ -442,7 +442,7 @@ describe('combatantTakeTurn targeting', () => {
 
   it('emits a miss on the target instead of applying the technique when the miss roll succeeds', () => {
     available(skill('weighted'));
-    vi.mocked(combatGetTargetsFromPriorityList).mockReturnValue([target]);
+    vi.mocked(combatGetTargetsForTechnique).mockReturnValue([target]);
     rollsSucceed('missChance');
 
     combatantTakeTurn(buildCombat(), caster());
@@ -455,7 +455,7 @@ describe('combatantTakeTurn targeting', () => {
 
   it('ignores the miss roll for a NeverMisses technique', () => {
     available(skill('weighted'));
-    vi.mocked(combatGetTargetsFromPriorityList).mockReturnValue([target]);
+    vi.mocked(combatGetTargetsForTechnique).mockReturnValue([target]);
     vi.mocked(techniqueHasAttribute).mockImplementation(
       (_tech, attribute) => attribute === 'NeverMisses',
     );
@@ -471,7 +471,7 @@ describe('combatantTakeTurn targeting', () => {
       techniques: [ensureEquipmentSkillTechnique({ accuracy: 70 })],
     });
     available(inaccurate);
-    vi.mocked(combatGetTargetsFromPriorityList).mockReturnValue([target]);
+    vi.mocked(combatGetTargetsForTechnique).mockReturnValue([target]);
 
     combatantTakeTurn(buildCombat(), caster());
     expect(combatApplySkillToTarget).not.toHaveBeenCalled();
@@ -484,7 +484,7 @@ describe('combatantTakeTurn targeting', () => {
 
   it('skips the accuracy roll entirely at 100 accuracy', () => {
     available(skill('weighted'));
-    vi.mocked(combatGetTargetsFromPriorityList).mockReturnValue([target]);
+    vi.mocked(combatGetTargetsForTechnique).mockReturnValue([target]);
 
     combatantTakeTurn(buildCombat(), caster());
 
@@ -494,7 +494,7 @@ describe('combatantTakeTurn targeting', () => {
 
   it('applies the technique twice when the strike-again roll succeeds', () => {
     available(skill('weighted'));
-    vi.mocked(combatGetTargetsFromPriorityList).mockReturnValue([target]);
+    vi.mocked(combatGetTargetsForTechnique).mockReturnValue([target]);
     rollsSucceed('skillStrikeAgainChance');
 
     combatantTakeTurn(buildCombat(), caster());
@@ -510,7 +510,7 @@ describe('combatantTakeTurn targeting', () => {
         ],
       }),
     );
-    vi.mocked(combatGetTargetsFromPriorityList).mockReturnValue([target]);
+    vi.mocked(combatGetTargetsForTechnique).mockReturnValue([target]);
     rollsSucceed('skillStrikeAgainChance');
 
     combatantTakeTurn(buildCombat(), caster());
@@ -617,7 +617,7 @@ describe('combatantTakeTurn delayed skills', () => {
   const charged = skill('charged', { name: 'Charged Strike', delay: 2 });
 
   beforeEach(() => {
-    vi.mocked(combatGetTargetsFromPriorityList).mockReturnValue([target]);
+    vi.mocked(combatGetTargetsForTechnique).mockReturnValue([target]);
   });
 
   function castThenIdle(combatant: Combatant, idleTurns: number): void {
@@ -676,13 +676,13 @@ describe('combatantTakeTurn delayed skills', () => {
       targetMode: 'Weakest',
     });
     castThenIdle(combatant, 1);
-    vi.mocked(combatGetTargetsFromPriorityList).mockClear();
+    vi.mocked(combatGetTargetsForTechnique).mockClear();
 
     combatantTakeTurn(buildCombat(), combatant);
 
-    expect(
-      vi.mocked(combatGetTargetsFromPriorityList).mock.calls[0][1],
-    ).toEqual([{ type: 'Weakest' }]);
+    expect(vi.mocked(combatGetTargetsForTechnique).mock.calls[0][3]).toEqual([
+      { type: 'Weakest' },
+    ]);
   });
 
   it('stops a ready batch and ends the turn once the caster dies mid-batch', () => {

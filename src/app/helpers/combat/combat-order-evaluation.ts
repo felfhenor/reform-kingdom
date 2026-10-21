@@ -233,7 +233,10 @@ function techniqueTargetsAnyLiving(
   return (
     technique.targetBehaviors.length > 0 &&
     technique.targetBehaviors.every(
-      ({ behavior }) => behavior === 'Always' || behavior === 'NotZeroHealth',
+      ({ behavior }) =>
+        behavior === 'Always' ||
+        behavior === 'NotZeroHealth' ||
+        behavior === 'PreferHeroes',
     )
   );
 }

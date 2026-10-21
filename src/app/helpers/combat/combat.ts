@@ -39,7 +39,7 @@ import {
   combatAvailableSkillsForCombatant,
   combatGetPossibleCombatantTargetsForSkill,
   combatGetPossibleCombatantTargetsForSkillTechnique,
-  combatGetTargetsFromPriorityList,
+  combatGetTargetsForTechnique,
 } from '@helpers/combat/combat-targetting';
 import { updateGamestate, worldCombatState } from '@helpers/state-game';
 
@@ -204,8 +204,10 @@ function combatantUseSkill(
         ? [{ type: combatOrderPick.targetMode }]
         : combatant.targetting;
 
-    const targets = combatGetTargetsFromPriorityList(
+    const targets = combatGetTargetsForTechnique(
+      combat,
       baseTargetList,
+      tech,
       targetPriority,
       numTargets,
       {

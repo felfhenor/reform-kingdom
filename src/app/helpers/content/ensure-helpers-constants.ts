@@ -56,6 +56,7 @@ export const VALID_SKILL_TARGET_BEHAVIORS: EquipmentSkillTargetBehavior[] = [
   'IfStatusEffect',
   'IfNotStatusEffect',
   'IfNoSummon',
+  'PreferHeroes',
 ];
 export const VALID_AFFIX_POSITIONS: AffixPosition[] = ['Prefix', 'Suffix'];
 export const VALID_SKILL_ATTRIBUTES: EquipmentSkillAttribute[] = [

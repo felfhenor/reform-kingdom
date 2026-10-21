@@ -209,6 +209,14 @@ function targetBehaviorIssues(t: Technique): AnalysisIssue[] {
     }
   });
 
+  if (hasBehavior(t, 'PreferHeroes') && t.targetType !== 'Allies') {
+    issues.push(
+      analysisFail(
+        `has PreferHeroes on a ${t.targetType} technique; it only belongs on Allies, where elsewhere it can skip a taunter.`,
+      ),
+    );
+  }
+
   if (!hasBehavior(t, 'NotZeroHealth') && !hasBehavior(t, 'ZeroHealth')) {
     issues.push(
       analysisWarn(

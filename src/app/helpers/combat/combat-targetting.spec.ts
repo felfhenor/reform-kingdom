@@ -2,6 +2,7 @@ import {
   combatAvailableSkillsForCombatant,
   combatGetPossibleCombatantTargetsForSkill,
   combatGetTargetsFromListBasedOnType,
+  combatGetTargetsForTechnique,
   combatGetTargetsFromPriorityList,
   combatSkillHasValidTargetsForMode,
 } from '@helpers/combat/combat-targetting';
@@ -416,6 +417,83 @@ describe('combatGetTargetsFromPriorityList', () => {
     );
 
     expect(result).toEqual([]);
+  });
+});
+
+describe('combatGetTargetsForTechnique', () => {
+  const caster = buildTestCombatant({ id: 'caster' });
+  const context: CombatTargetModeContext = { combatant: caster };
+  const preferHeroes = buildTechnique({
+    targetBehaviors: [{ behavior: 'PreferHeroes' }],
+  });
+
+  it('fills slots with heroes before a weaker summon', () => {
+    const hero = buildTestCombatant({ id: 'hero', hp: 50 });
+    const summon = buildTestCombatant({ id: 'summon', hp: 1 });
+    const combat = buildCombat({ heroes: [caster, hero], helpers: [summon] });
+
+    const result = combatGetTargetsForTechnique(
+      combat,
+      [caster, hero, summon],
+      preferHeroes,
+      [{ type: 'Weakest' }],
+      2,
+      context,
+    );
+
+    expect(sortBy(result, 'id')).toEqual([caster, hero]);
+  });
+
+  it('gives slots heroes cannot fill to summons', () => {
+    const summon = buildTestCombatant({ id: 'summon' });
+    const combat = buildCombat({ heroes: [caster], helpers: [summon] });
+
+    const result = combatGetTargetsForTechnique(
+      combat,
+      [caster, summon],
+      preferHeroes,
+      [{ type: 'Random' }],
+      4,
+      context,
+    );
+
+    expect(result).toEqual([caster, summon]);
+  });
+
+  it('does not hand a summon the slots of heroes an earlier entry skipped', () => {
+    const healer = buildTestCombatant({
+      id: 'healer',
+      jobId: 'healer' as JobId,
+    });
+    const summon = buildTestCombatant({ id: 'summon' });
+    const combat = buildCombat({ heroes: [caster, healer], helpers: [summon] });
+
+    const result = combatGetTargetsForTechnique(
+      combat,
+      [caster, healer, summon],
+      preferHeroes,
+      [{ type: 'Random', jobId: 'healer' as JobId }, { type: 'Random' }],
+      4,
+      context,
+    );
+
+    expect(result).toEqual([healer]);
+  });
+
+  it('picks normally without PreferHeroes', () => {
+    const summon = buildTestCombatant({ id: 'summon', hp: 1 });
+    const combat = buildCombat({ heroes: [caster], helpers: [summon] });
+
+    const result = combatGetTargetsForTechnique(
+      combat,
+      [caster, summon],
+      buildTechnique(),
+      [{ type: 'Weakest' }],
+      1,
+      context,
+    );
+
+    expect(result).toEqual([summon]);
   });
 });
 

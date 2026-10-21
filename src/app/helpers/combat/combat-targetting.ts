@@ -29,7 +29,13 @@ import type {
   EquipmentSkillTargetType,
   TargettingPriorityEntry,
 } from '@interfaces';
-import { intersection, sampleSize, sortBy, union } from 'es-toolkit/compat';
+import {
+  intersection,
+  partition,
+  sampleSize,
+  sortBy,
+  union,
+} from 'es-toolkit/compat';
 
 export function combatantSkills(combatant: Combatant): EquipmentSkill[] {
   return [
@@ -80,6 +86,7 @@ function filterCombatantTargetListForSkillTechniqueBehavior(
       ),
     IfNoSummon: (list) =>
       list.filter((c) => !combatantHasLivingSummon(combat, c)),
+    PreferHeroes: (list) => list,
   };
 
   if (!behaviors[behaviorData.behavior])
@@ -242,6 +249,43 @@ export function combatGetTargetsFromPriorityList(
       select,
       context,
     );
+    if (targets.length > 0) return targets;
+  }
+
+  return [];
+}
+
+// PreferHeroes only reorders: summons and town helpers get the slots heroes can't fill.
+export function combatGetTargetsForTechnique(
+  combat: Combat,
+  combatants: Combatant[],
+  technique: EquipmentSkillContentTechnique,
+  priority: TargettingPriorityEntry[],
+  select: number,
+  context: CombatTargetModeContext,
+): Combatant[] {
+  if (!technique.targetBehaviors.some((b) => b.behavior === 'PreferHeroes')) {
+    return combatGetTargetsFromPriorityList(
+      combatants,
+      priority,
+      select,
+      context,
+    );
+  }
+
+  const [heroes, others] = partition(combatants, (c) =>
+    combat.heroes.includes(c),
+  );
+
+  // Hero-first per entry, so an entry that only matches a summon still falls through like it would without PreferHeroes.
+  for (const entry of priority) {
+    const pick = (pool: Combatant[], count: number) =>
+      combatGetTargetsFromPriorityList(pool, [entry], count, context);
+    const picked = pick(heroes, select);
+    const targets =
+      picked.length >= select
+        ? picked
+        : [...picked, ...pick(others, select - picked.length)];
     if (targets.length > 0) return targets;
   }
 

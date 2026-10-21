@@ -25,7 +25,8 @@ export type EquipmentSkillTargetBehavior =
   | 'NotMaxEnergy'
   | 'IfStatusEffect'
   | 'IfNotStatusEffect'
-  | 'IfNoSummon';
+  | 'IfNoSummon'
+  | 'PreferHeroes';
 
 export type EquipmentSkillAttribute =
   | 'BypassDefense'
