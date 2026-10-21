@@ -252,6 +252,17 @@
       jobAbilityId: Intimidation
       value: -12
 
+- id: a4cbb75b-be38-461a-b034-387bc04d5271
+  name: 'Warrior: Blade Dance'
+  jobId: Warrior
+  level: 50
+  row: Swashbuckler
+  track: 2
+  requiredSkillTreeNodeIds: ['Warrior: Swashbuckler']
+  effects:
+    - kind: GrantSkill
+      skillId: 'Blade Dance'
+
 # --- Bastion ---
 
 - id: 71885e23-cb29-43f5-885a-670daaf6fae2

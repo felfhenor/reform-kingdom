@@ -251,6 +251,17 @@
       jobAbilityId: Loot Goblin
       value: 10
 
+- id: 5fe5b34f-07a9-42ba-be85-217166458961
+  name: 'Explorer: Lady Luck'
+  jobId: Explorer
+  level: 50
+  row: Treasure Hunter
+  track: 2
+  requiredSkillTreeNodeIds: ['Explorer: Treasure Hunter']
+  effects:
+    - kind: GrantSkill
+      skillId: 'Lady Luck'
+
 # --- Dungeon Delver ---
 
 - id: 57cf32e1-d128-401f-9a53-bde40a3c3b9d
@@ -276,6 +287,17 @@
     - kind: JobAbility
       jobAbilityId: Monster Research
       value: 2
+
+- id: 415fe1f1-3079-4f03-93bc-b90485152477
+  name: 'Explorer: Cave-In'
+  jobId: Explorer
+  level: 50
+  row: Dungeon Delver
+  track: 2
+  requiredSkillTreeNodeIds: ['Explorer: Dungeon Delver']
+  effects:
+    - kind: GrantSkill
+      skillId: 'Cave-In'
 
 # --- Skill oaths ---
 

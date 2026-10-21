@@ -1,0 +1,430 @@
+- id: 088c76fa-fdb6-439f-a6c1-6cc9c1174344
+  name: Phoenix Soul
+  family: Phoenix Soul
+  description: Shroud every ally in phoenix flames, reviving each of them once if they fall within 10 turns.
+
+  sprite: '0062'
+
+  rarity: Legendary
+
+  epCost: 0
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 12
+
+  elementCosts:
+    Fire: 2
+    Water: 1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Fire]
+      attributes: [Buff, NeverMisses]
+      targets: 4
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: PreferHeroes
+
+      statusEffects:
+        - statusEffectId: Phoenix
+          chance: 100
+          duration: 10
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}**.'
+
+- id: 928014c3-6ade-4c2b-bf4f-5fdd6f45d26c
+  name: Frozen Angel
+  family: Frozen Angel
+  description: Coat every ally in crystals that reflect damage and slowly regenerate their wounds.
+
+  sprite: '0063'
+
+  rarity: Legendary
+
+  epCost: 0
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 7
+
+  elementCosts:
+    Water: 2
+    Air: 1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Water]
+      attributes: [Buff, NeverMisses]
+      targets: 4
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: PreferHeroes
+
+      statusEffects:
+        - statusEffectId: Crystalline
+          chance: 100
+          duration: 5
+
+        - statusEffectId: Regeneration
+          chance: 100
+          duration: 5
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}**.'
+
+- id: ff693004-9958-418d-b18c-fabf5da27417
+  name: Safe Passage
+  family: Safe Passage
+  description: Slow every enemy and give regeneration to allies.
+
+  sprite: '0065'
+
+  rarity: Legendary
+
+  epCost: 0
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 7
+
+  elementCosts:
+    Earth: 2
+    Air: 1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Earth]
+      attributes: [Buff, NeverMisses]
+      targets: 4
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: PreferHeroes
+
+      statusEffects:
+        - statusEffectId: Regeneration
+          chance: 100
+          duration: 5
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}**.'
+
+    - elements: [Earth]
+      attributes: [Debuff]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+
+      statusEffects:
+        - statusEffectId: Slowed
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}**.'
+
+- id: e2619b6c-6c34-4bd1-8d9a-be929c69c6e2
+  name: Judgment
+  family: Judgment
+  description: Pass judgment on every enemy for {{ value }} holy damage, then heal every ally.
+
+  sprite: '0066'
+
+  rarity: Legendary
+
+  epCost: 0
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 5
+
+  elementCosts:
+    Water: 2
+    Air: 1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: []
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 1
+        Intelligence: 1
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
+
+    - elements: [Water]
+      attributes: [BypassDefense, NeverMisses, HealsTarget]
+      targets: 4
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: NotMaxHealth
+        - behavior: PreferHeroes
+      damageScaling:
+        Intelligence: 1
+        Vitality: 0.5
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing {{ targetStatus }}.'
+
+- id: afe6578a-2c95-4b6e-aa57-67276c588a2d
+  name: Lady Luck
+  family: Lady Luck
+  description: Smile on every ally with great fortune, and blind every enemy.
+
+  sprite: '0069'
+
+  rarity: Legendary
+
+  epCost: 0
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 7
+
+  elementCosts:
+    Air: 2
+    Earth: 1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: []
+      attributes: [Buff, NeverMisses]
+      targets: 4
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: PreferHeroes
+
+      statusEffects:
+        - statusEffectId: Lucky III
+          chance: 100
+          duration: 5
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}**.'
+
+    - elements: []
+      attributes: [Debuff]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+
+      statusEffects:
+        - statusEffectId: Blind I
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}**.'
+
+- id: d6442074-f2af-4f68-9fef-d4b0073c9cf6
+  name: Cave-In
+  family: Cave-In
+  description: Bring the ceiling down on every enemy for {{ value }} earth damage, stunning them and inflicting Gravity on them.
+
+  sprite: '0067'
+
+  rarity: Legendary
+
+  epCost: 0
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 5
+
+  elementCosts:
+    Earth: 2
+    Air: 1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Earth]
+      attributes: [DamagesTarget, AllowPlink, CanBeReflected, Debuff]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 1.2
+        Resistance: 1
+
+      statusEffects:
+        - statusEffectId: Stunned
+          chance: 100
+          duration: 1
+
+        - statusEffectId: Gravity
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
+
+- id: 7da30ad5-7617-49bd-9c54-53b7e0dadb22
+  name: Blade Dance
+  family: Blade Dance
+  description: Do an entrancing blade dance, slashing enemies for {{ value }} damage total, then keep dancing so skills strike twice.
+
+  sprite: '0068'
+
+  rarity: Legendary
+
+  epCost: 0
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 7
+
+  elementCosts:
+    Fire: 2
+    Earth: 1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: []
+      attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.4
+        Agility: 0.3
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** slashes **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
+
+    - elements: []
+      attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.4
+        Agility: 0.3
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** slashes **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
+
+    - elements: []
+      attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.4
+        Agility: 0.3
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** slashes **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
+
+    - elements: []
+      attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.4
+        Agility: 0.3
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** slashes **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
+
+    - elements: []
+      attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.4
+        Agility: 0.3
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** slashes **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
+
+    - elements: []
+      attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 0.4
+        Agility: 0.3
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** slashes **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
+
+    - elements: []
+      attributes: [Buff, NeverMisses]
+      targets: 1
+      targetType: Self
+      targetBehaviors:
+        - behavior: NotZeroHealth
+
+      statusEffects:
+        - statusEffectId: Blade Dancing
+          chance: 100
+          duration: 5
+
+      combatMessage: '**{{ combatant.name }}** keeps dancing.'
+
+- id: 6a3542f8-58be-4d42-a4f1-f0777c434938
+  name: Vanish
+  family: Vanish
+  description: Disappear from sight, taking extra turns while hidden.
+
+  sprite: '0064'
+
+  rarity: Legendary
+
+  epCost: 0
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 8
+
+  elementCosts:
+    Air: 2
+    Fire: 1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Air]
+      attributes: [Buff, NeverMisses]
+      targets: 1
+      targetType: Self
+      targetBehaviors:
+        - behavior: NotZeroHealth
+
+      statusEffects:
+        - statusEffectId: Vanished
+          chance: 100
+          duration: 6
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}**.'

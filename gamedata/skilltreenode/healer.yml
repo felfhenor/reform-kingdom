@@ -286,6 +286,17 @@
       jobAbilityId: Sanctified Incantations
       value: 0.5
 
+- id: 181c3476-5e24-4a59-9c98-5c536ade6515
+  name: 'Healer: Phoenix Soul'
+  jobId: Healer
+  level: 50
+  row: Lifegiver
+  track: 2
+  requiredSkillTreeNodeIds: ['Healer: Lifegiver']
+  effects:
+    - kind: GrantSkill
+      skillId: 'Phoenix Soul'
+
 # --- Templar ---
 
 - id: 8775de13-9dfc-4c17-8eeb-5b23218deb81
@@ -311,6 +322,17 @@
     - kind: JobAbility
       jobAbilityId: Town Favor
       value: 0.2
+
+- id: c9653531-4861-41ad-9ef3-47e32bd56ac5
+  name: 'Healer: Judgment'
+  jobId: Healer
+  level: 50
+  row: Templar
+  track: 2
+  requiredSkillTreeNodeIds: ['Healer: Templar']
+  effects:
+    - kind: GrantSkill
+      skillId: 'Judgment'
 
 # --- Skill oaths ---
 

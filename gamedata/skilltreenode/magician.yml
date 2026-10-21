@@ -276,6 +276,17 @@
       jobAbilityId: Astral Resonance
       value: 0.5
 
+- id: 388eb2a2-62eb-4b58-8f91-21a6f33cf256
+  name: 'Magician: Frozen Angel'
+  jobId: Magician
+  level: 50
+  row: Celestar
+  track: 2
+  requiredSkillTreeNodeIds: ['Magician: Celestar']
+  effects:
+    - kind: GrantSkill
+      skillId: 'Frozen Angel'
+
 # --- Skill oaths ---
 
 - id: 6b8ed2ee-c59b-41ec-910a-1dd2dedc179d

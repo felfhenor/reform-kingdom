@@ -254,6 +254,17 @@
       jobAbilityId: Ambush
       value: 20
 
+- id: 29d44cdb-e5df-430c-a547-24bfc89bc338
+  name: 'Ranger: Vanish'
+  jobId: Ranger
+  level: 50
+  row: Stalker
+  track: 2
+  requiredSkillTreeNodeIds: ['Ranger: Stalker']
+  effects:
+    - kind: GrantSkill
+      skillId: 'Vanish'
+
 # --- Wayfinder ---
 
 - id: 4e896423-5879-4651-871c-ab25f25c18ac
@@ -279,6 +290,17 @@
     - kind: JobAbility
       jobAbilityId: Pathfinder
       value: 0.2
+
+- id: 658ff722-2d8d-4f41-821d-52fd71e152ac
+  name: 'Ranger: Safe Passage'
+  jobId: Ranger
+  level: 50
+  row: Wayfinder
+  track: 2
+  requiredSkillTreeNodeIds: ['Ranger: Wayfinder']
+  effects:
+    - kind: GrantSkill
+      skillId: 'Safe Passage'
 
 # --- Skill oaths ---
 
