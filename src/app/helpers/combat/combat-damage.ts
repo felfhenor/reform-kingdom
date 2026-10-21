@@ -275,6 +275,9 @@ export function combatApplySkillToTarget(
 
     if (techniqueHasAttribute(technique, 'RestoresTargetEnergy')) {
       combatCombatantTakeEnergyDamage(target, effectiveDamage);
+    } else if (techniqueHasAttribute(technique, 'DrainsTargetEnergy')) {
+      effectiveDamage = Math.min(effectiveDamage, target.ep);
+      combatCombatantTakeEnergyDamage(target, effectiveDamage);
     } else {
       combatCombatantTakeDamage(
         target,

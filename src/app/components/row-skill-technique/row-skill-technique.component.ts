@@ -15,11 +15,14 @@ const kindClasses: Record<SkillTechniqueKind, string> = {
   Damage: 'text-error',
   Heal: 'text-success',
   Restore: 'text-success',
+  Drain: 'text-warning',
   Buff: 'text-info',
   Debuff: 'text-warning',
   Effect: '',
   Summon: 'text-info',
 };
+
+const energyKinds: SkillTechniqueKind[] = ['Restore', 'Drain'];
 
 @Component({
   selector: 'app-row-skill-technique',
@@ -37,6 +40,9 @@ export class RowSkillTechniqueComponent {
     const { elements, kind } = this.technique();
     return elements.length > 0 ? `${elementsLabel(elements)} ${kind}` : kind;
   });
+  public amountUnit = computed(() =>
+    energyKinds.includes(this.technique().kind) ? 'EP' : '',
+  );
   public statusVerb = computed(() =>
     this.technique().kind === 'Buff' ? 'Grants' : 'Inflicts',
   );

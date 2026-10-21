@@ -175,6 +175,7 @@ describe('skillTechniqueKind', () => {
   it.each([
     [['DamagesTarget', 'Debuff'], 'Damage'],
     [['HealsTarget'], 'Heal'],
+    [['DrainsTargetEnergy'], 'Drain'],
     [['Buff'], 'Buff'],
     [['Debuff'], 'Debuff'],
     [[], 'Effect'],

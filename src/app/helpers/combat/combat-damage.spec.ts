@@ -147,6 +147,56 @@ describe('combatApplySkillToTarget energy restore', () => {
   });
 });
 
+describe('combatApplySkillToTarget energy drain', () => {
+  function drain(ep: number, rounds = 0, casterLuck = 0): Combatant {
+    combatantDamageEvents.set([]);
+    const caster = buildCombatant({
+      totalStats: { ...defaultStats(), Spirit: 30, Luck: casterLuck },
+    });
+    const target = buildCombatant({
+      hp: 50,
+      ep,
+      totalStats: { ...defaultStats(), Health: 100, Energy: 100 },
+    });
+
+    combatApplySkillToTarget(
+      { ...buildCombat({ heroes: [caster] }), rounds },
+      caster,
+      target,
+      buildSkill(),
+      buildTechnique({
+        damageScaling: { ...defaultStats(), Spirit: 1 },
+        attributes: ['BypassDefense', 'NeverMisses', 'DrainsTargetEnergy'],
+      }),
+    );
+
+    return target;
+  }
+
+  it('drains EP without touching HP and emits only an energy event', () => {
+    const target = drain(50);
+
+    expect(target.ep).toBe(20);
+    expect(target.hp).toBe(50);
+    expect(combatantDamageEvents()).toMatchObject([
+      { combatantId: target.id, amount: -30, variant: 'energy' },
+    ]);
+  });
+
+  it('caps the drain at current EP, even with the long-fight damage boost', () => {
+    const target = drain(10, 100);
+
+    expect(target.ep).toBe(0);
+    expect(combatantDamageEvents()).toMatchObject([{ amount: -10 }]);
+  });
+
+  it('never crits, whatever the caster Luck', () => {
+    const target = drain(100, 0, 100_000);
+
+    expect(target.ep).toBe(70);
+  });
+});
+
 describe('combatApplySkillToTarget defense', () => {
   it('mitigates a purely physical technique using only the target Vitality stat', () => {
     const attacker = buildCombatant({

@@ -37,6 +37,7 @@ function damageTagIssues(t: Technique): AnalysisIssue[] {
   const damages = hasAttr(t, 'DamagesTarget');
   const heals = hasAttr(t, 'HealsTarget');
   const restores = hasAttr(t, 'RestoresTargetEnergy');
+  const drains = hasAttr(t, 'DrainsTargetEnergy');
   const scales = hasScaling(t);
   const issues: AnalysisIssue[] = [];
 
@@ -48,17 +49,29 @@ function damageTagIssues(t: Technique): AnalysisIssue[] {
       analysisFail('is tagged both HealsTarget and RestoresTargetEnergy.'),
     );
   }
-  if (scales && !damages && !heals && !restores) {
+  if (drains && (damages || heals || restores)) {
     issues.push(
       analysisFail(
-        'has damageScaling but neither DamagesTarget nor HealsTarget nor RestoresTargetEnergy, so it deals untagged damage (no crits or monster-type bonus).',
+        'is tagged DrainsTargetEnergy alongside DamagesTarget, HealsTarget or RestoresTargetEnergy.',
       ),
     );
   }
-  if (!scales && (damages || heals)) {
+  if (scales && !damages && !heals && !restores && !drains) {
     issues.push(
       analysisFail(
-        `is tagged ${damages ? 'DamagesTarget' : 'HealsTarget'} but has no damageScaling, so it does nothing.`,
+        'has damageScaling but neither DamagesTarget nor HealsTarget nor RestoresTargetEnergy nor DrainsTargetEnergy, so it deals untagged damage (no crits or monster-type bonus).',
+      ),
+    );
+  }
+  if (!scales && (damages || heals || drains)) {
+    const tag = damages
+      ? 'DamagesTarget'
+      : heals
+        ? 'HealsTarget'
+        : 'DrainsTargetEnergy';
+    issues.push(
+      analysisFail(
+        `is tagged ${tag} but has no damageScaling, so it does nothing.`,
       ),
     );
   }
@@ -103,6 +116,40 @@ function restoreIssues(
     issues.push(
       analysisWarn(
         `${verb} without a ${wastedGuards.join(' or ')} target behavior, so casts can be wasted on full targets.`,
+      ),
+    );
+  }
+
+  return issues;
+}
+
+function drainIssues(t: Technique): AnalysisIssue[] {
+  if (!hasAttr(t, 'DrainsTargetEnergy')) return [];
+
+  const issues: AnalysisIssue[] = [];
+  if (!hasAttr(t, 'BypassDefense')) {
+    issues.push(
+      analysisFail(
+        'drains without BypassDefense, so target defense zeroes the drain.',
+      ),
+    );
+  }
+  if (t.targetType !== 'Enemies') {
+    issues.push(
+      analysisFail(`is tagged DrainsTargetEnergy but targets ${t.targetType}.`),
+    );
+  }
+  if (hasAttr(t, 'CanBeReflected')) {
+    issues.push(
+      analysisFail(
+        'drains with CanBeReflected, so reflect turns the drained EP into HP damage on the caster.',
+      ),
+    );
+  }
+  if (!hasBehavior(t, 'NotZeroEnergy')) {
+    issues.push(
+      analysisWarn(
+        'drains without a NotZeroEnergy target behavior, so casts can be wasted on empty targets.',
       ),
     );
   }
@@ -314,6 +361,7 @@ export function techniqueIssues(t: Technique): AnalysisIssue[] {
     ...damageTagIssues(t),
     ...restoreIssues(t, 'HealsTarget', 'heals', ['NotMaxHealth', 'ZeroHealth']),
     ...restoreIssues(t, 'RestoresTargetEnergy', 'restores', ['NotMaxEnergy']),
+    ...drainIssues(t),
     ...statusEffectIssues(t),
     ...targetBehaviorIssues(t),
     ...targetCountIssues(t),

@@ -56,6 +56,7 @@ export function skillTechniqueKind(
   if (techniqueHasAttribute(technique, 'HealsTarget')) return 'Heal';
   if (techniqueHasAttribute(technique, 'RestoresTargetEnergy'))
     return 'Restore';
+  if (techniqueHasAttribute(technique, 'DrainsTargetEnergy')) return 'Drain';
   if (techniqueHasAttribute(technique, 'DamagesTarget') || scales) {
     return 'Damage';
   }
@@ -129,7 +130,7 @@ function skillTechniquePreview(
 ): SkillTechniquePreview {
   const kind = skillTechniqueKind(technique);
   const damageElements = combatDamageElements(combatant, technique);
-  const hasAmount = kind === 'Damage' || kind === 'Heal' || kind === 'Restore';
+  const hasAmount = ['Damage', 'Heal', 'Restore', 'Drain'].includes(kind);
 
   return {
     kind,
@@ -176,6 +177,7 @@ function skillDescriptionValue(
   let valuedKind = '';
 
   if (kinds.includes('Heal')) valuedKind = 'Heal';
+  if (kinds.includes('Drain')) valuedKind = 'Drain';
   if (kinds.includes('Damage')) valuedKind = 'Damage';
   if (kinds.includes('Restore')) valuedKind = 'Restore';
 
