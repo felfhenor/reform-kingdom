@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -10,7 +11,10 @@ import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.comp
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { getEntry } from '@helpers/content/content';
 import { itemPreviewDisplay } from '@helpers/item/item-preview';
-import { isMaterialDiscovered } from '@helpers/item/materials';
+import {
+  getMaterialQuantity,
+  isMaterialDiscovered,
+} from '@helpers/item/materials';
 import { worldNodeGatherMaterialTradeskillIds } from '@helpers/world-node/world-node-gathering-discovery';
 import type {
   ItemContent,
@@ -29,6 +33,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     IconUnknownComponent,
     TippyDirective,
     SlotRarityOutlineComponent,
+    DecimalPipe,
   ],
   templateUrl: './slot-gather-material.component.html',
   styleUrl: './slot-gather-material.component.scss',
@@ -49,5 +54,9 @@ export class SlotGatherMaterialComponent {
     worldNodeGatherMaterialTradeskillIds(this.node(), this.itemId())
       .map((id) => getEntry<TradeskillContent>(id))
       .filter((tradeskill) => !!tradeskill),
+  );
+
+  public quantityOfMaterial = computed(() =>
+    getMaterialQuantity(this.itemId()),
   );
 }

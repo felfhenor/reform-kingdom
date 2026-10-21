@@ -1,7 +1,13 @@
 @let contentEntry = content();
 
 @if (isDiscovered() && contentEntry) {
-  <app-tooltip-item-preview #preview [display]="displayTooltip()" />
+  <app-tooltip-item-preview #preview [display]="displayTooltip()">
+    @let qty = quantityOfMaterial();
+
+    @if (qty > 0) {
+      <div class="mt-2 type-meta">Quantity: {{ qty | number }}</div>
+    }
+  </app-tooltip-item-preview>
 
   <div [tp]="preview.template()" [tpPlacement]="'top'">
     <app-slot-rarity-outline

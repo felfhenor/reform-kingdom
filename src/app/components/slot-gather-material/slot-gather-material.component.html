@@ -11,6 +11,12 @@
             />
           }
         </div>
+
+        @let qty = quantityOfMaterial();
+
+        @if (qty > 0) {
+          <div class="mt-2 type-meta">Quantity: {{ qty | number }}</div>
+        }
       </app-detail-item-preview>
     }
   </ng-template>

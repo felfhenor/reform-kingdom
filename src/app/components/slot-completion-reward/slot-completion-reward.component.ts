@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -13,6 +14,7 @@ import {
   recipeResultContent,
   recipeResultSpritesheet,
 } from '@helpers/crafting/recipes';
+import { getMaterialQuantity } from '@helpers/item';
 import { resolveRewardDisplay } from '@helpers/item/item-preview';
 import { assertNeverReward } from '@helpers/item/loot';
 import { isRewardDiscovered } from '@helpers/world-node/world-node-rewards';
@@ -43,6 +45,7 @@ type RewardContent = {
     TippyDirective,
     SlotRarityOutlineComponent,
     TooltipItemPreviewComponent,
+    DecimalPipe,
   ],
   templateUrl: './slot-completion-reward.component.html',
   styleUrl: './slot-completion-reward.component.scss',
@@ -121,6 +124,13 @@ export class SlotCompletionRewardComponent {
   public displayTooltip = computed(() => resolveRewardDisplay(this.reward()));
 
   public isDiscovered = computed(() => isRewardDiscovered(this.reward()));
+
+  public quantityOfMaterial = computed(() => {
+    const reward = this.reward();
+    if (reward.kind !== 'Item') return 0;
+
+    return getMaterialQuantity(reward.itemId);
+  });
 
   public unknownTooltip = computed(() => {
     const reward = this.reward();
