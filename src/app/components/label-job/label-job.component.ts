@@ -30,8 +30,9 @@ import type { Character, JobContent, JobId } from '@interfaces';
         } @else {
           {{ jobData?.shorthand ?? 'JOB' }}
         }
-        <app-icon-spec [spec]="node" />
       </span>
+
+      <app-icon-spec class="pb-1" [spec]="node" />
     </span>
   `,
 })
