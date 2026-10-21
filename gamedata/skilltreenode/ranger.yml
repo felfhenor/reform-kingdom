@@ -23,7 +23,7 @@
 - id: 160ee79e-ce9a-49d7-8a57-fb27e7e024b6
   name: 'Ranger: Snipe III'
   jobId: Ranger
-  level: 25
+  level: 30
   row: Marksmanship
   requiredSkillTreeNodeIds: ['Ranger: Oath of the Deadeye']
   effects:
@@ -33,7 +33,7 @@
 - id: 1c8d16b1-87bd-4e90-8ce6-e6dbf367688d
   name: 'Ranger: Snipe IV'
   jobId: Ranger
-  level: 35
+  level: 45
   row: Marksmanship
   requiredSkillTreeNodeIds: ['Ranger: Snipe III']
   effects:
@@ -56,7 +56,7 @@
 - id: f190e900-e1a4-4417-9ff1-f7afd5475d4d
   name: 'Ranger: Rapidfire II'
   jobId: Ranger
-  level: 10
+  level: 15
   row: Marksmanship
   track: 1
   requiredSkillTreeNodeIds: ['Ranger: Rapidfire I']
@@ -67,7 +67,7 @@
 - id: e1c5163b-f401-480d-9735-439723eff737
   name: 'Ranger: Rapidfire III'
   jobId: Ranger
-  level: 25
+  level: 40
   row: Marksmanship
   track: 1
   requiredSkillTreeNodeIds: ['Ranger: Oath of the Volley']
@@ -91,7 +91,7 @@
 - id: 0ccf1e17-da38-413d-98de-f42688fdeaf3
   name: 'Ranger: Barbed Shot II'
   jobId: Ranger
-  level: 40
+  level: 45
   row: Marksmanship
   track: 2
   requiredSkillTreeNodeIds: ['Ranger: Oath of the Barb']
@@ -104,7 +104,7 @@
 - id: 20f50f74-a1f9-4ce4-a909-c0006e19a185
   name: 'Ranger: Arrow Rain I'
   jobId: Ranger
-  level: 5
+  level: 1
   row: Nature
   track: 2
   effects:
@@ -114,7 +114,7 @@
 - id: 17c933f8-3443-47a7-a62b-15f6134364ca
   name: 'Ranger: Arrow Rain II'
   jobId: Ranger
-  level: 15
+  level: 10
   row: Nature
   track: 2
   requiredSkillTreeNodeIds: ['Ranger: Arrow Rain I']
@@ -138,7 +138,7 @@
 - id: 1beb2fe3-3f52-4613-952e-14ad01fe4f9a
   name: 'Ranger: Regrowth I'
   jobId: Ranger
-  level: 15
+  level: 10
   row: Nature
   effects:
     - kind: GrantSkill
@@ -307,7 +307,7 @@
 - id: 013e24b5-4b3f-4c1b-ad8d-7a39cf7c4368
   name: 'Ranger: Oath of the Deadeye'
   jobId: Ranger
-  level: 15
+  level: 20
   row: Marksmanship
   track: 0
   requiredSkillTreeNodeIds: ['Ranger: Snipe II']
@@ -336,7 +336,7 @@
 - id: 4fae9abd-b186-4334-a76e-e626b5f2440b
   name: 'Ranger: Oath of the Volley'
   jobId: Ranger
-  level: 20
+  level: 25
   row: Marksmanship
   track: 1
   requiredSkillTreeNodeIds: ['Ranger: Rapidfire II']
@@ -424,7 +424,7 @@
 - id: 9dcd9fa3-673d-4210-97cb-4ab455523054
   name: 'Ranger: Oath of the Storm'
   jobId: Ranger
-  level: 30
+  level: 20
   row: Nature
   track: 2
   requiredSkillTreeNodeIds: ['Ranger: Arrow Rain II']
@@ -508,7 +508,7 @@
   jobId: Ranger
   description: '+5 Agility.'
   sprite: '0022'
-  level: 10
+  level: 1
   row: Marksmanship
   track: 2
   effects:
@@ -538,7 +538,7 @@
   sprite: '0021'
   level: 45
   row: Nature
-  track: 2
+  track: 0
   effects:
     - kind: ElementalResistance
       element: Air

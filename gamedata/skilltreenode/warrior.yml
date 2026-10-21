@@ -67,7 +67,7 @@
 - id: b8e81d21-0741-4dbb-99fb-cd3d65be0591
   name: 'Warrior: Sweep III'
   jobId: Warrior
-  level: 25
+  level: 30
   row: Weapon Arts
   track: 1
   requiredSkillTreeNodeIds: ['Warrior: Oath of the Sweep']
@@ -78,7 +78,7 @@
 - id: 23dce1c6-4b24-4d4e-82d0-80a4bd37b39d
   name: 'Warrior: Sweep IV'
   jobId: Warrior
-  level: 40
+  level: 45
   row: Weapon Arts
   track: 1
   requiredSkillTreeNodeIds: ['Warrior: Sweep III']
@@ -91,7 +91,7 @@
 - id: a9562edb-1231-4fc7-8be5-712f3d5a0b2b
   name: 'Warrior: Charged Strike I'
   jobId: Warrior
-  level: 10
+  level: 15
   row: Weapon Arts
   track: 2
   requiredSkillTreeNodeIds: ['Warrior: Double Strike I']
@@ -102,7 +102,7 @@
 - id: 6c14b4b1-edea-4a4d-9285-a987676d4f75
   name: 'Warrior: Charged Strike II'
   jobId: Warrior
-  level: 30
+  level: 25
   row: Weapon Arts
   track: 2
   requiredSkillTreeNodeIds: ['Warrior: Charged Strike I']
@@ -113,7 +113,7 @@
 - id: 97f2fb06-9704-475a-a128-4c44fd5a5123
   name: 'Warrior: Charged Strike III'
   jobId: Warrior
-  level: 45
+  level: 40
   row: Weapon Arts
   track: 2
   requiredSkillTreeNodeIds: ['Warrior: Oath of the Charge']
@@ -145,7 +145,7 @@
 - id: d4341855-50a0-4e98-8a2f-66b7aa6da0fa
   name: 'Warrior: Smashing Board III'
   jobId: Warrior
-  level: 30
+  level: 40
   row: Shield Arts
   requiredSkillTreeNodeIds: ['Warrior: Oath of the Shield']
   effects:
@@ -454,9 +454,9 @@
   jobId: Warrior
   description: '+25 Health.'
   sprite: '0028'
-  level: 5
+  level: 1
   row: Shield Arts
-  track: 1
+  track: 0
   effects:
     - kind: Stat
       stat: Health

@@ -137,7 +137,7 @@
 - id: 2e293734-0ea9-4fcf-96cf-4c766448079f
   name: 'Healer: Holy Smite III'
   jobId: Healer
-  level: 15
+  level: 20
   row: Divine Might
   requiredSkillTreeNodeIds: ['Healer: Oath of Judgement']
   effects:
@@ -162,7 +162,6 @@
   level: 25
   row: Divine Might
   track: 1
-  requiredSkillTreeNodeIds: ['Healer: Holy Smite III']
   effects:
     - kind: GrantSkill
       skillId: 'Spiked Smash I'

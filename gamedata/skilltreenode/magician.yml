@@ -13,7 +13,7 @@
 - id: 63689025-1b2c-4b0b-9404-717eed90ea80
   name: 'Magician: Fireball II'
   jobId: Magician
-  level: 5
+  level: 10
   row: Evocation
   requiredSkillTreeNodeIds: ['Magician: Fireball I']
   effects:
@@ -23,7 +23,7 @@
 - id: a24e8aa9-41f2-4e0f-a6ac-b155124ca909
   name: 'Magician: Fireball III'
   jobId: Magician
-  level: 20
+  level: 25
   row: Evocation
   requiredSkillTreeNodeIds: ['Magician: Oath of Flame']
   effects:
@@ -33,7 +33,7 @@
 - id: 9d9a80ff-07d8-4999-a866-dbdc2c9e70f3
   name: 'Magician: Fireball IV'
   jobId: Magician
-  level: 30
+  level: 40
   row: Evocation
   requiredSkillTreeNodeIds: ['Magician: Fireball III']
   effects:
@@ -56,7 +56,7 @@
 - id: 53ac1811-c36e-40ca-8cac-725305c183fb
   name: 'Magician: Broil II'
   jobId: Magician
-  level: 40
+  level: 45
   row: Evocation
   track: 1
   requiredSkillTreeNodeIds: ['Magician: Oath of Embers']
@@ -79,7 +79,7 @@
 - id: fcaa241b-e59e-429e-871c-2beae9f31c3b
   name: 'Magician: Thunderbolt II'
   jobId: Magician
-  level: 10
+  level: 15
   row: Evocation
   track: 2
   requiredSkillTreeNodeIds: ['Magician: Thunderbolt I']
@@ -90,7 +90,7 @@
 - id: 713ecf9a-69c7-4549-bc5e-447f5d02fb4f
   name: 'Magician: Thunderbolt III'
   jobId: Magician
-  level: 20
+  level: 25
   row: Evocation
   track: 2
   requiredSkillTreeNodeIds: ['Magician: Thunderbolt II']
@@ -114,7 +114,7 @@
 - id: 168d8149-cda5-476d-82ae-839a9da2acb7
   name: 'Magician: Frostfire Bolt I'
   jobId: Magician
-  level: 10
+  level: 5
   row: Spellweaving
   effects:
     - kind: GrantSkill

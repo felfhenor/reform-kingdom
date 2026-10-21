@@ -66,7 +66,7 @@
 - id: b926916d-8470-4611-945f-cd68472e072b
   name: 'Explorer: Earthshake III'
   jobId: Explorer
-  level: 25
+  level: 30
   row: Fieldcraft
   track: 1
   requiredSkillTreeNodeIds: ['Explorer: Oath of the Quake']
@@ -77,7 +77,7 @@
 - id: 0fd14805-1807-4529-bb43-d6957d39ceb3
   name: 'Explorer: Earthshake IV'
   jobId: Explorer
-  level: 35
+  level: 40
   row: Fieldcraft
   track: 1
   requiredSkillTreeNodeIds: ['Explorer: Earthshake III']
@@ -124,7 +124,6 @@
   level: 25
   row: Fortune
   track: 1
-  requiredSkillTreeNodeIds: ['Explorer: Lucky Charm II']
   effects:
     - kind: GrantSkill
       skillId: 'Zephyr I'
