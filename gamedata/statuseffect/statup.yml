@@ -239,3 +239,124 @@
     - type: TakeCombatStatNumber
       combatStat: agroValue
       value: 10
+
+- id: 75a6ca0b-b504-4f84-8bea-c8ac6364b685
+  name: Phoenix
+  sprite: '0026'
+
+  effectType: Buff
+  elements: [Fire]
+
+  trigger: TurnStart
+
+  onApply:
+    - type: SendMessage
+      combatMessage: '**{{ combatant.name }}** is cloaked in phoenix flames!'
+
+    - type: AddCombatStatNumber
+      combatStat: reviveChance
+      value: 100
+
+  onUnapply:
+    - type: SendMessage
+      combatMessage: '**{{ combatant.name }}** is no longer cloaked in phoenix flames.'
+
+    - type: TakeCombatStatNumber
+      combatStat: reviveChance
+      value: 100
+
+- id: 5c8c83b4-e324-4bf3-9456-dc4e18f48314
+  name: Crystalline
+  sprite: '0025'
+
+  effectType: Buff
+  elements: [Water]
+
+  trigger: TurnStart
+
+  onApply:
+    - type: SendMessage
+      combatMessage: '**{{ combatant.name }}** has been coated in crystals!'
+
+    - type: AddCombatStatNumber
+      combatStat: damageReflectPercent
+      value: 20
+
+  onUnapply:
+    - type: SendMessage
+      combatMessage: '**{{ combatant.name }}** is no longer coated in crystals.'
+
+    - type: TakeCombatStatNumber
+      combatStat: damageReflectPercent
+      value: 20
+
+- id: bb6e6d75-62ed-4b9f-8a23-9f253fadcd67
+  name: Regeneration
+  sprite: '0024'
+
+  effectType: Buff
+  elements: [Water]
+
+  trigger: TurnStart
+
+  statScaling:
+    Intelligence: 0.2
+    Agility: 0.2
+
+  onApply:
+    - type: SendMessage
+      combatMessage: '**{{ combatant.name }}** begins to regenerate their wounds!'
+
+  onTick:
+    - type: HealDamage
+      combatMessage: '**{{ combatant.name }}** regenerates {{ healing }} health {{ combatantStatus }}.'
+
+- id: 048eb270-cf85-42d8-b1ed-e85069a0a453
+  name: Blade Dancing
+  sprite: '0027'
+
+  effectType: Buff
+  elements: [Fire]
+
+  trigger: TurnStart
+
+  onApply:
+    - type: SendMessage
+      combatMessage: '**{{ combatant.name }}** falls into the rhythm of the blade dance!'
+
+    - type: AddCombatStatNumber
+      combatStat: skillStrikeAgainChance
+      value: 100
+
+  onUnapply:
+    - type: SendMessage
+      combatMessage: '**{{ combatant.name }}** loses the rhythm of the blade dance.'
+
+    - type: TakeCombatStatNumber
+      combatStat: skillStrikeAgainChance
+      value: 100
+
+- id: c802254f-a6d2-4851-b354-13cc6f9f518e
+  name: Vanished
+  sprite: '0028'
+
+  effectType: Buff
+  elements: [Air]
+
+  trigger: TurnStart
+
+  onApply:
+    - type: SendMessage
+      combatMessage: '**{{ combatant.name }}** vanishes from sight!'
+
+    - type: AddCombatStatNumber
+      combatStat: repeatActionChance
+      value: 100
+
+  onUnapply:
+    - type: SendMessage
+      combatMessage: '**{{ combatant.name }}** steps back into view.'
+
+    - type: TakeCombatStatNumber
+      combatStat: repeatActionChance
+      value: 100
