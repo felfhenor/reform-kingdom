@@ -127,6 +127,40 @@ describe('combatCombatantTakeDamage', () => {
 
     expect(combatantDamageEvents()).toHaveLength(0);
   });
+
+  it('spends a shield before HP and emits a shield event', () => {
+    const hero = buildTestCombatant({ hp: 100, shield: 40 });
+
+    combatCombatantTakeDamage(hero, 25, 'critical');
+
+    expect(hero.shield).toBe(15);
+    expect(hero.hp).toBe(100);
+    expect(combatantDamageEvents()).toMatchObject([
+      { combatantId: hero.id, amount: -25, variant: 'shield' },
+    ]);
+  });
+
+  it('bleeds the overflow into HP when a hit breaks the shield', () => {
+    const hero = buildTestCombatant({ hp: 100, shield: 10 });
+
+    combatCombatantTakeDamage(hero, 60, 'critical');
+
+    expect(hero.shield).toBe(0);
+    expect(hero.hp).toBe(50);
+    expect(combatantDamageEvents()).toMatchObject([
+      { amount: -10, variant: 'shield' },
+      { amount: -50, variant: 'critical' },
+    ]);
+  });
+
+  it('heals HP without touching the shield', () => {
+    const hero = buildTestCombatant({ hp: 50, shield: 40 });
+
+    combatCombatantTakeDamage(hero, -25);
+
+    expect(hero.hp).toBe(75);
+    expect(hero.shield).toBe(40);
+  });
 });
 
 describe('combatCombatantTakeEnergyDamage', () => {

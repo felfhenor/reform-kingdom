@@ -9,6 +9,7 @@ import {
 import { characterSpecNode } from '@helpers/hero/skill-tree';
 import { CardStatusCombatantComponent } from '@components/card-status-combatant/card-status-combatant.component';
 import { combatantDamageEventEmit } from '@helpers/combat/combat-damage-events';
+import { combatantHealthBar } from '@helpers/combat/combat-combatant-hp.ui';
 import { combatantStatusEffectPreviews } from '@helpers/combat/combat-statuseffects.ui';
 import { getEntry } from '@helpers/content/content';
 import { isPageVisible } from '@helpers/engine/page-visibility';
@@ -78,11 +79,7 @@ export class StatusHeroComponent {
         spriteFrames: job?.frames ?? 4,
         isDead: hp <= 0,
         bars: [
-          {
-            variant: 'hp',
-            current: hp,
-            max: maxHp,
-          },
+          combatantHealthBar(hp, maxHp, live?.shield),
           {
             variant: 'ep',
             current: ep,

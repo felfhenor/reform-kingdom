@@ -3,7 +3,7 @@ import type { Tradeskill } from '@interfaces/tradeskill';
 export type DaisyColor =
   'primary' | 'neutral' | 'info' | 'success' | 'warning' | 'error';
 
-export type ResourceBarColor = 'hp' | 'ep' | 'xp' | 'reputation';
+export type ResourceBarColor = 'hp' | 'ep' | 'xp' | 'reputation' | 'shield';
 
 export type ProgressBarColor = DaisyColor | ResourceBarColor | 'muted';
 

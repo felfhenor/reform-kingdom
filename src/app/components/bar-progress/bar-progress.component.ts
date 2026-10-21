@@ -24,6 +24,7 @@ const PROGRESS_COLOR_CLASSES: Record<ProgressBarColor, string> = {
   ep: 'text-ep',
   xp: 'text-xp',
   reputation: 'text-reputation',
+  shield: 'text-shield',
   muted: 'text-base-content/40',
 };
 

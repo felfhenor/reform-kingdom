@@ -189,6 +189,19 @@ describe('combatantStatusText', () => {
 
     expect(combatantStatusText(combatant)).toBe('[12/20 HP] [3/5 EP]');
   });
+
+  it('adds an active shield between HP and EP', () => {
+    const combatant = {
+      ...jala,
+      ep: 3,
+      shield: 7,
+      totalStats: { ...jala.totalStats, Energy: 5 },
+    };
+
+    expect(combatantStatusText(combatant)).toBe(
+      '[12/20 HP] [7 shield] [3/5 EP]',
+    );
+  });
 });
 
 describe('adventureLogMessageHtml', () => {

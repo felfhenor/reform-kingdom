@@ -38,6 +38,7 @@ function damageTagIssues(t: Technique): AnalysisIssue[] {
   const heals = hasAttr(t, 'HealsTarget');
   const restores = hasAttr(t, 'RestoresTargetEnergy');
   const drains = hasAttr(t, 'DrainsTargetEnergy');
+  const shields = hasAttr(t, 'ShieldsTarget');
   const scales = hasScaling(t);
   const issues: AnalysisIssue[] = [];
 
@@ -56,19 +57,31 @@ function damageTagIssues(t: Technique): AnalysisIssue[] {
       ),
     );
   }
-  if (scales && !damages && !heals && !restores && !drains) {
+  if (shields && (damages || heals || restores || drains)) {
     issues.push(
       analysisFail(
-        'has damageScaling but neither DamagesTarget nor HealsTarget nor RestoresTargetEnergy nor DrainsTargetEnergy, so it deals untagged damage (no crits or monster-type bonus).',
+        'is tagged ShieldsTarget alongside a damage, heal, restore or drain tag; only the shield applies.',
       ),
     );
   }
-  if (!scales && (damages || heals || drains)) {
+  if (shields && t.targetType === 'Enemies') {
+    issues.push(analysisFail('is tagged ShieldsTarget but targets Enemies.'));
+  }
+  if (scales && !damages && !heals && !restores && !drains && !shields) {
+    issues.push(
+      analysisFail(
+        'has damageScaling but neither DamagesTarget nor HealsTarget nor RestoresTargetEnergy nor DrainsTargetEnergy nor ShieldsTarget, so it deals untagged damage (no crits or monster-type bonus).',
+      ),
+    );
+  }
+  if (!scales && (damages || heals || drains || shields)) {
     const tag = damages
       ? 'DamagesTarget'
       : heals
         ? 'HealsTarget'
-        : 'DrainsTargetEnergy';
+        : drains
+          ? 'DrainsTargetEnergy'
+          : 'ShieldsTarget';
     issues.push(
       analysisFail(
         `is tagged ${tag} but has no damageScaling, so it does nothing.`,

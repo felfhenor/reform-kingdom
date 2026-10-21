@@ -9,6 +9,7 @@ export type SkillTechniqueKind =
   | 'Effect'
   | 'Restore'
   | 'Drain'
+  | 'Shield'
   | 'Summon';
 
 // `count` is omitted when the noun already says it all (e.g. "Self", "All allies").

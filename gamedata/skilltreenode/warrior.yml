@@ -289,6 +289,17 @@
       jobAbilityId: Cover
       value: 25
 
+- id: 526c1e98-563b-4724-9911-1864bcfa9cae
+  name: 'Warrior: Aegis'
+  jobId: Warrior
+  level: 50
+  row: Bastion
+  track: 2
+  requiredSkillTreeNodeIds: ['Warrior: Bastion']
+  effects:
+    - kind: GrantSkill
+      skillId: 'Aegis'
+
 # --- Skill oaths ---
 
 - id: fc44c5b6-f614-48f4-bddd-ada0b9cfdc62

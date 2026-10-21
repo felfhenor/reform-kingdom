@@ -3,7 +3,7 @@ import type { SkillTreeNodeContent } from '@interfaces/content-skilltreenode';
 import type { StatusEffectPreview } from '@interfaces/statuseffect-preview.ui';
 
 export type StatusCardBar = {
-  variant: 'hp' | 'xp' | 'ep';
+  variant: 'hp' | 'xp' | 'ep' | 'shield';
   current: number;
   max: number;
 };

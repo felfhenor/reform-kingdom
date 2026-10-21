@@ -7,6 +7,7 @@ import {
   input,
 } from '@angular/core';
 import { CardStatusCombatantComponent } from '@components/card-status-combatant/card-status-combatant.component';
+import { combatantHealthBar } from '@helpers/combat/combat-combatant-hp.ui';
 import { combatantStatusEffectPreviews } from '@helpers/combat/combat-statuseffects.ui';
 import type { Combatant, StatusCardEntry } from '@interfaces';
 import { AnimationService } from '@services/animation.service';
@@ -38,11 +39,11 @@ export class StatusEncounterCombatantsComponent {
       spriteFrames: combatant.frames,
       isDead: combatant.hp <= 0,
       bars: [
-        {
-          variant: 'hp',
-          current: combatant.hp,
-          max: Math.max(combatant.totalStats.Health, 1),
-        },
+        combatantHealthBar(
+          combatant.hp,
+          Math.max(combatant.totalStats.Health, 1),
+          combatant.shield,
+        ),
       ],
       statusEffects: combatantStatusEffectPreviews(combatant),
     })),

@@ -57,6 +57,7 @@ export function skillTechniqueKind(
   if (techniqueHasAttribute(technique, 'RestoresTargetEnergy'))
     return 'Restore';
   if (techniqueHasAttribute(technique, 'DrainsTargetEnergy')) return 'Drain';
+  if (techniqueHasAttribute(technique, 'ShieldsTarget')) return 'Shield';
   if (techniqueHasAttribute(technique, 'DamagesTarget') || scales) {
     return 'Damage';
   }

@@ -174,6 +174,8 @@ export type Combatant = HasAnimation & {
   level: number;
   hp: number;
   ep: number;
+  // Optional so mid-combat saves still load.
+  shield?: number;
 
   // Priority list of targeting modes, tried in order.
   targetting: TargettingPriorityEntry[];
@@ -234,9 +236,9 @@ export type Combat = {
 
 // A combatant HP change; amount is signed for display (positive = heal).
 export type DamageEventVariant =
-  'critical' | 'miss' | 'block' | 'energy' | 'xp';
+  'critical' | 'miss' | 'block' | 'energy' | 'xp' | 'shield';
 
-// Miss/block events carry an amount of 0 (the variant picks the label instead of a number); energy and xp are gains of those resources rather than HP.
+// Miss/block events carry an amount of 0 (the variant picks the label instead of a number); energy and xp are gains of those resources rather than HP, and shield is a hit the shield soaked up.
 export type CombatantDamageEvent = {
   id: string;
   combatantId: string;

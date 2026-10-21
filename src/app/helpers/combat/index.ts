@@ -1,6 +1,7 @@
 export * from './combat';
 export * from './combat-ambush';
 export * from './combat-combatant-hp';
+export * from './combat-combatant-hp.ui';
 export * from './combat-cover';
 export * from './combat-create';
 export * from './combat-damage';

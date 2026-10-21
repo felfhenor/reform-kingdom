@@ -73,7 +73,9 @@ export class CardStatusCombatantComponent {
     variant?: DamageEventVariant,
   ): void {
     const maxHp =
-      this.entry().bars.find((bar) => bar.variant === 'hp')?.max ?? 0;
+      this.entry().bars.find(
+        (bar) => bar.variant === 'hp' || bar.variant === 'shield',
+      )?.max ?? 0;
 
     this.anim.damageNumber(event.target, {
       lifetimeMs: this.playback.damageNumberLifetimeMs(variant),

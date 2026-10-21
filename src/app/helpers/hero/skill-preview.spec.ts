@@ -176,6 +176,7 @@ describe('skillTechniqueKind', () => {
     [['DamagesTarget', 'Debuff'], 'Damage'],
     [['HealsTarget'], 'Heal'],
     [['DrainsTargetEnergy'], 'Drain'],
+    [['ShieldsTarget'], 'Shield'],
     [['Buff'], 'Buff'],
     [['Debuff'], 'Debuff'],
     [[], 'Effect'],

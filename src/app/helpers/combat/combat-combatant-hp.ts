@@ -17,17 +17,30 @@ export function combatCombatantTakeDamage(
   damage: number,
   variant?: DamageEventVariant,
 ) {
-  combatant.hp = clamp(combatant.hp - damage, 0, combatant.totalStats.Health);
+  const hpDamage = damage - combatantShieldAbsorb(combatant, damage);
+  if (damage > 0 && hpDamage === 0) return;
+
+  combatant.hp = clamp(combatant.hp - hpDamage, 0, combatant.totalStats.Health);
   if (combatantIsDead(combatant)) combatantClearDelayedSkills(combatant);
 
   // Sign flipped so positive damage shows as "-".
-  if (damage !== 0) {
+  if (hpDamage !== 0) {
     combatantDamageEventEmit(
       combatant.id,
-      -damage,
-      damage > 0 ? variant : undefined,
+      -hpDamage,
+      hpDamage > 0 ? variant : undefined,
     );
   }
+}
+
+// The shield drains first; whatever it can't hold bleeds through to HP.
+function combatantShieldAbsorb(combatant: Combatant, damage: number): number {
+  const absorbed = damage > 0 ? Math.min(combatant.shield ?? 0, damage) : 0;
+  if (absorbed === 0) return 0;
+
+  combatant.shield = (combatant.shield ?? 0) - absorbed;
+  combatantDamageEventEmit(combatant.id, -absorbed, 'shield');
+  return absorbed;
 }
 
 export function combatCombatantTakeEnergyDamage(

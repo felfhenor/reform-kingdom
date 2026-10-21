@@ -466,3 +466,39 @@
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** drains {{ absdamage }} EP from **{{ target.name }}** {{ targetStatus }}.'
+
+- id: 2499cd1c-f83c-4e1b-8f25-ba307eed594e
+  name: Aegis
+  family: Aegis
+  description: Shield each of your party members with a shield as strong as their max HP.
+
+  sprite: '0071'
+
+  rarity: Legendary
+
+  epCost: 0
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 5
+
+  elementCosts:
+    Earth: 2
+    Water: 1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: []
+      attributes: [ShieldsTarget, NeverMisses]
+      targets: 4
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: PreferHeroes
+      damageScaling:
+        Health: 1
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** shields **{{ target.name }}** for {{ absdamage }} {{ targetStatus }}.'

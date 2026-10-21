@@ -16,6 +16,7 @@ const kindClasses: Record<SkillTechniqueKind, string> = {
   Heal: 'text-success',
   Restore: 'text-success',
   Drain: 'text-warning',
+  Shield: 'text-shield',
   Buff: 'text-info',
   Debuff: 'text-warning',
   Effect: '',

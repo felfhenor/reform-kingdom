@@ -114,8 +114,11 @@ function descriptionCountIssues(skill: Skill): AnalysisIssue[] {
 }
 
 function descriptionIssues(skill: Skill): AnalysisIssue[] {
-  const scales = skill.techniques.some((t) =>
-    Object.values(t.damageScaling).some((value) => value !== 0),
+  // A shield scales off each target, so no single {{ value }} describes it.
+  const scales = skill.techniques.some(
+    (t) =>
+      !t.attributes.includes('ShieldsTarget') &&
+      Object.values(t.damageScaling).some((value) => value !== 0),
   );
   const hasToken = VALUE_TOKEN.test(skill.description);
   const issues = descriptionCountIssues(skill);

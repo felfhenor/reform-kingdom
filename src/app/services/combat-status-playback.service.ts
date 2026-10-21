@@ -25,6 +25,7 @@ const DAMAGE_NUMBER_LIFETIME_BY_VARIANT: Record<DamageEventVariant, number> = {
   block: 900,
   energy: 1100,
   xp: 1400,
+  shield: 900,
 };
 // A backgrounded tab can dump a huge backlog of hits at once - only the newest are worth animating.
 const DAMAGE_NUMBER_MAX_PER_BATCH = 24;

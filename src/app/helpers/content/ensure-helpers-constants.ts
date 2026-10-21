@@ -69,6 +69,7 @@ export const VALID_SKILL_ATTRIBUTES: EquipmentSkillAttribute[] = [
   'HealsTarget',
   'RestoresTargetEnergy',
   'DrainsTargetEnergy',
+  'ShieldsTarget',
   'Buff',
   'Debuff',
 ];

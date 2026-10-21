@@ -33,6 +33,7 @@
           [class.block]="num.event.variant === 'block'"
           [class.energy]="num.event.variant === 'energy'"
           [class.xp]="num.event.variant === 'xp'"
+          [class.shield]="num.event.variant === 'shield'"
           [style.left.%]="xOffsetPercent(num.xOffsetSeed)"
           (animate.enter)="
             onDamageNumberEnter($event, num.event.amount, num.event.variant)
@@ -103,7 +104,7 @@
   </div>
 
   <div class="entry-bars">
-    @for (bar of data.bars; track $index) {
+    @for (bar of data.bars; track bar.variant) {
       <app-bar-progress
         [color]="bar.variant"
         [size]="isExpanded ? 'md' : 'sm'"

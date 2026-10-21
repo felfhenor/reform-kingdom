@@ -147,6 +147,10 @@
     color: var(--color-xp);
   }
 
+  &.shield {
+    color: var(--color-shield);
+  }
+
   &.crit {
     color: #fbbf24;
     font-weight: 800;

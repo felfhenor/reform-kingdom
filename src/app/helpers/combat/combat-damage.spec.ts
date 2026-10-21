@@ -147,6 +147,53 @@ describe('combatApplySkillToTarget energy restore', () => {
   });
 });
 
+describe('combatApplySkillToTarget shield', () => {
+  function shield(targetShield = 0): Combatant {
+    combatantDamageEvents.set([]);
+    const caster = buildCombatant({
+      totalStats: { ...defaultStats(), Health: 500 },
+    });
+    const target = buildCombatant({
+      hp: 50,
+      shield: targetShield,
+      totalStats: { ...defaultStats(), Health: 120 },
+    });
+
+    combatApplySkillToTarget(
+      buildCombat({ heroes: [caster, target] }),
+      caster,
+      target,
+      buildSkill(),
+      buildTechnique({
+        damageScaling: { ...defaultStats(), Health: 1 },
+        attributes: ['ShieldsTarget', 'NeverMisses'],
+      }),
+    );
+
+    return target;
+  }
+
+  it("shields for the target's own max HP without touching HP", () => {
+    const target = shield();
+
+    expect(target.shield).toBe(120);
+    expect(target.hp).toBe(50);
+    expect(combatantDamageEvents()).toMatchObject([
+      { combatantId: target.id, amount: 120, variant: 'shield' },
+    ]);
+  });
+
+  it('tops a worn shield back up instead of stacking, reporting only the gain', () => {
+    expect(shield(30).shield).toBe(120);
+    expect(combatantDamageEvents()).toMatchObject([
+      { amount: 90, variant: 'shield' },
+    ]);
+
+    expect(shield(200).shield).toBe(200);
+    expect(combatantDamageEvents()).toHaveLength(0);
+  });
+});
+
 describe('combatApplySkillToTarget energy drain', () => {
   function drain(ep: number, rounds = 0, casterLuck = 0): Combatant {
     combatantDamageEvents.set([]);

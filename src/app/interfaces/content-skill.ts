@@ -38,6 +38,7 @@ export type EquipmentSkillAttribute =
   | 'HealsTarget'
   | 'RestoresTargetEnergy'
   | 'DrainsTargetEnergy'
+  | 'ShieldsTarget'
   | 'Buff'
   | 'Debuff';
 

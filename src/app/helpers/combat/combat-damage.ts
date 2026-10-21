@@ -158,6 +158,23 @@ function attackerMonsterTypeDamageBonusPercent(
   );
 }
 
+// Scales off the target's own stats, and a recast tops the shield up rather than stacking it.
+function combatShieldTarget(
+  target: Combatant,
+  skill: EquipmentSkill,
+  technique: EquipmentSkillContentTechnique,
+): number {
+  const before = target.shield ?? 0;
+  const shield = Math.floor(
+    getCombatantBaseDamageForTechnique(target, skill, technique),
+  );
+  target.shield = Math.max(before, shield);
+
+  const gained = target.shield - before;
+  if (gained > 0) combatantDamageEventEmit(target.id, gained, 'shield');
+  return gained;
+}
+
 export function combatApplySkillToTarget(
   combat: Combat,
   combatant: Combatant,
@@ -205,7 +222,11 @@ export function combatApplySkillToTarget(
     techniqueHasAttribute(technique, 'DamagesTarget') &&
     luckRollSucceeds(combatant.totalStats.Luck);
 
-  if (baseDamage > 0) {
+  if (techniqueHasAttribute(technique, 'ShieldsTarget')) {
+    const shield = combatShieldTarget(target, skill, technique);
+    templateData.damage = shield;
+    templateData.absdamage = shield;
+  } else if (baseDamage > 0) {
     let effectiveDamage = baseDamage;
 
     if (techniqueHasAttribute(technique, 'HealsTarget')) {

@@ -186,6 +186,7 @@ function techniqueType(technique: EquipmentSkillContentTechnique): string {
   if (attributes.includes('HealsTarget')) return 'Heal';
   if (attributes.includes('RestoresTargetEnergy')) return 'Restore';
   if (attributes.includes('DrainsTargetEnergy')) return 'Drain';
+  if (attributes.includes('ShieldsTarget')) return 'Shield';
   if (attributes.includes('DamagesTarget')) return 'Damage';
   if (attributes.includes('Buff')) return 'Buff';
   if (attributes.includes('Debuff')) return 'Debuff';

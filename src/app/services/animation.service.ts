@@ -26,6 +26,7 @@ const DAMAGE_NUMBER_PROFILES: Record<
   block: { hold: 0.4, rise: 12, tilt: 0 },
   energy: { hold: 0.45, rise: 30, tilt: 0 },
   xp: { hold: 0.5, rise: 26, tilt: 0 },
+  shield: { hold: 0.4, rise: 16, tilt: 0 },
 };
 
 const SHATTER_COLUMNS = 7;
