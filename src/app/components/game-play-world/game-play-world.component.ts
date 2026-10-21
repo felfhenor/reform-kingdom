@@ -165,24 +165,30 @@ const NODE_STATUS_UPDATE_INTERVAL_MS = 150;
     }
     <div class="fade-overlay" [class.fade-active]="fadeVisible()"></div>
     <div class="death-overlay" [class.death-active]="isPartyDead()"></div>
-    <div class="top-left-layer">
-      <app-bar-global-effect class="global-effect-bar"></app-bar-global-effect>
-      <app-adventure-log-overlay
-        class="adventure-log-overlay-layer"
-      ></app-adventure-log-overlay>
-    </div>
-    <app-panel-map-node></app-panel-map-node>
+    <div class="hud-frame ui-scaled">
+      <div class="top-left-layer">
+        <app-bar-global-effect
+          class="global-effect-bar"
+        ></app-bar-global-effect>
+        <app-adventure-log-overlay
+          class="adventure-log-overlay-layer"
+        ></app-adventure-log-overlay>
+      </div>
+      <app-panel-map-node></app-panel-map-node>
 
-    <app-status-encounter class="encounter-status-layer"></app-status-encounter>
-    <div class="top-right-status-layer">
-      <app-status-worker-levelup></app-status-worker-levelup>
-      <app-status-crafting></app-status-crafting>
-      <app-status-tutorial-unlock></app-status-tutorial-unlock>
+      <app-status-encounter
+        class="encounter-status-layer"
+      ></app-status-encounter>
+      <div class="top-right-status-layer">
+        <app-status-worker-levelup></app-status-worker-levelup>
+        <app-status-crafting></app-status-crafting>
+        <app-status-tutorial-unlock></app-status-tutorial-unlock>
+      </div>
+      <app-status-task-list class="task-list-layer"></app-status-task-list>
+      @if (introMapName(); as mapName) {
+        <app-card-region-intro class="region-intro-layer" [mapName]="mapName" />
+      }
     </div>
-    <app-status-task-list class="task-list-layer"></app-status-task-list>
-    @if (introMapName(); as mapName) {
-      <app-card-region-intro class="region-intro-layer" [mapName]="mapName" />
-    }
   `,
   styleUrl: './game-play-world.component.scss',
 })

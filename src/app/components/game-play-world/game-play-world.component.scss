@@ -31,6 +31,12 @@
   }
 }
 
+// Caps the HUD at 16:9 so ultrawide corners stay near the middle; the 1920px floor keeps windowed browsers full width.
+.hud-frame {
+  @apply absolute inset-0 mx-auto pointer-events-none;
+  max-width: calc(max(1920px, 100vh * 16 / 9) / var(--ui-zoom));
+}
+
 .top-left-layer {
   @apply absolute top-0 left-0 right-0 flex flex-col pointer-events-none;
   z-index: 11;
@@ -46,25 +52,25 @@
 }
 
 .encounter-status-layer {
-  @apply absolute bottom-4 right-4;
+  @apply absolute bottom-4 right-4 pointer-events-auto;
   z-index: 20;
 }
 
 .top-right-status-layer {
-  @apply absolute top-8 right-4 flex gap-2;
+  @apply absolute top-8 right-4 flex gap-2 pointer-events-auto;
   z-index: 20;
 }
 
 // Pinned below the bubbles' expanded height so it doesn't shift as bubbles appear or expand on hover.
 .task-list-layer {
-  @apply absolute right-4;
+  @apply absolute right-4 pointer-events-auto;
   top: calc(1rem + var(--status-bubble-expanded-height) + 2rem);
   z-index: 20;
 }
 
 // Clears the adventure log on the left and the status bubbles on the right.
 .region-intro-layer {
-  @apply absolute left-1/2 -translate-x-1/2 w-[28rem] max-w-[calc(100%-2rem)];
+  @apply absolute left-1/2 -translate-x-1/2 w-[28rem] max-w-[calc(100%-2rem)] pointer-events-auto;
   top: 20%;
   z-index: 12;
 }

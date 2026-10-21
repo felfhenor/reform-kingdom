@@ -55,8 +55,8 @@
 
   &.size-full {
     transform: none;
-    min-height: calc(100vh - 40px);
-    max-height: calc(100vh - 40px);
+    min-height: calc((100vh - 40px) / var(--ui-zoom, 1));
+    max-height: calc((100vh - 40px) / var(--ui-zoom, 1));
     box-sizing: border-box;
     padding: 1rem;
 
@@ -112,4 +112,3 @@
     }
   }
 }
-

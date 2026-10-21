@@ -17,6 +17,18 @@
   @apply overflow-hidden;
 }
 
+// Zoom multiplies vh lengths too, so anything sized in vh inside divides by --ui-zoom.
+.ui-scaled {
+  --ui-zoom: var(--ui-scale, 1);
+  zoom: var(--ui-zoom);
+}
+
+// Modals declared inside a scaled panel stay 1x like every other modal, so their vh height caps still fit.
+.ui-scaled dialog.modal {
+  --ui-zoom: 1;
+  zoom: calc(1 / var(--ui-scale, 1));
+}
+
 .game-container {
   @media (max-width: 1399px) {
     .panel-layer {

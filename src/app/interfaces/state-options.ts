@@ -16,6 +16,8 @@ export type GameOption =
   | 'adventureLogOverlay'
   | 'cleanFont';
 
+export type UiScale = 'auto' | number;
+
 export type NotificationCategory = 'Error' | 'Success' | 'Warning';
 
 export type OptionsTab = 'UI' | 'Accessibility' | 'Savefile' | 'Misc' | 'Debug';
@@ -27,5 +29,6 @@ export type GameOptions = Record<GameOption, boolean> & {
   debugSaveInterval: number;
   optionsTab: OptionsTab;
   mapZoom: number;
+  uiScale: UiScale;
   adventureLogOverlayKinds: Record<AdventureLogEntryKind, boolean>;
 };

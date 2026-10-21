@@ -24,4 +24,5 @@ export * from './signal';
 export * from './timer';
 export * from './timer.ui';
 export * from './ui';
+export * from './ui-scale.ui';
 export * from './version';

@@ -100,16 +100,20 @@ export class PanelHeroesSkillTreeGridComponent {
   }
 
   private measure(): void {
-    const origin = this.overlay().nativeElement.getBoundingClientRect();
+    const overlay = this.overlay().nativeElement;
+    const origin = overlay.getBoundingClientRect();
+    // Rects come back in zoomed screen px (UI scale), but the svg draws in the overlay's own px.
+    const zoom =
+      overlay.offsetWidth > 0 ? origin.width / overlay.offsetWidth : 1;
     const boxes = new Map<SkillTreeNodeId, SkillTreeLayoutBox>();
     this.boxElements().forEach((ref) => {
       const element = ref.nativeElement as HTMLElement;
       const rect = element.getBoundingClientRect();
       boxes.set(element.dataset['boxId'] as SkillTreeNodeId, {
-        x: Math.round(rect.left - origin.left),
-        y: Math.round(rect.top - origin.top),
-        width: Math.round(rect.width),
-        height: Math.round(rect.height),
+        x: Math.round((rect.left - origin.left) / zoom),
+        y: Math.round((rect.top - origin.top) / zoom),
+        width: Math.round(rect.width / zoom),
+        height: Math.round(rect.height / zoom),
       });
     });
     this.boxes.set(boxes);

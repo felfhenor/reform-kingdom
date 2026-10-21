@@ -28,6 +28,7 @@ export function defaultOptions(): GameOptions {
     analyticsOptInDismissed: false,
 
     mapZoom: 1,
+    uiScale: 'auto',
 
     partyViewAlwaysExpand: true,
     craftingViewAlwaysExpand: false,

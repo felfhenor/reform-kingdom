@@ -47,6 +47,7 @@ import {
   decreeSetWaitForFullHealthBeforeCombat,
 } from '@helpers/decree/decree.ui';
 import { RISK_BAND_DIFFICULTY } from '@helpers/engine/difficulty-tier';
+import { uiScaleCurrent } from '@helpers/engine/ui-scale.ui';
 import { homeNodeGet } from '@helpers/town/town-spawn';
 import {
   gatherableDiscoveredMaterialIds,
@@ -169,6 +170,7 @@ function materialOptionsFor(ids: MaterialId[]): MaterialOption[] {
 export class GamePlayDecreeComponent {
   private anim = inject(AnimationService);
 
+  public uiScale = uiScaleCurrent;
   public autoModeEnabled = computed(() => autoModeIsEnabled());
   public waitForFullHealthBeforeCombat = computed(() =>
     decreeWaitForFullHealthBeforeCombat(),

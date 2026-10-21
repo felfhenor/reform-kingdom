@@ -5,6 +5,7 @@ import {
   uiTextFontFamily,
 } from '@helpers/engine/font.ui';
 import { windowHeight, windowWidth } from '@helpers/engine/ui';
+import { uiScaleCurrent } from '@helpers/engine/ui-scale.ui';
 import { getOption } from '@helpers/state-options';
 
 @Injectable({
@@ -17,6 +18,13 @@ export class ThemeService {
       const useCleanFont = !!getOption('cleanFont');
       document.body.classList.toggle('clean-font', useCleanFont);
       void this.applyTextFontFamily(useCleanFont);
+    });
+
+    effect(() => {
+      document.documentElement.style.setProperty(
+        '--ui-scale',
+        String(uiScaleCurrent()),
+      );
     });
   }
 
