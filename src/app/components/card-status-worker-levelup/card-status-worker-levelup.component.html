@@ -16,21 +16,19 @@
         [frames]="data.frames"
       />
     </div>
-    @if (!isExpanded) {
-      <!-- Level badge over the icon stays readable without expanding the card. -->
-      <span
-        class="absolute inset-x-0 bottom-0 text-center bg-black/70 text-[0.55rem] leading-[1.2]"
-      >
-        Lv. {{ data.level }}
-      </span>
-    }
   </div>
+  @if (!isExpanded) {
+    <!-- Level badge spans the whole bubble, so it stays readable without expanding the card. -->
+    <span
+      class="absolute inset-x-0 bottom-0 text-center bg-black/70 type-meta whitespace-nowrap"
+    >
+      Lv. {{ data.level | number }}
+    </span>
+  }
 
   @if (isExpanded) {
     <div class="flex flex-col justify-center text-white overflow-hidden">
-      <span class="truncate text-[0.65rem] text-lighter">
-        Ready to level up
-      </span>
+      <span class="type-meta truncate">Ready to level up</span>
       <span class="type-entity-name text-xs truncate">{{ data.name }}</span>
     </div>
   }

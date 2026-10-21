@@ -15,19 +15,19 @@
         [assetName]="data.resultSprite"
       />
     </div>
-    @if (!isExpanded) {
-      <!-- Timer badge over the icon stays readable without expanding the card. -->
-      <span
-        class="absolute inset-x-0 bottom-0 text-center bg-black/70 text-[0.55rem] leading-[1.2] tabular-nums"
-      >
-        {{ formatDuration(data.remainingTicks) }}
-      </span>
-    }
   </div>
+  @if (!isExpanded) {
+    <!-- Timer badge spans the whole bubble, so it stays readable without expanding the card. -->
+    <span
+      class="absolute inset-x-0 bottom-0 text-center bg-black/70 type-meta whitespace-nowrap tabular-nums"
+    >
+      {{ formatDurationBadge(data.remainingTicks) }}
+    </span>
+  }
 
   @if (isExpanded) {
     <div class="flex flex-col justify-center text-white overflow-hidden">
-      <span class="truncate text-[0.65rem] text-lighter">
+      <span class="type-meta truncate">
         <span class="tabular-nums">
           {{ formatDuration(data.remainingTicks) }}
         </span>

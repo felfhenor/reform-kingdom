@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { kingdomSubviewShow, setGamePlayView } from '@helpers/engine/ui';
@@ -6,7 +7,7 @@ import type { WorkerLevelUpStatusEntry } from '@interfaces';
 @Component({
   selector: 'app-card-status-worker-levelup',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AtlasAnimationComponent],
+  imports: [AtlasAnimationComponent, DecimalPipe],
   templateUrl: './card-status-worker-levelup.component.html',
   styleUrl: './card-status-worker-levelup.component.scss',
 })
