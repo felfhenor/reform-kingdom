@@ -24,6 +24,8 @@ export type TradeQuantityPrompt = {
   name: string;
   price: number;
   maxQuantity: number;
+  // Adds a one-click button that transacts maxQuantity.
+  allowMax?: boolean;
 };
 
 // Index into the trader's `tokenTrades` array - kept alongside the trade

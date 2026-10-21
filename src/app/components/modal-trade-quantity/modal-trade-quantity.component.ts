@@ -59,8 +59,11 @@ export class ModalTradeQuantityComponent {
       text: `How many ${prompt.name} would you like to ${prompt.verb.toLowerCase()}? (${price}g each)`,
       inputValue: 1,
       inputAttributes: { min: '0', max: `${prompt.maxQuantity}` },
+      showDenyButton: !!prompt.allowMax,
+      denyButtonText: `${prompt.verb} max (${formatNumber(prompt.maxQuantity, this.locale)})`,
     };
     const result = await swal.fire();
+    if (result.isDenied) return prompt.maxQuantity;
     return result.isConfirmed
       ? caravanTradeQuantityFromInput(result.value, prompt.maxQuantity)
       : 0;
