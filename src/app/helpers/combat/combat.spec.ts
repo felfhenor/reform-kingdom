@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('@helpers/combat/combat-combatant-hp');
 vi.mock('@helpers/combat/combat-cover');
 vi.mock('@helpers/combat/combat-damage');
+vi.mock('@helpers/combat/combat-damage-amount');
 vi.mock('@helpers/combat/combat-end');
 vi.mock('@helpers/combat/combat-order-evaluation');
 vi.mock('@helpers/combat/combat-statuseffects');
@@ -23,10 +24,8 @@ import {
   combatantIsDead,
   combatCombatantTakeDamage,
 } from '@helpers/combat/combat-combatant-hp';
-import {
-  combatApplySkillToTarget,
-  techniqueHasAttribute,
-} from '@helpers/combat/combat-damage';
+import { combatApplySkillToTarget } from '@helpers/combat/combat-damage';
+import { techniqueHasAttribute } from '@helpers/combat/combat-damage-amount';
 import { combatCoveringAlly } from '@helpers/combat/combat-cover';
 import { combatantDamageEvents } from '@helpers/combat/combat-damage-events';
 import { combatCheckIfOver } from '@helpers/combat/combat-end';

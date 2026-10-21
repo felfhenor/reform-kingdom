@@ -1,8 +1,8 @@
 import {
   combatDamageElements,
   getCombatantBaseDamageForTechnique,
-  techniqueHasAttribute,
 } from '@helpers/combat/combat-damage';
+import { techniqueHasAttribute } from '@helpers/combat/combat-damage-amount';
 import { elementalBoonMultiplier } from '@helpers/combat/combat-element';
 import { combatFormatMessage } from '@helpers/combat/combat-log';
 import { SKILL_MAX_ALLY_TARGETS } from '@helpers/config';

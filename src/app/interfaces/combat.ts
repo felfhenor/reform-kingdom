@@ -246,6 +246,15 @@ export type CombatantDamageEvent = {
   variant?: DamageEventVariant;
 };
 
+// What one technique did to a single target, before it's logged.
+export type CombatTechniqueOutcome = {
+  damage: number;
+  damageText: string;
+  isCriticalHit: boolean;
+  retaliationDamage: number;
+  summon?: Combatant;
+};
+
 // Pushed when a combatant resolves which skill to use for their turn, to flash the skill's icon/name on their status card.
 export type CombatantSkillCastEvent = {
   id: string;

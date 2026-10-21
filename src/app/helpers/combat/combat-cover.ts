@@ -2,7 +2,7 @@ import {
   combatantHealthPercent,
   combatantIsDead,
 } from '@helpers/combat/combat-combatant-hp';
-import { techniqueHasAttribute } from '@helpers/combat/combat-damage';
+import { techniqueHasAttribute } from '@helpers/combat/combat-damage-amount';
 import { combatCanTakeTurn } from '@helpers/combat/combat-statuseffects';
 import type { Combatant, EquipmentSkillContentTechnique } from '@interfaces';
 import { maxBy } from 'es-toolkit/compat';

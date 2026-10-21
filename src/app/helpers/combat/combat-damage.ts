@@ -1,13 +1,15 @@
 import {
   combatantIsDead,
   combatCombatantTakeDamage,
-  combatCombatantTakeEnergyDamage,
 } from '@helpers/combat/combat-combatant-hp';
+import {
+  combatDealTechniqueDamage,
+  combatReflectedDamage,
+  techniqueHasAttribute,
+} from '@helpers/combat/combat-damage-amount';
 import { combatantDamageEventEmit } from '@helpers/combat/combat-damage-events';
-import { combatDamageMitigationRoll } from '@helpers/combat/combat-damage-mitigation';
 import {
   combatTechniqueElements,
-  elementalDamageMultiplier,
   elementalDamageText,
 } from '@helpers/combat/combat-element';
 import {
@@ -16,78 +18,24 @@ import {
   combatFormatMessage,
   combatMessageLog,
 } from '@helpers/combat/combat-log';
-import { combatCombatantCombatStatValue } from '@helpers/combat/combat-stats';
+import { combatTryApplyTechniqueStatusEffect } from '@helpers/combat/combat-statuseffects-technique';
 import { combatSummonMonster } from '@helpers/combat/combat-summon';
-import {
-  combatApplyStatusEffectToTarget,
-  combatCreateStatusEffect,
-  statusEffectTagResistance,
-} from '@helpers/combat/combat-statuseffects';
-import { getEntry } from '@helpers/content/content';
-import { luckReducedChance, luckRollSucceeds } from '@helpers/hero/luck';
+import { luckRollSucceeds } from '@helpers/hero/luck';
 import {
   skillTechniqueDamageScalingStat,
-  skillTechniqueStatusEffectChance,
-  skillTechniqueStatusEffectDuration,
   skillTechniqueWithStatBonuses,
 } from '@helpers/hero/skill';
-import { rngSucceedsChance } from '@helpers/rng';
 import type {
   Combat,
   Combatant,
-  DebuffPotency,
+  CombatTechniqueOutcome,
   EquipmentSkill,
-  EquipmentSkillAttribute,
   EquipmentSkillContentTechnique,
   GameElement,
   GameStat,
-  MonsterContent,
   StatBlock,
-  StatusEffectContent,
 } from '@interfaces';
-import { MagicalStats, PhysicalStats } from '@interfaces';
-import { sum, sumBy } from 'es-toolkit/compat';
-
-function combatantDebuffPotency(
-  caster: Combatant,
-  effect: StatusEffectContent,
-): DebuffPotency {
-  return effect.effectType === 'Debuff' && caster.debuffPotency
-    ? caster.debuffPotency
-    : { chance: 0, duration: 0 };
-}
-
-export function techniqueHasAttribute(
-  technique: EquipmentSkillContentTechnique,
-  attribute: EquipmentSkillAttribute,
-): boolean {
-  return technique.attributes?.includes(attribute);
-}
-
-function targetDefenseValue(
-  target: Combatant,
-  technique: EquipmentSkillContentTechnique,
-): number {
-  const resistanceWeight = sumBy(
-    MagicalStats,
-    (stat) => technique.damageScaling[stat] ?? 0,
-  );
-  const vitalityWeight = sumBy(
-    PhysicalStats,
-    (stat) => technique.damageScaling[stat] ?? 0,
-  );
-
-  const totalWeight = resistanceWeight + vitalityWeight;
-  if (totalWeight === 0) return 0;
-
-  const resistancePercent = resistanceWeight / totalWeight;
-  const vitalityPercent = vitalityWeight / totalWeight;
-
-  return (
-    resistancePercent * target.totalStats.Resistance +
-    vitalityPercent * target.totalStats.Vitality
-  );
-}
+import { sum } from 'es-toolkit/compat';
 
 export function combatDamageElements(
   attacker: Combatant,
@@ -137,27 +85,6 @@ export function getCombatantBaseDamageForTechnique(
   );
 }
 
-function getDeadlockPreventionDamageMultiplier(rounds: number): number {
-  const multiplierTiers = Math.floor(rounds / 25);
-  return 1 + 0.25 * multiplierTiers;
-}
-
-// Sums the attacker's MonsterTypeDamage bonuses across every type the target's monster content carries - 0 for non-monster targets or monsters attacking.
-function attackerMonsterTypeDamageBonusPercent(
-  attacker: Combatant,
-  target: Combatant,
-): number {
-  if (!target.monsterId || !attacker.monsterTypeDamageBonus) return 0;
-
-  const monster = getEntry<MonsterContent>(target.monsterId);
-  if (!monster) return 0;
-
-  return sumBy(
-    monster.types,
-    (type) => attacker.monsterTypeDamageBonus?.[type] ?? 0,
-  );
-}
-
 // Scales off the target's own stats, and a recast tops the shield up rather than stacking it.
 function combatShieldTarget(
   target: Combatant,
@@ -175,6 +102,121 @@ function combatShieldTarget(
   return gained;
 }
 
+function combatTargetDodges(
+  combat: Combat,
+  combatant: Combatant,
+  target: Combatant,
+  skill: EquipmentSkill,
+  technique: EquipmentSkillContentTechnique,
+): boolean {
+  if (
+    !techniqueHasAttribute(technique, 'AllowLuckDodge') ||
+    !luckRollSucceeds(target.totalStats.Luck)
+  ) {
+    return false;
+  }
+
+  combatMessageLog(
+    combat,
+    `**${combatantMessageToken(target)}** dodges **${combatantMessageToken(combatant)}**'s **${skill.name}**!`,
+    target,
+  );
+  combatantDamageEventEmit(target.id, 0, 'miss');
+  return true;
+}
+
+function combatTechniqueHit(
+  combat: Combat,
+  combatant: Combatant,
+  target: Combatant,
+  skill: EquipmentSkill,
+  technique: EquipmentSkillContentTechnique,
+): CombatTechniqueOutcome {
+  const baseDamage = getCombatantBaseDamageForTechnique(
+    combatant,
+    skill,
+    technique,
+  );
+  const elements = combatDamageElements(combatant, technique);
+  const isCriticalHit =
+    baseDamage > 0 &&
+    techniqueHasAttribute(technique, 'DamagesTarget') &&
+    luckRollSucceeds(combatant.totalStats.Luck);
+
+  let damage = 0;
+  let retaliationDamage = 0;
+  if (techniqueHasAttribute(technique, 'ShieldsTarget')) {
+    damage = combatShieldTarget(target, skill, technique);
+  } else if (baseDamage > 0) {
+    damage = combatDealTechniqueDamage(
+      combat,
+      combatant,
+      target,
+      technique,
+      baseDamage,
+      elements,
+      isCriticalHit,
+    );
+    retaliationDamage = combatReflectedDamage(target, technique, damage);
+  }
+
+  const summon = technique.summonMonsterId
+    ? combatSummonMonster(combat, combatant, technique.summonMonsterId)
+    : undefined;
+
+  return {
+    damage,
+    damageText: elementalDamageText(damage, elements),
+    isCriticalHit,
+    retaliationDamage,
+    summon,
+  };
+}
+
+function combatLogTechniqueMessage(
+  combat: Combat,
+  combatant: Combatant,
+  target: Combatant,
+  skill: EquipmentSkill,
+  technique: EquipmentSkillContentTechnique,
+  outcome: CombatTechniqueOutcome,
+): void {
+  if (!technique.combatMessage) return;
+
+  const message = combatFormatMessage(technique.combatMessage, {
+    combat,
+    skill,
+    technique,
+    damage: outcome.damage,
+    absdamage: Math.abs(outcome.damage),
+    damageText: outcome.damageText,
+    combatant: { ...combatant, name: combatantMessageToken(combatant) },
+    target: { ...target, name: combatantMessageToken(target) },
+    summon: outcome.summon
+      ? { ...outcome.summon, name: combatantMessageToken(outcome.summon) }
+      : undefined,
+    combatantStatus: combatantStatusText(combatant),
+    targetStatus: combatantStatusText(target),
+  });
+  const critSuffix = outcome.isCriticalHit ? ' **Critical hit (2x)!**' : '';
+  combatMessageLog(combat, `${message}${critSuffix}`, target);
+}
+
+function combatApplyRetaliation(
+  combat: Combat,
+  combatant: Combatant,
+  damage: number,
+): void {
+  if (damage <= 0) return;
+
+  combatCombatantTakeDamage(combatant, damage);
+  combatMessageLog(
+    combat,
+    `**${combatantMessageToken(combatant)}** took ${damage} damage in retaliation ${combatantStatusText(combatant)}!`,
+    combatant,
+  );
+}
+
 export function combatApplySkillToTarget(
   combat: Combat,
   combatant: Combatant,
@@ -183,231 +225,35 @@ export function combatApplySkillToTarget(
   technique: EquipmentSkillContentTechnique,
   capturedCreatorStats?: StatBlock,
 ): void {
-  if (
-    techniqueHasAttribute(technique, 'AllowLuckDodge') &&
-    luckRollSucceeds(target.totalStats.Luck)
-  ) {
-    combatMessageLog(
-      combat,
-      `**${combatantMessageToken(target)}** dodges **${combatantMessageToken(combatant)}**'s **${skill.name}**!`,
-      target,
-    );
-    combatantDamageEventEmit(target.id, 0, 'miss');
-    return;
-  }
+  if (combatTargetDodges(combat, combatant, target, skill, technique)) return;
 
-  const baseDamage = getCombatantBaseDamageForTechnique(
-    combatant,
-    skill,
-    technique,
-  );
-
-  const elements = combatDamageElements(combatant, technique);
-
-  const templateData = {
+  const outcome = combatTechniqueHit(
     combat,
     combatant,
     target,
     skill,
     technique,
-    damage: 0,
-    absdamage: 0,
-    damageText: elementalDamageText(0, elements),
-  };
+  );
+  combatLogTechniqueMessage(
+    combat,
+    combatant,
+    target,
+    skill,
+    technique,
+    outcome,
+  );
+  combatApplyRetaliation(combat, combatant, outcome.retaliationDamage);
 
-  let retaliationDamage = 0;
-
-  const isCriticalHit =
-    baseDamage > 0 &&
-    techniqueHasAttribute(technique, 'DamagesTarget') &&
-    luckRollSucceeds(combatant.totalStats.Luck);
-
-  if (techniqueHasAttribute(technique, 'ShieldsTarget')) {
-    const shield = combatShieldTarget(target, skill, technique);
-    templateData.damage = shield;
-    templateData.absdamage = shield;
-  } else if (baseDamage > 0) {
-    let effectiveDamage = baseDamage;
-
-    if (techniqueHasAttribute(technique, 'HealsTarget')) {
-      const reduction = combatCombatantCombatStatValue(
-        target,
-        'healingIgnorePercent',
-      );
-
-      effectiveDamage *= 1 - reduction / 100;
-
-      effectiveDamage = Math.min(
-        effectiveDamage,
-        target.totalStats.Health - target.hp,
-      );
-
-      effectiveDamage = -Math.abs(effectiveDamage);
-    }
-
-    if (techniqueHasAttribute(technique, 'RestoresTargetEnergy')) {
-      effectiveDamage = -Math.min(
-        effectiveDamage,
-        target.totalStats.Energy - target.ep,
-      );
-    }
-
-    if (!techniqueHasAttribute(technique, 'BypassDefense')) {
-      const targetDefense = targetDefenseValue(target, technique);
-
-      const rolledDefense = combatDamageMitigationRoll(
-        targetDefense,
-        target.totalStats.Luck,
-      );
-      effectiveDamage = Math.max(0, effectiveDamage - rolledDefense);
-    }
-
-    // Before plink, so plink still guarantees 1 through heavy resistance.
-    effectiveDamage *= elementalDamageMultiplier(combatant, target, elements);
-
-    if (techniqueHasAttribute(technique, 'AllowPlink')) {
-      effectiveDamage = Math.max(baseDamage > 0 ? 1 : 0, effectiveDamage);
-    }
-
-    if (isCriticalHit) {
-      effectiveDamage *= 2;
-    }
-
-    if (techniqueHasAttribute(technique, 'DamagesTarget')) {
-      const monsterTypeBonusPercent = attackerMonsterTypeDamageBonusPercent(
-        combatant,
-        target,
-      );
-      if (monsterTypeBonusPercent !== 0) {
-        effectiveDamage *= 1 + monsterTypeBonusPercent / 100;
-      }
-    }
-
-    // Apply deadlock prevention damage multiplier (only for damage, not healing)
-    let deadlockPreventionMultiplier = 1;
-    if (effectiveDamage > 0) {
-      deadlockPreventionMultiplier = getDeadlockPreventionDamageMultiplier(
-        combat.rounds,
-      );
-    }
-
-    effectiveDamage *= deadlockPreventionMultiplier;
-    effectiveDamage = Math.floor(effectiveDamage);
-
-    if (techniqueHasAttribute(technique, 'RestoresTargetEnergy')) {
-      combatCombatantTakeEnergyDamage(target, effectiveDamage);
-    } else if (techniqueHasAttribute(technique, 'DrainsTargetEnergy')) {
-      effectiveDamage = Math.min(effectiveDamage, target.ep);
-      combatCombatantTakeEnergyDamage(target, effectiveDamage);
-    } else {
-      combatCombatantTakeDamage(
-        target,
-        effectiveDamage,
-        isCriticalHit ? 'critical' : undefined,
-      );
-    }
-
-    if (
-      effectiveDamage === 0 &&
-      techniqueHasAttribute(technique, 'DamagesTarget')
-    ) {
-      combatantDamageEventEmit(target.id, 0, 'block');
-    }
-
-    templateData.damage = effectiveDamage;
-    templateData.absdamage = Math.abs(effectiveDamage);
-    templateData.damageText = elementalDamageText(effectiveDamage, elements);
-
-    const damageReflectPercent = combatCombatantCombatStatValue(
-      target,
-      'damageReflectPercent',
-    );
-    if (
-      effectiveDamage > 0 &&
-      damageReflectPercent > 0 &&
-      techniqueHasAttribute(technique, 'CanBeReflected')
-    ) {
-      retaliationDamage = Math.floor(
-        (effectiveDamage * damageReflectPercent) / 100,
-      );
-    }
-  }
-
-  const summon = technique.summonMonsterId
-    ? combatSummonMonster(combat, combatant, technique.summonMonsterId)
-    : undefined;
-
-  if (technique.combatMessage) {
-    // Spread here, not in templateData, so combatant/target keep the damage applied above.
-    const renderData = {
-      ...templateData,
-      combatant: { ...combatant, name: combatantMessageToken(combatant) },
-      target: { ...target, name: combatantMessageToken(target) },
-      summon: summon
-        ? { ...summon, name: combatantMessageToken(summon) }
-        : undefined,
-      combatantStatus: combatantStatusText(combatant),
-      targetStatus: combatantStatusText(target),
-    };
-    const message = combatFormatMessage(technique.combatMessage, renderData);
-    const critSuffix = isCriticalHit ? ' **Critical hit (2x)!**' : '';
-    combatMessageLog(combat, `${message}${critSuffix}`, target);
-  }
-
-  if (retaliationDamage > 0) {
-    combatCombatantTakeDamage(combatant, retaliationDamage);
-
-    combatMessageLog(
+  (technique.statusEffects || []).forEach((application) =>
+    combatTryApplyTechniqueStatusEffect(
       combat,
-      `**${combatantMessageToken(combatant)}** took ${retaliationDamage} damage in retaliation ${combatantStatusText(combatant)}!`,
-      combatant,
-    );
-  }
-
-  (technique.statusEffects || []).forEach((effData) => {
-    const effectContent = getEntry<StatusEffectContent>(effData.statusEffectId);
-    if (!effectContent) return;
-
-    const potency = combatantDebuffPotency(combatant, effectContent);
-    const totalChance =
-      skillTechniqueStatusEffectChance(skill, effData) + potency.chance;
-    // Luck and gear only shrug off harm: a buff lands at its own chance.
-    const isBuff = effectContent.effectType === 'Buff';
-    const rollChance = isBuff
-      ? totalChance
-      : luckReducedChance(totalChance, target.totalStats.Luck);
-
-    if (!rngSucceedsChance(rollChance)) return;
-
-    // Independent second roll - gear resistance doesn't multiply into the
-    // LUK roll above, it's a separate chance to shrug the effect off.
-    const tagResistance = isBuff
-      ? 0
-      : statusEffectTagResistance(target, effectContent.tags);
-
-    if (tagResistance > 0 && rngSucceedsChance(tagResistance)) {
-      combatMessageLog(
-        combat,
-        `**${effectContent.name}** is resisted by **${combatantMessageToken(target)}**!`,
-        target,
-      );
-      return;
-    }
-
-    const statusEffect = combatCreateStatusEffect(
-      effectContent,
-      skill,
       combatant,
       target,
-      {
-        duration:
-          skillTechniqueStatusEffectDuration(skill, effData) + potency.duration,
-      },
+      skill,
+      application,
       capturedCreatorStats,
-    );
-
-    combatApplyStatusEffectToTarget(combat, target, statusEffect);
-  });
+    ),
+  );
 
   if (combatantIsDead(target)) {
     combatMessageLog(

@@ -4,10 +4,8 @@ import {
 } from '@helpers/combat/combat-combatant-hp';
 import { combatCoveringAlly } from '@helpers/combat/combat-cover';
 import { getEntry } from '@helpers/content/content';
-import {
-  combatApplySkillToTarget,
-  techniqueHasAttribute,
-} from '@helpers/combat/combat-damage';
+import { combatApplySkillToTarget } from '@helpers/combat/combat-damage';
+import { techniqueHasAttribute } from '@helpers/combat/combat-damage-amount';
 import { combatCheckIfOver, isCombatOver } from '@helpers/combat/combat-end';
 import {
   beginCombatLogCommits,
