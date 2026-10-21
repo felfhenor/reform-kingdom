@@ -107,8 +107,8 @@ export function caravanIsTradeSoldOut(
   return remaining !== undefined && remaining <= 0;
 }
 
-// Lesser of remaining stock and what the party can afford; a collectible is
-// capped at 1 (0 once owned). Accepts `state` for commit-time re-validation.
+// Lesser of remaining stock and what the party can afford (buys) or owns (sells).
+// Accepts `state` for commit-time re-validation.
 export function caravanTradeMaxQuantity(
   caravan: CaravanContent,
   trade: CaravanTrade,
@@ -116,6 +116,21 @@ export function caravanTradeMaxQuantity(
   index: number,
   state?: GameState,
 ): number {
+  const stock = caravanTradeStock(trade, tradeCounts, index, state);
+  const held =
+    trade.type === 'sell'
+      ? caravanTradeAffordable(caravan, trade, state)
+      : caravanTradeOwnedQuantity(trade, state);
+  return stock === undefined ? held : Math.min(stock, held);
+}
+
+// A collectible or recipe is a one-time unlock regardless of its limit.
+function caravanTradeStock(
+  trade: CaravanTrade,
+  tradeCounts: Record<number, number>,
+  index: number,
+  state?: GameState,
+): number | undefined {
   if (trade.collectibleId) {
     const discovered = state
       ? ledgerHas(state.collectibles, trade.collectibleId)
@@ -130,19 +145,16 @@ export function caravanTradeMaxQuantity(
     return discovered ? 0 : 1;
   }
 
-  const remaining = caravanTradeRemaining(trade, tradeCounts, index);
+  return caravanTradeRemaining(trade, tradeCounts, index);
+}
 
-  if (trade.type === 'sell') {
-    const price = caravanTradePrice(caravan, trade);
-    const goldQuantity = state
-      ? (state.materials[goldCoinId()]?.quantity ?? 0)
-      : getGoldQuantity();
-    const affordable = Math.floor(goldQuantity / price);
-    return remaining === undefined
-      ? affordable
-      : Math.min(remaining, affordable);
-  }
-
-  const owned = caravanTradeOwnedQuantity(trade, state);
-  return remaining === undefined ? owned : Math.min(remaining, owned);
+function caravanTradeAffordable(
+  caravan: CaravanContent,
+  trade: CaravanTrade,
+  state?: GameState,
+): number {
+  const goldQuantity = state
+    ? (state.materials[goldCoinId()]?.quantity ?? 0)
+    : getGoldQuantity();
+  return Math.floor(goldQuantity / caravanTradePrice(caravan, trade));
 }

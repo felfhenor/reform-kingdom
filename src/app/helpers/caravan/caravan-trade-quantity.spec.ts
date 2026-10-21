@@ -181,15 +181,20 @@ describe('caravanTradeMaxQuantity', () => {
     );
   });
 
-  it('allows one of a collectible or recipe the player lacks, none once had', () => {
+  it('allows one affordable collectible or recipe the player lacks, none once had', () => {
     const relicTrade = trade({ collectibleId: relic, limit: 5 });
     const recipeTrade = trade({ recipeId: cloakRecipe, limit: 5 });
+    const price = caravanTradePrice(caravan(), relicTrade);
 
-    withGold(0);
+    withGold(price - 1);
+    expect(caravanTradeMaxQuantity(caravan(), relicTrade, {}, 0)).toBe(0);
+    expect(caravanTradeMaxQuantity(caravan(), recipeTrade, {}, 0)).toBe(0);
+
+    withGold(price * 5);
     expect(caravanTradeMaxQuantity(caravan(), relicTrade, {}, 0)).toBe(1);
     expect(caravanTradeMaxQuantity(caravan(), recipeTrade, {}, 0)).toBe(1);
 
-    withGold(0, (state) => {
+    withGold(price * 5, (state) => {
       applyCollectibleGrant(state, relic, 1);
       state.discoveredRecipes[cloakRecipe] = { foundAt: 1 };
     });

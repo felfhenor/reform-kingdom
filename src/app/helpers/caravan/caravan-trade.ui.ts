@@ -19,7 +19,6 @@ import { newEquipmentItem } from '@helpers/item/equipment';
 import {
   applyMaterialDelta,
   gainGold,
-  hasGold,
   hasTraderTokens,
   spendGold,
   traderTokenId,
@@ -147,9 +146,6 @@ export async function caravanExecuteTrade(
   );
   if (quantity > maxQuantity) return false;
 
-  const totalPrice = caravanTradePrice(caravan, trade) * quantity;
-  if (trade.type === 'sell' && !hasGold(totalPrice)) return false;
-
   const isEquipmentPurchase = trade.type === 'sell' && !!trade.equipmentId;
   if (isEquipmentPurchase && !armoryHasRoom(quantity)) {
     notifyError('Your armory is full.');
@@ -179,6 +175,8 @@ export async function caravanExecuteTrade(
       return s;
     }
 
+    // Re-priced in the callback so affix changes since the click can't underpay.
+    const totalPrice = caravanTradePrice(caravan, trade) * quantity;
     if (trade.type === 'sell') {
       grantCaravanReward(
         s,
