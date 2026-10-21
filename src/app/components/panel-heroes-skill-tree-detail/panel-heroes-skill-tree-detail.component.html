@@ -43,6 +43,22 @@
         <span class="text-sm">{{ info.effect }}</span>
       }
 
+      @if (info.statSummary; as summary) {
+        <app-row-stat-summary
+          [stats]="summary.stats"
+          [resistances]="summary.resistances"
+          [combatStats]="summary.combatStats"
+          [monsterTypeDamage]="summary.monsterTypeDamage"
+          [elementalResistances]="summary.elementalResistances"
+          [elementalBoons]="summary.elementalBoons"
+        />
+      }
+
+      @if (info.statsPerLevel; as perLevel) {
+        <span class="type-meta">Per level</span>
+        <app-row-item-stats [stats]="perLevel" />
+      }
+
       @for (line of info.modifierLines; track $index) {
         <app-row-skill-modifier [line]="line" />
       }

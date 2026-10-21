@@ -205,7 +205,7 @@
 - id: bf16b2f1-bea2-4c90-a79c-d5803efc90f5
   name: 'Ranger: Stalker'
   jobId: Ranger
-  description: 'Become a Stalker, an expert tracker and hunter. Grants +0.15 Agility, +0.05 Luck per level.'
+  description: 'Become a Stalker, an expert tracker and hunter.'
   sprite: '0007'
   effects:
     - kind: StatPerLevel
@@ -218,7 +218,7 @@
 - id: 106d068a-7e1e-45e4-8877-5dab9538195a
   name: 'Ranger: Wayfinder'
   jobId: Ranger
-  description: 'Become a Wayfinder, an expert of wilderness navigation. Grants +0.15 Vitality, +0.1 Spirit per level.'
+  description: 'Become a Wayfinder, an expert of wilderness navigation.'
   sprite: '0006'
   effects:
     - kind: StatPerLevel
@@ -506,7 +506,6 @@
 - id: 48cb70a2-50e1-4192-af9f-abbc9c35ffd3
   name: 'Ranger: Nimble'
   jobId: Ranger
-  description: '+5 Agility.'
   sprite: '0022'
   level: 1
   row: Marksmanship
@@ -519,7 +518,6 @@
 - id: 6cfb4bda-1559-4f26-951b-2d6d16bbaa76
   name: 'Ranger: Nature Knowledge'
   jobId: Ranger
-  description: '+10% damage against Beasts and Insects.'
   sprite: '0020'
   level: 35
   row: Nature
@@ -534,7 +532,6 @@
 - id: 20d87cf5-c0d1-4089-8790-6ff157ba4dff
   name: 'Ranger: Aeroward'
   jobId: Ranger
-  description: '+15% Air resistance.'
   sprite: '0021'
   level: 45
   row: Nature
@@ -549,7 +546,6 @@
 - id: efab3837-38cc-497e-9fa0-bf5d978b3a0f
   name: 'Ranger: Apex Predator'
   jobId: Ranger
-  description: '+20% damage against Beasts.'
   sprite: '0023'
   level: 45
   row: Stalker
@@ -562,7 +558,6 @@
 - id: 5262450b-6cc4-4806-9500-3c51538f0aec
   name: 'Ranger: Wandering Way'
   jobId: Ranger
-  description: '15% chance to ignore a debuff.'
   sprite: '0024'
   level: 45
   row: Wayfinder

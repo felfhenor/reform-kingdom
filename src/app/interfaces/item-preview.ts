@@ -11,6 +11,7 @@ import type { WorkerContent } from '@interfaces/content-worker';
 import type { DropRarity } from '@interfaces/droppable';
 import type { ElementBlock, GameElement } from '@interfaces/element';
 import type { EquipmentItemType } from '@interfaces/equipment';
+import type { EffectStatSummary } from '@interfaces/equipment-bonus';
 import type { GameStat, StatBlock } from '@interfaces/stat';
 
 // A skill-family stat bonus resolved to the family's display name and icon.
@@ -75,17 +76,11 @@ export type ItemPreviewDisplay = {
 };
 
 // One rolled affix's own contribution, for listing affixes individually.
-export type AffixDisplay = {
+export type AffixDisplay = EffectStatSummary & {
   id: AffixId;
   name: string;
   rarity: DropRarity;
   position: AffixPosition;
-  stats: StatBlock;
-  resistances: StatusEffectBlock;
-  combatStats: CombatStatBlock;
-  monsterTypeDamage: Record<MonsterType, number>;
-  elementalResistances: ElementBlock;
-  elementalBoons: ElementBlock;
   hasStatRow: boolean;
   gatherYieldBonuses: NonNullable<ItemPreviewDisplay['gatherYieldBonuses']>;
   skillStatBonuses: SkillStatBonusDisplay[];

@@ -203,7 +203,7 @@
 - id: 870a427d-1539-4697-a657-9fc462b25b40
   name: 'Warrior: Swashbuckler'
   jobId: Warrior
-  description: 'Become a Swashbuckler, a master of combat. Grants +0.15 Strength, +0.1 Agility per level.'
+  description: 'Become a Swashbuckler, a master of combat.'
   sprite: '0000'
   effects:
     - kind: StatPerLevel
@@ -216,7 +216,7 @@
 - id: 08ef6b16-d580-41bc-a96c-e3764b32b634
   name: 'Warrior: Bastion'
   jobId: Warrior
-  description: 'Become a Bastion, an expert in defense. Grants +0.2 Vitality, +2 Health per level.'
+  description: 'Become a Bastion, an expert in defense.'
   sprite: '0001'
   effects:
     - kind: StatPerLevel
@@ -452,7 +452,6 @@
 - id: 92029ad9-2bce-4739-b1e6-09a808f33210
   name: 'Warrior: Hardy'
   jobId: Warrior
-  description: '+25 Health.'
   sprite: '0028'
   level: 1
   row: Shield Arts
@@ -465,7 +464,6 @@
 - id: 1aacc221-96fe-40e6-ae73-fcca75fca097
   name: 'Warrior: Iron Will'
   jobId: Warrior
-  description: '+10% Stun resistance.'
   sprite: '0012'
   level: 40
   row: Shield Arts
@@ -491,7 +489,6 @@
 - id: 938e045b-8f0a-4284-8c33-fe0f479ba2fb
   name: 'Warrior: Spiked Armor'
   jobId: Warrior
-  description: 'Reflect 15% of damage taken.'
   sprite: '0030'
   level: 45
   row: Bastion
@@ -504,7 +501,6 @@
 - id: e96067f7-5e2f-4082-8efb-0687159916d9
   name: 'Warrior: Light Slashes'
   jobId: Warrior
-  description: '+8 Agility.'
   sprite: '0029'
   level: 45
   row: Swashbuckler

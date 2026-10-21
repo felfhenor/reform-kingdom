@@ -1,14 +1,11 @@
-import type { CombatStatBlock } from '@interfaces/combat';
 import type {
   CollectibleContent,
   CollectibleId,
 } from '@interfaces/content-collectible';
 import type { JobContent } from '@interfaces/content-job';
-import type { ElementBlock } from '@interfaces/element';
 import type { EquipmentSkillContent } from '@interfaces/content-skill';
-import type { StatusEffectBlock } from '@interfaces/content-statuseffect';
+import type { EffectStatSummary } from '@interfaces/equipment-bonus';
 import type { TrainerTeachingContent } from '@interfaces/content-trainer-teaching';
-import type { StatBlock } from '@interfaces/stat';
 import type { TrainerTeachingAvailability } from '@interfaces/trainer';
 
 export type TrainerTeachingCollectibleRequirement = {
@@ -23,7 +20,7 @@ export type TrainerTeachingPrerequisite = {
 };
 
 // One teaching as seen by one hero, shared by the trainer's Visit modal and the hero's Teachings list.
-export type TrainerTeachingRow = {
+export type TrainerTeachingRow = EffectStatSummary & {
   teaching: TrainerTeachingContent;
   // '???' until learned, or until its trainer is visited and its collectibles are owned.
   displayName: string;
@@ -37,11 +34,6 @@ export type TrainerTeachingRow = {
   canAfford: boolean;
   collectibles: TrainerTeachingCollectibleRequirement[];
   prerequisites: TrainerTeachingPrerequisite[];
-  stats: StatBlock;
-  combatStats: CombatStatBlock;
-  resistances: StatusEffectBlock;
-  elementalResistances: ElementBlock;
-  elementalBoons: ElementBlock;
   grantedSkills: EquipmentSkillContent[];
 };
 

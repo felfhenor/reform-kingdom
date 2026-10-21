@@ -236,7 +236,7 @@
 - id: 361815c3-ddf7-4ab8-9d8d-631936d4ae02
   name: 'Healer: Lifegiver'
   jobId: Healer
-  description: 'Become a Lifegiver, a master restorer. Grants +0.15 Spirit, +0.15 Constitution per level.'
+  description: 'Become a Lifegiver, a master restorer.'
   sprite: '0003'
   effects:
     - kind: StatPerLevel
@@ -249,7 +249,7 @@
 - id: 908133c7-917f-4ed6-a989-b2efa8ec487b
   name: 'Healer: Templar'
   jobId: Healer
-  description: 'Become a Templar, a warrior of light. Grants +0.15 Strength, +0.15 Vitality per level.'
+  description: 'Become a Templar, a warrior of light.'
   sprite: '0002'
   effects:
     - kind: StatPerLevel
@@ -519,7 +519,6 @@
 - id: bf2e7073-b747-4cac-b6b3-a5d2c8fc0865
   name: 'Healer: Focused Eye'
   jobId: Healer
-  description: '+20 Energy.'
   sprite: '0013'
   level: 5
   row: Divine Might
@@ -532,7 +531,6 @@
 - id: eddf3d99-7d38-40ad-aeda-2bf9642db073
   name: 'Healer: Waterward'
   jobId: Healer
-  description: '+15% Water resistance.'
   sprite: '0016'
   level: 25
   row: Divine Might
@@ -545,7 +543,6 @@
 - id: ef1a14e0-4428-4fd4-aee3-41b6cdb47f8a
   name: 'Healer: Iron Will'
   jobId: Healer
-  description: '+10% Stun resistance.'
   sprite: '0012'
   level: 45
   row: Divine Might
@@ -559,7 +556,6 @@
 - id: c9a9d333-9fea-472f-9345-66d34ba5edab
   name: 'Healer: Undying Light'
   jobId: Healer
-  description: 'While defeated, 5% chance each turn to revive at full health.'
   sprite: '0011'
   level: 45
   row: Lifegiver
@@ -572,7 +568,6 @@
 - id: 83db2f03-32db-4e06-9f30-6b9eae5c8177
   name: 'Healer: Demonbane'
   jobId: Healer
-  description: '+20% damage against Demons.'
   sprite: '0014'
   level: 45
   row: Templar

@@ -49,6 +49,20 @@ export function characterXpForLevel(level: number): number {
   return roundToNearest10(xp);
 }
 
+export function affixEffectsStatsPerLevel(effects: HeroEffect[]): StatBlock {
+  const stats = defaultStats();
+
+  (Object.keys(stats) as Array<keyof StatBlock>).forEach((stat) => {
+    stats[stat] = affixEffectSum(
+      effects,
+      'StatPerLevel',
+      (effect) => effect.stat === stat,
+    );
+  });
+
+  return stats;
+}
+
 function jobStatsAtLevel(
   jobId: JobId,
   level: number,
@@ -57,12 +71,10 @@ function jobStatsAtLevel(
   const job = getEntry<JobContent>(jobId);
   const stats = { ...(job?.baseStats ?? defaultStats()) };
   const perLevel = job?.statsPerLevel ?? defaultStats();
+  const bonusPerLevel = affixEffectsStatsPerLevel(effects);
 
   (Object.keys(stats) as Array<keyof StatBlock>).forEach((stat) => {
-    const growth =
-      perLevel[stat] +
-      affixEffectSum(effects, 'StatPerLevel', (effect) => effect.stat === stat);
-    stats[stat] += growth * (level - 1);
+    stats[stat] += (perLevel[stat] + bonusPerLevel[stat]) * (level - 1);
   });
 
   return stats;

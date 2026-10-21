@@ -7,14 +7,7 @@ import {
 import { notifySuccess } from '@helpers/engine/notify';
 import { characterJobLevel, getUnlockedJobs } from '@helpers/hero/job';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
-import {
-  affixEffectsBlock,
-  COMBAT_STAT_BONUS,
-  ELEMENT_BOON_BONUS,
-  ELEMENT_RESISTANCE_BONUS,
-  RESISTANCE_BONUS,
-  STAT_BONUS,
-} from '@helpers/item/equipment-bonus';
+import { affixEffectsStatSummary } from '@helpers/item/equipment-bonus';
 import { updateGamestate, worldPartyState } from '@helpers/state-game';
 import {
   characterApplyTeaching,
@@ -130,14 +123,7 @@ export function trainerTeachingRow(
     prerequisites: teaching.requiredTrainerTeachingIds.map((teachingId) =>
       trainerTeachingPrerequisite(character, teachingId, jobId),
     ),
-    stats: affixEffectsBlock(teaching.effects, STAT_BONUS),
-    combatStats: affixEffectsBlock(teaching.effects, COMBAT_STAT_BONUS),
-    resistances: affixEffectsBlock(teaching.effects, RESISTANCE_BONUS),
-    elementalResistances: affixEffectsBlock(
-      teaching.effects,
-      ELEMENT_RESISTANCE_BONUS,
-    ),
-    elementalBoons: affixEffectsBlock(teaching.effects, ELEMENT_BOON_BONUS),
+    ...affixEffectsStatSummary(teaching.effects),
     grantedSkills: teachingGrantedSkills(teaching),
   };
 }

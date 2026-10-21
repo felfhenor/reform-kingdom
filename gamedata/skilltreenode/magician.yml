@@ -201,7 +201,7 @@
 - id: 586f3c02-0e5e-4c4e-9393-0d17faf44abb
   name: 'Magician: Arcanist'
   jobId: Magician
-  description: 'Become an Arcanist, a mysticism expert. Grants +0.2 Intelligence, +0.1 Agility per level.'
+  description: 'Become an Arcanist, a mysticism expert.'
   sprite: '0005'
   effects:
     - kind: StatPerLevel
@@ -214,7 +214,7 @@
 - id: 28021991-7ee4-4677-995a-500327942fd0
   name: 'Magician: Celestar'
   jobId: Magician
-  description: 'Become a Celestar, an astral magic expert. Grants +0.15 Spirit, +0.15 Constitution per level.'
+  description: 'Become a Celestar, an astral magic expert.'
   sprite: '0004'
   effects:
     - kind: StatPerLevel
@@ -470,7 +470,6 @@
 - id: e0fe5657-7867-4959-90cf-dee57f43ee6f
   name: 'Magician: Focused Eye'
   jobId: Magician
-  description: '+20 Energy.'
   sprite: '0013'
   level: 10
   row: Spellweaving
@@ -483,7 +482,6 @@
 - id: b7b41672-5176-45fa-b481-098ff0fc0f3c
   name: 'Magician: Fireward'
   jobId: Magician
-  description: '+15% Fire resistance.'
   sprite: '0015'
   level: 30
   row: Spellweaving
@@ -496,7 +494,6 @@
 - id: 820e82d7-7a1d-42f3-8e5a-709653d9bc57
   name: 'Magician: Spirit Bane'
   jobId: Magician
-  description: '+15% damage against Spirits.'
   sprite: '0017'
   level: 45
   row: Evocation
@@ -510,7 +507,6 @@
 - id: f87ad505-e2d2-4187-b8d7-236228c1d734
   name: 'Magician: Candlelit Focus'
   jobId: Magician
-  description: '+30 Energy.'
   sprite: '0018'
   level: 45
   row: Arcanist
@@ -523,7 +519,6 @@
 - id: 11528838-39c1-4656-a12d-eff1979270aa
   name: 'Magician: Starbane'
   jobId: Magician
-  description: '+20% damage against Spirits.'
   sprite: '0019'
   level: 45
   row: Celestar

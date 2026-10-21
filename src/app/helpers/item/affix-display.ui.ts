@@ -1,19 +1,8 @@
-import {
-  defaultAffinities,
-  defaultCombatStats,
-  defaultMonsterTypeDamageBonus,
-  defaultStats,
-  defaultTagResistances,
-} from '@helpers/defaults';
 import { affixEffectsOfKind, equipmentItemAffixes } from '@helpers/item/affix';
 import {
-  affixEffectsAddToBlock,
-  COMBAT_STAT_BONUS,
-  ELEMENT_BOON_BONUS,
-  ELEMENT_RESISTANCE_BONUS,
-  MONSTER_TYPE_DAMAGE_BONUS,
-  RESISTANCE_BONUS,
-  STAT_BONUS,
+  affixEffectsHaveStatSummary,
+  affixEffectsStatSummary,
+  STAT_SUMMARY_EFFECT_KINDS,
 } from '@helpers/item/equipment-bonus';
 import {
   resolveGatherYieldBonusDisplay,
@@ -22,21 +11,12 @@ import {
 import type {
   AffixContent,
   AffixDisplay,
-  AffixEffect,
   EquipmentItem,
+  HeroEffect,
 } from '@interfaces';
 
-const AFFIX_KINDS_IN_STAT_SUMMARY = new Set<AffixEffect['kind']>([
-  'Stat',
-  'CombatStat',
-  'Resistance',
-  'MonsterTypeDamage',
-  'ElementalResistance',
-  'ElementalBoon',
-]);
-
-const AFFIX_KINDS_WITH_STAT_ROW = new Set<AffixEffect['kind']>([
-  ...AFFIX_KINDS_IN_STAT_SUMMARY,
+const AFFIX_KINDS_WITH_STAT_ROW = new Set<HeroEffect['kind']>([
+  ...STAT_SUMMARY_EFFECT_KINDS,
   'GatherYield',
   'SkillStatBonus',
 ]);
@@ -52,38 +32,8 @@ export function affixDisplay(affix: AffixContent): AffixDisplay {
     name: affix.name,
     rarity: affix.rarity,
     position: affix.position,
-    stats: affixEffectsAddToBlock(defaultStats(), effects, STAT_BONUS),
-    resistances: affixEffectsAddToBlock(
-      defaultTagResistances(),
-      effects,
-      RESISTANCE_BONUS,
-    ),
-    combatStats: affixEffectsAddToBlock(
-      defaultCombatStats(),
-      effects,
-      COMBAT_STAT_BONUS,
-    ),
-    monsterTypeDamage: affixEffectsAddToBlock(
-      defaultMonsterTypeDamageBonus(),
-      effects,
-      MONSTER_TYPE_DAMAGE_BONUS,
-    ),
-    elementalResistances: affixEffectsAddToBlock(
-      defaultAffinities(),
-      effects,
-      ELEMENT_RESISTANCE_BONUS,
-    ),
-    elementalBoons: affixEffectsAddToBlock(
-      defaultAffinities(),
-      effects,
-      ELEMENT_BOON_BONUS,
-    ),
-    hasStatRow: effects.some(
-      (effect) =>
-        AFFIX_KINDS_IN_STAT_SUMMARY.has(effect.kind) &&
-        'value' in effect &&
-        effect.value !== 0,
-    ),
+    ...affixEffectsStatSummary(effects),
+    hasStatRow: affixEffectsHaveStatSummary(effects),
     gatherYieldBonuses: resolveGatherYieldBonusDisplay(
       affixEffectsOfKind(effects, 'GatherYield'),
     ),

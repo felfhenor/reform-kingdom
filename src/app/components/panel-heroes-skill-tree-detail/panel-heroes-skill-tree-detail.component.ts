@@ -11,7 +11,9 @@ import {
 } from '@angular/core';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
+import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
 import { RowSkillModifierComponent } from '@components/row-skill-modifier/row-skill-modifier.component';
+import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { AnimationService } from '@services/animation.service';
 import { skillTreeNodeShortName } from '@helpers/hero/skill-tree-content';
@@ -22,9 +24,14 @@ import {
   skillTreeNodeKind,
   skillTreeNodeRequirements,
   skillTreeNodeSkill,
+  skillTreeNodeStatsPerLevel,
   skillTreeNodeValueText,
 } from '@helpers/hero/skill-tree-layout.ui';
 import { combatantFromCharacter } from '@helpers/combat/combat-create';
+import {
+  affixEffectsHaveStatSummary,
+  affixEffectsStatSummary,
+} from '@helpers/item/equipment-bonus';
 import {
   characterSkillPreview,
   skillModifierLines,
@@ -45,7 +52,9 @@ import type {
   imports: [
     BlankSlateComponent,
     IconItemPreviewComponent,
+    RowItemStatsComponent,
     RowSkillModifierComponent,
+    RowStatSummaryComponent,
     SFXDirective,
   ],
   templateUrl: './panel-heroes-skill-tree-detail.component.html',
@@ -92,6 +101,10 @@ export class PanelHeroesSkillTreeDetailComponent {
       modifierLines: skill
         ? skillModifierLines(skill, this.format)
         : skillTreeNodeModifierLines(node, this.format),
+      statSummary: affixEffectsHaveStatSummary(node.effects)
+        ? affixEffectsStatSummary(node.effects)
+        : undefined,
+      statsPerLevel: skillTreeNodeStatsPerLevel(node),
       value: skillTreeNodeValueText(node),
       requires: skillTreeNodeRequirements(node, this.job()),
     };

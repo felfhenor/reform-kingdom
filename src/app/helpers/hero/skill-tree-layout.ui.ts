@@ -17,6 +17,7 @@ import { getEntry } from '@helpers/content/content';
 import { jobAbilityValueLabel } from '@helpers/hero/job-ability.ui';
 import { skillTreeNodeModifiers } from '@helpers/hero/skill-modifier';
 import { skillModifierFamilySkill } from '@helpers/hero/skill-modifier.ui';
+import { affixEffectsStatsPerLevel } from '@helpers/hero/party';
 import { characterCurrentRegalia } from '@helpers/hero/regalia';
 import {
   characterSkillTreeAvailableSp,
@@ -51,6 +52,7 @@ import type {
   SkillTreeNodeKind,
   SkillTreeNodeSummary,
   SkillTreeRow,
+  StatBlock,
 } from '@interfaces';
 import { max, range, sortBy } from 'es-toolkit/compat';
 
@@ -310,6 +312,14 @@ export function skillTreeNodeValueText(node: SkillTreeNodeContent): string {
   return ability && effect?.kind === 'JobAbility'
     ? jobAbilityValueLabel(ability, effect.value)
     : '';
+}
+
+export function skillTreeNodeStatsPerLevel(
+  node: SkillTreeNodeContent,
+): StatBlock | undefined {
+  return node.effects.some((effect) => effect.kind === 'StatPerLevel')
+    ? affixEffectsStatsPerLevel(node.effects)
+    : undefined;
 }
 
 function skillTreeNodeSummary(

@@ -12,6 +12,7 @@ import { ensureSkillTreeNode } from '@helpers/content/ensure-skilltreenode';
 import { ensureTrainerTeaching } from '@helpers/content/ensure-trainer';
 import { defaultEquipment, defaultStats } from '@helpers/defaults';
 import {
+  affixEffectsStatsPerLevel,
   characterRecalculateStats,
   characterStats,
   characterStatsForLevel,
@@ -343,5 +344,18 @@ describe('party-wide reads', () => {
 
     expect(partyAffixEffects()).toEqual(mighty.effects);
     expect(partyGatherYieldBonuses()).toEqual(trinket.gatherYieldBonuses);
+  });
+});
+
+describe('affixEffectsStatsPerLevel', () => {
+  it('sums per-level effects by stat and ignores flat stats', () => {
+    const perLevel = affixEffectsStatsPerLevel([
+      { kind: 'StatPerLevel', stat: 'Strength', value: 0.1 },
+      { kind: 'StatPerLevel', stat: 'Strength', value: 0.05 },
+      { kind: 'Stat', stat: 'Agility', value: 5 },
+    ]);
+
+    expect(perLevel.Strength).toBeCloseTo(0.15);
+    expect(perLevel.Agility).toBe(0);
   });
 });

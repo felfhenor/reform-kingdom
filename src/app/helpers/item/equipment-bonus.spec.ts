@@ -5,6 +5,8 @@ import {
 } from '@helpers/defaults';
 import {
   affixEffectsAddToBlock,
+  affixEffectsHaveStatSummary,
+  affixEffectsStatSummary,
   COMBAT_STAT_BONUS,
   equipmentItemBonusTotals,
   equipmentItemGatherYieldBonuses,
@@ -458,5 +460,38 @@ describe('affixEffectsAddToBlock', () => {
 
     expect(combined.damageReflectPercent).toBe(3);
     expect(block.damageReflectPercent).toBe(2);
+  });
+});
+
+describe('affixEffectsStatSummary', () => {
+  it('routes each effect into its own block', () => {
+    const summary = affixEffectsStatSummary([
+      { kind: 'Stat', stat: 'Health', value: 25 },
+      { kind: 'Resistance', tag: 'Stun', value: 10 },
+      { kind: 'ElementalResistance', element: 'Fire', value: 15 },
+      { kind: 'MonsterTypeDamage', monsterType: 'Beast', value: 20 },
+    ]);
+
+    expect(summary.stats.Health).toBe(25);
+    expect(summary.resistances.Stun).toBe(10);
+    expect(summary.elementalResistances.Fire).toBe(15);
+    expect(summary.elementalBoons.Fire).toBe(0);
+    expect(summary.monsterTypeDamage.Beast).toBe(20);
+  });
+});
+
+describe('affixEffectsHaveStatSummary', () => {
+  it('is false for effects a stat summary does not draw', () => {
+    expect(
+      affixEffectsHaveStatSummary([
+        { kind: 'StatPerLevel', stat: 'Strength', value: 0.1 },
+        { kind: 'Stat', stat: 'Health', value: 0 },
+      ]),
+    ).toBe(false);
+    expect(
+      affixEffectsHaveStatSummary([
+        { kind: 'CombatStat', stat: 'reviveChance', value: 5 },
+      ]),
+    ).toBe(true);
   });
 });

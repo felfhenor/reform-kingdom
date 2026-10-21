@@ -12,8 +12,8 @@ import {
   equipmentItemAffixEffects,
 } from '@helpers/item/affix';
 import type {
-  AffixEffect,
   CombatStatBlock,
+  EffectStatSummary,
   EquipmentBonusDimension,
   EquipmentContent,
   EquipmentItem,
@@ -226,10 +226,41 @@ export function affixEffectsAddToBlock<K extends string>(
 }
 
 export function affixEffectsBlock<K extends string>(
-  effects: AffixEffect[],
+  effects: HeroEffect[],
   dimension: EquipmentBonusDimension<K>,
 ): Record<K, number> {
   return affixEffectsAddToBlock(dimension.defaultBlock(), effects, dimension);
+}
+
+export const STAT_SUMMARY_EFFECT_KINDS = new Set<HeroEffect['kind']>([
+  'Stat',
+  'CombatStat',
+  'Resistance',
+  'MonsterTypeDamage',
+  'ElementalResistance',
+  'ElementalBoon',
+]);
+
+export function affixEffectsStatSummary(
+  effects: HeroEffect[],
+): EffectStatSummary {
+  return {
+    stats: affixEffectsBlock(effects, STAT_BONUS),
+    resistances: affixEffectsBlock(effects, RESISTANCE_BONUS),
+    combatStats: affixEffectsBlock(effects, COMBAT_STAT_BONUS),
+    monsterTypeDamage: affixEffectsBlock(effects, MONSTER_TYPE_DAMAGE_BONUS),
+    elementalResistances: affixEffectsBlock(effects, ELEMENT_RESISTANCE_BONUS),
+    elementalBoons: affixEffectsBlock(effects, ELEMENT_BOON_BONUS),
+  };
+}
+
+export function affixEffectsHaveStatSummary(effects: HeroEffect[]): boolean {
+  return effects.some(
+    (effect) =>
+      STAT_SUMMARY_EFFECT_KINDS.has(effect.kind) &&
+      'value' in effect &&
+      effect.value !== 0,
+  );
 }
 
 // Infusion + affix only, no base equipment content - the "green bonus rows" UI shows under an item's base stats.
