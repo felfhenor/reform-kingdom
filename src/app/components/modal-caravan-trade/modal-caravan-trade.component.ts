@@ -162,7 +162,13 @@ export class ModalCaravanTradeComponent {
       caravanTradeDisplay(row.trade, row.equipmentItem)?.name ?? 'this';
     const quantity =
       (await this.quantityPrompt()?.ask(
-        { verb, name, price: row.price, maxQuantity: row.maxQuantity },
+        {
+          verb,
+          name,
+          price: row.price,
+          maxQuantity: row.maxQuantity,
+          allowMax: true,
+        },
         skipConfirm,
       )) ?? 0;
     if (quantity > 0) await this.commitTrade(row, quantity);
