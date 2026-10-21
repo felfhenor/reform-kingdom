@@ -34,7 +34,7 @@
       @if (selectedContent) {
         <app-slot-button-container
           [disabled]="!modifiable"
-          [helpText]="'This cannot be done in combat.'"
+          [helpText]="'Unequip this item from this hero. This cannot be done in combat.'"
         >
           <button
             type="button"
@@ -54,7 +54,7 @@
       @for (entry of items; track $index) {
         <app-slot-button-container
           [disabled]="!modifiable"
-          [helpText]="'This cannot be done in combat.'"
+          [helpText]="'Equip this item to this hero. This cannot be done in combat.'"
         >
           <app-card-equipment-item
             [equipment]="entry.content"

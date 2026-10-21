@@ -76,7 +76,7 @@
       <div [appHideUntilLevel]="3" class="flex gap-2">
         <app-slot-button-container
           [disabled]="!isAtKingdomCurrently()"
-          [helpText]="'This must be done at the Duchy.'"
+          [helpText]="'Promote a hero to be higher in the party order. This must be done at the Duchy.'"
         >
           <button
             type="button"
@@ -93,7 +93,7 @@
 
         <app-slot-button-container
           [disabled]="!isAtKingdomCurrently()"
-          [helpText]="'This must be done at the Duchy.'"
+          [helpText]="'Demote a hero to be lower in the party order. This must be done at the Duchy.'"
         >
           <button
             type="button"
@@ -112,7 +112,7 @@
       <div class="flex gap-2 ms-auto">
         <app-slot-button-container
           [disabled]="!equipmentModifiable()"
-          [helpText]="'This cannot be done in combat.'"
+          [helpText]="'Optimize this heros gear. This cannot be done in combat.'"
         >
           <button
             type="button"
@@ -152,7 +152,7 @@
         @if (hasBurstOptions()) {
           <app-slot-button-container
             [disabled]="!equipmentModifiable()"
-            [helpText]="'This cannot be done in combat.'"
+            [helpText]="'Change the burst skill for this hero. This cannot be done in combat.'"
           >
             <button
               type="button"
