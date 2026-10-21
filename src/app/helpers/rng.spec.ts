@@ -1,6 +1,7 @@
 import {
   rngChoice,
   rngChoiceIdentifiable,
+  rngChoiceOther,
   rngChoiceWeighted,
   rngNumber,
   rngNumberRange,
@@ -113,6 +114,19 @@ describe('RNG Helper Functions', () => {
     it('should return false when random value exceeds chance', () => {
       const mockRng = () => 0.8;
       expect(rngSucceedsChance(50, mockRng as PRNG)).toBeFalsy();
+    });
+  });
+
+  describe('rngChoiceOther', () => {
+    it('never returns the current choice when another exists', () => {
+      const rng = rngSeeded('other');
+      for (let i = 0; i < 20; i++) {
+        expect(rngChoiceOther(['a', 'b'], 'a', rng)).toBe('b');
+      }
+    });
+
+    it('returns the current choice when it is the only one', () => {
+      expect(rngChoiceOther(['a'], 'a', rngSeeded('other'))).toBe('a');
     });
   });
 

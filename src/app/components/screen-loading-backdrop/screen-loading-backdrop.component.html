@@ -1,0 +1,17 @@
+<div
+  class="backdrop-grid"
+  [style.grid-template-columns]="`repeat(${grid().cols}, var(--cell-px))`"
+>
+  @for (icon of cells(); track $index) {
+    <div #cell class="cell">
+      <!-- A background sprite, not an <img>: Angular's dev image audit warns on every atlas img. -->
+      <div
+        class="sprite"
+        [style.background-image]="sheetUrls()[icon.spritesheet]"
+        [style.background-position]="`-${icon.x}px -${icon.y}px`"
+      ></div>
+    </div>
+  }
+</div>
+
+<div class="vignette"></div>

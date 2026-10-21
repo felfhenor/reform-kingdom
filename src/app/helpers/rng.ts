@@ -19,6 +19,15 @@ export function rngChoice<T>(choices: T[], rng = rngSeeded(rngUuid())): T {
   return choices[Math.floor(rng() * choices.length)];
 }
 
+export function rngChoiceOther<T>(
+  choices: T[],
+  current: T,
+  rng = rngSeeded(rngUuid()),
+): T {
+  const others = choices.filter((choice) => choice !== current);
+  return rngChoice(others.length > 0 ? others : choices, rng);
+}
+
 export function rngShuffle<T>(choices: T[], rng = rngSeeded(rngUuid())): T[] {
   const baseArray = choices.slice();
 

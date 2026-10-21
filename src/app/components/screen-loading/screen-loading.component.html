@@ -1,0 +1,44 @@
+@let progress = loadingService.progress();
+
+<div class="fixed inset-0 z-50 bg-base-100">
+  <app-screen-loading-backdrop />
+
+  <div
+    class="pointer-events-none relative flex h-full flex-col items-center justify-center gap-4 p-8 px-[30%]"
+  >
+    <div
+      #hero
+      class="grid h-32 items-end justify-items-center [image-rendering:pixelated]"
+    >
+      @if (heroJob(); as job) {
+        @for (shown of [job]; track shown.id) {
+          <div
+            class="col-start-1 row-start-1 origin-bottom scale-200"
+            (animate.enter)="onHeroEnter($event)"
+            (animate.leave)="onHeroLeave($event)"
+          >
+            <app-atlas-animation
+              spritesheet="job"
+              [assetName]="shown.sprite"
+              [frames]="shown.frames"
+            />
+          </div>
+        }
+      }
+    </div>
+
+    <app-bar-progress
+      class="w-[50%]"
+      color="primary"
+      [shimmer]="true"
+      [value]="progress.percent"
+      (filled)="loadingService.onBarFilled()"
+    />
+
+    @for (label of [progress.label]; track $index) {
+      <p class="type-muted" (animate.enter)="anim.slideIn($event.target)">
+        {{ label }}
+      </p>
+    }
+  </div>
+</div>

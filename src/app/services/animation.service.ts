@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import type { DamageEventVariant } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
-import { animate, type DOMTarget, type JSAnimation } from 'animejs';
+import { animate, stagger, type DOMTarget, type JSAnimation } from 'animejs';
 
 // hold: fraction of the lifetime spent fully opaque; rise: px travelled; tilt: total random rotation range in degrees.
 const DAMAGE_NUMBER_PROFILES: Record<
@@ -41,6 +41,8 @@ const SHATTER_SMOKE_MS = 750;
 })
 export class AnimationService {
   private locale = inject(LOCALE_ID);
+  public readonly reducedMotion = matchMedia('(prefers-reduced-motion: reduce)')
+    .matches;
   // Angular can fire a leave handler twice for one element; a second shatter would clone the shards too.
   private shattering = new WeakMap<Element, Promise<unknown>>();
 
@@ -258,6 +260,64 @@ export class AnimationService {
       duration: 220,
       delay: Math.min(index, 8) * 45,
       ease: 'outQuad',
+    });
+  }
+
+  // Inline opacity is zeroed up front so cells don't flash in before their stagger delay.
+  gridReveal(targets: HTMLElement[], cols: number, rows: number): JSAnimation {
+    targets.forEach((el) => (el.style.opacity = '0'));
+    return animate(targets, {
+      opacity: [0, 1],
+      scale: [0.4, 1],
+      duration: 700,
+      delay: stagger(25, { grid: [cols, rows], from: 'center' }),
+      ease: 'outBack',
+    });
+  }
+
+  // Animates `--glow` so the cell's own :hover styling still works after the wave passes.
+  gridRipple(
+    targets: HTMLElement[],
+    cols: number,
+    rows: number,
+    fromIndex: number,
+  ): JSAnimation {
+    return animate(targets, {
+      '--glow': [0, 1, 0],
+      scale: [1, 1.3, 1],
+      duration: 900,
+      delay: stagger(35, { grid: [cols, rows], from: fromIndex }),
+      ease: 'inOutSine',
+    });
+  }
+
+  iconSwapOut(target: Element): JSAnimation {
+    return animate(target as DOMTarget, {
+      opacity: [1, 0],
+      scale: [1, 0.5],
+      rotate: [0, -20],
+      duration: 500,
+      ease: 'inQuad',
+    });
+  }
+
+  iconSwapIn(target: Element): JSAnimation {
+    return animate(target as DOMTarget, {
+      opacity: [0, 1],
+      scale: [0.5, 1],
+      rotate: [20, 0],
+      duration: 800,
+      ease: 'outBack',
+    });
+  }
+
+  bob(target: Element): JSAnimation {
+    return animate(target as DOMTarget, {
+      translateY: [0, -6],
+      duration: 900,
+      ease: 'inOutSine',
+      loop: true,
+      alternate: true,
     });
   }
 

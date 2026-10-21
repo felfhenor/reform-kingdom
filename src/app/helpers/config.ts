@@ -64,6 +64,9 @@ export const MAX_SEGMENT_LENGTH = 32;
 // How long the full loading bar stays on screen before the overlay fades.
 export const LOADING_FULL_HOLD_MS = 500;
 export const LOADING_FILL_FALLBACK_MS = 2000;
+export const LOADING_BACKDROP_CELL_PX = 72;
+export const LOADING_BACKDROP_SWAP_MS = 400;
+export const LOADING_HERO_CYCLE_MS = 2500;
 // The resolution the UI was laid out at; auto UI scale only grows past it.
 export const UI_SCALE_BASE_WIDTH = 1920;
 export const UI_SCALE_BASE_HEIGHT = 1080;
