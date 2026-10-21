@@ -38,6 +38,7 @@ import { TICKS_PER_YIELD } from '@helpers/config';
 import { craftProcessTick } from '@helpers/crafting/crafting-queue';
 import { autoModeProcessTick } from '@helpers/decree/auto-mode';
 import { encounterRandomProcessTick } from '@helpers/encounter/encounter-random-tick';
+import { discordUpdateStatus } from '@helpers/engine/discord';
 import { error } from '@helpers/engine/logging';
 import { schedulerYield } from '@helpers/engine/scheduler';
 import { gameloop } from '@helpers/gameloop';
@@ -165,6 +166,23 @@ describe('gameloop', () => {
 
     expect(numTicks()).toBe(0);
     expect(travelProcessTick).not.toHaveBeenCalled();
+  });
+
+  it('still updates the discord presence while paused or during the title crawl, but not off the game page', async () => {
+    useOptions({ gameloopPaused: true });
+    await gameloop(1);
+
+    useOptions();
+    seedGamestate((state) => {
+      state.meta.isSetup = true;
+      state.meta.titleCrawlPending = true;
+    });
+    await gameloop(1);
+    expect(discordUpdateStatus).toHaveBeenCalledTimes(2);
+
+    window.history.pushState({}, '', '/');
+    await gameloop(1);
+    expect(discordUpdateStatus).toHaveBeenCalledTimes(2);
   });
 
   it.each([

@@ -146,7 +146,7 @@ const handleRPC = () => {
           startTimestamp,
           state: result.state || 'Idle',
           details: result.details,
-          smallImageKey: result.smmallImageKey,
+          smallImageKey: result.smallImageKey,
           smallImageText: result.smallImageText,
           largeImageKey: result.largeImageKey || 'defaultimage',
           largeImageText: result.largeImageText,

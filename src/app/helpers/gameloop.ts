@@ -58,6 +58,10 @@ export async function gameloop(totalTicks: number): Promise<void> {
   if (!isSetup()) return;
   if (!isGameStateReady()) return;
   if (!gameloopShouldRun()) return;
+
+  // Before the pause/title crawl guards, so the presence still reflects those states.
+  discordUpdateStatus();
+
   if (isGameloopPaused()) return;
   if (isTitleCrawlPending()) return;
   if (isProcessingTicks) return;
@@ -114,8 +118,6 @@ export async function gameloop(totalTicks: number): Promise<void> {
     }
 
     timer.dumpTimers((timers) => debug('Gameloop:Timers', timers));
-
-    discordUpdateStatus();
 
     gamestateTickEnd();
 
