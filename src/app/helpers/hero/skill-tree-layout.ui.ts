@@ -15,17 +15,16 @@ import {
 } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { jobAbilityValueLabel } from '@helpers/hero/job-ability.ui';
-import { skillTreeNodeModifiers } from '@helpers/hero/skill-modifier';
-import { skillModifierFamilySkill } from '@helpers/hero/skill-modifier.ui';
 import { affixEffectsStatsPerLevel } from '@helpers/hero/party';
 import { characterCurrentRegalia } from '@helpers/hero/regalia';
+import { skillTreeNodeModifiers } from '@helpers/hero/skill-modifier';
+import { skillModifierFamilySkill } from '@helpers/hero/skill-modifier.ui';
 import {
   characterSkillTreeAvailableSp,
   characterSkillTreeNodeIds,
   characterSpecNode,
   skillTreeEarnedSp,
 } from '@helpers/hero/skill-tree';
-import { regaliasState } from '@helpers/state-game';
 import {
   skillTreeIsOath,
   skillTreeIsSpecOption,
@@ -33,11 +32,13 @@ import {
   skillTreeNodeShortName,
   skillTreeOptionOath,
 } from '@helpers/hero/skill-tree-content';
+import { regaliasState } from '@helpers/state-game';
 import type {
   Character,
   EquipmentSkillContent,
   JobAbilityContent,
   JobContent,
+  SkillTreeBuildSummary,
   SkillTreeLayout,
   SkillTreeLayoutArrow,
   SkillTreeLayoutBox,
@@ -45,7 +46,6 @@ import type {
   SkillTreeLayoutLane,
   SkillTreeLayoutLevel,
   SkillTreeLayoutSpecOath,
-  SkillTreeBuildSummary,
   SkillTreeNodeArt,
   SkillTreeNodeContent,
   SkillTreeNodeId,
@@ -259,7 +259,11 @@ function nodeAbility(
 export function skillTreeNodeKind(
   node: SkillTreeNodeContent,
 ): SkillTreeNodeKind {
-  if (skillTreeNodeSkill(node)) return 'Skill';
+  const skillData = skillTreeNodeSkill(node);
+  if (skillData) {
+    if (skillData.special) return 'Burst Skill';
+    return 'Skill';
+  }
   if (nodeAbility(node)) return 'Job Ability';
   if (skillTreeNodeModifiers(node).length > 0) return 'Skill Modifier';
   return skillTreeIsSpecOption(node) ? 'Specialization' : 'Perk';

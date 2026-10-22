@@ -1,11 +1,11 @@
 import type { AtlasedImage } from '@interfaces/artable';
-import type { GameElement } from '@interfaces/element';
 import type {
   SkillTreeNodeContent,
   SkillTreeNodeId,
   SkillTreeNodeState,
   SkillTreeRow,
 } from '@interfaces/content-skilltreenode';
+import type { GameElement } from '@interfaces/element';
 
 // A measured rectangle in tree pixels: a node, or an oath frame standing in for its oath.
 export type SkillTreeLayoutBox = {
@@ -76,7 +76,12 @@ export type SkillModifierLine = {
 export type SkillTreeOathChoice = { name: string; state: SkillTreeNodeState };
 
 export type SkillTreeNodeKind =
-  'Skill' | 'Job Ability' | 'Skill Modifier' | 'Specialization' | 'Perk';
+  | 'Skill'
+  | 'Burst Skill'
+  | 'Job Ability'
+  | 'Skill Modifier'
+  | 'Specialization'
+  | 'Perk';
 
 export type SkillTreeNodeArt = { sprite: string; spritesheet: AtlasedImage };
 
