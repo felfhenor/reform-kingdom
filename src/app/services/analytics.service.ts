@@ -16,7 +16,12 @@ export class AnalyticsService {
   private analytics: typeof gameanalytics.GameAnalytics;
 
   init() {
-    if (environment.gameanalytics.game && environment.gameanalytics.secret) {
+    const isElementInsideIframe = document.location.ancestorOrigins.length;
+    if (
+      environment.gameanalytics.game &&
+      environment.gameanalytics.secret &&
+      !isElementInsideIframe
+    ) {
       this.analytics = gameanalytics.GameAnalytics;
       this.analytics.configureBuild(
         `${environment.platform} ${this.metaService.versionString()}`,
