@@ -19,7 +19,13 @@
       </div>
 
       <div class="flex flex-col items-start gap-2">
-        <span class="type-meta">{{ info.kind }}</span>
+        <span class="type-meta flex gap-2 items-center">
+          {{ info.kind }}
+
+          @if (info.elementCosts; as elements) {
+            <app-row-element-charges [block]="elements" />
+          }
+        </span>
 
         <div class="flex gap-2">
           <span class="badge badge-sm badge-data">1 SP</span>
@@ -40,7 +46,9 @@
     <div class="flex flex-col gap-2">
       <span class="type-label">Effect</span>
       @if (info.effect) {
-        <span class="text-sm">{{ info.effect }}</span>
+        <span class="text-sm">
+          {{ info.effect }}
+        </span>
       }
 
       @if (info.statSummary; as summary) {
