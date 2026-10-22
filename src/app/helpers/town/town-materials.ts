@@ -1,9 +1,7 @@
-import { getEntry } from '@helpers/content/content';
 import { worldTownsState } from '@helpers/state-game';
 import type {
   CommissionRequirement,
   GameState,
-  ItemContent,
   ItemId,
   TownContent,
   TownId,
@@ -54,19 +52,4 @@ export function depositCommissionRequirementsToTown(
       requirement.quantity,
     );
   });
-}
-
-// Drops entries whose itemId no longer resolves.
-export function pruneInvalidTownMaterials(
-  materials: TownMaterials,
-): TownMaterials {
-  const pruned: TownMaterials = {};
-
-  (Object.keys(materials) as ItemId[]).forEach((itemId) => {
-    if (getEntry<ItemContent>(itemId)) {
-      pruned[itemId] = materials[itemId];
-    }
-  });
-
-  return pruned;
 }

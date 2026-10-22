@@ -14,7 +14,6 @@ import {
   isMonsterDiscovered,
   monsterRecordKill,
   monsterSourceNodeNames,
-  pruneInvalidBestiaryEntries,
   repairInvalidBestiaryLevels,
 } from '@helpers/kingdom/bestiary';
 import { bestiaryState } from '@helpers/state-game';
@@ -159,14 +158,6 @@ describe('monsterRecordKill', () => {
     recordKill(3);
 
     expect(events).toEqual(['Progress:Bestiary:Unlock:Goblin']);
-  });
-});
-
-describe('pruneInvalidBestiaryEntries', () => {
-  it('drops only the entries that no longer resolve to content', () => {
-    expect(
-      pruneInvalidBestiaryEntries({ [goblinId]: entry(), [staleId]: entry() }),
-    ).toEqual({ [goblinId]: entry() });
   });
 });
 

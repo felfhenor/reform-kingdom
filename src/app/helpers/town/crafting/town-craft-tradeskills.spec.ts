@@ -6,7 +6,6 @@ import { ensureTown } from '@helpers/content/ensure-town';
 import { ensureTradeskill } from '@helpers/content/ensure-tradeskill';
 import {
   pruneInvalidTownCraftQueue,
-  pruneInvalidTownTradeskills,
   townTradeskillsMaterialize,
 } from '@helpers/town/crafting/town-craft-tradeskills';
 import type { RecipeId, TownId, TradeskillId } from '@interfaces';
@@ -77,20 +76,6 @@ describe('townTradeskillsMaterialize', () => {
     const existing = { [smithing.id]: { level: 5 } };
 
     expect(townTradeskillsMaterialize(townId, existing)).toBe(existing);
-  });
-});
-
-describe('pruneInvalidTownTradeskills', () => {
-  it('drops tradeskills gone from content', () => {
-    seedTown([]);
-    const kept = { level: 4 };
-
-    expect(
-      pruneInvalidTownTradeskills({
-        [smithing.id]: kept,
-        ['removed' as TradeskillId]: { level: 1 },
-      }),
-    ).toEqual({ [smithing.id]: kept });
   });
 });
 

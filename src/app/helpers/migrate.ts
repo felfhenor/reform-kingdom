@@ -3,7 +3,7 @@ import {
   craftQueueOrphanedEquipment,
   pruneInvalidCraftQueues,
 } from '@helpers/crafting/crafting';
-import { getEntry } from '@helpers/content/content';
+import { contentExists } from '@helpers/content/content';
 import {
   migrateTradeskillStateKeys,
   retrofitTradeskillXp,
@@ -13,31 +13,23 @@ import {
   pruneInvalidDecreeGatherClauses,
 } from '@helpers/decree/decree';
 import { defaultGameState } from '@helpers/defaults';
-import { ledgerMark, ledgerPrune } from '@helpers/engine/ledger';
+import { ledgerMark } from '@helpers/engine/ledger';
+import { recordPrune } from '@helpers/engine/record';
 import { getMap } from '@helpers/maps';
 import { retrofitPartyXp } from '@helpers/hero/character-progress';
 import { recomputeGlobalEffectSums } from '@helpers/hero/global-effect-state';
 import { pruneInvalidPartyEquipment } from '@helpers/hero/party';
-import {
-  grantFoundingStoneIfMissing,
-  pruneInvalidCollectibles,
-} from '@helpers/item/collectibles';
+import { grantFoundingStoneIfMissing } from '@helpers/item/collectibles';
 import {
   backfillEquipmentBlock,
   backfillEquipmentItem,
   repairSplitEquippedItems,
 } from '@helpers/item/equipment';
 import { grandfatherGatherNodeDiscoveries } from '@helpers/item/gather-node-discovery';
-import {
-  applyMaterialDelta,
-  pruneInvalidMaterials,
-} from '@helpers/item/materials';
+import { applyMaterialDelta } from '@helpers/item/materials';
 import { pruneInvalidArmoryItems } from '@helpers/kingdom/armory';
 import { pruneInvalidActiveAstralProjectorSpells } from '@helpers/kingdom/astral-projector';
-import {
-  pruneInvalidBestiaryEntries,
-  repairInvalidBestiaryLevels,
-} from '@helpers/kingdom/bestiary';
+import { repairInvalidBestiaryLevels } from '@helpers/kingdom/bestiary';
 import { repairUnwalkableCurrentLocation } from '@helpers/pathfinding/pathfinding';
 import { pruneInvalidHomeNode } from '@helpers/town/town-spawn';
 import { pruneInvalidTowns } from '@helpers/town/town-prune';
@@ -45,7 +37,7 @@ import { pruneInvalidBurstSkills } from '@helpers/hero/burst-skill';
 import { stateRegaliaMigrate } from '@helpers/hero/regalia-state';
 import { pruneInvalidCharacterTeachings } from '@helpers/trainer/trainer';
 import { characterSkillTreesMigrate } from '@helpers/hero/skill-tree';
-import { pruneInvalidTasks, retrofitTasks } from '@helpers/task/task-migrate';
+import { retrofitTasks } from '@helpers/task/task-migrate';
 import { TUTORIAL_CATALOG } from '@helpers/tutorial/tutorial-catalog';
 import {
   gamestate,
@@ -83,10 +75,6 @@ import type {
   MaterialId,
 } from '@interfaces';
 import { merge } from 'es-toolkit/compat';
-
-function contentExists(id: string): boolean {
-  return !!getEntry(id);
-}
 
 // Backfill for pre-materials-discovery-tracking saves - anything currently held was obviously found already.
 function backfillLegacyDiscoveredMaterials(
@@ -167,8 +155,8 @@ export function migrateGameState() {
   stateRegaliaMigrate(newState);
 
   newState.armory = pruneInvalidArmoryItems(newState.armory);
-  newState.materials = pruneInvalidMaterials(newState.materials);
-  newState.discoveredMaterials = ledgerPrune(
+  newState.materials = recordPrune(newState.materials, contentExists);
+  newState.discoveredMaterials = recordPrune(
     newState.discoveredMaterials,
     contentExists,
   );
@@ -176,15 +164,15 @@ export function migrateGameState() {
     newState.discoveredMaterials,
     newState.materials,
   );
-  newState.discoveredEquipment = ledgerPrune(
+  newState.discoveredEquipment = recordPrune(
     newState.discoveredEquipment,
     contentExists,
   );
-  newState.discoveredCaravans = ledgerPrune(
+  newState.discoveredCaravans = recordPrune(
     newState.discoveredCaravans,
     contentExists,
   );
-  newState.discoveredTrainers = ledgerPrune(
+  newState.discoveredTrainers = recordPrune(
     newState.discoveredTrainers,
     contentExists,
   );
@@ -195,13 +183,13 @@ export function migrateGameState() {
   newState.world.homeNodeName = pruneInvalidHomeNode(
     newState.world.homeNodeName,
   );
-  newState.collectibles = pruneInvalidCollectibles(newState.collectibles);
+  newState.collectibles = recordPrune(newState.collectibles, contentExists);
   newState.collectibles = grantFoundingStoneIfMissing(newState.collectibles);
-  newState.discoveredRecipes = ledgerPrune(
+  newState.discoveredRecipes = recordPrune(
     newState.discoveredRecipes,
     contentExists,
   );
-  newState.discoveredGatherNodes = ledgerPrune(
+  newState.discoveredGatherNodes = recordPrune(
     newState.discoveredGatherNodes,
     (nodeName) => !!worldNodeByName(nodeName),
   );
@@ -219,7 +207,7 @@ export function migrateGameState() {
       },
     );
   });
-  newState.worldDiscoveries = ledgerPrune(
+  newState.worldDiscoveries = recordPrune(
     newState.worldDiscoveries,
     (nodeName) => !!worldNodeByName(nodeName),
   );
@@ -231,13 +219,13 @@ export function migrateGameState() {
     newState.world.autoMode.clauses,
     legacyRiskTolerance,
   );
-  newState.bestiary = pruneInvalidBestiaryEntries(newState.bestiary);
+  newState.bestiary = recordPrune(newState.bestiary, contentExists);
   newState.bestiary = repairInvalidBestiaryLevels(newState.bestiary);
-  newState.discoveredWorkers = ledgerPrune(
+  newState.discoveredWorkers = recordPrune(
     newState.discoveredWorkers,
     isWorkerContentKnown,
   );
-  newState.tutorials = ledgerPrune(newState.tutorials, (id) =>
+  newState.tutorials = recordPrune(newState.tutorials, (id) =>
     TUTORIAL_CATALOG.some((t) => t.id === id),
   );
   const prunedWorkers = pruneInvalidWorkerStates(
@@ -261,11 +249,11 @@ export function migrateGameState() {
     newState.world.currentLocation.mapName,
     ...visitedNodeMapNames(newState),
   ]);
-  newState.discoveredMaps = ledgerPrune(
+  newState.discoveredMaps = recordPrune(
     newState.discoveredMaps,
     (mapName) => !!getMap(mapName),
   );
-  newState.regionIntros = ledgerPrune(
+  newState.regionIntros = recordPrune(
     newState.regionIntros,
     (mapName) => !!getMap(mapName),
   );
@@ -273,7 +261,7 @@ export function migrateGameState() {
   newState.world.party = retrofitPartyXp(newState.world.party);
   newState.tradeskills = retrofitTradeskillXp(newState.tradeskills);
 
-  newState.discoveredAstralProjectorSpells = ledgerPrune(
+  newState.discoveredAstralProjectorSpells = recordPrune(
     newState.discoveredAstralProjectorSpells,
     contentExists,
   );
@@ -282,7 +270,7 @@ export function migrateGameState() {
       newState.activeAstralProjectorSpells,
     );
 
-  newState.tasks = pruneInvalidTasks(newState.tasks);
+  newState.tasks = recordPrune(newState.tasks, contentExists);
   newState.tasks = retrofitTasks(newState);
 
   // Always recomputed fresh on load - guards against saves predating this field, and

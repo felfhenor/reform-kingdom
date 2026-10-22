@@ -6,13 +6,7 @@ import {
   materialsState,
   updateGamestate,
 } from '@helpers/state-game';
-import type {
-  GameState,
-  GameStateMaterials,
-  ItemContent,
-  ItemId,
-  MaterialId,
-} from '@interfaces';
+import type { GameState, ItemContent, ItemId, MaterialId } from '@interfaces';
 
 const GOLD_COIN_NAME = 'Gold Coin';
 
@@ -36,22 +30,6 @@ const REFORGE_REAGENT_NAME = 'Duskhall Flux';
 
 export function reforgeReagentId(): ItemId {
   return getEntry<ItemContent>(REFORGE_REAGENT_NAME)!.id;
-}
-
-// Drops any storage entries whose id no longer resolves to real content -
-// e.g. after a material is renamed/removed from gamedata.
-export function pruneInvalidMaterials(
-  materials: GameStateMaterials,
-): GameStateMaterials {
-  const pruned: GameStateMaterials = {};
-
-  (Object.keys(materials) as MaterialId[]).forEach((materialId) => {
-    if (getEntry<ItemContent>(materialId)) {
-      pruned[materialId] = materials[materialId];
-    }
-  });
-
-  return pruned;
 }
 
 export function getMaterialQuantity(materialId: MaterialId): number {

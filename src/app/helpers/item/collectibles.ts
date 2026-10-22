@@ -14,22 +14,6 @@ import type {
 } from '@interfaces';
 import { taskEventCollectibleGained } from '@helpers/task/task-events';
 
-// Drops any storage entries whose id no longer resolves to real content -
-// e.g. after a collectible is renamed/removed from gamedata.
-export function pruneInvalidCollectibles(
-  collectibles: GameStateCollectibles,
-): GameStateCollectibles {
-  const pruned: GameStateCollectibles = {};
-
-  (Object.keys(collectibles) as CollectibleId[]).forEach((collectibleId) => {
-    if (getEntry<CollectibleContent>(collectibleId)) {
-      pruned[collectibleId] = collectibles[collectibleId];
-    }
-  });
-
-  return pruned;
-}
-
 export function getCollectibleQuantity(collectibleId: CollectibleId): number {
   return collectiblesState()[collectibleId]?.quantity ?? 0;
 }

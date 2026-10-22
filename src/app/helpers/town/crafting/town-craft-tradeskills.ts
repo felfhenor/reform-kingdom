@@ -42,21 +42,6 @@ export function townTradeskillsMaterialize(
   return materialized;
 }
 
-// Drops entries whose tradeskillId no longer resolves.
-export function pruneInvalidTownTradeskills(
-  tradeskills: Record<TradeskillId, TownTradeskillState>,
-): Record<TradeskillId, TownTradeskillState> {
-  const pruned: Record<TradeskillId, TownTradeskillState> = {};
-
-  (Object.keys(tradeskills) as TradeskillId[]).forEach((tradeskillId) => {
-    if (getEntry<TradeskillContent>(tradeskillId)) {
-      pruned[tradeskillId] = tradeskills[tradeskillId];
-    }
-  });
-
-  return pruned;
-}
-
 export function pruneInvalidTownCraftQueue(
   queue: TownCraftQueueEntry[],
 ): TownCraftQueueEntry[] {

@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { ensureTask } from '@helpers/content/ensure-task';
 import { defaultGameState } from '@helpers/defaults';
-import { pruneInvalidTasks, retrofitTasks } from '@helpers/task/task-migrate';
+import { retrofitTasks } from '@helpers/task/task-migrate';
 import type { IsContentItem, ItemId, TaskId } from '@interfaces';
 import { buildCharacter } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
@@ -29,17 +29,6 @@ beforeEach(() => {
     }),
   ];
   seedContent(content);
-});
-
-describe('pruneInvalidTasks', () => {
-  it('drops entries for tasks that no longer exist', () => {
-    const pruned = pruneInvalidTasks({
-      [LEVEL_TASK]: { progress: 0 },
-      ['removed-task' as TaskId]: { progress: 2 },
-    });
-
-    expect(Object.keys(pruned)).toEqual([LEVEL_TASK]);
-  });
 });
 
 describe('retrofitTasks', () => {

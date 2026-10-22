@@ -11,7 +11,6 @@ import {
   getCollectibleQuantity,
   grantFoundingStoneIfMissing,
   isCollectibleDiscovered,
-  pruneInvalidCollectibles,
 } from '@helpers/item/collectibles';
 import { gamestate } from '@helpers/state-game';
 import { taskEventCollectibleGained } from '@helpers/task/task-events';
@@ -22,7 +21,6 @@ import { inTick, seedGamestate } from '@/testing/gamestate';
 
 const stoneId = 'founding-stone' as CollectibleId;
 const chestId = 'big-chest' as CollectibleId;
-const staleId = 'stale' as CollectibleId;
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -125,17 +123,6 @@ describe('collectiblesAdd', () => {
     });
 
     expect(events).toEqual(['Progress:Museum:Unlock:Founding Stone']);
-  });
-});
-
-describe('pruneInvalidCollectibles', () => {
-  it('drops only the entries that no longer resolve to content', () => {
-    expect(
-      pruneInvalidCollectibles({
-        [stoneId]: { quantity: 1, foundAt: 1000 },
-        [staleId]: { quantity: 1, foundAt: 1000 },
-      }),
-    ).toEqual({ [stoneId]: { quantity: 1, foundAt: 1000 } });
   });
 });
 

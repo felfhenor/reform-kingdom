@@ -90,3 +90,8 @@ export function getEntry<T extends IsContentItem>(
 
   return ret;
 }
+
+// For migrations: a saved id that no longer resolves was renamed or removed from gamedata.
+export function contentExists(id: string): boolean {
+  return !!getEntry(id);
+}

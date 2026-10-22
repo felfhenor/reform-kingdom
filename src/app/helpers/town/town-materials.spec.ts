@@ -1,12 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { ensureItem } from '@helpers/content/ensure-item';
 import { ensureTown } from '@helpers/content/ensure-town';
 import { defaultGameState } from '@helpers/defaults';
 import {
   applyTownMaterialDelta,
   depositCommissionRequirementsToTown,
-  pruneInvalidTownMaterials,
   townDefaultMaterials,
   townMaterialQuantity,
 } from '@helpers/town/town-materials';
@@ -19,7 +17,6 @@ import type {
   TownMaterials,
 } from '@interfaces';
 import { buildTownNodeState } from '@/testing/builders';
-import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
 
 const townId = 'larsia' as TownId;
@@ -80,16 +77,6 @@ describe('depositCommissionRequirementsToTown', () => {
     ]);
 
     expect(materialsOf(state)).toEqual({ [ore]: 8 });
-  });
-});
-
-describe('pruneInvalidTownMaterials', () => {
-  it('drops materials gone from content', () => {
-    seedContent([ensureItem({ id: ore, name: 'Copper Ore' })]);
-
-    expect(
-      pruneInvalidTownMaterials({ [ore]: 5, ['gone' as ItemId]: 2 }),
-    ).toEqual({ [ore]: 5 });
   });
 });
 

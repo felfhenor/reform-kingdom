@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ledgerHas, ledgerMark, ledgerPrune } from '@helpers/engine/ledger';
+import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
 import type { Ledger } from '@interfaces';
 
 beforeEach(() => {
@@ -36,16 +36,5 @@ describe('ledgerMark', () => {
     ledgerMark(ledger, 'a', 42);
 
     expect(ledger).toEqual({ a: { foundAt: 42 } });
-  });
-});
-
-describe('ledgerPrune', () => {
-  it('keeps only the keys the predicate accepts, without mutating the input', () => {
-    const ledger: Ledger = { a: { foundAt: 1 }, b: { foundAt: 2 } };
-
-    expect(ledgerPrune(ledger, (key) => key === 'a')).toEqual({
-      a: { foundAt: 1 },
-    });
-    expect(Object.keys(ledger)).toEqual(['a', 'b']);
   });
 });

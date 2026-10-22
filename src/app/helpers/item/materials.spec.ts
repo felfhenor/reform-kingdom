@@ -12,7 +12,6 @@ import {
   grantStartingGold,
   hasTraderTokens,
   isMaterialDiscovered,
-  pruneInvalidMaterials,
   removeMaterial,
   spendGold,
 } from '@helpers/item/materials';
@@ -24,7 +23,6 @@ import { inTick, seedGamestate } from '@/testing/gamestate';
 const goldId = 'gold-coin' as ItemId;
 const scripId = 'trader-scrip' as ItemId;
 const oreId = 'ore' as ItemId;
-const staleId = 'stale' as ItemId;
 
 beforeEach(() => {
   seedContent([
@@ -161,16 +159,5 @@ describe('gold and trader scrip', () => {
 
     expect(hasTraderTokens(5)).toBe(true);
     expect(hasTraderTokens(6)).toBe(false);
-  });
-});
-
-describe('pruneInvalidMaterials', () => {
-  it('drops only the entries that no longer resolve to content', () => {
-    expect(
-      pruneInvalidMaterials({
-        [oreId]: { quantity: 5, foundAt: 1000 },
-        [staleId]: { quantity: 2, foundAt: 2000 },
-      }),
-    ).toEqual({ [oreId]: { quantity: 5, foundAt: 1000 } });
   });
 });

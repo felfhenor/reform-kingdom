@@ -15,12 +15,3 @@ export function ledgerMark<K extends string>(
 ): void {
   ledger[key] ??= { foundAt };
 }
-
-export function ledgerPrune<K extends string>(
-  ledger: Ledger<K>,
-  keep: (key: K) => boolean,
-): Ledger<K> {
-  return Object.fromEntries(
-    Object.entries(ledger).filter(([key]) => keep(key as K)),
-  ) as Ledger<K>;
-}

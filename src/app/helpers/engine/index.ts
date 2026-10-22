@@ -17,6 +17,7 @@ export * from './modal-stack';
 export * from './notify';
 export * from './number';
 export * from './page-visibility';
+export * from './record';
 export * from './risk-band';
 export * from './scheduler';
 export * from './sfx.ui';

@@ -1,13 +1,12 @@
-import { getEntry } from '@helpers/content/content';
+import { contentExists, getEntry } from '@helpers/content/content';
+import { recordPrune } from '@helpers/engine/record';
 import { pruneInvalidTownStock } from '@helpers/town/shop/town-stock';
 import {
   pruneInvalidTownCraftQueue,
-  pruneInvalidTownTradeskills,
   townTradeskillsMaterialize,
 } from '@helpers/town/crafting/town-craft-tradeskills';
 import { pruneInvalidTownSpecialtyPriority } from '@helpers/town/crafting/town-craft-priority-state';
 import { pruneInvalidTownCommissionSlots } from '@helpers/town/town-commission-slots';
-import { pruneInvalidTownMaterials } from '@helpers/town/town-materials';
 import {
   pruneInvalidTownWorkers,
   townWorkerRosterMaterialize,
@@ -33,10 +32,10 @@ export function pruneInvalidTowns(towns: GameStateTowns): GameStateTowns {
         workers,
         reputation: towns[townId].reputation ?? 0,
         hiddenGold: towns[townId].hiddenGold ?? 0,
-        materials: pruneInvalidTownMaterials(towns[townId].materials ?? {}),
+        materials: recordPrune(towns[townId].materials ?? {}, contentExists),
         tradeskills: townTradeskillsMaterialize(
           townId,
-          pruneInvalidTownTradeskills(towns[townId].tradeskills ?? {}),
+          recordPrune(towns[townId].tradeskills ?? {}, contentExists),
         ),
         craftQueue: pruneInvalidTownCraftQueue(towns[townId].craftQueue ?? []),
         commissionSlots: pruneInvalidTownCommissionSlots(

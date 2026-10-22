@@ -1,25 +1,7 @@
-import { getEntry } from '@helpers/content/content';
 import { isTaskRequirementCounter, tasksOrdered } from '@helpers/task/task';
 import { taskRequirementSatisfiedOnLoad } from '@helpers/task/task-requirement';
 import { taskStateRequirementSatisfied } from '@helpers/task/task-requirement-state';
-import type {
-  GameState,
-  GameStateTasks,
-  TaskContent,
-  TaskId,
-} from '@interfaces';
-
-export function pruneInvalidTasks(tasks: GameStateTasks): GameStateTasks {
-  const pruned: GameStateTasks = {};
-
-  (Object.keys(tasks) as TaskId[]).forEach((taskId) => {
-    if (getEntry<TaskContent>(taskId)) {
-      pruned[taskId] = tasks[taskId];
-    }
-  });
-
-  return pruned;
-}
+import type { GameState, GameStateTasks, TaskContent } from '@interfaces';
 
 function taskLatchesOnLoad(state: GameState, task: TaskContent): boolean {
   const entry = state.tasks[task.id];

@@ -11,6 +11,7 @@ import {
 } from '@helpers/content/ensure-gathernode';
 import { ensureCaravan } from '@helpers/content/ensure-caravan';
 import { ensureJob } from '@helpers/content/ensure-job';
+import { ensureMonster } from '@helpers/content/ensure-monster';
 import { ensureRecipe } from '@helpers/content/ensure-recipe';
 import { ensureSkill } from '@helpers/content/ensure-skill';
 import { ensureTask } from '@helpers/content/ensure-task';
@@ -40,6 +41,7 @@ import type {
   GatheringId,
   ItemId,
   JobId,
+  MonsterId,
   RecipeId,
   TaskId,
   TownId,
@@ -80,7 +82,18 @@ const lunge = ensureTrainerTeaching({
   name: 'Lunge',
 });
 const trainer = ensureTrainer({ id: 'trainer' as TrainerId, name: 'Trainer' });
-const content = [sword, ore, ruby, cloak, smithing, warrior, lunge, trainer];
+const goblin = ensureMonster({ id: 'goblin' as MonsterId, name: 'Goblin' });
+const content = [
+  sword,
+  ore,
+  ruby,
+  cloak,
+  smithing,
+  warrior,
+  lunge,
+  trainer,
+  goblin,
+];
 
 const gone = <T extends string>(id: string) => `gone-${id}` as T;
 
@@ -112,6 +125,14 @@ describe('migrateGameState', () => {
         [ruby.id]: { quantity: 1, foundAt: 1 },
         [gone<CollectibleId>('ruby')]: { quantity: 1, foundAt: 1 },
       };
+      const kill = {
+        foundAt: 1,
+        kills: 1,
+        minLevelFound: 1,
+        maxLevelFound: 1,
+        foundAtNodes: [],
+      };
+      save.bestiary = { [goblin.id]: kill, [gone<MonsterId>('goblin')]: kill };
       save.discoveredRecipes = {
         [cloak.id]: { foundAt: 1 },
         [gone<RecipeId>('recipe')]: { foundAt: 1 },
@@ -138,6 +159,7 @@ describe('migrateGameState', () => {
     expect(Object.keys(migrated.materials)).toEqual([ore.id]);
     expect(Object.keys(migrated.discoveredEquipment)).toEqual([sword.id]);
     expect(Object.keys(migrated.collectibles)).toEqual([ruby.id]);
+    expect(Object.keys(migrated.bestiary)).toEqual([goblin.id]);
     expect(Object.keys(migrated.discoveredRecipes)).toEqual([cloak.id]);
     expect(Object.keys(migrated.discoveredTrainers)).toEqual([trainer.id]);
 

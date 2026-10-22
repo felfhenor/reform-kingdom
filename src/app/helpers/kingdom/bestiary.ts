@@ -107,22 +107,6 @@ export function repairInvalidBestiaryLevels(
   return repaired;
 }
 
-// Drops any bestiary entries whose monsterId no longer resolves to real
-// content - e.g. after a monster is renamed/removed from gamedata.
-export function pruneInvalidBestiaryEntries(
-  bestiary: GameStateBestiary,
-): GameStateBestiary {
-  const pruned: GameStateBestiary = {};
-
-  (Object.keys(bestiary) as MonsterId[]).forEach((monsterId) => {
-    if (getEntry<MonsterContent>(monsterId)) {
-      pruned[monsterId] = bestiary[monsterId];
-    }
-  });
-
-  return pruned;
-}
-
 export function monsterEncounters(
   monsterId: MonsterId,
 ): Array<EncounterContent | EncounterRandomContent> {
