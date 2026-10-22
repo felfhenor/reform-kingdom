@@ -64,6 +64,10 @@ export type WorkerStatus =
   | WorkerStatusGathering
   | WorkerStatusTravelingBack;
 
+// The out-gather-home statuses both kingdom and town workers share.
+export type WorkerTripStatus =
+  WorkerStatusTravelingTo | WorkerStatusGathering | WorkerStatusTravelingBack;
+
 export type WorkerGatherTickOutcome =
   | { kind: 'Progress'; ticksIntoGather: number }
   | { kind: 'UnitGathered'; itemsGathered: number };

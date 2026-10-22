@@ -2,6 +2,7 @@ import type * as RngHelper from '@helpers/rng';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/town/worker/town-worker-travel');
+vi.mock('@helpers/worker/worker-trip');
 vi.mock('@helpers/rng', async (importOriginal) => {
   const actual = await importOriginal<typeof RngHelper>();
   return {
@@ -22,10 +23,10 @@ import {
   townPickGatherAssignment,
   townWorkerAutoAssign,
 } from '@helpers/town/worker/town-worker-auto-assign';
-import {
-  townWorkerAssignmentIsValid,
-  townWorkerBeginOutboundTrip,
-} from '@helpers/town/worker/town-worker-travel';
+import { worldTownsState } from '@helpers/state-game';
+import { defaultTownWorkerState } from '@helpers/town/worker/town-worker-progression';
+import { townWorkerAssignmentIsValid } from '@helpers/town/worker/town-worker-travel';
+import { workerTripBeginOutbound } from '@helpers/worker/worker-trip';
 import type {
   GameState,
   GatheringId,
@@ -107,7 +108,7 @@ function offered() {
 
 beforeEach(() => {
   vi.mocked(rngChoiceWeighted).mockClear();
-  vi.mocked(townWorkerBeginOutboundTrip).mockClear();
+  vi.mocked(workerTripBeginOutbound).mockClear();
   vi.mocked(townWorkerAssignmentIsValid).mockImplementation(
     (_town, _worker, _level, assignment) =>
       assignment.nodeName !== farMine.name,
@@ -178,16 +179,19 @@ describe('townPickGatherAssignment', () => {
 
 describe('townWorkerAutoAssign', () => {
   it('sends the worker out on the picked assignment', () => {
-    seedWorld({ materials: { [wood]: 10 } });
+    seedWorld({
+      materials: { [wood]: 10 },
+      workers: { [workerId]: defaultTownWorkerState(town, 1) },
+    });
 
     townWorkerAutoAssign(town, workerId, 1);
 
-    expect(townWorkerBeginOutboundTrip).toHaveBeenCalledWith(
-      townId,
-      town,
-      workerId,
-      { nodeName: mine.name, itemId: ore },
-    );
+    expect(workerTripBeginOutbound).toHaveBeenCalledWith(expect.anything(), {
+      nodeName: mine.name,
+      itemId: ore,
+    });
+    const [host] = vi.mocked(workerTripBeginOutbound).mock.calls[0];
+    expect(host.read()).toBe(worldTownsState()[townId].workers[workerId]);
   });
 
   it('leaves the worker idle when nothing is picked', () => {
@@ -196,6 +200,6 @@ describe('townWorkerAutoAssign', () => {
 
     townWorkerAutoAssign(town, workerId, 1);
 
-    expect(townWorkerBeginOutboundTrip).not.toHaveBeenCalled();
+    expect(workerTripBeginOutbound).not.toHaveBeenCalled();
   });
 });

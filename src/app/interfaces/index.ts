@@ -103,5 +103,6 @@ export * from './tutorial';
 export * from './ui';
 export * from './worker-state';
 export * from './worker-travel.ui';
+export * from './worker-trip';
 export * from './workshop.ui';
 export * from './world-nodes';

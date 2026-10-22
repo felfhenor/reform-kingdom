@@ -19,9 +19,9 @@ import { workersState } from '@helpers/state-game';
 import { workerStatsForLevel } from '@helpers/worker/worker-progression';
 import {
   canWorkerReachNode,
-  workerAssign,
   workerStaminaCostToNode,
-} from '@helpers/worker/worker-travel';
+} from '@helpers/worker/worker-assignment';
+import { workerAssign } from '@helpers/worker/worker-travel';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
 import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
 import {

@@ -14,10 +14,13 @@ import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
 import { worldTownsState } from '@helpers/state-game';
 import {
   townWorkerAssignmentIsValid,
-  townWorkerBeginOutboundTrip,
-  townWorkerBeginReturnTrip,
   townWorkerStaminaCostToNode,
 } from '@helpers/town/worker/town-worker-travel';
+import { townWorkerTripHost } from '@helpers/town/worker/town-worker-trip';
+import {
+  workerTripBeginOutbound,
+  workerTripBeginReturn,
+} from '@helpers/worker/worker-trip';
 import { defaultTownWorkerState } from '@helpers/town/worker/town-worker-progression';
 import type {
   GatheringId,
@@ -169,13 +172,13 @@ describe('townWorkerAssignmentIsValid', () => {
   });
 });
 
-describe('townWorkerBeginOutboundTrip', () => {
+describe('town worker outbound trip', () => {
   it('sends the worker toward its assignment along the route', () => {
     const nodes = seedTown();
     routesCost(5);
 
     inTick(() =>
-      townWorkerBeginOutboundTrip(town.id, town, worker.id, assignment),
+      workerTripBeginOutbound(townWorkerTripHost(town, worker.id), assignment),
     );
 
     expect(vi.mocked(travelPathFrom).mock.calls[0]).toEqual([
@@ -199,7 +202,7 @@ describe('townWorkerBeginOutboundTrip', () => {
     seedTown();
     routesCost(undefined);
     inTick(() =>
-      townWorkerBeginOutboundTrip(town.id, town, worker.id, assignment),
+      workerTripBeginOutbound(townWorkerTripHost(town, worker.id), assignment),
     );
     expect(workerState()).toMatchObject({
       assignment: null,
@@ -209,7 +212,7 @@ describe('townWorkerBeginOutboundTrip', () => {
     routesCost(5);
     seedWorldNodes([{ name: mine.name, type: 'GatherNode' }]);
     inTick(() =>
-      townWorkerBeginOutboundTrip(town.id, town, worker.id, assignment),
+      workerTripBeginOutbound(townWorkerTripHost(town, worker.id), assignment),
     );
     expect(workerState().status.kind).toBe('AtTown');
   });
@@ -219,7 +222,10 @@ describe('townWorkerBeginOutboundTrip', () => {
     routesCost(5);
 
     inTick(() =>
-      townWorkerBeginOutboundTrip(town.id, town, grounded.id, assignment),
+      workerTripBeginOutbound(
+        townWorkerTripHost(town, grounded.id),
+        assignment,
+      ),
     );
 
     expect(vi.mocked(travelPathFrom).mock.calls[0].slice(2)).toEqual(
@@ -228,7 +234,7 @@ describe('townWorkerBeginOutboundTrip', () => {
   });
 });
 
-describe('townWorkerBeginReturnTrip', () => {
+describe('town worker return trip', () => {
   it('heads home from where the worker stands, carrying its haul', () => {
     const nodes = seedTown();
     const atMine = locationOf(nodes[mine.name]);
@@ -240,14 +246,13 @@ describe('townWorkerBeginReturnTrip', () => {
       });
     });
     routesCost(5);
-    // Called on the update draft, which is revoked afterward, so copy the start out.
-    let routedFrom: unknown;
-    vi.mocked(travelPathFrom).mockImplementation((from) => {
-      routedFrom = { ...from };
-      return path;
-    });
 
-    inTick(() => townWorkerBeginReturnTrip(town.id, town, worker.id, ore, 5));
+    inTick(() =>
+      workerTripBeginReturn(townWorkerTripHost(town, worker.id), {
+        itemId: ore,
+        quantity: 5,
+      }),
+    );
 
     expect(workerState().status).toEqual({
       kind: 'TravelingBack',
@@ -256,8 +261,8 @@ describe('townWorkerBeginReturnTrip', () => {
       carriedItemId: ore,
       carriedQuantity: 5,
     });
-    expect(routedFrom).toEqual(atMine);
-    expect(vi.mocked(travelPathFrom).mock.calls[0].slice(1)).toEqual([
+    expect(vi.mocked(travelPathFrom).mock.calls[0]).toEqual([
+      atMine,
       town.name,
       ...noOutpostRoute(true),
     ]);
@@ -274,7 +279,12 @@ describe('townWorkerBeginReturnTrip', () => {
     });
     routesCost(undefined);
 
-    inTick(() => townWorkerBeginReturnTrip(town.id, town, worker.id, ore, 5));
+    inTick(() =>
+      workerTripBeginReturn(townWorkerTripHost(town, worker.id), {
+        itemId: ore,
+        quantity: 5,
+      }),
+    );
 
     expect(workerState().status).toEqual({ kind: 'AtTown' });
   });

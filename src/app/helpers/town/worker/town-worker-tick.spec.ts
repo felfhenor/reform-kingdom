@@ -2,19 +2,20 @@ import type { Mock } from 'vitest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/town/worker/town-worker-auto-assign');
-vi.mock('@helpers/town/worker/town-worker-gathering');
+vi.mock('@helpers/worker/worker-trip');
 vi.mock('@helpers/town/worker/town-worker-travel-tick');
 
 import { ensureTown } from '@helpers/content/ensure-town';
+import { worldTownsState } from '@helpers/state-game';
 import { uniq } from 'es-toolkit/compat';
 import { townWorkerAutoAssign } from '@helpers/town/worker/town-worker-auto-assign';
-import { townWorkerGatheringProcessTick } from '@helpers/town/worker/town-worker-gathering';
 import { defaultTownWorkerState } from '@helpers/town/worker/town-worker-progression';
 import { townWorkerProcessTick } from '@helpers/town/worker/town-worker-tick';
+import { townWorkerRestProcessTick } from '@helpers/town/worker/town-worker-travel-tick';
 import {
-  townWorkerRestProcessTick,
-  townWorkerTravelProcessTick,
-} from '@helpers/town/worker/town-worker-travel-tick';
+  workerTripGatheringTick,
+  workerTripTravelTick,
+} from '@helpers/worker/worker-trip';
 import type {
   ItemId,
   TownId,
@@ -46,14 +47,19 @@ function seedWorker(
 }
 
 const travel = { path: [], ticksIntoStep: 0 };
-const statuses: { status: TownWorkerStatus; processor: Mock }[] = [
+// Trip statuses go to the shared engine (no `args`: checked by the worker the host reads); resting stays town-specific.
+const statuses: {
+  status: TownWorkerStatus;
+  processor: Mock;
+  args?: unknown[];
+}[] = [
   {
     status: { kind: 'TravelingTo', ...travel, ...assignment },
-    processor: vi.mocked(townWorkerTravelProcessTick),
+    processor: vi.mocked(workerTripTravelTick),
   },
   {
     status: { kind: 'TravelingBack', ...travel, carriedQuantity: 0 },
-    processor: vi.mocked(townWorkerTravelProcessTick),
+    processor: vi.mocked(workerTripTravelTick),
   },
   {
     status: {
@@ -62,11 +68,12 @@ const statuses: { status: TownWorkerStatus; processor: Mock }[] = [
       itemsGathered: 0,
       ticksIntoGather: 0,
     },
-    processor: vi.mocked(townWorkerGatheringProcessTick),
+    processor: vi.mocked(workerTripGatheringTick),
   },
   {
     status: { kind: 'Resting', ticksIntoRest: 0 },
     processor: vi.mocked(townWorkerRestProcessTick),
+    args: [town, workerId],
   },
 ];
 
@@ -98,12 +105,18 @@ describe('townWorkerProcessTick', () => {
 
   it.each(statuses)(
     'advances a $status.kind worker',
-    ({ status, processor }) => {
+    ({ status, processor, args }) => {
       seedWorker({ status, assignment });
 
       townWorkerProcessTick();
 
-      expect(processor).toHaveBeenCalledExactlyOnceWith(town, workerId);
+      expect(processor).toHaveBeenCalledOnce();
+      if (args) {
+        expect(processor).toHaveBeenCalledWith(...args);
+      } else {
+        const [host] = processor.mock.calls[0];
+        expect(host.read()).toBe(worldTownsState()[town.id].workers[workerId]);
+      }
       [townWorkerAutoAssign, ...processors()]
         .filter((fn) => fn !== processor)
         .forEach((fn) => expect(fn).not.toHaveBeenCalled());

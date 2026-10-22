@@ -1,33 +1,17 @@
-import type { ItemId } from '@interfaces/content-item';
 import type { WorkerId } from '@interfaces/content-worker';
 import type { CurrentLocation } from '@interfaces/state-game';
-import type { TravelStep } from '@interfaces/travel';
-import type { WorkerStatus } from '@interfaces/worker-state';
+import type {
+  WorkerGatherAssignment,
+  WorkerStatus,
+  WorkerTripStatus,
+} from '@interfaces/worker-state';
 import type { WorldNodeEntry } from '@interfaces/world-nodes';
 
-export type TownWorkerAssignment = {
-  nodeName: string;
-  itemId: ItemId;
-};
+// Town workers only gather, so a craft assignment can't reach one.
+export type TownWorkerAssignment = WorkerGatherAssignment;
 
 export type TownWorkerStatusAtTown = {
   kind: 'AtTown';
-};
-
-export type TownWorkerStatusTravelingTo = {
-  kind: 'TravelingTo';
-  nodeName: string;
-  itemId: ItemId;
-  path: TravelStep[];
-  ticksIntoStep: number;
-};
-
-export type TownWorkerStatusGathering = {
-  kind: 'Gathering';
-  nodeName: string;
-  itemId: ItemId;
-  itemsGathered: number;
-  ticksIntoGather: number;
 };
 
 export type TownWorkerStatusResting = {
@@ -35,20 +19,8 @@ export type TownWorkerStatusResting = {
   ticksIntoRest: number;
 };
 
-export type TownWorkerStatusTravelingBack = {
-  kind: 'TravelingBack';
-  path: TravelStep[];
-  ticksIntoStep: number;
-  carriedItemId?: ItemId;
-  carriedQuantity: number;
-};
-
 export type TownWorkerStatus =
-  | TownWorkerStatusAtTown
-  | TownWorkerStatusTravelingTo
-  | TownWorkerStatusGathering
-  | TownWorkerStatusResting
-  | TownWorkerStatusTravelingBack;
+  TownWorkerStatusAtTown | WorkerTripStatus | TownWorkerStatusResting;
 
 export type TownWorkerState = {
   level: number;

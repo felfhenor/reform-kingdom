@@ -52,7 +52,7 @@ import {
   pruneInvalidWorkerStates,
 } from '@helpers/worker/worker-discovery';
 import { workerCraftOrphanedMaterials } from '@helpers/worker/worker-crafting';
-import { workerAssignmentIsValid } from '@helpers/worker/worker-travel';
+import { workerAssignmentIsValid } from '@helpers/worker/worker-assignment';
 import { backfillDiscoveredMaps } from '@helpers/world-node/world-map-discovery';
 import { allGatherableMaterialIds } from '@helpers/world-node/world-node-gathering';
 import { pruneInvalidWorldNodeDevelopmentLevels } from '@helpers/world-node/world-node-development';

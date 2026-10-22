@@ -6,11 +6,12 @@ import {
   markTownSubsystemProcessed,
 } from '@helpers/town/town-tick';
 import { townWorkerAutoAssign } from '@helpers/town/worker/town-worker-auto-assign';
-import { townWorkerGatheringProcessTick } from '@helpers/town/worker/town-worker-gathering';
+import { townWorkerRestProcessTick } from '@helpers/town/worker/town-worker-travel-tick';
+import { townWorkerTripHost } from '@helpers/town/worker/town-worker-trip';
 import {
-  townWorkerRestProcessTick,
-  townWorkerTravelProcessTick,
-} from '@helpers/town/worker/town-worker-travel-tick';
+  workerTripGatheringTick,
+  workerTripTravelTick,
+} from '@helpers/worker/worker-trip';
 import type { TownContent, WorkerId } from '@interfaces';
 
 function processTownWorker(town: TownContent, workerId: WorkerId): void {
@@ -25,10 +26,10 @@ function processTownWorker(town: TownContent, workerId: WorkerId): void {
       return;
     case 'TravelingTo':
     case 'TravelingBack':
-      townWorkerTravelProcessTick(town, workerId);
+      workerTripTravelTick(townWorkerTripHost(town, workerId));
       return;
     case 'Gathering':
-      townWorkerGatheringProcessTick(town, workerId);
+      workerTripGatheringTick(townWorkerTripHost(town, workerId));
       return;
     case 'Resting':
       townWorkerRestProcessTick(town, workerId);

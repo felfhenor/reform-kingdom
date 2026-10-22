@@ -1,7 +1,10 @@
 import { gamestate } from '@helpers/state-game';
 import { workerCraftingProcessTick } from '@helpers/worker/worker-crafting';
-import { workerGatheringProcessTick } from '@helpers/worker/worker-gathering';
-import { workerTravelProcessTick } from '@helpers/worker/worker-travel-tick';
+import {
+  workerTripGatheringTick,
+  workerTripTravelTick,
+} from '@helpers/worker/worker-trip';
+import { kingdomWorkerTripHost } from '@helpers/worker/worker-trip-kingdom';
 import type { WorkerId } from '@interfaces';
 
 export function workersProcessTick(): void {
@@ -11,12 +14,12 @@ export function workersProcessTick(): void {
     const status = workers[workerId]?.status.kind;
 
     if (status === 'TravelingTo' || status === 'TravelingBack') {
-      workerTravelProcessTick(workerId);
+      workerTripTravelTick(kingdomWorkerTripHost(workerId));
       return;
     }
 
     if (status === 'Gathering') {
-      workerGatheringProcessTick(workerId);
+      workerTripGatheringTick(kingdomWorkerTripHost(workerId));
       return;
     }
 

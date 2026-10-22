@@ -13,15 +13,12 @@ import { getMaterialQuantity } from '@helpers/item/materials';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
 import { workersState } from '@helpers/state-game';
 import { defaultWorkerState } from '@helpers/worker/worker-progression';
+import { workerAssign, workerRecall } from '@helpers/worker/worker-travel';
 import {
-  canWorkerReachNode,
-  workerAssignmentIsValid,
-  workerBeginOutboundTrip,
-  workerAssign,
-  workerBeginReturnTrip,
-  workerRecall,
-  workerStaminaCostToNode,
-} from '@helpers/worker/worker-travel';
+  workerTripBeginOutbound,
+  workerTripBeginReturn,
+} from '@helpers/worker/worker-trip';
+import { kingdomWorkerTripHost } from '@helpers/worker/worker-trip-kingdom';
 import type {
   GameState,
   GatheringId,
@@ -97,61 +94,14 @@ beforeEach(() => {
   seedWorker();
 });
 
-describe('workerStaminaCostToNode / canWorkerReachNode', () => {
-  it('is the base cost of the one-way trip from the kingdom', () => {
-    expect(workerStaminaCostToNode(woods)).toBe(tripCost());
-    expect(canWorkerReachNode(woods, tripCost())).toBe(true);
-    expect(canWorkerReachNode(woods, tripCost() - 1)).toBe(false);
-  });
-
-  it('is unreachable when no route resolves', () => {
-    vi.mocked(travelPathFrom).mockReturnValue(undefined);
-
-    expect(workerStaminaCostToNode(woods)).toBeUndefined();
-    expect(canWorkerReachNode(woods, 9999)).toBe(false);
-  });
-});
-
-describe('workerAssignmentIsValid', () => {
-  it('needs a discovered node that yields the item, within stamina', () => {
-    seedWorker(staminaFor(tripCost()));
-    seedWorkerState();
-
-    expect(workerAssignmentIsValid(workerId, 1, assignment)).toBe(true);
-    expect(
-      workerAssignmentIsValid(workerId, 1, {
-        ...assignment,
-        itemId: 'gold' as ItemId,
-      }),
-    ).toBe(false);
-  });
-
-  it('is invalid when the trip exceeds stamina or the node is undiscovered', () => {
-    seedWorker(staminaFor(tripCost() - 1));
-    seedWorkerState();
-    expect(workerAssignmentIsValid(workerId, 1, assignment)).toBe(false);
-
-    seedWorker(staminaFor(tripCost()));
-    seedGamestate();
-    expect(workerAssignmentIsValid(workerId, 1, assignment)).toBe(false);
-  });
-
-  it("routes with the worker's canUseTeleports flag", () => {
-    seedWorker({ canUseTeleports: false });
-    seedWorkerState();
-
-    workerAssignmentIsValid(workerId, 1, assignment);
-
-    expect(travelPathFrom).toHaveBeenCalledWith(duchy, woods, false);
-  });
-});
-
-describe('workerBeginOutboundTrip', () => {
+describe('kingdom worker outbound trip', () => {
   it('sets the worker traveling to the node along the routed path', () => {
     seedWorker({ canUseTeleports: false });
     seedWorkerState();
 
-    inTick(() => workerBeginOutboundTrip(workerId, assignment));
+    inTick(() =>
+      workerTripBeginOutbound(kingdomWorkerTripHost(workerId), assignment),
+    );
 
     expect(travelPathFrom).toHaveBeenCalledWith(duchy, woods, false);
     expect(workersState()[workerId].status).toEqual({
@@ -167,22 +117,29 @@ describe('workerBeginOutboundTrip', () => {
     vi.mocked(travelPathFrom).mockReturnValue(undefined);
     seedWorkerState();
 
-    inTick(() => workerBeginOutboundTrip(workerId, assignment));
+    inTick(() =>
+      workerTripBeginOutbound(kingdomWorkerTripHost(workerId), assignment),
+    );
 
     expect(workersState()[workerId].status).toEqual({ kind: 'AtDuchy' });
   });
 });
 
-describe('workerBeginReturnTrip', () => {
+describe('kingdom worker return trip', () => {
   const location = { mapName: 'TestMap', x: 3, y: 3 };
 
   it('heads home from where the worker is, carrying its haul', () => {
     seedWorker({ canUseTeleports: false });
     seedWorkerState({ location });
 
-    expect(inTick(() => workerBeginReturnTrip(workerId, copperId, 4))).toBe(
-      true,
-    );
+    expect(
+      inTick(() =>
+        workerTripBeginReturn(kingdomWorkerTripHost(workerId), {
+          itemId: copperId,
+          quantity: 4,
+        }),
+      ),
+    ).toBe(true);
     expect(travelPathFrom).toHaveBeenCalledWith(location, 'The Duchy', false);
     expect(workersState()[workerId].status).toEqual({
       kind: 'TravelingBack',
@@ -206,9 +163,14 @@ describe('workerBeginReturnTrip', () => {
       },
     });
 
-    expect(inTick(() => workerBeginReturnTrip(workerId, copperId, 4))).toBe(
-      false,
-    );
+    expect(
+      inTick(() =>
+        workerTripBeginReturn(kingdomWorkerTripHost(workerId), {
+          itemId: copperId,
+          quantity: 4,
+        }),
+      ),
+    ).toBe(false);
     expect(workersState()[workerId].status).toEqual({ kind: 'AtDuchy' });
   });
 });

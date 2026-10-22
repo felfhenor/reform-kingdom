@@ -5,10 +5,9 @@ import {
 } from '@helpers/town/crafting/town-craft-priority-weight';
 import { townSpecialtyPriority } from '@helpers/town/crafting/town-craft-priority-state';
 import { townMaterialAtOrAboveThreshold } from '@helpers/town/town-resource-thresholds';
-import {
-  townWorkerAssignmentIsValid,
-  townWorkerBeginOutboundTrip,
-} from '@helpers/town/worker/town-worker-travel';
+import { townWorkerAssignmentIsValid } from '@helpers/town/worker/town-worker-travel';
+import { townWorkerTripHost } from '@helpers/town/worker/town-worker-trip';
+import { workerTripBeginOutbound } from '@helpers/worker/worker-trip';
 import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
 import { worldNodeLevel } from '@helpers/world-node/world-node-level';
 import {
@@ -75,5 +74,5 @@ export function townWorkerAutoAssign(
   const assignment = townPickGatherAssignment(town, workerId, level);
   if (!assignment) return;
 
-  townWorkerBeginOutboundTrip(town.id, town, workerId, assignment);
+  workerTripBeginOutbound(townWorkerTripHost(town, workerId), assignment);
 }

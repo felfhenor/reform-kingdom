@@ -1,5 +1,4 @@
 export * from './town-worker-auto-assign';
-export * from './town-worker-gathering';
 export * from './town-worker-progression';
 export * from './town-worker-roster';
 export * from './town-worker-roster.ui';
@@ -7,3 +6,4 @@ export * from './town-worker-tick';
 export * from './town-worker-travel';
 export * from './town-worker-travel-tick';
 export * from './town-worker-travel.ui';
+export * from './town-worker-trip';
