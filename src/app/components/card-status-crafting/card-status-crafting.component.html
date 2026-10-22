@@ -1,36 +1,22 @@
-@let isExpanded = expanded();
 @let data = entry();
 
-<div
-  class="status-bubble select-none cursor-pointer"
-  [class.expanded]="isExpanded"
+<app-card-status-bubble
+  [expanded]="expanded()"
+  [name]="data.itemName"
+  [badge]="formatDurationBadge(data.remainingTicks)"
+  badgeNumeric
   (click)="goToTradeskill()"
 >
-  <div
-    class="relative flex items-center justify-center shrink-0 overflow-hidden w-[32px] h-[32px]"
-  >
-    <div class="zoom-row">
-      <app-atlas-image
-        [spritesheet]="data.resultSpritesheet"
-        [assetName]="data.resultSprite"
-      />
-    </div>
+  <div bubbleIcon class="zoom-row">
+    <app-atlas-image
+      [spritesheet]="data.resultSpritesheet"
+      [assetName]="data.resultSprite"
+    />
   </div>
-  @if (!isExpanded) {
-    <span class="status-bubble-badge type-meta tabular-nums">
-      {{ formatDurationBadge(data.remainingTicks) }}
+  <span bubbleSubtitle class="type-meta truncate">
+    <span class="tabular-nums">
+      {{ formatDuration(data.remainingTicks) }}
     </span>
-  }
-
-  @if (isExpanded) {
-    <div class="flex flex-col justify-center text-white overflow-hidden">
-      <span class="type-meta truncate">
-        <span class="tabular-nums">
-          {{ formatDuration(data.remainingTicks) }}
-        </span>
-        remaining
-      </span>
-      <span class="type-entity-name text-xs truncate">{{ data.itemName }}</span>
-    </div>
-  }
-</div>
+    remaining
+  </span>
+</app-card-status-bubble>

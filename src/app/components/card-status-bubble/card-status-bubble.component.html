@@ -1,0 +1,29 @@
+@let isExpanded = expanded();
+@let badgeText = badge();
+
+<div
+  class="relative flex items-center justify-center shrink-0 overflow-hidden w-[32px] h-[32px]"
+  [class.opacity-50]="dimmed()"
+>
+  <ng-content select="[bubbleIcon]"></ng-content>
+</div>
+
+@if (!isExpanded && badgeText) {
+  <!-- Sized to the collapsed bubble rather than its live width, so it doesn't stretch while the bubble animates. -->
+  <span
+    class="absolute left-0 bottom-0 text-center bg-black/70 whitespace-nowrap w-[calc(var(--status-bubble-width)-2px)] type-meta"
+    [class.tabular-nums]="badgeNumeric()"
+  >
+    {{ badgeText }}
+  </span>
+}
+
+<!-- Hidden rather than @if'd, since projected content shouldn't sit inside a conditional ng-content. -->
+<div
+  class="flex-col justify-center text-white overflow-hidden"
+  [class.flex]="isExpanded"
+  [class.hidden]="!isExpanded"
+>
+  <ng-content select="[bubbleSubtitle]"></ng-content>
+  <span class="type-entity-name text-xs truncate">{{ name() }}</span>
+</div>

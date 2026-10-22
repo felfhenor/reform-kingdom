@@ -1,27 +1,15 @@
-@let isExpanded = expanded();
 @let data = entry();
 
 <button
   type="button"
-  class="status-bubble select-none text-start cursor-pointer"
-  [class.expanded]="isExpanded"
+  class="block"
   appButtonGlow
   (click)="select()"
   appSfx="ui-click"
   [sfxTrigger]="['click', 'hover']"
 >
-  <div
-    class="relative flex items-center justify-center shrink-0 overflow-hidden w-[32px] h-[32px]"
-  >
-    <app-icon name="gameHelp" size="nav" />
-  </div>
-
-  @if (isExpanded) {
-    <div class="flex flex-col justify-center text-white overflow-hidden">
-      <span class="type-meta truncate">
-        New feature unlocked
-      </span>
-      <span class="type-entity-name text-xs truncate">{{ data.name }}</span>
-    </div>
-  }
+  <app-card-status-bubble [expanded]="expanded()" [name]="data.name">
+    <app-icon bubbleIcon name="gameHelp" size="nav" />
+    <span bubbleSubtitle class="type-meta truncate">New feature unlocked</span>
+  </app-card-status-bubble>
 </button>
