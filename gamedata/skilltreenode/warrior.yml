@@ -423,7 +423,7 @@
 - id: cb476729-967c-4ed1-bd52-6f652e501c5c
   name: 'Warrior: Oath of Provocation'
   jobId: Warrior
-  level: 35
+  level: 30
   row: Shield Arts
   track: 1
   requiredSkillTreeNodeIds: ['Warrior: Taunt I']

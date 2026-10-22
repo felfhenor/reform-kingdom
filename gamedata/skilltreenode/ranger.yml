@@ -161,8 +161,7 @@
   jobId: Ranger
   level: 35
   row: Nature
-  track: 1
-  requiredSkillTreeNodeIds: ['Ranger: Regrowth II']
+  track: 0
   effects:
     - kind: GrantSkill
       skillId: 'Static Gust I'
@@ -465,7 +464,7 @@
   jobId: Ranger
   level: 40
   row: Nature
-  track: 1
+  track: 0
   requiredSkillTreeNodeIds: ['Ranger: Static Gust I']
   optionSkillTreeNodeIds: ['Ranger: Focused Gust', 'Ranger: Tempest']
 
@@ -519,8 +518,9 @@
   name: 'Ranger: Nature Knowledge'
   jobId: Ranger
   sprite: '0020'
-  level: 35
+  level: 30
   row: Nature
+  track: 1
   effects:
     - kind: MonsterTypeDamage
       monsterType: Beast
