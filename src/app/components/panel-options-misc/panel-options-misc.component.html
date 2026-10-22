@@ -9,6 +9,7 @@
             <input
               type="checkbox"
               [checked]="getOption('analyticsEnabled')"
+              [disabled]="!canAnalyticsActivate()"
               class="checkbox"
               (click)="
                 setOption('analyticsEnabled', !getOption('analyticsEnabled'))
@@ -19,7 +20,7 @@
               name="gameHelp"
               size="inline"
               class="text-lighter"
-              [tp]="'Analytics are not tied to your email or any identifying information. What is collected: events related to game progress, discoveries, and in-game actions.'"
+              [tp]="'Analytics are not tied to your email or any identifying information. What is collected: events related to game progress, discoveries, and in-game actions. Analytics cannot be enabled when the game is played in an embedded environment.'"
               [tpPlacement]="'top'"
             />
           </label>

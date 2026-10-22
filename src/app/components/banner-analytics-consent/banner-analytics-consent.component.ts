@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
 import { SFXDirective } from '@directives/sfx.directive';
+import { canAnalyticsActivate } from '@helpers/engine';
 import { setOption } from '@helpers/state-options';
 import { shouldShowAnalyticsConsentBanner } from '@helpers/state-options.ui';
 
@@ -12,7 +13,9 @@ import { shouldShowAnalyticsConsentBanner } from '@helpers/state-options.ui';
   styleUrl: './banner-analytics-consent.component.scss',
 })
 export class BannerAnalyticsConsentComponent {
-  public showBanner = computed(() => shouldShowAnalyticsConsentBanner());
+  public showBanner = computed(
+    () => shouldShowAnalyticsConsentBanner() && canAnalyticsActivate(),
+  );
 
   optIn(): void {
     setOption('analyticsEnabled', true);

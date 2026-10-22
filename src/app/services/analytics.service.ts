@@ -1,6 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { environment } from '@environments/environment';
-import { analyticsEvent$ } from '@helpers/engine/analytics';
+import {
+  analyticsEvent$,
+  canAnalyticsActivate,
+} from '@helpers/engine/analytics';
 import { analyticsBoundEventId } from '@helpers/engine/analytics.ui';
 import { info } from '@helpers/engine/logging';
 import { getOption } from '@helpers/state-options';
@@ -16,12 +19,13 @@ export class AnalyticsService {
   private analytics: typeof gameanalytics.GameAnalytics;
 
   init() {
-    const isElementInsideIframe = document.location.ancestorOrigins.length;
-    if (
-      environment.gameanalytics.game &&
-      environment.gameanalytics.secret &&
-      !isElementInsideIframe
-    ) {
+    const canActivateAnalytics = canAnalyticsActivate();
+    if (!canActivateAnalytics) {
+      info('GameAnalytics', 'Not starting analytics; in an iframe.');
+      return;
+    }
+
+    if (environment.gameanalytics.game && environment.gameanalytics.secret) {
       this.analytics = gameanalytics.GameAnalytics;
       this.analytics.configureBuild(
         `${environment.platform} ${this.metaService.versionString()}`,

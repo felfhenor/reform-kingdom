@@ -14,3 +14,8 @@ export function analyticsSendDesignEvent(event: string, value = 1): void {
 export function analyticsSafeSegment(name: string): string {
   return name.replace(/:/g, '');
 }
+
+export function canAnalyticsActivate(): boolean {
+  const isInsideIframe = document.location.ancestorOrigins.length;
+  return !isInsideIframe;
+}
