@@ -10,7 +10,6 @@ import {
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
-import { notifyError } from '@helpers/engine/notify';
 import {
   applyCollectibleGrant,
   isCollectibleDiscovered,
@@ -23,15 +22,12 @@ import {
   spendGold,
   traderTokenId,
 } from '@helpers/item/materials';
-import {
-  addArmoryItems,
-  armoryHasRoom,
-  armoryHasRoomForState,
-} from '@helpers/kingdom/armory';
-import { updateGamestate } from '@helpers/state-game';
+import { tradeArmoryHasRoom, tradeCommit } from '@helpers/item/trade';
+import { addArmoryItems, armoryHasRoomForState } from '@helpers/kingdom/armory';
 import { taskEventCollectibleGained } from '@helpers/task/task-events';
 import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
 import type {
+  CaravanContent,
   CaravanTokenTrade,
   CaravanTrade,
   CaravanTraderContent,
@@ -41,6 +37,7 @@ import type {
   GameState,
   ItemContent,
   RecipeContent,
+  TradeCommitOutcome,
   WorldNodeEntry,
 } from '@interfaces';
 
@@ -117,6 +114,64 @@ function takeCaravanPayment(
   }
 }
 
+function caravanTradeBuysEquipment(trade: CaravanTrade): boolean {
+  return trade.type === 'sell' && !!trade.equipmentId;
+}
+
+function caravanTradeApply(
+  state: GameState,
+  caravan: CaravanContent,
+  trade: CaravanTrade,
+  tradeIndex: number,
+  quantity: number,
+): TradeCommitOutcome {
+  const nodeState = state.world.caravans[caravan.id];
+  if (!nodeState || !nodeState.activeTradeIndices.includes(tradeIndex)) {
+    return 'rejected';
+  }
+
+  const liveMax = caravanTradeMaxQuantity(
+    caravan,
+    trade,
+    nodeState.tradeCounts,
+    tradeIndex,
+    state,
+  );
+  if (quantity > liveMax) return 'rejected';
+
+  if (
+    caravanTradeBuysEquipment(trade) &&
+    !armoryHasRoomForState(state, quantity)
+  ) {
+    return 'armoryFull';
+  }
+
+  // Re-priced in the commit so affix changes since the click can't underpay.
+  const totalPrice = caravanTradePrice(caravan, trade) * quantity;
+  if (trade.type === 'sell') {
+    grantCaravanReward(
+      state,
+      trade,
+      quantity,
+      nodeState.rolledEquipment?.[tradeIndex],
+    );
+    if (trade.equipmentId) {
+      nodeState.rolledEquipment ??= {};
+      nodeState.rolledEquipment[tradeIndex] = newEquipmentItem(
+        trade.equipmentId,
+      );
+    }
+    spendGold(state, totalPrice);
+  } else {
+    takeCaravanPayment(state, trade, quantity);
+    gainGold(state, totalPrice);
+  }
+
+  nodeState.tradeCounts[tradeIndex] =
+    (nodeState.tradeCounts[tradeIndex] ?? 0) + quantity;
+  return 'executed';
+}
+
 export async function caravanExecuteTrade(
   entry: WorldNodeEntry,
   tradeIndex: number,
@@ -145,81 +200,25 @@ export async function caravanExecuteTrade(
     tradeIndex,
   );
   if (quantity > maxQuantity) return false;
-
-  const isEquipmentPurchase = trade.type === 'sell' && !!trade.equipmentId;
-  if (isEquipmentPurchase && !armoryHasRoom(quantity)) {
-    notifyError('Your armory is full.');
+  if (caravanTradeBuysEquipment(trade) && !tradeArmoryHasRoom(quantity)) {
     return false;
   }
 
-  let executed = false;
-  let armoryFull = false;
+  const executed = await tradeCommit((s) =>
+    caravanTradeApply(s, caravan, trade, tradeIndex, quantity),
+  );
+  if (!executed) return false;
 
-  await updateGamestate((s) => {
-    const nodeState = s.world.caravans[caravan.id];
-    if (!nodeState || !nodeState.activeTradeIndices.includes(tradeIndex)) {
-      return s;
-    }
-
-    const liveMax = caravanTradeMaxQuantity(
-      caravan,
-      trade,
-      nodeState.tradeCounts,
-      tradeIndex,
-      s,
-    );
-    if (quantity > liveMax) return s;
-
-    if (isEquipmentPurchase && !armoryHasRoomForState(s, quantity)) {
-      armoryFull = true;
-      return s;
-    }
-
-    // Re-priced in the callback so affix changes since the click can't underpay.
-    const totalPrice = caravanTradePrice(caravan, trade) * quantity;
-    if (trade.type === 'sell') {
-      grantCaravanReward(
-        s,
-        trade,
-        quantity,
-        nodeState.rolledEquipment?.[tradeIndex],
-      );
-      if (trade.equipmentId) {
-        nodeState.rolledEquipment ??= {};
-        nodeState.rolledEquipment[tradeIndex] = newEquipmentItem(
-          trade.equipmentId,
-        );
-      }
-      spendGold(s, totalPrice);
-    } else {
-      takeCaravanPayment(s, trade, quantity);
-      gainGold(s, totalPrice);
-    }
-
-    nodeState.tradeCounts[tradeIndex] =
-      (nodeState.tradeCounts[tradeIndex] ?? 0) + quantity;
-    executed = true;
-
-    return s;
-  });
-
-  if (armoryFull) {
-    notifyError('Your armory is full.');
-    return false;
+  const tradeName = caravanTradeName(trade);
+  analyticsSendDesignEvent(
+    tradeName
+      ? `Kingdom:Caravan:Trade:${analyticsSafeSegment(tradeName)}`
+      : 'Kingdom:Caravan:Trade',
+  );
+  if (trade.type === 'sell' && trade.collectibleId) {
+    void taskEventCollectibleGained(trade.collectibleId);
   }
-
-  if (executed) {
-    const tradeName = caravanTradeName(trade);
-    analyticsSendDesignEvent(
-      tradeName
-        ? `Kingdom:Caravan:Trade:${analyticsSafeSegment(tradeName)}`
-        : 'Kingdom:Caravan:Trade',
-    );
-    if (trade.type === 'sell' && trade.collectibleId) {
-      void taskEventCollectibleGained(trade.collectibleId);
-    }
-  }
-  return executed;
+  return true;
 }
 
 // A collectible or recipe token trade is a one-time purchase, same rule as
@@ -243,6 +242,24 @@ function isTokenTradeAlreadyOwned(
   return false;
 }
 
+function caravanTokenTradeApply(
+  state: GameState,
+  trade: CaravanTokenTrade,
+): TradeCommitOutcome {
+  if (isTokenTradeAlreadyOwned(trade, state)) return 'rejected';
+
+  const tokenQuantity = state.materials[traderTokenId()]?.quantity ?? 0;
+  if (tokenQuantity < trade.tokenCost) return 'rejected';
+
+  if (trade.equipmentId && !armoryHasRoomForState(state, 1)) {
+    return 'armoryFull';
+  }
+
+  grantCaravanReward(state, trade, 1);
+  applyMaterialDelta(state, traderTokenId(), -trade.tokenCost);
+  return 'executed';
+}
+
 export async function caravanExecuteTokenTrade(
   entry: WorldNodeEntry,
   tokenTradeIndex: number,
@@ -261,48 +278,19 @@ export async function caravanExecuteTokenTrade(
 
   if (isTokenTradeAlreadyOwned(trade)) return false;
   if (!hasTraderTokens(trade.tokenCost)) return false;
+  if (trade.equipmentId && !tradeArmoryHasRoom(1)) return false;
 
-  if (trade.equipmentId && !armoryHasRoom(1)) {
-    notifyError('Your armory is full.');
-    return false;
+  const executed = await tradeCommit((s) => caravanTokenTradeApply(s, trade));
+  if (!executed) return false;
+
+  const tradeName = caravanTradeName(trade);
+  analyticsSendDesignEvent(
+    tradeName
+      ? `Kingdom:Caravan:TokenTrade:${analyticsSafeSegment(tradeName)}`
+      : 'Kingdom:Caravan:TokenTrade',
+  );
+  if (trade.collectibleId) {
+    void taskEventCollectibleGained(trade.collectibleId);
   }
-
-  let executed = false;
-  let armoryFull = false;
-
-  await updateGamestate((s) => {
-    if (isTokenTradeAlreadyOwned(trade, s)) return s;
-
-    const tokenQuantity = s.materials[traderTokenId()]?.quantity ?? 0;
-    if (tokenQuantity < trade.tokenCost) return s;
-
-    if (trade.equipmentId && !armoryHasRoomForState(s, 1)) {
-      armoryFull = true;
-      return s;
-    }
-
-    grantCaravanReward(s, trade, 1);
-    applyMaterialDelta(s, traderTokenId(), -trade.tokenCost);
-    executed = true;
-
-    return s;
-  });
-
-  if (armoryFull) {
-    notifyError('Your armory is full.');
-    return false;
-  }
-
-  if (executed) {
-    const tradeName = caravanTradeName(trade);
-    analyticsSendDesignEvent(
-      tradeName
-        ? `Kingdom:Caravan:TokenTrade:${analyticsSafeSegment(tradeName)}`
-        : 'Kingdom:Caravan:TokenTrade',
-    );
-    if (trade.collectibleId) {
-      void taskEventCollectibleGained(trade.collectibleId);
-    }
-  }
-  return executed;
+  return true;
 }

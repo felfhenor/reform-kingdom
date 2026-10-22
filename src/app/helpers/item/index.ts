@@ -22,3 +22,4 @@ export * from './material-source.ui';
 export * from './materials';
 export * from './reforge';
 export * from './reforge.ui';
+export * from './trade';

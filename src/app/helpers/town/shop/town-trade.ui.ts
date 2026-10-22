@@ -3,7 +3,6 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { notifyError } from '@helpers/engine/notify';
 import {
   getGoldQuantity,
   goldCoinId,
@@ -11,11 +10,11 @@ import {
   spendGold,
 } from '@helpers/item/materials';
 import {
-  addArmoryItems,
-  armoryHasRoom,
-  armoryHasRoomForState,
-} from '@helpers/kingdom/armory';
-import { updateGamestate } from '@helpers/state-game';
+  tradeArmoryHasRoom,
+  tradeCommit,
+  tradeWarn,
+} from '@helpers/item/trade';
+import { addArmoryItems, armoryHasRoomForState } from '@helpers/kingdom/armory';
 import { townStockPrice } from '@helpers/town/shop/town-price';
 import { townStock, townStockDisplay } from '@helpers/town/shop/town-stock';
 import { townStockAffordable } from '@helpers/town/shop/town-trade';
@@ -25,6 +24,7 @@ import type {
   TownContent,
   TownId,
   TownStockEntry,
+  TradeCommitOutcome,
 } from '@interfaces';
 
 function grantStockEntry(state: GameState, entry: TownStockEntry): void {
@@ -38,8 +38,30 @@ function findStockEntry(
   return stock.find((entry) => entry.equipmentItem.id === itemId);
 }
 
+function townTradeApply(
+  state: GameState,
+  townId: TownId,
+  itemId: EquipmentItemId,
+  price: number,
+): TradeCommitOutcome {
+  const target = state.world.towns[townId];
+  const liveEntry = target ? findStockEntry(target.stock, itemId) : undefined;
+  if (!target || !liveEntry) return 'vanished';
+
+  const liveGold = state.materials[goldCoinId()]?.quantity ?? 0;
+  if (!townStockAffordable(price, liveGold)) return 'rejected';
+  if (!armoryHasRoomForState(state, 1)) return 'armoryFull';
+
+  grantStockEntry(state, liveEntry);
+  spendGold(state, price);
+  target.stock = target.stock.filter(
+    (stockEntry) => stockEntry.equipmentItem.id !== itemId,
+  );
+  return 'executed';
+}
+
 // Keyed by itemId, not index - stock can shift while a confirm dialog is open.
-// Fast path only - re-validated against live state inside the callback.
+// Fast path only - re-validated against live state inside the commit.
 export async function townExecuteTrade(
   townId: TownId,
   itemId: EquipmentItemId,
@@ -49,7 +71,7 @@ export async function townExecuteTrade(
 
   const entry = findStockEntry(townStock(townId), itemId);
   if (!entry) {
-    notifyError('That item has disappeared from the shop.');
+    tradeWarn('vanished');
     return false;
   }
 
@@ -57,58 +79,16 @@ export async function townExecuteTrade(
   if (price === undefined) return false;
   if (!townStockAffordable(price, getGoldQuantity())) return false;
   if (!hasGold(price)) return false;
+  if (!tradeArmoryHasRoom(1)) return false;
 
-  if (!armoryHasRoom(1)) {
-    notifyError('Your armory is full.');
-    return false;
-  }
+  const executed = await tradeCommit((state) =>
+    townTradeApply(state, townId, itemId, price),
+  );
+  if (!executed) return false;
 
-  let executed = false;
-  let vanished = false;
-  let armoryFull = false;
-
-  await updateGamestate((state) => {
-    const target = state.world.towns[townId];
-    const liveEntry = target ? findStockEntry(target.stock, itemId) : undefined;
-    if (!target || !liveEntry) {
-      vanished = true;
-      return state;
-    }
-
-    const liveGold = state.materials[goldCoinId()]?.quantity ?? 0;
-    if (!townStockAffordable(price, liveGold)) return state;
-
-    if (!armoryHasRoomForState(state, 1)) {
-      armoryFull = true;
-      return state;
-    }
-
-    grantStockEntry(state, liveEntry);
-    spendGold(state, price);
-    target.stock = target.stock.filter(
-      (stockEntry) => stockEntry.equipmentItem.id !== itemId,
-    );
-    executed = true;
-
-    return state;
-  });
-
-  if (vanished) {
-    notifyError('That item has disappeared from the shop.');
-    return false;
-  }
-
-  if (armoryFull) {
-    notifyError('Your armory is full.');
-    return false;
-  }
-
-  if (executed) {
-    const name = townStockDisplay(entry)?.name;
-    analyticsSendDesignEvent(
-      name ? `Town:Trade:${analyticsSafeSegment(name)}` : 'Town:Trade',
-    );
-  }
-
-  return executed;
+  const name = townStockDisplay(entry)?.name;
+  analyticsSendDesignEvent(
+    name ? `Town:Trade:${analyticsSafeSegment(name)}` : 'Town:Trade',
+  );
+  return true;
 }

@@ -93,6 +93,7 @@ export * from './town-reputation.ui';
 export * from './town-state';
 export * from './town-state.ui';
 export * from './town-worker-state';
+export * from './trade';
 export * from './tradeskill';
 export * from './trainer';
 export * from './trainer.ui';
