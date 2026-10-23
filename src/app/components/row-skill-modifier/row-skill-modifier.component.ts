@@ -15,7 +15,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   ],
   template: `
     @let entry = line();
-    <span class="inline-flex flex-wrap items-center gap-2 text-sm text-oath">
+    <span class="inline-flex flex-wrap items-center gap-x-2 text-sm text-oath">
       @if (entry.label) {
         {{ entry.label }}:
       }
