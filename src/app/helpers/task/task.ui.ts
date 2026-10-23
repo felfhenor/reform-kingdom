@@ -2,6 +2,7 @@ import { TASK_WIDGET_ENTRY_COUNT } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { bestiaryState, tasksState } from '@helpers/state-game';
 import { isTaskRequirementCounter, tasksOrdered } from '@helpers/task/task';
+import { isWorldMapVisited } from '@helpers/world-node/world-map-discovery';
 import type {
   GameStateTasks,
   ItemContent,
@@ -52,9 +53,20 @@ function taskRowViewModel(
   };
 }
 
+// Completed tasks stay listed so a reward earned off-map can still be claimed.
+function isTaskVisible(task: TaskContent, tasks: GameStateTasks): boolean {
+  return (
+    !task.requireMapVisit ||
+    !!tasks[task.id]?.completedAt ||
+    isWorldMapVisited(task.requireMapVisit)
+  );
+}
+
 function taskRowViewModelsByOrder(): TaskRowViewModel[] {
   const tasks = tasksState();
-  return tasksOrdered().map((task) => taskRowViewModel(task, tasks));
+  return tasksOrdered()
+    .filter((task) => isTaskVisible(task, tasks))
+    .map((task) => taskRowViewModel(task, tasks));
 }
 
 // Unclaimed first so rewards waiting to be claimed stay near the top.

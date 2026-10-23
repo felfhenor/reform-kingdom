@@ -100,5 +100,6 @@ export function ensureTask(task: Partial<TaskContent>): Required<TaskContent> {
     requirement: ensureTaskRequirement(task.requirement),
     rewards: ensureArray(task.rewards, ensureItemQuantity),
     whisper: task.whisper ?? '',
+    requireMapVisit: task.requireMapVisit ?? '',
   };
 }

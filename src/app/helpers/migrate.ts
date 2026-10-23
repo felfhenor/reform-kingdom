@@ -12,7 +12,7 @@ import {
   backfillDecreeClauseRiskTolerance,
   pruneInvalidDecreeGatherClauses,
 } from '@helpers/decree/decree';
-import { defaultGameState } from '@helpers/defaults';
+import { defaultGameState, GAMESTATE_VERSION } from '@helpers/defaults';
 import { ledgerMark } from '@helpers/engine/ledger';
 import { recordPrune } from '@helpers/engine/record';
 import { getMap } from '@helpers/maps';
@@ -91,14 +91,17 @@ function backfillLegacyDiscoveredMaterials(
 }
 
 // Backfill for pre-discovery-tracking saves: existing material progress with no recorded visits means treat every GatherNode as found.
+// Version-gated because a new game's starting gold alone would otherwise look like legacy progress.
 function backfillLegacyGatherNodeDiscoveries(
   discoveredGatherNodes: GameStateDiscoveredGatherNodes,
   materials: GameStateMaterials,
+  version: number,
 ): GameStateDiscoveredGatherNodes {
+  const isLegacySave = version < 2;
   const hasNoRecordedVisits = Object.keys(discoveredGatherNodes).length === 0;
   const hasExistingProgress = Object.keys(materials).length > 0;
 
-  if (!hasNoRecordedVisits || !hasExistingProgress)
+  if (!isLegacySave || !hasNoRecordedVisits || !hasExistingProgress)
     return discoveredGatherNodes;
 
   return grandfatherGatherNodeDiscoveries(
@@ -196,7 +199,9 @@ export function migrateGameState() {
   newState.discoveredGatherNodes = backfillLegacyGatherNodeDiscoveries(
     newState.discoveredGatherNodes,
     newState.materials,
+    newState.meta.version,
   );
+  newState.meta.version = GAMESTATE_VERSION;
   WORLD_NODE_DEVELOPABLE_TYPES.forEach((type) => {
     const slice = WORLD_NODE_DEVELOPMENT_SLICES[type];
     newState[slice] = pruneInvalidWorldNodeDevelopmentLevels(

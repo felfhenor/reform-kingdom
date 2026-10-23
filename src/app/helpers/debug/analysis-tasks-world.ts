@@ -1,5 +1,6 @@
 import { getEntry } from '@helpers/content/content';
 import { analysisFail } from '@helpers/debug/analysis-utils';
+import { allMaps } from '@helpers/maps';
 import { teleportNodeProperty } from '@helpers/pathfinding/pathfinding';
 import {
   isWorldNodeHidden,
@@ -264,6 +265,37 @@ function requirementNodeIssues(
   ];
 }
 
+function nodeMapVisitIssues(task: TaskContent): AnalysisIssue[] {
+  const nodeName = requirementNodeName(task.requirement);
+  const entry = nodeName ? worldNodeByName(nodeName) : undefined;
+  if (!entry) return [];
+
+  const expected =
+    entry.mapName === kingdomNodeGet()?.mapName ? '' : entry.mapName;
+  return task.requireMapVisit === expected
+    ? []
+    : [
+        analysisFail(
+          `"${entry.nodeName}" is on ${entry.mapName}, so requireMapVisit should be ${expected || 'empty'}`,
+        ),
+      ];
+}
+
+function mapVisitIssues(
+  task: TaskContent,
+  guaranteed: CollectibleId[],
+): AnalysisIssue[] {
+  const mapName = task.requireMapVisit;
+  if (!mapName) return nodeMapVisitIssues(task);
+  if (!allMaps().has(mapName)) {
+    return [analysisFail(`requireMapVisit "${mapName}" is not a map`)];
+  }
+  if (!reachableMapNames(guaranteed).has(mapName)) {
+    return [analysisFail(`requireMapVisit "${mapName}" is not reachable`)];
+  }
+  return nodeMapVisitIssues(task);
+}
+
 export function taskNodeIssues(
   task: TaskContent,
   earlierTasks: TaskContent[],
@@ -272,5 +304,6 @@ export function taskNodeIssues(
   return [
     ...requirementNodeIssues(task.requirement, guaranteed),
     ...requirementGateIssues(task.requirement, guaranteed),
+    ...mapVisitIssues(task, guaranteed),
   ];
 }

@@ -24,10 +24,13 @@ import type {
   WorkerStatBlock,
 } from '@interfaces';
 
+// 2: saves track gather-node visits from creation, so they skip the legacy gather-node backfill.
+export const GAMESTATE_VERSION = 2;
+
 export function defaultGameState(): GameState {
   return {
     meta: {
-      version: 1,
+      version: GAMESTATE_VERSION,
       isSetup: false,
       isPaused: false,
       createdAt: Date.now(),

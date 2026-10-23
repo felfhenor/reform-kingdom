@@ -2,6 +2,7 @@
   name: Find the Elven Satchel
   description: In the Larsian Desert, search the Rolling Sands until you find the Elven Satchel. It reveals a hidden path to the Erden Woodland, northeast of the Duchy of Carrina.
   order: 520
+  requireMapVisit: LarsianDesert
   requirement:
     kind: OwnCollectible
     collectibleId: Elven Satchel
@@ -13,6 +14,7 @@
   name: Clear the Ghostmirage Wreck
   description: Defeat every ghost, crab, and Akroki in the Ghostmirage Wreck in the Larsian Desert.
   order: 590
+  requireMapVisit: LarsianDesert
   requirement:
     kind: ClearEncounter
     nodeName: Ghostmirage Wreck
@@ -28,6 +30,7 @@
   name: Rescue Selan Rose
   description: Enter Sandhenge and seek Selan Rose, a Larsian citizen captured by the Akroki.
   order: 600
+  requireMapVisit: LarsianDesert
   whisper: She walked the sands and landed on an Akroki altar. Another one saved.
   requirement:
     kind: RescueWorker
@@ -46,6 +49,7 @@
   name: Clear the Demon Foray
   description: Take the Elfway into the Erden Woodland and defeat the demons of the Demon Foray.
   order: 530
+  requireMapVisit: LarsianDesert
   whisper: Remember their color - the pale blue. The Pale is not natural. It does not belong in this world.
   requirement:
     kind: ClearEncounter
@@ -59,6 +63,7 @@
   name: Visit Elfheim
   description: Visit the elven town of Elfheim in the Erden Woodland.
   order: 540
+  requireMapVisit: ErdenWoodland
   whisper: Elfheim hasn't changed in all this time. They've waited patiently for my help; I only wish I could've given it to them sooner.
   requirement:
     kind: VisitTown
@@ -71,6 +76,7 @@
   name: Upgrade the Shrine of Culcula
   description: Make an offering at the Shrine of Culcula to raise it to level 1, then pray there for its blessing.
   order: 550
+  requireMapVisit: ErdenWoodland
   whisper: I remember Culcula. They were the first cartographer the realm had. Their talent for getting lost made them exceptional at it.
   requirement:
     kind: ShrineLevel
@@ -84,6 +90,7 @@
   name: Defeat 25 Woodwolves
   description: Defeat 25 of the Woodwolves that plague the Erden Woodland.
   order: 560
+  requireMapVisit: ErdenWoodland
   requirement:
     kind: DefeatMonster
     monsterId: Woodwolf
@@ -99,6 +106,7 @@
   name: Train with Elfen Ledi
   description: Visit Elfen Ledi and have a hero learn one of her teachings.
   order: 570
+  requireMapVisit: ErdenWoodland
   requirement:
     kind: LearnTeaching
     trainerId: Elfen Ledi
@@ -110,6 +118,7 @@
   name: Clear Spiderwolf Forest
   description: Clear out the wolves and spiders of the Spiderwolf Forest.
   order: 580
+  requireMapVisit: ErdenWoodland
   requirement:
     kind: ClearEncounter
     nodeName: Spiderwolf Forest
@@ -125,6 +134,7 @@
   name: Reach Level 35
   description: Keep adventuring until a hero reaches level 35.
   order: 610
+  requireMapVisit: ErdenWoodland
   requirement:
     kind: ReachLevel
     level: 35
@@ -138,6 +148,7 @@
   name: Gather 25 Crimson Ore
   description: Travel to the Elfheim Royal Mines and gather until you have collected 25 Crimson Ore.
   order: 620
+  requireMapVisit: ErdenWoodland
   requirement:
     kind: GatherItem
     nodeName: Elfheim Royal Mines
@@ -151,6 +162,7 @@
   name: Reach Blacksmithing Level 20
   description: Craft Blacksmithing recipes until the building reaches level 20. It needs a Finely-made Sharp Star to grow past level 15.
   order: 525
+  requireMapVisit: ErdenWoodland
   requirement:
     kind: TradeskillLevel
     tradeskillId: Blacksmithing
@@ -165,6 +177,7 @@
   name: Reach Tailoring Level 20
   description: Craft Tailoring recipes until the building reaches level 20. It needs a Fluff-filled Plushy Creature to grow past level 15.
   order: 535
+  requireMapVisit: ErdenWoodland
   requirement:
     kind: TradeskillLevel
     tradeskillId: Tailoring
@@ -179,6 +192,7 @@
   name: Reach Jewelcrafting Level 20
   description: Craft Jewelcrafting recipes until the building reaches level 20. It needs an Artistically-crafted Miremetal Ring to grow past level 15.
   order: 545
+  requireMapVisit: ErdenWoodland
   requirement:
     kind: TradeskillLevel
     tradeskillId: Jewelcrafting
@@ -193,6 +207,7 @@
   name: Reach Woodworking Level 20
   description: Craft Woodworking recipes until the building reaches level 20. It needs an Ooze-filled Drawing Tool to grow past level 15.
   order: 565
+  requireMapVisit: ErdenWoodland
   requirement:
     kind: TradeskillLevel
     tradeskillId: Woodworking
@@ -207,6 +222,7 @@
   name: Reach Artificing Level 20
   description: Craft Artificing recipes until the building reaches level 20. It needs an Ooze-coated Miremetal to grow past level 15.
   order: 575
+  requireMapVisit: ErdenWoodland
   requirement:
     kind: TradeskillLevel
     tradeskillId: Artificing

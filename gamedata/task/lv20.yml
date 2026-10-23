@@ -2,6 +2,7 @@
   name: Rescue Sefirah Hornacis
   description: Head to the Craggled Mire and rescue Sefirah Hornacis from the Miserable Mire.
   order: 400
+  requireMapVisit: CraggledMire
   whisper: No explorer is truly safe from the Mire. The fault lies entirely with Fel, that fiend.
   requirement:
     kind: RescueWorker
@@ -20,6 +21,7 @@
   name: Visit Larsia
   description: Cross the Larsian Traverse into the Larsian Desert and visit the town of Larsia.
   order: 410
+  requireMapVisit: CraggledMire
   whisper: Ah, Larsia. It looks so different now. It seems even I've forgotten what it used to be.
   requirement:
     kind: VisitTown
@@ -32,6 +34,7 @@
   name: Earn the Respect of Larsia
   description: Fulfill commissions for Larsia until you reach reputation tier 1.
   order: 420
+  requireMapVisit: LarsianDesert
   requirement:
     kind: TownReputationTier
     townId: Larsia
@@ -47,6 +50,7 @@
   name: Reach Level 25
   description: Keep adventuring until a hero reaches level 25.
   order: 430
+  requireMapVisit: LarsianDesert
   requirement:
     kind: ReachLevel
     level: 25
@@ -60,6 +64,7 @@
   name: Gather 50 Cactspine
   description: Travel to the Mescalin Expanse in the Larsian Desert and gather until you have collected 50 Cactspine.
   order: 440
+  requireMapVisit: LarsianDesert
   requirement:
     kind: GatherItem
     nodeName: Mescalin Expanse
@@ -76,6 +81,7 @@
   name: Gather 25 Timberfuzz
   description: Travel to the Oasis Wellspring in the Larsian Desert and gather until you have collected 25 Timberfuzz.
   order: 450
+  requireMapVisit: LarsianDesert
   requirement:
     kind: GatherItem
     nodeName: Oasis Wellspring
@@ -92,6 +98,7 @@
   name: Upgrade the Shrine of Medina
   description: Make an offering at the Shrine of Medina to raise it to level 1, then pray there for its blessing.
   order: 460
+  requireMapVisit: LarsianDesert
   whisper: Ah, Medina. An immeasurable talent for growth. I see her sunflowers persist even to this day. A shame that she's no longer around.
   requirement:
     kind: ShrineLevel
@@ -105,6 +112,7 @@
   name: Defeat 30 Akroki Vanguards
   description: Defeat 30 Akroki Vanguards that patrol the Larsian Desert, threatening the peace of Larsia.
   order: 470
+  requireMapVisit: LarsianDesert
   requirement:
     kind: DefeatMonster
     monsterId: Akroki Vanguard
@@ -120,6 +128,7 @@
   name: Become Honored in Larsia
   description: Keep fulfilling commissions for Larsia until you reach reputation tier 2.
   order: 480
+  requireMapVisit: LarsianDesert
   requirement:
     kind: TownReputationTier
     townId: Larsia
@@ -135,6 +144,7 @@
   name: Clear the Cimmerian Temple
   description: Defeat every Akroki and magical creature in the Cimmerian Temple in the Larsian Desert.
   order: 490
+  requireMapVisit: LarsianDesert
   whisper: A temple once filled with people who are now lost to time. It's strange to think they've just vanished.
   requirement:
     kind: ClearEncounter
@@ -151,6 +161,7 @@
   name: Train with Maxim Tasnica
   description: Bring a Cimmerian charm to Maxim Tasnica in the Craggled Mire and have a hero learn one of his teachings.
   order: 500
+  requireMapVisit: CraggledMire
   requirement:
     kind: LearnTeaching
     trainerId: Maxim Tasnica
@@ -162,6 +173,7 @@
   name: Reach Level 30
   description: Keep adventuring until a hero reaches level 30.
   order: 510
+  requireMapVisit: LarsianDesert
   requirement:
     kind: ReachLevel
     level: 30
@@ -173,6 +185,7 @@
   name: Reach Blacksmithing Level 15
   description: Craft Blacksmithing recipes until the building reaches level 15.
   order: 405
+  requireMapVisit: LarsianDesert
   requirement:
     kind: TradeskillLevel
     tradeskillId: Blacksmithing
@@ -187,6 +200,7 @@
   name: Reach Tailoring Level 15
   description: Craft Tailoring recipes until the building reaches level 15.
   order: 415
+  requireMapVisit: LarsianDesert
   requirement:
     kind: TradeskillLevel
     tradeskillId: Tailoring
@@ -201,6 +215,7 @@
   name: Reach Jewelcrafting Level 15
   description: Craft Jewelcrafting recipes until the building reaches level 15.
   order: 425
+  requireMapVisit: LarsianDesert
   requirement:
     kind: TradeskillLevel
     tradeskillId: Jewelcrafting
@@ -215,6 +230,7 @@
   name: Reach Woodworking Level 15
   description: Craft Woodworking recipes until the building reaches level 15.
   order: 445
+  requireMapVisit: LarsianDesert
   requirement:
     kind: TradeskillLevel
     tradeskillId: Woodworking
@@ -229,6 +245,7 @@
   name: Reach Artificing Level 15
   description: Craft Artificing recipes until the building reaches level 15.
   order: 455
+  requireMapVisit: LarsianDesert
   requirement:
     kind: TradeskillLevel
     tradeskillId: Artificing
@@ -243,6 +260,7 @@
   name: Craft a Finely-made Sharp Star
   description: Craft a Finely-made Sharp Star so Blacksmithing can grow past level 15.
   order: 465
+  requireMapVisit: CraggledMire
   requirement:
     kind: CraftRecipe
     recipeId: 'Collectible: Finely-made Sharp Star'

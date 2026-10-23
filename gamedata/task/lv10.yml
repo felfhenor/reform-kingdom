@@ -48,6 +48,7 @@
   name: Defeat 25 Toxic Toads
   description: Defeat 25 of the Toxic Toads that lurk across the Craggled Mire.
   order: 270
+  requireMapVisit: CraggledMire
   requirement:
     kind: DefeatMonster
     monsterId: Toxic Toad
@@ -76,6 +77,7 @@
   name: Gather 25 Miremetal Ore
   description: Travel to the Miremetal Mines and gather until you have collected 25 Miremetal Ore.
   order: 290
+  requireMapVisit: CraggledMire
   requirement:
     kind: GatherItem
     nodeName: Miremetal Mines
@@ -92,6 +94,7 @@
   name: Gather 50 Mireweed
   description: Travel to Swampfields and gather until you have collected 50 Mireweed.
   order: 300
+  requireMapVisit: CraggledMire
   requirement:
     kind: GatherItem
     nodeName: Swampfields
@@ -108,6 +111,7 @@
   name: Upgrade the Shrine of Parcilyte
   description: Make an offering at the Shrine of Parcilyte to raise it to level 1, then pray there for its blessing.
   order: 310
+  requireMapVisit: CraggledMire
   whisper: The orcs remember Parcilyte. She was my champion, and she was a damn good general.
   requirement:
     kind: ShrineLevel
@@ -163,6 +167,7 @@
   name: Clear Craggleorc Bluff
   description: Defeat every fight on Craggleorc Bluff, located in the Craggled Mire.
   order: 350
+  requireMapVisit: CraggledMire
   requirement:
     kind: ClearEncounter
     nodeName: Craggleorc Bluff
@@ -175,6 +180,7 @@
   name: Defeat 25 Angry Spirits
   description: Defeat 25 of the Angry Spirits that haunt the Ghostyard in the Craggled Mire.
   order: 360
+  requireMapVisit: CraggledMire
   requirement:
     kind: DefeatMonster
     monsterId: Angry Spirit
@@ -190,6 +196,7 @@
   name: Acquire the Ghost Orbs
   description: Head to the Craggled Mire and seek the Ghost Orbs at the Spirit Nexus.
   order: 370
+  requireMapVisit: CraggledMire
   requirement:
     kind: OwnCollectible
     collectibleId: Ghost Orbs
@@ -204,6 +211,7 @@
   name: Cast Fortitude of the Warden
   description: 'Ghost Orbs from the Spirit Nexus unlock a warding spell. Cast Fortitude of the Warden I.'
   order: 380
+  requireMapVisit: CraggledMire
   requirement:
     kind: CastAstralSpell
     astralProjectorId: 'Ward: Fortitude of the Warden I'
@@ -214,6 +222,7 @@
 
 - id: 2a69de63-0b51-4ff0-9de3-1ffa886ef853
   name: Reach Level 20
+  requireMapVisit: CraggledMire
   description: Keep adventuring until a hero reaches level 20.
   order: 390
   requirement:
@@ -225,6 +234,7 @@
 
 - id: b3139f3b-8b83-45f5-95cb-ee47c3f3cd3c
   name: Reach Blacksmithing Level 10
+  requireMapVisit: CraggledMire
   description: Craft Blacksmithing recipes until the building reaches level 10.
   order: 255
   requirement:
@@ -239,6 +249,7 @@
 
 - id: 6b896c57-9b90-4152-8792-bea47a55f761
   name: Reach Tailoring Level 10
+  requireMapVisit: CraggledMire
   description: Craft Tailoring recipes until the building reaches level 10. It needs a Minor Tailoring Effigy to grow past level 5.
   order: 265
   requirement:
@@ -253,6 +264,7 @@
 
 - id: 36352784-ee2c-4ff1-a2ac-5c24f4b37c09
   name: Reach Woodworking Level 10
+  requireMapVisit: CraggledMire
   description: Craft Woodworking recipes until the building reaches level 10. It needs a Minor Woodworking Effigy to grow past level 5.
   order: 285
   requirement:
@@ -269,6 +281,7 @@
   name: Reach Artificing Level 10
   description: Craft Artificing recipes until the building reaches level 10. It needs a Minor Artificing Effigy to grow past level 5.
   order: 305
+  requireMapVisit: CraggledMire
   requirement:
     kind: TradeskillLevel
     tradeskillId: Artificing

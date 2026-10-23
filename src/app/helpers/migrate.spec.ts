@@ -22,7 +22,11 @@ import {
   ensureTrainerTeaching,
 } from '@helpers/content/ensure-trainer';
 import { tradeskillXpForLevel } from '@helpers/crafting/tradeskill';
-import { defaultGameState, defaultTradeskillBuilding } from '@helpers/defaults';
+import {
+  defaultGameState,
+  defaultTradeskillBuilding,
+  GAMESTATE_VERSION,
+} from '@helpers/defaults';
 import { characterXpForLevel } from '@helpers/hero/party';
 import { migrateGameState, migrateOptionsState } from '@helpers/migrate';
 import { defaultOptions, options, setOptions } from '@helpers/state-options';
@@ -282,16 +286,23 @@ describe('migrateGameState', () => {
     it('are granted for every node to a save with material progress from before visits were tracked', () => {
       seedGroves();
 
-      const migrated = migrate(
-        (save) => (save.materials[ore.id] = { quantity: 5, foundAt: 1 }),
-      );
+      const migrated = migrate((save) => {
+        save.meta.version = 1;
+        save.materials[ore.id] = { quantity: 5, foundAt: 1 };
+      });
 
       expect(Object.keys(migrated.discoveredGatherNodes)).toEqual(groves);
+      expect(migrated.meta.version).toBe(GAMESTATE_VERSION);
     });
 
     it('are left alone for a fresh save or one that already records visits', () => {
       seedGroves();
       expect(migrate(() => {}).discoveredGatherNodes).toEqual({});
+      expect(
+        migrate(
+          (save) => (save.materials[ore.id] = { quantity: 5, foundAt: 1 }),
+        ).discoveredGatherNodes,
+      ).toEqual({});
 
       const visited = { 'Wergen Woods': { foundAt: 1 } };
       expect(
