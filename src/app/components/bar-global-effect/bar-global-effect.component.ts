@@ -27,7 +27,7 @@ import { AnimationService } from '@services/animation.service';
       <ul class="flex gap-2 items-center p-2 bg-transparent">
         @for (effect of displayedEffects(); track effect.id) {
           <li
-            class="global-effect-box tooltip tooltip-bottom"
+            class="global-effect-box text-sm tooltip tooltip-bottom"
             [tp]="effectTooltip"
             [tpPlacement]="'bottom'"
             (animate.enter)="onEnter($event)"
@@ -70,7 +70,6 @@ import { AnimationService } from '@services/animation.service';
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.9rem;
       border: 1px solid currentColor;
       border-radius: 0.25rem;
       opacity: 0.85;

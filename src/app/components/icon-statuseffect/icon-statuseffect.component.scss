@@ -5,10 +5,9 @@
 }
 
 .statuseffect-turns {
-  @apply absolute font-bold text-white leading-none pointer-events-none;
+  @apply absolute font-bold text-white leading-none pointer-events-none text-xs;
   right: -2px;
   bottom: -2px;
-  font-size: 0.5rem;
   text-shadow:
     -1px -1px 0 #000,
     1px -1px 0 #000,

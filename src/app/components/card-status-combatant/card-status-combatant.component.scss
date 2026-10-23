@@ -50,8 +50,7 @@
 }
 
 .skill-cast {
-  @apply flex items-center gap-2 truncate text-amber-300;
-  font-size: 0.6rem;
+  @apply flex items-center gap-2 truncate text-amber-300 text-xs;
   animation: skill-cast-fade 750ms ease-out forwards;
 }
 
@@ -69,8 +68,8 @@
   // `position: relative` (not absolute) keeps concurrent numbers stacked via
   // flex-col-reverse instead of overlapping at the same spot.
   position: relative;
+  @apply text-xs;
   font-weight: 700;
-  font-size: 0.55rem;
   white-space: nowrap;
   text-shadow:
     -1px -1px 0 #000,
@@ -120,7 +119,7 @@
 }
 
 .status-entry.expanded .damage-number {
-  font-size: 0.8rem;
+  @apply text-sm;
 }
 
 @keyframes skill-cast-fade {

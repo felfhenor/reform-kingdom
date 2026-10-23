@@ -5,7 +5,7 @@
 }
 
 .label-text {
-  @apply absolute text-[14px] font-semibold text-white leading-none pointer-events-none z-[20];
+  @apply absolute text-sm font-semibold text-white leading-none pointer-events-none z-[20];
   text-shadow:
     -1px -1px 0 #000,
     1px -1px 0 #000,
@@ -18,11 +18,11 @@
 }
 
 .label-banner {
-  @apply absolute inset-x-0 text-[10px] text-white text-center bg-black/60 z-[20];
+  @apply absolute inset-x-0 text-xs text-white text-center bg-black/60 z-[20];
 }
 
 .badge {
-  @apply absolute bottom-0 right-0 text-[16px] leading-tight px-1 text-white tabular-nums z-[20];
+  @apply absolute bottom-0 right-0 text-base leading-tight px-1 text-white tabular-nums z-[20];
 
   &:empty {
     @apply hidden;

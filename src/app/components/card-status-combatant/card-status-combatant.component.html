@@ -118,7 +118,7 @@
         [max]="bar.max"
       >
         @if (isExpanded) {
-          <span class="text-[0.6rem] text-white">
+          <span class="text-xs text-white">
             <app-text-number-tween [value]="bar.current" />
             / {{ bar.max | number }} {{ bar.variant | uppercase }}
           </span>

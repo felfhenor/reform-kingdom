@@ -32,7 +32,7 @@ function pixiFloatingQuoteCreate(quote: string, width: number): Text {
   return new Text({
     text: `"${quote}"`,
     style: {
-      fontSize: 11,
+      fontSize: 12,
       fontFamily: uiTextFontFamily(),
       fontStyle: 'italic',
       fill: 0xffffff,
@@ -82,9 +82,9 @@ export function pixiFloatingTextCreate(
   const qtyText = pixiFloatingTextLabelCreate(
     `+${event.quantity.toLocaleString()}`,
     0x4ade80,
-    13,
+    14,
   );
-  const nameText = pixiFloatingTextLabelCreate(event.name, 0xffffff, 11);
+  const nameText = pixiFloatingTextLabelCreate(event.name, 0xffffff, 12);
   const iconSize = 16;
   const gap = 4;
 
