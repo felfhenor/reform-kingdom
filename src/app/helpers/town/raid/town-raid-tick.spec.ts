@@ -10,6 +10,7 @@ import {
   RAID_WARNING_TICKS_PER_MAP_HOP,
   RAID_WARNING_TICKS_PER_REPUTATION_TIER,
 } from '@helpers/config';
+import { combatLog, resetCombatLog } from '@helpers/combat/combat-log';
 import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
 import { ensureTown } from '@helpers/content/ensure-town';
 import { globalEffectsState, worldTownsState } from '@helpers/state-game';
@@ -148,12 +149,14 @@ describe('townRaidProcessTick', () => {
 
   it('loses an undefended raid once its warning runs out, and not before', () => {
     const notifications = captureNotifications();
+    resetCombatLog();
     seedTown({
       raidTelegraphedAtTick: 1,
       raidEngageWindowExpiresAtTick: now + 1,
     });
     tick();
     expect(raidResolveDefeat).not.toHaveBeenCalled();
+    expect(combatLog()).toEqual([]);
     expect(townState()).toMatchObject({
       raidTelegraphedAtTick: 1,
       raidEngageWindowExpiresAtTick: now + 1,
@@ -162,6 +165,12 @@ describe('townRaidProcessTick', () => {
     seedTown({ raidTelegraphedAtTick: 1, raidEngageWindowExpiresAtTick: now });
     tick();
     expect(raidResolveDefeat).toHaveBeenCalledWith(larsia.id);
+    expect(combatLog()).toEqual([
+      expect.objectContaining({
+        kind: 'Raid',
+        message: '**Larsia** was raided while undefended!',
+      }),
+    ]);
     expect(notifications).toEqual([
       expect.objectContaining({ message: expect.stringContaining('Larsia') }),
     ]);

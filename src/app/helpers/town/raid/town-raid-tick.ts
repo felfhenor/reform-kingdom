@@ -5,6 +5,7 @@ import {
   RAID_WARNING_TICKS_PER_MAP_HOP,
   RAID_WARNING_TICKS_PER_REPUTATION_TIER,
 } from '@helpers/config';
+import { categoryMessageLog } from '@helpers/combat/combat-log';
 import { getEntriesByType } from '@helpers/content/content';
 import {
   analyticsSafeSegment,
@@ -85,6 +86,11 @@ function processTownRaid(town: TownContent): void {
       now >= state.raidEngageWindowExpiresAtTick
     ) {
       notifyError(`${town.name} was raided while undefended!`);
+      categoryMessageLog(
+        'Raid',
+        town.name,
+        `**${town.name}** was raided while undefended!`,
+      );
       raidResolveDefeat(town.id);
     }
     return;
