@@ -16,7 +16,7 @@ import {
   recipeResultQuantity,
   recipeResultRollSucceeds,
 } from '@helpers/crafting/recipe-result';
-import { isRecipeCraftable } from '@helpers/crafting/recipes';
+import { isRecipeAvailable } from '@helpers/crafting/recipes';
 import {
   craftXpChance,
   tradeskillBuilding,
@@ -252,10 +252,9 @@ export function craftQueueStart(
   if (!recipe || !tradeskillId || recipe.tradeskillId !== tradeskillId) {
     return false;
   }
-  if (!isRecipeCraftable(recipeId)) return false;
+  if (!isRecipeAvailable(recipe)) return false;
 
   const building = tradeskillBuilding(tradeskill);
-  if (building.level < recipe.minTradeskillLevel) return false;
 
   const maxCraftable = craftMaxCraftableQuantity(recipe, tradeskill);
   if (maxCraftable <= 0) return false;

@@ -1,10 +1,18 @@
+import { caravanTraderSoldGoodIds } from '@helpers/caravan/caravan-trader-goods';
 import { getEntry } from '@helpers/content/content';
+import {
+  isRecipeCraftable,
+  isRecipeTownUnique,
+  recipesProducing,
+} from '@helpers/crafting/recipes';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { armoryGet } from '@helpers/kingdom/armory';
 import { rngNumberRange } from '@helpers/rng';
 import { townReputationTierValueResolve } from '@helpers/town/reputation/town-reputation-tier-value';
+import { allGatherableMaterialIds } from '@helpers/world-node/world-node-gathering';
 import type {
   CommissionOfferContent,
+  CommissionOfferRequirement,
   CommissionOfferSlot,
   CommissionRequirement,
   CommissionRequirementEntry,
@@ -16,14 +24,42 @@ import type {
   TownId,
 } from '@interfaces';
 
+// Only an undiscovered drop-gated recipe blocks, never tradeskill level; gatherable, trader-sold and town-shop goods need no recipe.
+function commissionOfferRequirementCraftable(
+  requirement: CommissionOfferRequirement,
+  obtainable: Set<string>,
+): boolean {
+  if ('monsterId' in requirement) return true;
+
+  const resultId =
+    'equipmentId' in requirement ? requirement.equipmentId : requirement.itemId;
+  if (obtainable.has(resultId)) return true;
+
+  const recipes = recipesProducing(resultId);
+  return (
+    recipes.length === 0 ||
+    recipes.some(
+      (recipe) => isRecipeTownUnique(recipe.id) || isRecipeCraftable(recipe.id),
+    )
+  );
+}
+
 // Shared by caravan and town commission generation - both draw from the same weighted CommissionOfferSlot[] pool shape.
 export function eligibleCommissionOffers(
   slots: CommissionOfferSlot[],
 ): EligibleCommissionOffer[] {
+  const obtainable = new Set<string>([
+    ...allGatherableMaterialIds(),
+    ...caravanTraderSoldGoodIds(),
+  ]);
+
   return slots
     .map((slot) => {
       const offer = getEntry<CommissionOfferContent>(slot.commissionOfferId);
-      return offer ? { offer, weight: slot.weight } : undefined;
+      const craftable = offer?.requirements.every((requirement) =>
+        commissionOfferRequirementCraftable(requirement, obtainable),
+      );
+      return offer && craftable ? { offer, weight: slot.weight } : undefined;
     })
     .filter((slot): slot is EligibleCommissionOffer => !!slot);
 }

@@ -1,9 +1,9 @@
-import { getEntriesByType } from '@helpers/content/content';
+import { recipesProducing } from '@helpers/crafting/recipes';
 import { farmableExploreNodes } from '@helpers/decree/decree-farm-node';
 import { farmNodeRewardOptions } from '@helpers/decree/decree-farm-node.ui';
 import { isMaterialDiscovered } from '@helpers/item/materials';
 import { discoveredGatherNodesFor } from '@helpers/world-node/world-node-gathering-discovery';
-import type { ItemId, RecipeContent, WorldNodeEntry } from '@interfaces';
+import type { ItemId, WorldNodeEntry } from '@interfaces';
 import { sortBy, uniqBy } from 'es-toolkit/compat';
 
 function farmNodesFor(itemId: ItemId): WorldNodeEntry[] {
@@ -31,7 +31,5 @@ export function materialSourceNodes(itemId: ItemId): WorldNodeEntry[] {
 export function materialSourceIsCrafting(itemId: ItemId): boolean {
   if (!isMaterialDiscovered(itemId)) return false;
 
-  return getEntriesByType<RecipeContent>('recipe').some(
-    (recipe) => 'itemId' in recipe.result && recipe.result.itemId === itemId,
-  );
+  return recipesProducing(itemId).length > 0;
 }

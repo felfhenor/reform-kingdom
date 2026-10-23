@@ -8,25 +8,41 @@ import {
   eligibleCommissionOffers,
   rollCommissionRequirements,
 } from '@helpers/commission/commission-requirement';
+import { ensureCaravanTrader } from '@helpers/content/ensure-caravan';
 import { ensureCommissionOffer } from '@helpers/content/ensure-commission';
+import { ensureEncounter } from '@helpers/content/ensure-encounternode';
+import {
+  ensureGatherResult,
+  ensureGathering,
+} from '@helpers/content/ensure-gathernode';
+import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
 import { ensureMonster } from '@helpers/content/ensure-monster';
+import { ensureRecipe } from '@helpers/content/ensure-recipe';
+import { ensureTown } from '@helpers/content/ensure-town';
 import { defaultGameState } from '@helpers/defaults';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
 import type {
+  CaravanTraderContent,
+  CaravanTraderId,
   CommissionOfferContent,
   CommissionOfferId,
+  EncounterId,
   CommissionRequirement,
   EquipmentId,
   GameState,
+  IsContentItem,
   ItemId,
   MonsterId,
+  RecipeContent,
+  RecipeId,
   TownId,
 } from '@interfaces';
 import { buildEquipmentItem, buildTownNodeState } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 
 const townId = 'larsia' as TownId;
 const stick = ensureItem({
@@ -79,6 +95,134 @@ describe('eligibleCommissionOffers', () => {
         { commissionOfferId: 'gone' as CommissionOfferId, weight: 1 },
       ]),
     ).toEqual([{ offer: offer(), weight: 3 }]);
+  });
+
+  describe('with a recipe gate', () => {
+    const swordOffer = offer({
+      id: 'offer-b' as CommissionOfferId,
+      requirements: [{ equipmentId: sword.id, quantityMin: 1, quantityMax: 1 }],
+    });
+    const slots = [
+      { commissionOfferId: offer().id, weight: 1 },
+      { commissionOfferId: swordOffer.id, weight: 1 },
+    ];
+    const recipe = (id: string, result: RecipeContent['result']) =>
+      ensureRecipe({ id: id as RecipeId, result, minTradeskillLevel: 50 });
+    const swordRecipe = recipe('sword-recipe', { equipmentId: sword.id });
+    const stickRecipe = recipe('stick-recipe', {
+      itemId: stick.id,
+      quantity: 1,
+    });
+    const recipeDrop = ensureEncounter({
+      id: 'forest-ruins' as EncounterId,
+      name: 'Forest Ruins',
+      completionRewards: [
+        ensureDroppedReward({ recipeId: swordRecipe.id }),
+        ensureDroppedReward({ recipeId: stickRecipe.id }),
+      ],
+    });
+
+    const swordOnlyFrom = (...sources: IsContentItem[]) => {
+      seedContent([
+        stick,
+        sword,
+        offer(),
+        swordOffer,
+        swordRecipe,
+        recipeDrop,
+        ...sources,
+      ]);
+    };
+
+    beforeEach(() => {
+      swordOnlyFrom(
+        stickRecipe,
+        ensureGathering({
+          name: 'Wergen Woods',
+          gatherResults: [
+            ensureGatherResult({
+              chance: 100,
+              items: [{ itemId: stick.id, quantity: 1 }],
+            }),
+          ],
+        }),
+      );
+      seedWorldNodes([{ name: 'Wergen Woods', type: 'GatherNode' }]);
+    });
+
+    it('drops an offer needing a crafted-only good until its dropped recipe is found, ignoring gatherables', () => {
+      expect(eligibleCommissionOffers(slots)).toEqual([
+        { offer: offer(), weight: 1 },
+      ]);
+
+      seedGamestate((state) => {
+        state.discoveredRecipes[swordRecipe.id] = { foundAt: 1000 };
+      });
+      expect(eligibleCommissionOffers(slots)).toHaveLength(2);
+    });
+
+    it('keeps an offer when any of its recipes is known, regardless of tradeskill level', () => {
+      swordOnlyFrom(recipe('ungated-sword-recipe', { equipmentId: sword.id }));
+
+      expect(eligibleCommissionOffers(slots)).toHaveLength(2);
+    });
+
+    it.each<[string, Partial<CaravanTraderContent>]>([
+      [
+        'gold',
+        {
+          trades: [
+            { type: 'sell', value: 10, equipmentId: sword.id, weight: 1 },
+          ],
+        },
+      ],
+      ['token', { tokenTrades: [{ tokenCost: 3, equipmentId: sword.id }] }],
+    ])('keeps an offer whose good a trader sells for %s', (_, trades) => {
+      swordOnlyFrom(
+        ensureCaravanTrader({ id: 'alekia' as CaravanTraderId, ...trades }),
+      );
+
+      expect(eligibleCommissionOffers(slots)).toHaveLength(2);
+    });
+
+    it("ignores a trader buying the good, since that's no source", () => {
+      swordOnlyFrom(
+        ensureCaravanTrader({
+          id: 'alekia' as CaravanTraderId,
+          trades: [
+            { type: 'buy', value: 10, equipmentId: sword.id, weight: 1 },
+          ],
+        }),
+      );
+
+      expect(eligibleCommissionOffers(slots)).toHaveLength(1);
+    });
+
+    it("keeps an offer whose good only a town's shop crafts", () => {
+      swordOnlyFrom(
+        ensureTown({
+          id: townId,
+          name: 'Larsia',
+          crafting: { uniqueRecipeIds: ['sword-recipe' as RecipeId] },
+        }),
+      );
+
+      expect(eligibleCommissionOffers(slots)).toHaveLength(2);
+    });
+
+    it('never gates a kill requirement', () => {
+      const killOffer = offer({
+        id: 'offer-c' as CommissionOfferId,
+        requirements: [{ monsterId: worm.id, quantityMin: 1, quantityMax: 1 }],
+      });
+      seedContent([worm, killOffer]);
+
+      expect(
+        eligibleCommissionOffers([
+          { commissionOfferId: killOffer.id, weight: 1 },
+        ]),
+      ).toEqual([{ offer: killOffer, weight: 1 }]);
+    });
   });
 });
 

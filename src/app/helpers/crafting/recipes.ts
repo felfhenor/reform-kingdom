@@ -3,6 +3,10 @@ import {
   getEntriesByType,
   getEntry,
 } from '@helpers/content/content';
+import {
+  tradeskillBuilding,
+  tradeskillNameForId,
+} from '@helpers/crafting/tradeskill';
 import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
 import { getCollectibleQuantity } from '@helpers/item/collectibles';
 import { equippedItems } from '@helpers/item/equipment';
@@ -21,6 +25,7 @@ import type {
   EquipmentId,
   GameState,
   ItemContent,
+  ItemId,
   RecipeContent,
   RecipeId,
   TownContent,
@@ -101,6 +106,26 @@ export function isRecipeCraftable(recipeId: RecipeId): boolean {
   if (isRecipeTownUnique(recipeId)) return false;
   if (isRecipeDiscovered(recipeId)) return true;
   return !isRecipeDropGated(recipeId);
+}
+
+// Whether the player could queue it right now, ignoring materials on hand.
+export function isRecipeAvailable(recipe: RecipeContent): boolean {
+  const tradeskill = tradeskillNameForId(recipe.tradeskillId);
+  if (!tradeskill) return false;
+  if (tradeskillBuilding(tradeskill).level < recipe.minTradeskillLevel)
+    return false;
+  return isRecipeCraftable(recipe.id);
+}
+
+export function recipesProducing(
+  resultId: ItemId | EquipmentId,
+): RecipeContent[] {
+  return getEntriesByType<RecipeContent>('recipe').filter((recipe) =>
+    'itemId' in recipe.result
+      ? recipe.result.itemId === resultId
+      : 'equipmentId' in recipe.result &&
+        recipe.result.equipmentId === resultId,
+  );
 }
 
 export function recipeDiscover(recipeId: RecipeId): void {

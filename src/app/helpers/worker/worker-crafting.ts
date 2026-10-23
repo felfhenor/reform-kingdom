@@ -11,11 +11,7 @@ import {
   recipeResultQuantity,
   recipeResultRollSucceeds,
 } from '@helpers/crafting/recipe-result';
-import { isRecipeCraftable } from '@helpers/crafting/recipes';
-import {
-  tradeskillBuilding,
-  tradeskillNameForId,
-} from '@helpers/crafting/tradeskill';
+import { isRecipeAvailable } from '@helpers/crafting/recipes';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -69,11 +65,7 @@ export function isRecipeWorkerCraftable(recipe: RecipeContent): boolean {
   if (recipe.requirements.some((requirement) => 'equipmentId' in requirement))
     return false;
 
-  const tradeskill = tradeskillNameForId(recipe.tradeskillId);
-  if (!tradeskill) return false;
-  if (tradeskillBuilding(tradeskill).level < recipe.minTradeskillLevel)
-    return false;
-  if (!isRecipeCraftable(recipe.id)) return false;
+  if (!isRecipeAvailable(recipe)) return false;
 
   return recipe.requirements.every(
     (requirement) =>

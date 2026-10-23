@@ -4,3 +4,4 @@ export * from './caravan-trade-display.ui';
 export * from './caravan-trade-quantity';
 export * from './caravan-trade-quantity.ui';
 export * from './caravan-trade.ui';
+export * from './caravan-trader-goods';

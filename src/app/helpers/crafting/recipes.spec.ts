@@ -16,15 +16,21 @@ import {
   isRecipeDiscovered,
   isRecipeDropGated,
   isRecipeTownUnique,
+  isRecipeAvailable,
   recipeCanUnlockWithTokens,
   recipeDiscover,
   recipeResultContent,
   recipeResultOwnedQuantity,
   recipeResultSpritesheet,
   recipeStylizedName,
+  recipesProducing,
   recipeUndiscover,
 } from '@helpers/crafting/recipes';
-import { defaultEquipment, defaultGameState } from '@helpers/defaults';
+import {
+  defaultEquipment,
+  defaultGameState,
+  defaultTradeskillBuilding,
+} from '@helpers/defaults';
 import { applyCollectibleGrant } from '@helpers/item/collectibles';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import { discoveredRecipesState } from '@helpers/state-game';
@@ -167,6 +173,47 @@ describe('isRecipeCraftable', () => {
     expect(isRecipeTownUnique(equipmentRecipe.id)).toBe(true);
     expect(isRecipeTownUnique(itemRecipe.id)).toBe(false);
     expect(isRecipeCraftable(equipmentRecipe.id)).toBe(false);
+  });
+});
+
+describe('isRecipeAvailable', () => {
+  const highLevel = { ...equipmentRecipe, minTradeskillLevel: 5 };
+
+  function seedTailoring(level: number, ...discovered: RecipeId[]): void {
+    seedGamestate((state) => {
+      state.tradeskills[tailoringId] = {
+        ...defaultTradeskillBuilding(),
+        level,
+      };
+      discovered.forEach(
+        (id) => (state.discoveredRecipes[id] = { foundAt: 1000 }),
+      );
+    });
+  }
+
+  it('needs the building level and, if gated, discovery', () => {
+    seedTailoring(1);
+    expect(isRecipeAvailable(equipmentRecipe)).toBe(false);
+
+    seedTailoring(1, equipmentRecipe.id);
+    expect(isRecipeAvailable(equipmentRecipe)).toBe(true);
+    expect(isRecipeAvailable(highLevel)).toBe(false);
+
+    seedTailoring(5, equipmentRecipe.id);
+    expect(isRecipeAvailable(highLevel)).toBe(true);
+  });
+
+  it('is false when the tradeskill is missing from content', () => {
+    seedTailoring(1);
+    expect(isRecipeAvailable(itemRecipe)).toBe(false);
+  });
+});
+
+describe('recipesProducing', () => {
+  it('finds recipes by item or equipment result', () => {
+    expect(recipesProducing(ingotId)).toEqual([itemRecipe]);
+    expect(recipesProducing(cloakId)).toEqual([equipmentRecipe]);
+    expect(recipesProducing('other' as EquipmentId)).toEqual([]);
   });
 });
 

@@ -7,7 +7,7 @@ import {
 import { backfillReservedEquipment } from '@helpers/crafting/crafting-reserved-equipment';
 import { recipeResultQuantity } from '@helpers/crafting/recipe-result';
 import {
-  isRecipeCraftable,
+  isRecipeAvailable,
   recipeBackdropSprite,
   recipeResultContent,
   recipeResultOwnedQuantity,
@@ -103,9 +103,7 @@ export function getCraftableRecipeEntries(
   const entries: CraftRecipeEntry[] = getEntriesByType<RecipeContent>('recipe')
     .filter(
       (recipe) =>
-        recipe.tradeskillId === tradeskillId &&
-        building.level >= recipe.minTradeskillLevel &&
-        isRecipeCraftable(recipe.id),
+        recipe.tradeskillId === tradeskillId && isRecipeAvailable(recipe),
     )
     .map((recipe) => {
       const maxCraftable = craftMaxCraftableQuantity(recipe, tradeskill);
