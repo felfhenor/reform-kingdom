@@ -2,9 +2,10 @@
   class="w-full overflow-hidden bg-black/30"
   [class]="[colorClass(), sizeClass()]"
 >
+  <!-- scaleX under a CSS transition runs on the compositor, so the fill keeps moving through main-thread stalls. -->
   <div
-    class="relative h-full overflow-hidden bg-current"
-    [style.width.%]="fillPercent()"
+    class="relative h-full origin-left overflow-hidden bg-current transition-transform duration-400 ease-out motion-reduce:transition-none"
+    [style.transform]="`scaleX(${fillScale()})`"
   >
     @if (shimmer()) {
       <div
@@ -15,7 +16,7 @@
   </div>
 </div>
 
-<progress class="sr-only" [value]="displayValue()" [max]="max()"></progress>
+<progress class="sr-only" [value]="value()" [max]="max()"></progress>
 
 <span
   class="absolute inset-0 flex items-center justify-center text-xs text-shadow-black pointer-events-none tabular-nums"

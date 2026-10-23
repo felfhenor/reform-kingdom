@@ -61,9 +61,10 @@ export const LEVEL_UP_NODE_FAILURE_LIMIT = 5;
 export const GAMELOOP_INTERVAL_MS = 1000;
 export const MAX_EVENT_SEGMENTS = 5;
 export const MAX_SEGMENT_LENGTH = 32;
-// How long the full loading bar stays on screen before the overlay fades.
-export const LOADING_FULL_HOLD_MS = 500;
-export const LOADING_FILL_FALLBACK_MS = 2000;
+// How long the loading screen lingers once the page beneath it has rendered; covers the bar's 400ms fill.
+export const LOADING_FULL_HOLD_MS = 900;
+// Cap on waiting for the page rendered under the loading screen to settle before the hold starts.
+export const LOADING_IDLE_TIMEOUT_MS = 3000;
 export const LOADING_BACKDROP_CELL_PX = 72;
 export const LOADING_BACKDROP_SWAP_MS = 400;
 export const LOADING_HERO_CYCLE_MS = 2500;

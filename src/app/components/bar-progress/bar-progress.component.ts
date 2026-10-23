@@ -2,13 +2,10 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  effect,
   input,
-  output,
 } from '@angular/core';
 import { ShimmerDirective } from '@directives/shimmer.directive';
 import type { ProgressBarColor, ProgressBarSize } from '@interfaces';
-import { injectTweenedNumber } from '@services/animation.service';
 import { clamp } from 'es-toolkit/compat';
 
 // Tailwind's class scanner only picks up literal strings, so the color->class
@@ -49,18 +46,10 @@ export class BarProgressComponent {
   public color = input<ProgressBarColor>('primary');
   public size = input<ProgressBarSize>('default');
   public shimmer = input(false);
-  public filled = output();
 
   public colorClass = computed(() => PROGRESS_COLOR_CLASSES[this.color()]);
   public sizeClass = computed(() => PROGRESS_SIZE_CLASSES[this.size()]);
-  public displayValue = injectTweenedNumber(() => this.value());
-  public fillPercent = computed(() =>
-    clamp((this.displayValue() / this.max()) * 100, 0, 100),
+  public fillScale = computed(() =>
+    clamp(this.value() / this.max(), 0, 1),
   );
-
-  constructor() {
-    effect(() => {
-      if (this.displayValue() >= this.max()) this.filled.emit();
-    });
-  }
 }

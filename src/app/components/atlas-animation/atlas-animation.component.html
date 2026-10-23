@@ -1,7 +1,11 @@
 <div
   class="animated-sprite"
-  [style.background-image]="'url(\'' + assetUrl() + '\')'"
   [style.--frames]="frames()"
   [style.--position]="assetOffsetY()"
   [style.--frame-duration]="totalAnimationDuration()"
-></div>
+>
+  <div
+    class="sprite-strip"
+    [style.background-image]="'url(\'' + assetUrl() + '\')'"
+  ></div>
+</div>

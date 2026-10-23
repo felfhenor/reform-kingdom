@@ -1,12 +1,9 @@
 .backdrop-grid {
   display: grid;
   grid-auto-rows: var(--cell-px);
-  // Resting opacity; the ripple adds --glow on top.
-  --rest: 0.12;
 }
 
 .cell {
-  --glow: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -14,11 +11,10 @@
   .sprite {
     width: 64px;
     height: 64px;
-    opacity: calc(var(--rest) + var(--glow) * 0.7);
-    filter: grayscale(calc(0.85 - var(--glow) * 0.85)) sepia(0.2);
+    opacity: 0.12;
+    filter: grayscale(0.85) sepia(0.2);
   }
 
-  // Hover-only: the ripple rewrites --glow every frame and would restart a resting transition per cell.
   &:hover .sprite {
     opacity: 0.85;
     filter: none;

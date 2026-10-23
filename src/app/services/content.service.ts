@@ -23,7 +23,10 @@ export class ContentService {
 
   private artSignals: Array<WritableSignal<boolean>> = [];
   public artImages = signal<Record<string, HTMLImageElement>>({});
-  public hasLoadedArt = computed(() => this.artSignals.every((s) => s()));
+  // Gated on the atlases, which create artSignals; otherwise this memoizes `true` off the initial empty list.
+  public hasLoadedArt = computed(
+    () => this.hasLoadedAtlases() && this.artSignals.every((s) => s()),
+  );
   public hasLoadedAtlases = signal<boolean>(false);
   public hasLoadedData = signal<boolean>(false);
   public hasLoadedMaps = signal<boolean>(false);
@@ -68,14 +71,21 @@ export class ContentService {
       const img = new Image();
       img.src = this.toCacheBustURL(`art/spritesheets/${sheet}.webp`);
       this.artSignals[idx].set(false);
-      img.onload = async () => {
-        artImageHash[sheet] = img;
+      // decode() runs off the main thread, so the first paint of a sheet can't stall a frame decoding it.
+      // A failed sheet still counts as done, or the loading screen (and the savefile load behind it) would wait forever.
+      void img.decode().then(
+        () => {
+          artImageHash[sheet] = img;
+          this.artImages.set(artImageHash);
+          this.artSignals[idx].set(true);
 
-        this.artImages.set(artImageHash);
-        this.artSignals[idx].set(true);
-
-        this.logger.info('Content:LoadArt', `Loaded sheet: ${sheet}`);
-      };
+          this.logger.info('Content:LoadArt', `Loaded sheet: ${sheet}`);
+        },
+        (err: unknown) => {
+          this.logger.error('Content:LoadArt', `Failed sheet: ${sheet}`, err);
+          this.artSignals[idx].set(true);
+        },
+      );
     });
 
     this.hasLoadedAtlases.set(true);

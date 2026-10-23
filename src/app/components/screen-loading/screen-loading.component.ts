@@ -38,10 +38,9 @@ export class ScreenLoadingComponent {
 
   private heroEl = viewChild.required<ElementRef<HTMLElement>>('hero');
 
-  // Sprites can't render until their atlas lands, which may be after the data.
+  // Waits for the decoded sheets so the first hero never pops in over a blank frame.
   private jobs = computed(() =>
-    this.contentService.hasLoadedData() &&
-    this.contentService.hasLoadedAtlases()
+    this.contentService.hasLoadedData() && this.contentService.hasLoadedArt()
       ? getEntriesByType<JobContent>('job')
       : [],
   );
@@ -60,7 +59,7 @@ export class ScreenLoadingComponent {
     afterNextRender(() => {
       if (this.anim.reducedMotion) return;
       const bob = this.anim.bob(this.heroEl().nativeElement);
-      destroyRef.onDestroy(() => bob.revert());
+      destroyRef.onDestroy(() => bob.cancel());
     });
 
     destroyRef.onDestroy(() => clearInterval(cycleTimer));
@@ -78,7 +77,9 @@ export class ScreenLoadingComponent {
 
     this.anim
       .iconSwapOut(event.target)
-      .then(() => event.animationComplete())
-      .catch(() => event.animationComplete());
+      .finished.then(
+        () => event.animationComplete(),
+        () => event.animationComplete(),
+      );
   }
 }

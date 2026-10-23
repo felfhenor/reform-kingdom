@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -6,6 +7,7 @@ import {
   effect,
   ElementRef,
   inject,
+  Injector,
   linkedSignal,
   signal,
   viewChildren,
@@ -39,6 +41,8 @@ export class ScreenLoadingBackdropComponent {
   private anim = inject(AnimationService);
   private contentService = inject(ContentService);
   private host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private injector = inject(Injector);
+  private destroyRef = inject(DestroyRef);
 
   private rng = rngRandom();
   private hasStartedReveal = false;
@@ -51,8 +55,11 @@ export class ScreenLoadingBackdropComponent {
     { equal: (a, b) => a.cols === b.cols && a.rows === b.rows },
   );
 
+  // Waits for every sheet to decode so the reveal never plays over blank cells.
   private pool = computed(() =>
-    loadingIconPool(this.contentService.artAtlases()),
+    this.contentService.hasLoadedArt()
+      ? loadingIconPool(this.contentService.artAtlases())
+      : [],
   );
 
   protected sheetUrls = computed(() =>
@@ -91,7 +98,7 @@ export class ScreenLoadingBackdropComponent {
       LOADING_BACKDROP_SWAP_MS,
     );
 
-    inject(DestroyRef).onDestroy(() => {
+    this.destroyRef.onDestroy(() => {
       resizeObserver.disconnect();
       clearInterval(swapTimer);
     });
@@ -103,7 +110,7 @@ export class ScreenLoadingBackdropComponent {
 
       this.hasStartedReveal = true;
       const { cols, rows } = this.grid();
-      this.anim
+      void this.anim
         .gridReveal(
           els.map((el) => el.nativeElement),
           cols,
@@ -117,7 +124,7 @@ export class ScreenLoadingBackdropComponent {
     const els = this.cellEls();
     if (els.length === 0 || this.anim.reducedMotion) return;
 
-    const { cols, rows } = this.grid();
+    const { cols } = this.grid();
     const rect = this.host.nativeElement.getBoundingClientRect();
     const col = Math.floor((event.clientX - rect.left) / this.cellPx);
     const row = Math.floor((event.clientY - rect.top) / this.cellPx);
@@ -125,25 +132,38 @@ export class ScreenLoadingBackdropComponent {
     this.anim.gridRipple(
       els.map((el) => el.nativeElement),
       cols,
-      rows,
       row * cols + col,
     );
   }
 
   private swapRandomCell(): void {
-    const els = this.cellEls();
-    if (els.length === 0 || !this.hasFinishedReveal || document.hidden) return;
+    if (!this.hasFinishedReveal || document.hidden) return;
 
-    const index = rngNumber(els.length, this.rng);
-    const el = els[index].nativeElement;
+    // A cell still mid-swap or mid-ripple would snap back to full opacity if re-picked.
+    const idle = this.cellEls()
+      .map((ref, index) => ({ el: ref.nativeElement, index }))
+      .filter(({ el }) => el.getAnimations().length === 0);
+    if (idle.length === 0) return;
 
-    this.anim.iconSwapOut(el).then(() => {
+    const { el, index } = idle[rngNumber(idle.length, this.rng)];
+
+    const swapOut = this.anim.iconSwapOut(el);
+    void swapOut.finished.then(() => {
+      if (this.destroyRef.destroyed) return;
+
       this.cells.update((cells) =>
         cells.map((icon, i) =>
           i === index ? rngChoiceOther(this.pool(), icon, this.rng) : icon,
         ),
       );
-      this.anim.iconSwapIn(el);
+      // The old icon stays held hidden until the new one has rendered, so it can't flash back for a frame.
+      afterNextRender(
+        () => {
+          this.anim.iconSwapIn(el);
+          swapOut.cancel();
+        },
+        { injector: this.injector },
+      );
     });
   }
 }

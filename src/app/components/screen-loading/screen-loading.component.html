@@ -32,11 +32,14 @@
       color="primary"
       [shimmer]="true"
       [value]="progress.percent"
-      (filled)="loadingService.onBarFilled()"
     />
 
-    @for (label of [progress.label]; track $index) {
-      <p class="type-muted" (animate.enter)="anim.slideIn($event.target)">
+    <!-- Tracked by text so each new step fades in; nowrap keeps a long label from shifting the hero and bar. -->
+    @for (label of [progress.label]; track label) {
+      <p
+        class="type-muted whitespace-nowrap"
+        (animate.enter)="anim.reflowEnter($event.target)"
+      >
         {{ label }}
       </p>
     }

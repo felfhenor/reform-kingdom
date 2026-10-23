@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import type { DamageEventVariant } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
-import { animate, stagger, type DOMTarget, type JSAnimation } from 'animejs';
+import { animate, type DOMTarget, type JSAnimation } from 'animejs';
 
 // hold: fraction of the lifetime spent fully opaque; rise: px travelled; tilt: total random rotation range in degrees.
 const DAMAGE_NUMBER_PROFILES: Record<
@@ -35,6 +35,19 @@ const SHATTER_ROWS = 4;
 const SHATTER_EDGE_BLEED_PX = 48;
 const SHATTER_SHARD_MS = 650;
 const SHATTER_SMOKE_MS = 750;
+
+// CSS equivalents of anime's outBack/inQuad/inOutSine, for native WAAPI.
+const EASE_OUT_BACK = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
+const EASE_IN_QUAD = 'cubic-bezier(0.11, 0, 0.5, 0)';
+const EASE_IN_OUT_SINE = 'cubic-bezier(0.37, 0, 0.63, 1)';
+
+function gridDistance(
+  index: number,
+  cols: number,
+  from: { x: number; y: number },
+): number {
+  return Math.hypot((index % cols) - from.x, Math.floor(index / cols) - from.y);
+}
 
 @Injectable({
   providedIn: 'root',
@@ -263,62 +276,89 @@ export class AnimationService {
     });
   }
 
-  // Inline opacity is zeroed up front so cells don't flash in before their stagger delay.
-  gridReveal(targets: HTMLElement[], cols: number, rows: number): JSAnimation {
-    targets.forEach((el) => (el.style.opacity = '0'));
-    return animate(targets, {
-      opacity: [0, 1],
-      scale: [0.4, 1],
-      duration: 700,
-      delay: stagger(25, { grid: [cols, rows], from: 'center' }),
-      ease: 'outBack',
-    });
-  }
-
-  // Animates `--glow` so the cell's own :hover styling still works after the wave passes.
-  gridRipple(
+  // The loading-screen animations below are native WAAPI on transform/opacity/filter so they run on the compositor through its main-thread stalls.
+  // Backwards fill holds each cell hidden until its stagger delay passes.
+  gridReveal(
     targets: HTMLElement[],
     cols: number,
     rows: number,
-    fromIndex: number,
-  ): JSAnimation {
-    return animate(targets, {
-      '--glow': [0, 1, 0],
-      scale: [1, 1.3, 1],
-      duration: 900,
-      delay: stagger(35, { grid: [cols, rows], from: fromIndex }),
-      ease: 'inOutSine',
+  ): Promise<unknown> {
+    const center = { x: (cols - 1) / 2, y: (rows - 1) / 2 };
+    return Promise.all(
+      targets.map(
+        (el, i) =>
+          el.animate(
+            [
+              { opacity: 0, transform: 'scale(0.4)' },
+              { opacity: 1, transform: 'scale(1)' },
+            ],
+            {
+              duration: 700,
+              delay: gridDistance(i, cols, center) * 25,
+              easing: EASE_OUT_BACK,
+              fill: 'backwards',
+            },
+          ).finished,
+      ),
+    );
+  }
+
+  // A lone midpoint keyframe glows the sprite up from, and back down to, its own resting (or hovered) style.
+  gridRipple(targets: HTMLElement[], cols: number, fromIndex: number): void {
+    const origin = { x: fromIndex % cols, y: Math.floor(fromIndex / cols) };
+    targets.forEach((el, i) => {
+      const timing = {
+        duration: 900,
+        delay: gridDistance(i, cols, origin) * 35,
+        easing: EASE_IN_OUT_SINE,
+      };
+      el.animate(
+        [
+          { transform: 'scale(1)' },
+          { transform: 'scale(1.3)' },
+          { transform: 'scale(1)' },
+        ],
+        timing,
+      );
+      el.firstElementChild?.animate(
+        [{ offset: 0.5, opacity: 0.82, filter: 'grayscale(0) sepia(0.2)' }],
+        timing,
+      );
     });
   }
 
-  iconSwapOut(target: Element): JSAnimation {
-    return animate(target as DOMTarget, {
-      opacity: [1, 0],
-      scale: [1, 0.5],
-      rotate: [0, -20],
-      duration: 500,
-      ease: 'inQuad',
-    });
+  // Forwards fill keeps the icon hidden until the caller removes or refills it.
+  iconSwapOut(target: Element): Animation {
+    return target.animate(
+      [
+        { opacity: 1, transform: 'scale(1) rotate(0deg)' },
+        { opacity: 0, transform: 'scale(0.5) rotate(-20deg)' },
+      ],
+      { duration: 500, easing: EASE_IN_QUAD, fill: 'forwards' },
+    );
   }
 
-  iconSwapIn(target: Element): JSAnimation {
-    return animate(target as DOMTarget, {
-      opacity: [0, 1],
-      scale: [0.5, 1],
-      rotate: [20, 0],
-      duration: 800,
-      ease: 'outBack',
-    });
+  iconSwapIn(target: Element): Animation {
+    return target.animate(
+      [
+        { opacity: 0, transform: 'scale(0.5) rotate(20deg)' },
+        { opacity: 1, transform: 'scale(1) rotate(0deg)' },
+      ],
+      { duration: 800, easing: EASE_OUT_BACK },
+    );
   }
 
-  bob(target: Element): JSAnimation {
-    return animate(target as DOMTarget, {
-      translateY: [0, -6],
-      duration: 900,
-      ease: 'inOutSine',
-      loop: true,
-      alternate: true,
-    });
+  // Loops forever, so the caller must cancel it on teardown.
+  bob(target: Element): Animation {
+    return target.animate(
+      [{ transform: 'translateY(0)' }, { transform: 'translateY(-6px)' }],
+      {
+        duration: 900,
+        easing: EASE_IN_OUT_SINE,
+        iterations: Infinity,
+        direction: 'alternate',
+      },
+    );
   }
 
   // Duration is capped at `lifetimeMs` since the playback service removes the element on its own timer.
