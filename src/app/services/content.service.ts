@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import type { WritableSignal } from '@angular/core';
 import { computed, inject, Injectable, signal } from '@angular/core';
+import { TIPPY_LOADER } from '@ngneat/helipopper/config';
+import { SweetAlert2LoaderService } from '@sweetalert2/ngx-sweetalert2';
 import { LOADING_PRELOAD_IMAGES } from '@helpers/config';
 import { unfurlContent } from '@helpers/content/content';
 import { allMaps, setAllMaps } from '@helpers/maps';
@@ -22,6 +24,8 @@ export class ContentService {
   private metaService = inject(MetaService);
   private logger = inject(LoggerService);
   private http = inject(HttpClient);
+  private tippyLoader = inject(TIPPY_LOADER);
+  private swalLoader = inject(SweetAlert2LoaderService);
 
   private artSignals: Array<WritableSignal<boolean>> = [];
   public artImages = signal<Record<string, HTMLImageElement>>({});
@@ -34,6 +38,7 @@ export class ContentService {
   public hasLoadedMaps = signal<boolean>(false);
   public hasLoadedMapArt = signal<boolean>(false);
   public hasLoadedUIArt = signal<boolean>(false);
+  public hasLoadedUILibraries = signal<boolean>(false);
   private uiImages: HTMLImageElement[] = [];
 
   public artAtlases = signal<ArtAtlases>({});
@@ -52,6 +57,7 @@ export class ContentService {
 
     void this.loadJSON();
     void this.loadUIArt();
+    void this.loadUILibraries();
     await Promise.all([this.loadArt(), this.loadMaps()]);
     await this.loadMapArt();
   }
@@ -99,6 +105,17 @@ export class ContentService {
     ).filter((img) => !!img);
 
     this.hasLoadedUIArt.set(true);
+  }
+
+  // Runs the libraries' own lazy loaders early, so the first tooltip or modal doesn't wait on a chunk download.
+  private async loadUILibraries() {
+    try {
+      await Promise.all([this.tippyLoader(), this.swalLoader.swal]);
+    } catch (err) {
+      this.logger.error('Content:LoadUILibraries', 'Failed to preload', err);
+    }
+
+    this.hasLoadedUILibraries.set(true);
   }
 
   // decode() runs off the main thread, so a first paint can't stall a frame decoding the image.

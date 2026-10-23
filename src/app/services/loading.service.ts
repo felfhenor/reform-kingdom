@@ -71,6 +71,10 @@ export class LoadingService {
         label: 'Loading UI art...',
         isDone: this.contentService.hasLoadedUIArt(),
       },
+      {
+        label: 'Loading UI scripts...',
+        isDone: this.contentService.hasLoadedUILibraries(),
+      },
       { label: 'Loading maps...', isDone: this.contentService.hasLoadedMaps() },
       {
         label: 'Loading map art...',
