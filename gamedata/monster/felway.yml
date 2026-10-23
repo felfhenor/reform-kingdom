@@ -134,7 +134,7 @@
 
   types: [Demon]
   elementalResistances:
-    Earth: 25
+    Earth: 50
 
   sprite: '0136'
   frames: 4

@@ -120,7 +120,7 @@
   types: [Beast]
   elementalResistances:
     Water: 15
-    Earth: 15
+    Earth: 35
     Air: -15
 
   sprite: '0076'
@@ -178,7 +178,7 @@
   types: [Beast]
   elementalResistances:
     Water: 15
-    Earth: 15
+    Earth: 45
     Air: -15
 
   sprite: '0080'
