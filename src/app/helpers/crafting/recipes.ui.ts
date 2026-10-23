@@ -6,6 +6,7 @@ import {
 } from '@helpers/engine/analytics';
 import { ledgerMark } from '@helpers/engine/ledger';
 import { applyMaterialDelta, traderTokenId } from '@helpers/item/materials';
+import { tradeGoodsLogPart, tradeLog } from '@helpers/item/trade';
 import { updateGamestate } from '@helpers/state-game';
 import type { RecipeContent, RecipeId } from '@interfaces';
 
@@ -31,6 +32,12 @@ export async function recipeUnlockWithTokens(
   });
 
   if (unlocked) {
+    tradeLog(
+      'Miscellaneous',
+      'unlocked',
+      [tradeGoodsLogPart({ recipeId }, 1)],
+      [tradeGoodsLogPart({ itemId: traderTokenId() }, recipe.tokenUnlockCost)],
+    );
     analyticsSendDesignEvent(
       `Progress:Museum:RecipeUnlock:${analyticsSafeSegment(recipe.name)}`,
     );

@@ -81,14 +81,20 @@ export function armoryHasRoom(quantity = 1, allowOverflow = false): boolean {
   return armoryHasRoomFor(armoryGet().length, quantity, allowOverflow);
 }
 
-// One entry per owned item (duplicates never merged), carrying the instance alongside its content for per-instance infusion state.
-export function getArmoryEntries(): EquipmentArmoryEntry[] {
-  const entries = armoryGet()
+export function armoryEntriesFor(
+  items: EquipmentItem[],
+): EquipmentArmoryEntry[] {
+  return items
     .map((item) => {
       const content = getEntry<EquipmentContent>(item.equipmentId);
       return content ? { item, content } : undefined;
     })
     .filter((entry): entry is EquipmentArmoryEntry => !!entry);
+}
+
+// One entry per owned item (duplicates never merged), carrying the instance alongside its content for per-instance infusion state.
+export function getArmoryEntries(): EquipmentArmoryEntry[] {
+  const entries = armoryEntriesFor(armoryGet());
 
   return orderBy(
     entries,

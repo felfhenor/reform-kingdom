@@ -18,15 +18,23 @@ import { newEquipmentItem } from '@helpers/item/equipment';
 import {
   applyMaterialDelta,
   gainGold,
+  goldCoinId,
   hasTraderTokens,
   spendGold,
   traderTokenId,
 } from '@helpers/item/materials';
-import { tradeArmoryHasRoom, tradeCommit } from '@helpers/item/trade';
+import {
+  tradeArmoryHasRoom,
+  tradeCommit,
+  tradeEquipmentItemLogPart,
+  tradeGoodsLogPart,
+  tradeLog,
+} from '@helpers/item/trade';
 import { addArmoryItems, armoryHasRoomForState } from '@helpers/kingdom/armory';
 import { taskEventCollectibleGained } from '@helpers/task/task-events';
 import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
 import type {
+  AdventureLogRewardPart,
   CaravanContent,
   CaravanTokenTrade,
   CaravanTrade,
@@ -38,6 +46,7 @@ import type {
   ItemContent,
   RecipeContent,
   TradeCommitOutcome,
+  TradeReceipt,
   WorldNodeEntry,
 } from '@interfaces';
 
@@ -114,6 +123,16 @@ function takeCaravanPayment(
   }
 }
 
+function caravanTradeGoodsLogPart(
+  trade: CaravanTrade,
+  quantity: number,
+  previewed?: EquipmentItem,
+): AdventureLogRewardPart | undefined {
+  return previewed && quantity === 1
+    ? tradeEquipmentItemLogPart(previewed)
+    : tradeGoodsLogPart(trade, quantity);
+}
+
 function caravanTradeBuysEquipment(trade: CaravanTrade): boolean {
   return trade.type === 'sell' && !!trade.equipmentId;
 }
@@ -124,6 +143,7 @@ function caravanTradeApply(
   trade: CaravanTrade,
   tradeIndex: number,
   quantity: number,
+  receipt: TradeReceipt,
 ): TradeCommitOutcome {
   const nodeState = state.world.caravans[caravan.id];
   if (!nodeState || !nodeState.activeTradeIndices.includes(tradeIndex)) {
@@ -148,13 +168,11 @@ function caravanTradeApply(
 
   // Re-priced in the commit so affix changes since the click can't underpay.
   const totalPrice = caravanTradePrice(caravan, trade) * quantity;
+  receipt.totalPrice = totalPrice;
   if (trade.type === 'sell') {
-    grantCaravanReward(
-      state,
-      trade,
-      quantity,
-      nodeState.rolledEquipment?.[tradeIndex],
-    );
+    const previewed = nodeState.rolledEquipment?.[tradeIndex];
+    receipt.goods = caravanTradeGoodsLogPart(trade, quantity, previewed);
+    grantCaravanReward(state, trade, quantity, previewed);
     if (trade.equipmentId) {
       nodeState.rolledEquipment ??= {};
       nodeState.rolledEquipment[tradeIndex] = newEquipmentItem(
@@ -163,6 +181,7 @@ function caravanTradeApply(
     }
     spendGold(state, totalPrice);
   } else {
+    receipt.goods = caravanTradeGoodsLogPart(trade, quantity);
     takeCaravanPayment(state, trade, quantity);
     gainGold(state, totalPrice);
   }
@@ -170,6 +189,19 @@ function caravanTradeApply(
   nodeState.tradeCounts[tradeIndex] =
     (nodeState.tradeCounts[tradeIndex] ?? 0) + quantity;
   return 'executed';
+}
+
+function caravanTradeLog(
+  entry: WorldNodeEntry,
+  trade: CaravanTrade,
+  receipt: TradeReceipt,
+): void {
+  tradeLog(
+    entry.nodeName,
+    trade.type === 'sell' ? 'bought' : 'sold',
+    [receipt.goods],
+    [tradeGoodsLogPart({ itemId: goldCoinId() }, receipt.totalPrice)],
+  );
 }
 
 export async function caravanExecuteTrade(
@@ -204,11 +236,13 @@ export async function caravanExecuteTrade(
     return false;
   }
 
+  const receipt: TradeReceipt = { totalPrice: 0 };
   const executed = await tradeCommit((s) =>
-    caravanTradeApply(s, caravan, trade, tradeIndex, quantity),
+    caravanTradeApply(s, caravan, trade, tradeIndex, quantity, receipt),
   );
   if (!executed) return false;
 
+  caravanTradeLog(entry, trade, receipt);
   const tradeName = caravanTradeName(trade);
   analyticsSendDesignEvent(
     tradeName
@@ -283,6 +317,12 @@ export async function caravanExecuteTokenTrade(
   const executed = await tradeCommit((s) => caravanTokenTradeApply(s, trade));
   if (!executed) return false;
 
+  tradeLog(
+    entry.nodeName,
+    'bought',
+    [tradeGoodsLogPart(trade, 1)],
+    [tradeGoodsLogPart({ itemId: traderTokenId() }, trade.tokenCost)],
+  );
   const tradeName = caravanTradeName(trade);
   analyticsSendDesignEvent(
     tradeName

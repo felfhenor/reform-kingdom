@@ -12,6 +12,9 @@ import {
 import {
   tradeArmoryHasRoom,
   tradeCommit,
+  tradeEquipmentItemLogPart,
+  tradeGoodsLogPart,
+  tradeLog,
   tradeWarn,
 } from '@helpers/item/trade';
 import { addArmoryItems, armoryHasRoomForState } from '@helpers/kingdom/armory';
@@ -86,6 +89,12 @@ export async function townExecuteTrade(
   );
   if (!executed) return false;
 
+  tradeLog(
+    town.name,
+    'bought',
+    [tradeEquipmentItemLogPart(entry.equipmentItem)],
+    [tradeGoodsLogPart({ itemId: goldCoinId() }, price)],
+  );
   const name = townStockDisplay(entry)?.name;
   analyticsSendDesignEvent(
     name ? `Town:Trade:${analyticsSafeSegment(name)}` : 'Town:Trade',

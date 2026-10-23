@@ -13,6 +13,7 @@ import {
   armoryAdd,
   armoryAddWithAffixes,
   armoryCap,
+  armoryEntriesFor,
   armoryHasRoom,
   armoryHasRoomFor,
   armoryHasRoomForState,
@@ -297,6 +298,20 @@ describe('pruneInvalidArmoryItems', () => {
     expect(
       pruneInvalidArmoryItems([kept, buildEquipmentItem(staleId)]),
     ).toEqual([kept]);
+  });
+});
+
+describe('armoryEntriesFor', () => {
+  it('pairs each item with its content in order, dropping unknown content', () => {
+    const swordItem = buildEquipmentItem(swordId);
+    const shieldItem = buildEquipmentItem(shieldId);
+
+    expect(
+      armoryEntriesFor([shieldItem, buildEquipmentItem(staleId), swordItem]),
+    ).toEqual([
+      { item: shieldItem, content: shield },
+      { item: swordItem, content: sword },
+    ]);
   });
 });
 

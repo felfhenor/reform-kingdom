@@ -10,7 +10,7 @@ import {
   hasGold,
   spendGold,
 } from '@helpers/item/materials';
-import { tradeCommit } from '@helpers/item/trade';
+import { tradeCommit, tradeGoodsLogPart, tradeLog } from '@helpers/item/trade';
 import { applyTownMaterialDelta } from '@helpers/town/town-materials';
 import {
   townMaterialSaleConfig,
@@ -89,6 +89,12 @@ export async function townExecuteMaterialSale(
   );
   if (!executed) return false;
 
+  tradeLog(
+    town.name,
+    'bought',
+    [tradeGoodsLogPart({ itemId }, quantity)],
+    [tradeGoodsLogPart({ itemId: goldCoinId() }, totalPrice)],
+  );
   const name = getEntry<ItemContent>(itemId)?.name;
   analyticsSendDesignEvent(
     name

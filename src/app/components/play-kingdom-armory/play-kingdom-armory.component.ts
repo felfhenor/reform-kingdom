@@ -117,7 +117,7 @@ export class PlayKingdomArmoryComponent {
   }
 
   public confirmSell(): void {
-    sellEquipmentItems([...this.selectedIds()]);
+    void sellEquipmentItems([...this.selectedIds()]);
     this.exitSellMode();
   }
 

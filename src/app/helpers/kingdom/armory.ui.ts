@@ -1,11 +1,17 @@
 import { ARMORY_ENCUMBERED_THRESHOLD } from '@helpers/config';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
-import { gainGold } from '@helpers/item/materials';
-import { equipmentSellValue, getArmoryEntries } from '@helpers/kingdom/armory';
+import { gainGold, goldCoinId } from '@helpers/item/materials';
+import {
+  tradeEquipmentItemLogPart,
+  tradeGoodsLogPart,
+  tradeLog,
+} from '@helpers/item/trade';
+import { armoryEntriesFor, equipmentSellValue } from '@helpers/kingdom/armory';
 import { syncArmoryGlobalEffects } from '@helpers/kingdom/armory-global-effects';
 import { updateGamestate } from '@helpers/state-game';
 import type {
+  AdventureLogRewardPart,
   EquipmentArmoryEntry,
   EquipmentItemId,
   ProgressBarColor,
@@ -38,25 +44,46 @@ export function filterArmoryEntries(
   });
 }
 
+function armorySoldLogPart(
+  entries: EquipmentArmoryEntry[],
+): AdventureLogRewardPart | undefined {
+  if (entries.length === 1) {
+    return tradeEquipmentItemLogPart(entries[0].item);
+  }
+  return { html: `${entries.length.toLocaleString()} pieces of equipment` };
+}
+
 // Sells owned armory items atomically; stale ids are silently skipped. Returns total gold gained.
-export function sellEquipmentItems(
+export async function sellEquipmentItems(
   equipmentItemIds: EquipmentItemId[],
-): number {
+): Promise<number> {
   const idsToSell = new Set(equipmentItemIds);
-  const entries = getArmoryEntries().filter((entry) =>
-    idsToSell.has(entry.item.id),
-  );
-  if (entries.length === 0) return 0;
+  let soldCount = 0;
+  let soldPart: AdventureLogRewardPart | undefined;
+  let totalGold = 0;
 
-  const totalGold = sum(entries.map((entry) => equipmentSellValue(entry)));
+  await updateGamestate((state) => {
+    const sold = armoryEntriesFor(
+      state.armory.filter((item) => idsToSell.has(item.id)),
+    );
+    if (sold.length === 0) return state;
 
-  updateGamestate((state) => {
+    soldCount = sold.length;
+    soldPart = armorySoldLogPart(sold);
+    totalGold = sum(sold.map((entry) => equipmentSellValue(entry)));
     state.armory = state.armory.filter((item) => !idsToSell.has(item.id));
     syncArmoryGlobalEffects(state);
     gainGold(state, totalGold);
     return state;
   });
+  if (soldCount === 0) return 0;
 
-  analyticsSendDesignEvent('Kingdom:Armory:MassSell', entries.length);
+  tradeLog(
+    'Miscellaneous',
+    'sold',
+    [soldPart],
+    [tradeGoodsLogPart({ itemId: goldCoinId() }, totalGold)],
+  );
+  analyticsSendDesignEvent('Kingdom:Armory:MassSell', soldCount);
   return totalGold;
 }

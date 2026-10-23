@@ -5,6 +5,7 @@ import {
 } from '@helpers/engine/analytics';
 import { notifySuccess } from '@helpers/engine/notify';
 import { applyMaterialDelta } from '@helpers/item/materials';
+import { tradeGoodsLogPart, tradeLog } from '@helpers/item/trade';
 import { updateGamestate } from '@helpers/state-game';
 import type { TaskContent, TaskId } from '@interfaces';
 
@@ -18,6 +19,14 @@ function tasksAnnounceClaimed(claimed: TaskContent[]): void {
   );
 
   claimed.forEach((task) => {
+    tradeLog(
+      'Miscellaneous',
+      'claimed',
+      task.rewards.map((reward) =>
+        tradeGoodsLogPart({ itemId: reward.itemId }, reward.quantity),
+      ),
+      [{ html: `completing **${task.name}**` }],
+    );
     analyticsSendDesignEvent('Task:Claim');
     analyticsSendDesignEvent(`Task:Claim:${analyticsSafeSegment(task.name)}`);
   });
