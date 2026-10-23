@@ -5,6 +5,7 @@ import {
   computed,
   input,
 } from '@angular/core';
+import { kingdomIconURL } from '@helpers/kingdom/kingdom-nav.ui';
 import type { KingdomIcon } from '@interfaces';
 
 @Component({
@@ -18,5 +19,5 @@ import type { KingdomIcon } from '@interfaces';
 export class IconKingdomComponent {
   public name = input.required<KingdomIcon>();
 
-  public src = computed(() => `asset/kingdom/${this.name()}.png`);
+  public src = computed(() => kingdomIconURL(this.name()));
 }

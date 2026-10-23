@@ -69,6 +69,7 @@ export const LOADING_IDLE_TIMEOUT_MS = 3000;
 export const LOADING_PRELOAD_IMAGES = [
   '/asset/texture-bg.png',
   '/asset/texture-button.png',
+  '/asset/splash-game.png',
 ];
 export const LOADING_BACKDROP_CELL_PX = 72;
 export const LOADING_BACKDROP_SWAP_MS = 400;

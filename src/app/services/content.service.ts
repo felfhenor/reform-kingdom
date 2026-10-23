@@ -5,6 +5,7 @@ import { TIPPY_LOADER } from '@ngneat/helipopper/config';
 import { SweetAlert2LoaderService } from '@sweetalert2/ngx-sweetalert2';
 import { LOADING_PRELOAD_IMAGES } from '@helpers/config';
 import { unfurlContent } from '@helpers/content/content';
+import { kingdomIconURLs } from '@helpers/kingdom/kingdom-nav.ui';
 import { allMaps, setAllMaps } from '@helpers/maps';
 import { tiledMapsTilesetImagePaths } from '@helpers/pixi/tiled-map';
 import type { GameMap, IsContentItem, TiledMap } from '@interfaces';
@@ -100,7 +101,9 @@ export class ContentService {
   private async loadUIArt() {
     this.uiImages = (
       await Promise.all(
-        LOADING_PRELOAD_IMAGES.map((url) => this.decodeImage(url)),
+        [...LOADING_PRELOAD_IMAGES, ...kingdomIconURLs()].map((url) =>
+          this.decodeImage(url),
+        ),
       )
     ).filter((img) => !!img);
 

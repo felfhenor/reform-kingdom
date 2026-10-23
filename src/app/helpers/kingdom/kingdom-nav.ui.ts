@@ -8,13 +8,14 @@ import { discoveredWorkersState } from '@helpers/state-game';
 import type {
   KingdomFeatureNav,
   KingdomFeatureSubview,
+  KingdomIcon,
   KingdomNavEntry,
   KingdomNavGroup,
   KingdomNavSection,
   Tradeskill,
   TradeskillContent,
 } from '@interfaces';
-import { sortBy } from 'es-toolkit/compat';
+import { sortBy, uniq } from 'es-toolkit/compat';
 
 export const KINGDOM_FEATURE_NAV: Record<
   KingdomFeatureSubview,
@@ -66,6 +67,18 @@ export const KINGDOM_FEATURE_NAV: Record<
   },
 };
 
+// Exhaustive over the non-feature icons, so a new one won't compile until it's listed (and so preloaded).
+const KINGDOM_EXTRA_ICONS: Record<
+  Exclude<KingdomIcon, KingdomFeatureSubview>,
+  true
+> = {
+  kingdom: true,
+  reclass: true,
+  requesteddefenses: true,
+  sethome: true,
+  tasks: true,
+};
+
 const KINGDOM_NAV_GROUP_ORDER: KingdomNavGroup[] = [
   'reserves',
   'collections',
@@ -73,6 +86,18 @@ const KINGDOM_NAV_GROUP_ORDER: KingdomNavGroup[] = [
   'crafting',
   'actions',
 ];
+
+export function kingdomIconURL(icon: KingdomIcon): string {
+  return `asset/kingdom/${icon}.png`;
+}
+
+export function kingdomIconURLs(): string[] {
+  const icons = [
+    ...Object.values(KINGDOM_FEATURE_NAV).map((nav) => nav.icon),
+    ...(Object.keys(KINGDOM_EXTRA_ICONS) as KingdomIcon[]),
+  ];
+  return uniq(icons).map(kingdomIconURL);
+}
 
 export function isKingdomFeatureAvailable(
   subview: KingdomFeatureSubview,
