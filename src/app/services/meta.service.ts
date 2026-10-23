@@ -43,6 +43,8 @@ export class MetaService {
     () => !!this.changelogAll() && !!this.changelogCurrent(),
   );
 
+  private localVersionLoad?: Promise<void>;
+
   private get renderer() {
     const renderer = new Renderer();
     renderer.heading = ({ tokens, depth }) => {
@@ -60,20 +62,7 @@ export class MetaService {
   }
 
   async init() {
-    this.logger.log('Meta:Version', 'Checking for local version...');
-
-    try {
-      const response = await fetch('version.json');
-      const versionInfo = await response.json();
-      localVersion.set(versionInfo);
-
-      this.logger.log(
-        'Meta:Version',
-        `Got local version: ${this.versionString()}`,
-      );
-    } catch (e) {
-      this.logger.error('Meta:Version', 'Failed to load version info', e);
-    }
+    await this.loadLocalVersion();
 
     try {
       const changelog = await fetch('CHANGELOG.md');
@@ -106,6 +95,29 @@ export class MetaService {
     interval(15 * 60 * 1000).subscribe(() => {
       this.checkVersionAgainstLiveVersion();
     });
+  }
+
+  // Memoized so content loading can wait on the same fetch that init starts.
+  public loadLocalVersion(): Promise<void> {
+    this.localVersionLoad ??= this.fetchLocalVersion();
+    return this.localVersionLoad;
+  }
+
+  private async fetchLocalVersion() {
+    this.logger.log('Meta:Version', 'Checking for local version...');
+
+    try {
+      const response = await fetch('version.json');
+      const versionInfo = await response.json();
+      localVersion.set(versionInfo);
+
+      this.logger.log(
+        'Meta:Version',
+        `Got local version: ${this.versionString()}`,
+      );
+    } catch (e) {
+      this.logger.error('Meta:Version', 'Failed to load version info', e);
+    }
   }
 
   private async checkVersionAgainstLiveVersion() {

@@ -42,6 +42,9 @@ export class ContentService {
   );
 
   async init() {
+    // Every content URL is versioned; building them before the version lands makes the preloads miss what's displayed later.
+    await this.metaService.loadLocalVersion();
+
     this.loadJSON();
     this.loadArt();
     this.loadMaps();
