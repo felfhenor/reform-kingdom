@@ -1,0 +1,55 @@
+@let skillData = skill();
+
+<div class="text-sm">{{ description() }}</div>
+
+@for (line of modifierLines(); track line.label) {
+  <div class="mt-2">
+    <app-row-skill-modifier [line]="line" [skillTooltip]="skillTooltip()" />
+  </div>
+}
+
+@if (skillData.delay > 0) {
+  <div class="text-xs mt-1">
+    Takes effect after {{ skillData.delay | number }}
+    {{ 'turn' | pluralize: skillData.delay !== 1 }}
+  </div>
+}
+
+@let cooldownTurns = cooldown();
+@if (cooldownTurns > 0) {
+  <div class="text-xs mt-1">
+    Cooldown: {{ cooldownTurns | number }}
+    {{ 'turn' | pluralize: cooldownTurns !== 1 }}
+  </div>
+}
+
+@let costBlock = costs();
+@if (costBlock) {
+  <div class="flex items-center gap-2 mt-1 text-xs">
+    <span class="type-meta">Cost</span>
+    <app-row-element-charges [block]="costBlock" />
+  </div>
+}
+
+@let techniqueList = techniques();
+@if (techniqueList.length > 0) {
+  <div class="flex flex-col gap-2 mt-2">
+    @for (technique of techniqueList; track $index) {
+      <div class="flex gap-2">
+        @if (techniqueList.length > 1) {
+          <span class="type-muted">{{ $index + 1 | number }}.</span>
+        }
+        <app-row-skill-technique [technique]="technique" />
+      </div>
+    }
+  </div>
+}
+
+@if (
+  characterWeaponTypes().length > 0 && skillData.requiredWeaponTypes.length > 0
+) {
+  <div class="text-xs mt-2" [class.type-blocker]="!usable()">
+    Skill only usable with
+    {{ skillData.requiredWeaponTypes.join(', ') }}
+  </div>
+}

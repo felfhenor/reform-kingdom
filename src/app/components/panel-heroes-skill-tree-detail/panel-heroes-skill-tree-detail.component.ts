@@ -10,8 +10,8 @@ import {
   output,
 } from '@angular/core';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
+import { DetailSkillPreviewComponent } from '@components/detail-skill-preview/detail-skill-preview.component';
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
-import { RowElementChargesComponent } from '@components/row-element-charges/row-element-charges.component';
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
 import { RowSkillModifierComponent } from '@components/row-skill-modifier/row-skill-modifier.component';
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
@@ -21,10 +21,8 @@ import { combatantFromCharacter } from '@helpers/combat/combat-create';
 import { SKILL_TREE_NODE_SIZE } from '@helpers/config';
 import {
   characterSkillPreview,
-  skillModifierLines,
   skillTreeNodeModifierLines,
 } from '@helpers/hero/skill-modifier.ui';
-import { skillDescriptionWithPreview } from '@helpers/hero/skill-preview';
 import { skillTreeNodeShortName } from '@helpers/hero/skill-tree-content';
 import {
   skillTreeNodeArt,
@@ -41,6 +39,7 @@ import {
   affixEffectsHaveStatSummary,
   affixEffectsStatSummary,
 } from '@helpers/item/equipment-bonus';
+import { equippedItemTypes } from '@helpers/item/equipment';
 import type {
   Character,
   JobContent,
@@ -60,7 +59,7 @@ import { AnimationService } from '@services/animation.service';
     RowSkillModifierComponent,
     RowStatSummaryComponent,
     SFXDirective,
-    RowElementChargesComponent,
+    DetailSkillPreviewComponent,
     NgTemplateOutlet,
     TooltipSkillPreviewComponent,
   ],
@@ -81,6 +80,9 @@ export class PanelHeroesSkillTreeDetailComponent {
   public readonly nodeSize = SKILL_TREE_NODE_SIZE;
 
   public combatant = computed(() => combatantFromCharacter(this.character()));
+  public weaponTypes = computed(() =>
+    equippedItemTypes(this.character().equipment),
+  );
 
   public state = computed(() => {
     const node = this.node();
@@ -92,25 +94,20 @@ export class PanelHeroesSkillTreeDetailComponent {
     if (!node) return undefined;
 
     const content = skillTreeNodeSkill(node);
-    const skill = content
-      ? characterSkillPreview(this.character(), content, this.staged())
-      : undefined;
 
     return {
       node,
       name: skillTreeNodeShortName(node),
       kind: skillTreeNodeKind(node),
       art: skillTreeNodeArt(node, this.job()),
-      effect: skill
-        ? skillDescriptionWithPreview(this.combatant(), skill)
-        : skillTreeNodeEffectText(node),
-      modifierLines: skill
-        ? skillModifierLines(skill, this.format)
-        : skillTreeNodeModifierLines(node, this.format),
+      skill: content
+        ? characterSkillPreview(this.character(), content, this.staged())
+        : undefined,
+      effect: skillTreeNodeEffectText(node),
+      modifierLines: skillTreeNodeModifierLines(node, this.format),
       statSummary: affixEffectsHaveStatSummary(node.effects)
         ? affixEffectsStatSummary(node.effects)
         : undefined,
-      elementCosts: skill ? skill.elementCosts : undefined,
       statsPerLevel: skillTreeNodeStatsPerLevel(node),
       value: skillTreeNodeValueText(node),
       requires: skillTreeNodeRequirements(node, this.job()),

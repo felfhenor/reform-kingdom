@@ -28,13 +28,7 @@
       </div>
 
       <div class="flex flex-col items-start gap-2">
-        <span class="type-meta flex gap-2 items-center">
-          {{ info.kind }}
-
-          @if (info.elementCosts; as elements) {
-            <app-row-element-charges [block]="elements" />
-          }
-        </span>
+        <span class="type-meta">{{ info.kind }}</span>
 
         <div class="flex gap-2">
           <span class="badge badge-sm badge-data">1 SP</span>
@@ -54,10 +48,23 @@
 
     <div class="flex flex-col gap-2">
       <span class="type-label">Effect</span>
-      @if (info.effect) {
-        <span class="text-sm">
-          {{ info.effect }}
-        </span>
+      @if (info.skill; as skill) {
+        <app-detail-skill-preview
+          [skill]="skill"
+          [combatant]="combatant()"
+          [characterWeaponTypes]="weaponTypes()"
+          [skillTooltip]="echoTooltip"
+        />
+      } @else {
+        @if (info.effect) {
+          <span class="text-sm">
+            {{ info.effect }}
+          </span>
+        }
+
+        @for (line of info.modifierLines; track $index) {
+          <app-row-skill-modifier [line]="line" [skillTooltip]="echoTooltip" />
+        }
       }
 
       @if (info.statSummary; as summary) {
@@ -74,10 +81,6 @@
       @if (info.statsPerLevel; as perLevel) {
         <span class="type-meta">Per level</span>
         <app-row-item-stats [stats]="perLevel" />
-      }
-
-      @for (line of info.modifierLines; track $index) {
-        <app-row-skill-modifier [line]="line" [skillTooltip]="echoTooltip" />
       }
 
       @if (info.value) {
