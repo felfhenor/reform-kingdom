@@ -2,6 +2,7 @@ import { getEntry } from '@helpers/content/content';
 import { analysisFail } from '@helpers/debug/analysis-utils';
 import { allMaps } from '@helpers/maps';
 import { teleportNodeProperty } from '@helpers/pathfinding/pathfinding';
+import { taskRequirementNodeName } from '@helpers/task/task';
 import {
   isWorldNodeHidden,
   kingdomNodeGet,
@@ -23,8 +24,6 @@ import type {
   MonsterId,
   TaskContent,
   TaskRequirement,
-  TownContent,
-  TrainerContent,
   WorldNodeEntry,
 } from '@interfaces';
 import { uniq } from 'es-toolkit/compat';
@@ -167,22 +166,6 @@ function nodeTypeIssues(
   }
 }
 
-function requirementNodeName(requirement: TaskRequirement): string | undefined {
-  switch (requirement.kind) {
-    case 'GatherItem':
-    case 'ClearEncounter':
-    case 'ShrineLevel':
-      return requirement.nodeName;
-    case 'LearnTeaching':
-      return getEntry<TrainerContent>(requirement.trainerId)?.name;
-    case 'VisitTown':
-    case 'TownReputationTier':
-      return getEntry<TownContent>(requirement.townId)?.name;
-    default:
-      return undefined;
-  }
-}
-
 function isNodeOpenAndReachable(
   entry: WorldNodeEntry,
   guaranteed: CollectibleId[],
@@ -253,7 +236,7 @@ function requirementNodeIssues(
   requirement: TaskRequirement,
   guaranteed: CollectibleId[],
 ): AnalysisIssue[] {
-  const nodeName = requirementNodeName(requirement);
+  const nodeName = taskRequirementNodeName(requirement);
   if (!nodeName) return [];
 
   const entry = worldNodeByName(nodeName);
@@ -266,7 +249,7 @@ function requirementNodeIssues(
 }
 
 function nodeMapVisitIssues(task: TaskContent): AnalysisIssue[] {
-  const nodeName = requirementNodeName(task.requirement);
+  const nodeName = taskRequirementNodeName(task.requirement);
   const entry = nodeName ? worldNodeByName(nodeName) : undefined;
   if (!entry) return [];
 

@@ -1,14 +1,27 @@
 import { TASK_WIDGET_ENTRY_COUNT } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
-import { bestiaryState, tasksState } from '@helpers/state-game';
-import { isTaskRequirementCounter, tasksOrdered } from '@helpers/task/task';
+import { modalClose } from '@helpers/engine/modal-stack';
+import { setGamePlayView, worldCameraFocus } from '@helpers/engine/ui';
+import { regionForMap } from '@helpers/lore/region-intro';
+import {
+  bestiaryState,
+  tasksState,
+  worldCurrentLocationState,
+} from '@helpers/state-game';
+import {
+  isTaskRequirementCounter,
+  taskRequirementNodeName,
+  tasksOrdered,
+} from '@helpers/task/task';
 import { isWorldMapVisited } from '@helpers/world-node/world-map-discovery';
+import { worldNodeByName } from '@helpers/world-node/world-nodes';
 import type {
   GameStateTasks,
   ItemContent,
   TaskContent,
   TaskId,
   TaskRowViewModel,
+  WorldNodeEntry,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
 
@@ -32,6 +45,19 @@ function taskProgress(
   };
 }
 
+function taskLocate(task: TaskContent): TaskRowViewModel['locate'] {
+  const nodeName = taskRequirementNodeName(task.requirement);
+  const node = nodeName ? worldNodeByName(nodeName) : undefined;
+  if (!node) return undefined;
+
+  const mapName = regionForMap(node.mapName)?.name ?? node.mapName;
+  const disabledReason =
+    node.mapName === worldCurrentLocationState().mapName
+      ? ''
+      : `You must be in ${mapName} to locate this node.`;
+  return { node, disabledReason };
+}
+
 function taskRowViewModel(
   task: TaskContent,
   tasks: GameStateTasks,
@@ -46,6 +72,7 @@ function taskRowViewModel(
     isComplete,
     isClaimed: !!entry?.claimedAt,
     progress: isComplete ? undefined : taskProgress(task, tasks),
+    locate: isComplete ? undefined : taskLocate(task),
     rewards: task.rewards.map((reward) => ({
       ...reward,
       name: getEntry<ItemContent>(reward.itemId)?.name ?? '',
@@ -87,4 +114,10 @@ export function tasksClaimableIds(): TaskId[] {
       (task) => !!tasks[task.id]?.completedAt && !tasks[task.id]?.claimedAt,
     )
     .map((task) => task.id);
+}
+
+export function taskNodeLocate(node: WorldNodeEntry): void {
+  modalClose('tasks');
+  setGamePlayView('world');
+  worldCameraFocus(node);
 }

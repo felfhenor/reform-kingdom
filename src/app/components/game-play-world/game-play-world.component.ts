@@ -33,7 +33,7 @@ import {
   mapNodeDeselect,
   mapNodeSelect,
   selectedMapNode,
-  worldCameraRecenterRequest,
+  worldCameraRequest,
   worldMapReady,
 } from '@helpers/engine/ui';
 import { isGlobalEffectActive } from '@helpers/hero/global-effects';
@@ -333,16 +333,20 @@ export class GamePlayWorldComponent implements OnDestroy {
       isWorldCameraPanned.set(this.isPanned());
     });
 
-    // Bridges the navbar's recenter button to this component's camera state; skips the initial run so mounting doesn't count as a request.
+    // Skips the initial run so a request left over from before mounting isn't replayed.
     // `untracked` avoids self-retrigger.
-    let isFirstRecenterCheck = true;
+    let isFirstCameraRequestCheck = true;
     effect(() => {
-      worldCameraRecenterRequest();
-      if (isFirstRecenterCheck) {
-        isFirstRecenterCheck = false;
+      const request = worldCameraRequest();
+      if (isFirstCameraRequestCheck) {
+        isFirstCameraRequestCheck = false;
         return;
       }
-      untracked(() => this.recenterCamera());
+      untracked(() =>
+        request?.target
+          ? this.focusCamera(request.target)
+          : this.recenterCamera(),
+      );
     });
 
     // Subscribed once so it survives map transitions; queued events are dropped
@@ -780,20 +784,9 @@ export class GamePlayWorldComponent implements OnDestroy {
     if (!this.app || !this.map) return;
 
     const zoom = getOption('mapZoom');
-    const { widthTiles: viewportWidthTiles, heightTiles: viewportHeightTiles } =
-      this.viewportTiles;
 
     // Anchor only on the first off-center move of this gesture; later deltas accumulate against the same frozen anchor.
-    if (!this.frozenCameraBase) {
-      const location = this.partyGlide.visual;
-      this.frozenCameraBase = cameraPositionCalculate(
-        location.x,
-        location.y,
-        viewportWidthTiles,
-        viewportHeightTiles,
-        this.cameraBounds,
-      );
-    }
+    this.frozenCameraBase ??= this.cameraPositionFor(this.partyGlide.visual);
 
     // Tile size must include zoom, since drag deltas are screen pixels but offset is unscaled tile units.
     this.cameraOffset.set(
@@ -815,6 +808,32 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.cameraOffset.set({ x: 0, y: 0 });
     this.frozenCameraBase = undefined;
     this.positionCamera();
+  }
+
+  private focusCamera(target: CameraPosition): void {
+    if (!this.map) return;
+
+    const base = this.cameraPositionFor(this.partyGlide.visual);
+    const focus = this.cameraPositionFor(target);
+    // A zero offset reads as unpanned, so a frozen base would pin the camera with no recenter button.
+    if (focus.x === base.x && focus.y === base.y) {
+      this.recenterCamera();
+      return;
+    }
+
+    this.frozenCameraBase = base;
+    this.cameraOffset.set({ x: focus.x - base.x, y: focus.y - base.y });
+    this.positionCamera();
+  }
+
+  private cameraPositionFor(tile: CameraPosition): CameraPosition {
+    return cameraPositionCalculate(
+      tile.x,
+      tile.y,
+      this.viewportTiles.widthTiles,
+      this.viewportTiles.heightTiles,
+      this.cameraBounds,
+    );
   }
 
   private async loadPartyTokenTextures(heroIndex: number): Promise<Texture[]> {
@@ -1062,21 +1081,11 @@ export class GamePlayWorldComponent implements OnDestroy {
       return;
 
     const location = this.partyGlide.visual;
-    const { widthTiles: viewportWidthTiles, heightTiles: viewportHeightTiles } =
-      this.viewportTiles;
     const bounds = this.cameraBounds;
     const offset = this.cameraOffset();
 
     // Stay anchored while panned, so party movement doesn't drag the view.
-    const base =
-      this.frozenCameraBase ??
-      cameraPositionCalculate(
-        location.x,
-        location.y,
-        viewportWidthTiles,
-        viewportHeightTiles,
-        bounds,
-      );
+    const base = this.frozenCameraBase ?? this.cameraPositionFor(location);
 
     // Reclamped to cover a resize while panned shifting the bounds.
     const camera = {

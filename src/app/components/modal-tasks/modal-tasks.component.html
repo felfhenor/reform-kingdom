@@ -61,6 +61,23 @@
             >
               Claim
             </button>
+          } @else if (row.locate; as locate) {
+            <app-slot-button-container
+              [disabled]="!!locate.disabledReason"
+              [helpText]="locate.disabledReason"
+            >
+              <button
+                type="button"
+                class="btn btn-xs btn-square btn-neutral"
+                tp="Locate on Map"
+                [disabled]="!!locate.disabledReason"
+                (click)="locateNode(locate.node)"
+                appSfx="ui-click"
+                [sfxTrigger]="['click', 'hover']"
+              >
+                <app-icon name="tablerFocus" />
+              </button>
+            </app-slot-button-container>
           }
         </div>
       </div>

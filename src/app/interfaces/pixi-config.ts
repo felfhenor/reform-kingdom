@@ -13,6 +13,11 @@ export type CameraPosition = {
   y: number;
 };
 
+// Omitting the target recenters on the party.
+export type WorldCameraRequest = {
+  target?: CameraPosition;
+};
+
 export type CameraBounds = {
   minX: number;
   maxX: number;

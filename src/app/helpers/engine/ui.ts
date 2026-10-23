@@ -14,11 +14,13 @@ import {
   worldNodeTrainer,
 } from '@helpers/world-node/world-nodes';
 import type {
+  CameraPosition,
   CharacterId,
   GamePlayView,
   HeroesSubview,
   KingdomSubview,
   Tradeskill,
+  WorldCameraRequest,
   WorldNodeEntry,
 } from '@interfaces';
 
@@ -141,11 +143,17 @@ export const isWorldCameraPanned = signal<boolean>(false);
 // False while the world view is loading or switching maps.
 export const worldMapReady = signal<boolean>(false);
 
-// Incremented to signal a recenter request; the navbar's button has no direct reference to the map component, so this bridges them.
-export const worldCameraRecenterRequest = signal<number>(0);
+// Bridges callers with no reference to the map component; a fresh object per request so repeats still fire.
+export const worldCameraRequest = signal<WorldCameraRequest | undefined>(
+  undefined,
+);
 
 export function worldCameraRecenter(): void {
-  worldCameraRecenterRequest.update((count) => count + 1);
+  worldCameraRequest.set({});
+}
+
+export function worldCameraFocus(target: CameraPosition): void {
+  worldCameraRequest.set({ target });
 }
 
 export const selectedMapNode = signal<WorldNodeEntry | undefined>(undefined);
