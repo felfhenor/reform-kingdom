@@ -22,7 +22,7 @@
         - behavior: NotZeroHealth
       damageScaling:
         Strength: 0.35
-        Resistance: 1
+        Resistance: 0.25
 
       statusEffects:
         - statusEffectId: Trembling
@@ -55,7 +55,7 @@
         - behavior: NotZeroHealth
       damageScaling:
         Strength: 0.7
-        Resistance: 1.5
+        Resistance: 0.65
 
       statusEffects:
         - statusEffectId: Trembling
@@ -88,7 +88,7 @@
         - behavior: NotZeroHealth
       damageScaling:
         Strength: 1.1
-        Resistance: 1.9
+        Resistance: 1.15
 
       statusEffects:
         - statusEffectId: Trembling
@@ -121,8 +121,8 @@
         - behavior: NotZeroHealth
       damageScaling:
         Strength: 1.6
-        Resistance: 2.1
-        Constitution: 5
+        Resistance: 1.5
+        Constitution: 3
 
       statusEffects:
         - statusEffectId: Trembling
