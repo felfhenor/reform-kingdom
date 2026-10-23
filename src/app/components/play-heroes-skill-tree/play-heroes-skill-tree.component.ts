@@ -13,6 +13,7 @@ import {
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
+import { IconComponent } from '@components/icon/icon.component';
 import { PanelHeroesSkillTreeDetailComponent } from '@components/panel-heroes-skill-tree-detail/panel-heroes-skill-tree-detail.component';
 import { PanelHeroesSkillTreeGridComponent } from '@components/panel-heroes-skill-tree-grid/panel-heroes-skill-tree-grid.component';
 import { RowCurrencyCostComponent } from '@components/row-currency-cost/row-currency-cost.component';
@@ -47,6 +48,7 @@ import type {
   SkillTreeNodeContent,
   SkillTreeNodeId,
 } from '@interfaces';
+import { TippyDirective } from '@ngneat/helipopper';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
@@ -65,6 +67,8 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     SlotButtonContainerComponent,
     SweetAlert2Module,
     TabsHeroComponent,
+    IconComponent,
+    TippyDirective,
   ],
   templateUrl: './play-heroes-skill-tree.component.html',
 })
