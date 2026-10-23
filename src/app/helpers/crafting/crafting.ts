@@ -24,7 +24,11 @@ import {
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { backfillEquipmentItem } from '@helpers/item/equipment';
 import { itemPreviewDisplay } from '@helpers/item/item-preview';
-import { pruneInvalidArmoryItems } from '@helpers/kingdom/armory';
+import { isMaterialDiscovered } from '@helpers/item/materials';
+import {
+  isEquipmentDiscovered,
+  pruneInvalidArmoryItems,
+} from '@helpers/kingdom/armory';
 import type {
   CollectibleContent,
   CraftRecipeEntry,
@@ -40,6 +44,16 @@ import type {
 } from '@interfaces';
 import { RARITY_PRIORITY } from '@interfaces';
 import { orderBy, sumBy } from 'es-toolkit/compat';
+
+function isRequirementDiscovered(requirement: RecipeRequirement): boolean {
+  if ('collectibleId' in requirement) {
+    return isCollectibleDiscovered(requirement.collectibleId);
+  }
+  if ('equipmentId' in requirement) {
+    return isEquipmentDiscovered(requirement.equipmentId);
+  }
+  return isMaterialDiscovered(requirement.itemId);
+}
 
 function buildRequirementEntry(
   requirement: RecipeRequirement,
@@ -79,17 +93,24 @@ const REQUIREMENT_KIND_ORDER: Record<CraftRequirementEntry['kind'], number> = {
   item: 2,
 };
 
-// Collectible costs (not consumed) first, then equipment, then materials.
+// Collectible costs (not consumed) first, then equipment, then materials. Sorted before masking undiscovered content, so slots don't move once found.
 function recipeRequirementEntries(
   recipe: RecipeContent,
 ): CraftRequirementEntry[] {
-  return orderBy(
-    recipe.requirements.map(buildRequirementEntry),
+  const sorted = orderBy(
+    recipe.requirements.map((requirement) => ({
+      entry: buildRequirementEntry(requirement),
+      discovered: isRequirementDiscovered(requirement),
+    })),
     [
-      (entry) => REQUIREMENT_KIND_ORDER[entry.kind],
-      (entry) => entry.content?.name ?? '',
+      ({ entry }) => REQUIREMENT_KIND_ORDER[entry.kind],
+      ({ entry }) => entry.content?.name ?? '',
     ],
     ['asc', 'asc'],
+  );
+
+  return sorted.map(({ entry, discovered }) =>
+    discovered ? entry : { ...entry, content: undefined },
   );
 }
 

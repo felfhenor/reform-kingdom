@@ -4,6 +4,7 @@ import type { Combat } from '@interfaces/combat';
 import type { GameStateCommissions } from '@interfaces/commission-state';
 import type { AstralProjectorId } from '@interfaces/content-astralprojector';
 import type { CaravanId } from '@interfaces/content-caravan';
+import type { CaravanTraderId } from '@interfaces/content-caravan-trader';
 import type { CollectibleId } from '@interfaces/content-collectible';
 import type { EquipmentId } from '@interfaces/content-equipment';
 import type { GlobalEffect } from '@interfaces/content-globaleffect';
@@ -78,6 +79,9 @@ export type GameStateDiscoveredEquipment = Ledger<EquipmentId>;
 // show in the Commissions panel. Keyed by caravan (not trader), since
 // traders don't map 1:1 to a caravan brand.
 export type GameStateDiscoveredCaravans = Ledger<CaravanId>;
+
+// Marked when the player visits a caravan staffed by this trader.
+export type GameStateDiscoveredTraders = Ledger<CaravanTraderId>;
 
 // Marked when the player opens a trainer's Visit modal - unlocks the heroes' Teachings list.
 export type GameStateDiscoveredTrainers = Ledger<TrainerId>;
@@ -173,6 +177,7 @@ export type GameState = {
   lootFilters: LootFilterSettings;
   discoveredEquipment: GameStateDiscoveredEquipment;
   discoveredCaravans: GameStateDiscoveredCaravans;
+  discoveredTraders: GameStateDiscoveredTraders;
   discoveredTrainers: GameStateDiscoveredTrainers;
   discoveredRecipes: GameStateDiscoveredRecipes;
   discoveredGatherNodes: GameStateDiscoveredGatherNodes;

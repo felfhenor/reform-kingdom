@@ -17,6 +17,7 @@ import {
   pruneInvalidCraftQueues,
 } from '@helpers/crafting/crafting';
 import { defaultTradeskillBuilding } from '@helpers/defaults';
+import { ledgerMark } from '@helpers/engine/ledger';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import type {
   CollectibleId,
@@ -226,6 +227,54 @@ describe('getCraftableRecipeEntries', () => {
       { kind: 'collectible', quantity: 1, owned: 0 },
       { kind: 'equipment', quantity: 1, owned: 1 },
       { kind: 'item', quantity: 3, owned: 7 },
+    ]);
+  });
+
+  it('hides the content of requirements the player has never discovered', () => {
+    seedContent([
+      ...baseContent,
+      recipe('forge', {
+        requirements: [
+          { itemId: oreId, quantity: 3 },
+          { equipmentId: hammerId },
+          { collectibleId: toolId },
+        ],
+      }),
+    ]);
+    seedBlacksmithing(5);
+
+    const [entry] = getCraftableRecipeEntries('Blacksmithing');
+
+    expect(entry.requirementEntries.map((req) => req.content)).toEqual([
+      undefined,
+      undefined,
+      undefined,
+    ]);
+  });
+
+  it('shows the content of discovered requirements', () => {
+    seedContent([
+      ...baseContent,
+      recipe('forge', {
+        requirements: [
+          { itemId: oreId, quantity: 3 },
+          { equipmentId: hammerId },
+          { collectibleId: toolId },
+        ],
+      }),
+    ]);
+    seedBlacksmithing(5, (state) => {
+      applyMaterialDelta(state, oreId, 1);
+      ledgerMark(state.discoveredEquipment, hammerId);
+      state.collectibles[toolId] = { foundAt: 1, quantity: 1 };
+    });
+
+    const [entry] = getCraftableRecipeEntries('Blacksmithing');
+
+    expect(entry.requirementEntries.map((req) => req.content?.id)).toEqual([
+      toolId,
+      hammerId,
+      oreId,
     ]);
   });
 });

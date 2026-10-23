@@ -253,7 +253,7 @@ function mapVisitIssues(
   guaranteed: CollectibleId[],
 ): AnalysisIssue[] {
   const mapName = task.requireMapVisit;
-  if (!mapName) return [];
+  if (!mapName) return [analysisFail('requireMapVisit is missing')];
   if (!allMaps().has(mapName)) {
     return [analysisFail(`requireMapVisit "${mapName}" is not a map`)];
   }

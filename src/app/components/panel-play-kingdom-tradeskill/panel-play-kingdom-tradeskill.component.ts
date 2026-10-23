@@ -225,7 +225,7 @@ export class PanelPlayKingdomTradeskillComponent {
   }
 
   public requirementTooltip(entry: CraftRequirementEntry): string {
-    const name = entry.content?.name ?? 'Unknown';
+    const name = entry.content?.name ?? '???';
 
     if (entry.kind === 'collectible') return `${name} (not consumed)`;
 

@@ -15,4 +15,5 @@ export * from './town-spawn';
 export * from './town-spawn.ui';
 export * from './town-tick';
 export * from './town-visit';
+export * from './town-visit.ui';
 export * from './worker';

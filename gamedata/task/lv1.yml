@@ -2,6 +2,7 @@
   name: Gather 5 Wergen Sticks
   description: Travel to Wergen Woods and gather until you have collected 5 Wergen Sticks.
   order: 10
+  requireMapVisit: Carrina
   whisper: Everyone starts somewhere. Every kingdom begins with a few sticks. Mine certainly did.
   requirement:
     kind: GatherItem
@@ -16,6 +17,7 @@
   name: Gather 5 Copper Ore
   description: Travel to the Carrina Copper Mines and gather until you have collected 5 Copper Ore.
   order: 20
+  requireMapVisit: Carrina
   requirement:
     kind: GatherItem
     nodeName: Carrina Copper Mines
@@ -29,6 +31,7 @@
   name: Craft a Copper Ingot
   description: Head to the Kingdom and craft a Copper Ingot in the Blacksmithing building.
   order: 30
+  requireMapVisit: Carrina
   requirement:
     kind: CraftRecipe
     recipeId: 'Material: Copper Ingot'
@@ -41,6 +44,7 @@
   name: Reach Level 3
   description: Fight encounters around the Duchy of Carrina or gather materials until a hero reaches level 3.
   order: 40
+  requireMapVisit: Carrina
   requirement:
     kind: ReachLevel
     level: 3
@@ -52,6 +56,7 @@
   name: Acquire the Goblin Ruby
   description: Defeat the Goblins of the Field Ruins, near the Duchy of Carrina, to recover the Goblin Ruby.
   order: 50
+  requireMapVisit: Carrina
   whisper: The unending praise of wealth leads to their downfall. How predictable.
   requirement:
     kind: OwnCollectible
@@ -67,6 +72,7 @@
   name: Train with Reyn Astra
   description: Visit Reyn Astra and have a hero learn one of his teachings.
   order: 60
+  requireMapVisit: Carrina
   requirement:
     kind: LearnTeaching
     trainerId: Reyn Astra
@@ -78,6 +84,7 @@
   name: Upgrade the Shrine of the Founder
   description: Make an offering at the Shrine of the Founder to raise it to level 1, then pray there for its blessing.
   order: 70
+  requireMapVisit: Carrina
   whisper: How quaint - a shrine dedicated to me. I'm right here, you know.
   requirement:
     kind: ShrineLevel
@@ -94,6 +101,7 @@
   name: Defeat 25 Goblins
   description: Defeat 25 of the Goblins roaming the ruins and caves around the Duchy of Carrina.
   order: 80
+  requireMapVisit: Carrina
   requirement:
     kind: DefeatMonster
     monsterId: Goblin
@@ -109,6 +117,7 @@
   name: Cast Strength of the Duchy
   description: 'The Goblin Ruby unlocks a spell in the Astral Projector. Use it to cast Strength of the Duchy I.'
   order: 90
+  requireMapVisit: Carrina
   requirement:
     kind: CastAstralSpell
     astralProjectorId: 'Power: Strength of the Duchy I'
@@ -121,6 +130,7 @@
   name: Gather 15 Flax Flowers
   description: Travel to Fieren Fields and gather until you have collected 15 Flax Flowers.
   order: 100
+  requireMapVisit: Carrina
   requirement:
     kind: GatherItem
     nodeName: Fieren Fields
@@ -137,6 +147,7 @@
   name: Reach Level 5
   description: Keep adventuring until a hero reaches level 5.
   order: 110
+  requireMapVisit: Carrina
   requirement:
     kind: ReachLevel
     level: 5
@@ -148,6 +159,7 @@
   name: Train with Stona Lowe
   description: Visit Stona Lowe and have a hero learn one of her teachings.
   order: 120
+  requireMapVisit: Carrina
   requirement:
     kind: LearnTeaching
     trainerId: Stona Lowe
@@ -159,6 +171,7 @@
   name: Infuse Your Equipment
   description: Use the Kingdom Workshop to infuse a material into a piece of equipment.
   order: 130
+  requireMapVisit: Carrina
   requirement:
     kind: InfuseEquipment
   rewards:
@@ -172,6 +185,7 @@
   name: Clear the Forest Ruins
   description: Defeat every Goblin in the Forest Ruins, located near the Duchy of Carrina.
   order: 140
+  requireMapVisit: Carrina
   requirement:
     kind: ClearEncounter
     nodeName: Forest Ruins
@@ -187,6 +201,7 @@
   name: Clear Gobsilk Forest
   description: Defeat the vicious Goblin & Spider teams in the Gobsilk Forest, located in the northwest forest of the Duchy of Carrina.
   order: 150
+  requireMapVisit: Carrina
   requirement:
     kind: ClearEncounter
     nodeName: Gobsilk Forest
@@ -202,6 +217,7 @@
   name: Rescue Weaver Welch
   description: Weaver Welch is held captive in the Spider Tower. Rescue her to obtain your first worker.
   order: 165
+  requireMapVisit: Carrina
   whisper: One of the Lost has been brought back, eh? She'll help you greatly.
   requirement:
     kind: RescueWorker
@@ -217,6 +233,7 @@
   name: Reach Blacksmithing Level 5
   description: Craft Blacksmithing recipes until the building reaches level 5.
   order: 170
+  requireMapVisit: Carrina
   requirement:
     kind: TradeskillLevel
     tradeskillId: Blacksmithing
@@ -229,6 +246,7 @@
   name: Craft a Minor Blacksmithing Effigy
   description: Craft a Minor Blacksmithing Effigy so Blacksmithing can grow past level 5.
   order: 180
+  requireMapVisit: Carrina
   requirement:
     kind: CraftRecipe
     recipeId: 'Collectible: Minor Blacksmithing Effigy'
@@ -244,6 +262,7 @@
   name: Reach Tailoring Level 5
   description: Craft Tailoring recipes until the building reaches level 5.
   order: 190
+  requireMapVisit: Carrina
   requirement:
     kind: TradeskillLevel
     tradeskillId: Tailoring
@@ -259,6 +278,7 @@
   name: Clear Jelly Fields
   description: Cull the vicious slimes of the Jelly Fields, located south of the Duchy of Carrina.
   order: 200
+  requireMapVisit: Carrina
   requirement:
     kind: ClearEncounter
     nodeName: Jelly Fields
@@ -274,6 +294,7 @@
   name: Cast Magic of the Cimmerians
   description: 'The Jelly Flower unlocks another Astral Projector spell. Use it to cast Magic of the Cimmerians I.'
   order: 210
+  requireMapVisit: Carrina
   requirement:
     kind: CastAstralSpell
     astralProjectorId: 'Power: Magic of the Cimmerians I'
@@ -286,6 +307,7 @@
   name: Reach Level 10
   description: Keep adventuring until a hero reaches level 10.
   order: 220
+  requireMapVisit: Carrina
   whisper: Your strength is growing. It has not gone unnoticed.
   requirement:
     kind: ReachLevel
@@ -298,6 +320,7 @@
   name: Reach Woodworking Level 5
   description: Craft Woodworking recipes until the building reaches level 5.
   order: 175
+  requireMapVisit: Carrina
   requirement:
     kind: TradeskillLevel
     tradeskillId: Woodworking
@@ -312,6 +335,7 @@
   name: Reach Jewelcrafting Level 5
   description: Craft Jewelcrafting recipes until the building reaches level 5.
   order: 185
+  requireMapVisit: Carrina
   requirement:
     kind: TradeskillLevel
     tradeskillId: Jewelcrafting
@@ -326,6 +350,7 @@
   name: Reach Artificing Level 5
   description: Craft Artificing recipes until the building reaches level 5.
   order: 195
+  requireMapVisit: Carrina
   requirement:
     kind: TradeskillLevel
     tradeskillId: Artificing

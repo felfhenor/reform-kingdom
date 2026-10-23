@@ -84,9 +84,11 @@ describe('collectibleSourceMapBuild', () => {
       [ruby]: [{ type: 'node', name: 'Field Ruins' }],
       [flower]: [{ type: 'node', name: 'Gobslime Shrine' }],
       [effigy]: [{ type: 'crafting' }],
-      [card]: [{ type: 'trader', name: 'Juke Itos' }],
-      [treasureMap]: [{ type: 'trader', name: 'Juke Itos' }],
-      [houseModel]: [{ type: 'raid', name: 'Larsia' }],
+      [card]: [{ type: 'trader', traderId: 'juke-itos', name: 'Juke Itos' }],
+      [treasureMap]: [
+        { type: 'trader', traderId: 'juke-itos', name: 'Juke Itos' },
+      ],
+      [houseModel]: [{ type: 'raid', townId: 'larsia', name: 'Larsia' }],
     });
     expect(error).not.toHaveBeenCalled();
   });
@@ -99,7 +101,7 @@ describe('collectibleSourceMapBuild', () => {
 
     expect(collectibleSourceMapBuild().get(ruby)).toEqual([
       { type: 'node', name: 'Field Ruins' },
-      { type: 'trader', name: 'Juke Itos' },
+      { type: 'trader', traderId: 'juke-itos', name: 'Juke Itos' },
     ]);
     expect(error).toHaveBeenCalledWith(
       'CollectibleSource:Collision',

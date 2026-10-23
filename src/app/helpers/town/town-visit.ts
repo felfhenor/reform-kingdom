@@ -26,10 +26,13 @@ export function isPartyAtTown(townId: TownId): boolean {
   return !!entry && worldNodeTown(entry)?.id === townId;
 }
 
+export function isTownVisited(townId: TownId): boolean {
+  return worldTownsState()[townId]?.firstVisitedAtTick !== undefined;
+}
+
 // Activates a town's crafting/workers/commissions on first visit - inert until then. Idempotent, and only fires analytics on the actual first visit.
 export function townMarkVisited(townId: TownId): void {
-  const alreadyVisited =
-    worldTownsState()[townId]?.firstVisitedAtTick !== undefined;
+  const alreadyVisited = isTownVisited(townId);
   const town = getEntry<TownContent>(townId);
 
   updateGamestate((state) => {

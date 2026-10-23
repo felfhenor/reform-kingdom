@@ -16,7 +16,11 @@ import {
   townCompleteInitialCrafts,
   townQueueInitialCrafts,
 } from '@helpers/town/crafting/town-craft-queue';
-import { isPartyAtTown, townMarkVisited } from '@helpers/town/town-visit';
+import {
+  isPartyAtTown,
+  isTownVisited,
+  townMarkVisited,
+} from '@helpers/town/town-visit';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
 import type {
   EquipmentId,
@@ -191,6 +195,16 @@ describe('townMarkVisited', () => {
     expect(townQueueInitialCrafts).not.toHaveBeenCalled();
     expect(townCompleteInitialCrafts).not.toHaveBeenCalled();
     expect(events).toEqual([]);
+  });
+});
+
+describe('isTownVisited', () => {
+  it('is false until the town is first visited', () => {
+    seedTownState({});
+    expect(isTownVisited(townId)).toBe(false);
+
+    visitedTown();
+    expect(isTownVisited(townId)).toBe(true);
   });
 });
 

@@ -8,6 +8,7 @@ import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
 import { formatDuration, timerTicksElapsed } from '@helpers/engine/timer';
 import {
   discoveredCaravansState,
+  discoveredTradersState,
   updateGamestate,
   worldCaravansState,
 } from '@helpers/state-game';
@@ -20,6 +21,8 @@ import type {
   CaravanTimerUrgency,
   CaravanTraderContent,
   CaravanTraderId,
+  GameStateCaravans,
+  GameStateDiscoveredTraders,
 } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
@@ -99,6 +102,24 @@ export function isCaravanDiscovered(caravanId: CaravanId): boolean {
   return ledgerHas(discoveredCaravansState(), caravanId);
 }
 
+export function isTraderDiscovered(traderId: CaravanTraderId): boolean {
+  return ledgerHas(discoveredTradersState(), traderId);
+}
+
+// Pre-ledger saves only remember the last trader seen at each caravan.
+export function backfillDiscoveredTraders(
+  discovered: GameStateDiscoveredTraders,
+  caravans: GameStateCaravans,
+): GameStateDiscoveredTraders {
+  const backfilled = { ...discovered };
+  Object.values(caravans).forEach((caravan) => {
+    if (caravan.visitedTraderId)
+      ledgerMark(backfilled, caravan.visitedTraderId);
+  });
+
+  return backfilled;
+}
+
 export function isPartyAtCaravan(caravanId: CaravanId): boolean {
   const entry = worldNodeAtCurrentLocation();
   return !!entry && worldNodeCaravan(entry)?.id === caravanId;
@@ -122,6 +143,8 @@ export function caravanMarkVisited(caravanId: CaravanId): void {
     if (caravan && caravan.visitedTraderId !== caravan.traderId) {
       caravan.visitedTraderId = caravan.traderId;
     }
+    if (caravan?.traderId)
+      ledgerMark(state.discoveredTraders, caravan.traderId);
     return state;
   });
 }

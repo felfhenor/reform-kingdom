@@ -46,14 +46,22 @@ export function collectibleSourceMapBuild(): Map<
   getEntriesByType<CaravanTraderContent>('caravantrader').forEach((trader) => {
     trader.trades.forEach((trade) => {
       if (trade.type === 'sell' && trade.collectibleId) {
-        addSource(trade.collectibleId, { type: 'trader', name: trader.name });
+        addSource(trade.collectibleId, {
+          type: 'trader',
+          traderId: trader.id,
+          name: trader.name,
+        });
       }
     });
 
     // Token trades (bought with Trader Scrip) are a separate offer list from `trades`.
     trader.tokenTrades.forEach((trade) => {
       if (trade.collectibleId) {
-        addSource(trade.collectibleId, { type: 'trader', name: trader.name });
+        addSource(trade.collectibleId, {
+          type: 'trader',
+          traderId: trader.id,
+          name: trader.name,
+        });
       }
     });
   });
@@ -61,7 +69,11 @@ export function collectibleSourceMapBuild(): Map<
   getEntriesByType<TownContent>('town').forEach((town) => {
     town.defense.rewards.forEach((reward) => {
       if ('collectibleId' in reward) {
-        addSource(reward.collectibleId, { type: 'raid', name: town.name });
+        addSource(reward.collectibleId, {
+          type: 'raid',
+          townId: town.id,
+          name: town.name,
+        });
       }
     });
   });

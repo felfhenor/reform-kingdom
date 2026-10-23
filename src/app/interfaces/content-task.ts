@@ -142,6 +142,6 @@ export type TaskContent = IsContentItem &
     // The Founder's whisper, logged when the task completes; empty for none.
     whisper: string;
 
-    // Map the task stays hidden behind until the party first visits it; empty for none.
+    // Map the task stays hidden behind until the party first visits it.
     requireMapVisit: string;
   };

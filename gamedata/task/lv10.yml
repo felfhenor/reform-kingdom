@@ -2,6 +2,7 @@
   name: Clear Copperorc Retreat
   description: Defeat every fight in Copperorc Retreat, nestled in the mountain range in the northeast of the Duchy of Carrina.
   order: 240
+  requireMapVisit: Carrina
   requirement:
     kind: ClearEncounter
     nodeName: Copperorc Retreat
@@ -17,6 +18,7 @@
   name: Clear the Mired Ruins
   description: Pass through Craggled Cave, west of the Duchy of Carrina, into the Craggled Mire and defeat every fight in the Mired Ruins.
   order: 250
+  requireMapVisit: CraggledMire
   whisper: The Mire will fight you every step you take. Keep fighting back.
   requirement:
     kind: ClearEncounter
@@ -33,6 +35,7 @@
   name: Clear the Elven River Camp
   description: Defeat every fight in the Elven River Camp, northeast of the Duchy of Carrina.
   order: 260
+  requireMapVisit: Carrina
   requirement:
     kind: ClearEncounter
     nodeName: Elven River Camp
@@ -64,6 +67,7 @@
   name: Reach Level 15
   description: Keep adventuring until a hero reaches level 15.
   order: 280
+  requireMapVisit: Carrina
   requirement:
     kind: ReachLevel
     level: 15
@@ -125,6 +129,7 @@
   name: Rescue Dekar Anten
   description: Clear the Mystical Gobslime Shrine to rescue Dekar Anten.
   order: 320
+  requireMapVisit: Carrina
   whisper: Some would say he got lost in the ruins. I say the ruins lost him.
   requirement:
     kind: RescueWorker
@@ -141,6 +146,7 @@
   description: Fulfill a caravan commission to earn Trader Scrip.
   whisper: The traders may seem unscrupulous, but they're your allies. They were mine, too.
   order: 330
+  requireMapVisit: Carrina
   requirement:
     kind: FulfillCommission
     quantity: 1
@@ -152,6 +158,7 @@
   name: Reach Jewelcrafting Level 10
   description: Craft Jewelcrafting recipes until the building reaches level 10. It needs a Minor Jewelcrafting Effigy to grow past level 5.
   order: 340
+  requireMapVisit: Carrina
   requirement:
     kind: TradeskillLevel
     tradeskillId: Jewelcrafting

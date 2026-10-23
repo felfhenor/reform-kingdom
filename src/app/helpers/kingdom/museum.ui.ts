@@ -8,11 +8,11 @@ import {
   getCollectibleQuantity,
   isCollectibleDiscovered,
 } from '@helpers/item/collectibles';
-import { recipeSourceNodeNames } from '@helpers/kingdom/museum';
 import {
-  isWorldNodeMapVisited,
-  worldNodeDisplayName,
-} from '@helpers/world-node/world-nodes';
+  isCollectibleSourceKnown,
+  recipeSources,
+} from '@helpers/kingdom/museum';
+import { worldNodeDisplayName } from '@helpers/world-node/world-nodes';
 import type {
   CollectibleContent,
   CollectibleId,
@@ -25,6 +25,7 @@ import { RARITY_PRIORITY } from '@interfaces';
 import { orderBy } from 'es-toolkit/compat';
 
 const CRAFTING_SOURCE_NAME = 'Crafting';
+const UNMET_TRADER_NAME = 'an unmet trader';
 
 // Includes undiscovered collectibles (quantity: 0) so the museum can render them as silhouettes.
 export function getMuseumCollectibleEntries(): MuseumCollectibleEntry[] {
@@ -52,14 +53,19 @@ export function getMuseumCollectibleEntries(): MuseumCollectibleEntry[] {
   );
 }
 
-// Node sources are re-masked live, and stay unknown for an undiscovered collectible until its map is visited.
+// An undiscovered collectible's source stays unknown until its map is visited or its town visited; an unmet trader is hinted at without a name.
 function museumCollectibleSource(
   collectibleId: CollectibleId,
   discovered: boolean,
 ): CollectibleSource | undefined {
   const source = getCollectibleSource(collectibleId);
-  if (source?.type !== 'node') return source;
-  if (!discovered && !isWorldNodeMapVisited(source.name)) return undefined;
+  if (!source) return undefined;
+  if (!discovered && !isCollectibleSourceKnown(source)) {
+    return source.type === 'trader'
+      ? { ...source, name: UNMET_TRADER_NAME }
+      : undefined;
+  }
+  if (source.type !== 'node') return source;
 
   return { type: 'node', name: worldNodeDisplayName(source.name) };
 }
@@ -110,9 +116,13 @@ export function getMuseumRecipeEntries(): MuseumRecipeEntry[] {
     return {
       recipe,
       discovered,
-      sourceNodeNames: recipeSourceNodeNames(recipe.id)
-        .filter((name) => discovered || isWorldNodeMapVisited(name))
-        .map(worldNodeDisplayName),
+      sourceNodeNames: recipeSources(recipe.id)
+        .filter((source) => discovered || isCollectibleSourceKnown(source))
+        .map((source) =>
+          source.type === 'node'
+            ? worldNodeDisplayName(source.name)
+            : collectibleSourceName(source),
+        ),
       tokenUnlockCost: discovered ? undefined : recipe.tokenUnlockCost,
     };
   });

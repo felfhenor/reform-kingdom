@@ -1,3 +1,4 @@
+import { backfillDiscoveredTraders } from '@helpers/caravan/caravan';
 import { pruneInvalidCommissions } from '@helpers/commission/commission-tick';
 import {
   craftQueueOrphanedEquipment,
@@ -173,6 +174,14 @@ export function migrateGameState() {
   );
   newState.discoveredCaravans = recordPrune(
     newState.discoveredCaravans,
+    contentExists,
+  );
+  newState.discoveredTraders = backfillDiscoveredTraders(
+    newState.discoveredTraders,
+    newState.world.caravans,
+  );
+  newState.discoveredTraders = recordPrune(
+    newState.discoveredTraders,
     contentExists,
   );
   newState.discoveredTrainers = recordPrune(

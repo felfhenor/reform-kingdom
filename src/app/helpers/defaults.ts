@@ -64,6 +64,7 @@ export function defaultGameState(): GameState {
     lootFilters: defaultLootFilterSettings(),
     discoveredEquipment: {},
     discoveredCaravans: {},
+    discoveredTraders: {},
     discoveredTrainers: {},
     discoveredRecipes: {},
     discoveredGatherNodes: {},

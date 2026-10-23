@@ -10,7 +10,9 @@ import {
   caravanTicksUntilReset,
   caravanTimerLabel,
   caravanTimerUrgency,
+  backfillDiscoveredTraders,
   isCaravanDiscovered,
+  isTraderDiscovered,
   isPartyAtCaravan,
 } from '@helpers/caravan/caravan';
 import { commissionGenerateIfMissing } from '@helpers/commission/commission-tick';
@@ -186,6 +188,7 @@ describe('caravanMarkVisited', () => {
     });
     expect(commissionGenerateIfMissing).toHaveBeenCalledWith(caravan.id);
     expect(worldCaravansState()[caravan.id].visitedTraderId).toBe(traderA);
+    expect(isTraderDiscovered(traderA)).toBe(true);
   });
 
   it('still discovers a caravan with no trader state yet', () => {
@@ -195,5 +198,34 @@ describe('caravanMarkVisited', () => {
 
     expect(isCaravanDiscovered(caravan.id)).toBe(true);
     expect(worldCaravansState()).toEqual({});
+  });
+});
+
+describe('backfillDiscoveredTraders', () => {
+  it('marks the last visited trader of each caravan, keeping existing entries', () => {
+    const traderB = 'trader-b' as CaravanTraderId;
+    const result = backfillDiscoveredTraders(
+      { [traderB]: { foundAt: 1 } },
+      {
+        [caravan.id]: buildCaravanNodeState({
+          traderId: traderB,
+          visitedTraderId: traderA,
+        }),
+      },
+    );
+
+    expect(result).toEqual({
+      [traderA]: { foundAt: expect.any(Number) },
+      [traderB]: { foundAt: 1 },
+    });
+  });
+
+  it('skips caravans that were never visited', () => {
+    const result = backfillDiscoveredTraders(
+      {},
+      { [caravan.id]: buildCaravanNodeState({ traderId: traderA }) },
+    );
+
+    expect(result).toEqual({});
   });
 });

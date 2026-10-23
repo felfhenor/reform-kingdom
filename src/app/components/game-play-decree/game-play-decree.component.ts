@@ -19,7 +19,7 @@ import { ListReflowDragDirective } from '@directives/list-reflow-drag.directive'
 import { ListReflowDirective } from '@directives/list-reflow.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { HIGH_RISK_LEVELS_ABOVE_PARTY } from '@helpers/config';
-import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { getEntry } from '@helpers/content/content';
 import {
   autoModeIsEnabled,
   autoModeToggle,
@@ -49,6 +49,7 @@ import {
 import { RISK_BAND_DIFFICULTY } from '@helpers/engine/difficulty-tier';
 import { uiScaleCurrent } from '@helpers/engine/ui-scale.ui';
 import { homeNodeGet } from '@helpers/town/town-spawn';
+import { visitedTowns } from '@helpers/town/town-visit.ui';
 import {
   gatherableDiscoveredMaterialIds,
   gatherNodeFarmOptions,
@@ -240,7 +241,7 @@ export class GamePlayDecreeComponent {
   public draftTownName = signal<string | undefined>(undefined);
 
   public townOptions = computed(() =>
-    sortBy(getEntriesByType<TownContent>('town'), (town) => town.name),
+    sortBy(visitedTowns(), (town) => town.name),
   );
 
   // Scoped to the currently-selected node - a FarmNode reward only ever
