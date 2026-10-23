@@ -2,8 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import type { WritableSignal } from '@angular/core';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { unfurlContent } from '@helpers/content/content';
-import { setAllMaps } from '@helpers/maps';
-import type { GameMap, IsContentItem } from '@interfaces';
+import { allMaps, setAllMaps } from '@helpers/maps';
+import { tiledMapsTilesetImagePaths } from '@helpers/pixi/tiled-map';
+import type { GameMap, IsContentItem, TiledMap } from '@interfaces';
 import { LoggerService } from '@services/logger.service';
 import { MetaService } from '@services/meta.service';
 import { lastValueFrom } from 'rxjs';
@@ -30,6 +31,7 @@ export class ContentService {
   public hasLoadedAtlases = signal<boolean>(false);
   public hasLoadedData = signal<boolean>(false);
   public hasLoadedMaps = signal<boolean>(false);
+  public hasLoadedMapArt = signal<boolean>(false);
 
   public artAtlases = signal<ArtAtlases>({});
 
@@ -45,9 +47,9 @@ export class ContentService {
     // Every content URL is versioned; building them before the version lands makes the preloads miss what's displayed later.
     await this.metaService.loadLocalVersion();
 
-    this.loadJSON();
-    this.loadArt();
-    this.loadMaps();
+    void this.loadJSON();
+    await Promise.all([this.loadArt(), this.loadMaps()]);
+    await this.loadMapArt();
   }
 
   public toCacheBustURL(url: string): string {
@@ -92,6 +94,37 @@ export class ContentService {
     });
 
     this.hasLoadedAtlases.set(true);
+  }
+
+  // Imported lazily so Pixi stays out of the main bundle.
+  private async loadMapArt() {
+    const { pixiTexturesPreload } =
+      await import('@helpers/pixi/pixi-texture-loader');
+
+    const maps = [...allMaps().values()].map((map) => map.data as TiledMap);
+    const urls = [
+      ...tiledMapsTilesetImagePaths(maps),
+      ...Object.keys(this.artAtlases()).map((sheet) =>
+        this.toCacheBustURL(`art/spritesheets/${sheet}.webp`),
+      ),
+    ];
+
+    // A failed texture still counts as done; the map would load it on demand, rather than the loading screen hanging.
+    try {
+      await pixiTexturesPreload(urls);
+      this.logger.info(
+        'Content:LoadMapArt',
+        `Preloaded ${urls.length} map textures.`,
+      );
+    } catch (err) {
+      this.logger.error(
+        'Content:LoadMapArt',
+        'Failed to preload map textures',
+        err,
+      );
+    }
+
+    this.hasLoadedMapArt.set(true);
   }
 
   private async loadJSON() {

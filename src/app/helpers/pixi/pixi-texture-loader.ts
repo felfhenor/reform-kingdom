@@ -5,6 +5,11 @@ import {
 import type { TiledMap, TiledTileset } from '@interfaces';
 import { Assets, Rectangle, Texture } from 'pixi.js';
 
+// Fills Pixi's asset cache by URL, so the world map's later loads of the same URLs resolve without fetching or decoding.
+export async function pixiTexturesPreload(urls: string[]): Promise<void> {
+  await Assets.load(urls);
+}
+
 export async function pixiTiledTilesetTexturesLoad(
   tileset: TiledTileset,
 ): Promise<Record<number, Texture>> {

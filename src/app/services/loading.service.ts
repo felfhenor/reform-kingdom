@@ -71,6 +71,10 @@ export class LoadingService {
         isDone: this.contentService.hasLoadedArt(),
       },
       { label: 'Loading maps...', isDone: this.contentService.hasLoadedMaps() },
+      {
+        label: 'Loading map art...',
+        isDone: this.contentService.hasLoadedMapArt(),
+      },
       { label: 'Loading music...', isDone: this.soundService.hasLoadedAudio() },
       { label: 'Loading your save...', isDone: hasGameStateLoaded() },
       {

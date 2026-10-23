@@ -6,7 +6,7 @@ import type {
   TiledObjectSpriteFrame,
   TiledTileset,
 } from '@interfaces';
-import { sortBy } from 'es-toolkit/compat';
+import { sortBy, uniq } from 'es-toolkit/compat';
 
 // Tiled's gid flip flags occupy the top 3 bits of the stored gid, so a
 // sprite lookup on a (potentially flipped) object gid needs them masked off
@@ -64,6 +64,12 @@ export function tiledLayerTileAt(
 
 export function tiledTilesetImagePath(tileset: TiledTileset): string {
   return cacheBustURL(tileset.image.replace(/^\.\.\//, ''));
+}
+
+export function tiledMapsTilesetImagePaths(maps: TiledMap[]): string[] {
+  return uniq(
+    maps.flatMap((map) => map.tilesets.map((t) => tiledTilesetImagePath(t))),
+  );
 }
 
 export function tiledObjectProperty<T>(

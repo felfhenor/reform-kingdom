@@ -9,6 +9,7 @@ import { describe, expect, it } from 'vitest';
 import {
   tiledLayerTileAt,
   tiledMapGetLayer,
+  tiledMapsTilesetImagePaths,
   tiledMapTileLayers,
   tiledObjectProperty,
   tiledObjectSpriteFrame,
@@ -265,5 +266,23 @@ describe('Tiled Map Helper Functions', () => {
 
       expect(tiledLayerTileAt(layer, 0, 0)).toBe(0);
     });
+  });
+});
+
+describe('tiledMapsTilesetImagePaths', () => {
+  it('lists each tileset image once across maps, without the ../ prefix', () => {
+    const terrain = buildTileset({ image: '../mapdata/terrain.png' });
+    const trees = buildTileset({ image: '../mapdata/trees.png' });
+
+    expect(
+      tiledMapsTilesetImagePaths([
+        buildMap({ tilesets: [terrain, trees] }),
+        buildMap({ tilesets: [terrain] }),
+      ]),
+    ).toEqual(['mapdata/terrain.png', 'mapdata/trees.png']);
+  });
+
+  it('returns nothing for no maps', () => {
+    expect(tiledMapsTilesetImagePaths([])).toEqual([]);
   });
 });
