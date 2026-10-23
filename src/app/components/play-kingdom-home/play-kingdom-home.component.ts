@@ -8,6 +8,7 @@ import { CardPageComponent } from '@components/card-page/card-page.component';
 import { SlotButtonContainerComponent } from '@components/slot-button-container/slot-button-container.component';
 import { IconKingdomComponent } from '@components/icon-kingdom/icon-kingdom.component';
 import { SFXDirective } from '@directives/sfx.directive';
+import { isCaravanDiscovered } from '@helpers/caravan/caravan';
 import { commissionCanFulfill } from '@helpers/commission/commission-fulfill';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { craftQueueTicksRemaining } from '@helpers/crafting/crafting';
@@ -134,7 +135,11 @@ export class PlayKingdomHomeComponent {
     () =>
       worldNodesOfType('CaravanNode').filter((entry) => {
         const caravan = worldNodeCaravan(entry);
-        return !!caravan && commissionCanFulfill(caravan.id);
+        return (
+          !!caravan &&
+          isCaravanDiscovered(caravan.id) &&
+          commissionCanFulfill(caravan.id)
+        );
       }).length,
   );
 

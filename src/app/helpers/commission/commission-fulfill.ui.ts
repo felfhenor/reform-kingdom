@@ -1,4 +1,7 @@
-import { isPartyAtCaravan } from '@helpers/caravan/caravan';
+import {
+  isCaravanDiscovered,
+  isPartyAtCaravan,
+} from '@helpers/caravan/caravan';
 import {
   commissionCanFulfill,
   commissionExists,
@@ -19,7 +22,12 @@ export function commissionRowViewModel(
   entry: WorldNodeEntry,
 ): CommissionRowViewModel | undefined {
   const caravan = worldNodeCaravan(entry);
-  if (!caravan || !commissionExists(caravan.id)) return undefined;
+  if (
+    !caravan ||
+    !isCaravanDiscovered(caravan.id) ||
+    !commissionExists(caravan.id)
+  )
+    return undefined;
 
   return {
     caravanId: caravan.id,
