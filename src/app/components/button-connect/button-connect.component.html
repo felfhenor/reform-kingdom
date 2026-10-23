@@ -8,6 +8,7 @@
     [style.--social-color]="ext.color"
     (mouseenter)="ext.currentColor = ext.color"
     (mouseleave)="ext.currentColor = '#ccc'"
+    (click)="onLinkClick($event, ext.link, ext.copyWhenEmbedded)"
     [appAnalyticsClick]="'Meta:External:' + ext.name"
     appSfx="ui-click"
     [sfxOffset]="$index"

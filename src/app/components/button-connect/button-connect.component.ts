@@ -3,6 +3,8 @@ import { ModalChangelogComponent } from '@components/modal-changelog/modal-chang
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { HideInElectronDirective } from '@directives/hide-in-electron.directive';
 import { SFXDirective } from '@directives/sfx.directive';
+import { isInIframe } from '@helpers/engine/embed';
+import { discordCopyInvite } from '@helpers/engine/discord.ui';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import {
   tablerBrandDiscord,
@@ -43,6 +45,7 @@ export class ButtonConnectComponent {
       color: '#5865f2',
       currentColor: '#ccc',
       icon: 'tablerBrandDiscord',
+      copyWhenEmbedded: true,
     },
     {
       name: 'GitHub',
@@ -66,4 +69,15 @@ export class ButtonConnectComponent {
       icon: 'tablerMail',
     },
   ];
+
+  public onLinkClick(
+    event: MouseEvent,
+    link: string,
+    copyWhenEmbedded = false,
+  ) {
+    if (!copyWhenEmbedded || !isInIframe()) return;
+
+    event.preventDefault();
+    void discordCopyInvite(link);
+  }
 }

@@ -3,6 +3,8 @@ export * from './analytics.ui';
 export * from './changelog.ui';
 export * from './difficulty-tier';
 export * from './discord';
+export * from './discord.ui';
+export * from './embed';
 export * from './font.ui';
 export * from './gather-vfx';
 export * from './hero-level-up-vfx';

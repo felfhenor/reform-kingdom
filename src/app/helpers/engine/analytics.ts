@@ -1,3 +1,4 @@
+import { isInIframe } from '@helpers/engine/embed';
 import { Subject } from 'rxjs';
 
 const analyticsEvent = new Subject<{
@@ -16,6 +17,5 @@ export function analyticsSafeSegment(name: string): string {
 }
 
 export function canAnalyticsActivate(): boolean {
-  const isInsideIframe = document.location.ancestorOrigins.length;
-  return !isInsideIframe;
+  return !isInIframe();
 }
