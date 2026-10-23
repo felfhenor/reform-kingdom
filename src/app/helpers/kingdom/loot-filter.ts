@@ -4,7 +4,7 @@ import { ledgerMark } from '@helpers/engine/ledger';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import { gainGold } from '@helpers/item/materials';
 import { addArmoryItems, equipmentSellValue } from '@helpers/kingdom/armory';
-import { updateGamestate } from '@helpers/state-game';
+import { lootFiltersState, updateGamestate } from '@helpers/state-game';
 import type {
   EquipmentContent,
   EquipmentId,
@@ -20,6 +20,11 @@ export function equipmentPassesLootFilter(
   if (content.levelRequirement < filters.minimumItemLevel) return false;
   if (!filters.keepEquipmentTypes[content.type]) return false;
   return true;
+}
+
+export function equipmentAutoSells(equipmentId: EquipmentId): boolean {
+  const content = getEntry<EquipmentContent>(equipmentId);
+  return !!content && !equipmentPassesLootFilter(content, lootFiltersState());
 }
 
 // A drop that fails the filter is sold before it ever reaches the armory,

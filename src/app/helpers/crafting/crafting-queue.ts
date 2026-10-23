@@ -33,8 +33,16 @@ import {
   collectiblesAdd,
   isCollectibleDiscovered,
 } from '@helpers/item/collectibles';
-import { addMaterial, getMaterialQuantity } from '@helpers/item/materials';
-import { armoryAdd, armoryGet, armoryHasRoom } from '@helpers/kingdom/armory';
+import {
+  addMaterial,
+  getMaterialQuantity,
+  goldCoinId,
+} from '@helpers/item/materials';
+import { armoryGet, armoryHasRoom } from '@helpers/kingdom/armory';
+import {
+  armoryAddLootDrop,
+  equipmentAutoSells,
+} from '@helpers/kingdom/loot-filter';
 import { rngSucceedsChance, rngUuid } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
 import { taskRecordCraft } from '@helpers/task/task-progress';
@@ -42,9 +50,9 @@ import type {
   CollectibleContent,
   CraftQueueEntry,
   CraftQueueEntryId,
-  EquipmentContent,
   EquipmentItem,
   ItemContent,
+  LootDropOutcome,
   RecipeContent,
   RecipeId,
   RecipeRequirement,
@@ -281,6 +289,28 @@ export function craftQueueStart(
   return true;
 }
 
+function logCraftedEquipment(
+  tradeskill: Tradeskill,
+  outcome: LootDropOutcome,
+): void {
+  if (outcome.kind !== 'Kept' && outcome.kind !== 'AutoSold') return;
+
+  const crafted = `${tradeskill} crafted ${ITEM_ICON_TOKEN}${equipmentDropHtml(outcome.content)}`;
+  const goldItem =
+    outcome.kind === 'AutoSold'
+      ? getEntry<ItemContent>(goldCoinId())
+      : undefined;
+  const message =
+    outcome.kind === 'AutoSold' && goldItem
+      ? `${crafted} and automatically sold it for ${itemDropHtml(goldItem, outcome.goldEarned)}.`
+      : `${crafted}!`;
+
+  categoryMessageLog('Craft', tradeskill, message, {
+    sprite: outcome.content.sprite,
+    spritesheet: 'equipment',
+  });
+}
+
 // An item result with a `chance` roll can whiff entirely, producing nothing
 // - but the tradeskill still attempted the craft, so XP is granted either way.
 function grantCraftResult(tradeskill: Tradeskill, recipe: RecipeContent): void {
@@ -314,19 +344,10 @@ function grantCraftResult(tradeskill: Tradeskill, recipe: RecipeContent): void {
   }
 
   if ('equipmentId' in recipe.result) {
-    const { equipmentId } = recipe.result;
-
-    armoryAdd(equipmentId);
-
-    const equipment = getEntry<EquipmentContent>(equipmentId);
-    if (equipment) {
-      categoryMessageLog(
-        'Craft',
-        tradeskill,
-        `${tradeskill} crafted ${ITEM_ICON_TOKEN}${equipmentDropHtml(equipment)}!`,
-        { sprite: equipment.sprite, spritesheet: 'equipment' },
-      );
-    }
+    logCraftedEquipment(
+      tradeskill,
+      armoryAddLootDrop(recipe.result.equipmentId),
+    );
     return;
   }
 
@@ -398,10 +419,14 @@ function advanceQueueEntry(
   });
 }
 
-// An equipment-result craft that's ready to deliver holds instead, once the armory has no room left - the strict cap, same rule as a purchase, not the drop-overflow allowance.
+// An equipment-result craft that's ready to deliver holds instead, once the armory has no room left - the strict cap, same rule as a purchase, not the drop-overflow allowance. One the loot filter would sell never needs room.
 // Note: gates on the recipe having an equipment result at all, not on whether this particular roll would hit - a chance-gated equipment recipe (none exist today) would hold even on ticks its own roll would have whiffed.
 function craftResultBlockedByArmory(recipe: RecipeContent): boolean {
-  return 'equipmentId' in recipe.result && !armoryHasRoom(1);
+  return (
+    'equipmentId' in recipe.result &&
+    !equipmentAutoSells(recipe.result.equipmentId) &&
+    !armoryHasRoom(1)
+  );
 }
 
 export function craftProcessTick(): void {

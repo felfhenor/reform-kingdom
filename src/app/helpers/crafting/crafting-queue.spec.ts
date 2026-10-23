@@ -55,6 +55,7 @@ const recipeId = 'recipe-1' as RecipeId;
 const oreId = 'ore' as ItemId;
 const ingotId = 'copper-ingot' as ItemId;
 const malachiteId = 'malachite' as ItemId;
+const goldId = 'gold' as ItemId;
 const daggerId = 'dagger' as EquipmentId;
 const swordId = 'sword' as EquipmentId;
 const copperDaggerId = 'copper-dagger' as EquipmentId;
@@ -79,6 +80,7 @@ function seedRecipe(overrides: Partial<RecipeContent> = {}): RecipeContent {
     ensureItem({ id: oreId, name: 'Ore' }),
     ensureItem({ id: ingotId, name: 'Copper Ingot', sprite: 'ingot-sprite' }),
     ensureItem({ id: malachiteId, name: 'Malachite' }),
+    ensureItem({ id: goldId, name: 'Gold Coin' }),
     ensureEquipment({ id: daggerId, name: 'Dagger' }),
     ensureEquipment({ id: swordId, name: 'Sword' }),
     ensureEquipment({
@@ -472,6 +474,20 @@ describe('craftProcessTick', () => {
     ]);
   });
 
+  it('auto-sells a crafted equipment the loot filter rejects', () => {
+    seedRecipe({ result: { equipmentId: copperDaggerId } });
+    seedBlacksmithing({ queue: [entry({ ticksIntoCraft: 4 })] }, (state) => {
+      state.lootFilters.minimumItemLevel = 99;
+    });
+
+    processTick();
+
+    expect(gamestate().armory).toEqual([]);
+    expect(gamestate().materials[goldId]?.quantity).toBeGreaterThan(0);
+    expect(combatLog()[0]?.message).toContain('automatically sold');
+    expect(blacksmithing().queue).toEqual([]);
+  });
+
   it('completes a collectible craft into the collection', () => {
     seedRecipe({ result: { collectibleId: effigyId } });
     seedBlacksmithing({ queue: [entry({ ticksIntoCraft: 4 })] });
@@ -534,6 +550,20 @@ describe('craftProcessTick', () => {
 
     expect(gamestate().armory).toHaveLength(armory.length);
     expect(blacksmithing().queue[0].ticksIntoCraft).toBe(5);
+  });
+
+  it('does not hold an equipment craft the loot filter would sell when the armory is full', () => {
+    seedRecipe({ result: { equipmentId: copperDaggerId } });
+    const armory = fullArmory();
+    seedBlacksmithing({ queue: [entry({ ticksIntoCraft: 4 })] }, (state) => {
+      state.armory = armory;
+      state.lootFilters.minimumItemLevel = 99;
+    });
+
+    processTick();
+
+    expect(gamestate().armory).toHaveLength(armory.length);
+    expect(blacksmithing().queue).toEqual([]);
   });
 
   it('resumes and completes a held equipment craft once armory room frees up', () => {
