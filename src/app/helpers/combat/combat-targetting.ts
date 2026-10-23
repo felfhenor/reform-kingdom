@@ -172,15 +172,30 @@ export function combatGetPossibleCombatantTargetsForSkill(
   );
 }
 
-// Negative agro hides a combatant from the other side, so it's only picked once no one else is.
+// Agro only steers the other side's picks, so heals and buffs ignore it.
+function combatantIsFoeOf(
+  combatant: Combatant,
+  context?: CombatTargetModeContext,
+): boolean {
+  return !!context && combatant.isEnemy !== context.combatant.isEnemy;
+}
+
+function combatantTauntsFor(
+  combatant: Combatant,
+  context?: CombatTargetModeContext,
+): boolean {
+  return (
+    combatant.combatStats.agroValue > 0 && combatantIsFoeOf(combatant, context)
+  );
+}
+
+// Negative agro hides a combatant, so it's only picked once no one else is.
 function combatantHiddenFrom(
   combatant: Combatant,
   context?: CombatTargetModeContext,
 ): boolean {
   return (
-    combatant.combatStats.agroValue < 0 &&
-    !!context &&
-    combatant.isEnemy !== context.combatant.isEnemy
+    combatant.combatStats.agroValue < 0 && combatantIsFoeOf(combatant, context)
   );
 }
 
@@ -190,13 +205,12 @@ export function combatGetTargetsFromListBasedOnType(
   select: number,
   context?: CombatTargetModeContext,
 ): Combatant[] {
-  const targetsWithAgro = sortBy(
-    combatants.filter((c) => c.combatStats.agroValue > 0),
-    (c) => -c.combatStats.agroValue,
+  const [taunters, others] = partition(combatants, (c) =>
+    combatantTauntsFor(c, context),
   );
-  const [targetsHidden, targetsWithoutAgro] = partition(
-    combatants.filter((c) => c.combatStats.agroValue <= 0),
-    (c) => combatantHiddenFrom(c, context),
+  const targetsWithAgro = sortBy(taunters, (c) => -c.combatStats.agroValue);
+  const [targetsHidden, targetsWithoutAgro] = partition(others, (c) =>
+    combatantHiddenFrom(c, context),
   );
 
   // intersection() keeps the matches' most-relevant-first order while dropping any no longer in the pool.
@@ -233,12 +247,9 @@ export function combatGetTargetsFromListBasedOnType(
       SpecificHero: () =>
         combatants.filter((c) => c.id === context?.targetCharacterId),
       MatchingAllies: () => matchesIn(combatants).slice(0, select),
-      // Enemy taunters still come first; a taunting ally must not pull an enemy-only order onto itself.
       MatchingEnemies: () =>
         [
-          ...targetsWithAgro.filter(
-            (c) => c.isEnemy !== context?.combatant.isEnemy,
-          ),
+          ...targetsWithAgro,
           ...matchesIn(targetsWithoutAgro),
           ...matchesIn(targetsHidden),
         ].slice(0, select),

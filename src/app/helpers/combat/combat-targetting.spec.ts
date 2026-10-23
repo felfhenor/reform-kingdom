@@ -247,6 +247,10 @@ describe('combatGetTargetsFromListBasedOnType negative agro', () => {
 });
 
 describe('combatGetTargetsFromListBasedOnType', () => {
+  const monsterContext: CombatTargetModeContext = {
+    combatant: buildTestCombatant({ id: 'monster', isEnemy: true }),
+  };
+
   it('Self returns only the caster from the given list', () => {
     const caster = buildTestCombatant({ id: 'caster' });
     const ally = buildTestCombatant({ id: 'ally' });
@@ -432,6 +436,7 @@ describe('combatGetTargetsFromListBasedOnType', () => {
       [agroed, weakest, other],
       'Weakest',
       2,
+      monsterContext,
     );
 
     expect(sortBy(result, (c) => c.id)).toEqual([agroed, weakest]);
@@ -454,10 +459,37 @@ describe('combatGetTargetsFromListBasedOnType', () => {
       [lowAgro, highAgro, noAgro],
       'Weakest',
       1,
+      monsterContext,
     );
 
     expect(result).toEqual([highAgro]);
   });
+
+  it.each(['Weakest', 'Strongest'] as const)(
+    '%s ignores agro and hiding on the caster side',
+    (mode) => {
+      const caster = buildTestCombatant({ id: 'caster', hp: 50 });
+      const tank = buildTestCombatant({
+        id: 'tank',
+        hp: mode === 'Weakest' ? 100 : 1,
+        combatStats: { ...defaultCombatStats(), agroValue: 10 },
+      });
+      const sneak = buildTestCombatant({
+        id: 'sneak',
+        hp: mode === 'Weakest' ? 1 : 100,
+        combatStats: { ...defaultCombatStats(), agroValue: -100 },
+      });
+
+      const result = combatGetTargetsFromListBasedOnType(
+        [tank, sneak],
+        mode,
+        1,
+        { combatant: caster },
+      );
+
+      expect(result).toEqual([sneak]);
+    },
+  );
 });
 
 describe('combatGetTargetsFromPriorityList', () => {
