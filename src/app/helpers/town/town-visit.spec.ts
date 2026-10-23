@@ -8,6 +8,7 @@ import {
   TOWN_FIRST_VISIT_COMPLETED_CRAFT_COUNT,
   TOWN_FIRST_VISIT_CRAFT_COUNT,
 } from '@helpers/config';
+import { combatLog, resetCombatLog } from '@helpers/combat/combat-log';
 import { ensureTown } from '@helpers/content/ensure-town';
 import { ensureTradeskill } from '@helpers/content/ensure-tradeskill';
 import { worldTownsState } from '@helpers/state-game';
@@ -85,14 +86,18 @@ describe('townMarkVisited', () => {
     );
   });
 
-  it('fires the visit analytics and task event on first visit', () => {
+  it('fires the visit analytics, task event and log on first visit', () => {
     seedTownState();
+    resetCombatLog();
     const events = captureAnalyticsEvents();
 
     visitedTown();
 
     expect(events).toContain('Town:Visit:Larsia');
     expect(taskEventTownVisited).toHaveBeenCalledWith(townId);
+    expect(combatLog().map((entry) => entry.message)).toEqual([
+      'You arrived at **Larsia** for the first time.',
+    ]);
   });
 
   it('keeps progress the town accrued before it was activated', () => {
@@ -187,14 +192,16 @@ describe('townMarkVisited', () => {
     );
   });
 
-  it('is a no-op and fires no analytics if the town was already visited', () => {
+  it('is a no-op and fires no analytics or log if the town was already visited', () => {
     seedTownState({ firstVisitedAtTick: 100 });
+    resetCombatLog();
     const events = captureAnalyticsEvents();
 
     expect(visitedTown().firstVisitedAtTick).toBe(100);
     expect(townQueueInitialCrafts).not.toHaveBeenCalled();
     expect(townCompleteInitialCrafts).not.toHaveBeenCalled();
     expect(events).toEqual([]);
+    expect(combatLog()).toEqual([]);
   });
 });
 

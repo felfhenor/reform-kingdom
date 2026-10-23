@@ -13,6 +13,7 @@ import {
   TRADESKILL_XP_END,
   TRADESKILL_XP_START,
 } from '@helpers/config';
+import { combatLog, resetCombatLog } from '@helpers/combat/combat-log';
 import { ensureCollectible } from '@helpers/content/ensure-item';
 import { ensureRecipe } from '@helpers/content/ensure-recipe';
 import {
@@ -314,6 +315,8 @@ describe('tradeskillGainXp', () => {
     });
   };
 
+  beforeEach(() => resetCombatLog());
+
   it('holds XP at the cap when the next level is gated', () => {
     seedBlacksmithing(almostLeveled());
 
@@ -323,6 +326,7 @@ describe('tradeskillGainXp', () => {
     expect(result.level).toBe(GATED_LEVEL - 1);
     expect(result.xp.current).toBe(result.xp.maximum);
     expect(taskEventTradeskillLevel).not.toHaveBeenCalled();
+    expect(combatLog()).toEqual([]);
   });
 
   it('levels through the gate once its collectible is owned, carrying over leftover xp', () => {
@@ -340,6 +344,12 @@ describe('tradeskillGainXp', () => {
       BLACKSMITHING_ID,
       GATED_LEVEL,
     );
+    expect(combatLog()).toEqual([
+      expect.objectContaining({
+        kind: 'Craft',
+        message: `**Blacksmithing** reached level ${GATED_LEVEL}!`,
+      }),
+    ]);
   });
 
   it('can climb several levels from one large gain', () => {

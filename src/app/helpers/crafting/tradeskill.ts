@@ -1,3 +1,4 @@
+import { categoryMessageLog } from '@helpers/combat/combat-log';
 import {
   TRADESKILL_MAX_LEVEL,
   TRADESKILL_QUEUE_BASE_SIZE,
@@ -190,6 +191,11 @@ export function tradeskillGainXp(tradeskill: Tradeskill, amount: number): void {
   });
 
   if (newLevel > previousLevel) {
+    categoryMessageLog(
+      'Craft',
+      tradeskill,
+      `**${tradeskill}** reached level ${newLevel}!`,
+    );
     analyticsSendDesignEvent(
       `Kingdom:Building:LevelUp:${analyticsSafeSegment(tradeskill)}`,
       newLevel,

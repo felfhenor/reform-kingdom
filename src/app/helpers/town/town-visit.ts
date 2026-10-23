@@ -2,6 +2,7 @@ import {
   TOWN_FIRST_VISIT_COMPLETED_CRAFT_COUNT,
   TOWN_FIRST_VISIT_CRAFT_COUNT,
 } from '@helpers/config';
+import { categoryMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
 import {
   analyticsSafeSegment,
@@ -75,6 +76,13 @@ export function townMarkVisited(townId: TownId): void {
   });
 
   if (!alreadyVisited) {
+    if (town) {
+      categoryMessageLog(
+        'Travel',
+        town.name,
+        `You arrived at **${town.name}** for the first time.`,
+      );
+    }
     void taskEventTownVisited(townId);
     analyticsSendDesignEvent(
       `Town:Visit:${analyticsSafeSegment(town?.name ?? townId)}`,
