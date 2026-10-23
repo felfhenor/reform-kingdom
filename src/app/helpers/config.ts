@@ -70,6 +70,15 @@ export const LOADING_PRELOAD_IMAGES = [
   '/asset/texture-bg.png',
   '/asset/texture-button.png',
   '/asset/splash-game.png',
+  '/asset/splash-dark.png',
+];
+// One CSS font shorthand per @font-face in font.scss, so each face is fetched during loading.
+export const LOADING_PRELOAD_FONTS = [
+  '1em FancyText',
+  '400 1em OtherText',
+  '400 1em NumericText',
+  '400 1em CleanText',
+  'italic 400 1em CleanText',
 ];
 export const LOADING_BACKDROP_CELL_PX = 72;
 export const LOADING_BACKDROP_SWAP_MS = 400;

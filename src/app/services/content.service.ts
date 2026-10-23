@@ -3,7 +3,7 @@ import type { WritableSignal } from '@angular/core';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { TIPPY_LOADER } from '@ngneat/helipopper/config';
 import { SweetAlert2LoaderService } from '@sweetalert2/ngx-sweetalert2';
-import { LOADING_PRELOAD_IMAGES } from '@helpers/config';
+import { LOADING_PRELOAD_FONTS, LOADING_PRELOAD_IMAGES } from '@helpers/config';
 import { unfurlContent } from '@helpers/content/content';
 import { kingdomIconURLs } from '@helpers/kingdom/kingdom-nav.ui';
 import { allMaps, setAllMaps } from '@helpers/maps';
@@ -40,6 +40,7 @@ export class ContentService {
   public hasLoadedMapArt = signal<boolean>(false);
   public hasLoadedUIArt = signal<boolean>(false);
   public hasLoadedUILibraries = signal<boolean>(false);
+  public hasLoadedFonts = signal<boolean>(false);
   private uiImages: HTMLImageElement[] = [];
 
   public artAtlases = signal<ArtAtlases>({});
@@ -59,6 +60,7 @@ export class ContentService {
     void this.loadJSON();
     void this.loadUIArt();
     void this.loadUILibraries();
+    void this.loadFonts();
     await Promise.all([this.loadArt(), this.loadMaps()]);
     await this.loadMapArt();
   }
@@ -110,6 +112,19 @@ export class ContentService {
     this.hasLoadedUIArt.set(true);
   }
 
+  // Text would otherwise reflow when a swap-display face lands after the loading screen.
+  private async loadFonts() {
+    try {
+      await Promise.all(
+        LOADING_PRELOAD_FONTS.map((font) => document.fonts.load(font)),
+      );
+    } catch (err) {
+      this.logger.error('Content:LoadFonts', 'Failed to preload fonts', err);
+    }
+
+    this.hasLoadedFonts.set(true);
+  }
+
   // Runs the libraries' own lazy loaders early, so the first tooltip or modal doesn't wait on a chunk download.
   private async loadUILibraries() {
     try {
@@ -139,11 +154,7 @@ export class ContentService {
     }
   }
 
-  // Imported lazily so Pixi stays out of the main bundle.
   private async loadMapArt() {
-    const { pixiTexturesPreload } =
-      await import('@helpers/pixi/pixi-texture-loader');
-
     const maps = [...allMaps().values()].map((map) => map.data as TiledMap);
     const urls = [
       ...tiledMapsTilesetImagePaths(maps),
@@ -152,8 +163,10 @@ export class ContentService {
       ),
     ];
 
-    // A failed texture still counts as done; the map would load it on demand, rather than the loading screen hanging.
+    // Any failure (Pixi's lazy chunk included) still counts as done; the map would load it on demand, rather than the loading screen hanging.
     try {
+      const { pixiTexturesPreload } =
+        await import('@helpers/pixi/pixi-texture-loader');
       await pixiTexturesPreload(urls);
       this.logger.info(
         'Content:LoadMapArt',

@@ -64,7 +64,7 @@ export class LoadingService {
         isDone: this.contentService.hasLoadedData(),
       },
       {
-        label: 'Loading artwork...',
+        label: 'Loading game art...',
         isDone: this.contentService.hasLoadedArt(),
       },
       {
@@ -72,10 +72,17 @@ export class LoadingService {
         isDone: this.contentService.hasLoadedUIArt(),
       },
       {
+        label: 'Loading UI fonts...',
+        isDone: this.contentService.hasLoadedFonts(),
+      },
+      {
         label: 'Loading UI scripts...',
         isDone: this.contentService.hasLoadedUILibraries(),
       },
-      { label: 'Loading maps...', isDone: this.contentService.hasLoadedMaps() },
+      {
+        label: 'Loading map data...',
+        isDone: this.contentService.hasLoadedMaps(),
+      },
       {
         label: 'Loading map art...',
         isDone: this.contentService.hasLoadedMapArt(),
