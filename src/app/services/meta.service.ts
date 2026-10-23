@@ -150,7 +150,7 @@ export class MetaService {
       return;
     }
 
-    window.open('https://seiyria.itch.io/reformkingdom');
+    window.open('https://seiyria.itch.io/reform-kingdom');
   }
 
   public quit() {
