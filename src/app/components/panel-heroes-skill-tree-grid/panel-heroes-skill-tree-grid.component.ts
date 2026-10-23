@@ -31,8 +31,8 @@ import {
   skillTreeArrows,
   skillTreeLayout,
   skillTreeNodeArt,
-  skillTreeNodeKind,
 } from '@helpers/hero/skill-tree-layout.ui';
+import { skillTreeNodeKind } from '@helpers/hero/skill-tree-node';
 import { skillTreeOathChoice } from '@helpers/hero/skill-tree.ui';
 import type {
   JobContent,

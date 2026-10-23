@@ -9,6 +9,7 @@ import { runHeroStatsAnalysis } from '@helpers/debug/analysis-herostats';
 import { runInfusionGapsAnalysis } from '@helpers/debug/analysis-infusiongaps';
 import { runJobAbilitiesAnalysis } from '@helpers/debug/analysis-jobabilities';
 import { runSkillTreesAnalysis } from '@helpers/debug/analysis-skilltrees';
+import { runSkillTreeSpAnalysis } from '@helpers/debug/analysis-skilltreesp';
 import { runJobStarterAnalysis } from '@helpers/debug/analysis-jobstarter';
 import { runMaterialUtilizationAnalysis } from '@helpers/debug/analysis-materialutilization';
 import { runMonsterDropsAnalysis } from '@helpers/debug/analysis-monsterdrops';
@@ -377,6 +378,16 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     strict: true,
     inputKeys: [],
     run: runSkillTreesAnalysis,
+  },
+  {
+    id: 'skilltreesp',
+    title: 'Skill Tree SP',
+    description:
+      "Each job tree's nodes by type, and the SP a full build of each spec costs against the SP earned by the level cap.",
+    category: 'Skills',
+    strict: false,
+    inputKeys: [],
+    run: runSkillTreeSpAnalysis,
   },
   {
     id: 'jobstarter',

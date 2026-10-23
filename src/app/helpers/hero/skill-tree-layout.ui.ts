@@ -18,6 +18,10 @@ import { jobAbilityValueLabel } from '@helpers/hero/job-ability.ui';
 import { affixEffectsStatsPerLevel } from '@helpers/hero/party';
 import { characterCurrentRegalia } from '@helpers/hero/regalia';
 import { skillTreeNodeModifiers } from '@helpers/hero/skill-modifier';
+import {
+  skillTreeNodeAbility,
+  skillTreeNodeSkill,
+} from '@helpers/hero/skill-tree-node';
 import { skillModifierFamilySkill } from '@helpers/hero/skill-modifier.ui';
 import {
   characterSkillTreeAvailableSp,
@@ -35,8 +39,6 @@ import {
 import { regaliasState } from '@helpers/state-game';
 import type {
   Character,
-  EquipmentSkillContent,
-  JobAbilityContent,
   JobContent,
   SkillTreeBuildSummary,
   SkillTreeLayout,
@@ -49,7 +51,6 @@ import type {
   SkillTreeNodeArt,
   SkillTreeNodeContent,
   SkillTreeNodeId,
-  SkillTreeNodeKind,
   SkillTreeNodeSummary,
   SkillTreeRow,
   StatBlock,
@@ -238,37 +239,6 @@ export function skillTreeArrows(
   });
 }
 
-export function skillTreeNodeSkill(
-  node: SkillTreeNodeContent,
-): EquipmentSkillContent | undefined {
-  const effect = node.effects.find((entry) => entry.kind === 'GrantSkill');
-  return effect?.kind === 'GrantSkill'
-    ? getEntry<EquipmentSkillContent>(effect.skillId)
-    : undefined;
-}
-
-function nodeAbility(
-  node: SkillTreeNodeContent,
-): JobAbilityContent | undefined {
-  const effect = node.effects.find((entry) => entry.kind === 'JobAbility');
-  return effect?.kind === 'JobAbility'
-    ? getEntry<JobAbilityContent>(effect.jobAbilityId)
-    : undefined;
-}
-
-export function skillTreeNodeKind(
-  node: SkillTreeNodeContent,
-): SkillTreeNodeKind {
-  const skillData = skillTreeNodeSkill(node);
-  if (skillData) {
-    if (skillData.special) return 'Burst Skill';
-    return 'Skill';
-  }
-  if (nodeAbility(node)) return 'Job Ability';
-  if (skillTreeNodeModifiers(node).length > 0) return 'Skill Modifier';
-  return skillTreeIsSpecOption(node) ? 'Specialization' : 'Perk';
-}
-
 // Skill and ability nodes reuse their content's art; perks show the job until they have their own.
 export function skillTreeNodeArt(
   node: SkillTreeNodeContent,
@@ -284,7 +254,7 @@ export function skillTreeNodeArt(
     : undefined;
   if (option) return skillTreeNodeArt(option, job);
 
-  const ability = nodeAbility(node);
+  const ability = skillTreeNodeAbility(node);
   if (ability) return { sprite: ability.sprite, spritesheet: 'jobability' };
 
   if (node.sprite !== '') {
@@ -304,14 +274,14 @@ export function skillTreeNodeEffectText(node: SkillTreeNodeContent): string {
   return (
     node.description ||
     skillTreeNodeSkill(node)?.description ||
-    nodeAbility(node)?.description ||
+    skillTreeNodeAbility(node)?.description ||
     ''
   );
 }
 
 // A job ability node's own rank value, e.g. "+10% item drop rate".
 export function skillTreeNodeValueText(node: SkillTreeNodeContent): string {
-  const ability = nodeAbility(node);
+  const ability = skillTreeNodeAbility(node);
   const effect = node.effects.find((entry) => entry.kind === 'JobAbility');
   return ability && effect?.kind === 'JobAbility'
     ? jobAbilityValueLabel(ability, effect.value)

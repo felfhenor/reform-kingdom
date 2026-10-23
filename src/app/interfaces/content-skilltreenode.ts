@@ -96,6 +96,14 @@ export type SkillTreeNodeContent = IsContentItem &
     effects: SkillTreeNodeEffect[];
   };
 
+export type SkillTreeNodeKind =
+  | 'Skill'
+  | 'Burst Skill'
+  | 'Job Ability'
+  | 'Skill Modifier'
+  | 'Specialization'
+  | 'Perk';
+
 // A skill a job's tree can grant, at the column level its node unlocks.
 export type SkillTreeSkillGrant = {
   skillId: EquipmentSkillId;

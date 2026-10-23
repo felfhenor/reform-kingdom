@@ -82,14 +82,6 @@ export type SkillModifierLine = {
 // The option picked for an oath, confirmed or only staged.
 export type SkillTreeOathChoice = { name: string; state: SkillTreeNodeState };
 
-export type SkillTreeNodeKind =
-  | 'Skill'
-  | 'Burst Skill'
-  | 'Job Ability'
-  | 'Skill Modifier'
-  | 'Specialization'
-  | 'Perk';
-
 export type SkillTreeNodeArt = { sprite: string; spritesheet: AtlasedImage };
 
 // A saved build as the Regalias page shows it.

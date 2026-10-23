@@ -29,12 +29,14 @@ import { skillTreeNodeShortName } from '@helpers/hero/skill-tree-content';
 import {
   skillTreeNodeArt,
   skillTreeNodeEffectText,
-  skillTreeNodeKind,
   skillTreeNodeRequirements,
-  skillTreeNodeSkill,
   skillTreeNodeStatsPerLevel,
   skillTreeNodeValueText,
 } from '@helpers/hero/skill-tree-layout.ui';
+import {
+  skillTreeNodeKind,
+  skillTreeNodeSkill,
+} from '@helpers/hero/skill-tree-node';
 import {
   affixEffectsHaveStatSummary,
   affixEffectsStatSummary,
