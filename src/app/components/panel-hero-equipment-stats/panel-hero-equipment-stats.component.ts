@@ -7,6 +7,7 @@ import {
   type Signal,
 } from '@angular/core';
 import { IconDimensionComponent } from '@components/icon-dimension/icon-dimension.component';
+import { RowElementChargesComponent } from '@components/row-element-charges/row-element-charges.component';
 import { combatStatsForCharacter } from '@helpers/combat/combat-stats';
 import {
   characterMonsterTypeDamageTotals,
@@ -41,7 +42,12 @@ import { injectTweenedNumber } from '@services/animation.service';
 @Component({
   selector: 'app-panel-hero-equipment-stats',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DecimalPipe, TippyDirective, IconDimensionComponent],
+  imports: [
+    DecimalPipe,
+    TippyDirective,
+    IconDimensionComponent,
+    RowElementChargesComponent,
+  ],
   host: {
     class: 'flex flex-col min-h-0 pb-8',
   },
@@ -88,6 +94,16 @@ export class PanelHeroEquipmentStatsComponent {
 
   public gearElements = computed(() =>
     equipmentGearElements(this.character().equipment),
+  );
+
+  public gearElementBlock = computed(() =>
+    this.gearElements().reduce(
+      (prev, cur) => {
+        prev[cur] = 1;
+        return prev;
+      },
+      {} as Record<GameElement, number>,
+    ),
   );
 
   public elementalResistanceRows = computed(() =>

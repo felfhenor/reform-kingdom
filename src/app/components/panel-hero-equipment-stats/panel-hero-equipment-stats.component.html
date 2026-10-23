@@ -72,7 +72,11 @@
   @if (gearElements().length > 0) {
     <div class="flex items-center gap-2">
       <span class="text-base">Attacks deal</span>
-      <span class="ml-auto font-semibold text-lg">
+      <span class="ml-auto font-semibold text-lg flex gap-2 items-center">
+        <app-row-element-charges
+          [block]="gearElementBlock()"
+        ></app-row-element-charges>
+
         {{ gearElements().join('/') }}
       </span>
     </div>

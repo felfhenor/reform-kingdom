@@ -1,6 +1,12 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { DetailCollectibleEffectsComponent } from '@components/detail-collectible-effects/detail-collectible-effects.component';
+import { RowElementChargesComponent } from '@components/row-element-charges/row-element-charges.component';
 import { RowGatherYieldBonusesComponent } from '@components/row-gather-yield-bonuses/row-gather-yield-bonuses.component';
 import { RowSkillStatBonusesComponent } from '@components/row-skill-stat-bonuses/row-skill-stat-bonuses.component';
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
@@ -10,6 +16,7 @@ import { elementsLabel } from '@helpers/combat/combat-element';
 import {
   type CombatStatBlock,
   type ElementBlock,
+  type GameElement,
   type ItemPreviewDisplay,
   type MonsterType,
   type StatBlock,
@@ -28,6 +35,7 @@ import {
     RowGatherYieldBonusesComponent,
     RowSkillStatBonusesComponent,
     DetailCollectibleEffectsComponent,
+    RowElementChargesComponent,
   ],
   templateUrl: './detail-item-preview.component.html',
 })
@@ -51,4 +59,14 @@ export class DetailItemPreviewComponent {
 
   public showEquippableBy = input<boolean>(true);
   public showDescription = input<boolean>(true);
+
+  public elementBlock = computed(() =>
+    (this.display().elements ?? []).reduce(
+      (prev, cur) => {
+        prev[cur] = 1;
+        return prev;
+      },
+      {} as Record<GameElement, number>,
+    ),
+  );
 }
