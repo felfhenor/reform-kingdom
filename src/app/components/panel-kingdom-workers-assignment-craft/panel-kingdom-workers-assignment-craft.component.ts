@@ -141,7 +141,7 @@ export class PanelKingdomWorkersAssignmentCraftComponent {
     const recipeId = this.displayedRecipeId();
     if (!recipeId) return;
 
-    workerAssignCraft(this.workerId(), recipeId);
+    void workerAssignCraft(this.workerId(), recipeId);
     this.draftRecipeId.set(undefined);
   }
 

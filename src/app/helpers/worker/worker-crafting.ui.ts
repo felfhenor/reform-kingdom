@@ -1,3 +1,4 @@
+import { categoryMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
 import {
   analyticsSafeSegment,
@@ -22,10 +23,10 @@ import type {
 } from '@interfaces';
 
 // A worker that's out gathering picks the craft up once it gets home.
-export function workerAssignCraft(
+export async function workerAssignCraft(
   workerId: WorkerId,
   recipeId: RecipeId,
-): boolean {
+): Promise<boolean> {
   const worker = gamestate().workers[workerId];
   if (!worker) return false;
 
@@ -33,17 +34,28 @@ export function workerAssignCraft(
   if (!workerCraftAssignmentIsValid(workerId, worker.level, assignment))
     return false;
 
-  updateGamestate((state) => {
+  let assigned = false;
+  await updateGamestate((state) => {
     const target = state.workers[workerId];
     if (!target) return state;
 
     target.assignment = assignment;
     workerStartCrafting(state, workerId, recipeId);
+    assigned = true;
 
     return state;
   });
+  if (!assigned) return false;
 
+  const workerName = getEntry<WorkerContent>(workerId)?.name;
   const recipeName = getEntry<RecipeContent>(recipeId)?.name;
+  if (workerName && recipeName) {
+    categoryMessageLog(
+      'Craft',
+      'Worker Crafting',
+      `${workerName} was assigned to craft ${recipeName}.`,
+    );
+  }
   analyticsSendDesignEvent(
     recipeName
       ? `Worker:AssignCraft:${analyticsSafeSegment(recipeName)}`

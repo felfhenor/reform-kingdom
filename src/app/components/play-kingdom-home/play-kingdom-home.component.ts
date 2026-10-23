@@ -228,7 +228,7 @@ export class PlayKingdomHomeComponent {
   }
 
   public resetHome(): void {
-    homeNodeResetToDuchy();
+    void homeNodeResetToDuchy();
     notifySuccess('The Duchy is your home once again!');
   }
 }

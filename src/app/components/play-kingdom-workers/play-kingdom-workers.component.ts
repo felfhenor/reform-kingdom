@@ -259,7 +259,7 @@ export class PlayKingdomWorkersComponent {
   public levelUp(event: MouseEvent): void {
     const entry = this.selectedEntry();
     if (!entry) return;
-    workerLevelUp(entry.id);
+    void workerLevelUp(entry.id);
     this.anim.levelUp(event.currentTarget as HTMLElement);
   }
 }

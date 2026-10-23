@@ -372,7 +372,7 @@ export class PanelMapNodeComponent {
     const entry = this.node();
     if (!entry) return;
 
-    homeNodeSet(entry);
+    void homeNodeSet(entry);
     notifySuccess(`${entry.nodeName} is now your home.`);
   }
 

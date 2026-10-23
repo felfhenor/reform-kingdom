@@ -51,7 +51,7 @@ export class ButtonTownHomeComponent {
 
   public setHome(): void {
     const town = this.town();
-    homeNodeSet(this.entry());
+    void homeNodeSet(this.entry());
     notifySuccess(`${town.name} is now your home.`);
   }
 }
