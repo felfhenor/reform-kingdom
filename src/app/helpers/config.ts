@@ -65,6 +65,11 @@ export const MAX_SEGMENT_LENGTH = 32;
 export const LOADING_FULL_HOLD_MS = 900;
 // Cap on waiting for the page rendered under the loading screen to settle before the hold starts.
 export const LOADING_IDLE_TIMEOUT_MS = 3000;
+// Images only stylesheets reference; decoded during loading so nothing paints untextured after it. Paths match the CSS exactly.
+export const LOADING_PRELOAD_IMAGES = [
+  '/asset/texture-bg.png',
+  '/asset/texture-button.png',
+];
 export const LOADING_BACKDROP_CELL_PX = 72;
 export const LOADING_BACKDROP_SWAP_MS = 400;
 export const LOADING_HERO_CYCLE_MS = 2500;

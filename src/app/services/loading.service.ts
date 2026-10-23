@@ -8,10 +8,7 @@ import {
   Injector,
   signal,
 } from '@angular/core';
-import {
-  LOADING_FULL_HOLD_MS,
-  LOADING_IDLE_TIMEOUT_MS,
-} from '@helpers/config';
+import { LOADING_FULL_HOLD_MS, LOADING_IDLE_TIMEOUT_MS } from '@helpers/config';
 import { loadingProgressCalculate } from '@helpers/engine/loading.ui';
 import { hasGameStateLoaded } from '@helpers/state-game';
 import { ContentService } from '@services/content.service';
@@ -69,6 +66,10 @@ export class LoadingService {
       {
         label: 'Loading artwork...',
         isDone: this.contentService.hasLoadedArt(),
+      },
+      {
+        label: 'Loading UI art...',
+        isDone: this.contentService.hasLoadedUIArt(),
       },
       { label: 'Loading maps...', isDone: this.contentService.hasLoadedMaps() },
       {

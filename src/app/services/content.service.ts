@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import type { WritableSignal } from '@angular/core';
 import { computed, inject, Injectable, signal } from '@angular/core';
+import { LOADING_PRELOAD_IMAGES } from '@helpers/config';
 import { unfurlContent } from '@helpers/content/content';
 import { allMaps, setAllMaps } from '@helpers/maps';
 import { tiledMapsTilesetImagePaths } from '@helpers/pixi/tiled-map';
@@ -32,6 +33,8 @@ export class ContentService {
   public hasLoadedData = signal<boolean>(false);
   public hasLoadedMaps = signal<boolean>(false);
   public hasLoadedMapArt = signal<boolean>(false);
+  public hasLoadedUIArt = signal<boolean>(false);
+  private uiImages: HTMLImageElement[] = [];
 
   public artAtlases = signal<ArtAtlases>({});
 
@@ -48,6 +51,7 @@ export class ContentService {
     await this.metaService.loadLocalVersion();
 
     void this.loadJSON();
+    void this.loadUIArt();
     await Promise.all([this.loadArt(), this.loadMaps()]);
     await this.loadMapArt();
   }
@@ -73,27 +77,46 @@ export class ContentService {
     const artImageHash: Record<string, HTMLImageElement> = {};
 
     spritesheetsToLoad.forEach((sheet, idx) => {
-      const img = new Image();
-      img.src = this.toCacheBustURL(`art/spritesheets/${sheet}.webp`);
-      this.artSignals[idx].set(false);
-      // decode() runs off the main thread, so the first paint of a sheet can't stall a frame decoding it.
-      // A failed sheet still counts as done, or the loading screen (and the savefile load behind it) would wait forever.
-      void img.decode().then(
-        () => {
+      const url = this.toCacheBustURL(`art/spritesheets/${sheet}.webp`);
+      void this.decodeImage(url).then((img) => {
+        if (img) {
           artImageHash[sheet] = img;
           this.artImages.set(artImageHash);
-          this.artSignals[idx].set(true);
-
-          this.logger.info('Content:LoadArt', `Loaded sheet: ${sheet}`);
-        },
-        (err: unknown) => {
-          this.logger.error('Content:LoadArt', `Failed sheet: ${sheet}`, err);
-          this.artSignals[idx].set(true);
-        },
-      );
+        }
+        this.artSignals[idx].set(true);
+      });
     });
 
     this.hasLoadedAtlases.set(true);
+  }
+
+  // Held onto so the browser keeps them cached for the stylesheets that reference them.
+  private async loadUIArt() {
+    this.uiImages = (
+      await Promise.all(
+        LOADING_PRELOAD_IMAGES.map((url) => this.decodeImage(url)),
+      )
+    ).filter((img) => !!img);
+
+    this.hasLoadedUIArt.set(true);
+  }
+
+  // decode() runs off the main thread, so a first paint can't stall a frame decoding the image.
+  // Resolves undefined on failure: a missing image must never hang the loading screen (or the savefile load behind it).
+  private async decodeImage(
+    url: string,
+  ): Promise<HTMLImageElement | undefined> {
+    const img = new Image();
+    img.src = url;
+
+    try {
+      await img.decode();
+      this.logger.info('Content:LoadImage', `Loaded: ${url}`);
+      return img;
+    } catch (err) {
+      this.logger.error('Content:LoadImage', `Failed: ${url}`, err);
+      return undefined;
+    }
   }
 
   // Imported lazily so Pixi stays out of the main bundle.
