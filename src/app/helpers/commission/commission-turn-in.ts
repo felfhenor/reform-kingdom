@@ -55,7 +55,7 @@ export function grantCommissionRewards(
   state: GameState,
   offer: CommissionOfferContent,
 ): ResolvedDrop[] {
-  return rollDroppedRewards(offer.rewards, 1, {}, state).filter((drop) =>
+  return rollDroppedRewards(offer.rewards, 1).filter((drop) =>
     applyResolvedDropToState(state, drop),
   );
 }

@@ -8,6 +8,8 @@ import { backfillReservedEquipment } from '@helpers/crafting/crafting-reserved-e
 import { recipeResultQuantity } from '@helpers/crafting/recipe-result';
 import {
   isRecipeAvailable,
+  isRecipeCraftable,
+  isRecipeDiscovered,
   recipeBackdropSprite,
   recipeResultContent,
   recipeResultOwnedQuantity,
@@ -91,8 +93,9 @@ function recipeRequirementEntries(
   );
 }
 
-// Only recipes the building has reached and that pass the craftability check
-// are shown, sorted by recipe level (not item level) so entries stay put as craftability changes.
+// Recipes the building has reached and that pass the craftability check are
+// shown, plus dropped recipes still above the building's level (locked, at the bottom).
+// Sorted by recipe level (not item level) so entries stay put as craftability changes.
 export function getCraftableRecipeEntries(
   tradeskill: Tradeskill,
 ): CraftRecipeEntry[] {
@@ -103,10 +106,15 @@ export function getCraftableRecipeEntries(
   const entries: CraftRecipeEntry[] = getEntriesByType<RecipeContent>('recipe')
     .filter(
       (recipe) =>
-        recipe.tradeskillId === tradeskillId && isRecipeAvailable(recipe),
+        recipe.tradeskillId === tradeskillId &&
+        (isRecipeAvailable(recipe) ||
+          (isRecipeDiscovered(recipe.id) && isRecipeCraftable(recipe.id))),
     )
     .map((recipe) => {
-      const maxCraftable = craftMaxCraftableQuantity(recipe, tradeskill);
+      const levelLocked = building.level < recipe.minTradeskillLevel;
+      const maxCraftable = levelLocked
+        ? 0
+        : craftMaxCraftableQuantity(recipe, tradeskill);
       const resultContent = recipeResultContent(recipe);
       const resultSpritesheet = recipeResultSpritesheet(recipe);
 
@@ -120,6 +128,7 @@ export function getCraftableRecipeEntries(
         resultChance: recipe.result.chance ?? 100,
         resultQuantity: recipeResultQuantity(recipe),
         backdropSprite,
+        levelLocked,
         maxCraftable,
         maxQueueable: craftMaxQueueableQuantity(maxCraftable),
         ownedQuantity: recipeResultOwnedQuantity(recipe),
@@ -133,12 +142,13 @@ export function getCraftableRecipeEntries(
   return orderBy(
     entries,
     [
+      (entry) => entry.levelLocked,
       (entry) => entry.recipe.minTradeskillLevel,
       (entry) =>
         entry.resultContent ? RARITY_PRIORITY[entry.resultContent.rarity] : 0,
       (entry) => entry.recipe.name,
     ],
-    ['desc', 'asc', 'asc'],
+    ['asc', 'desc', 'asc', 'asc'],
   );
 }
 

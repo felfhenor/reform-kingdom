@@ -150,7 +150,7 @@ export function worldNodeCompletionRewardProgress(
   };
 }
 
-// Excludes rewards that can't roll yet (e.g. recipes above the tradeskill level), so a node isn't chased for nothing.
+// Excludes rewards that can never roll (e.g. town-exclusive recipes), so a node isn't chased for nothing.
 export function worldNodeObtainableMissingRewards(
   entry: WorldNodeEntry,
 ): DroppedReward[] {

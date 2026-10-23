@@ -123,6 +123,30 @@ describe('getCraftableRecipeEntries', () => {
     expect(craftableIds()).toEqual(['gated', 'open']);
   });
 
+  it('lists a discovered recipe above the building level as locked, at the bottom', () => {
+    const gated = recipe('gated', { minTradeskillLevel: 5 });
+    seedContent([
+      ...baseContent,
+      gated,
+      recipe('open', { minTradeskillLevel: 1 }),
+      ensureEncounter({
+        id: 'ruins' as EncounterId,
+        completionRewards: [ensureDroppedReward({ recipeId: gated.id })],
+      }),
+    ]);
+    seedBlacksmithing(2, (state) => {
+      state.discoveredRecipes[gated.id] = { foundAt: 1 };
+      applyMaterialDelta(state, oreId, 10);
+    });
+
+    const entries = getCraftableRecipeEntries('Blacksmithing');
+
+    expect(entries.map((entry) => entry.recipe.id)).toEqual(['open', 'gated']);
+    expect(entries[1].levelLocked).toBe(true);
+    expect(entries[1].maxCraftable).toBe(0);
+    expect(entries[0].levelLocked).toBe(false);
+  });
+
   it('shows the real craftable count but caps the queueable batch', () => {
     seedContent([
       ...baseContent,

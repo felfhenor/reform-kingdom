@@ -47,6 +47,7 @@ import {
   craftingHideUncraftableToggle,
   uiClockTick,
 } from '@helpers/engine/ui';
+import { workerCraftSlots } from '@helpers/worker/worker-crafting.ui';
 import type {
   CollectibleContent,
   CraftQueueEntryId,
@@ -56,7 +57,6 @@ import type {
   RecipeId,
   Tradeskill,
 } from '@interfaces';
-import { workerCraftSlots } from '@helpers/worker/worker-crafting.ui';
 import { TippyDirective } from '@ngneat/helipopper';
 import { AnimationService } from '@services/animation.service';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
@@ -236,6 +236,10 @@ export class PanelPlayKingdomTradeskillComponent {
 
   public xpChanceTooltip(entry: CraftRecipeEntry): string {
     return `${entry.xpChanceTier} - ${Math.round(entry.xpChance)}% chance to gain tradeskill XP. This will reduce in probability as your tradeskill level gets higher.`;
+  }
+
+  public levelLockedTooltip(entry: CraftRecipeEntry): string {
+    return `You can't craft this until ${this.tradeskill()} Lv. ${entry.recipe.minTradeskillLevel}.`;
   }
 
   public craft(

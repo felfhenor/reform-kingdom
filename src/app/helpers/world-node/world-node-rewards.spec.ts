@@ -177,14 +177,8 @@ describe('worldNodeObtainableMissingRewards', () => {
     );
   });
 
-  it('skips a recipe the tradeskill is too low to drop', () => {
+  it('includes a recipe even below its tradeskill level', () => {
     withTailoringLevel(cloakRecipe.minTradeskillLevel - 1);
-
-    expect(worldNodeObtainableMissingRewards(node())).toEqual([clamReward]);
-  });
-
-  it('includes the recipe once the tradeskill level is met', () => {
-    withTailoringLevel(cloakRecipe.minTradeskillLevel);
 
     expect(worldNodeObtainableMissingRewards(node())).toHaveLength(2);
   });

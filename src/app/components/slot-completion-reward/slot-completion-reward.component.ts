@@ -144,7 +144,7 @@ export class SlotCompletionRewardComponent {
         )?.name;
         if (!tradeskillName) return 'A reward yet to be discovered.';
 
-        return `A reward that requires ${tradeskillName} Lv. ${recipe.minTradeskillLevel} to decipher.`;
+        return `A ${tradeskillName} recipe yet to be discovered, craftable at Lv. ${recipe.minTradeskillLevel}.`;
       }
 
       default: {

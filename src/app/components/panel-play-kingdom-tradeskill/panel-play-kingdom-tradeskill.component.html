@@ -165,6 +165,15 @@
               </span>
 
               <div class="flex items-center gap-2 flex-wrap">
+                @if (entry.levelLocked) {
+                  <span
+                    class="badge badge-sm badge-error"
+                    [tp]="levelLockedTooltip(entry)"
+                  >
+                    Lv. {{ entry.recipe.minTradeskillLevel }}
+                  </span>
+                }
+
                 <span class="badge badge-sm badge-data">
                   Craftable: {{ entry.maxCraftable | number }}
                 </span>

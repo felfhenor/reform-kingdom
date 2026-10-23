@@ -71,6 +71,8 @@ export type CraftRecipeEntry = {
   resultChance: number;
   resultQuantity: number;
   backdropSprite?: string;
+  // Dropped, but the tradeskill hasn't reached the recipe's minTradeskillLevel yet.
+  levelLocked: boolean;
   maxCraftable: number;
   maxQueueable: number;
   ownedQuantity: number;

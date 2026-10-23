@@ -1,7 +1,5 @@
 import { CHARACTER_MAX_LEVEL } from '@helpers/config';
-import { getEntry } from '@helpers/content/content';
 import { isRecipeTownUnique } from '@helpers/crafting/recipes';
-import { tradeskillBuildingIn } from '@helpers/crafting/tradeskill';
 import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
 import { rangeAtLevel } from '@helpers/engine/leveled-range';
 import { jobAbilityValue } from '@helpers/hero/job-ability';
@@ -10,13 +8,12 @@ import { newEquipmentItem } from '@helpers/item/equipment';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import { addArmoryItems } from '@helpers/kingdom/armory';
 import { rngNumberRange } from '@helpers/rng';
-import { gamestate, globalEffectSumsState } from '@helpers/state-game';
+import { globalEffectSumsState } from '@helpers/state-game';
 import { defaultWorkerState } from '@helpers/worker/worker-progression';
 import type {
   DropChanceBonus,
   DroppedReward,
   GameState,
-  RecipeContent,
   ResolvedCollectibleDrop,
   ResolvedDrop,
   ResolvedEquipmentDrop,
@@ -101,36 +98,24 @@ export function isClearProofReward(drop: DroppedReward): boolean {
   );
 }
 
-// A recipe the player can never personally craft (town-exclusive), or that's
-// below their current tradeskill level for it, isn't usable yet
-export function isRecipeUsable(
-  drop: DroppedReward,
-  state: GameState = gamestate(),
-): boolean {
+// A recipe the player can never personally craft (town-exclusive) isn't usable;
+// one above their tradeskill level still drops and waits in the list until it's reached.
+export function isRecipeUsable(drop: DroppedReward): boolean {
   if (drop.kind !== 'Recipe') return true;
-  if (isRecipeTownUnique(drop.recipeId)) return false;
-
-  const recipe = getEntry<RecipeContent>(drop.recipeId);
-  if (!recipe) return true;
-
-  return (
-    tradeskillBuildingIn(state, recipe.tradeskillId).level >=
-    recipe.minTradeskillLevel
-  );
+  return !isRecipeTownUnique(drop.recipeId);
 }
 
 export function rollDroppedRewards(
   rewards: DroppedReward[],
   level: number,
   bonus: DropChanceBonus = {},
-  state: GameState = gamestate(),
 ): ResolvedDrop[] {
   return rewards
     .filter(
       (drop) =>
         (drop.minLevel ?? 0) <= level &&
         (drop.maxLevel ?? CHARACTER_MAX_LEVEL) >= level &&
-        isRecipeUsable(drop, state),
+        isRecipeUsable(drop),
     )
     .map((drop) => resolveDrop(drop, level, bonus))
     .filter((drop): drop is ResolvedDrop => !!drop);

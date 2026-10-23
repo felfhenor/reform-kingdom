@@ -24,7 +24,6 @@ import type {
   CollectibleId,
   DroppedItemReward,
   EquipmentId,
-  GameState,
   ItemId,
   RecipeId,
   TownId,
@@ -145,7 +144,7 @@ describe('rollDroppedRewards', () => {
   });
 
   describe('recipe drops', () => {
-    function seedRecipe(townUnique: boolean, tradeskillLevel = 1): GameState {
+    function seedRecipe(townUnique: boolean, tradeskillLevel = 1): void {
       seedContent([
         ensureRecipe({
           id: cloakRecipeId,
@@ -157,7 +156,7 @@ describe('rollDroppedRewards', () => {
           crafting: { uniqueRecipeIds: townUnique ? [cloakRecipeId] : [] },
         }),
       ]);
-      return seedGamestate(
+      seedGamestate(
         (state) =>
           (state.tradeskills[artificing] = {
             ...defaultTradeskillBuilding(),
@@ -166,20 +165,19 @@ describe('rollDroppedRewards', () => {
       );
     }
 
-    it('drop once the player can craft them', () => {
-      expect(
-        rollDroppedRewards([guaranteed.recipe], 5, {}, seedRecipe(false, 5)),
-      ).toHaveLength(1);
+    it('drop at or above their tradeskill level', () => {
+      seedRecipe(false, 5);
       expect(rollDroppedRewards([guaranteed.recipe], 5)).toHaveLength(1);
     });
 
-    it('don’t drop below their tradeskill level, or when only a town crafts them', () => {
-      expect(
-        rollDroppedRewards([guaranteed.recipe], 5, {}, seedRecipe(false, 4)),
-      ).toEqual([]);
-      expect(
-        rollDroppedRewards([guaranteed.recipe], 5, {}, seedRecipe(true, 5)),
-      ).toEqual([]);
+    it('still drop below their tradeskill level', () => {
+      seedRecipe(false, 1);
+      expect(rollDroppedRewards([guaranteed.recipe], 5)).toHaveLength(1);
+    });
+
+    it('don’t drop when only a town crafts them', () => {
+      seedRecipe(true, 5);
+      expect(rollDroppedRewards([guaranteed.recipe], 5)).toEqual([]);
     });
 
     it('still drop when the recipe content is missing', () => {
