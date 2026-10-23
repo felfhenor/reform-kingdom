@@ -1,3 +1,26 @@
+- id: 3724a04c-f021-4cdc-b138-68619bae7857
+  name: Commission - Crate of Duchy Staples
+  description: The trader needs a full crate of the Duchy's staple goods to supply the next leg of their route.
+
+  requirements:
+    - itemId: Copper Ore
+      quantityMin: 75
+      quantityMax: 75
+
+    - itemId: Wergen Wood
+      quantityMin: 75
+      quantityMax: 75
+
+    - itemId: Flax Flower
+      quantityMin: 40
+      quantityMax: 40
+
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 3
+      max: 3
+
 - id: 6b2e2f4a-2b7a-4c1a-9a3e-1a2b3c4d5e6f
   name: Commission - Bundle of Wergen Sticks
   description: The trader needs a bundle of Wergen Sticks for cart repairs.

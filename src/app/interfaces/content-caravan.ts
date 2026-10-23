@@ -41,4 +41,7 @@ export type CaravanContent = IsContentItem &
     // Direct pool this caravan rolls its daily commission from. Not
     // category-matched like traders; the caravan owns its own list.
     commissionOffers: CommissionOfferSlot[];
+
+    // Forced as the caravan's first-ever commission, so a new game opens on an easy one - 'UNKNOWN' to roll from the pool as usual.
+    startingCommissionOfferId: CommissionOfferId;
   };

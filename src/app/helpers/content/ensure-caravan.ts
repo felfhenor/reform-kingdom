@@ -11,6 +11,7 @@ import type {
   CaravanTrade,
   CaravanTraderContent,
   CaravanTraderId,
+  CommissionOfferId,
 } from '@interfaces';
 
 function ensureCaravanTrade(trade: Partial<CaravanTrade> = {}): CaravanTrade {
@@ -42,6 +43,8 @@ export function ensureCaravan(
       caravan.commissionOffers,
       ensureCommissionOfferSlot,
     ),
+    startingCommissionOfferId:
+      caravan.startingCommissionOfferId ?? ('UNKNOWN' as CommissionOfferId),
     hidden: caravan.hidden ?? false,
     invisibleUntilCollectibleIdsFound:
       caravan.invisibleUntilCollectibleIdsFound ?? [],

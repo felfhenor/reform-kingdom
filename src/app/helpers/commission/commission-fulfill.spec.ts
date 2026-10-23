@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
 vi.mock('@helpers/task/task-events');
 vi.mock('@helpers/task/task-progress');
@@ -183,6 +183,19 @@ describe('commissionCanFulfill', () => {
 });
 
 describe('commissionFulfill', () => {
+  it('restarts a kept starting commission at turn-in so it waits for the next reset', async () => {
+    const clock = vi.spyOn(Date, 'now').mockReturnValue(5000);
+    onTestFinished(() => clock.mockRestore());
+    seedCommission([sticks], (state) => {
+      ownSticks(100)(state);
+      state.world.commissions[caravan.id].isStartingCommission = true;
+    });
+
+    await commissionFulfill(caravan.id);
+
+    expect(commission()).toMatchObject({ completed: true, generatedAt: 5000 });
+  });
+
   it('spends the requirements, grants the rewards and completes the commission', async () => {
     seedCommission([sticks], ownSticks(100));
     const events = captureAnalyticsEvents();

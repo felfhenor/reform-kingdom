@@ -32,10 +32,22 @@ const offer = ensureCommissionOffer({
   ],
 });
 
-function caravan(offers = [offer]): CaravanContent {
+const starter = ensureCommissionOffer({
+  id: 'offer-starter' as CommissionOfferId,
+  name: 'Crate of Duchy Staples',
+  requirements: [
+    { itemId: 'copper-ore' as ItemId, quantityMin: 75, quantityMax: 75 },
+  ],
+});
+
+function caravan(
+  offers = [offer],
+  startingCommissionOfferId?: CommissionOfferId,
+): CaravanContent {
   return ensureCaravan({
     id: 'carrina-duchy' as CaravanId,
     name: 'Duchy Trading Caravan - Carrina',
+    startingCommissionOfferId,
     commissionOffers: offers.map((o) => ({
       commissionOfferId: o.id,
       weight: 1,
@@ -54,7 +66,7 @@ function seedCaravan(
   content: CaravanContent,
   existing?: Partial<CommissionNodeState>,
 ): void {
-  seedContent([content, offer]);
+  seedContent([content, offer, starter]);
   seedWorldNodes([
     { name: content.name, type: 'CaravanNode', x: 1 },
     { name: 'Abandoned Camp', type: 'CaravanNode', x: 2 },
@@ -99,6 +111,38 @@ describe('commissionProcessTick', () => {
     });
     tick();
     expect(commission()).toEqual(freshCommission);
+  });
+
+  it('opens on the starting offer, then rerolls from the pool', () => {
+    seedCaravan(caravan([offer], starter.id));
+    tick();
+    expect(commission()).toMatchObject({
+      commissionOfferId: starter.id,
+      requirements: [{ itemId: 'copper-ore', quantity: 75 }],
+      isStartingCommission: true,
+    });
+
+    seedCaravan(caravan([offer], starter.id), {
+      commissionOfferId: starter.id,
+      generatedAt: resetAt - 1,
+      completed: true,
+      isStartingCommission: true,
+    });
+    tick();
+    expect(commission()).toEqual(freshCommission);
+  });
+
+  it('keeps an unfulfilled starting commission past the daily reset', () => {
+    const kept = {
+      commissionOfferId: starter.id,
+      generatedAt: resetAt - 1,
+      isStartingCommission: true,
+    };
+    seedCaravan(caravan([offer], starter.id), kept);
+
+    tick();
+
+    expect(commission()).toMatchObject(kept);
   });
 
   it('writes nothing when no offer resolves, so the next tick retries', () => {

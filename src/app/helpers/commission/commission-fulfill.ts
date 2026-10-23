@@ -113,6 +113,8 @@ export async function commissionFulfill(
     spendCommissionRequirements(s, nodeState.requirements);
     if (offer) grantedDrops.push(...grantCommissionRewards(s, offer));
     nodeState.completed = true;
+    // A kept starting commission can predate several resets, so restart its wait for the next one from turn-in.
+    if (nodeState.isStartingCommission) nodeState.generatedAt = Date.now();
     fulfilled = true;
 
     return s;

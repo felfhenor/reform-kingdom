@@ -44,6 +44,8 @@ export type CommissionNodeState = {
   completed: boolean;
   // Date.now() epoch ms - wall-clock, not a tick count.
   generatedAt: number;
+  // Survives daily resets until fulfilled.
+  isStartingCommission?: boolean;
 };
 
 export type GameStateCommissions = {

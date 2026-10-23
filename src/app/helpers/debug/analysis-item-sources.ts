@@ -4,6 +4,7 @@
  * crafting, caravan trades, commission rewards).
  */
 
+import { caravanCommissionOfferIds } from '@helpers/commission/commission-offer-ids';
 import { getEntry } from '@helpers/content/content';
 import type {
   AnalysisItemSource,
@@ -178,8 +179,8 @@ export function buildItemSources(
 
   // A commission's reward has no level of its own - attributed to the caravan offering it.
   caravans.forEach((caravan) => {
-    caravan.commissionOffers.forEach((slot) => {
-      const offer = getEntry<CommissionOfferContent>(slot.commissionOfferId);
+    caravanCommissionOfferIds(caravan).forEach((offerId) => {
+      const offer = getEntry<CommissionOfferContent>(offerId);
       offer?.rewards.forEach((reward) => {
         if ('itemId' in reward) {
           addSource(

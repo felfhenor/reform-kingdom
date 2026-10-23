@@ -1,5 +1,6 @@
 // Validates every commission offer has the reward(s) required by whichever pool(s) actually reference it - a caravan needs `rewards`, a town needs `townReputationReward`, and some offers are assigned to both.
 
+import { caravanCommissionOfferIds } from '@helpers/commission/commission-offer-ids';
 import { getEntriesByType } from '@helpers/content/content';
 import type {
   AnalysisCheck,
@@ -16,9 +17,7 @@ export function runCommissionRewardsAnalysis(): AnalysisRunResult {
 
   const caravanOfferIds = new Set<string>();
   caravans.forEach((caravan) =>
-    caravan.commissionOffers.forEach((slot) =>
-      caravanOfferIds.add(slot.commissionOfferId),
-    ),
+    caravanCommissionOfferIds(caravan).forEach((id) => caravanOfferIds.add(id)),
   );
 
   const townOfferIds = new Set<string>();

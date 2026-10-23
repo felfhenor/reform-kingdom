@@ -1,6 +1,7 @@
 export * from './commission-fulfill';
 export * from './commission-fulfill.ui';
 export * from './commission-kill-progress';
+export * from './commission-offer-ids';
 export * from './commission-requirement';
 export * from './commission-requirement.ui';
 export * from './commission-reset';
