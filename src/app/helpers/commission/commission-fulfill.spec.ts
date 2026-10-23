@@ -10,6 +10,7 @@ import {
   commissionRequirementEntries,
   commissionRewards,
 } from '@helpers/commission/commission-fulfill';
+import { combatLog } from '@helpers/combat/combat-log';
 import { ensureCaravan } from '@helpers/content/ensure-caravan';
 import { ensureCommissionOffer } from '@helpers/content/ensure-commission';
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
@@ -197,6 +198,19 @@ describe('commissionFulfill', () => {
     expect(taskRecordCommissionFulfilled).toHaveBeenCalledTimes(1);
     expect(taskEventCollectibleGained).toHaveBeenCalledWith(medal.id);
     expect(taskEventWorkerRescued).toHaveBeenCalledWith(nell.id);
+    expect(combatLog()[0]).toEqual(
+      expect.objectContaining({
+        locationName: 'Duchy Trading Caravan Carrina',
+        message: expect.stringMatching(
+          /^You got @@icon@@2 .*trader tokens.*, @@icon@@.*Medal.*, @@icon@@Nell from turning in "Bundle of Wergen Sticks"!$/,
+        ),
+        itemIcons: [
+          expect.objectContaining({ spritesheet: 'item' }),
+          expect.objectContaining({ spritesheet: 'collectible' }),
+          expect.objectContaining({ spritesheet: 'worker' }),
+        ],
+      }),
+    );
   });
 
   it('hands over only the required armory pieces, and spends nothing for kills', async () => {

@@ -31,7 +31,9 @@ describe('townReputationGainAndRefresh', () => {
   it('refreshes the local buff and tier-scaled commissions on reaching a new tier', async () => {
     const events = captureAnalyticsEvents();
 
-    await townReputationGainAndRefresh(town.id, nextTier, 'RaidBuyoff');
+    await expect(
+      townReputationGainAndRefresh(town.id, nextTier, 'RaidBuyoff'),
+    ).resolves.toBe(nextTier);
 
     expect(worldTownsState()[town.id].reputation).toBe(nextTier);
     expect(townReputationBuffRefresh).toHaveBeenCalledWith('LarsianDesert');
@@ -42,7 +44,9 @@ describe('townReputationGainAndRefresh', () => {
   it('skips the refresh for a gain within the same tier', async () => {
     const events = captureAnalyticsEvents();
 
-    await townReputationGainAndRefresh(town.id, nextTier - 1, 'Commission');
+    await expect(
+      townReputationGainAndRefresh(town.id, nextTier - 1, 'Commission'),
+    ).resolves.toBe(nextTier - 1);
 
     expect(worldTownsState()[town.id].reputation).toBe(nextTier - 1);
     expect(townReputationBuffRefresh).not.toHaveBeenCalled();

@@ -12,6 +12,7 @@ import { SlotCompletionRewardComponent } from '@components/slot-completion-rewar
 import { SlotRequirementComponent } from '@components/slot-requirement/slot-requirement.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { commissionRarity } from '@helpers/commission/commission-requirement.ui';
+import { commissionDisplayName } from '@helpers/commission/commission-turn-in';
 import { getEntriesByType, getEntry } from '@helpers/content';
 import { kingdomSubviewShow } from '@helpers/engine';
 import { formatDuration } from '@helpers/engine/timer';
@@ -54,7 +55,7 @@ export class SlotCommissionComponent {
   public travel = output<void>();
 
   public commissionName = computed(() =>
-    (this.row().commission?.name ?? 'Commission').replace('Commission - ', ''),
+    commissionDisplayName(this.row().commission?.name ?? 'Commission'),
   );
 
   public rarityLabel = computed(() =>

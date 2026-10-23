@@ -1,6 +1,11 @@
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { updateGamestate, worldTownsState } from '@helpers/state-game';
-import type { GameState, TownId, TownReputationGainSource } from '@interfaces';
+import type {
+  GameState,
+  TownId,
+  TownReputationGainResult,
+  TownReputationGainSource,
+} from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 import { taskEventTownReputationTier } from '@helpers/task/task-events';
 
@@ -47,16 +52,17 @@ export function townReputationTier(townId: TownId, state?: GameState): number {
   return townReputationTierForAmount(townReputation(townId, state));
 }
 
-// Returns whether the gain crossed a tier threshold, so callers can re-sync the town's buff immediately.
+// `gained` is after clamping to the max; `tierChanged` lets callers re-sync the town's buff immediately.
 // Awaits its own updateGamestate call so a non-tick caller sees the mutation land before checking the result.
 export async function townReputationGain(
   townId: TownId,
   amount: number,
   source: TownReputationGainSource,
-): Promise<boolean> {
-  if (amount <= 0) return false;
+): Promise<TownReputationGainResult> {
+  if (amount <= 0) return { gained: 0, tierChanged: false };
 
   let applied = false;
+  let gained = 0;
   let tierChanged = false;
   let newTier = 0;
 
@@ -67,18 +73,19 @@ export async function townReputationGain(
     const reputation = clamp(town.reputation + amount, 0, TOWN_REPUTATION_MAX);
     newTier = townReputationTierForAmount(reputation);
     tierChanged = newTier !== townReputationTierForAmount(town.reputation);
+    gained = reputation - town.reputation;
     town.reputation = reputation;
     applied = true;
 
     return state;
   });
 
-  if (!applied) return false;
+  if (!applied) return { gained: 0, tierChanged: false };
 
   analyticsSendDesignEvent(`Town:Reputation:${source}`);
   if (tierChanged) void taskEventTownReputationTier(townId, newTier);
 
-  return tierChanged;
+  return { gained, tierChanged };
 }
 
 // The sole subtraction path - reputation is otherwise cumulative-only, reserved for a raid loss.

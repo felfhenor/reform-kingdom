@@ -99,19 +99,26 @@ describe('townReputationGain', () => {
   it('reports a tier crossing, including to the task system', async () => {
     seedReputation(TIER_1 - 10);
 
-    await expect(townReputationGain(townId, 5, 'Trade')).resolves.toBe(false);
+    await expect(townReputationGain(townId, 5, 'Trade')).resolves.toEqual({
+      gained: 5,
+      tierChanged: false,
+    });
     expect(taskEventTownReputationTier).not.toHaveBeenCalled();
 
-    await expect(townReputationGain(townId, 5, 'Trade')).resolves.toBe(true);
+    await expect(townReputationGain(townId, 5, 'Trade')).resolves.toEqual({
+      gained: 5,
+      tierChanged: true,
+    });
     expect(taskEventTownReputationTier).toHaveBeenCalledWith(townId, 1);
   });
 
-  it('clamps at the max rather than climbing past it', async () => {
+  it('clamps at the max rather than climbing past it, reporting only what landed', async () => {
     seedReputation(TOWN_REPUTATION_MAX - 50);
 
-    await townReputationGain(townId, 500, 'Trade');
+    const { gained } = await townReputationGain(townId, 500, 'Trade');
 
     expect(reputation()).toBe(TOWN_REPUTATION_MAX);
+    expect(gained).toBe(50);
   });
 
   it('does nothing for a non-positive amount or a town never visited', async () => {
@@ -120,7 +127,10 @@ describe('townReputationGain', () => {
 
     await townReputationGain(townId, 0, 'Trade');
     await townReputationGain(townId, -5, 'Trade');
-    await expect(townReputationGain(townId, 10, 'Trade')).resolves.toBe(false);
+    await expect(townReputationGain(townId, 10, 'Trade')).resolves.toEqual({
+      gained: 0,
+      tierChanged: false,
+    });
 
     expect(gamestate()).toBe(before);
     expect(events).toEqual([]);

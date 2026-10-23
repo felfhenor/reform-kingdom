@@ -20,8 +20,10 @@ import {
 } from '@helpers/worker/worker-discovery';
 import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
 import type {
+  AdventureLogRewardPart,
   CollectibleContent,
   Combat,
+  EquipmentContent,
   ItemContent,
   ItemId,
   RecipeContent,
@@ -48,6 +50,42 @@ function goldGainMultiplier(): number {
 // Only Explore/ExploreRandom combat sets encounterId/encounterRandomId - raids (raidTownId) never do.
 function isExploreCombat(combat: Combat): boolean {
   return !!combat.encounterId || !!combat.encounterRandomId;
+}
+
+function resolvedDropNameHtml(drop: ResolvedDrop): string | undefined {
+  switch (drop.kind) {
+    case 'Item': {
+      const item = getEntry<ItemContent>(drop.itemId);
+      return item ? itemDropHtml(item, drop.quantity) : undefined;
+    }
+    case 'Equipment': {
+      const equipment = getEntry<EquipmentContent>(drop.equipmentId);
+      return equipment ? equipmentDropHtml(equipment) : undefined;
+    }
+    case 'Collectible': {
+      const collectible = getEntry<CollectibleContent>(drop.collectibleId);
+      return collectible ? collectibleDropHtml(collectible) : undefined;
+    }
+    case 'Recipe': {
+      const recipe = getEntry<RecipeContent>(drop.recipeId);
+      return recipe ? recipeDropHtml(recipe) : undefined;
+    }
+    case 'Worker':
+      return getEntry<WorkerContent>(drop.workerId)?.name;
+    default:
+      return assertNeverReward(drop);
+  }
+}
+
+// Icon-token-prefixed text plus its matching icon, for listing drops granted outside combat.
+export function resolvedDropLogPart(
+  drop: ResolvedDrop,
+): AdventureLogRewardPart | undefined {
+  const html = resolvedDropNameHtml(drop);
+  const info = rewardContentInfo(drop);
+  return html && info
+    ? { html: `${ITEM_ICON_TOKEN}${html}`, icon: info }
+    : undefined;
 }
 
 // A worker reward always rolls its chance but only ever grants once - the already-rescued check is here.

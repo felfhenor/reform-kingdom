@@ -1,10 +1,13 @@
+import { categoryMessageLog } from '@helpers/combat/combat-log';
 import {
   applyResolvedDropToState,
   rollDroppedRewards,
 } from '@helpers/item/loot';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import { syncArmoryGlobalEffects } from '@helpers/kingdom/armory-global-effects';
+import { worldNodeAtCurrentLocation } from '@helpers/world';
 import type {
+  AdventureLogRewardPart,
   CommissionOfferContent,
   CommissionRequirement,
   CommissionRequirementEquipment,
@@ -12,6 +15,7 @@ import type {
   GameState,
   ResolvedDrop,
 } from '@interfaces';
+import { compact } from 'es-toolkit/compat';
 
 function consumeEquipmentRequirement(
   armory: EquipmentItem[],
@@ -46,12 +50,31 @@ export function spendCommissionRequirements(
   syncArmoryGlobalEffects(state);
 }
 
-// Returns the drops so callers can react to them once the callback has committed.
+// Returns only the drops that landed, so callers can react to them once the callback has committed.
 export function grantCommissionRewards(
   state: GameState,
   offer: CommissionOfferContent,
 ): ResolvedDrop[] {
-  const drops = rollDroppedRewards(offer.rewards, 1, {}, state);
-  drops.forEach((drop) => applyResolvedDropToState(state, drop));
-  return drops;
+  return rollDroppedRewards(offer.rewards, 1, {}, state).filter((drop) =>
+    applyResolvedDropToState(state, drop),
+  );
+}
+
+export function commissionDisplayName(offerName: string): string {
+  return offerName.replace('Commission - ', '');
+}
+
+// Turn-ins require the party at the caravan/town, so the current node is where it happened.
+export function commissionLogTurnIn(
+  offerName: string,
+  rewards: AdventureLogRewardPart[],
+): void {
+  if (rewards.length === 0) return;
+
+  categoryMessageLog(
+    'Miscellaneous',
+    worldNodeAtCurrentLocation()?.nodeName ?? 'Miscellaneous',
+    `You got ${rewards.map((reward) => reward.html).join(', ')} from turning in "${commissionDisplayName(offerName)}"!`,
+    compact(rewards.map((reward) => reward.icon)),
+  );
 }

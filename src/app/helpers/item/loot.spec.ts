@@ -287,15 +287,15 @@ describe('applyResolvedDropToState', () => {
       state.armory = Array.from({ length: count }, () =>
         buildEquipmentItem('shield' as EquipmentId),
       );
-      applyResolvedDropToState(state, {
+      const applied = applyResolvedDropToState(state, {
         kind: 'Equipment',
         equipmentId: cloakId,
       });
-      return state.armory.length;
+      return [state.armory.length, applied];
     };
 
-    expect(withArmory(cap - 1)).toBe(cap);
-    expect(withArmory(cap)).toBe(cap);
+    expect(withArmory(cap - 1)).toEqual([cap, true]);
+    expect(withArmory(cap)).toEqual([cap, false]);
   });
 
   it('adds a collectible drop to an existing stack, keeping its discovery date', () => {
@@ -313,23 +313,26 @@ describe('applyResolvedDropToState', () => {
     });
   });
 
-  it('discovers a recipe drop', () => {
+  it('discovers a recipe drop once, reporting a repeat as not applied', () => {
     const state = defaultGameState();
+    const drop = { kind: 'Recipe', recipeId: cloakRecipeId } as const;
 
-    applyResolvedDropToState(state, {
-      kind: 'Recipe',
-      recipeId: cloakRecipeId,
-    });
-
+    expect(applyResolvedDropToState(state, drop)).toBe(true);
     expect(state.discoveredRecipes[cloakRecipeId]?.foundAt).toEqual(
       expect.any(Number),
     );
+    expect(applyResolvedDropToState(state, drop)).toBe(false);
   });
 
   it('rescues a worker drop once, leaving an already-rescued worker’s progress alone', () => {
     const state = defaultGameState();
 
-    applyResolvedDropToState(state, { kind: 'Worker', workerId: weaverNellId });
+    expect(
+      applyResolvedDropToState(state, {
+        kind: 'Worker',
+        workerId: weaverNellId,
+      }),
+    ).toBe(true);
     expect(state.discoveredWorkers[weaverNellId]?.foundAt).toEqual(
       expect.any(Number),
     );
@@ -337,7 +340,12 @@ describe('applyResolvedDropToState', () => {
 
     const progressed = { ...defaultWorkerState(), level: 7 };
     state.workers[weaverNellId] = progressed;
-    applyResolvedDropToState(state, { kind: 'Worker', workerId: weaverNellId });
+    expect(
+      applyResolvedDropToState(state, {
+        kind: 'Worker',
+        workerId: weaverNellId,
+      }),
+    ).toBe(false);
     expect(state.workers[weaverNellId]).toBe(progressed);
   });
 });

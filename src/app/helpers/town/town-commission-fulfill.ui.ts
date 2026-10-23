@@ -1,5 +1,8 @@
 import { commissionRequirementsSatisfied } from '@helpers/commission/commission-requirement';
-import { spendCommissionRequirements } from '@helpers/commission/commission-turn-in';
+import {
+  commissionLogTurnIn,
+  spendCommissionRequirements,
+} from '@helpers/commission/commission-turn-in';
 import { getEntry } from '@helpers/content/content';
 import {
   analyticsSafeSegment,
@@ -116,8 +119,22 @@ export async function townCommissionFulfill(
   });
 
   if (fulfilled) {
-    await townReputationGainAndRefresh(townId, reputationAmount, 'Commission');
+    const gained = await townReputationGainAndRefresh(
+      townId,
+      reputationAmount,
+      'Commission',
+    );
     if (offerName) {
+      commissionLogTurnIn(
+        offerName,
+        gained > 0
+          ? [
+              {
+                html: `${gained.toLocaleString()} reputation with ${townData.name}`,
+              },
+            ]
+          : [],
+      );
       analyticsSendDesignEvent(
         `Town:Commission:Fulfill:${analyticsSafeSegment(offerName)}`,
       );

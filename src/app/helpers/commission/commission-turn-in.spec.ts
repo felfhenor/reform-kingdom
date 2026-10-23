@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
+import { combatLog } from '@helpers/combat/combat-log';
 import {
+  commissionDisplayName,
+  commissionLogTurnIn,
   grantCommissionRewards,
   spendCommissionRequirements,
 } from '@helpers/commission/commission-turn-in';
@@ -14,6 +17,7 @@ import type {
   GameState,
   ItemId,
   MonsterId,
+  WorkerId,
 } from '@interfaces';
 import { buildEquipmentItem } from '@/testing/builders';
 
@@ -83,5 +87,56 @@ describe('grantCommissionRewards', () => {
     expect(drops).toEqual([{ kind: 'Item', itemId: token, quantity: 3 }]);
     expect(state.materials[token]?.quantity).toBe(3);
     expect(state.materials[stick]).toBeUndefined();
+  });
+});
+
+describe('grantCommissionRewards repeats', () => {
+  it('leaves out a reward that changed nothing, like an already-rescued worker', () => {
+    const nell = 'nell' as WorkerId;
+    const offer = ensureCommissionOffer({
+      id: 'offer-b' as CommissionOfferId,
+      rewards: [
+        ensureDroppedReward({ itemId: token, chance: 100, min: 1, max: 1 }),
+        ensureDroppedReward({ workerId: nell, chance: 100 }),
+      ],
+    });
+    const state = defaultGameState();
+
+    expect(grantCommissionRewards(state, offer)).toHaveLength(2);
+    expect(grantCommissionRewards(state, offer)).toEqual([
+      { kind: 'Item', itemId: token, quantity: 1 },
+    ]);
+  });
+});
+
+describe('commissionLogTurnIn', () => {
+  it('lists every reward with its icons, and logs nothing with none', () => {
+    const icon = { sprite: 'token', spritesheet: 'item' } as const;
+    const before = combatLog().length;
+
+    commissionLogTurnIn('Sticks', []);
+    expect(combatLog()).toHaveLength(before);
+
+    commissionLogTurnIn('Commission - Sticks', [
+      { html: '@@icon@@2 tokens', icon },
+      { html: '5 reputation with Carrina' },
+    ]);
+    expect(combatLog()[0]).toEqual(
+      expect.objectContaining({
+        kind: 'Miscellaneous',
+        message:
+          'You got @@icon@@2 tokens, 5 reputation with Carrina from turning in "Sticks"!',
+        itemIcons: [icon],
+      }),
+    );
+  });
+});
+
+describe('commissionDisplayName', () => {
+  it('drops the shared "Commission - " prefix', () => {
+    expect(commissionDisplayName('Commission - Larsian Rings')).toBe(
+      'Larsian Rings',
+    );
+    expect(commissionDisplayName('Larsian Rings')).toBe('Larsian Rings');
   });
 });

@@ -1,9 +1,11 @@
 import { isPartyAtCaravan } from '@helpers/caravan/caravan';
+import { resolvedDropLogPart } from '@helpers/combat/combat-rewards';
 import {
   buildCommissionRequirementEntries,
   commissionRequirementOwnedQuantity,
 } from '@helpers/commission/commission-requirement';
 import {
+  commissionLogTurnIn,
   grantCommissionRewards,
   spendCommissionRequirements,
 } from '@helpers/commission/commission-turn-in';
@@ -27,6 +29,7 @@ import type {
   GameState,
   ResolvedDrop,
 } from '@interfaces';
+import { compact } from 'es-toolkit/compat';
 
 export function commissionState(
   caravanId: CaravanId,
@@ -116,6 +119,10 @@ export async function commissionFulfill(
   });
 
   if (fulfilled && offerName) {
+    commissionLogTurnIn(
+      offerName,
+      compact(grantedDrops.map(resolvedDropLogPart)),
+    );
     analyticsSendDesignEvent(
       `Kingdom:Commission:Fulfill:${analyticsSafeSegment(offerName)}`,
     );

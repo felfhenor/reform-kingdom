@@ -20,6 +20,7 @@ import type {
   ResolvedCollectibleDrop,
   ResolvedDrop,
   ResolvedEquipmentDrop,
+  ResolvedRecipeDrop,
   ResolvedWorkerDrop,
 } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
@@ -138,12 +139,14 @@ export function rollDroppedRewards(
 function applyEquipmentDrop(
   state: GameState,
   drop: ResolvedEquipmentDrop,
-): void {
-  addArmoryItems(
-    state,
-    drop.equipmentId,
-    [newEquipmentItem(drop.equipmentId)],
-    true,
+): boolean {
+  return (
+    addArmoryItems(
+      state,
+      drop.equipmentId,
+      [newEquipmentItem(drop.equipmentId)],
+      true,
+    ).length > 0
   );
 }
 
@@ -154,35 +157,41 @@ function applyCollectibleDrop(
   applyCollectibleGrant(state, drop.collectibleId, 1);
 }
 
-function applyWorkerDrop(state: GameState, drop: ResolvedWorkerDrop): void {
-  if (ledgerHas(state.discoveredWorkers, drop.workerId)) return;
+function applyWorkerDrop(state: GameState, drop: ResolvedWorkerDrop): boolean {
+  if (ledgerHas(state.discoveredWorkers, drop.workerId)) return false;
 
   ledgerMark(state.discoveredWorkers, drop.workerId);
   state.workers[drop.workerId] = defaultWorkerState();
+  return true;
+}
+
+function applyRecipeDrop(state: GameState, drop: ResolvedRecipeDrop): boolean {
+  if (ledgerHas(state.discoveredRecipes, drop.recipeId)) return false;
+
+  ledgerMark(state.discoveredRecipes, drop.recipeId);
+  return true;
 }
 
 // Mutates `state` directly with no side effects, for callers already inside their own `updateGamestate`.
+// False when the drop changed nothing: a repeat recipe/worker, or equipment past the armory's overflow cap.
 export function applyResolvedDropToState(
   state: GameState,
   drop: ResolvedDrop,
-): void {
+): boolean {
   switch (drop.kind) {
     case 'Item':
       applyMaterialDelta(state, drop.itemId, drop.quantity);
-      return;
+      return true;
     case 'Equipment':
-      applyEquipmentDrop(state, drop);
-      return;
+      return applyEquipmentDrop(state, drop);
     case 'Collectible':
       applyCollectibleDrop(state, drop);
-      return;
+      return true;
     case 'Recipe':
-      ledgerMark(state.discoveredRecipes, drop.recipeId);
-      return;
+      return applyRecipeDrop(state, drop);
     case 'Worker':
-      applyWorkerDrop(state, drop);
-      return;
+      return applyWorkerDrop(state, drop);
     default:
-      assertNeverReward(drop);
+      return assertNeverReward(drop);
   }
 }

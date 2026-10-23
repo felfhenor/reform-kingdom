@@ -20,6 +20,12 @@ export type CombatLogIcon = {
   spritesheet: AtlasedImage;
 };
 
+// One reward in a log line's list - `html` carries its own icon token when `icon` is set.
+export type AdventureLogRewardPart = {
+  html: string;
+  icon?: CombatLogIcon;
+};
+
 export type CombatLog = {
   kind: AdventureLogEntryKind;
   combatId?: CombatId;

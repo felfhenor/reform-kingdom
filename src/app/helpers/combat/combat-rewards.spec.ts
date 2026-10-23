@@ -4,7 +4,10 @@ vi.mock('@helpers/engine/gather-vfx');
 vi.mock('@helpers/task/task-events');
 
 import { combatLog } from '@helpers/combat/combat-log';
-import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
+import {
+  grantResolvedDrops,
+  resolvedDropLogPart,
+} from '@helpers/combat/combat-rewards';
 import {
   ensureCollectible,
   ensureEquipment,
@@ -213,5 +216,44 @@ describe('grantResolvedDrops', () => {
 
       expect(getMaterialQuantity(gold.id)).toBe(100);
     });
+  });
+});
+
+describe('resolvedDropLogPart', () => {
+  it('pairs each drop kind with its icon token and sprite', () => {
+    const parts = (
+      [
+        { kind: 'Item', itemId: ore.id, quantity: 3 },
+        { kind: 'Equipment', equipmentId: sword.id },
+        { kind: 'Collectible', collectibleId: coin.id },
+        { kind: 'Recipe', recipeId: recipe.id },
+        { kind: 'Worker', workerId: nell.id },
+      ] as ResolvedDrop[]
+    ).map(resolvedDropLogPart);
+
+    expect(parts.map((part) => part?.html)).toEqual([
+      expect.stringMatching(/^@@icon@@3 .*copper ores/),
+      expect.stringMatching(/^@@icon@@.*Iron Sword/),
+      expect.stringMatching(/^@@icon@@.*Old Coin/),
+      expect.stringMatching(/^@@icon@@.*Iron Sword/),
+      '@@icon@@Weaver Nell',
+    ]);
+    expect(parts.map((part) => part?.icon?.spritesheet)).toEqual([
+      'item',
+      'equipment',
+      'collectible',
+      expect.any(String),
+      'worker',
+    ]);
+  });
+
+  it('skips a drop whose content no longer exists', () => {
+    expect(
+      resolvedDropLogPart({
+        kind: 'Item',
+        itemId: 'gone' as ItemId,
+        quantity: 1,
+      }),
+    ).toBeUndefined();
   });
 });
