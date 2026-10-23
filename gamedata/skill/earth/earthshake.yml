@@ -16,7 +16,7 @@
   techniques:
     - elements: [Earth]
       attributes: [DamagesTarget, AllowPlink, Debuff, CanBeReflected]
-      targets: 3
+      targets: 2
       targetType: Enemies
       targetBehaviors:
         - behavior: NotZeroHealth
@@ -49,7 +49,7 @@
   techniques:
     - elements: [Earth]
       attributes: [DamagesTarget, AllowPlink, Debuff, CanBeReflected]
-      targets: 4
+      targets: 2
       targetType: Enemies
       targetBehaviors:
         - behavior: NotZeroHealth
@@ -82,7 +82,7 @@
   techniques:
     - elements: [Earth]
       attributes: [DamagesTarget, AllowPlink, Debuff, CanBeReflected]
-      targets: 5
+      targets: 3
       targetType: Enemies
       targetBehaviors:
         - behavior: NotZeroHealth
@@ -115,7 +115,7 @@
   techniques:
     - elements: [Earth]
       attributes: [DamagesTarget, AllowPlink, Debuff, CanBeReflected]
-      targets: 5
+      targets: 3
       targetType: Enemies
       targetBehaviors:
         - behavior: NotZeroHealth
