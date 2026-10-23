@@ -1,0 +1,120 @@
+@let e = effect();
+@let buff = isBuff();
+@let turns = e.turnsRemaining;
+
+<div class="flex flex-col gap-2 p-2 max-w-[300px]">
+  <div class="flex items-center gap-2">
+    <app-atlas-image
+      class="zoom-row shrink-0"
+      spritesheet="statuseffect"
+      [assetName]="e.sprite"
+    />
+    <div class="flex flex-col">
+      <span
+        class="type-entity-name"
+        [class.text-success]="buff"
+        [class.text-error]="!buff"
+      >
+        {{ e.name }}
+      </span>
+      <span class="type-meta">{{ typeLabel() }}</span>
+    </div>
+  </div>
+
+  @if (turns !== undefined) {
+    <div class="text-xs">
+      <span class="font-semibold tabular-nums">
+        {{ turns | number }}
+      </span>
+      {{ 'turn' | pluralize: turns !== 1 }} remaining
+    </div>
+  }
+
+  @if (e.damagePerTurn > 0) {
+    <div class="text-xs">
+      Takes
+      <span class="font-semibold text-error tabular-nums">
+        {{ e.damagePerTurn | number }}
+      </span>
+      damage per turn
+      @if (turns !== undefined) {
+        <span class="text-lighter">
+          ({{ e.damagePerTurn * turns | number }} total)
+        </span>
+      }
+    </div>
+  }
+
+  @if (e.healingPerTurn > 0) {
+    <div class="text-xs">
+      Heals
+      <span class="font-semibold text-success tabular-nums">
+        {{ e.healingPerTurn | number }}
+      </span>
+      HP per turn
+      @if (turns !== undefined) {
+        <span class="text-lighter">
+          ({{ e.healingPerTurn * turns | number }} total)
+        </span>
+      }
+    </div>
+  }
+
+  @if (e.modifiers.length > 0) {
+    <div class="flex flex-col gap-2">
+      @for (mod of e.modifiers; track $index) {
+        <div class="flex flex-col">
+          <div class="flex items-center gap-2 text-xs">
+            @if (mod.stat) {
+              <app-icon-dimension
+                [dimension]="statDimension"
+                [key]="mod.stat"
+                size="inline"
+              />
+            } @else if (mod.icon) {
+              <app-icon [name]="mod.icon" size="inline" />
+            }
+            <span>{{ mod.label }}</span>
+            @if (mod.amount !== undefined) {
+              <span class="font-semibold tabular-nums">
+                {{ mod.amount > 0 ? '+' : '' }}{{ mod.amount | number
+                }}{{ mod.isPercent ? '%' : '' }}
+              </span>
+            }
+            @if (mod.timing === 'PerTurn') {
+              <span class="text-lighter">per turn</span>
+            }
+          </div>
+          @if (mod.description) {
+            <span class="text-xs text-lighter">{{ mod.description }}</span>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  @if (e.scaling) {
+    <div class="type-meta">{{ e.scaling }}</div>
+  }
+
+  @if (e.tags.length > 0) {
+    <div class="type-meta">
+      Resisted by:
+
+      <ul>
+        @for (tag of e.tags; track tag) {
+          <li class="pl-2">
+            <span class="flex items-center gap-2">
+              <app-icon-dimension
+                [dimension]="tagDimension"
+                [key]="tag"
+                size="inline"
+              />
+              {{ tagLabels[tag] }}
+            </span>
+          </li>
+        }
+      </ul>
+    </div>
+  }
+</div>

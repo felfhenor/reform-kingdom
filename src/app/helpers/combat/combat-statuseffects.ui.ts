@@ -1,12 +1,14 @@
 import { statusEffectDamage } from '@helpers/combat/combat-statuseffects';
 import type {
   Combatant,
+  GameStat,
   StatusEffect,
   StatusEffectAddCombatStatNumber,
   StatusEffectBehavior,
   StatusEffectBehaviorAddStat,
   StatusEffectBehaviorTakeStat,
   StatusEffectBehaviorType,
+  StatusEffectContent,
   StatusEffectPreview,
   StatusEffectPreviewModifier,
   StatusEffectPreviewTiming,
@@ -19,14 +21,23 @@ import {
 
 function statModifier(
   behavior: StatusEffectBehaviorAddStat | StatusEffectBehaviorTakeStat,
-  amount: number,
+  amount: number | undefined,
   timing: StatusEffectPreviewTiming,
 ): StatusEffectPreviewModifier {
-  const sign = behavior.type === 'AddDamageToStat' ? 1 : -1;
+  const raises = behavior.type === 'AddDamageToStat';
+  if (amount === undefined) {
+    return {
+      label: `${behavior.modifyStat} ${raises ? 'up' : 'down'}`,
+      stat: behavior.modifyStat,
+      isPercent: false,
+      timing,
+    };
+  }
+
   return {
     label: behavior.modifyStat,
     stat: behavior.modifyStat,
-    amount: sign * amount,
+    amount: raises ? amount : -amount,
     isPercent: false,
     timing,
   };
@@ -43,16 +54,25 @@ function combatStatModifier(
     amount: sign * behavior.value,
     isPercent: CombatStatDimension.isPercent?.[behavior.combatStat] ?? true,
     timing,
+    description: CombatStatDimension.info?.[behavior.combatStat],
   };
 }
 
-// HP damage/healing is summarized separately, and a one-off message has nothing to show.
+// A known amount means HP damage/healing is summarized separately; a one-off message has nothing to show.
 function behaviorModifier(
   behavior: StatusEffectBehavior,
-  amount: number,
+  amount: number | undefined,
   timing: StatusEffectPreviewTiming,
 ): StatusEffectPreviewModifier | undefined {
   switch (behavior.type) {
+    case 'TakeDamage':
+    case 'HealDamage':
+      if (amount !== undefined) return undefined;
+      return {
+        label: behavior.type === 'TakeDamage' ? 'Takes damage' : 'Heals',
+        isPercent: false,
+        timing,
+      };
     case 'AddDamageToStat':
     case 'TakeDamageFromStat':
       return statModifier(behavior, amount, timing);
@@ -73,12 +93,39 @@ function behaviorModifier(
 
 function behaviorModifiers(
   behaviors: StatusEffectBehavior[],
-  amount: number,
+  amount: number | undefined,
   timing: StatusEffectPreviewTiming,
 ): StatusEffectPreviewModifier[] {
   return behaviors
     .map((behavior) => behaviorModifier(behavior, amount, timing))
     .filter((modifier) => modifier !== undefined);
+}
+
+function statusEffectModifiers(
+  effect: StatusEffectContent,
+  amount?: number,
+): StatusEffectPreviewModifier[] {
+  return [
+    ...behaviorModifiers(effect.onApply, amount, 'Active'),
+    ...behaviorModifiers(effect.onTick, amount, 'PerTurn'),
+  ];
+}
+
+function statusEffectPreviewBase(
+  effect: StatusEffectContent,
+): Pick<
+  StatusEffectPreview,
+  'id' | 'name' | 'sprite' | 'effectType' | 'elements' | 'tags' | 'trigger'
+> {
+  return {
+    id: effect.id,
+    name: effect.name,
+    sprite: effect.sprite,
+    effectType: effect.effectType,
+    elements: effect.elements,
+    tags: effect.tags,
+    trigger: effect.trigger,
+  };
 }
 
 function tickBehaviorCount(
@@ -92,20 +139,54 @@ export function statusEffectPreview(effect: StatusEffect): StatusEffectPreview {
   const amount = statusEffectDamage(effect);
 
   return {
-    id: effect.id,
-    name: effect.name,
-    sprite: effect.sprite,
-    effectType: effect.effectType,
-    elements: effect.elements,
-    tags: effect.tags,
-    trigger: effect.trigger,
+    ...statusEffectPreviewBase(effect),
     turnsRemaining: effect.duration,
     damagePerTurn: amount * tickBehaviorCount(effect, 'TakeDamage'),
     healingPerTurn: amount * tickBehaviorCount(effect, 'HealDamage'),
-    modifiers: [
-      ...behaviorModifiers(effect.onApply, amount, 'Active'),
-      ...behaviorModifiers(effect.onTick, amount, 'PerTurn'),
-    ],
+    modifiers: statusEffectModifiers(effect, amount),
+  };
+}
+
+const SCALED_BEHAVIORS: StatusEffectBehaviorType[] = [
+  'TakeDamage',
+  'HealDamage',
+  'AddDamageToStat',
+  'TakeDamageFromStat',
+];
+
+function statusEffectUsesScaling(effect: StatusEffectContent): boolean {
+  return [...effect.onApply, ...effect.onTick].some((behavior) =>
+    SCALED_BEHAVIORS.includes(behavior.type),
+  );
+}
+
+function statusEffectScalingText(
+  effect: StatusEffectContent,
+  format: (value: number) => string,
+): string | undefined {
+  if (!statusEffectUsesScaling(effect)) return undefined;
+
+  const whose = effect.useTargetStats ? "the target's" : "the caster's";
+  const parts = (Object.keys(effect.statScaling) as GameStat[])
+    .filter((stat) => effect.statScaling[stat] > 0)
+    .map(
+      (stat) =>
+        `${format(effect.statScaling[stat] * 100)}% of ${whose} ${stat}`,
+    );
+  return parts.length > 0 ? `Based on ${parts.join(' + ')}` : undefined;
+}
+
+// Outside combat amounts can't be sized yet, so each change shows what it scales with instead.
+export function statusEffectContentPreview(
+  effect: StatusEffectContent,
+  format: (value: number) => string,
+): StatusEffectPreview {
+  return {
+    ...statusEffectPreviewBase(effect),
+    damagePerTurn: 0,
+    healingPerTurn: 0,
+    modifiers: statusEffectModifiers(effect),
+    scaling: statusEffectScalingText(effect, format),
   };
 }
 

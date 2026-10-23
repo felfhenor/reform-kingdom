@@ -1,4 +1,6 @@
+import { statusEffectContentPreview } from '@helpers/combat/combat-statuseffects.ui';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { ensureElementBlock } from '@helpers/content/ensure-helpers-stats';
 import { characterNonGearEffects } from '@helpers/hero/hero-effect';
 import {
   skillModifiersForFamily,
@@ -37,15 +39,19 @@ function namedSegment(
   return { text: name, art };
 }
 
-function statusSegment(modifier: {
-  statusEffectId: string;
-}): SkillModifierLineSegment {
+function statusSegment(
+  modifier: { statusEffectId: string },
+  format: (value: number) => string,
+): SkillModifierLineSegment {
   const status = getEntry<StatusEffectContent>(modifier.statusEffectId);
   return status
-    ? namedSegment(status.name, {
-        sprite: status.sprite,
-        spritesheet: 'statuseffect',
-      })
+    ? {
+        ...namedSegment(status.name, {
+          sprite: status.sprite,
+          spritesheet: 'statuseffect',
+        }),
+        statusEffect: statusEffectContentPreview(status, format),
+      }
     : { text: modifier.statusEffectId };
 }
 
@@ -61,7 +67,7 @@ function inflictSegments(
   const hits = modifier.onElement ? ` on ${modifier.onElement} hits` : '';
   return [
     { text: `${format(modifier.chance)}% chance to ${statusVerb(modifier)}` },
-    statusSegment(modifier),
+    statusSegment(modifier, format),
     { text: `for ${turnsText(modifier.duration, format)}${hits}` },
   ];
 }
@@ -73,15 +79,26 @@ function potencySegments(
 ): SkillModifierLineSegment[] {
   const turns = `+${turnsText(modifier.duration, format)}`;
   if (!modifier.chance) {
-    return [{ text: `${turns} of` }, statusSegment(modifier)];
+    return [{ text: `${turns} of` }, statusSegment(modifier, format)];
   }
 
   const chance = {
     text: `+${format(modifier.chance)}% chance to ${statusVerb(modifier)}`,
   };
   return modifier.duration
-    ? [chance, statusSegment(modifier), { text: `for ${turns}` }]
-    : [chance, statusSegment(modifier)];
+    ? [chance, statusSegment(modifier, format), { text: `for ${turns}` }]
+    : [chance, statusSegment(modifier, format)];
+}
+
+// An echo rides along on the parent's cast, so it pays no costs and has no timing of its own.
+function echoedSkill(skill: EquipmentSkillContent): EquipmentSkillContent {
+  return {
+    ...skill,
+    delay: 0,
+    cooldown: 0,
+    special: false,
+    elementCosts: ensureElementBlock(),
+  };
 }
 
 function echoSegments(
@@ -91,7 +108,13 @@ function echoSegments(
   return [
     { text: 'Also casts' },
     skill
-      ? namedSegment(skill.name, { sprite: skill.sprite, spritesheet: 'skill' })
+      ? {
+          ...namedSegment(skill.name, {
+            sprite: skill.sprite,
+            spritesheet: 'skill',
+          }),
+          skill: echoedSkill(skill),
+        }
       : { text: 'UNKNOWN' },
   ];
 }

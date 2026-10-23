@@ -1,4 +1,5 @@
 import type { AtlasedImage } from '@interfaces/artable';
+import type { EquipmentSkillContent } from '@interfaces/content-skill';
 import type {
   SkillTreeNodeContent,
   SkillTreeNodeId,
@@ -6,6 +7,7 @@ import type {
   SkillTreeRow,
 } from '@interfaces/content-skilltreenode';
 import type { GameElement } from '@interfaces/element';
+import type { StatusEffectPreview } from '@interfaces/statuseffect-preview.ui';
 
 // A measured rectangle in tree pixels: a node, or an oath frame standing in for its oath.
 export type SkillTreeLayoutBox = {
@@ -61,7 +63,12 @@ export type SkillTreeLayout = {
 
 // One label's skill modifiers; added elements are kept apart so they can show as badges.
 // A run of text; a status or skill name carries its icon, drawn just before it.
-export type SkillModifierLineSegment = { text: string; art?: SkillTreeNodeArt };
+export type SkillModifierLineSegment = {
+  text: string;
+  art?: SkillTreeNodeArt;
+  statusEffect?: StatusEffectPreview;
+  skill?: EquipmentSkillContent;
+};
 
 export type SkillModifierLineEntry = { segments: SkillModifierLineSegment[] };
 

@@ -8,6 +8,8 @@ export type StatDisplayDimension<K extends string = string> = {
   icon: Record<K, Icon>;
   // Tailwind text-color class per key; uncolored when omitted.
   color?: Record<K, string>;
+  // Shown as a tooltip on the key's icon.
+  info?: Record<K, string>;
   // Omitted (or a key missing from the map) defaults to percent - true for
   // every dimension shipped so far except `agroValue`.
   isPercent?: Record<K, boolean>;

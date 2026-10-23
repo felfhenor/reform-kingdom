@@ -6,6 +6,7 @@
   [class.gap-x-3]="layout() === 'row'"
 >
   @for (key of baseRows(); track key) {
+    @let keyInfo = info(key);
     <div
       class="flex items-center gap-2"
       [class.text-value-positive]="!hasComparison() && bonusValue(key) > 0"
@@ -16,6 +17,8 @@
         [dimension]="dimension()"
         [key]="key"
         size="stat"
+        [tp]="keyInfo"
+        [tpIsEnabled]="!!keyInfo"
       />
 
       <span>

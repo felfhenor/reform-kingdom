@@ -1,12 +1,18 @@
+import type { TemplateRef } from '@angular/core';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { IconElementChargeComponent } from '@components/icon-element-charge/icon-element-charge.component';
-import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
+import { IconSkillModifierSegmentComponent } from '@components/icon-skill-modifier-segment/icon-skill-modifier-segment.component';
 import type { SkillModifierLine } from '@interfaces';
+import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-row-skill-modifier',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconElementChargeComponent, IconItemPreviewComponent],
+  imports: [
+    IconElementChargeComponent,
+    IconSkillModifierSegmentComponent,
+    TippyDirective,
+  ],
   template: `
     @let entry = line();
     <span class="inline-flex flex-wrap items-center gap-2 text-sm text-oath">
@@ -20,21 +26,17 @@ import type { SkillModifierLine } from '@interfaces';
           [element]="element"
           [filled]="true"
           size="sm"
+          [tp]="'Generates a ' + element + ' charge'"
         />
       }
       @for (part of entry.entries; track $index) {
         @for (segment of part.segments; track $index) {
           <span class="inline-flex items-center gap-2">
-            @if (segment.art; as segmentArt) {
-              <span
-                class="relative inline-block overflow-hidden shrink-0 w-4 h-4"
-              >
-                <app-icon-item-preview
-                  [sprite]="segmentArt.sprite"
-                  [spritesheet]="segmentArt.spritesheet"
-                  cssClass="zoom-inline"
-                />
-              </span>
+            @if (segment.art) {
+              <app-icon-skill-modifier-segment
+                [segment]="segment"
+                [skillTooltip]="skillTooltip()"
+              />
             }
             <span [textContent]="segment.text"></span>
           </span>
@@ -45,4 +47,5 @@ import type { SkillModifierLine } from '@interfaces';
 })
 export class RowSkillModifierComponent {
   public line = input.required<SkillModifierLine>();
+  public skillTooltip = input<TemplateRef<unknown>>();
 }

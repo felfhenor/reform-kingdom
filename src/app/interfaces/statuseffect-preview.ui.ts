@@ -27,6 +27,7 @@ export type StatusEffectPreviewModifier = {
   timing: StatusEffectPreviewTiming;
   stat?: GameStat;
   icon?: Icon;
+  description?: string;
 };
 
 export type StatusEffectPreview = {
@@ -37,8 +38,10 @@ export type StatusEffectPreview = {
   elements: GameElement[];
   tags: StatusEffectTag[];
   trigger: StatusEffectTrigger;
-  turnsRemaining: number;
+  // Unset outside combat, where there's no caster or target to size the amounts.
+  turnsRemaining?: number;
   damagePerTurn: number;
   healingPerTurn: number;
   modifiers: StatusEffectPreviewModifier[];
+  scaling?: string;
 };

@@ -1,4 +1,4 @@
-import { formatNumber } from '@angular/common';
+import { formatNumber, NgTemplateOutlet } from '@angular/common';
 import type { AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
@@ -15,6 +15,7 @@ import { RowElementChargesComponent } from '@components/row-element-charges/row-
 import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
 import { RowSkillModifierComponent } from '@components/row-skill-modifier/row-skill-modifier.component';
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
+import { TooltipSkillPreviewComponent } from '@components/tooltip-skill-preview/tooltip-skill-preview.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { combatantFromCharacter } from '@helpers/combat/combat-create';
 import { SKILL_TREE_NODE_SIZE } from '@helpers/config';
@@ -58,6 +59,8 @@ import { AnimationService } from '@services/animation.service';
     RowStatSummaryComponent,
     SFXDirective,
     RowElementChargesComponent,
+    NgTemplateOutlet,
+    TooltipSkillPreviewComponent,
   ],
   templateUrl: './panel-heroes-skill-tree-detail.component.html',
 })
@@ -75,6 +78,8 @@ export class PanelHeroesSkillTreeDetailComponent {
   private format = (value: number) => formatNumber(value, this.locale);
   public readonly nodeSize = SKILL_TREE_NODE_SIZE;
 
+  public combatant = computed(() => combatantFromCharacter(this.character()));
+
   public state = computed(() => {
     const node = this.node();
     return node ? this.states().get(node.id) : undefined;
@@ -89,18 +94,13 @@ export class PanelHeroesSkillTreeDetailComponent {
       ? characterSkillPreview(this.character(), content, this.staged())
       : undefined;
 
-    console.log(skill);
-
     return {
       node,
       name: skillTreeNodeShortName(node),
       kind: skillTreeNodeKind(node),
       art: skillTreeNodeArt(node, this.job()),
       effect: skill
-        ? skillDescriptionWithPreview(
-            combatantFromCharacter(this.character()),
-            skill,
-          )
+        ? skillDescriptionWithPreview(this.combatant(), skill)
         : skillTreeNodeEffectText(node),
       modifierLines: skill
         ? skillModifierLines(skill, this.format)

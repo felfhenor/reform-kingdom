@@ -106,6 +106,27 @@ export const CombatStatDimension: StatDisplayDimension<CombatStat> = {
     agroValue: 'text-orange-600',
     coverThreshold: 'text-cyan-600',
   },
+  info: {
+    repeatActionChance: 'Chance to take another turn right after acting.',
+    skillStrikeAgainChance:
+      'Chance for each hit of a skill to hit a second time on the same target.',
+    redirectionChance:
+      'Chance for each part of a skill to change targets. Attacks hit allies instead of enemies, and heals or buffs go to enemies.',
+    missChance:
+      'Chance for each hit to miss outright, even when it would otherwise hit. Skills that never miss are immune.',
+    debuffIgnoreChance: 'Chance to ignore a debuff entirely.',
+    damageReflectPercent:
+      'Part of damage taken from reflectable attacks that is dealt back to the attacker.',
+    healingIgnorePercent: 'Healing from skills is reduced.',
+    reviveChance:
+      'Chance each turn to come back at full HP after being defeated.',
+    stunChance: 'Chance to lose turn.',
+    epCostIncreasePercent: 'Skills cost this much more EP.',
+    agroValue:
+      'Positive aggro causes the target to be first in line for attacks; negative aggro causes the target to be last in line for any attacks.',
+    coverThreshold:
+      'Steps in to take hits for an ally whose HP percent is below this.',
+  },
   isPercent: {
     repeatActionChance: true,
     skillStrikeAgainChance: true,
