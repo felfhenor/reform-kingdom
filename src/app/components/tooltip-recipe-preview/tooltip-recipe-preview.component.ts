@@ -34,10 +34,14 @@ import type { RecipeContent } from '@interfaces';
 })
 export class TooltipRecipePreviewComponent {
   public recipe = input.required<RecipeContent>();
+  // Crafting lists pass the recipe's own name to match their rows; drops and the museum keep the "<Tradeskill> Recipe: X" form.
+  public name = input<string>();
 
-  public display = computed(() =>
-    resolveRewardDisplay({ recipeId: this.recipe().id }),
-  );
+  public display = computed(() => {
+    const display = resolveRewardDisplay({ recipeId: this.recipe().id });
+    const name = this.name();
+    return display && name ? { ...display, name } : display;
+  });
 
   public sourceNames = computed(() => recipeKnownSourceNames(this.recipe()));
 

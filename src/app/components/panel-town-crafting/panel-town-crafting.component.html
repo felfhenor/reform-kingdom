@@ -50,7 +50,11 @@
       @for (_ of craftQueueSlots(); track $index) {
         @let row = craftQueueRows()[$index];
         @if (row && row.resultDisplay; as item) {
-          <app-tooltip-recipe-preview #preview [recipe]="row.recipe" />
+          <app-tooltip-recipe-preview
+            #preview
+            [recipe]="row.recipe"
+            [name]="row.recipe.name"
+          />
 
           <div
             class="relative w-16 h-16 shrink-0"

@@ -130,7 +130,11 @@
           class="flex items-center gap-2 p-2 bg-base-200 min-h-[72px] max-h-[72px]"
           [class.opacity-50]="uncraftable"
         >
-          <app-tooltip-recipe-preview #preview [recipe]="entry.recipe" />
+          <app-tooltip-recipe-preview
+            #preview
+            [recipe]="entry.recipe"
+            [name]="entry.recipe.name"
+          />
 
           <div
             #recipeIcon
