@@ -28,8 +28,12 @@
   baseStats:
     Luck: 4.2
 
+  monsterTypeDamage:
+    Humanoid: 10
+
   elementalResistances:
     Water: 5
+    Fire: 5
 
 - id: 6fbb85ba-8029-48ea-8774-d44f15111696
   name: Cimmerian Ring
@@ -47,3 +51,6 @@
 
   elementalResistances:
     Water: 5
+
+  monsterTypeDamage:
+    Spirit: 5

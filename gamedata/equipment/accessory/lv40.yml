@@ -12,6 +12,9 @@
   elementalResistances:
     Fire: 5
 
+  debuffResistances:
+    Burn: 10
+
 - id: bde54738-2a5c-4402-9f11-9a1319b1dea1
   name: Fel Earrings
   description: A pair of earrings that absorb magic from the air around them.
@@ -25,6 +28,12 @@
 
   elementalResistances:
     Fire: 5
+
+  elementalBoons:
+    Water: 10
+
+  debuffResistances:
+    Stun: 5
 
 - id: 7759c83a-51d9-4e64-a702-054b9a67d6f8
   name: Felshaped Bracers

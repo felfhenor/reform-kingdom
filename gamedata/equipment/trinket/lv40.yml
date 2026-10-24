@@ -15,6 +15,9 @@
     - tradeskillId: Tailoring
       value: 1
 
+  monsterTypeDamage:
+    Demon: 10
+
 - id: 1cf15722-4b19-4120-b127-68b462c85383
   name: Felshaped Gatherer's Gloves
   description: A pair of gloves that allows for more effective gathering.

@@ -30,9 +30,13 @@
 
   debuffResistances:
     Bleed: 3
+    Poison: 10
 
   elementalResistances:
     Air: 5
+
+  monsterTypeDamage:
+    Insect: 10
 
 - id: cfbef018-d4b4-43a5-ba8a-903f87917c49
   name: Angelf Earrings
@@ -49,3 +53,6 @@
 
   elementalResistances:
     Air: 5
+
+  monsterTypeDamage:
+    Amalgamation: 10

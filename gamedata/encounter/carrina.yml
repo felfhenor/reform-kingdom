@@ -210,6 +210,9 @@
       max: 200
       chance: 100
 
+    - equipmentId: Slimepopper
+      chance: 10
+
 - id: f98cf9b9-2060-4e50-80cf-a5cbc041905a
   name: Copperpan Cave
   description: A cave filled with goblins who seek copper to barter.
