@@ -27,7 +27,7 @@
   sprite: '0058'
 
   infusionStats:
-    Resitance: 2.4
+    Resistance: 2.4
     Vitality: 1.9
 
 - id: 2f09811f-a4db-4ba0-aef4-903639d8fa85
@@ -38,7 +38,7 @@
   sprite: '0057'
 
   infusionStats:
-    Stength: 2.1
+    Strength: 2.1
     Vitality: 1.2
 
 - id: 5bd71230-ee06-48eb-8565-cdd66d1ea981
