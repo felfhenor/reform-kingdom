@@ -1,4 +1,57 @@
 
+## [0.12.1](https://github.com/felfhenor/reform-kingdom/compare/v0.12.0...v0.12.1) (2026-10-24)
+
+
+### Bug Fixes
+
+* **analytics:** analytics can only even be turned on when not embedded ([1287d09](https://github.com/felfhenor/reform-kingdom/commit/1287d09bd1803cddd2b2de434b552b55e140da22))
+* **balance:** nerf earthshake ([fbaae8e](https://github.com/felfhenor/reform-kingdom/commit/fbaae8e7a740463110a85f61aca96a4cd02768df))
+* **caravan:** clean up buying items ([192ba2c](https://github.com/felfhenor/reform-kingdom/commit/192ba2c252187459a8ec3e271481fa4d5389d978))
+* **combat:** taunt should only draw attacks, not heals or buffs ([4691151](https://github.com/felfhenor/reform-kingdom/commit/46911515664a9b4ce365fd02d12cdcec3c132cc2))
+* **commission:** commissions will no longer roll if the recipe is not owned by the player (not by tradeskill level, just recipe item) ([1a658e1](https://github.com/felfhenor/reform-kingdom/commit/1a658e1a0b668b9ddf06e363fa9ceddce53a8e40))
+* **commissions:** only show commissions for nodes the player has discovered ([ca41afc](https://github.com/felfhenor/reform-kingdom/commit/ca41afca55fe7ac301092c3c5fc91d9b3114305a))
+* **desktop:** desktop builds will not prompt to download the game ([4904b7a](https://github.com/felfhenor/reform-kingdom/commit/4904b7abb01f20302cd24456a86b9d48a8b6f98b))
+* **item:** demon horn & wolf pelt infusions give all their stats ([3ffa08d](https://github.com/felfhenor/reform-kingdom/commit/3ffa08db5676a3564bc1be3bda83e6b84a7ab9a6))
+* **loader:** wait for version to load correctly to cache bust urls correctly ([948127f](https://github.com/felfhenor/reform-kingdom/commit/948127f0b731dd207a347f3088bf32b6d8533d16))
+* **recipe:** recipes will always drop, but will call out when they're gated ([bae08ca](https://github.com/felfhenor/reform-kingdom/commit/bae08ca1e49f80106bc877bb31272bff2fd041be))
+* **ui:** discord links cannot be copied in iframe environments like galaxy ([9bf2e1f](https://github.com/felfhenor/reform-kingdom/commit/9bf2e1f7ff3494365aaa7942b4f497c446f5ebd3))
+* **ui:** rework display of common things like stats to be more consistent across the board ([77a79c8](https://github.com/felfhenor/reform-kingdom/commit/77a79c8ee6007cd228c462cd84b13dd47d98cfc7))
+* **ui:** worker ui has less jitter with a static height for description ([0d93e3a](https://github.com/felfhenor/reform-kingdom/commit/0d93e3a3546ad704ce67f5d1edf7a76cbfbb3c5d))
+* **ux:** improve load screen by taking main-thread animations and removing them or moving them ([c78ec1c](https://github.com/felfhenor/reform-kingdom/commit/c78ec1cb7fef8f56391b109438bd1f8fa0a8a144))
+
+
+### Features
+
+* **analysis:** add analysis script for skill trees ([baa6ac7](https://github.com/felfhenor/reform-kingdom/commit/baa6ac761fd9222d7e40a613f4a9865c90f5e081))
+* **armory:** crafted equipment auto sells now ([6ca6f0b](https://github.com/felfhenor/reform-kingdom/commit/6ca6f0b3e899a33209f3aab0753125c2d387d2b2))
+* **build:** add idb-compatible updates file ([c9a8d1c](https://github.com/felfhenor/reform-kingdom/commit/c9a8d1cc838e26f05ba0e9958d721391ff89958c))
+* **commission:** always have a 3-scrip commission given by default for basic trader ([29cb09b](https://github.com/felfhenor/reform-kingdom/commit/29cb09ba21b2bdb625753e24b041cc4b8b918193))
+* **commission:** tell users what they got when turning in commissions ([5c8b08c](https://github.com/felfhenor/reform-kingdom/commit/5c8b08c7763c8348ffea28d7dc4e6097672ae172))
+* **discoverability:** the game will no longer leak names of things that it shouldn't ([26a7a05](https://github.com/felfhenor/reform-kingdom/commit/26a7a050e69369c8ea40b20ba434e648c649957b))
+* **loader:** add loader for fonts ([b0261a8](https://github.com/felfhenor/reform-kingdom/commit/b0261a8d9091c4bcbe424610e856c3c887f2c67a))
+* **loader:** map loader is much snappier! ([c60f471](https://github.com/felfhenor/reform-kingdom/commit/c60f471d761033ad4e73fcf77c8afc5e83b37a2a))
+* **loader:** preload interface art ([158b0e8](https://github.com/felfhenor/reform-kingdom/commit/158b0e8cae952ea6fc3631ffbd9afe0a9898b71a))
+* **loader:** preload more icons ([a02a7f5](https://github.com/felfhenor/reform-kingdom/commit/a02a7f5cb0e8969f2b82ba002405e3277c285f81))
+* **loader:** preload ui scripts ([ad00d2f](https://github.com/felfhenor/reform-kingdom/commit/ad00d2f9af6e581ddab245f83a4b54eda8315da1))
+* **loading:** add fun loading screen stuff ([45b382e](https://github.com/felfhenor/reform-kingdom/commit/45b382e3ffe7a68f6c15096cb18e158f32efc892))
+* **shrine:** add preview of shrine effects in the info section ([ae14c25](https://github.com/felfhenor/reform-kingdom/commit/ae14c255f63e4cf99814b4c53be64c86d26e91f3))
+* **skilltree:** add full preview to skill tree ([3cd21a5](https://github.com/felfhenor/reform-kingdom/commit/3cd21a5439c720a47860dfa83d15f0d3e4263fb6))
+* **skilltree:** add skill tree help text ([78e8513](https://github.com/felfhenor/reform-kingdom/commit/78e8513454e6f6e413725f3f3e56f6c4c65c50e4))
+* **skilltree:** make icons more descriptive on hover for elements, skills, and effects ([0a39d9d](https://github.com/felfhenor/reform-kingdom/commit/0a39d9dd7942dec7ed4606a6e26f1490d6aab71e))
+* **skilltree:** show burst skill element costs ([fe0fdb3](https://github.com/felfhenor/reform-kingdom/commit/fe0fdb31dcb416c4a9c0914c1d2de15bd8500414))
+* **skilltree:** show burst skills separtely from skills ([8096300](https://github.com/felfhenor/reform-kingdom/commit/8096300491ed06b103642446894d7b142f1aceac))
+* **task:** clear the overwhelming task list and let it fold out more naturally as the player explores ([35ec65e](https://github.com/felfhenor/reform-kingdom/commit/35ec65ec7b0f0ae834ccc8fec958714abb070bdb))
+* **task:** tasks now have a locator button where applicable ([ae50495](https://github.com/felfhenor/reform-kingdom/commit/ae504950a014a9490979a5db13e6138f65b810d0))
+* **ui:** add consistent skill tooltips in other places ([7467f84](https://github.com/felfhenor/reform-kingdom/commit/7467f84c537b26c7f08cbc57d6966e74e8723cb2))
+* **ui:** add ep to skill tree details ([9d441c5](https://github.com/felfhenor/reform-kingdom/commit/9d441c585eec7b4bf3a0894d955f4a13ba36dadc))
+* **ui:** improve accessibility of monster info / consistency ([654d80c](https://github.com/felfhenor/reform-kingdom/commit/654d80cde2c69a198d843f81d2e9a5ba4a2a8c08))
+* **ui:** increase consistency for equipment displays ([d191212](https://github.com/felfhenor/reform-kingdom/commit/d19121263c317e1726b9aad9e460c7f33bfc076b))
+* **ui:** log messaging for tradeskills & first town visits ([8cb095a](https://github.com/felfhenor/reform-kingdom/commit/8cb095a27afa2733aa3f5c7b427616698efd4007))
+* **ui:** log more player actions in the log rather than just having popups ([a7800af](https://github.com/felfhenor/reform-kingdom/commit/a7800af5332fcc820dc9e93731bc0c5665d9c940))
+* **ui:** log more ui actions in the logs ([3dc310a](https://github.com/felfhenor/reform-kingdom/commit/3dc310a7476b2469785d865576dfa4600129567c))
+* **ui:** more messaging added for logs/missed actions (like raids) ([6747acb](https://github.com/felfhenor/reform-kingdom/commit/6747acb29c2d293ac2c7f4dd6ace762a01609ccf))
+* **ui:** museum recipes now display items everywhere, including town queue ([547608c](https://github.com/felfhenor/reform-kingdom/commit/547608c7fd42937c331ac026cf9107675d2aea45))
+
 # [0.12.0](https://github.com/felfhenor/reform-kingdom/compare/v0.11.1...v0.12.0) (2026-10-21)
 
 
