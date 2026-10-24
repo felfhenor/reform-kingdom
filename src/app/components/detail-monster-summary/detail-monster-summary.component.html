@@ -1,0 +1,56 @@
+@let e = entry();
+
+<div class="flex gap-4">
+  @if (e.discovered) {
+    <app-slot-icon-blank class="shrink-0">
+      <app-atlas-animation
+        spritesheet="monster"
+        [assetName]="e.monster.sprite"
+        [frames]="e.monster.frames"
+      />
+    </app-slot-icon-blank>
+
+    <div class="flex flex-col gap-2">
+      <div class="flex items-center gap-2">
+        <span class="type-entity-heading text-{{ e.monster.rarity }}">
+          {{ e.monster.name }}
+        </span>
+
+        <ng-content select="[summary-corner]" />
+      </div>
+
+      <span class="type-meta">
+        {{ levelLabel() }} {{ e.monster.types.join('/') }} ·
+        {{ e.kills | number }} killed
+      </span>
+
+      @let nodes = foundIn();
+      @if (showLocations() && e.foundAtNodes.length > 0 && nodes.length > 0) {
+        <span class="type-meta">Found in: {{ nodes.join(', ') }}</span>
+      }
+
+      @let xp = xpLabel();
+      @if (xp) {
+        <span class="type-meta">XP: {{ xp }}</span>
+      }
+    </div>
+  } @else {
+    <div class="zoom-header shrink-0">
+      <app-icon-unknown />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <span class="type-entity-heading type-unknown">???</span>
+
+      @if (showLocations()) {
+        @if (e.sourceNodeNames.length > 0) {
+          <span class="type-meta">
+            Discoverable in: {{ e.sourceNodeNames.join(', ') }}
+          </span>
+        } @else {
+          <span class="type-meta">Location unknown</span>
+        }
+      }
+    </div>
+  }
+</div>

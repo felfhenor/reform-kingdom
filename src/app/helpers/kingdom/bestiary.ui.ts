@@ -1,4 +1,4 @@
-import { getEntriesByType } from '@helpers/content/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { rangeLabelAtLevel } from '@helpers/engine/leveled-range';
 import { rewardDisplayOrder } from '@helpers/item/loot';
 import {
@@ -14,8 +14,13 @@ import {
   rewardContentInfo,
 } from '@helpers/world-node/world-node-rewards';
 import { worldNodeDisplayName } from '@helpers/world-node/world-nodes';
-import type { BestiaryEntry, DroppedReward, MonsterContent } from '@interfaces';
-import { orderBy, sortBy } from 'es-toolkit/compat';
+import type {
+  BestiaryEntry,
+  DroppedReward,
+  EncounterContent,
+  MonsterContent,
+} from '@interfaces';
+import { orderBy, range, sortBy, uniq } from 'es-toolkit/compat';
 
 // Item drops roll a level-scaled quantity range; other reward types are always a flat chance for one.
 export function bestiaryDropQuantityLabel(
@@ -35,6 +40,54 @@ export function bestiaryXpLabel(
   return rangeLabelAtLevel(monster.xp, level);
 }
 
+export function bestiaryEntry(monster: MonsterContent): BestiaryEntry {
+  return {
+    monster,
+    discovered: isMonsterDiscovered(monster.id),
+    kills: getMonsterKillCount(monster.id),
+    levelRange: getMonsterLevelRangeFound(monster.id),
+    foundAtNodes: getMonsterFoundAtNodes(monster.id).map(worldNodeDisplayName),
+    sourceNodeNames: monsterSourceNodeNames(monster.id).map(
+      worldNodeDisplayName,
+    ),
+    drops: sortBy(monster.drops, [rewardDisplayOrder]).map((reward) => ({
+      reward,
+      discovered: isRewardDiscovered(reward),
+    })),
+  };
+}
+
+function bestiarySourceNodes(entry: BestiaryEntry): EncounterContent[] {
+  return entry.sourceNodeNames
+    .map((name) => getEntry<EncounterContent>(name))
+    .filter((node): node is EncounterContent => !!node);
+}
+
+// Every level the monster can be met at, across all the nodes it spawns in.
+export function bestiaryEntryLevels(entry: BestiaryEntry): number[] {
+  return sortBy(
+    uniq(
+      bestiarySourceNodes(entry).flatMap(({ levelRange }) =>
+        range(levelRange.min, levelRange.max + 1),
+      ),
+    ),
+  );
+}
+
+// Without a level, every node it spawns in.
+export function bestiarySourceNodeNamesAtLevel(
+  entry: BestiaryEntry,
+  level?: number,
+): string[] {
+  return bestiarySourceNodes(entry)
+    .filter(
+      ({ levelRange }) =>
+        level === undefined ||
+        (level >= levelRange.min && level <= levelRange.max),
+    )
+    .map((node) => node.name);
+}
+
 // Undiscovered monsters are still returned so the bestiary can render them as silhouettes instead of omitting them.
 export function getBestiaryEntries(): BestiaryEntry[] {
   const guardianMonsterIds = new Set(townGuardianMonsterIds());
@@ -42,29 +95,8 @@ export function getBestiaryEntries(): BestiaryEntry[] {
     (monster) => !guardianMonsterIds.has(monster.id),
   );
 
-  const entries = monsters.map((monster) => {
-    const discovered = isMonsterDiscovered(monster.id);
-
-    return {
-      monster,
-      discovered,
-      kills: getMonsterKillCount(monster.id),
-      levelRange: getMonsterLevelRangeFound(monster.id),
-      foundAtNodes: getMonsterFoundAtNodes(monster.id).map(
-        worldNodeDisplayName,
-      ),
-      sourceNodeNames: monsterSourceNodeNames(monster.id).map(
-        worldNodeDisplayName,
-      ),
-      drops: sortBy(monster.drops, [rewardDisplayOrder]).map((reward) => ({
-        reward,
-        discovered: isRewardDiscovered(reward),
-      })),
-    };
-  });
-
   return orderBy(
-    entries,
+    monsters.map(bestiaryEntry),
     [(entry) => (entry.discovered ? 1 : 0), (entry) => entry.monster.name],
     ['desc', 'asc'],
   );

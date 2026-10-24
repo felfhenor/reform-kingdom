@@ -1,4 +1,4 @@
-import { DecimalPipe, UpperCasePipe } from '@angular/common';
+import { DecimalPipe, NgTemplateOutlet, UpperCasePipe } from '@angular/common';
 import type { ElementRef, AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
@@ -14,9 +14,11 @@ import { AtlasImageComponent } from '@components/atlas-image/atlas-image.compone
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
 import { IconStatusEffectComponent } from '@components/icon-statuseffect/icon-statuseffect.component';
 import { TextNumberTweenComponent } from '@components/text-number-tween/text-number-tween.component';
+import { TooltipMonsterPreviewComponent } from '@components/tooltip-monster-preview/tooltip-monster-preview.component';
 import { damageNumberScale } from '@helpers/combat/combat-damage-events.ui';
 import { heroLevelUpVfx$ } from '@helpers/engine/hero-level-up-vfx';
 import type { DamageEventVariant, StatusCardEntry } from '@interfaces';
+import { TippyDirective } from '@ngneat/helipopper';
 import { AnimationService } from '@services/animation.service';
 import type { JSAnimation } from 'animejs';
 import { CombatStatusPlaybackService } from '@services/combat-status-playback.service';
@@ -38,6 +40,9 @@ const COLLAPSED_X_JITTER_PERCENT = 18;
     BarProgressComponent,
     IconStatusEffectComponent,
     UpperCasePipe,
+    NgTemplateOutlet,
+    TippyDirective,
+    TooltipMonsterPreviewComponent,
   ],
   templateUrl: './card-status-combatant.component.html',
   styleUrl: './card-status-combatant.component.scss',

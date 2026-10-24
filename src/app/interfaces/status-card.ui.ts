@@ -1,4 +1,5 @@
 import type { AtlasedImage } from '@interfaces/artable';
+import type { MonsterContent } from '@interfaces/content-monster';
 import type { SkillTreeNodeContent } from '@interfaces/content-skilltreenode';
 import type { StatusEffectPreview } from '@interfaces/statuseffect-preview.ui';
 
@@ -17,6 +18,9 @@ export type StatusCardEntry = {
   subtitleLevel?: number;
   subtitleLabel?: string;
   subtitleSpec?: SkillTreeNodeContent;
+  // Monsters only - drives the rarity-colored name and the bestiary tooltip.
+  monster?: MonsterContent;
+  level?: number;
   spritesheet: AtlasedImage;
   spriteAssetName: string;
   spriteFrames: number;

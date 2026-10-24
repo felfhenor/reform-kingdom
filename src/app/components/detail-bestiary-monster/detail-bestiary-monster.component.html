@@ -1,62 +1,17 @@
 @let e = entry();
 
 <div class="flex flex-col gap-4">
-  <div class="flex gap-4">
-    @if (e.discovered) {
-      <app-slot-icon-blank>
-        <app-atlas-animation
-          spritesheet="monster"
-          [assetName]="e.monster.sprite"
-          [frames]="e.monster.frames"
-        />
-      </app-slot-icon-blank>
-
-      <div class="flex flex-col gap-2">
-        <div class="flex items-center gap-2">
-          <span class="type-entity-heading text-{{ e.monster.rarity }}">
-            {{ e.monster.name }}
-          </span>
-
-          <ng-select
-            class="w-28"
-            [items]="levelOptions()"
-            bindLabel="label"
-            bindValue="value"
-            [clearable]="false"
-            [(ngModel)]="selectedLevel"
-          ></ng-select>
-        </div>
-
-        <span class="type-meta">
-          Lv. {{ levelMin() }}-{{ levelMax() }}
-          {{ e.monster.types.join('/') }} · {{ e.kills | number }} killed
-        </span>
-        @if (e.foundAtNodes.length > 0) {
-          <span class="type-meta">
-            Found in:
-            {{ nodeNameString() }}
-          </span>
-        }
-        <span class="type-meta">XP: {{ xpLabel() }}</span>
-      </div>
-    } @else {
-      <div class="zoom-header">
-        <app-icon-unknown />
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <span class="type-entity-heading type-unknown">???</span>
-
-        @if (e.sourceNodeNames.length > 0) {
-          <span class="type-meta">
-            Discoverable in: {{ e.sourceNodeNames.join(', ') }}
-          </span>
-        } @else {
-          <span class="type-meta">Location unknown</span>
-        }
-      </div>
-    }
-  </div>
+  <app-detail-monster-summary [entry]="e" [level]="selectedLevel()">
+    <ng-select
+      summary-corner
+      class="w-28"
+      [items]="levelOptions()"
+      bindLabel="label"
+      bindValue="value"
+      [clearable]="false"
+      [(ngModel)]="selectedLevel"
+    ></ng-select>
+  </app-detail-monster-summary>
 
   @if (e.discovered) {
     <p class="type-flavor">{{ e.monster.description }}</p>

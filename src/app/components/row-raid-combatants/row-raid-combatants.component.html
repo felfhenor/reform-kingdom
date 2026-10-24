@@ -2,9 +2,11 @@
 
 <div class="flex flex-wrap gap-2">
   @for (row of combatants(); track row.monster.id) {
+    <app-tooltip-monster-preview #preview [monster]="row.monster" />
+
     <div
       class="relative w-16 h-16"
-      [tp]="row.monster.name"
+      [tp]="preview.template()"
       [tpPlacement]="'top'"
     >
       <app-slot-icon-blank>

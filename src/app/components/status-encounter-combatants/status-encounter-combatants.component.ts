@@ -9,7 +9,8 @@ import {
 import { CardStatusCombatantComponent } from '@components/card-status-combatant/card-status-combatant.component';
 import { combatantHealthBar } from '@helpers/combat/combat-combatant-hp.ui';
 import { combatantStatusEffectPreviews } from '@helpers/combat/combat-statuseffects.ui';
-import type { Combatant, StatusCardEntry } from '@interfaces';
+import { getEntry } from '@helpers/content/content';
+import type { Combatant, MonsterContent, StatusCardEntry } from '@interfaces';
 import { AnimationService } from '@services/animation.service';
 import { chunk } from 'es-toolkit/compat';
 
@@ -34,6 +35,10 @@ export class StatusEncounterCombatantsComponent {
     this.combatants().map((combatant) => ({
       combatantId: combatant.id,
       name: combatant.name,
+      monster: combatant.monsterId
+        ? getEntry<MonsterContent>(combatant.monsterId)
+        : undefined,
+      level: combatant.level,
       spritesheet: 'monster',
       spriteAssetName: combatant.sprite ?? '',
       spriteFrames: combatant.frames,

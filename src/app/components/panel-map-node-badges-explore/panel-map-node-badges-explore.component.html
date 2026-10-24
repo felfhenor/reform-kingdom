@@ -23,26 +23,9 @@
 }
 
 <ng-template #monstersTooltip>
-  <div class="flex flex-col gap-2 p-2">
-    @for (monster of monsters(); track monster.id) {
-      <div class="flex items-center gap-2">
-        @if (isMonsterDiscovered(monster.id)) {
-          <app-atlas-animation
-            spritesheet="monster"
-            [assetName]="monster.sprite"
-            [frames]="monster.frames"
-            class="zoom-tooltip"
-          />
-          <span class="type-entity-name text-{{ monster.rarity }}">
-            {{ monster.name }}
-          </span>
-        } @else {
-          <div class="zoom-tooltip">
-            <app-icon-unknown />
-          </div>
-          <span class="type-unknown">???</span>
-        }
-      </div>
+  <div class="flex flex-col gap-4 p-2 max-w-[400px]">
+    @for (monster of monsterEntries(); track monster.monster.id) {
+      <app-detail-monster-summary [entry]="monster" [showLocations]="false" />
     }
   </div>
 </ng-template>

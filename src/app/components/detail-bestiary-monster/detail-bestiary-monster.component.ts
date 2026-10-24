@@ -1,4 +1,3 @@
-import { DecimalPipe } from '@angular/common';
 import type { AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
@@ -10,12 +9,10 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
-import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
+import { DetailMonsterSummaryComponent } from '@components/detail-monster-summary/detail-monster-summary.component';
 import { RowBestiarySkillComponent } from '@components/row-bestiary-skill/row-bestiary-skill.component';
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotCompletionRewardComponent } from '@components/slot-completion-reward/slot-completion-reward.component';
-import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { combatantFromMonster } from '@helpers/combat/combat-create';
 import {
   monsterSkillsAtLevel,
@@ -24,12 +21,11 @@ import {
 import { getEntry } from '@helpers/content/content';
 import {
   bestiaryDropQuantityLabel,
-  bestiaryXpLabel,
+  bestiaryEntryLevels,
 } from '@helpers/kingdom/bestiary.ui';
 import {
   type BestiaryEntry,
   type Combatant,
-  type EncounterContent,
   type EquipmentSkillContent,
   type MonsterId,
   type StatBlock,
@@ -37,7 +33,6 @@ import {
 
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { AnimationService } from '@services/animation.service';
-import { maxBy, minBy, sortBy, uniq } from 'es-toolkit/compat';
 
 type LevelOption = { value: number; label: string };
 
@@ -45,15 +40,12 @@ type LevelOption = { value: number; label: string };
   selector: 'app-detail-bestiary-monster',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AtlasAnimationComponent,
+    DetailMonsterSummaryComponent,
     RowBestiarySkillComponent,
     SlotCompletionRewardComponent,
     FormsModule,
-    SlotIconBlankComponent,
-    IconUnknownComponent,
     RowStatSummaryComponent,
     NgSelectComponent,
-    DecimalPipe,
   ],
   templateUrl: './detail-bestiary-monster.component.html',
   styleUrl: './detail-bestiary-monster.component.scss',
@@ -67,55 +59,15 @@ export class DetailBestiaryMonsterComponent {
 
   private lastMonsterId?: MonsterId;
 
-  public levelMin = computed(
-    () => minBy(this.levelOptions(), 'value')?.value ?? 1,
-  );
-  public levelMax = computed(
-    () => maxBy(this.levelOptions(), 'value')?.value ?? 1,
-  );
-
-  public filteredSourceNodes = computed(() => {
-    return this.entry()
-      .sourceNodeNames.map((e) => getEntry<EncounterContent>(e)!)
-      .filter(Boolean);
-  });
-
-  public levelOptions = computed<LevelOption[]>(() => {
-    return sortBy(
-      uniq(
-        this.filteredSourceNodes().flatMap((node) =>
-          Array(node.levelRange.max - node.levelRange.min + 1)
-            .fill(0)
-            .map((_, i) => i + node.levelRange.min),
-        ),
-      ),
-    ).map((x) => ({ value: x, label: `Lv. ${x}` }));
-  });
-
-  public sourceNodesAtLevel = computed(() => {
-    return this.filteredSourceNodes()
-
-      .filter((node) => {
-        const curLevel = this.selectedLevel();
-
-        return (
-          curLevel >= node.levelRange.min && curLevel <= node.levelRange.max
-        );
-      });
-  });
-
-  public nodeNameString = computed(() =>
-    this.sourceNodesAtLevel()
-      .map((e) => e.name)
-      .join(', '),
+  public levelOptions = computed<LevelOption[]>(() =>
+    bestiaryEntryLevels(this.entry()).map((value) => ({
+      value,
+      label: `Lv. ${value}`,
+    })),
   );
 
   public stats = computed<StatBlock>(() =>
     monsterStatsAtLevel(this.entry().monster, this.selectedLevel()),
-  );
-
-  public xpLabel = computed(() =>
-    bestiaryXpLabel(this.entry().monster, this.selectedLevel()),
   );
 
   public skills = computed<EquipmentSkillContent[]>(() =>
@@ -151,7 +103,7 @@ export class DetailBestiaryMonsterComponent {
       if (entry.monster.id === this.lastMonsterId) return;
 
       this.lastMonsterId = entry.monster.id;
-      this.selectedLevel.set(this.levelOptions()[0].value);
+      this.selectedLevel.set(this.levelOptions()[0]?.value ?? 1);
     });
   }
 }

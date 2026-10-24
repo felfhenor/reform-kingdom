@@ -71,17 +71,39 @@
   }
 
   <div class="flex flex-row items-center gap-2">
-    <div class="entry-sprite">
+    @if (data.monster; as monster) {
+      <app-tooltip-monster-preview
+        #monsterPreview
+        [monster]="monster"
+        [level]="data.level"
+      />
+
+      <div class="entry-sprite" [tp]="monsterPreview.template()">
+        <ng-container [ngTemplateOutlet]="sprite" />
+      </div>
+    } @else {
+      <div class="entry-sprite">
+        <ng-container [ngTemplateOutlet]="sprite" />
+      </div>
+    }
+
+    <ng-template #sprite>
       <app-atlas-animation
         [spritesheet]="data.spritesheet"
         [assetName]="data.spriteAssetName"
         [frames]="data.spriteFrames"
       ></app-atlas-animation>
-    </div>
+    </ng-template>
 
     @if (isExpanded) {
       <div class="flex flex-col justify-center text-white overflow-hidden">
-        <span class="type-entity-name text-xs">{{ data.name }}</span>
+        <span
+          class="type-entity-name text-xs {{
+            data.monster ? 'text-' + data.monster.rarity : ''
+          }}"
+        >
+          {{ data.name }}
+        </span>
         @if (data.subtitleLabel) {
           <span class="type-meta truncate">
             Lv.
