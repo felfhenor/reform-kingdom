@@ -6,16 +6,15 @@ import {
   output,
 } from '@angular/core';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
-import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
+import { TooltipRecipePreviewComponent } from '@components/tooltip-recipe-preview/tooltip-recipe-preview.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import {
   recipeBackdropSprite,
   recipeCanUnlockWithTokens,
   recipeResultContent,
   recipeResultSpritesheet,
-  recipeStylizedName,
 } from '@helpers/crafting/recipes';
 import { traderTokenId } from '@helpers/item/materials';
 import type {
@@ -30,12 +29,12 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-slot-museum-recipe',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    IconItemPreviewComponent,
     CurrencyCostComponent,
     IconUnknownComponent,
     TippyDirective,
     SlotRarityOutlineComponent,
     SFXDirective,
+    TooltipRecipePreviewComponent,
   ],
   templateUrl: './slot-museum-recipe.component.html',
   styleUrl: './slot-museum-recipe.component.scss',
@@ -60,6 +59,4 @@ export class SlotMuseumRecipeComponent {
   public canUnlock = computed(() =>
     recipeCanUnlockWithTokens(this.entry().recipe.id),
   );
-
-  public recipeName = computed(() => recipeStylizedName(this.entry().recipe));
 }

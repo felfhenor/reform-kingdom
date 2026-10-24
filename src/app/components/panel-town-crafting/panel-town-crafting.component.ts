@@ -11,7 +11,7 @@ import { AtlasImageComponent } from '@components/atlas-image/atlas-image.compone
 import { IconComponent } from '@components/icon/icon.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
-import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
+import { TooltipRecipePreviewComponent } from '@components/tooltip-recipe-preview/tooltip-recipe-preview.component';
 import {
   townCraftQueueRows,
   townTradeskillLevelRows,
@@ -34,7 +34,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     SlotIconBlankComponent,
     TippyDirective,
     SlotRarityOutlineComponent,
-    TooltipItemPreviewComponent,
+    TooltipRecipePreviewComponent,
   ],
   host: { class: 'flex flex-col gap-4' },
   templateUrl: './panel-town-crafting.component.html',

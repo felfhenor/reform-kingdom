@@ -50,7 +50,7 @@
       @for (_ of craftQueueSlots(); track $index) {
         @let row = craftQueueRows()[$index];
         @if (row && row.resultDisplay; as item) {
-          <app-tooltip-item-preview #preview [display]="item" />
+          <app-tooltip-recipe-preview #preview [recipe]="row.recipe" />
 
           <div
             class="relative w-16 h-16 shrink-0"
@@ -60,6 +60,7 @@
             <app-slot-rarity-outline
               [entry]="item"
               [spritesheet]="item.spritesheet"
+              [backdropSprite]="item.backdropSprite"
             >
               <span text-banner-top class="tabular-nums">
                 {{ row.remaining }}

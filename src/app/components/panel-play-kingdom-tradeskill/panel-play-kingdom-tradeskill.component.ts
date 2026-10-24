@@ -20,7 +20,7 @@ import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-bl
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { SlotRequirementComponent } from '@components/slot-requirement/slot-requirement.component';
 import { TextNumberTweenComponent } from '@components/text-number-tween/text-number-tween.component';
-import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
+import { TooltipRecipePreviewComponent } from '@components/tooltip-recipe-preview/tooltip-recipe-preview.component';
 import { ListReflowDirective } from '@directives/list-reflow.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
@@ -80,7 +80,7 @@ import { chunk, clamp } from 'es-toolkit/compat';
     ButtonKingdomBackComponent,
     SweetAlert2Module,
     TippyDirective,
-    TooltipItemPreviewComponent,
+    TooltipRecipePreviewComponent,
     SlotRarityOutlineComponent,
     SFXDirective,
   ],

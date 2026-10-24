@@ -23,7 +23,6 @@ import {
 } from '@helpers/crafting/tradeskill';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { backfillEquipmentItem } from '@helpers/item/equipment';
-import { itemPreviewDisplay } from '@helpers/item/item-preview';
 import { isMaterialDiscovered } from '@helpers/item/materials';
 import {
   isEquipmentDiscovered,
@@ -143,9 +142,6 @@ export function getCraftableRecipeEntries(
         recipe,
         resultContent,
         resultSpritesheet,
-        resultDisplay: resultContent
-          ? itemPreviewDisplay(resultSpritesheet, resultContent)
-          : undefined,
         resultChance: recipe.result.chance ?? 100,
         resultQuantity: recipeResultQuantity(recipe),
         backdropSprite,

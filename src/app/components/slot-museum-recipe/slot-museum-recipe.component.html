@@ -3,7 +3,13 @@
 @let backdrop = backdropSprite();
 
 @if (e.discovered) {
-  <div class="museum-recipe-slot" [tp]="tooltip" [tpPlacement]="'top'">
+  <app-tooltip-recipe-preview #recipePreview [recipe]="e.recipe" />
+
+  <div
+    class="museum-recipe-slot"
+    [tp]="result ? recipePreview.template() : undefined"
+    [tpPlacement]="'top'"
+  >
     @if (result) {
       <app-slot-rarity-outline
         [entry]="result"
@@ -31,50 +37,27 @@
 }
 
 <ng-template #tooltip>
-  <div class="flex gap-2 p-2">
-    @if (e.discovered && result) {
-      <div class="relative w-[64px] h-[64px] shrink-0">
-        <app-icon-item-preview
-          [sprite]="result.sprite"
-          [spritesheet]="resultSpritesheet()"
-          [backdropSprite]="backdrop"
-        />
+  <div class="p-2">
+    <div class="type-unknown mb-1">???</div>
+
+    @if (e.sourceNodeNames.length > 0) {
+      <div class="text-xs">
+        Discoverable in: {{ e.sourceNodeNames.join(', ') }}
       </div>
     }
 
-    <div>
-      @if (e.discovered) {
-        <div
-          class="type-entity-name mb-1 {{
-            result ? 'text-' + result.rarity : ''
-          }}"
-        >
-          {{ recipeName() }}
-        </div>
-      } @else {
-        <div class="type-unknown mb-1">???</div>
-      }
+    @if (e.tokenUnlockCost !== undefined) {
+      <div class="type-meta flex items-center gap-2 mt-1">
+        Unlock for
+        <app-currency-cost
+          [type]="traderTokenItemId"
+          [amount]="e.tokenUnlockCost"
+        />
+      </div>
 
-      @if (e.sourceNodeNames.length > 0) {
-        <div class="text-xs">
-          {{ e.discovered ? 'Found in' : 'Discoverable in' }}:
-          {{ e.sourceNodeNames.join(', ') }}
-        </div>
+      @if (canUnlock()) {
+        <div class="type-hint mt-1">Click to unlock.</div>
       }
-
-      @if (e.tokenUnlockCost !== undefined) {
-        <div class="type-meta flex items-center gap-2 mt-1">
-          Unlock for
-          <app-currency-cost
-            [type]="traderTokenItemId"
-            [amount]="e.tokenUnlockCost"
-          />
-        </div>
-
-        @if (canUnlock()) {
-          <div class="type-hint mt-1">Click to unlock.</div>
-        }
-      }
-    </div>
+    }
   </div>
 </ng-template>

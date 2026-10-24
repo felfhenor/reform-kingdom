@@ -162,6 +162,7 @@ export type TownTradeskillLevelRow = {
 export type TownCraftQueueRow = {
   id: CraftQueueEntryId;
   tradeskillName: string;
+  recipe: RecipeContent;
   resultDisplay?: ItemPreviewDisplay;
   // Pre-formatted (mm:ss/hh:mm:ss) - the UI shows actual remaining time, not a raw tick count.
   remaining: string;

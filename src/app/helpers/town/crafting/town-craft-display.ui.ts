@@ -61,7 +61,8 @@ export function townCraftQueueRows(townId: TownId): TownCraftQueueRow[] {
       {
         id: entry.id,
         tradeskillName: tradeskill.name,
-        resultDisplay: resolveRewardDisplay(recipe.result),
+        recipe,
+        resultDisplay: resolveRewardDisplay({ recipeId: recipe.id }),
         remaining: formatDuration(craftTime - entry.ticksIntoCraft),
       },
     ];

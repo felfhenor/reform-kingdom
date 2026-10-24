@@ -104,6 +104,24 @@ export function filterMuseumCollectibleEntries(
   });
 }
 
+// Undiscovered recipes only list sources the player has already found.
+export function recipeSourceNames(
+  recipe: RecipeContent,
+  discovered: boolean,
+): string[] {
+  return recipeSources(recipe.id)
+    .filter((source) => discovered || isCollectibleSourceKnown(source))
+    .map((source) =>
+      source.type === 'node'
+        ? worldNodeDisplayName(source.name)
+        : collectibleSourceName(source),
+    );
+}
+
+export function recipeKnownSourceNames(recipe: RecipeContent): string[] {
+  return recipeSourceNames(recipe, isRecipeDiscovered(recipe.id));
+}
+
 // Only drop-gated recipes are shown - level-learned recipes have no discovery to track.
 export function getMuseumRecipeEntries(): MuseumRecipeEntry[] {
   const recipes = getEntriesByType<RecipeContent>('recipe').filter((recipe) =>
@@ -116,13 +134,7 @@ export function getMuseumRecipeEntries(): MuseumRecipeEntry[] {
     return {
       recipe,
       discovered,
-      sourceNodeNames: recipeSources(recipe.id)
-        .filter((source) => discovered || isCollectibleSourceKnown(source))
-        .map((source) =>
-          source.type === 'node'
-            ? worldNodeDisplayName(source.name)
-            : collectibleSourceName(source),
-        ),
+      sourceNodeNames: recipeSourceNames(recipe, discovered),
       tokenUnlockCost: discovered ? undefined : recipe.tokenUnlockCost,
     };
   });
