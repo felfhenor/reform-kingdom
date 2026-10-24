@@ -171,6 +171,42 @@ function relaxSubObjectRequired(schema: any): any {
   return result;
 }
 
+function isNumericBlock(node: any): boolean {
+  const props = node?.type === 'object' ? node.properties : undefined;
+  if (!props || Object.keys(props).length === 0) return false;
+  return Object.values(props).every((prop: any) => prop?.type === 'number');
+}
+
+function closeIfNumericBlock(node: any): any {
+  return isNumericBlock(node) ? { ...node, additionalProperties: false } : node;
+}
+
+// Keyed number blocks (stats, resistances, elements) get closed so a misspelled key fails validation. Only
+// property values and array items are closed, never allOf facets, and nothing under a union, since those
+// legitimately see each other's keys and a failed union reports errors from every branch.
+function closeNumericBlocks(schema: any): any {
+  if (typeof schema !== 'object' || schema === null) return schema;
+  if (Array.isArray(schema)) return schema.map(closeNumericBlocks);
+
+  const result: any = {};
+  for (const [key, value] of Object.entries(schema)) {
+    const isUnion = key === 'anyOf' || key === 'oneOf';
+    result[key] = isUnion ? value : closeNumericBlocks(value);
+  }
+
+  if (result.properties && typeof result.properties === 'object') {
+    for (const [key, prop] of Object.entries(result.properties)) {
+      result.properties[key] = closeIfNumericBlock(prop);
+    }
+  }
+
+  if (result.items && !Array.isArray(result.items)) {
+    result.items = closeIfNumericBlock(result.items);
+  }
+
+  return result;
+}
+
 // Additional post-processing function to fix complex nested ID arrays
 function postProcessIdArrays(schema: any): any {
   if (!schema) return schema;
@@ -367,7 +403,9 @@ for (const [contentType, typeName] of Object.entries(contentTypeMap)) {
     }
 
     // Fix schema issues
-    schema = stripInjectedFields(postProcessIdArrays(fixSchema(schema)));
+    schema = closeNumericBlocks(
+      stripInjectedFields(postProcessIdArrays(fixSchema(schema))),
+    );
 
     // For single content items, wrap in array for YAML content files
     let arraySchema: any = {

@@ -19,6 +19,10 @@
  * discriminated union's *other* branches (which always mismatch a `const`
  * tag by construction) don't get reported as false positives.
  *
+ * Keyed number blocks (stats, resistances, elements, etc.) are closed by the
+ * generator, so a misspelled key inside one (e.g. `Resitance`) is reported
+ * too via Ajv's `additionalProperties` keyword.
+ *
  * Runs against the raw `gamedata/**\/*.yml` sources rather than compiled
  * output, so it needs no build step first - only `npm run schemas:generate`
  * (already wired into `postinstall`) to have produced `schemas/*.json`.
@@ -132,6 +136,25 @@ function mergeEnumIssues(errors: any[]): Map<string, MergedIssue> {
   return merged;
 }
 
+function unknownKeyMessages(
+  errors: any[],
+  loaded: LoadedEntry[],
+  folder: string,
+): string[] {
+  const messages = errors
+    .filter((error: any) => error.keyword === 'additionalProperties')
+    .map((error: any) => {
+      const allowed = Object.keys(error.parentSchema?.properties ?? {}).sort();
+      return (
+        `[${folder}] ${entryLabel(loaded, error.instancePath)}: ` +
+        `field "${prettyFieldPath(error.instancePath)}" has unknown key ` +
+        `"${error.params.additionalProperty}" - expected one of: ${allowed.join(', ')}`
+      );
+    });
+
+  return [...new Set(messages)];
+}
+
 function entryLabel(loaded: LoadedEntry[], instancePath: string): string {
   const match = /^\/(\d+)/.exec(instancePath);
   const index = match ? Number(match[1]) : -1;
@@ -171,7 +194,8 @@ async function validateContentType(
   }
 
   const merged = mergeEnumIssues(validate.errors ?? []);
-  const problems: string[] = [];
+  const problems = unknownKeyMessages(validate.errors ?? [], loaded, folder);
+  problems.forEach((message) => console.log(`  ✗ ${message}`));
 
   merged.forEach((issue) => {
     const actual = resolvePointer(entries, issue.instancePath);
@@ -188,7 +212,7 @@ async function validateContentType(
 
   if (problems.length === 0) {
     console.log(
-      `  ✓ "${folder}": ${loaded.length} entrie(s) valid (no enum/const mismatches).`,
+      `  ✓ "${folder}": ${loaded.length} entrie(s) valid (no enum/const mismatches or unknown keys).`,
     );
   }
 
@@ -198,10 +222,11 @@ async function validateContentType(
 export async function runSchemaValidation(): Promise<string[]> {
   console.log('=== validate:schemas ===');
   console.log(
-    'Checking every gamedata YAML entry against its generated JSON schema for invalid enum/const values (typos).\n',
+    'Checking every gamedata YAML entry against its generated JSON schema for invalid enum/const values and unknown block keys (typos).\n',
   );
 
-  const ajv = new Ajv({ allErrors: true, strict: false });
+  // `verbose` exposes `parentSchema`, which lists the allowed keys for an unknown-key error.
+  const ajv = new Ajv({ allErrors: true, strict: false, verbose: true });
 
   const folders: string[] = fs
     .readdirSync(GAMEDATA_DIR)
@@ -226,11 +251,11 @@ export async function runSchemaValidation(): Promise<string[]> {
       console.log(`::error::${message}`);
     });
     console.error(
-      `\n[validate:schemas] FAILED: ${problems.length} invalid enum/const value(s) found.`,
+      `\n[validate:schemas] FAILED: ${problems.length} invalid value(s) or unknown key(s) found.`,
     );
   } else {
     console.log(
-      '\n[validate:schemas] PASSED: every gamedata entry has valid enum/const values.',
+      '\n[validate:schemas] PASSED: every gamedata entry has valid enum/const values and known keys.',
     );
   }
 
