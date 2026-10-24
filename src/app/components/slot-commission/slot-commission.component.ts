@@ -13,7 +13,8 @@ import { SlotRequirementComponent } from '@components/slot-requirement/slot-requ
 import { SFXDirective } from '@directives/sfx.directive';
 import { commissionRarity } from '@helpers/commission/commission-requirement.ui';
 import { commissionDisplayName } from '@helpers/commission/commission-turn-in';
-import { getEntriesByType, getEntry } from '@helpers/content';
+import { getEntry } from '@helpers/content';
+import { recipesProducing } from '@helpers/crafting/recipes';
 import { kingdomSubviewShow } from '@helpers/engine';
 import { formatDuration } from '@helpers/engine/timer';
 import { bestiaryDropQuantityLabel } from '@helpers/kingdom/bestiary.ui';
@@ -21,10 +22,9 @@ import type {
   CommissionRequirementEntry,
   CommissionSlotDisplay,
   DroppedReward,
+  EquipmentId,
+  ItemId,
   KingdomSubview,
-  RecipeContent,
-  RecipeResultEquipment,
-  RecipeResultItem,
   TradeskillContent,
   TradeskillId,
 } from '@interfaces';
@@ -86,14 +86,12 @@ export class SlotCommissionComponent {
   public tradeskillForRequirement(
     requirement: CommissionRequirementEntry,
   ): TradeskillId | undefined {
-    const recipes = getEntriesByType<RecipeContent>('recipe').filter(
-      (r) =>
-        (r.result as RecipeResultEquipment).equipmentId ===
-          requirement.content?.id ||
-        (r.result as RecipeResultItem).itemId === requirement.content?.id,
-    );
+    const isCraftable =
+      requirement.kind === 'item' || requirement.kind === 'equipment';
+    if (!isCraftable || !requirement.content) return undefined;
 
-    return recipes[0].tradeskillId;
+    const resultId = requirement.content.id as ItemId | EquipmentId;
+    return recipesProducing(resultId)[0]?.tradeskillId;
   }
 
   public navigateToTradeskill(requirement: CommissionRequirementEntry): void {
