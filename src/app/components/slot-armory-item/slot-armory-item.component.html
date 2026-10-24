@@ -7,10 +7,7 @@
   [bonusResistances]="bonusResistances()"
   [bonusCombatStats]="bonusCombatStats()"
 >
-  <div class="text-xs my-2 flex items-center gap-2">
-    Sell value:
-    <app-currency-cost [type]="goldCoinItemId" [amount]="sellValue()" />
-  </div>
+  <app-row-equipment-sell-value [item]="equipmentItem()" />
 
   @if (infusionSlotCount() > 0) {
     <app-row-infused-materials

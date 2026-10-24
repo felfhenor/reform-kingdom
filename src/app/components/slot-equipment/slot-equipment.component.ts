@@ -6,6 +6,7 @@ import {
   output,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { RowEquipmentSellValueComponent } from '@components/row-equipment-sell-value/row-equipment-sell-value.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
@@ -37,6 +38,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   imports: [
     AtlasImageComponent,
     SlotIconBlankComponent,
+    RowEquipmentSellValueComponent,
     RowInfusedMaterialsComponent,
     TippyDirective,
     TooltipItemPreviewComponent,

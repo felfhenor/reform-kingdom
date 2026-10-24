@@ -45,7 +45,7 @@ import {
   type WorkerId,
 } from '@interfaces';
 
-// Hero names whose job can equip this type, shown in item tooltips.
+// Shorthands of every job that can equip this type, shown in item tooltips.
 function equippableJobNames(equipment: EquipmentContent): string[] {
   return getEntriesByType<JobContent>('job')
     .filter((j) => j.equippableTypes.includes(equipment.type))

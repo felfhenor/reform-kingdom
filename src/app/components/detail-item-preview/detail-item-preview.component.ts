@@ -57,9 +57,6 @@ export class DetailItemPreviewComponent {
   public comparisonElementalResistances = input<ElementBlock>();
   public comparisonElementalBoons = input<ElementBlock>();
 
-  public showEquippableBy = input<boolean>(true);
-  public showDescription = input<boolean>(true);
-
   public elementBlock = computed(() =>
     (this.display().elements ?? []).reduce(
       (prev, cur) => {

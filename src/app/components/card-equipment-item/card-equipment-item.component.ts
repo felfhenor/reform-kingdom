@@ -6,12 +6,12 @@ import {
   output,
 } from '@angular/core';
 import { DetailItemPreviewComponent } from '@components/detail-item-preview/detail-item-preview.component';
+import { RowEquipmentSellValueComponent } from '@components/row-equipment-sell-value/row-equipment-sell-value.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
-import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats.component';
+import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { ListRowDirective } from '@directives/list-row.directive';
 import { SFXDirective } from '@directives/sfx.directive';
-import { equipmentItemBonusStats } from '@helpers/item/equipment-display';
 import { equipmentItemSlotCount } from '@helpers/item/infusion';
 import { itemPreviewDisplay } from '@helpers/item/item-preview';
 import {
@@ -34,8 +34,9 @@ import { TippyDirective } from '@ngneat/helipopper';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     SlotRarityOutlineComponent,
+    RowEquipmentSellValueComponent,
     RowInfusedMaterialsComponent,
-    RowItemStatsComponent,
+    RowStatSummaryComponent,
     DetailItemPreviewComponent,
     TippyDirective,
     ListRowDirective,
@@ -140,8 +141,4 @@ export class CardEquipmentItemComponent {
     const item = this.equippedItem();
     return item ? equipmentItemSlotCount(item) : 0;
   });
-
-  public bonusStats = computed(() =>
-    equipmentItemBonusStats(this.equipmentItem()),
-  );
 }

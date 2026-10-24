@@ -69,7 +69,7 @@ export type ItemPreviewDisplay = {
   skills?: EquipmentSkillContent[];
   // Equipment only.
   levelRequirement?: number;
-  // Equipment only - party hero names whose job can equip this item.
+  // Equipment only - shorthands of every job that can equip this item.
   equippableHeroNames?: string[];
   // Recipe trades only - composited behind `sprite`.
   backdropSprite?: string;

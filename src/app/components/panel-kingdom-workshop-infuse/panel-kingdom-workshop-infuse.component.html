@@ -27,11 +27,7 @@
   </app-slot-button-container>
 </ng-container>
 
-<app-detail-item-preview
-  class="shrink-0"
-  [display]="display()"
-  [showEquippableBy]="false"
->
+<app-detail-item-preview class="shrink-0" [display]="display()">
   @if (slotCount() > 0) {
     <div class="type-hint my-2 mt-4">
       Click a slot to choose what to infuse into it.

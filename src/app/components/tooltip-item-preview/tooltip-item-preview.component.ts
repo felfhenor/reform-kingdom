@@ -34,8 +34,5 @@ export class TooltipItemPreviewComponent {
   public bonusCombatStats = input<CombatStatBlock>();
   public bonusMonsterTypeDamage = input<Record<MonsterType, number>>();
 
-  public showEquippableBy = input<boolean>(true);
-  public showDescription = input<boolean>(true);
-
   public template = viewChild.required<TemplateRef<unknown>>('tooltipContent');
 }

@@ -25,11 +25,7 @@
 </ng-container>
 
 <div class="flex flex-col gap-2 flex-1 min-h-0 overflow-y-auto">
-  <app-detail-item-preview
-    class="shrink-0"
-    [display]="previewDisplay()"
-    [showEquippableBy]="false"
-  >
+  <app-detail-item-preview class="shrink-0" [display]="previewDisplay()">
     @if (slotCount() > 0) {
       <app-row-infused-materials
         class="block mt-2"

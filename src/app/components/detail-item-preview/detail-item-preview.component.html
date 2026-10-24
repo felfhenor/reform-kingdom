@@ -23,25 +23,21 @@
       </div>
     }
 
-    @if (showEquippableBy()) {
-      @if (item.equippableHeroNames; as equippable) {
-        <div class="text-xs mb-2">
-          @if (equippable.length > 0) {
-            {{ equippable.join(' ') }}
-          } @else {
-            <span class="badge badge-sm badge-warning">
-              None of your heroes can equip this.
-            </span>
-          }
-        </div>
-      }
-    }
-
-    @if (showDescription()) {
-      <div class="type-flavor mb-2">
-        {{ item.description }}
+    @if (item.equippableHeroNames; as equippable) {
+      <div class="text-xs mb-2">
+        @if (equippable.length > 0) {
+          {{ equippable.join(' ') }}
+        } @else {
+          <span class="badge badge-sm badge-warning">
+            None of your heroes can equip this.
+          </span>
+        }
       </div>
     }
+
+    <div class="type-flavor mb-2">
+      {{ item.description }}
+    </div>
 
     @if (item.collectibleEffects; as effects) {
       <app-detail-collectible-effects [effects]="effects" />

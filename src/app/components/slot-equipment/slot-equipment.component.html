@@ -28,13 +28,9 @@
       [bonusStats]="bonusStats()"
       [bonusResistances]="bonusResistances()"
       [bonusCombatStats]="bonusCombatStats()"
-      [showEquippableBy]="false"
-      [showDescription]="false"
     >
-      @if (occupiedPaperdollSlots().length > 1) {
-        <div class="type-meta mb-1">
-          Occupies: {{ occupiedPaperdollSlots().join(' + ') }}
-        </div>
+      @if (equippedItem(); as item) {
+        <app-row-equipment-sell-value [item]="item" />
       }
 
       @if (infusionSlotCount() > 0) {
@@ -42,6 +38,12 @@
           [infusedItemIds]="equippedItem()!.infusedItemIds"
           [maxSlots]="infusionSlotCount()"
         />
+      }
+
+      @if (occupiedPaperdollSlots().length > 1) {
+        <div class="type-meta mt-2">
+          Occupies: {{ occupiedPaperdollSlots().join(' + ') }}
+        </div>
       }
 
       @if (showUnequipHint()) {

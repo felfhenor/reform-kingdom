@@ -5,7 +5,7 @@ import {
   input,
   output,
 } from '@angular/core';
-import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
+import { RowEquipmentSellValueComponent } from '@components/row-equipment-sell-value/row-equipment-sell-value.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
@@ -17,8 +17,6 @@ import {
 } from '@helpers/item/equipment-display';
 import { equipmentItemSlotCount } from '@helpers/item/infusion';
 import { itemPreviewDisplay } from '@helpers/item/item-preview';
-import { goldCoinId } from '@helpers/item/materials';
-import { equipmentSellValue } from '@helpers/kingdom/armory';
 import type { EquipmentContent, EquipmentItem } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
@@ -26,7 +24,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-slot-armory-item',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CurrencyCostComponent,
+    RowEquipmentSellValueComponent,
     RowInfusedMaterialsComponent,
     TooltipItemPreviewComponent,
     TippyDirective,
@@ -43,8 +41,6 @@ export class SlotArmoryItemComponent {
   public selected = input(false);
 
   public toggleSelect = output<MouseEvent>();
-
-  public goldCoinItemId = goldCoinId();
 
   public display = computed(() =>
     itemPreviewDisplay('equipment', this.equipment(), this.equipmentItem()),
@@ -64,12 +60,5 @@ export class SlotArmoryItemComponent {
 
   public infusionSlotCount = computed(() =>
     equipmentItemSlotCount(this.equipmentItem()),
-  );
-
-  public sellValue = computed(() =>
-    equipmentSellValue({
-      item: this.equipmentItem(),
-      content: this.equipment(),
-    }),
   );
 }

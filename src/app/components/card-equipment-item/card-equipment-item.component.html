@@ -22,12 +22,22 @@
       {{ display().name }}
     </span>
 
-    <app-row-item-stats
-      [stats]="equipment().baseStats"
-      [bonusStats]="bonusStats()"
+    @let item = display();
+    <app-row-stat-summary
       layout="row"
-      [showShorthand]="false"
       [maxDecimals]="1"
+      [stats]="item.stats"
+      [bonusStats]="item.bonusStats"
+      [resistances]="item.resistances"
+      [bonusResistances]="item.bonusResistances"
+      [combatStats]="item.combatStats"
+      [bonusCombatStats]="item.bonusCombatStats"
+      [monsterTypeDamage]="item.monsterTypeDamage"
+      [bonusMonsterTypeDamage]="item.bonusMonsterTypeDamage"
+      [elementalResistances]="item.elementalResistances"
+      [bonusElementalResistances]="item.bonusElementalResistances"
+      [elementalBoons]="item.elementalBoons"
+      [bonusElementalBoons]="item.bonusElementalBoons"
     />
   </span>
 </button>
@@ -47,9 +57,11 @@
             equippedComparisonElementalResistances()
           "
           [comparisonElementalBoons]="equippedComparisonElementalBoons()"
-          [showEquippableBy]="false"
-          [showDescription]="false"
         >
+          @if (equippedItem(); as equippedItemValue) {
+            <app-row-equipment-sell-value [item]="equippedItemValue" />
+          }
+
           @if (equippedInfusionSlotCount() > 0) {
             <app-row-infused-materials
               class="block mt-2"
@@ -72,9 +84,9 @@
             thisItemComparisonElementalResistances()
           "
           [comparisonElementalBoons]="thisItemComparisonElementalBoons()"
-          [showEquippableBy]="false"
-          [showDescription]="false"
         >
+          <app-row-equipment-sell-value [item]="equipmentItem()" />
+
           @if (infusionSlotCount() > 0) {
             <app-row-infused-materials
               class="block mt-2"
@@ -87,11 +99,9 @@
     </div>
   } @else {
     <div class="p-3">
-      <app-detail-item-preview
-        [display]="display()"
-        [showEquippableBy]="false"
-        [showDescription]="false"
-      >
+      <app-detail-item-preview [display]="display()">
+        <app-row-equipment-sell-value [item]="equipmentItem()" />
+
         @if (infusionSlotCount() > 0) {
           <app-row-infused-materials
             [infusedItemIds]="equipmentItem().infusedItemIds"
