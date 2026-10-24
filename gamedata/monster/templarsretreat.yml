@@ -30,6 +30,9 @@
       max: 1
       chance: 25
 
+    - equipmentId: Templar's Ghostbane
+      chance: 5
+
   skills:
     - skillId: Attack
       weight: 1

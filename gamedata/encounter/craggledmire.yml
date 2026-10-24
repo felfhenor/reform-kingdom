@@ -68,6 +68,11 @@
     - recipeId: 'Weapon: Miremetal Cutlass'
       chance: 25
 
+    - itemId: Craggled Mossweed
+      min: 1
+      max: 1
+      chance: 10
+
 - id: b04d13b9-586f-4c56-8002-5413ce5ed552
   name: Mirefrog Marsh
   description: A small marsh, home to many, many mire frogs. It smells like death, and the air is palpable. And yet, goblins around ride the marsh creatures as if it was a casual day out.
@@ -139,6 +144,11 @@
 
     - recipeId: 'Weapon: Ghostwood Dagger'
       chance: 25
+
+    - itemId: Ectopowder
+      min: 1
+      max: 1
+      chance: 10
 
 - id: 4fc58634-8a5c-4336-930a-e926fa32d348
   name: Spirit Nexus

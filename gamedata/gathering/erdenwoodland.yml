@@ -270,6 +270,13 @@
         - itemId: Weak Spider Silk
           quantity: 3
 
+    - chance: 1
+      levelRequirement: 1
+      tradeskillIds: []
+      items:
+        - itemId: Bloodflower
+          quantity: 1
+
     # level 3
     - chance: 2
       levelRequirement: 2
@@ -291,3 +298,10 @@
       items:
         - itemId: Weak Spider Silk
           quantity: 4
+
+    - chance: 2
+      levelRequirement: 2
+      tradeskillIds: []
+      items:
+        - itemId: Bloodflower
+          quantity: 1

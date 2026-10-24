@@ -28,3 +28,27 @@
 
   infusionStats:
     Spirit: 2
+
+- id: 712b38e2-4f42-4844-8034-f704a3e12efc
+  name: Craggled Mossweed
+  description: A kind of moss that supports the immune system.
+  rarity: Common
+
+  sprite: '0087'
+
+  infusionStats:
+    Health: 12
+    Constitution: 1.2
+
+- id: b83b6bda-0ff4-4985-ac30-3f1ae0d9a68c
+  name: Ectopowder
+  description: Dust droppings from spiritual beings, mixed with magic-infused soil.
+  rarity: Uncommon
+
+  sprite: '0088'
+
+  infusionMonsterTypeDamage:
+    Spirit: 5
+
+  infusionDebuffResistances:
+    Stun: 3

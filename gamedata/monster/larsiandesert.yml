@@ -30,6 +30,11 @@
       min: 3
       max: 5
 
+    - chance: 10
+      itemId: Akroki Eye
+      min: 1
+      max: 1
+
   skills:
     - skillId: Attack
       weight: 1
@@ -93,6 +98,16 @@
       min: 2
       max: 3
 
+    - chance: 15
+      itemId: Akroki Muscle
+      min: 1
+      max: 1
+
+    - chance: 2
+      itemId: Akroki Eye
+      min: 1
+      max: 1
+
   skills:
     - skillId: Attack
       weight: 1
@@ -155,6 +170,16 @@
       itemId: Cimmerian Dust
       min: 1
       max: 2
+
+    - chance: 10
+      itemId: Akroki Muscle
+      min: 1
+      max: 1
+
+    - chance: 5
+      itemId: Akroki Eye
+      min: 1
+      max: 1
 
   skills:
     - skillId: Attack

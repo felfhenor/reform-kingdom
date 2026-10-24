@@ -47,34 +47,48 @@
           quantity: 1
 
     # level 2
-    - chance: 3
+    - chance: 4
       levelRequirement: 1
       tradeskillIds: [Artificing]
       items:
         - itemId: Cactspine
           quantity: 1
 
-    - chance: 1
+    - chance: 2
       levelRequirement: 1
       tradeskillIds: [Artificing]
       items:
         - itemId: Cactspine
           quantity: 2
 
+    - chance: 1
+      levelRequirement: 1
+      tradeskillIds: [Artificing]
+      items:
+        - itemId: Opaque Glass
+          quantity: 1
+
     # level 3
-    - chance: 3
+    - chance: 4
       levelRequirement: 2
       tradeskillIds: [Artificing]
       items:
         - itemId: Cactspine
           quantity: 1
 
-    - chance: 1
+    - chance: 2
       levelRequirement: 2
       tradeskillIds: [Artificing]
       items:
         - itemId: Cactspine
           quantity: 3
+
+    - chance: 1
+      levelRequirement: 2
+      tradeskillIds: [Artificing]
+      items:
+        - itemId: Opaque Glass
+          quantity: 1
 
 - id: 97d6c2ca-9eb1-46fd-af60-983b0ad05511
   name: Oasis Wellspring

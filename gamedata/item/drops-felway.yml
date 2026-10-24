@@ -18,3 +18,52 @@
   rarity: Rare
 
   sprite: '0084'
+
+- id: 9272e1f8-0fcd-4737-bcc7-233b873dd759
+  name: Fel Energy Core
+  description: A concentrated mass of demonic energy, bearing a sinister hue.
+  rarity: Uncommon
+
+  sprite: '0094'
+
+  infusionStats:
+    Strength: 4.3
+    Intelligence: 4.3
+
+- id: 3f5218fa-ef5c-473c-97d5-ddb07f5549fb
+  name: Pixie Dust
+  description: A pile of dust left behind wherever pixies fly. It's said this is rarer than a cauldron underneath a rainbow.
+  rarity: Uncommon
+
+  sprite: '0095'
+
+  infusionStats:
+    Agility: 5.1
+    Luck: 2.1
+
+- id: 1cfa2e45-28cc-4e68-b4a6-7273cc9ec72e
+  name: Beholder Lens
+  description: An eye lens, taken from the eye of a beholder. It allows the user to see slightly into the future.
+  rarity: Rare
+
+  sprite: '0096'
+
+  infusionElementalBoons:
+    Water: 8
+
+  infusionDebuffResistances:
+    Accuracy: 10
+
+- id: 23354d84-d3ac-4dea-9aaf-b1f5ba0b976e
+  name: Demonic Armor Shard
+  description: A chunk of metal taken from demonic armor. It radiates powerful demonic energy.
+  rarity: Rare
+
+  sprite: '0097'
+
+  infusionStats:
+    Vitality: 5.3
+    Resistance: 4.8
+
+  infusionDebuffResistances:
+    Stun: 5

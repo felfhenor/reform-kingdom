@@ -34,6 +34,11 @@
       chance: 100
       minLevel: 25
 
+    - itemId: Fel Energy Core
+      min: 1
+      max: 1
+      chance: 10
+
   skills:
     - skillId: Attack
       weight: 1
@@ -98,6 +103,11 @@
       chance: 100
       minLevel: 25
 
+    - itemId: Fel Energy Core
+      min: 1
+      max: 1
+      chance: 15
+
   skills:
     - skillId: Attack
       weight: 1
@@ -161,6 +171,11 @@
       minLevel: 25
       chance: 30
 
+    - itemId: Beholder Lens
+      min: 1
+      max: 1
+      chance: 3
+
   skills:
     - skillId: Attack
       weight: 1
@@ -223,6 +238,11 @@
       max: 1
       minLevel: 25
       chance: 30
+
+    - itemId: Pixie Dust
+      min: 1
+      max: 1
+      chance: 10
 
   skills:
     - skillId: Attack
@@ -291,6 +311,11 @@
       max: 1
       minLevel: 25
       chance: 30
+
+    - itemId: Demonic Armor Shard
+      min: 1
+      max: 1
+      chance: 5
 
   skills:
     - skillId: Attack

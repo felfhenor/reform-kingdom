@@ -35,3 +35,37 @@
   infusionStats:
     Spirit: 2
     Constitution: 2
+
+- id: 342a6777-1e2c-4d91-a729-a75f6a3f265a
+  name: Akroki Muscle
+  description: A still-pulsating muscle, gently removed from a strong Akroki.
+  rarity: Uncommon
+
+  sprite: '0089'
+
+  infusionStats:
+    Strength: 3.1
+    Agility: 2.5
+
+- id: 1a69bec4-165c-4bef-a7ca-8fd0afbc779c
+  name: Akroki Eye
+  description: A hardened eye, taken from an Akroki that doesn't need it anymore.
+  rarity: Rare
+
+  sprite: '0090'
+
+  infusionMonsterTypeDamage:
+    Humanoid: 5
+
+- id: 2dba9f05-f82e-495d-af8c-0316958c34ca
+  name: Opaque Glass
+  description: A curious creation, formed naturally by the Larsian desert's heat.
+  rarity: Uncommon
+
+  sprite: '0091'
+
+  infusionStats:
+    Energy: 8
+
+  infusionElementalResistances:
+    Fire: 5

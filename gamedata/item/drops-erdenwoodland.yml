@@ -51,3 +51,29 @@
   infusionStats:
     Agility: 2.3
     Resistance: 1.7
+
+- id: 6435f89e-8470-47dc-9c2f-acd99e831520
+  name: Bloodflower
+  description: A flower that helps prevent bleeding.
+  rarity: Common
+
+  sprite: '0092'
+
+  infusionStats:
+    Health: 17
+
+  infusionDebuffResistances:
+    Bleed: 5
+
+- id: bc773a40-9a94-4463-bcea-ad96ece216d8
+  name: Hexdust
+  description: A powder that helps keep ailments away. Prized by elves, who are known for their good physical health.
+  rarity: Rare
+
+  sprite: '0093'
+
+  infusionCombatStats:
+    debuffIgnoreChance: 3
+
+  infusionDebuffResistances:
+    StatDown: 5
