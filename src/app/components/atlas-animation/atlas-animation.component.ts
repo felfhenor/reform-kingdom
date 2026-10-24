@@ -22,7 +22,13 @@ export class AtlasAnimationComponent {
     () => this.contentService.artAtlases()[this.spritesheet()],
   );
   public specificAsset = computed(
-    () => this.assetJSON()[this.assetPath()] ?? { width: 0, height: 0 },
+    () =>
+      this.assetJSON()?.[this.assetPath()] ?? {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+      },
   );
 
   public assetUrl = computed(() =>
