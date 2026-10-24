@@ -6,6 +6,7 @@ import {
   inject,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { TooltipGlobalEffectComponent } from '@components/tooltip-global-effect/tooltip-global-effect.component';
 import { autoModeStatusLabel } from '@helpers/decree/auto-mode.ui';
 import {
   activeGlobalEffects,
@@ -18,7 +19,7 @@ import { AnimationService } from '@services/animation.service';
 @Component({
   selector: 'app-bar-global-effect',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AtlasImageComponent, TippyDirective],
+  imports: [AtlasImageComponent, TippyDirective, TooltipGlobalEffectComponent],
   host: {
     class: 'min-h-[80px]',
   },
@@ -26,9 +27,15 @@ import { AnimationService } from '@services/animation.service';
     @if (displayedEffects().length > 0) {
       <ul class="flex gap-2 items-center p-2 bg-transparent">
         @for (effect of displayedEffects(); track effect.id) {
+          <app-tooltip-global-effect
+            #effectTooltip
+            [effect]="effect"
+            [description]="effectDescription(effect)"
+          />
+
           <li
             class="global-effect-box text-sm tooltip tooltip-bottom"
-            [tp]="effectTooltip"
+            [tp]="effectTooltip.template()"
             [tpPlacement]="'bottom'"
             (animate.enter)="onEnter($event)"
             (animate.leave)="onLeave($event)"
@@ -45,20 +52,6 @@ import { AnimationService } from '@services/animation.service';
               </div>
             }
           </li>
-
-          <ng-template #effectTooltip>
-            <div class="p-2">
-              <div class="type-entity-name mb-2">{{ effect.name }}</div>
-
-              <p>{{ effectDescription(effect) }}</p>
-
-              @if (effect.extendedDescription) {
-                <p class="type-meta mt-2">
-                  {{ effect.extendedDescription }}
-                </p>
-              }
-            </div>
-          </ng-template>
         }
       </ul>
     }

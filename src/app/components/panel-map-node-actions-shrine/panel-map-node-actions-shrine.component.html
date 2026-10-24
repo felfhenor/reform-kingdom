@@ -1,18 +1,32 @@
 <div class="flex flex-col gap-2">
   <app-button-world-node-develop [entry]="entry()" subject="shrine" />
 
-  <button
-    type="button"
-    class="btn btn-sm btn-neutral"
-    [disabled]="!canPray()"
-    (click)="doPray()"
-    appSfx="ui-success"
-    [sfxTrigger]="['click', 'hover']"
-  >
-    @if (currentBuffName(); as buffName) {
-      Pray for {{ buffName }}
-    } @else {
+  @let buff = currentBuff();
+  @if (buff) {
+    <app-tooltip-global-effect #buffTooltip [effect]="buff" />
+
+    <!-- Tooltip sits on a wrapper: a disabled button fires no hover events. -->
+    <span class="flex flex-col" [tp]="buffTooltip.template()">
+      <button
+        type="button"
+        class="btn btn-sm btn-neutral"
+        [disabled]="!canPray()"
+        (click)="doPray()"
+        appSfx="ui-success"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        Pray for
+        <app-atlas-image
+          class="zoom-inline"
+          spritesheet="globaleffect"
+          [assetName]="buff.sprite"
+        />
+        {{ buff.name }}
+      </button>
+    </span>
+  } @else {
+    <button type="button" class="btn btn-sm btn-neutral" [disabled]="true">
       Develop to pray here
-    }
-  </button>
+    </button>
+  }
 </div>

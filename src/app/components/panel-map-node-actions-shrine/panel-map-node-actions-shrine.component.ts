@@ -5,7 +5,9 @@ import {
   input,
   output,
 } from '@angular/core';
+import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { ButtonWorldNodeDevelopComponent } from '@components/button-world-node-develop/button-world-node-develop.component';
+import { TooltipGlobalEffectComponent } from '@components/tooltip-global-effect/tooltip-global-effect.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
 import { notifySuccess } from '@helpers/engine/notify';
@@ -13,11 +15,18 @@ import { isPartyAtNode } from '@helpers/world';
 import { worldNodeShrineCurrentTier } from '@helpers/world-node/world-node-shrine';
 import { worldNodeShrine } from '@helpers/world-node/world-nodes';
 import type { GlobalEffectContent, WorldNodeEntry } from '@interfaces';
+import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-panel-map-node-actions-shrine',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SFXDirective, ButtonWorldNodeDevelopComponent],
+  imports: [
+    AtlasImageComponent,
+    ButtonWorldNodeDevelopComponent,
+    SFXDirective,
+    TippyDirective,
+    TooltipGlobalEffectComponent,
+  ],
   templateUrl: './panel-map-node-actions-shrine.component.html',
   styleUrl: './panel-map-node-actions-shrine.component.scss',
 })
@@ -29,17 +38,17 @@ export class PanelMapNodeActionsShrineComponent {
   private shrine = computed(() => worldNodeShrine(this.entry()));
 
   public canPray = computed(
-    () => isPartyAtNode(this.entry().nodeName) && !!this.currentBuffName(),
+    () => isPartyAtNode(this.entry().nodeName) && !!this.currentBuff(),
   );
 
-  public currentBuffName = computed(() => {
+  public currentBuff = computed(() => {
     const shrine = this.shrine();
     if (!shrine) return undefined;
 
     const tier = worldNodeShrineCurrentTier(shrine, this.entry().nodeName);
     if (!tier) return undefined;
 
-    return getEntry<GlobalEffectContent>(tier.globalEffectId)?.name;
+    return getEntry<GlobalEffectContent>(tier.globalEffectId);
   });
 
   doPray() {
