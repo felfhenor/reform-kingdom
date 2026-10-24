@@ -11,7 +11,8 @@
     Resistance: 25.8
 
   elementalResistances:
-    Fire: 10
+    Fire: 15
+    Water: -10
 
 - id: 4dcc7e76-dc97-4075-b7a2-af290f983f15
   name: Purified Plateshirt

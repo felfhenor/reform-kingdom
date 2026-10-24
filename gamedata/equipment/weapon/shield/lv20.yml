@@ -16,6 +16,9 @@
   elementalResistances:
     Water: 5
 
+  combatStats:
+    agroValue: 10
+
 - id: 98731fca-4409-4199-9380-b492067b2954
   name: Crimson Shield
   description: A simple protective shield made of crimson.

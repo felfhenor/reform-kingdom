@@ -26,3 +26,4 @@
 
   elementalResistances:
     Air: 5
+    Earth: -10

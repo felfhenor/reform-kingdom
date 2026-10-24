@@ -26,7 +26,8 @@
   sprite: '0135'
   slots: 1
   baseStats:
-    Resistance: 17.2
+    Resistance: 13.2
+    Agility: 6.8
 
   debuffResistances:
     Accuracy: 5

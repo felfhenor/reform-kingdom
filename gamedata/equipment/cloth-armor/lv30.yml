@@ -36,8 +36,9 @@
   sprite: '0230'
   slots: 1
   baseStats:
-    Vitality: 27.3
-    Resistance: 19.3
+    Vitality: 22.3
+    Resistance: 14.3
+    Agility: 9.7
 
   elementalResistances:
     Fire: 10

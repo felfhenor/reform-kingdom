@@ -11,7 +11,8 @@
     Resistance: 22.1
 
   elementalResistances:
-    Fire: 10
+    Fire: 15
+    Water: -10
 
 - id: 4c5d22f5-f7e6-49c6-bb7f-067e6b488579
   name: Purified Platemail
