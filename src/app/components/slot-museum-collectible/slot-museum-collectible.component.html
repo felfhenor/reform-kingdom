@@ -18,56 +18,33 @@
 }
 
 <ng-template #tooltip>
-  <div class="flex gap-2 p-2 max-w-[400px]">
+  <div class="max-w-[400px]">
     @if (e.discovered) {
-      <app-atlas-image
-        spritesheet="collectible"
-        [assetName]="e.collectible.sprite"
-        class="shrink-0"
-      />
-    }
-
-    <div>
-      @if (e.discovered) {
-        <div class="type-entity-name mb-1 text-{{ e.collectible.rarity }}">
-          {{ e.collectible.name }}
-        </div>
-
-        <div class="type-flavor mb-2">
-          {{ e.collectible.description }}
-        </div>
-
-        @if (e.collectible.effects.length > 0) {
-          <app-detail-collectible-effects
-            [effects]="e.collectible.effects"
-            class="block mb-2"
-          />
-        }
-
+      <app-detail-item-preview [display]="display()">
         <div class="text-xs">Found: {{ displayQuantity() }}</div>
-
-        @if (source?.type === 'crafting') {
-          <div class="text-xs">Source: Crafting</div>
-        } @else if (source?.type === 'trader') {
-          <div class="text-xs">From: {{ source.name }}</div>
-        } @else if (source?.type === 'node') {
-          <div class="text-xs">Found in: {{ source.name }}</div>
-        }
-      } @else {
+        <ng-container [ngTemplateOutlet]="sourceLine" />
+      </app-detail-item-preview>
+    } @else {
+      <div class="p-2">
         <div class="type-unknown mb-1">???</div>
-
-        @if (source?.type === 'crafting') {
-          <div class="text-xs">Source: Crafting</div>
-        } @else if (source?.type === 'trader') {
-          <div class="text-xs">From: {{ source.name }}</div>
-        } @else if (source?.type === 'node') {
-          <div class="text-xs">Discoverable in: {{ source.name }}</div>
-        } @else if (source?.type === 'raid') {
-          <div class="text-xs">From defending: {{ source.name }}</div>
-        } @else {
-          <div class="type-meta">Source unknown</div>
-        }
-      }
-    </div>
+        <ng-container [ngTemplateOutlet]="sourceLine" />
+      </div>
+    }
   </div>
+</ng-template>
+
+<ng-template #sourceLine>
+  @if (source?.type === 'crafting') {
+    <div class="text-xs">Source: Crafting</div>
+  } @else if (source?.type === 'trader') {
+    <div class="text-xs">From: {{ source.name }}</div>
+  } @else if (source?.type === 'node') {
+    <div class="text-xs">
+      {{ e.discovered ? 'Found in' : 'Discoverable in' }}: {{ source.name }}
+    </div>
+  } @else if (source?.type === 'raid') {
+    <div class="text-xs">From defending: {{ source.name }}</div>
+  } @else if (!e.discovered) {
+    <div class="type-meta">Source unknown</div>
+  }
 </ng-template>

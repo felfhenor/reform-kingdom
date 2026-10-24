@@ -1,13 +1,14 @@
+import { NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
   input,
 } from '@angular/core';
-import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
-import { DetailCollectibleEffectsComponent } from '@components/detail-collectible-effects/detail-collectible-effects.component';
+import { DetailItemPreviewComponent } from '@components/detail-item-preview/detail-item-preview.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
+import { itemPreviewDisplay } from '@helpers/item/item-preview';
 import type { MuseumCollectibleEntry } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
@@ -17,17 +18,21 @@ const MAX_DISPLAY_QUANTITY = 9999;
   selector: 'app-slot-museum-collectible',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AtlasImageComponent,
+    DetailItemPreviewComponent,
     IconUnknownComponent,
     TippyDirective,
     SlotRarityOutlineComponent,
-    DetailCollectibleEffectsComponent,
+    NgTemplateOutlet,
   ],
   templateUrl: './slot-museum-collectible.component.html',
   styleUrl: './slot-museum-collectible.component.scss',
 })
 export class SlotMuseumCollectibleComponent {
   public entry = input.required<MuseumCollectibleEntry>();
+
+  public display = computed(() =>
+    itemPreviewDisplay('collectible', this.entry().collectible),
+  );
 
   public displayQuantity = computed(() => {
     const quantity = this.entry().quantity;
