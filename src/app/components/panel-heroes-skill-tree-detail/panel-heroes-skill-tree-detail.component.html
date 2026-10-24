@@ -33,6 +33,12 @@
         <div class="flex gap-2">
           <span class="badge badge-sm badge-data">1 SP</span>
 
+          @if (info.skill; as skill) {
+            <span class="badge badge-sm badge-data">
+              {{ epCost(skill) | number }} EP
+            </span>
+          }
+
           @if (nodeState === 'learned') {
             <span
               class="badge badge-sm badge-success"

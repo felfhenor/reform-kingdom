@@ -1,4 +1,4 @@
-import { formatNumber, NgTemplateOutlet } from '@angular/common';
+import { DecimalPipe, formatNumber, NgTemplateOutlet } from '@angular/common';
 import type { AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
@@ -19,6 +19,7 @@ import { TooltipSkillPreviewComponent } from '@components/tooltip-skill-preview/
 import { SFXDirective } from '@directives/sfx.directive';
 import { combatantFromCharacter } from '@helpers/combat/combat-create';
 import { SKILL_TREE_NODE_SIZE } from '@helpers/config';
+import { skillEpCost } from '@helpers/hero/skill';
 import {
   characterSkillPreview,
   skillTreeNodeModifierLines,
@@ -54,6 +55,7 @@ import { AnimationService } from '@services/animation.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     BlankSlateComponent,
+    DecimalPipe,
     IconItemPreviewComponent,
     RowItemStatsComponent,
     RowSkillModifierComponent,
@@ -78,6 +80,7 @@ export class PanelHeroesSkillTreeDetailComponent {
   private locale = inject(LOCALE_ID);
   private format = (value: number) => formatNumber(value, this.locale);
   public readonly nodeSize = SKILL_TREE_NODE_SIZE;
+  public readonly epCost = skillEpCost;
 
   public combatant = computed(() => combatantFromCharacter(this.character()));
   public weaponTypes = computed(() =>
