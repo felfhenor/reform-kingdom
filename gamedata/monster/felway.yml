@@ -142,7 +142,7 @@
   name: Beholder
   description: A magical pet kept by demons to help with magical tasks.
 
-  types: [Demon]
+  types: [Demon, Amalgamation]
   elementalResistances:
     Earth: 50
 
@@ -210,7 +210,7 @@
   name: Pixie
   description: A magical creature that often aids demons with their support.
 
-  types: [Demon]
+  types: [Demon, Beast]
   elementalResistances:
     Air: 25
 
