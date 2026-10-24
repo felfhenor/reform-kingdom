@@ -14,6 +14,9 @@ export class LoggerService {
 
   private readonly ignoredMessageSubstrings: string[] = [
     'Failed to fetch dynamically imported module',
+    'error loading dynamically imported module',
+    'NG0750',
+    'Http failure during parsing',
     'is not valid JSON',
     'Script error',
     'jQuery',
