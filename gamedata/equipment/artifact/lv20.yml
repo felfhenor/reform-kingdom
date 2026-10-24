@@ -18,6 +18,27 @@
   elementalResistances:
     Earth: 5
 
+- id: 1eb09329-3016-43d7-a6cc-8380a4a8c489
+  name: Templar's Ghostbane
+  description: A censer held by templars to keep the spirits away.
+  levelRequirement: 21
+  rarity: Rare
+  type: Artifact
+  sprite: '0260'
+  slots: 2
+  baseStats:
+    Intelligence: 6.3
+    Spirit: 2.1
+
+  monsterTypeDamage:
+    Spirit: 10
+
+  elementalResistances:
+    Water: 10
+
+  debuffResistances:
+    Stun: 5
+
 - id: 1451bdd4-0b36-4005-bb1d-fea4e9007f43
   name: Larsian Boots
   description: A pair of Larsian boots set with amber. They're large enough to fit over another pair of boots, yet tight enough to be mobile.

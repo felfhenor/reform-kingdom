@@ -19,3 +19,18 @@
   slots: 1
   baseStats:
     Intelligence: 3
+
+- id: bfa36b1b-cc59-4350-b2b9-80dc78b27f86
+  name: Slimepopper
+  description: A charm carried by Carrina residents in case they need to fight a wandering slime.
+  levelRequirement: 9
+  rarity: Uncommon
+  type: Charm
+  sprite: '0259'
+  slots: 1
+  baseStats:
+    Intelligence: 3.1
+    Vitality: 2.2
+
+  monsterTypeDamage:
+    Amalgamation: 10
