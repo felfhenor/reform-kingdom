@@ -6,6 +6,7 @@ import {
 } from '@helpers/engine/analytics';
 import { notifySuccess } from '@helpers/engine/notify';
 import { characterJobLevel, getUnlockedJobs } from '@helpers/hero/job';
+import { characterSkillPreview } from '@helpers/hero/skill-modifier.ui';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { affixEffectsStatSummary } from '@helpers/item/equipment-bonus';
 import { updateGamestate, worldPartyState } from '@helpers/state-game';
@@ -31,6 +32,7 @@ import type {
   Character,
   CharacterId,
   CollectibleContent,
+  EquipmentSkill,
   EquipmentSkillContent,
   JobId,
   TrainerContent,
@@ -68,12 +70,15 @@ function isTrainerTeachingRevealed(
   );
 }
 
+// With the hero's skill modifiers, so the preview matches the skill once it's learned.
 function teachingGrantedSkills(
+  character: Character,
   teaching: TrainerTeachingContent,
-): EquipmentSkillContent[] {
+): EquipmentSkill[] {
   return trainerTeachingGrantedSkillIds([teaching.id])
     .map((skillId) => getEntry<EquipmentSkillContent>(skillId))
-    .filter((skill): skill is EquipmentSkillContent => !!skill);
+    .filter((skill): skill is EquipmentSkillContent => !!skill)
+    .map((skill) => characterSkillPreview(character, skill, []));
 }
 
 // Same masking as the row's own name, so a prerequisite can't leak a hidden teaching.
@@ -124,7 +129,7 @@ export function trainerTeachingRow(
       trainerTeachingPrerequisite(character, teachingId, jobId),
     ),
     ...affixEffectsStatSummary(teaching.effects),
-    grantedSkills: teachingGrantedSkills(teaching),
+    grantedSkills: teachingGrantedSkills(character, teaching),
   };
 }
 

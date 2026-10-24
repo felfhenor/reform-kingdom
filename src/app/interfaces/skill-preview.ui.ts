@@ -1,4 +1,6 @@
+import type { Combatant } from '@interfaces/combat';
 import type { GameElement } from '@interfaces/element';
+import type { EquipmentItemType } from '@interfaces/equipment';
 import type { SkillStatScaling } from '@interfaces/stat';
 
 export type SkillTechniqueKind =
@@ -39,4 +41,10 @@ export type SkillTechniquePreview = {
   // 100 when the technique can't miss on its own.
   accuracy: number;
   summonName?: string;
+};
+
+// Who a skill tooltip previews against, built once per hero and shared by every tooltip in a view.
+export type SkillPreviewContext = {
+  combatant: Combatant;
+  weaponTypes: EquipmentItemType[];
 };

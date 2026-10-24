@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { IconComponent } from '@components/icon/icon.component';
+import { TooltipSkillPreviewComponent } from '@components/tooltip-skill-preview/tooltip-skill-preview.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { combatOrderClauseSummary } from '@helpers/combat/combat-order.ui';
 import {
@@ -22,7 +23,11 @@ import { isCombatOrderTargetModeUsable } from '@helpers/combat/combat-order-targ
 import { defaultEquipment } from '@helpers/defaults';
 import { characterCombatSkills, characterSkills } from '@helpers/hero/job';
 import { equippedItemTypes } from '@helpers/item/equipment';
-import type { Character, CombatOrderClause } from '@interfaces';
+import type {
+  Character,
+  CombatOrderClause,
+  SkillPreviewContext,
+} from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { AnimationService } from '@services/animation.service';
 
@@ -30,7 +35,13 @@ import { AnimationService } from '@services/animation.service';
   selector: 'app-row-combat-order-clause',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex items-center gap-2 flex-1 min-w-0' },
-  imports: [AtlasImageComponent, IconComponent, TippyDirective, SFXDirective],
+  imports: [
+    AtlasImageComponent,
+    IconComponent,
+    TippyDirective,
+    SFXDirective,
+    TooltipSkillPreviewComponent,
+  ],
   templateUrl: './row-combat-order-clause.component.html',
 })
 export class RowCombatOrderClauseComponent {
@@ -40,6 +51,7 @@ export class RowCombatOrderClauseComponent {
 
   public clause = input.required<CombatOrderClause>();
   public character = input.required<Character>();
+  public skillContext = input.required<SkillPreviewContext>();
 
   constructor() {
     // Same clause id, new params - combatOrderClauseUpdate replaces the clause object in

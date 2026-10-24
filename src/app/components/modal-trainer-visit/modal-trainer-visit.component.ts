@@ -17,6 +17,7 @@ import { getEntry } from '@helpers/content/content';
 import { activeTrainerNode } from '@helpers/engine/ui';
 import { worldPartyState } from '@helpers/state-game';
 import { isPartyAtTrainer } from '@helpers/trainer/trainer';
+import { characterSkillPreviewContext } from '@helpers/hero/skill-modifier.ui';
 import { trainerTeach, trainerVisitRows } from '@helpers/trainer/trainer.ui';
 import { worldNodeTrainer } from '@helpers/world-node/world-nodes';
 import type {
@@ -57,6 +58,11 @@ export class ModalTrainerVisitComponent {
       this.party().find((c) => c.id === this.selectedCharacterId()) ??
       this.party()[0],
   );
+
+  public skillContext = computed(() => {
+    const character = this.selectedCharacter();
+    return character ? characterSkillPreviewContext(character) : undefined;
+  });
 
   public selectedJobName = computed(() => {
     const character = this.selectedCharacter();

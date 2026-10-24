@@ -8,6 +8,7 @@
 @let missingReasons = selectedMissingReasons();
 @let itemsById = ownedItemsById();
 @let burst = selectedBurstSkill();
+@let skillContext = selectedRegaliaSkillContext();
 @let matches = selectedMatches();
 @let canModify = equipmentModifiable();
 
@@ -140,7 +141,7 @@
     </div>
 
     <div class="flex flex-col gap-4 h-full min-h-0 overflow-y-auto pl-2">
-      @if (regalia && regaliaHero) {
+      @if (regalia && regaliaHero && skillContext) {
         <div class="flex flex-col gap-2 shrink-0">
           <span class="type-label">Equipment</span>
 
@@ -180,9 +181,22 @@
           <span class="type-label">Burst Skill</span>
 
           @if (burst) {
-            <div class="flex items-center gap-2">
+            <app-tooltip-skill-preview
+              #burstPreview
+              [display]="burst"
+              [displayCombatant]="skillContext.combatant"
+              [displayCharacterWeaponTypes]="skillContext.weaponTypes"
+            />
+
+            <div
+              class="flex items-center gap-2 self-start"
+              [tp]="burstPreview.template()"
+              [tpPlacement]="'right'"
+            >
               <app-slot-rarity-outline [entry]="burst" spritesheet="skill" />
-              <span class="text-{{ burst.rarity }}">{{ burst.name }}</span>
+              <span class="text-{{ burst.rarity }}">
+                {{ burst.name }}
+              </span>
             </div>
           } @else {
             <span class="type-flavor">No burst skill chosen.</span>
@@ -198,6 +212,7 @@
                 <app-row-combat-order-clause
                   [clause]="clause"
                   [character]="regaliaHero"
+                  [skillContext]="skillContext"
                   [readOnly]="true"
                 />
               </li>
@@ -207,6 +222,7 @@
               <app-row-combat-order-clause
                 [clause]="alwaysRandomClause"
                 [character]="regaliaHero"
+                [skillContext]="skillContext"
                 [readOnly]="true"
               />
             </li>
@@ -230,17 +246,37 @@
             </div>
 
             <div class="flex flex-wrap gap-2">
+              @let nodeSkills = treeNodeSkills();
               @for (entry of tree.nodes; track entry.node.id) {
-                <div
-                  class="relative overflow-hidden w-8 h-8 bg-base-200"
-                  [tp]="entry.name"
-                >
-                  <app-icon-item-preview
-                    [sprite]="entry.art.sprite"
-                    [spritesheet]="entry.art.spritesheet"
-                    cssClass="zoom-row"
+                @let nodeSkill = nodeSkills.get(entry.node.id);
+                @if (nodeSkill) {
+                  <app-tooltip-skill-preview
+                    #nodePreview
+                    [display]="nodeSkill"
+                    [displayCombatant]="skillContext.combatant"
+                    [displayCharacterWeaponTypes]="skillContext.weaponTypes"
                   />
-                </div>
+
+                  <div
+                    class="relative overflow-hidden w-8 h-8 bg-base-200"
+                    [tp]="nodePreview.template()"
+                  >
+                    <ng-container
+                      [ngTemplateOutlet]="nodeIcon"
+                      [ngTemplateOutletContext]="{ $implicit: entry }"
+                    />
+                  </div>
+                } @else {
+                  <div
+                    class="relative overflow-hidden w-8 h-8 bg-base-200"
+                    [tp]="entry.name"
+                  >
+                    <ng-container
+                      [ngTemplateOutlet]="nodeIcon"
+                      [ngTemplateOutletContext]="{ $implicit: entry }"
+                    />
+                  </div>
+                }
               }
             </div>
           </div>
@@ -280,3 +316,11 @@
   cancelButtonText="Cancel"
   (confirm)="remove()"
 ></swal>
+
+<ng-template #nodeIcon let-entry>
+  <app-icon-item-preview
+    [sprite]="entry.art.sprite"
+    [spritesheet]="entry.art.spritesheet"
+    cssClass="zoom-row"
+  />
+</ng-template>

@@ -1,7 +1,14 @@
 @if (icon(); as skill) {
+  <app-tooltip-skill-preview
+    #preview
+    [display]="skill"
+    [displayCombatant]="skillContext().combatant"
+    [displayCharacterWeaponTypes]="skillContext().weaponTypes"
+  />
+
   <div
     class="min-w-[16px] min-h-[16px]"
-    [tp]="skill.family"
+    [tp]="preview.template()"
     [tpPlacement]="'top'"
   >
     <app-atlas-image

@@ -1,3 +1,4 @@
+import { combatantFromCharacter } from '@helpers/combat/combat-create';
 import { statusEffectContentPreview } from '@helpers/combat/combat-statuseffects.ui';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { ensureElementBlock } from '@helpers/content/ensure-helpers-stats';
@@ -8,6 +9,7 @@ import {
   skillWithModifiers,
 } from '@helpers/hero/skill-modifier';
 import { characterSkillTreeNodeIds } from '@helpers/hero/skill-tree';
+import { equippedItemTypes } from '@helpers/item/equipment';
 import type {
   Character,
   EquipmentSkill,
@@ -18,6 +20,7 @@ import type {
   HeroEffectSkillModifierPotency,
   SkillModifierLine,
   SkillModifierLineSegment,
+  SkillPreviewContext,
   SkillTreeNodeArt,
   SkillTreeNodeContent,
   SkillTreeNodeId,
@@ -211,6 +214,15 @@ export function skillModifierFamilySkill(
   return getEntriesByType<EquipmentSkillContent>('skill').find(
     (skill) => skill.family === family,
   );
+}
+
+export function characterSkillPreviewContext(
+  character: Character,
+): SkillPreviewContext {
+  return {
+    combatant: combatantFromCharacter(character),
+    weaponTypes: equippedItemTypes(character.equipment),
+  };
 }
 
 // The skill as the hero would cast it once their staged picks are confirmed.

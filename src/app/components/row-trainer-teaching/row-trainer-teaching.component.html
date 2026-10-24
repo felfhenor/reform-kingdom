@@ -37,8 +37,20 @@
             [elementalBoons]="teachingRow.elementalBoons"
           />
 
+          @let context = skillContext();
           @for (skill of teachingRow.grantedSkills; track skill.id) {
-            <div class="flex items-center gap-2 text-xs">
+            <app-tooltip-skill-preview
+              #preview
+              [display]="skill"
+              [displayCombatant]="context.combatant"
+              [displayCharacterWeaponTypes]="context.weaponTypes"
+            />
+
+            <div
+              class="flex items-center gap-2 text-xs"
+              [tp]="preview.template()"
+              [tpPlacement]="'left'"
+            >
               <div class="zoom-inline">
                 <app-slot-rarity-outline [entry]="skill" spritesheet="skill" />
               </div>

@@ -1,4 +1,4 @@
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -18,6 +18,7 @@ import { RowHeroSummaryComponent } from '@components/row-hero-summary/row-hero-s
 import { SlotButtonContainerComponent } from '@components/slot-button-container/slot-button-container.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
+import { TooltipSkillPreviewComponent } from '@components/tooltip-skill-preview/tooltip-skill-preview.component';
 import { ListReflowDirective } from '@directives/list-reflow.directive';
 import { ListRowDirective } from '@directives/list-row.directive';
 import { SFXDirective } from '@directives/sfx.directive';
@@ -47,7 +48,15 @@ import {
   regaliasState,
   worldPartyState,
 } from '@helpers/state-game';
-import { characterJobLevel } from '@helpers/hero/job';
+import {
+  characterChosenBurstSkills,
+  characterJobLevel,
+} from '@helpers/hero/job';
+import {
+  characterSkillPreview,
+  characterSkillPreviewContext,
+} from '@helpers/hero/skill-modifier.ui';
+import { skillTreeNodeSkill } from '@helpers/hero/skill-tree-node';
 import { skillTreeBuildSummary } from '@helpers/hero/skill-tree-layout.ui';
 import { regaliaEquipLosesLiveTree } from '@helpers/hero/skill-tree.ui';
 import type {
@@ -77,6 +86,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     IconItemPreviewComponent,
     ListReflowDirective,
     ListRowDirective,
+    NgTemplateOutlet,
     RowCombatOrderClauseComponent,
     RowEquipmentItemSummaryComponent,
     RowHeroSummaryComponent,
@@ -86,6 +96,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     SlotRarityOutlineComponent,
     SweetAlert2Module,
     TippyDirective,
+    TooltipSkillPreviewComponent,
   ],
   templateUrl: './play-heroes-regalia.component.html',
 })
@@ -175,9 +186,21 @@ export class PlayHeroesRegaliaComponent {
       : undefined;
   });
 
+  public selectedRegaliaSkillContext = computed(() => {
+    const hero = this.selectedRegaliaCharacter();
+    return hero ? characterSkillPreviewContext(hero) : undefined;
+  });
+
   public selectedBurstSkill = computed(() => {
+    const hero = this.selectedRegaliaCharacter();
     const skillId = this.selectedRegalia()?.burstSkillIds[0];
-    return skillId ? getEntry<EquipmentSkillContent>(skillId) : undefined;
+    if (!hero || !skillId) return undefined;
+
+    // The hero's copy carries skill tree modifiers; the raw entry covers a burst that's no longer an option.
+    return (
+      characterChosenBurstSkills(hero).find((skill) => skill.id === skillId) ??
+      getEntry<EquipmentSkillContent>(skillId)
+    );
   });
 
   public selectedMatches = computed(() => {
@@ -226,6 +249,20 @@ export class PlayHeroesRegaliaComponent {
 
     await regaliaEquip(character.id, regalia.id);
   }
+
+  // Previewed against the regalia's own tree, so the skills read as they would once equipped.
+  public treeNodeSkills = computed(() => {
+    const hero = this.selectedRegaliaCharacter();
+    const nodes = this.treeSummary()?.nodes ?? [];
+    return new Map(
+      nodes.flatMap(({ node }) => {
+        const skill = skillTreeNodeSkill(node);
+        return hero && skill
+          ? [[node.id, characterSkillPreview(hero, skill, [])] as const]
+          : [];
+      }),
+    );
+  });
 
   public treeSummary = computed(() => {
     const character = this.selectedCharacter();

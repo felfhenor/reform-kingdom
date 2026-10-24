@@ -10,7 +10,8 @@
 
   <div body class="flex flex-col gap-4">
     @let hero = character();
-    @if (!hero || !job()) {
+    @let context = skillContext();
+    @if (!hero || !job() || !context) {
       <app-blank-slate>No hero selected.</app-blank-slate>
     } @else {
       <div class="card shadow-sm">
@@ -371,6 +372,7 @@
                 <app-row-combat-order-clause
                   [clause]="clause"
                   [character]="hero"
+                  [skillContext]="context"
                   (toggleEnabled)="toggleClauseEnabled(clause)"
                   (remove)="removeClause(clause.id)"
                   (edit)="startEditClause(clause)"
@@ -383,6 +385,7 @@
               <app-row-combat-order-clause
                 [clause]="alwaysRandomClause"
                 [character]="hero"
+                [skillContext]="context"
                 [readOnly]="true"
               />
             </li>

@@ -38,6 +38,7 @@ import {
 import { getEntry } from '@helpers/content/content';
 import { combatOrdersModalCharacterId } from '@helpers/engine/ui';
 import { characterSkills } from '@helpers/hero/job';
+import { characterSkillPreviewContext } from '@helpers/hero/skill-modifier.ui';
 import { worldPartyState } from '@helpers/state-game';
 import type {
   Character,
@@ -162,6 +163,11 @@ export class ModalHeroCombatOrdersComponent {
   public character = computed<Character | undefined>(() =>
     worldPartyState().find((c) => c.id === combatOrdersModalCharacterId()),
   );
+
+  public skillContext = computed(() => {
+    const character = this.character();
+    return character ? characterSkillPreviewContext(character) : undefined;
+  });
 
   public job = computed<JobContent | undefined>(() => {
     const character = this.character();

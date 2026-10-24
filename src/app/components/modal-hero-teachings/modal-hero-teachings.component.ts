@@ -13,6 +13,7 @@ import { ModalComponent } from '@components/modal/modal.component';
 import { RowTrainerTeachingComponent } from '@components/row-trainer-teaching/row-trainer-teaching.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { heroTeachingsModalCharacterId } from '@helpers/engine/ui';
+import { characterSkillPreviewContext } from '@helpers/hero/skill-modifier.ui';
 import { worldPartyState } from '@helpers/state-game';
 import {
   characterTeachingJobTabs,
@@ -39,6 +40,11 @@ export class ModalHeroTeachingsComponent {
   public character = computed(() =>
     worldPartyState().find((c) => c.id === heroTeachingsModalCharacterId()),
   );
+
+  public skillContext = computed(() => {
+    const character = this.character();
+    return character ? characterSkillPreviewContext(character) : undefined;
+  });
 
   // Keyed on primitives (and the computation untracked) so hp/xp/gear updates don't snap the tab back.
   private heroJobKey = computed(() => {

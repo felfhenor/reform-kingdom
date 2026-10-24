@@ -3,7 +3,7 @@ import type {
   CollectibleId,
 } from '@interfaces/content-collectible';
 import type { JobContent } from '@interfaces/content-job';
-import type { EquipmentSkillContent } from '@interfaces/content-skill';
+import type { EquipmentSkill } from '@interfaces/content-skill';
 import type { EffectStatSummary } from '@interfaces/equipment-bonus';
 import type { TrainerTeachingContent } from '@interfaces/content-trainer-teaching';
 import type { TrainerTeachingAvailability } from '@interfaces/trainer';
@@ -34,7 +34,7 @@ export type TrainerTeachingRow = EffectStatSummary & {
   canAfford: boolean;
   collectibles: TrainerTeachingCollectibleRequirement[];
   prerequisites: TrainerTeachingPrerequisite[];
-  grantedSkills: EquipmentSkillContent[];
+  grantedSkills: EquipmentSkill[];
 };
 
 // One job's tab in a hero's Teachings list.
