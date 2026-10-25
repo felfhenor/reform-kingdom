@@ -96,6 +96,33 @@ export const ELEMENT_BOON_BONUS: EquipmentBonusDimension<GameElement> = {
     ),
 };
 
+// Every fixed-key dimension's infusion getter - GatherYield/SkillStatBonus are checked separately below since their keys are dynamic content.
+const INFUSION_BLOCKS: ((
+  content: ItemContent,
+) => Partial<Record<string, number>> | undefined)[] = [
+  STAT_BONUS.infusionBlock,
+  RESISTANCE_BONUS.infusionBlock,
+  COMBAT_STAT_BONUS.infusionBlock,
+  MONSTER_TYPE_DAMAGE_BONUS.infusionBlock,
+  ELEMENT_RESISTANCE_BONUS.infusionBlock,
+  ELEMENT_BOON_BONUS.infusionBlock,
+];
+
+// Lives here rather than in infusion.ts so content-only callers (the analysis CLI) can use it without pulling in game state.
+export function isInfusionMaterial(item: ItemContent): boolean {
+  const hasDimensionBonus = INFUSION_BLOCKS.some((infusionBlock) =>
+    Object.values(infusionBlock(item) ?? {}).some((value) => value !== 0),
+  );
+  const hasGatherYieldBonus = (item.infusionGatherYieldBonuses ?? []).some(
+    (bonus) => bonus.value !== 0,
+  );
+  const hasSkillStatBonus = (item.infusionSkillStatBonuses ?? []).some(
+    (bonus) => bonus.value !== 0,
+  );
+
+  return hasDimensionBonus || hasGatherYieldBonus || hasSkillStatBonus;
+}
+
 // Sums one dimension's infusion bonus across every non-empty slot.
 export function equipmentItemInfusionTotals<K extends string>(
   infusedItemIds: (ItemId | null)[],

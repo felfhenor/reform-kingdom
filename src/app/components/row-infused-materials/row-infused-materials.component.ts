@@ -10,7 +10,7 @@ import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-s
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
-import { isInfusionMaterial } from '@helpers/item/infusion';
+import { isInfusionMaterial } from '@helpers/item/equipment-bonus';
 import { type ItemContent, type ItemId } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 

@@ -8,7 +8,7 @@ import {
 import { BadgeInfusableComponent } from '@components/badge-infusable/badge-infusable.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
-import { isInfusionMaterial } from '@helpers/item/infusion';
+import { isInfusionMaterial } from '@helpers/item/equipment-bonus';
 import { itemPreviewDisplay } from '@helpers/item/item-preview';
 import type { StorageMaterialEntry } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';

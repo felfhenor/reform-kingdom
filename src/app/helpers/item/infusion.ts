@@ -20,6 +20,7 @@ import {
   ELEMENT_BOON_BONUS,
   ELEMENT_RESISTANCE_BONUS,
   equipmentItemInfusionTotals,
+  isInfusionMaterial,
   MONSTER_TYPE_DAMAGE_BONUS,
   RESISTANCE_BONUS,
   STAT_BONUS,
@@ -67,37 +68,11 @@ export function equipmentItemSlotCount(item: EquipmentItem): number {
   return baseSlots + affixBonus;
 }
 
-// Every fixed-key dimension's infusion getter - GatherYield/SkillStatBonus are checked separately below since their keys are dynamic content.
-const INFUSION_BLOCKS: ((
-  content: ItemContent,
-) => Partial<Record<string, number>> | undefined)[] = [
-  STAT_BONUS.infusionBlock,
-  RESISTANCE_BONUS.infusionBlock,
-  COMBAT_STAT_BONUS.infusionBlock,
-  MONSTER_TYPE_DAMAGE_BONUS.infusionBlock,
-  ELEMENT_RESISTANCE_BONUS.infusionBlock,
-  ELEMENT_BOON_BONUS.infusionBlock,
-];
-
 export function isInfusionUnlocked(): boolean {
   return Object.keys(discoveredMaterialsState()).some((id) => {
     const item = getEntry<ItemContent>(id as ItemId);
     return !!item && isInfusionMaterial(item);
   });
-}
-
-export function isInfusionMaterial(item: ItemContent): boolean {
-  const hasDimensionBonus = INFUSION_BLOCKS.some((infusionBlock) =>
-    Object.values(infusionBlock(item) ?? {}).some((value) => value !== 0),
-  );
-  const hasGatherYieldBonus = (item.infusionGatherYieldBonuses ?? []).some(
-    (bonus) => bonus.value !== 0,
-  );
-  const hasSkillStatBonus = (item.infusionSkillStatBonuses ?? []).some(
-    (bonus) => bonus.value !== 0,
-  );
-
-  return hasDimensionBonus || hasGatherYieldBonus || hasSkillStatBonus;
 }
 
 // Each dimension's flat GOLD_PER_*_POINT rate is weighted per-key by the matching VALUE_MULTIPLIER_PER_* table (same tables armory sell value uses).

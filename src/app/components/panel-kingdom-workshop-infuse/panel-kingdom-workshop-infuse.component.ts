@@ -24,12 +24,12 @@ import { ListRowDirective } from '@directives/list-row.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { TeleportToDirective } from '@directives/teleport.to.directive';
 import { getEntry } from '@helpers/content/content';
+import { isInfusionMaterial } from '@helpers/item/equipment-bonus';
 import { equipmentInfuse } from '@helpers/hero/character-equipment';
 import {
   canInfuseEquipmentItem,
   equipmentItemSlotCount,
   infusionMaterialCost,
-  isInfusionMaterial,
 } from '@helpers/item/infusion';
 import {
   resolveGatherYieldBonusDisplay,

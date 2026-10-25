@@ -5,6 +5,7 @@
  */
 
 import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { isInfusionMaterial } from '@helpers/item/equipment-bonus';
 import type {
   AnalysisCheck,
   AnalysisParams,
@@ -32,11 +33,6 @@ import { sortBy } from 'es-toolkit/compat';
 // transitively imports gamestate/IndexedDB, unsafe for this ts-node script.
 const TRADER_TOKEN_NAME = 'Trader Scrip';
 const REFORGE_REAGENT_NAME = 'Duskhall Flux';
-
-function isInfusionMaterial(item: ItemContent): boolean {
-  if (!item.infusionStats) return false;
-  return Object.values(item.infusionStats).some((value) => value !== 0);
-}
 
 function emptyStats(item: ItemContent): MaterialUtilizationStats {
   return {

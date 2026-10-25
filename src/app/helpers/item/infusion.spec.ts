@@ -21,9 +21,9 @@ import {
   equipmentItemInfusionResistanceBonus,
   equipmentItemSlotCount,
   infusionMaterialCost,
-  isInfusionMaterial,
   isInfusionUnlocked,
 } from '@helpers/item/infusion';
+import { isInfusionMaterial } from '@helpers/item/equipment-bonus';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import { ensureAffix } from '@helpers/content/ensure-affix';
 import { buildEquipmentItem } from '@/testing/builders';
