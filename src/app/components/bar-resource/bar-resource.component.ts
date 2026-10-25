@@ -1,6 +1,7 @@
 import type { AnimationCallbackEvent } from '@angular/core';
 import { Component, computed, inject } from '@angular/core';
 import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
+import { CRIMSON_LUCRE_NAME, GOLD_COIN_NAME } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import {
   getMaterialQuantity,
@@ -18,8 +19,8 @@ export class BarResourceComponent {
   private anim = inject(AnimationService);
 
   public resources = computed(() => {
-    const goldCoinEntry = getEntry<ItemContent>('Gold Coin');
-    const crimsonLucreEntry = getEntry<ItemContent>('Crimson Lucre');
+    const goldCoinEntry = getEntry<ItemContent>(GOLD_COIN_NAME);
+    const crimsonLucreEntry = getEntry<ItemContent>(CRIMSON_LUCRE_NAME);
     if (!goldCoinEntry || !crimsonLucreEntry) return [];
 
     return [

@@ -1,3 +1,4 @@
+import { GOLD_COIN_NAME } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import {
   isRecipeDiscovered,
@@ -93,7 +94,7 @@ export function rewardContentInfo(
 
 export function isGoldCoinReward(reward: DroppedReward): boolean {
   if (!('itemId' in reward)) return false;
-  return reward.itemId === getEntry<ItemContent>('Gold Coin')?.id;
+  return reward.itemId === getEntry<ItemContent>(GOLD_COIN_NAME)?.id;
 }
 
 // Distinct completion rewards, excluding Gold Coin and de-duplicated by identity.

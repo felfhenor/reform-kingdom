@@ -1,4 +1,10 @@
-import { STARTING_GOLD_AMOUNT } from '@helpers/config';
+import {
+  GOLD_COIN_NAME,
+  MEMORY_FLUX_NAME,
+  REFORGE_REAGENT_NAME,
+  STARTING_GOLD_AMOUNT,
+  TRADER_TOKEN_NAME,
+} from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
 import {
@@ -8,25 +14,17 @@ import {
 } from '@helpers/state-game';
 import type { GameState, ItemContent, ItemId, MaterialId } from '@interfaces';
 
-const GOLD_COIN_NAME = 'Gold Coin';
-
 export function goldCoinId(): ItemId {
   return getEntry<ItemContent>(GOLD_COIN_NAME)!.id;
 }
-
-const TRADER_TOKEN_NAME = 'Trader Scrip';
 
 export function traderTokenId(): ItemId {
   return getEntry<ItemContent>(TRADER_TOKEN_NAME)!.id;
 }
 
-const MEMORY_FLUX_NAME = 'Memory Flux';
-
 export function memoryFluxId(): ItemId | undefined {
   return getEntry<ItemContent>(MEMORY_FLUX_NAME)?.id;
 }
-
-const REFORGE_REAGENT_NAME = 'Duskhall Flux';
 
 export function reforgeReagentId(): ItemId {
   return getEntry<ItemContent>(REFORGE_REAGENT_NAME)!.id;

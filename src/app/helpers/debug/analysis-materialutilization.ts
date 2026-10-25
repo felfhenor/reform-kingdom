@@ -4,6 +4,11 @@
  * configurable threshold as under-utilized.
  */
 
+import {
+  MEMORY_FLUX_NAME,
+  REFORGE_REAGENT_NAME,
+  TRADER_TOKEN_NAME,
+} from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { isInfusionMaterial } from '@helpers/item/equipment-bonus';
 import type {
@@ -29,10 +34,10 @@ import type {
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
 
-// Resolved directly (not via `@helpers/item/materials`) since that module
-// transitively imports gamestate/IndexedDB, unsafe for this ts-node script.
-const TRADER_TOKEN_NAME = 'Trader Scrip';
-const REFORGE_REAGENT_NAME = 'Duskhall Flux';
+const REAGENT_SYSTEMS: Record<string, string> = {
+  [REFORGE_REAGENT_NAME]: 'reforge',
+  [MEMORY_FLUX_NAME]: 'skill tree reset',
+};
 
 function emptyStats(item: ItemContent): MaterialUtilizationStats {
   return {
@@ -40,7 +45,7 @@ function emptyStats(item: ItemContent): MaterialUtilizationStats {
     rarity: item.rarity,
     unobtainable: !!item.unobtainable,
     infusable: isInfusionMaterial(item),
-    reforgeReagent: item.name === REFORGE_REAGENT_NAME,
+    reagentFor: REAGENT_SYSTEMS[item.name],
     craftedFrom: 0,
     craftedFromQuantity: 0,
     craftedInto: 0,
@@ -63,7 +68,7 @@ function emptyStats(item: ItemContent): MaterialUtilizationStats {
 }
 
 // One point per recipe, caravan buy, astral spell, commission, node-upgrade
-// tier, shrine/outpost tier, exchange, raid fortification, trainer teaching, and token-trade/unlock spend that consumes it, plus one each if infusable or the reforge reagent.
+// tier, shrine/outpost tier, exchange, raid fortification, trainer teaching, and token-trade/unlock spend that consumes it, plus one each if infusable or a system reagent.
 function score(stats: MaterialUtilizationStats): number {
   return (
     stats.craftedFrom +
@@ -78,7 +83,7 @@ function score(stats: MaterialUtilizationStats): number {
     stats.raidFortifyCosts +
     stats.trainerCosts +
     (stats.infusable ? 1 : 0) +
-    (stats.reforgeReagent ? 1 : 0)
+    (stats.reagentFor ? 1 : 0)
   );
 }
 
@@ -288,7 +293,7 @@ export function runMaterialUtilizationAnalysis(
             'Crafted From (recipes)': stats.craftedFrom,
             'Crafted From (qty)': stats.craftedFromQuantity,
             Infusable: stats.infusable ? 'Yes' : 'No',
-            'Reforge Reagent': stats.reforgeReagent ? 'Yes' : 'No',
+            'Reagent For': stats.reagentFor ?? '-',
             'Caravan Buys': stats.caravanBuys,
             'Astral Casts': stats.astralCasts,
             'Commission Requirements': stats.commissionRequirements,
@@ -316,8 +321,10 @@ export function runMaterialUtilizationAnalysis(
     rows,
   };
 
+  // A reagent's single system spends it on every repeat, so it's never short of sinks.
   const underUtilized = allStats.filter(
-    (stats) => !stats.unobtainable && score(stats) <= threshold,
+    (stats) =>
+      !stats.unobtainable && !stats.reagentFor && score(stats) <= threshold,
   );
 
   const checks: AnalysisCheck[] = underUtilized.map((stats) => {
@@ -344,7 +351,6 @@ export function runMaterialUtilizationAnalysis(
     if (stats.trainerCosts > 0)
       sinks.push(`${stats.trainerCosts} trainer teaching(s)`);
     if (stats.infusable) sinks.push('infusable');
-    if (stats.reforgeReagent) sinks.push('reforge reagent');
     const sinkDescription =
       sinks.length > 0 ? sinks.join(', ') : 'no known sinks';
     const sources = productionCount(stats);

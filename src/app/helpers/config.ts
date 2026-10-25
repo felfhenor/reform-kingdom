@@ -1,6 +1,7 @@
 // Every tunable scalar/numeric game-balance constant lives here, grouped by the domain that consumes it.
 // This is NOT the place for: signals/state, debug-tool
-// definitions, icon/UI maps, string identifiers that reference content by name/type, or fixed constants
+// definitions, icon/UI maps, string identifiers that reference content by name/type (except the core
+// currency/reagent material names under Item), or fixed constants
 // dictated by an external format/protocol (e.g. the Tiled map format's GID bitmask flags, IndexedDB
 // connection details) rather than authored game balance
 
@@ -144,6 +145,12 @@ export const OUTPOST_TELEPORT_LEVEL = 5;
 export const XP_CURVE_EASE = 1.5;
 
 // Item
+
+export const GOLD_COIN_NAME = 'Gold Coin';
+export const CRIMSON_LUCRE_NAME = 'Crimson Lucre';
+export const TRADER_TOKEN_NAME = 'Trader Scrip';
+export const MEMORY_FLUX_NAME = 'Memory Flux';
+export const REFORGE_REAGENT_NAME = 'Duskhall Flux';
 
 export const GOLD_PER_STAT_POINT = 30;
 export const GOLD_PER_RESISTANCE_POINT = 100;
