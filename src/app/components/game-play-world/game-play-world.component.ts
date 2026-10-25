@@ -66,6 +66,7 @@ import {
   pixiIndicatorProgressBarCreate,
   pixiNodeLabelColor,
 } from '@helpers/pixi/pixi-indicators';
+import { pixiNodeRevealCreate } from '@helpers/pixi/pixi-node-reveal.ui';
 import { pixiTiledMapRender } from '@helpers/pixi/pixi-map-render';
 import {
   partyFollowerCatchUpPosition,
@@ -280,6 +281,10 @@ export class GamePlayWorldComponent implements OnDestroy {
     spawnedAt: number;
     nodeName: string;
   }> = [];
+  private activeNodeReveals: Array<{
+    update: (elapsedMs: number) => boolean;
+    spawnedAt: number;
+  }> = [];
   // Icon textures persist across map transitions.
   private floatingTextIconTextures = new Map<string, Texture>();
   private pendingFloatingTextTextureLoads = new Map<string, GatherVfxEvent[]>();
@@ -481,6 +486,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.lastNodeStatusUpdateAt = 0;
     this.pendingFloatingTextTextureLoads.clear();
     this.activeFloatingTexts = [];
+    this.activeNodeReveals = [];
 
     this.app = undefined;
     this.map = undefined;
@@ -624,6 +630,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.renderPartyFollowerIndicators();
       this.updateWorkerIndicators();
       this.updateFloatingTexts();
+      this.updateNodeReveals();
     };
     this.app.ticker.add(this.visualPositionTicker);
 
@@ -659,7 +666,12 @@ export class GamePlayWorldComponent implements OnDestroy {
       const entry = worldNodeByName(nodeName);
       if (!entry) return;
 
-      worldNodeDiscoverIfCollectibleGateMet(entry);
+      if (worldNodeDiscoverIfCollectibleGateMet(entry) && this.map) {
+        this.activeNodeReveals.push({
+          update: pixiNodeRevealCreate(wrapper, this.map.tilewidth),
+          spawnedAt: performance.now(),
+        });
+      }
 
       const unlocked = isWorldNodeCollectibleGateMet(entry);
       wrapper.visible = unlocked;
@@ -1309,6 +1321,15 @@ export class GamePlayWorldComponent implements OnDestroy {
       if (!alive) entry.container.destroy({ children: true });
       return alive;
     });
+  }
+
+  private updateNodeReveals(): void {
+    if (this.activeNodeReveals.length === 0) return;
+
+    const now = performance.now();
+    this.activeNodeReveals = this.activeNodeReveals.filter((reveal) =>
+      reveal.update(now - reveal.spawnedAt),
+    );
   }
 
   private spawnFloatingText(event: GatherVfxEvent, now: number): void {

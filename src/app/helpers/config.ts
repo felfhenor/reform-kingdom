@@ -306,6 +306,11 @@ export const GATHER_VFX_JITTER_RANGE = 30;
 export const GATHER_VFX_QUOTE_LIFETIME_MS = 6000;
 export const GATHER_VFX_QUOTE_HOLD_FRACTION = 0.75;
 export const GATHER_VFX_QUOTE_WRAP_WIDTH = 220;
+export const NODE_REVEAL_LIFETIME_MS = 900;
+export const NODE_REVEAL_POP_MS = 450;
+// easeOutBack's overshoot; ~1.7 peaks about 10% past full size before settling.
+export const NODE_REVEAL_OVERSHOOT = 1.70158;
+export const NODE_REVEAL_RING_RADIUS_TILES = 1.5;
 export const INDICATOR_PROGRESS_BAR_HEIGHT = 6;
 export const INDICATOR_PROGRESS_BAR_OFFSET_Y = -50;
 export const NODE_STATUS_ICON_RADIUS = 7;

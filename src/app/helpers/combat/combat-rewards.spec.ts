@@ -78,7 +78,7 @@ function logMessages(): string[] {
   return combatLog().map((entry) => entry.message);
 }
 
-function vfxQuantities(): number[] {
+function vfxQuantities(): Array<number | undefined> {
   return vi.mocked(gatherVfxEmit).mock.calls.map(([event]) => event.quantity);
 }
 

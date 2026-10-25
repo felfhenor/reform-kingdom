@@ -79,25 +79,31 @@ export function pixiFloatingTextCreate(
   const container = new Container();
   container.cullable = true;
 
-  const qtyText = pixiFloatingTextLabelCreate(
-    `+${event.quantity.toLocaleString()}`,
-    0x4ade80,
-    14,
-  );
+  const qtyText =
+    event.quantity === undefined
+      ? undefined
+      : pixiFloatingTextLabelCreate(
+          `+${event.quantity.toLocaleString()}`,
+          0x4ade80,
+          14,
+        );
   const nameText = pixiFloatingTextLabelCreate(event.name, 0xffffff, 12);
+  const rowHeight = qtyText?.height ?? nameText.height;
   const iconSize = 16;
   const gap = 4;
 
   let cursorX = 0;
-  qtyText.position.set(cursorX, 0);
-  container.addChild(qtyText);
-  cursorX += qtyText.width + gap;
+  if (qtyText) {
+    qtyText.position.set(cursorX, 0);
+    container.addChild(qtyText);
+    cursorX += qtyText.width + gap;
+  }
 
   if (iconTexture) {
     const icon = new Sprite(iconTexture);
     icon.width = iconSize;
     icon.height = iconSize;
-    icon.position.set(cursorX, (qtyText.height - iconSize) / 2);
+    icon.position.set(cursorX, (rowHeight - iconSize) / 2);
     container.addChild(icon);
     cursorX += iconSize + gap;
   }
@@ -112,13 +118,13 @@ export function pixiFloatingTextCreate(
       GATHER_VFX_QUOTE_WRAP_WIDTH,
     );
     quoteText.anchor.set(0.5, 0);
-    quoteText.position.set(cursorX / 2, qtyText.height + gap);
+    quoteText.position.set(cursorX / 2, rowHeight + gap);
     container.addChild(quoteText);
   }
 
   // Pivot on the row's own horizontal center so `container.x` below lands the row centered on the tile,
   // not its left edge.
-  container.pivot.set(cursorX / 2, qtyText.height / 2);
+  container.pivot.set(cursorX / 2, rowHeight / 2);
 
   const lifetimeMs = event.quote
     ? GATHER_VFX_QUOTE_LIFETIME_MS
