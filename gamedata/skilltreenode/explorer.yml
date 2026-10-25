@@ -450,6 +450,18 @@
       stat: Vitality
       value: 5
 
+- id: 96faef6b-f96d-4fc4-82d6-afd049f0ee4d
+  name: 'Explorer: Nimble'
+  jobId: Explorer
+  sprite: '0022'
+  level: 5
+  row: Fieldcraft
+  track: 2
+  effects:
+    - kind: Stat
+      stat: Agility
+      value: 5
+
 - id: b75ed738-7d31-4dae-a6a3-d02815220ae0
   name: 'Explorer: Bug Hunter'
   jobId: Explorer
@@ -499,3 +511,55 @@
     - kind: Stat
       stat: Health
       value: 40
+
+# --- Pre-spec passives ---
+
+- id: 8689f977-f1df-4f30-ba0d-84a5ebfb5bb2
+  name: "Explorer: Nature's Vigor"
+  jobId: Explorer
+  sprite: '0031'
+  level: 5
+  row: Treasure Hunter
+  track: 1
+  effects:
+    - kind: Stat
+      stat: Constitution
+      value: 3
+    - kind: Stat
+      stat: Spirit
+      value: 3
+
+- id: ff546a6c-9204-4004-a795-21fb2833d469
+  name: 'Explorer: Charmed'
+  jobId: Explorer
+  sprite: '0032'
+  level: 10
+  row: Treasure Hunter
+  track: 2
+  effects:
+    - kind: Stat
+      stat: Luck
+      value: 2
+
+- id: 0c8eea12-6978-4e79-98d2-b50c8503c475
+  name: 'Explorer: Brawny'
+  jobId: Explorer
+  sprite: '0033'
+  level: 1
+  row: Dungeon Delver
+  effects:
+    - kind: Stat
+      stat: Strength
+      value: 5
+
+- id: 47611049-8b93-49cf-9482-6cce6c83cd85
+  name: 'Explorer: Studious'
+  jobId: Explorer
+  sprite: '0034'
+  level: 5
+  row: Dungeon Delver
+  track: 1
+  effects:
+    - kind: Stat
+      stat: Intelligence
+      value: 5

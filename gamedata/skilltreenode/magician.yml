@@ -527,3 +527,75 @@
     - kind: MonsterTypeDamage
       monsterType: Spirit
       value: 20
+
+# --- Pre-spec passives ---
+
+- id: 49bb8c3f-812a-4de2-ad99-7ac29c5ed1e6
+  name: 'Magician: Emberskin'
+  jobId: Magician
+  sprite: '0035'
+  level: 1
+  row: Arcanist
+  effects:
+    - kind: Resistance
+      tag: Burn
+      value: 10
+
+- id: d4d6d020-84ef-4fa4-bda9-8fbb57f8048c
+  name: 'Magician: Studious'
+  jobId: Magician
+  sprite: '0034'
+  level: 5
+  row: Arcanist
+  track: 1
+  effects:
+    - kind: Stat
+      stat: Intelligence
+      value: 5
+
+- id: a5bdc64d-ef26-4973-84d2-61dc61fd9c2e
+  name: 'Magician: Slimebane'
+  jobId: Magician
+  sprite: '0036'
+  level: 10
+  row: Arcanist
+  track: 2
+  effects:
+    - kind: MonsterTypeDamage
+      monsterType: Amalgamation
+      value: 10
+
+- id: 79293c62-b240-4008-8754-19f457f9d360
+  name: 'Magician: Spellward'
+  jobId: Magician
+  sprite: '0037'
+  level: 1
+  row: Celestar
+  effects:
+    - kind: Stat
+      stat: Resistance
+      value: 5
+
+- id: a0c0bd46-237e-4014-840a-e9f6adad6e5f
+  name: 'Magician: Serene'
+  jobId: Magician
+  sprite: '0038'
+  level: 5
+  row: Celestar
+  track: 1
+  effects:
+    - kind: Stat
+      stat: Spirit
+      value: 3
+
+- id: 4cc353bd-9fc7-4099-9a65-896723070cd8
+  name: 'Magician: Charmed'
+  jobId: Magician
+  sprite: '0032'
+  level: 10
+  row: Celestar
+  track: 2
+  effects:
+    - kind: Stat
+      stat: Luck
+      value: 2

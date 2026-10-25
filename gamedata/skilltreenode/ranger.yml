@@ -566,3 +566,63 @@
     - kind: CombatStat
       stat: debuffIgnoreChance
       value: 15
+
+# --- Pre-spec passives ---
+
+- id: cd515bb3-a075-445a-af05-a865d542c04c
+  name: 'Ranger: Carrot Eyes'
+  jobId: Ranger
+  sprite: '0040'
+  level: 1
+  row: Wayfinder
+  effects:
+    - kind: Resistance
+      tag: Accuracy
+      value: 10
+
+- id: 858d0b90-af37-46f6-9d08-f93bc1f08871
+  name: 'Ranger: Steadfast'
+  jobId: Ranger
+  sprite: '0041'
+  level: 5
+  row: Wayfinder
+  track: 1
+  effects:
+    - kind: Stat
+      stat: Constitution
+      value: 3
+
+- id: 4f2797e1-b249-48c5-af68-77c6b3986c48
+  name: 'Ranger: Brawny'
+  jobId: Ranger
+  sprite: '0033'
+  level: 1
+  row: Stalker
+  effects:
+    - kind: Stat
+      stat: Strength
+      value: 5
+
+- id: d470933a-10cb-464a-84af-8e3c6c45a727
+  name: 'Ranger: Charmed'
+  jobId: Ranger
+  sprite: '0032'
+  level: 5
+  row: Stalker
+  track: 1
+  effects:
+    - kind: Stat
+      stat: Luck
+      value: 2
+
+- id: f33cea9c-a08b-45c8-a427-9d247f1c0658
+  name: 'Ranger: Manhunter'
+  jobId: Ranger
+  sprite: '0039'
+  level: 10
+  row: Stalker
+  track: 2
+  effects:
+    - kind: MonsterTypeDamage
+      monsterType: Humanoid
+      value: 10

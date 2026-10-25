@@ -576,3 +576,43 @@
     - kind: MonsterTypeDamage
       monsterType: Demon
       value: 20
+
+# --- Pre-spec passives ---
+
+- id: 07c4e12a-a269-442b-9d00-ee9c28368545
+  name: 'Healer: Antivenom'
+  jobId: Healer
+  sprite: '0043'
+  level: 1
+  row: Lifegiver
+  effects:
+    - kind: Resistance
+      tag: Poison
+      value: 10
+
+- id: 3c726f2e-4784-4ed5-9dd4-65eb24852c08
+  name: 'Healer: Charmed'
+  jobId: Healer
+  sprite: '0032'
+  level: 10
+  row: Lifegiver
+  track: 2
+  effects:
+    - kind: Stat
+      stat: Luck
+      value: 2
+
+- id: 0cfe1cda-7679-45ba-a3d3-2c2c74773b19
+  name: 'Healer: Battle Scholar'
+  jobId: Healer
+  sprite: '0042'
+  level: 5
+  row: Templar
+  track: 1
+  effects:
+    - kind: Stat
+      stat: Intelligence
+      value: 5
+    - kind: Stat
+      stat: Strength
+      value: 5
