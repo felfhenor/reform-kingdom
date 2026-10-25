@@ -300,6 +300,12 @@
     astralProjectorId: 'Power: Magic of the Cimmerians I'
     quantity: 1
   rewards:
+    - itemId: Red Slime Core
+      quantity: 5
+
+    - itemId: Green Slime Core
+      quantity: 5
+
     - itemId: Purple Slime Core
       quantity: 5
 
