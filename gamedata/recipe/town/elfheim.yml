@@ -175,8 +175,8 @@
       quantity: 2
 
   tradeskillId: Tailoring
-  minTradeskillLevel: 12
-  maxTradeskillLevel: 12
+  minTradeskillLevel: 20
+  maxTradeskillLevel: 20
   tradeskillXP: 0
   craftTime: 240
 
@@ -209,7 +209,7 @@
       quantity: 1
 
   tradeskillId: Jewelcrafting
-  minTradeskillLevel: 14
-  maxTradeskillLevel: 14
+  minTradeskillLevel: 20
+  maxTradeskillLevel: 20
   tradeskillXP: 0
   craftTime: 240
