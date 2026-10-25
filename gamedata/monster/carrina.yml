@@ -305,6 +305,13 @@
       min: 1
       max: 1
       chance: 25
+      maxLevel: 10
+
+    - itemId: Green Slime Core
+      min: 1
+      max: 1
+      chance: 90
+      minLevel: 11
 
   skills:
     - skillId: Attack
@@ -358,7 +365,14 @@
     - itemId: Purple Slime Core
       min: 1
       max: 1
-      chance: 25
+      chance: 50
+      maxLevel: 10
+
+    - itemId: Purple Slime Core
+      min: 1
+      max: 1
+      chance: 90
+      minLevel: 11
 
   skills:
     - skillId: Attack
@@ -414,7 +428,14 @@
     - itemId: Red Slime Core
       min: 1
       max: 1
-      chance: 25
+      chance: 50
+      maxLevel: 10
+
+    - itemId: Red Slime Core
+      min: 1
+      max: 1
+      chance: 90
+      minLevel: 11
 
   skills:
     - skillId: Attack

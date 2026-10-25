@@ -752,6 +752,19 @@
                  "width":64,
                  "x":1792,
                  "y":2752
+                }, 
+                {
+                 "gid":47,
+                 "height":64,
+                 "id":193,
+                 "name":"Sandslime Mound",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"ExploreNode",
+                 "visible":true,
+                 "width":64,
+                 "x":960,
+                 "y":2432
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -760,7 +773,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":193,
+ "nextobjectid":194,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

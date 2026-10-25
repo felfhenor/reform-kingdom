@@ -153,3 +153,34 @@
 
     - recipeId: 'Material: Cimmerian Water Charm'
       chance: 5
+
+- id: fabdbd60-f9d9-4266-b048-59f601979c9b
+  name: Sandslime Mound
+  description: A home for arid, desert slimes. They roll around in the sand and their cores become more solid, leading to them being hunted aggressively by those who seek them.
+
+  levelRange:
+    min: 28
+    max: 31
+
+  fights:
+    - monsters:
+        - monsterId: Akroki Swashbuckler
+        - monsterId: Red Slime
+
+    - monsters:
+        - monsterId: Red Slime
+        - monsterId: Red Slime
+
+    - monsters:
+        - monsterId: Red Slime
+        - monsterId: Akroki Mage
+        - monsterId: Red Slime
+
+  completionRewards:
+    - collectibleId: Sandslime Kataclump
+      chance: 75
+
+    - itemId: Red Slime Core
+      chance: 50
+      min: 3
+      max: 6

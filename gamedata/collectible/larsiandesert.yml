@@ -55,3 +55,9 @@
   effects:
     - effectType: GlobalArmorySizeBoost
       value: 5
+
+- id: 76392933-b0cc-4732-be75-296d5108d37e
+  name: Sandslime Kataclump
+  rarity: Uncommon
+  description: A large red slime core coated in layer upon layer of sand.
+  sprite: '0064'
