@@ -59,7 +59,7 @@
     </div>
   }
 
-  @for (condition of t.conditions; track condition) {
+  @for (condition of t.conditions; track $index) {
     <div class="type-meta">{{ condition }}</div>
   }
 </div>

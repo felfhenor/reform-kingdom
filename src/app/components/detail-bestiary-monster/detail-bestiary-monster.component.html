@@ -31,7 +31,7 @@
 
         <div class="flex flex-col gap-2">
           <!-- Outer loop rebuilds every row per monster; a track key using outer state is re-evaluated for existing rows too. -->
-          @for (monsterId of [entry().monster.id]; track monsterId) {
+          @for (monster of [entry().monster]; track monster.id) {
             @for (skill of skills(); track skill.id) {
               <app-row-bestiary-skill
                 [skill]="skill"

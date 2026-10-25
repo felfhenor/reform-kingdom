@@ -35,12 +35,12 @@
     />
 
     <!-- Tracked by text so each new step fades in; nowrap keeps a long label from shifting the hero and bar. -->
-    @for (label of [progress.label]; track label) {
+    @for (step of [progress]; track step.label) {
       <p
         class="type-muted whitespace-nowrap"
         (animate.enter)="anim.reflowEnter($event.target)"
       >
-        {{ label }}
+        {{ step.label }}
       </p>
     }
   </div>

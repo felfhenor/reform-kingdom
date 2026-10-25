@@ -92,7 +92,7 @@
       </div>
     }
 
-    @for (desc of item.miscAffixDescriptions; track desc) {
+    @for (desc of item.miscAffixDescriptions; track $index) {
       <div class="text-xs my-2 text-value-positive">{{ desc }}</div>
     }
 
