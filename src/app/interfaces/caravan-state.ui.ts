@@ -23,6 +23,8 @@ export type TradeQuantityPrompt = {
   verb: 'Buy' | 'Sell';
   name: string;
   price: number;
+  // Trader Scrip charged per unit on top of gold.
+  tokenPrice?: number;
   maxQuantity: number;
   // Adds a one-click button that transacts maxQuantity.
   allowMax?: boolean;

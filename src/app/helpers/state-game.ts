@@ -73,6 +73,9 @@ export const worldExploreRandomState = gamestateSelect(
 export const worldHomeNodeNameState = gamestateSelect(
   (state) => state.world.homeNodeName,
 );
+export const worldPrayerLastTickState = gamestateSelect(
+  (state) => state.world.prayerLastTick,
+);
 export const worldCaravansState = gamestateSelect(
   (state) => state.world.caravans,
 );

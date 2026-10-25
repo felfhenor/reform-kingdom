@@ -22,6 +22,7 @@ import {
   equipmentItemBonusStats,
 } from '@helpers/item/equipment-display';
 import { equipmentItemGrantedSkills } from '@helpers/item/equipment-display.ui';
+import { rumorSprite, rumorTeaser } from '@helpers/rumor/rumor';
 import {
   type CollectibleContent,
   type CollectibleId,
@@ -38,6 +39,8 @@ import {
   type JobContent,
   type RecipeContent,
   type RecipeId,
+  type RumorContent,
+  type RumorId,
   type SkillStatBonus,
   type SkillStatBonusDisplay,
   type TradeskillContent,
@@ -212,6 +215,7 @@ export function resolveRewardDisplay(reward: {
   equipmentItem?: EquipmentItem;
   collectibleId?: CollectibleId;
   recipeId?: RecipeId;
+  rumorId?: RumorId;
 }): ItemPreviewDisplay | undefined {
   if (reward.itemId) {
     const item = getEntry<ItemContent>(reward.itemId);
@@ -243,6 +247,19 @@ export function resolveRewardDisplay(reward: {
       name: recipeStylizedName(recipe),
       backdropSprite: recipeBackdropSprite(),
     };
+  }
+
+  if (reward.rumorId) {
+    const rumor = getEntry<RumorContent>(reward.rumorId);
+    return rumor
+      ? {
+          name: rumor.name,
+          description: rumorTeaser(rumor),
+          sprite: rumorSprite() ?? '',
+          spritesheet: 'item',
+          rarity: rumor.rarity,
+        }
+      : undefined;
   }
 
   if (reward.workerId) {

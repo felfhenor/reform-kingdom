@@ -1,0 +1,35 @@
+- id: 15d68cf2-4730-4fb6-ac76-7c4f7ec62653
+  name: Rumor of Elven Trainers
+  rarity: Rare
+  description: The elves still train their young in the far east of my Duchy, past the outpost. They think I haven't noticed.
+  requireMapVisit: Carrina
+  subject:
+    kind: Node
+    nodeName: Elven Training Grounds
+
+- id: fb1789ef-b865-4a67-9d4c-9818b568270a
+  name: Rumor of an Elven Glade
+  rarity: Rare
+  description: East of Stona Lowe, the elves keep a glade rich with materials. They would prefer you never find it, but I think differently.
+  requireMapVisit: Carrina
+  subject:
+    kind: Node
+    nodeName: Elven Woods
+
+- id: 98c4e6d9-edc3-48be-b8c0-83863722330c
+  name: Rumor of a Webbed Tower
+  rarity: Uncommon
+  description: There's a tower that only shows itself to those carrying its web. The goblins of Gobsilk Forest have plenty, and they're not in desperate need of it.
+  requireMapVisit: Carrina
+  subject:
+    kind: Collectible
+    collectibleId: Gobweb
+
+- id: f31b1992-68c3-4594-bf67-b659ae9b9eb5
+  name: Rumor of a Templar Road
+  rarity: Rare
+  description: The templars' road out of my Duchy opens only for those carrying coin from the mire orcs. The orcs of the Craggled Mire are careless with theirs.
+  requireMapVisit: CraggledMire
+  subject:
+    kind: Collectible
+    collectibleId: Craggle Pebble

@@ -3,11 +3,15 @@
 
 <app-tooltip-item-preview #preview [display]="item">
   <div preview-footer class="mt-2 type-muted text-center">
-    {{
-      isPartyBuying()
-        ? 'This ' + merchantLabel() + ' is selling this item to you.'
-        : 'This ' + merchantLabel() + ' is buying this item from you.'
-    }}
+    @if (entry.trade.rumorId) {
+      Buying this reveals where the rumor leads.
+    } @else {
+      {{
+        isPartyBuying()
+          ? 'This ' + merchantLabel() + ' is selling this item to you.'
+          : 'This ' + merchantLabel() + ' is buying this item from you.'
+      }}
+    }
   </div>
 </app-tooltip-item-preview>
 
@@ -63,10 +67,11 @@
       </div>
     </div>
 
-    <app-currency-cost
-      [type]="goldCoinItemId"
-      [amount]="entry.price"
-      class="ml-auto mr-2 shrink-0"
-    />
+    <div class="flex flex-col items-end gap-1 ml-auto mr-2 shrink-0">
+      <app-currency-cost [type]="goldCoinItemId" [amount]="entry.price" />
+      @if (entry.trade.tokenCost; as tokenCost) {
+        <app-currency-cost [type]="traderTokenItemId" [amount]="tokenCost" />
+      }
+    </div>
   }
 </button>

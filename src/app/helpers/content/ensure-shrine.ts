@@ -32,6 +32,7 @@ export function ensureShrine(
     invisibleUntilCollectibleIdsFound:
       shrine.invisibleUntilCollectibleIdsFound ?? [],
     legendName: shrine.legendName ?? 'Legend of the Shrine',
+    founderWhispers: shrine.founderWhispers ?? false,
     levels: ensureArray(shrine.levels, ensureShrineLevel),
   };
 }

@@ -22,6 +22,8 @@ function ensureCaravanTrade(trade: Partial<CaravanTrade> = {}): CaravanTrade {
     equipmentId: trade.equipmentId,
     collectibleId: trade.collectibleId,
     recipeId: trade.recipeId,
+    rumorId: trade.rumorId,
+    tokenCost: trade.tokenCost,
     limit: trade.limit,
     weight: trade.weight ?? 1,
   };

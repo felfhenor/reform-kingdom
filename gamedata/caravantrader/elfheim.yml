@@ -93,6 +93,18 @@
       limit: 2
       weight: 3
 
+    - type: sell
+      value: 7500
+      tokenCost: 3
+      rumorId: Rumor of Elven Trainers
+      weight: 1
+
+    - type: sell
+      value: 7500
+      tokenCost: 3
+      rumorId: Rumor of an Elven Glade
+      weight: 1
+
 - id: d35a7b17-177f-47dd-bf7a-7a957187827c
   name: Audrey Hall
   description: Hello, humans. I have some wonderful things for sale that my father found for me. Please buy them so I can support my father's mercantile activites!
@@ -195,6 +207,12 @@
       itemId: Elven Purity Water
       limit: 50
       weight: 5
+
+    - type: sell
+      value: 40000
+      tokenCost: 5
+      rumorId: Rumor of Silken Leaves
+      weight: 1
 
     - type: sell
       value: 60000

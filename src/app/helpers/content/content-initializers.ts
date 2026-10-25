@@ -24,6 +24,7 @@ import { ensureNodeOverride } from '@helpers/content/ensure-nodeoverride';
 import { ensureOutpost } from '@helpers/content/ensure-outpost';
 import { ensureRecipe } from '@helpers/content/ensure-recipe';
 import { ensureRegion } from '@helpers/content/ensure-region';
+import { ensureRumor } from '@helpers/content/ensure-rumor';
 import { ensureShrine } from '@helpers/content/ensure-shrine';
 import { ensureSkill } from '@helpers/content/ensure-skill';
 import { ensureSkillTreeNode } from '@helpers/content/ensure-skilltreenode';
@@ -64,6 +65,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   outpost: ensureOutpost,
   recipe: ensureRecipe,
   region: ensureRegion,
+  rumor: ensureRumor,
   shrine: ensureShrine,
   skill: ensureSkill,
   skilltreenode: ensureSkillTreeNode,

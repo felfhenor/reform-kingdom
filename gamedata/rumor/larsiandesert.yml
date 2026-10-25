@@ -1,0 +1,26 @@
+- id: 0f733c51-00f3-4c7a-8d0d-ecd4027bb37f
+  name: Rumor of a Lucky Fool
+  rarity: Mystical
+  description: A lucky fool hides in plain sight just east of the Oasis Wellspring. He thinks the trees and mirages hide him, but they don't.
+  requireMapVisit: LarsianDesert
+  subject:
+    kind: Node
+    nodeName: Lucky Leaper
+
+- id: 698e376a-e3d4-4cda-ba6b-f6010cf59256
+  name: Rumor of a Royal Path
+  rarity: Rare
+  description: Defend Larsia well, and its king may share a faster path between his city and mine.
+  requireMapVisit: LarsianDesert
+  subject:
+    kind: Collectible
+    collectibleId: Larsian House Model
+
+- id: dfaf96fc-c952-4705-a1fe-cc5bf21f4a11
+  name: Rumor of a Lost Satchel
+  rarity: Uncommon
+  description: An elf lost a satchel in the Rolling Sands. Whatever is inside will help you remember the way into the elven woods.
+  requireMapVisit: LarsianDesert
+  subject:
+    kind: Collectible
+    collectibleId: Elven Satchel

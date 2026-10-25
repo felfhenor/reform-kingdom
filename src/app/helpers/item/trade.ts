@@ -8,6 +8,7 @@ import { getEntry } from '@helpers/content/content';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
 import { notifyError } from '@helpers/engine/notify';
 import { armoryHasRoom } from '@helpers/kingdom/armory';
+import { rumorSprite } from '@helpers/rumor/rumor';
 import { updateGamestate } from '@helpers/state-game';
 import type {
   AdventureLogRewardPart,
@@ -15,6 +16,8 @@ import type {
   EquipmentItem,
   GameState,
   ResolvedDrop,
+  RumorContent,
+  RumorId,
   TradeCommitOutcome,
   TradeGoods,
 } from '@interfaces';
@@ -93,6 +96,19 @@ export function tradeEquipmentItemLogPart(
   return {
     html: `${ITEM_ICON_TOKEN}${rarityNameHtml(name, content.rarity)}`,
     icon,
+  };
+}
+
+export function tradeRumorLogPart(
+  rumorId: RumorId,
+): AdventureLogRewardPart | undefined {
+  const rumor = getEntry<RumorContent>(rumorId);
+  const sprite = rumorSprite();
+  if (!rumor || !sprite) return undefined;
+
+  return {
+    html: `${ITEM_ICON_TOKEN}${rarityNameHtml(rumor.name, rumor.rarity)}`,
+    icon: { sprite, spritesheet: 'item' },
   };
 }
 

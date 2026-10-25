@@ -8,6 +8,7 @@ import {
 } from '@helpers/content/ensure-item';
 import { ensureJob } from '@helpers/content/ensure-job';
 import { ensureRecipe } from '@helpers/content/ensure-recipe';
+import { ensureRumor } from '@helpers/content/ensure-rumor';
 import { ensureSkill } from '@helpers/content/ensure-skill';
 import { ensureTradeskill } from '@helpers/content/ensure-tradeskill';
 import { ensureWorker } from '@helpers/content/ensure-worker';
@@ -28,6 +29,7 @@ import type {
   ItemId,
   JobId,
   RecipeId,
+  RumorId,
   TradeskillId,
   WorkerId,
 } from '@interfaces';
@@ -230,5 +232,28 @@ describe('resolveRewardDisplay', () => {
     expect(
       resolveRewardDisplay({ recipeId: 'gone' as RecipeId }),
     ).toBeUndefined();
+  });
+
+  it('previews a rumor with a teaser, not its hint, and the Rumor item sprite', () => {
+    const rumor = ensureRumor({
+      id: 'rumor' as RumorId,
+      name: 'Rumor of a Glade',
+      description: 'Look east.',
+      rarity: 'Rare',
+    });
+    const rumorItem = ensureItem({
+      id: 'rumor-item' as ItemId,
+      name: 'Rumor',
+      sprite: '0103',
+    });
+    seedContent([rumor, rumorItem]);
+
+    expect(resolveRewardDisplay({ rumorId: rumor.id })).toMatchObject({
+      name: 'Rumor of a Glade',
+      description: 'Word of something hidden.',
+      sprite: '0103',
+      spritesheet: 'item',
+      rarity: 'Rare',
+    });
   });
 });

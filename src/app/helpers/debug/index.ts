@@ -27,6 +27,7 @@ export * from './analysis-recipenames';
 export * from './analysis-reciperewards';
 export * from './analysis-regions';
 export * from './analysis-registry.ui';
+export * from './analysis-rumors';
 export * from './analysis-shrines';
 export * from './analysis-skillbonuses';
 export * from './analysis-skills';

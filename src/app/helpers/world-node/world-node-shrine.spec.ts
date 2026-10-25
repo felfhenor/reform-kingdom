@@ -4,7 +4,9 @@ import {
   ensureShrine,
   ensureShrineLevel,
 } from '@helpers/content/ensure-shrine';
+import { SHRINE_PRAYER_COOLDOWN_TICKS } from '@helpers/config';
 import {
+  shrinePrayerCooldownRemaining,
   worldNodeShrineCurrentTier,
   worldNodeShrineLevel,
 } from '@helpers/world-node/world-node-shrine';
@@ -50,5 +52,32 @@ describe('worldNodeShrineCurrentTier', () => {
     expect(tierAt()).toBeUndefined();
     expect(tierAt(1)).toBe('Wisdom I');
     expect(tierAt(3)).toBe('Wisdom III');
+  });
+});
+
+describe('shrinePrayerCooldownRemaining', () => {
+  const prayedAgo = (ticks?: number) =>
+    seedGamestate((state) => {
+      state.clock.numTicks = 1000;
+      state.world.prayerLastTick =
+        ticks === undefined ? undefined : 1000 - ticks;
+    });
+
+  it('is 0 before the first prayer', () => {
+    prayedAgo();
+    expect(shrinePrayerCooldownRemaining()).toBe(0);
+  });
+
+  it('counts down from the last prayer, floored at 0', () => {
+    prayedAgo(0);
+    expect(shrinePrayerCooldownRemaining()).toBe(SHRINE_PRAYER_COOLDOWN_TICKS);
+
+    prayedAgo(100);
+    expect(shrinePrayerCooldownRemaining()).toBe(
+      SHRINE_PRAYER_COOLDOWN_TICKS - 100,
+    );
+
+    prayedAgo(SHRINE_PRAYER_COOLDOWN_TICKS + 50);
+    expect(shrinePrayerCooldownRemaining()).toBe(0);
   });
 });

@@ -23,6 +23,7 @@ import { runTownMaterialThresholdsAnalysis } from '@helpers/debug/analysis-townm
 import { runOutpostsAnalysis } from '@helpers/debug/analysis-outposts';
 import { runNodeDevelopmentTimesAnalysis } from '@helpers/debug/analysis-nodedevelopmenttimes';
 import { runExchangeNodesAnalysis } from '@helpers/debug/analysis-exchangenodes';
+import { runRumorsAnalysis } from '@helpers/debug/analysis-rumors';
 import { runShrinesAnalysis } from '@helpers/debug/analysis-shrines';
 import { runRegionsAnalysis } from '@helpers/debug/analysis-regions';
 import { runTasksAnalysis } from '@helpers/debug/analysis-tasks';
@@ -65,6 +66,7 @@ const ANALYSIS_CHECKS: Array<{ title: string; run: () => AnalysisRunResult }> =
       run: runTownMaterialThresholdsAnalysis,
     },
     { title: 'validate:shrines', run: runShrinesAnalysis },
+    { title: 'validate:rumors', run: runRumorsAnalysis },
     { title: 'validate:regions', run: runRegionsAnalysis },
     { title: 'validate:outposts', run: runOutpostsAnalysis },
     {

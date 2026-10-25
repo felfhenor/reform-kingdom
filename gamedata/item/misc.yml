@@ -6,3 +6,12 @@
   sprite: '0010'
 
   unobtainable: true
+
+- id: c30ee15f-12b1-4c79-9864-733a30252c8f
+  name: Rumor
+  description: An icon used for rumors sold by caravans
+  rarity: Common
+
+  sprite: '0103'
+
+  unobtainable: true

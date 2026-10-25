@@ -30,7 +30,10 @@ export class ModalTradeQuantityComponent {
     if (prompt.maxQuantity <= 0) return 0;
     if (skipConfirm) return 1;
 
-    const price = formatNumber(prompt.price, this.locale);
+    const gold = `${formatNumber(prompt.price, this.locale)}g`;
+    const price = prompt.tokenPrice
+      ? `${gold} and ${formatNumber(prompt.tokenPrice, this.locale)} Trader Scrip`
+      : gold;
     return prompt.maxQuantity === 1
       ? this.askSingle(prompt, price)
       : this.askQuantity(prompt, price);
@@ -43,7 +46,7 @@ export class ModalTradeQuantityComponent {
     const swal = this.confirmSwal();
     if (!swal) return 0;
 
-    swal.swalOptions = { text: `${prompt.verb} ${prompt.name} for ${price}g?` };
+    swal.swalOptions = { text: `${prompt.verb} ${prompt.name} for ${price}?` };
     const result = await swal.fire();
     return result.isConfirmed ? 1 : 0;
   }
@@ -56,7 +59,7 @@ export class ModalTradeQuantityComponent {
     if (!swal) return 0;
 
     swal.swalOptions = {
-      text: `How many ${prompt.name} would you like to ${prompt.verb.toLowerCase()}? (${price}g each)`,
+      text: `How many ${prompt.name} would you like to ${prompt.verb.toLowerCase()}? (${price} each)`,
       inputValue: 1,
       inputAttributes: { min: '0', max: `${prompt.maxQuantity}` },
       showDenyButton: !!prompt.allowMax,

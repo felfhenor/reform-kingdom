@@ -53,6 +53,8 @@ export type GameStateWorld = {
   homeNodeName?: string;
   // Tick of the last Intimidation auto-win - undefined until the first one.
   intimidationLastTick?: number;
+  // Tick of the last shrine prayer - undefined until the first one.
+  prayerLastTick?: number;
 };
 
 export type MaterialId = ItemId;

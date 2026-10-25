@@ -1,0 +1,8 @@
+- id: 45faf3a5-007d-45a4-9830-3aeb87b028a4
+  name: Rumor of a Crimson Altar
+  rarity: Mystical
+  description: Northwest of the path home to Carrina, the demons drain crimson energies into the moonlit stones. It may be of use to you.
+  requireMapVisit: Felway
+  subject:
+    kind: Node
+    nodeName: Crimson Stones

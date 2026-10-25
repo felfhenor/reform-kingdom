@@ -1,0 +1,8 @@
+- id: 981401c9-e79e-46e4-85fe-ca237b3e3b1c
+  name: Rumor of Silken Leaves
+  rarity: Mystical
+  description: Follow the roads south of the Elfheim Royal Mines to the very edge of the woods. The spiders leave silk there for those willing to search for it.
+  requireMapVisit: ErdenWoodland
+  subject:
+    kind: Node
+    nodeName: Silkleaf Glade

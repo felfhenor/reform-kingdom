@@ -30,14 +30,13 @@ import {
   caravanTradeOwnedQuantity,
   caravanTradePrice,
   caravanTradeRemaining,
+  caravanTradeUnlockOwned,
 } from '@helpers/caravan/caravan-trade-quantity';
 import { commissionFulfill } from '@helpers/commission/commission-fulfill';
 import { commissionRowViewModel } from '@helpers/commission/commission-fulfill.ui';
 import { getEntry } from '@helpers/content/content';
-import { isRecipeDiscovered } from '@helpers/crafting/recipes';
 import { notifySuccess } from '@helpers/engine/notify';
 import { activeCaravanNode } from '@helpers/engine/ui';
-import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
 import type {
   CaravanTokenTradeRow,
@@ -82,12 +81,7 @@ export class ModalCaravanTradeComponent {
 
     return trader.tokenTrades
       .map((trade, index) => ({ index, trade }))
-      .filter(
-        ({ trade }) =>
-          (!trade.collectibleId ||
-            !isCollectibleDiscovered(trade.collectibleId)) &&
-          (!trade.recipeId || !isRecipeDiscovered(trade.recipeId)),
-      );
+      .filter(({ trade }) => !caravanTradeUnlockOwned(trade));
   });
 
   public commission = computed(() => {
@@ -166,6 +160,7 @@ export class ModalCaravanTradeComponent {
           verb,
           name,
           price: row.price,
+          tokenPrice: row.trade.tokenCost,
           maxQuantity: row.maxQuantity,
           allowMax: true,
         },

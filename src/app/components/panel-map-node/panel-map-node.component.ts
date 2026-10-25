@@ -354,11 +354,13 @@ export class PanelMapNodeComponent {
     setGamePlayView('kingdom');
   }
 
-  public prayShrine(): void {
+  public async prayShrine(): Promise<void> {
     const entry = this.node();
     if (!entry) return;
 
-    shrinePray(entry.nodeName);
+    if (await shrinePray(entry.nodeName)) {
+      notifySuccess('You pray at the shrine!');
+    }
   }
 
   public openOutpostTeleport(): void {

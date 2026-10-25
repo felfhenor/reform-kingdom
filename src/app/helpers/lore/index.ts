@@ -1,3 +1,4 @@
+export * from './founder-whisper';
 export * from './region-intro';
 export * from './region-intro.ui';
 export * from './title-crawl';

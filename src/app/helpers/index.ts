@@ -22,6 +22,7 @@ export * from './noise';
 export * from './pathfinding';
 export * from './pixi';
 export * from './rng';
+export * from './rumor';
 export * from './savefile';
 export * from './setup';
 export * from './state-game';

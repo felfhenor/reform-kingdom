@@ -22,6 +22,9 @@
           [assetName]="buff.sprite"
         />
         {{ buff.name }}
+        @if (cooldownLabel(); as label) {
+          ({{ label }})
+        }
       </button>
     </span>
   } @else {

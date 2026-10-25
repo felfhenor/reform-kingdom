@@ -2,6 +2,7 @@
   name: Shrine of the Founder
   description: A shrine dedicated to the Founder. It helps new adventurers and old ones alike to recognize their experiences and learn more from them.
   legendName: Legend of the Founder
+  founderWhispers: true
 
   levels:
     - developTime: 300

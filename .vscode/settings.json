@@ -34,6 +34,7 @@
     "./schemas/outpost.schema.json": "gamedata/outpost/**/*.yml",
     "./schemas/recipe.schema.json": "gamedata/recipe/**/*.yml",
     "./schemas/region.schema.json": "gamedata/region/**/*.yml",
+    "./schemas/rumor.schema.json": "gamedata/rumor/**/*.yml",
     "./schemas/shrine.schema.json": "gamedata/shrine/**/*.yml",
     "./schemas/skill.schema.json": "gamedata/skill/**/*.yml",
     "./schemas/skilltreenode.schema.json": "gamedata/skilltreenode/**/*.yml",

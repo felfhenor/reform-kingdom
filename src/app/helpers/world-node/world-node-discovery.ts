@@ -20,12 +20,14 @@ export function worldNodeDiscover(nodeName: string): void {
     return state;
   });
 
-  if (!alreadyDiscovered) {
-    notifySuccess(`You discovered ${nodeName}!`);
-    analyticsSendDesignEvent(
-      `World:Node:Discover:${analyticsSafeSegment(nodeName)}`,
-    );
-  }
+  if (!alreadyDiscovered) worldNodeDiscoverAnnounce(nodeName);
+}
+
+export function worldNodeDiscoverAnnounce(nodeName: string): void {
+  notifySuccess(`You discovered ${nodeName}!`);
+  analyticsSendDesignEvent(
+    `World:Node:Discover:${analyticsSafeSegment(nodeName)}`,
+  );
 }
 
 // Debug tool: reverts a node back to undiscovered.

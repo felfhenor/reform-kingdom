@@ -10,9 +10,32 @@ import {
   getGoldQuantity,
   getMaterialQuantity,
   goldCoinId,
+  traderTokenId,
 } from '@helpers/item/materials';
 import { getArmoryEntries } from '@helpers/kingdom/armory';
+import { isRumorRevealed } from '@helpers/rumor/rumor';
 import type { CaravanContent, CaravanTrade, GameState } from '@interfaces';
+
+// Collectibles, recipes and rumors sell once; undefined for trades with no such cap.
+export function caravanTradeUnlockOwned(
+  trade: Pick<CaravanTrade, 'collectibleId' | 'recipeId' | 'rumorId'>,
+  state?: GameState,
+): boolean | undefined {
+  if (trade.collectibleId) {
+    return state
+      ? ledgerHas(state.collectibles, trade.collectibleId)
+      : isCollectibleDiscovered(trade.collectibleId);
+  }
+
+  if (trade.recipeId) {
+    return state
+      ? ledgerHas(state.discoveredRecipes, trade.recipeId)
+      : isRecipeDiscovered(trade.recipeId);
+  }
+
+  if (trade.rumorId) return isRumorRevealed(trade.rumorId);
+  return undefined;
+}
 
 // How many of trade's target the party owns, shown so price can be weighed
 // against stock. Accepts an explicit `state` to re-validate at commit time.
@@ -89,19 +112,13 @@ export function caravanTradeRemaining(
   return Math.max(0, trade.limit - (tradeCounts[index] ?? 0));
 }
 
-// A collectible or recipe sell is always one-time even with no explicit limit - once owned, sold out everywhere.
+// A one-time sell ignores its limit - once owned, sold out everywhere.
 export function caravanIsTradeSoldOut(
   trade: CaravanTrade,
   tradeCounts: Record<number, number>,
   index: number,
 ): boolean {
-  if (trade.collectibleId && isCollectibleDiscovered(trade.collectibleId)) {
-    return true;
-  }
-
-  if (trade.recipeId && isRecipeDiscovered(trade.recipeId)) {
-    return true;
-  }
+  if (caravanTradeUnlockOwned(trade)) return true;
 
   const remaining = caravanTradeRemaining(trade, tradeCounts, index);
   return remaining !== undefined && remaining <= 0;
@@ -124,26 +141,14 @@ export function caravanTradeMaxQuantity(
   return stock === undefined ? held : Math.min(stock, held);
 }
 
-// A collectible or recipe is a one-time unlock regardless of its limit.
 function caravanTradeStock(
   trade: CaravanTrade,
   tradeCounts: Record<number, number>,
   index: number,
   state?: GameState,
 ): number | undefined {
-  if (trade.collectibleId) {
-    const discovered = state
-      ? ledgerHas(state.collectibles, trade.collectibleId)
-      : isCollectibleDiscovered(trade.collectibleId);
-    return discovered ? 0 : 1;
-  }
-
-  if (trade.recipeId) {
-    const discovered = state
-      ? ledgerHas(state.discoveredRecipes, trade.recipeId)
-      : isRecipeDiscovered(trade.recipeId);
-    return discovered ? 0 : 1;
-  }
+  const owned = caravanTradeUnlockOwned(trade, state);
+  if (owned !== undefined) return owned ? 0 : 1;
 
   return caravanTradeRemaining(trade, tradeCounts, index);
 }
@@ -156,5 +161,11 @@ function caravanTradeAffordable(
   const goldQuantity = state
     ? (state.materials[goldCoinId()]?.quantity ?? 0)
     : getGoldQuantity();
-  return Math.floor(goldQuantity / caravanTradePrice(caravan, trade));
+  const byGold = Math.floor(goldQuantity / caravanTradePrice(caravan, trade));
+  if (!trade.tokenCost) return byGold;
+
+  const tokenQuantity = state
+    ? (state.materials[traderTokenId()]?.quantity ?? 0)
+    : getMaterialQuantity(traderTokenId());
+  return Math.min(byGold, Math.floor(tokenQuantity / trade.tokenCost));
 }

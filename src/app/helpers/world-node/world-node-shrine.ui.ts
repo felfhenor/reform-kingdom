@@ -7,9 +7,11 @@ import {
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { applyGlobalEffectAdd } from '@helpers/hero/global-effect-state';
 import { jobAbilityValue } from '@helpers/hero/job-ability';
+import { rumorWhisper } from '@helpers/rumor/rumor-whisper';
 import { updateGamestate } from '@helpers/state-game';
 import { isPartyAtNode } from '@helpers/world';
 import {
+  shrinePrayerCooldownRemaining,
   worldNodeShrineCurrentTier,
   worldNodeShrineLevel,
 } from '@helpers/world-node/world-node-shrine';
@@ -17,16 +19,19 @@ import {
   worldNodeByName,
   worldNodeShrine,
 } from '@helpers/world-node/world-nodes';
-import type { GlobalEffectContent, ShrineContent } from '@interfaces';
+import type {
+  GlobalEffectContent,
+  ShrineContent,
+  ShrineLevel,
+} from '@interfaces';
 
 // Every isShrineBuff effect is removed first (not just this shrine's), so re-praying refreshes rather than duplicates.
-export function shrinePray(nodeName: string): boolean {
+// Awaited and re-checked in the update so a double-click inside the deferral can't pray twice.
+export async function shrinePray(nodeName: string): Promise<boolean> {
   const node = worldNodeByName(nodeName);
-  if (!node) return false;
-
-  const shrine = worldNodeShrine(node);
-  if (!shrine) return false;
-  if (!isPartyAtNode(nodeName)) return false;
+  const shrine = node ? worldNodeShrine(node) : undefined;
+  if (!shrine || !isPartyAtNode(nodeName)) return false;
+  if (shrinePrayerCooldownRemaining() > 0) return false;
 
   const tier = worldNodeShrineCurrentTier(shrine, nodeName);
   if (!tier) return false;
@@ -37,14 +42,24 @@ export function shrinePray(nodeName: string): boolean {
     tier.globalEffectDuration * (1 + jobAbilityValue('ShrineDurationBoost')),
   );
 
-  updateGamestate((state) => {
+  let prayed = false;
+  await updateGamestate((state) => {
+    if (shrinePrayerCooldownRemaining() > 0) return state;
+
     state.globalEffects = state.globalEffects.filter(
       (effect) => !effect.isShrineBuff,
     );
     applyGlobalEffectAdd(state, tier.globalEffectId, duration, currentTick);
+    state.world.prayerLastTick = currentTick;
+    prayed = true;
     return state;
   });
 
+  if (prayed) shrinePrayAnnounce(shrine, tier);
+  return prayed;
+}
+
+function shrinePrayAnnounce(shrine: ShrineContent, tier: ShrineLevel): void {
   const content = getEntry<GlobalEffectContent>(tier.globalEffectId);
   if (content) {
     miscellaneousMessageLog(
@@ -52,10 +67,11 @@ export function shrinePray(nodeName: string): boolean {
     );
   }
 
+  if (shrine.founderWhispers) rumorWhisper();
+
   analyticsSendDesignEvent(
     `World:Shrine:Pray:${analyticsSafeSegment(shrine.name)}`,
   );
-  return true;
 }
 
 export function worldNodeShrineLegendVerses(

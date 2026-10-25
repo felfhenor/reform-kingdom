@@ -4,6 +4,7 @@ import {
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { notifySuccess } from '@helpers/engine/notify';
+import { founderWhisperLog } from '@helpers/lore/founder-whisper';
 import type { TaskContent } from '@interfaces';
 
 export function tasksAnnounceCompleted(tasks: TaskContent[]): void {
@@ -11,7 +12,7 @@ export function tasksAnnounceCompleted(tasks: TaskContent[]): void {
     notifySuccess(`Task complete: ${task.name}`);
     miscellaneousMessageLog(`Task complete: **${task.name}**`);
     if (task.whisper) {
-      miscellaneousMessageLog(`*The Founder whispers: "${task.whisper}"*`);
+      founderWhisperLog(task.whisper);
     }
     analyticsSendDesignEvent('Task:Complete');
     analyticsSendDesignEvent(

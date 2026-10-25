@@ -10,9 +10,12 @@ import { ButtonWorldNodeDevelopComponent } from '@components/button-world-node-d
 import { TooltipGlobalEffectComponent } from '@components/tooltip-global-effect/tooltip-global-effect.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
-import { notifySuccess } from '@helpers/engine/notify';
+import { formatDuration } from '@helpers/engine/timer';
 import { isPartyAtNode } from '@helpers/world';
-import { worldNodeShrineCurrentTier } from '@helpers/world-node/world-node-shrine';
+import {
+  shrinePrayerCooldownRemaining,
+  worldNodeShrineCurrentTier,
+} from '@helpers/world-node/world-node-shrine';
 import { worldNodeShrine } from '@helpers/world-node/world-nodes';
 import type { GlobalEffectContent, WorldNodeEntry } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -37,8 +40,16 @@ export class PanelMapNodeActionsShrineComponent {
 
   private shrine = computed(() => worldNodeShrine(this.entry()));
 
+  public cooldownLabel = computed(() => {
+    const remaining = shrinePrayerCooldownRemaining();
+    return remaining > 0 ? formatDuration(remaining) : undefined;
+  });
+
   public canPray = computed(
-    () => isPartyAtNode(this.entry().nodeName) && !!this.currentBuff(),
+    () =>
+      isPartyAtNode(this.entry().nodeName) &&
+      !!this.currentBuff() &&
+      !this.cooldownLabel(),
   );
 
   public currentBuff = computed(() => {
@@ -53,7 +64,5 @@ export class PanelMapNodeActionsShrineComponent {
 
   doPray() {
     this.pray.emit();
-
-    notifySuccess('You pray at the shrine!');
   }
 }

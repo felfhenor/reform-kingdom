@@ -2,18 +2,15 @@ import { caravanState } from '@helpers/caravan/caravan';
 import {
   caravanTradeMaxQuantity,
   caravanTradePrice,
+  caravanTradeUnlockOwned,
 } from '@helpers/caravan/caravan-trade-quantity';
 import { getEntry } from '@helpers/content/content';
-import { isRecipeDiscovered } from '@helpers/crafting/recipes';
 import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
-import {
-  applyCollectibleGrant,
-  isCollectibleDiscovered,
-} from '@helpers/item/collectibles';
+import { ledgerMark } from '@helpers/engine/ledger';
+import { applyCollectibleGrant } from '@helpers/item/collectibles';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import {
   applyMaterialDelta,
@@ -29,9 +26,12 @@ import {
   tradeEquipmentItemLogPart,
   tradeGoodsLogPart,
   tradeLog,
+  tradeRumorLogPart,
 } from '@helpers/item/trade';
 import { addArmoryItems, armoryHasRoomForState } from '@helpers/kingdom/armory';
+import { rumorRevealNodeName } from '@helpers/rumor/rumor';
 import { taskEventCollectibleGained } from '@helpers/task/task-events';
+import { worldNodeDiscoverAnnounce } from '@helpers/world-node/world-node-discovery';
 import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
 import type {
   AdventureLogRewardPart,
@@ -45,6 +45,7 @@ import type {
   GameState,
   ItemContent,
   RecipeContent,
+  RumorContent,
   TradeCommitOutcome,
   TradeReceipt,
   WorldNodeEntry,
@@ -62,6 +63,9 @@ function caravanTradeName(
     return getEntry<CollectibleContent>(trade.collectibleId)?.name;
   }
   if (trade.recipeId) return getEntry<RecipeContent>(trade.recipeId)?.name;
+  if ('rumorId' in trade && trade.rumorId) {
+    return getEntry<RumorContent>(trade.rumorId)?.name;
+  }
   return undefined;
 }
 
@@ -97,7 +101,14 @@ function grantCaravanReward(
 
   if (trade.recipeId) {
     ledgerMark(state.discoveredRecipes, trade.recipeId);
+    return;
   }
+
+  const revealedNodeName =
+    'rumorId' in trade && trade.rumorId
+      ? rumorRevealNodeName(trade.rumorId)
+      : undefined;
+  if (revealedNodeName) ledgerMark(state.worldDiscoveries, revealedNodeName);
 }
 
 // Removes payment from storage/armory - the only two sources a purchase may draw from.
@@ -128,6 +139,7 @@ function caravanTradeGoodsLogPart(
   quantity: number,
   previewed?: EquipmentItem,
 ): AdventureLogRewardPart | undefined {
+  if (trade.rumorId) return tradeRumorLogPart(trade.rumorId);
   return previewed && quantity === 1
     ? tradeEquipmentItemLogPart(previewed)
     : tradeGoodsLogPart(trade, quantity);
@@ -180,6 +192,9 @@ function caravanTradeApply(
       );
     }
     spendGold(state, totalPrice);
+    if (trade.tokenCost) {
+      applyMaterialDelta(state, traderTokenId(), -trade.tokenCost * quantity);
+    }
   } else {
     receipt.goods = caravanTradeGoodsLogPart(trade, quantity);
     takeCaravanPayment(state, trade, quantity);
@@ -194,13 +209,21 @@ function caravanTradeApply(
 function caravanTradeLog(
   entry: WorldNodeEntry,
   trade: CaravanTrade,
+  quantity: number,
   receipt: TradeReceipt,
 ): void {
+  const tokenPrice =
+    trade.type === 'sell' ? (trade.tokenCost ?? 0) * quantity : 0;
   tradeLog(
     entry.nodeName,
     trade.type === 'sell' ? 'bought' : 'sold',
     [receipt.goods],
-    [tradeGoodsLogPart({ itemId: goldCoinId() }, receipt.totalPrice)],
+    [
+      tradeGoodsLogPart({ itemId: goldCoinId() }, receipt.totalPrice),
+      tokenPrice > 0
+        ? tradeGoodsLogPart({ itemId: traderTokenId() }, tokenPrice)
+        : undefined,
+    ],
   );
 }
 
@@ -242,7 +265,7 @@ export async function caravanExecuteTrade(
   );
   if (!executed) return false;
 
-  caravanTradeLog(entry, trade, receipt);
+  caravanTradeLog(entry, trade, quantity, receipt);
   const tradeName = caravanTradeName(trade);
   analyticsSendDesignEvent(
     tradeName
@@ -252,35 +275,18 @@ export async function caravanExecuteTrade(
   if (trade.type === 'sell' && trade.collectibleId) {
     void taskEventCollectibleGained(trade.collectibleId);
   }
+  const revealedNodeName = trade.rumorId
+    ? rumorRevealNodeName(trade.rumorId)
+    : undefined;
+  if (revealedNodeName) worldNodeDiscoverAnnounce(revealedNodeName);
   return true;
-}
-
-// A collectible or recipe token trade is a one-time purchase, same rule as
-// their gold-trade counterparts; item/equipment token trades have no such gate.
-function isTokenTradeAlreadyOwned(
-  trade: CaravanTokenTrade,
-  state?: GameState,
-): boolean {
-  if (trade.collectibleId) {
-    return state
-      ? ledgerHas(state.collectibles, trade.collectibleId)
-      : isCollectibleDiscovered(trade.collectibleId);
-  }
-
-  if (trade.recipeId) {
-    return state
-      ? ledgerHas(state.discoveredRecipes, trade.recipeId)
-      : isRecipeDiscovered(trade.recipeId);
-  }
-
-  return false;
 }
 
 function caravanTokenTradeApply(
   state: GameState,
   trade: CaravanTokenTrade,
 ): TradeCommitOutcome {
-  if (isTokenTradeAlreadyOwned(trade, state)) return 'rejected';
+  if (caravanTradeUnlockOwned(trade, state)) return 'rejected';
 
   const tokenQuantity = state.materials[traderTokenId()]?.quantity ?? 0;
   if (tokenQuantity < trade.tokenCost) return 'rejected';
@@ -310,7 +316,7 @@ export async function caravanExecuteTokenTrade(
   const trade = trader.tokenTrades[tokenTradeIndex];
   if (!trade) return false;
 
-  if (isTokenTradeAlreadyOwned(trade)) return false;
+  if (caravanTradeUnlockOwned(trade)) return false;
   if (!hasTraderTokens(trade.tokenCost)) return false;
   if (trade.equipmentId && !tradeArmoryHasRoom(1)) return false;
 

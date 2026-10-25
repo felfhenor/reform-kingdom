@@ -2,6 +2,7 @@ import type { CollectibleId } from '@interfaces/content-collectible';
 import type { EquipmentId } from '@interfaces/content-equipment';
 import type { ItemId } from '@interfaces/content-item';
 import type { RecipeId } from '@interfaces/content-recipe';
+import type { RumorId } from '@interfaces/content-rumor';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { HasDescription } from '@interfaces/traits';
 
@@ -22,6 +23,11 @@ export type CaravanTrade = {
   collectibleId?: CollectibleId;
   // A recipe sale is one-time like a collectible.
   recipeId?: RecipeId;
+  // Reveals the rumor's hidden node; one-time, retired once the node is found.
+  rumorId?: RumorId;
+
+  // Trader Scrip charged on top of gold, never marked up.
+  tokenCost?: number;
 
   // Omitted for unlimited-quantity trades (e.g. unique collectible sells).
   limit?: number;

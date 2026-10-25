@@ -2,10 +2,9 @@ import {
   caravanBusyTraderIds,
   caravanEligibleTraders,
 } from '@helpers/caravan/caravan';
+import { caravanTradeUnlockOwned } from '@helpers/caravan/caravan-trade-quantity';
 import { ACTIVE_TRADE_COUNT } from '@helpers/config';
-import { isRecipeDiscovered } from '@helpers/crafting/recipes';
 import { timerTicksElapsed } from '@helpers/engine/timer';
-import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import { updateGamestate, worldCaravansState } from '@helpers/state-game';
 import {
@@ -72,16 +71,11 @@ function pickTrader(
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
-// A unique collectible or recipe sell is retired from the rotation once owned.
+// A one-time sell is retired from the rotation once owned.
 function pickActiveTradeIndices(trader: CaravanTraderContent): number[] {
   const eligible = trader.trades
     .map((trade, index) => ({ index, weight: trade.weight, trade }))
-    .filter(
-      ({ trade }) =>
-        (!trade.collectibleId ||
-          !isCollectibleDiscovered(trade.collectibleId)) &&
-        (!trade.recipeId || !isRecipeDiscovered(trade.recipeId)),
-    );
+    .filter(({ trade }) => !caravanTradeUnlockOwned(trade));
 
   return caravanWeightedSample(eligible, ACTIVE_TRADE_COUNT).map(
     (entry) => entry.index,

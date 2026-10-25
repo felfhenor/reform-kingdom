@@ -22,6 +22,8 @@ export type ShrineContent = IsContentItem &
     __type: 'shrine';
 
     legendName: string;
+    // Praying here also draws a Founder whisper hinting at something unfound.
+    founderWhispers: boolean;
     // Level 0 = no investment (not prayable); level N (1..levels.length) grants
     // levels[N-1]'s buff, unlocked by paying levels[N-1].costs.
     levels: ShrineLevel[];

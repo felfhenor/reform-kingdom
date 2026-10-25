@@ -19,6 +19,7 @@ export type ContentType =
   | 'outpost'
   | 'recipe'
   | 'region'
+  | 'rumor'
   | 'shrine'
   | 'skill'
   | 'skilltreenode'

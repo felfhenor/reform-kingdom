@@ -129,6 +129,8 @@ export const DEATHS_DOOR_SECONDS_PER_MAP = 10;
 export const DEATHS_DOOR_MINIMUM_SECONDS = 10;
 // Minimum ticks between two Intimidation auto-wins, so Intimidation can't instantly sweep a chain of weak nodes.
 export const INTIMIDATION_COOLDOWN_TICKS = 15;
+// Shared by every shrine, since a prayer anywhere replaces the last shrine's buff.
+export const SHRINE_PRAYER_COOLDOWN_TICKS = 300;
 // Per home-outpost level past the build (+1), applied to both Deaths Door and Healing.
 export const OUTPOST_DEATH_PENALTY_REDUCTION_PER_LEVEL = 0.25;
 // Levels past this add no further reduction, so the teleport level can't zero out Deaths Door.

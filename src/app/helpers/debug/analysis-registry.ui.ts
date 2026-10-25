@@ -24,6 +24,7 @@ import { runRecipeNamesAnalysis } from '@helpers/debug/analysis-recipenames';
 import { runRecipeRewardsAnalysis } from '@helpers/debug/analysis-reciperewards';
 import { runExchangeNodesAnalysis } from '@helpers/debug/analysis-exchangenodes';
 import { runRegionsAnalysis } from '@helpers/debug/analysis-regions';
+import { runRumorsAnalysis } from '@helpers/debug/analysis-rumors';
 import { runShrinesAnalysis } from '@helpers/debug/analysis-shrines';
 import { runSkillBonusesAnalysis } from '@helpers/debug/analysis-skillbonuses';
 import { runAffixesAnalysis } from '@helpers/debug/analysis-affixes';
@@ -234,6 +235,16 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     strict: true,
     inputKeys: [],
     run: runShrinesAnalysis,
+  },
+  {
+    id: 'rumors',
+    title: 'Rumors',
+    description:
+      'Every rumor points at a real secret, every caravan reveal sells a hidden node for gold and scrip, and every secret node has a rumor.',
+    category: 'World & Maps',
+    strict: true,
+    inputKeys: [],
+    run: runRumorsAnalysis,
   },
   {
     id: 'regions',

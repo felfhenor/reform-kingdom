@@ -21,6 +21,12 @@
       limit: 5
       weight: 3
 
+    - type: sell
+      value: 15000
+      tokenCost: 4
+      rumorId: Rumor of a Lucky Fool
+      weight: 1
+
     - type: buy
       value: 1000
       itemId: Brightwisp Core

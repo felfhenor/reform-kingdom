@@ -6,10 +6,13 @@ import {
   caravanTradeOwnedQuantity,
   caravanTradePrice,
   caravanTradeRemaining,
+  caravanTradeUnlockOwned,
 } from '@helpers/caravan/caravan-trade-quantity';
 import { ensureAffix } from '@helpers/content/ensure-affix';
 import { ensureCaravan } from '@helpers/content/ensure-caravan';
+import { ensureGathering } from '@helpers/content/ensure-gathernode';
 import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
+import { ensureRumor } from '@helpers/content/ensure-rumor';
 import { applyCollectibleGrant } from '@helpers/item/collectibles';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import type {
@@ -21,14 +24,28 @@ import type {
   CollectibleId,
   EquipmentId,
   GameState,
+  GatheringId,
   ItemId,
   RecipeId,
+  RumorId,
 } from '@interfaces';
 import { buildCharacter, buildEquipmentItem } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 
 const goldCoin = ensureItem({ id: 'gold-coin' as ItemId, name: 'Gold Coin' });
+const scrip = ensureItem({ id: 'scrip' as ItemId, name: 'Trader Scrip' });
+const glade = ensureGathering({
+  id: 'glade' as GatheringId,
+  name: 'Hidden Glade',
+  hidden: true,
+});
+const gladeRumor = ensureRumor({
+  id: 'glade-rumor' as RumorId,
+  name: 'Glade Rumor',
+  subject: { kind: 'Node', nodeName: glade.name },
+});
 const ore = 'copper-ore' as ItemId;
 const relic = 'relic' as CollectibleId;
 const cloakRecipe = 'cloak-recipe' as RecipeId;
@@ -48,7 +65,8 @@ const trade = (overrides: Partial<CaravanTrade>): CaravanTrade => ({
 });
 
 beforeEach(() => {
-  seedContent([goldCoin, sword]);
+  seedContent([goldCoin, scrip, sword, glade, gladeRumor]);
+  seedWorldNodes([{ name: glade.name, type: 'GatherNode' }]);
 });
 
 describe('caravanTradePrice', () => {
@@ -61,7 +79,7 @@ describe('caravanTradePrice', () => {
   it('applies the party’s caravan affixes for the trade’s direction only', () => {
     const wearing = (...effects: AffixEffect[]) => {
       const affix = ensureAffix({ id: 'trader' as AffixId, effects });
-      seedContent([goldCoin, sword, affix]);
+      seedContent([goldCoin, scrip, sword, affix]);
       const hero = buildCharacter();
       hero.equipment.Weapon = buildEquipmentItem(sword.id, {
         affixIds: [affix.id],
@@ -239,5 +257,59 @@ describe('caravanTradeMaxQuantity', () => {
         given,
       ),
     ).toBe(0);
+  });
+});
+
+describe('caravanTradeUnlockOwned', () => {
+  it('is undefined for trades with no one-time cap', () => {
+    seedGamestate();
+    expect(caravanTradeUnlockOwned(trade({ itemId: ore }))).toBeUndefined();
+  });
+
+  it('owns a rumor reveal once its node is found', () => {
+    seedGamestate();
+    expect(caravanTradeUnlockOwned(trade({ rumorId: gladeRumor.id }))).toBe(
+      false,
+    );
+
+    seedGamestate((state) => {
+      state.worldDiscoveries[glade.name] = { foundAt: 1 };
+    });
+    expect(caravanTradeUnlockOwned(trade({ rumorId: gladeRumor.id }))).toBe(
+      true,
+    );
+  });
+});
+
+describe('rumor reveal trades', () => {
+  const reveal = trade({ rumorId: gladeRumor.id, tokenCost: 3 });
+  const withCurrency = (gold: number, tokens: number) =>
+    seedGamestate((state) => {
+      applyMaterialDelta(state, goldCoin.id, gold);
+      applyMaterialDelta(state, scrip.id, tokens);
+    });
+
+  it('needs both the gold and the scrip, and never sells more than one', () => {
+    const price = caravanTradePrice(caravan(), reveal);
+
+    withCurrency(price * 5, 2);
+    expect(caravanTradeMaxQuantity(caravan(), reveal, {}, 0)).toBe(0);
+
+    withCurrency(price - 1, 9);
+    expect(caravanTradeMaxQuantity(caravan(), reveal, {}, 0)).toBe(0);
+
+    withCurrency(price * 5, 9);
+    expect(caravanTradeMaxQuantity(caravan(), reveal, {}, 0)).toBe(1);
+  });
+
+  it('marks up gold but not scrip', () => {
+    expect(caravanTradePrice(caravan(), reveal)).toBe(125);
+  });
+
+  it('sells out once the node is found', () => {
+    seedGamestate((state) => {
+      state.worldDiscoveries[glade.name] = { foundAt: 1 };
+    });
+    expect(caravanIsTradeSoldOut(reveal, {}, 0)).toBe(true);
   });
 });

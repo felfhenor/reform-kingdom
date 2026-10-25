@@ -51,6 +51,12 @@
       limit: 10
       weight: 3
 
+    - type: sell
+      value: 20000
+      tokenCost: 5
+      rumorId: Rumor of a Crimson Altar
+      weight: 1
+
 - id: 233c05d3-d8c0-441d-8372-67a8a2c284fe
   name: Valg Brvyot
   description: You found it, I move it. Nobody needs to know the rest.

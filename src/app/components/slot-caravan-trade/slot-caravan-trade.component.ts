@@ -11,7 +11,7 @@ import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/to
 import { ListRowDirective } from '@directives/list-row.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { caravanTradeDisplay } from '@helpers/caravan/caravan-trade-display.ui';
-import { goldCoinId, hasGold } from '@helpers/item/materials';
+import { goldCoinId, hasGold, traderTokenId } from '@helpers/item/materials';
 import type { CaravanTradeRow } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
@@ -37,6 +37,7 @@ export class SlotCaravanTradeComponent {
   public activate = output<boolean>();
 
   public goldCoinItemId = goldCoinId();
+  public traderTokenItemId = traderTokenId();
 
   public display = computed(() =>
     caravanTradeDisplay(this.row().trade, this.row().equipmentItem),
