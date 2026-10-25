@@ -186,6 +186,9 @@
     - collectibleId: Brother Figurine
       tokenCost: 3
 
+    - itemId: Hexdust
+      tokenCost: 4
+
   trades:
     - type: sell
       value: 100

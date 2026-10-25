@@ -11,6 +11,9 @@
     - itemId: Demonic Armor Shard
       tokenCost: 4
 
+    - itemId: Demonic Crimson Ingot
+      tokenCost: 5
+
   trades:
     - type: sell
       value: 4000
@@ -60,6 +63,9 @@
 
     - itemId: Beholder Lens
       tokenCost: 4
+
+    - itemId: Fel-infused Scale
+      tokenCost: 6
 
   trades:
     - type: sell

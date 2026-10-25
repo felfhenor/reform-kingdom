@@ -8,6 +8,12 @@
     - collectibleId: Shiny Hat
       tokenCost: 3
 
+    - itemId: Star Fragment
+      tokenCost: 3
+
+    - itemId: Akroki Eye
+      tokenCost: 3
+
   trades:
     - type: sell
       value: 3500

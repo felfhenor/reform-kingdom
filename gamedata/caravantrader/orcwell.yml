@@ -8,6 +8,12 @@
     - collectibleId: Golden Orc Skull
       tokenCost: 3
 
+    - itemId: Spirit Gear
+      tokenCost: 2
+
+    - itemId: Ectopowder
+      tokenCost: 3
+
   trades:
     - type: sell
       value: 400

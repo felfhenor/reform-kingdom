@@ -146,6 +146,9 @@
     - collectibleId: Blank Templar Scroll
       tokenCost: 3
 
+    - itemId: Gobslime Tongue
+      tokenCost: 2
+
   trades:
     - type: sell
       value: 500
