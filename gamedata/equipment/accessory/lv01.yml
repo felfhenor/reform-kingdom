@@ -45,6 +45,9 @@
   baseStats:
     Resistance: 2.5
 
+  elementalResistances:
+    Air: 5
+
 - id: 49e2b537-0501-4255-9813-bff11afef4d5
   name: Ace of Spades
   description: A playing card symbolizing luck. Some say it was dealt from a marked deck.

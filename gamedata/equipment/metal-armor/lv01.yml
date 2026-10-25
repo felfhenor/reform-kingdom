@@ -10,6 +10,9 @@
     Vitality: 1
     Resistance: 0.5
 
+  elementalResistances:
+    Fire: 5
+
 - id: 5fb070f8-c521-4452-8105-3ca3ace2c75b
   name: Coppersilk Breastplate
   description: A breastplate made of coppersilk, lighter than it looks.

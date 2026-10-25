@@ -47,3 +47,6 @@
     Health: 10
     Vitality: 2.1
     Resistance: 2.4
+
+  elementalResistances:
+    Air: 5
