@@ -86,7 +86,23 @@
       sellAtQuantity: 30
 
     - itemId: Elven Purity Water
+      maxQuantity: 100
+
+    # special items
+    - itemId: Dewsilk
       maxQuantity: 50
+      value: 1500
+      sellAtQuantity: 1
+
+    - itemId: Corewood Slivers
+      maxQuantity: 50
+      value: 2000
+      sellAtQuantity: 1
+
+    - itemId: Crimson Ruby Shard
+      maxQuantity: 50
+      value: 2500
+      sellAtQuantity: 1
 
   crafting:
     maxQueueSize:
@@ -134,6 +150,9 @@
       - 'Weapon: Ancestral Kukri'
       - 'Offhand: Ancestral Greatshield'
       - 'Weapon: Ancestral Whip'
+      - 'Material: Dewsilk'
+      - 'Material: Corewood Slivers'
+      - 'Material: Crimson Ruby Shard'
 
     bannedRecipeIds:
       - 'Offhand: Elven Shield Copycat'

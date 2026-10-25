@@ -85,6 +85,17 @@
       value: 3000
       sellAtQuantity: 4
 
+    # special recipes
+    - itemId: Sunfire Onyx
+      maxQuantity: 20
+      value: 1800
+      sellAtQuantity: 1
+
+    - itemId: Merchant's Lucky Coin
+      maxQuantity: 10
+      value: 3000
+      sellAtQuantity: 1
+
   crafting:
     maxQueueSize:
       - tier: 0
@@ -125,6 +136,8 @@
 
     uniqueRecipeIds:
       - 'Ring: Larsian Ring'
+      - 'Material: Sunfire Onyx'
+      - "Material: Merchant's Lucky Coin"
 
   traders:
     sellItemCount:

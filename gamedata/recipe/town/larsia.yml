@@ -18,3 +18,35 @@
   maxTradeskillLevel: 16
   tradeskillXP: 0
   craftTime: 300
+
+- id: 5471d63f-f83a-4922-b809-76ca40dfa6f7
+  name: 'Material: Sunfire Onyx'
+  result:
+    itemId: Sunfire Onyx
+  requirements:
+    - itemId: Amber
+      quantity: 3
+
+    - itemId: Cimmerian Dust
+      quantity: 1
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 16
+  maxTradeskillLevel: 16
+  tradeskillXP: 0
+  craftTime: 240
+
+- id: 1f551c51-527e-4f7f-a728-64026499d128
+  name: "Material: Merchant's Lucky Coin"
+  result:
+    itemId: "Merchant's Lucky Coin"
+  requirements:
+    - itemId: Gold Coin
+      quantity: 750
+    - itemId: Amber
+      quantity: 2
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 16
+  maxTradeskillLevel: 16
+  tradeskillXP: 0
+  craftTime: 300

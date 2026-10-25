@@ -47,3 +47,24 @@
 
   infusionCombatStats:
     debuffIgnoreChance: 1
+
+- id: 32941892-b863-489d-9cf9-1d17dcbd7c74
+  name: Sunfire Onyx
+  description: An artificial gem often used by the Cimmerians to navigate the day and night alike.
+  rarity: Uncommon
+  sprite: '0099'
+
+  infusionElementalResistances:
+    Fire: 5
+
+  infusionStats:
+    Intelligence: 2.2
+
+- id: e2faa6a3-bede-4c6e-9512-5a0b79d0f5c4
+  name: Merchant's Lucky Coin
+  description: A silver tribute to Izchak, merchants everywhere seek these good luck charms.
+  rarity: Uncommon
+  sprite: '0098'
+  infusionStats:
+    Luck: 2.5
+    Energy: 6

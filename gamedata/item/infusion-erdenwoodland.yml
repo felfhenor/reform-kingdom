@@ -40,3 +40,31 @@
     Strength: 4.2
     Vitality: 2.6
     Resistance: 8.3
+
+- id: 3ee29565-57d6-4d0c-88ad-df4222b6e3b9
+  name: Dewsilk
+  description: A fabric that's made of erden dew sprinkled on elfsilk, and twice-purified. Elves love how fluffy it is!
+  rarity: Uncommon
+  sprite: '0100'
+  infusionElementalResistances:
+    Air: 5
+  infusionDebuffResistances:
+    StatDown: 5
+
+- id: 87577874-6b6e-470f-b82a-b5eebc021094
+  name: Corewood Slivers
+  description: Splinters of elven corewood that are light to the touch.
+  rarity: Uncommon
+  sprite: '0101'
+  infusionStats:
+    Agility: 3.6
+    Resistance: 2.2
+
+- id: 155fa9b6-75b9-4225-93cd-efb095627d3b
+  name: Crimson Ruby Shard
+  description: An unused shard of a crimson ruby, too small to be refined, but not so small that it's useless.
+  rarity: Uncommon
+  sprite: '0102'
+  infusionStats:
+    Strength: 3.8
+    Vitality: 2.3

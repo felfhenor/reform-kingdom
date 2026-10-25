@@ -162,3 +162,54 @@
   maxTradeskillLevel: 24
   tradeskillXP: 0
   craftTime: 600
+
+- id: 088820b7-83fe-47c6-8fd5-30099301101a
+  name: 'Material: Dewsilk'
+  result:
+    itemId: Dewsilk
+  requirements:
+    - itemId: Elven Purity Water
+      quantity: 1
+
+    - itemId: Elfsilk
+      quantity: 2
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 12
+  maxTradeskillLevel: 12
+  tradeskillXP: 0
+  craftTime: 240
+
+- id: 948852a8-b1ec-4537-8200-f18775427711
+  name: 'Material: Corewood Slivers'
+  result:
+    itemId: Corewood Slivers
+  requirements:
+    - itemId: Elven Corewood
+      quantity: 3
+
+    - itemId: Hawk Feather
+      quantity: 2
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 20
+  maxTradeskillLevel: 20
+  tradeskillXP: 0
+  craftTime: 240
+
+- id: 09c01c60-65ad-4687-808c-3ac0389e6845
+  name: 'Material: Crimson Ruby Shard'
+  result:
+    itemId: Crimson Ruby Shard
+  requirements:
+    - itemId: Crimson Ruby
+      quantity: 1
+
+    - itemId: Crimson Ingot
+      quantity: 1
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 14
+  maxTradeskillLevel: 14
+  tradeskillXP: 0
+  craftTime: 240
