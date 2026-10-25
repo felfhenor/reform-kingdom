@@ -14,6 +14,7 @@ import {
   skillTreeNodeLevel,
   skillTreeOptionOath,
 } from '@helpers/hero/skill-tree-content';
+import { skillTreeNodeKind } from '@helpers/hero/skill-tree-node';
 import type {
   Character,
   JobContent,
@@ -22,7 +23,7 @@ import type {
   SkillTreeNodeContent,
   SkillTreeNodeId,
 } from '@interfaces';
-import { clamp, sortBy, uniq } from 'es-toolkit/compat';
+import { clamp, partition, sortBy, takeWhile, uniq } from 'es-toolkit/compat';
 
 export function skillTreeEarnedSp(level: number): number {
   const counted = clamp(level, 1, SKILL_TREE_MAX_COLUMN_LEVEL);
@@ -156,33 +157,55 @@ export function characterSkillTreeWithAdditions(
   return valid ? [...current, ...added.map((node) => node.id)] : undefined;
 }
 
-// What a hands-off player would buy: lowest level first, an oath's first option, until SP runs out.
+// Everything a hands-off player will eventually buy, in order: lowest level first, an oath's first option, perks only after all else.
+function skillTreeAutoPickPlan(
+  nodes: SkillTreeNodeContent[],
+  learned: Set<SkillTreeNodeId>,
+): SkillTreeNodeContent[] {
+  const planned = new Set(learned);
+  const [perks, others] = partition(
+    sortBy(nodes, (node) => skillTreeNodeLevel(nodes, node)),
+    (node) => skillTreeNodeKind(node) === 'Perk',
+  );
+
+  return [...others, ...perks].filter((node) => {
+    if (
+      !skillTreeNodeIsLearnable(
+        nodes,
+        planned,
+        node,
+        SKILL_TREE_MAX_COLUMN_LEVEL,
+      )
+    )
+      return false;
+
+    planned.add(node.id);
+    return true;
+  });
+}
+
+// Follows the plan until it reaches a node above the hero's level, banking SP rather than buying perks early.
 export function characterSkillTreeAutoPicks(
   character: Pick<
     Character,
     'jobId' | 'level' | 'jobProgress' | 'skillTreeNodes'
   >,
 ): SkillTreeNodeId[] {
-  let sp = characterSkillTreeAvailableSp(character, character.jobId);
+  const sp = characterSkillTreeAvailableSp(character, character.jobId);
   if (sp <= 0) return [];
 
   const nodes = skillTreeJobNodes(character.jobId);
-  const learned = new Set(
-    characterSkillTreeNodeIds(character, character.jobId),
+  const plan = skillTreeAutoPickPlan(
+    nodes,
+    new Set(characterSkillTreeNodeIds(character, character.jobId)),
   );
-  const picks: SkillTreeNodeId[] = [];
 
-  sortBy(nodes, (node) => skillTreeNodeLevel(nodes, node)).forEach((node) => {
-    if (sp <= 0) return;
-    if (!skillTreeNodeIsLearnable(nodes, learned, node, character.level))
-      return;
-
-    learned.add(node.id);
-    picks.push(node.id);
-    sp -= 1;
-  });
-
-  return picks;
+  return takeWhile(
+    plan,
+    (node) => skillTreeNodeLevel(nodes, node) <= character.level,
+  )
+    .slice(0, sp)
+    .map((node) => node.id);
 }
 
 // Parents always sit at a lower level, so rebuilding in level order drops unknown, too-high, orphaned and duplicate oath picks in one pass.

@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { ensureJob } from '@helpers/content/ensure-job';
+import { ensureSkill } from '@helpers/content/ensure-skill';
 import { ensureSkillTreeNode } from '@helpers/content/ensure-skilltreenode';
 import { characterNonGearEffects } from '@helpers/hero/hero-effect';
 import {
@@ -16,6 +17,7 @@ import {
 } from '@helpers/hero/skill-tree';
 import type {
   Character,
+  EquipmentSkillId,
   JobId,
   SkillTreeNodeContent,
   SkillTreeNodeId,
@@ -43,10 +45,20 @@ function node(
 
 const ids = (...names: string[]) => names as SkillTreeNodeId[];
 
+const strikeSkill = ensureSkill({
+  id: 'strike-skill' as EquipmentSkillId,
+  name: 'Strike II',
+});
+const grantsStrike = [{ kind: 'GrantSkill' as const, skillId: strikeSkill.id }];
+
 // strike (default) -> strike2 (Lv 10); aura (default); oath (Lv 15) -> left | right; leftPerk (Lv 20) needs left; oathChild (Lv 20) needs either option.
 const tree = [
   node('strike', { default: true }),
-  node('strike2', { level: 10, requiredSkillTreeNodeIds: ids('strike') }),
+  node('strike2', {
+    level: 10,
+    requiredSkillTreeNodeIds: ids('strike'),
+    effects: grantsStrike,
+  }),
   node('aura', {
     default: true,
     effects: [{ kind: 'Stat', stat: 'Strength', value: 3 }],
@@ -62,7 +74,7 @@ function hero(overrides: Partial<Character> = {}): Character {
   return buildCharacter({ jobId, ...overrides });
 }
 
-beforeEach(() => {
+function seedTree(nodes: SkillTreeNodeContent[]): void {
   seedContent([
     ensureJob({
       id: jobId,
@@ -71,8 +83,13 @@ beforeEach(() => {
       specializationRows: ['Stalker', 'Wayfinder'],
     }),
     ensureJob({ id: otherJobId, name: 'Other', treeVersion: 1 }),
-    ...tree,
+    strikeSkill,
+    ...nodes,
   ]);
+}
+
+beforeEach(() => {
+  seedTree(tree);
 });
 
 describe('skillTreeEarnedSp', () => {
@@ -196,6 +213,22 @@ describe('characterSkillTreeAutoPicks', () => {
     expect(picks(50, ['strike', 'aura'])).toEqual(
       ids('strike2', 'left', 'leftPerk', 'oathChild'),
     );
+  });
+
+  it('banks SP for upcoming skills instead of buying perks early', () => {
+    seedTree([
+      node('strike', { default: true }),
+      node('aura', { default: true }),
+      node('perk', { effects: [{ kind: 'Stat', stat: 'Luck', value: 2 }] }),
+      node('strike2', { level: 5, effects: grantsStrike }),
+    ]);
+    const picks = (level: number) =>
+      characterSkillTreeAutoPicks(
+        hero({ level, skillTreeNodes: { [jobId]: ids('strike', 'aura') } }),
+      );
+
+    expect(picks(3)).toEqual([]);
+    expect(picks(5)).toEqual(ids('strike2', 'perk'));
   });
 });
 

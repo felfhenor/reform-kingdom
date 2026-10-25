@@ -152,7 +152,7 @@ function sharedOptionIssues(nodes: SkillTreeNodeContent[]): AnalysisIssue[] {
     );
 }
 
-// Spec-row nodes must descend from their own row's spec option.
+// Spec-row nodes from the oath level on must descend from their row's spec; lower ones are free-standing pre-spec passives.
 function specLineageIssues(
   job: JobContent,
   nodes: SkillTreeNodeContent[],
@@ -162,6 +162,7 @@ function specLineageIssues(
       (node) =>
         node.row !== '' &&
         job.specializationRows.includes(node.row) &&
+        node.level >= SKILL_TREE_SPEC_OATH_LEVEL &&
         !skillTreeIsOath(node),
     )
     .flatMap((node) => {
