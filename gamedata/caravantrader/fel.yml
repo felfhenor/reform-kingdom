@@ -1,0 +1,99 @@
+- id: b86f057a-7f23-45de-9b9a-8f41b0d7cf7c
+  name: Gary Forcena
+  description: Elves, Fel, humans - coin spends the same. Don't tell the elves I said that - their money doesn't do us any good outside Elfheim.
+  category: Fel
+  level: 35
+
+  tokenTrades:
+    - collectibleId: Smuggler's Pouch
+      tokenCost: 3
+
+    - itemId: Demonic Armor Shard
+      tokenCost: 4
+
+  trades:
+    - type: sell
+      value: 4000
+      itemId: Fel Energy Core
+      limit: 5
+      weight: 3
+
+    - type: sell
+      value: 3000
+      itemId: Merchant's Lucky Coin
+      limit: 3
+      weight: 2
+
+    - type: sell
+      value: 6000
+      itemId: Cimmerian Holy Charm
+      limit: 2
+      weight: 1
+
+    - type: sell
+      value: 3000
+      itemId: Cimmerian Skull Charm
+      limit: 2
+      weight: 1
+
+    - type: buy
+      value: 1200
+      itemId: Knight Belltag
+      limit: 10
+      weight: 3
+
+    - type: buy
+      value: 1000
+      itemId: Pixie Claw
+      limit: 10
+      weight: 3
+
+- id: 233c05d3-d8c0-441d-8372-67a8a2c284fe
+  name: Valg Brvyot
+  description: You found it, I move it. Nobody needs to know the rest.
+  category: Fel
+  level: 45
+
+  tokenTrades:
+    - collectibleId: Smuggler's Knapsack
+      tokenCost: 5
+
+    - itemId: Beholder Lens
+      tokenCost: 4
+
+  trades:
+    - type: sell
+      value: 4000
+      itemId: Pixie Dust
+      limit: 5
+      weight: 3
+
+    - type: sell
+      value: 2500
+      itemId: Sunfire Onyx
+      limit: 3
+      weight: 2
+
+    - type: sell
+      value: 2500
+      itemId: Dewsilk
+      limit: 3
+      weight: 2
+
+    - type: sell
+      value: 2500
+      itemId: Crimson Ruby Shard
+      limit: 3
+      weight: 2
+
+    - type: buy
+      value: 1500
+      itemId: Beholder Eyeball
+      limit: 10
+      weight: 3
+
+    - type: buy
+      value: 150
+      itemId: Fel Essence
+      limit: 50
+      weight: 2

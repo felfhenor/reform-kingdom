@@ -1,0 +1,88 @@
+- id: 8b67e00b-9f25-4608-b4d6-8936b59062a4
+  name: Commission - Muffled Belltags
+  description: The smugglers want knight belltags taken to minimize the risk of patrols hearing each other.
+
+  requirements:
+    - itemId: Knight Belltag
+      quantityMin: 5
+      quantityMax: 10
+
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 1
+      max: 1
+
+  townReputationReward: 30
+
+- id: f9710cd6-1224-459c-a65f-33241499b7c1
+  name: Commission - Pixie Claw Contraband
+  description: The smugglers have a buyer for pixie claws. As endangered pets, selling their parts is punishable by death - but worth every penny.
+
+  requirements:
+    - itemId: Pixie Claw
+      quantityMin: 5
+      quantityMax: 10
+
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 1
+      max: 1
+
+  townReputationReward: 30
+
+- id: 3a3125c6-103c-4b19-8d52-1b81db8e3d92
+  name: Commission - Jarred Eyeballs
+  description: The smugglers need beholder eyeballs for someone who wants to test if they can really see the future.
+
+  requirements:
+    - itemId: Beholder Eyeball
+      quantityMin: 5
+      quantityMax: 10
+
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 1
+      max: 1
+
+  townReputationReward: 30
+
+- id: 28a3fa3a-48b3-4561-baa4-88c92605f23c
+  name: Commission - False-Bottom Crates
+  description: The smugglers need felrock and felwood to build crates that look a lot emptier than they are.
+
+  requirements:
+    - itemId: Felrock
+      quantityMin: 40
+      quantityMax: 60
+
+    - itemId: Felwood
+      quantityMin: 40
+      quantityMax: 60
+
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 1
+      max: 1
+
+  townReputationReward: 15
+
+- id: 520fdb6c-8320-4d03-93f6-00edb71ad277
+  name: Commission - Clear the Patrol Route
+  description: The smugglers want the demon knights thinned out along their route. The less there are, the fewer inspections there are.
+
+  requirements:
+    - monsterId: Demon Knight
+      quantityMin: 5
+      quantityMax: 10
+
+  rewards:
+    - itemId: Trader Scrip
+      chance: 100
+      min: 1
+      max: 1
+
+  townReputationReward: 30

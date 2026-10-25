@@ -446,6 +446,19 @@
                  "width":64,
                  "x":320,
                  "y":832
+                }, 
+                {
+                 "gid":407,
+                 "height":64,
+                 "id":164,
+                 "name":"Fel Smugglers - Felway",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"CaravanNode",
+                 "visible":true,
+                 "width":64,
+                 "x":1472,
+                 "y":1152
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -454,7 +467,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":164,
+ "nextobjectid":165,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

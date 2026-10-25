@@ -1,0 +1,19 @@
+- id: 91b1f457-f6f2-47f6-93a6-269d2eacaaec
+  name: Smuggler's Pouch
+  rarity: Rare
+  description: A pouch used by smugglers to transport small goods covertly.
+  sprite: '0065'
+
+  effects:
+    - effectType: GlobalArmorySizeBoost
+      value: 5
+
+- id: 1574e470-1161-402d-9fda-6adad584973c
+  name: Smuggler's Knapsack
+  rarity: Rare
+  description: A knapsack used by smugglers to transport large goods covertly.
+  sprite: '0066'
+
+  effects:
+    - effectType: GlobalArmorySizeBoost
+      value: 10

@@ -1,0 +1,32 @@
+- id: 27f1d90d-7c5c-49c0-b813-7d079ac5234c
+  name: Fel Smugglers - Felway
+  description: A band of Fel who move goods between the Fel and the Duchy. They'll trade with anyone who has the coin they need.
+
+  traderResetTime: 3600
+
+  level:
+    min: 35
+    max: 52
+
+  markupPercentages:
+    sell: 150
+    buy: -10
+
+  traderCategories:
+    - Fel
+
+  commissionOffers:
+    - commissionOfferId: Commission - Muffled Belltags
+      weight: 2
+
+    - commissionOfferId: Commission - Pixie Claw Contraband
+      weight: 2
+
+    - commissionOfferId: Commission - Jarred Eyeballs
+      weight: 2
+
+    - commissionOfferId: Commission - False-Bottom Crates
+      weight: 1
+
+    - commissionOfferId: Commission - Clear the Patrol Route
+      weight: 1

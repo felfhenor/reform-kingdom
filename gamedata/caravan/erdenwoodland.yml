@@ -14,6 +14,7 @@
 
   traderCategories:
     - Elfheim
+    - Fel
 
   commissionOffers:
     - commissionOfferId: Commission - Batch of Raw Metals
