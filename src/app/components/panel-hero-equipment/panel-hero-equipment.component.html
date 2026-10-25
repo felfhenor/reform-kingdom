@@ -74,7 +74,7 @@
     </div>
 
     <div class="flex items-center justify-between gap-2">
-      <div [appHideUntilLevel]="3" class="flex gap-2">
+      <div [appHideUntilLevel]="3" class="flex">
         <app-slot-button-container
           [disabled]="!isAtKingdomCurrently()"
           [helpText]="'Promote a hero to be higher in the party order. This must be done at the Duchy.'"
