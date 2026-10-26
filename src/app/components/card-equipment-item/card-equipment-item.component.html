@@ -5,7 +5,7 @@
   [disabled]="disabled()"
   [tp]="tooltip"
   [tpVariation]="equippedDisplay() ? 'itemComparison' : undefined"
-  (click)="equip.emit()"
+  (click)="emitEquip()"
   appSfx="ui-click"
   [sfxTrigger]="['click', 'hover']"
 >

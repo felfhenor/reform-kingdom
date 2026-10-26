@@ -2,8 +2,10 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  ElementRef,
   input,
   output,
+  viewChild,
 } from '@angular/core';
 import { DetailItemPreviewComponent } from '@components/detail-item-preview/detail-item-preview.component';
 import { RowEquipmentSellValueComponent } from '@components/row-equipment-sell-value/row-equipment-sell-value.component';
@@ -53,7 +55,16 @@ export class CardEquipmentItemComponent {
   public equippedItem = input<EquipmentItem>();
   public disabled = input<boolean>(false);
 
-  public equip = output<void>();
+  // Emits the item's icon so the parent can fly it into the slot it was equipped to.
+  public equip = output<HTMLElement>();
+
+  private icon = viewChild.required(SlotRarityOutlineComponent, {
+    read: ElementRef<HTMLElement>,
+  });
+
+  public emitEquip(): void {
+    this.equip.emit(this.icon().nativeElement);
+  }
 
   public display = computed<ItemPreviewDisplay>(() =>
     itemPreviewDisplay('equipment', this.equipment(), this.equipmentItem()),

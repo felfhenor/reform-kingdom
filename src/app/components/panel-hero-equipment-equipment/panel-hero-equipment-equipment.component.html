@@ -13,6 +13,7 @@
           @if (isSlotVisible(slot)) {
             <app-slot-equipment
               class="min-h-[66px]"
+              [attr.data-equip-slot]="slot"
               [slot]="slot"
               [equippedItem]="equippedItemFor(slot)"
               [isSelected]="selected === slot"
@@ -62,7 +63,7 @@
             [equippedContent]="selectedContent"
             [equippedItem]="equippedItemFor(selected)"
             [disabled]="!modifiable"
-            (equip)="equip(entry.item.id)"
+            (equip)="equip(entry.item.id, $event)"
           />
         </app-slot-button-container>
       } @empty {

@@ -3,6 +3,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  ElementRef,
+  inject,
   input,
   signal,
 } from '@angular/core';
@@ -20,6 +22,7 @@ import {
   isSlotAvailableForJob,
 } from '@helpers/item/equipment';
 import { equipmentAvailableForSlot } from '@helpers/item/equipment.ui';
+import { AnimationService } from '@services/animation.service';
 import {
   EquipmentTypeToSlot,
   type Character,
@@ -56,6 +59,9 @@ const PAPERDOLL_ROWS: EquipmentSlot[][] = [
   styleUrl: './panel-hero-equipment-equipment.component.scss',
 })
 export class PanelHeroEquipmentEquipmentComponent {
+  private host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private anim = inject(AnimationService);
+
   public character = input.required<Character>();
 
   public paperdollRows = PAPERDOLL_ROWS;
@@ -115,10 +121,21 @@ export class PanelHeroEquipmentEquipmentComponent {
     this.selectedSlot.set(this.selectedSlot() === slot ? undefined : slot);
   }
 
-  public equip(equipmentItemId: EquipmentItemId): void {
-    if (characterEquipFromArmory(this.character().id, equipmentItemId)) {
-      this.selectedSlot.set(undefined);
+  public equip(equipmentItemId: EquipmentItemId, sourceEl: HTMLElement): void {
+    const slot = this.selectedSlot();
+    if (
+      !slot ||
+      !characterEquipFromArmory(this.character().id, equipmentItemId)
+    ) {
+      return;
     }
+
+    this.selectedSlot.set(undefined);
+
+    const targetEl = this.host.nativeElement.querySelector(
+      `[data-equip-slot="${slot}"]`,
+    );
+    if (targetEl) this.anim.flyTo(sourceEl, targetEl, 'pulse');
   }
 
   public unequip(slot = this.selectedSlot()): void {
