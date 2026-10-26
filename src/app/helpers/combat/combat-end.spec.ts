@@ -8,6 +8,7 @@ vi.mock('@helpers/encounter/encounter-random-combat');
 vi.mock('@helpers/hero/travel');
 vi.mock('@helpers/town/raid/town-raid-resolve');
 vi.mock('@helpers/task/task-progress');
+vi.mock('@helpers/engine/sfx');
 
 import { combatantMessageToken, combatLog } from '@helpers/combat/combat-log';
 import { combatCheckIfOver, isCombatOver } from '@helpers/combat/combat-end';
@@ -27,6 +28,7 @@ import {
 } from '@helpers/decree/auto-mode-state';
 import { encounterStartFight } from '@helpers/encounter/encounter';
 import { encounterRandomHandleVictory } from '@helpers/encounter/encounter-random-combat';
+import { playGameSFX } from '@helpers/engine/sfx';
 import {
   partyGainXp,
   syncPartyHpFromCombat,
@@ -391,6 +393,7 @@ describe('combatCheckIfOver', () => {
 
       endFight(combat);
 
+      expect(playGameSFX).toHaveBeenCalledWith('death');
       expect(syncPartyHpFromCombat).toHaveBeenCalledWith(combat.heroes);
       expect(travelBeginDeathsDoor).toHaveBeenCalled();
       expect(autoModeRecordClauseFailure).toHaveBeenCalled();

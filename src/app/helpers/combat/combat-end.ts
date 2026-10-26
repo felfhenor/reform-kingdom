@@ -23,6 +23,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { playGameSFX } from '@helpers/engine/sfx';
 import {
   partyGainXp,
   syncPartyHpFromCombat,
@@ -275,6 +276,7 @@ function handleCombatVictory(combat: Combat): boolean {
 export function combatHandleDefeat(combat: Combat): void {
   combatMessageLog(combat, 'Heroes have lost the combat!');
   analyticsSendDesignEvent('Combat:Encounter:Loss');
+  playGameSFX('death');
 
   syncPartyHpFromCombat(combat.heroes);
   autoModeRecordClauseFailure();

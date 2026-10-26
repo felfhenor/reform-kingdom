@@ -23,7 +23,7 @@ export * from './page-visibility';
 export * from './record';
 export * from './risk-band';
 export * from './scheduler';
-export * from './sfx.ui';
+export * from './sfx';
 export * from './signal';
 export * from './timer';
 export * from './timer.ui';

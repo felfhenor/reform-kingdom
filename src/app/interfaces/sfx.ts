@@ -1,4 +1,5 @@
 export type SFX =
+  | 'death'
   | 'item-get-major'
   | 'item-get-minor'
   | 'loading'

@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/engine/gather-vfx');
+vi.mock('@helpers/engine/sfx');
 vi.mock('@helpers/task/task-events');
 
 import { combatLog } from '@helpers/combat/combat-log';
@@ -17,6 +18,7 @@ import { ensureRecipe } from '@helpers/content/ensure-recipe';
 import { ensureWorker } from '@helpers/content/ensure-worker';
 import { defaultGameState } from '@helpers/defaults';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
+import { playGameSFX } from '@helpers/engine/sfx';
 import { ledgerMark } from '@helpers/engine/ledger';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { getMaterialQuantity } from '@helpers/item/materials';
@@ -138,6 +140,19 @@ describe('grantResolvedDrops', () => {
     expect(vfxQuantities()).toEqual([1]);
   });
 
+  it('logs a repeat collectible without the major-find sound', () => {
+    grant(
+      [{ kind: 'Collectible', collectibleId: coin.id }],
+      fight(),
+      (state) => {
+        state.collectibles[coin.id] = { quantity: 1, foundAt: 1 };
+      },
+    );
+
+    expect(logMessages()).toEqual([expect.stringContaining('Old Coin')]);
+    expect(playGameSFX).not.toHaveBeenCalled();
+  });
+
   it('discovers a recipe once, staying silent on a repeat', () => {
     grant([{ kind: 'Recipe', recipeId: recipe.id }]);
     expect(discoveredRecipesState()[recipe.id]).toBeDefined();
@@ -149,6 +164,7 @@ describe('grantResolvedDrops', () => {
     );
     expect(logMessages()).toHaveLength(1);
     expect(gatherVfxEmit).not.toHaveBeenCalled();
+    expect(playGameSFX).not.toHaveBeenCalled();
   });
 
   it('rescues a worker once, staying silent on a repeat', () => {
@@ -162,6 +178,23 @@ describe('grantResolvedDrops', () => {
     });
     expect(logMessages()).toHaveLength(1);
     expect(gatherVfxEmit).not.toHaveBeenCalled();
+    expect(playGameSFX).not.toHaveBeenCalled();
+  });
+
+  it('plays one major-find sound for a batch of rare finds, none for common loot', () => {
+    grant([
+      { kind: 'Collectible', collectibleId: coin.id },
+      { kind: 'Recipe', recipeId: recipe.id },
+      { kind: 'Worker', workerId: nell.id },
+    ]);
+    expect(playGameSFX).toHaveBeenCalledExactlyOnceWith('item-get-major');
+
+    vi.clearAllMocks();
+    grant([
+      { kind: 'Equipment', equipmentId: sword.id },
+      { kind: 'Item', itemId: ore.id, quantity: 2 },
+    ]);
+    expect(playGameSFX).not.toHaveBeenCalled();
   });
 
   it("logs and floats a rescued worker's thanks", () => {

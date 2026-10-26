@@ -16,6 +16,7 @@ import { commissionDisplayName } from '@helpers/commission/commission-turn-in';
 import { getEntry } from '@helpers/content';
 import { recipesProducing } from '@helpers/crafting/recipes';
 import { kingdomSubviewShow } from '@helpers/engine';
+import { playSFX } from '@helpers/engine/sfx';
 import { formatDuration } from '@helpers/engine/timer';
 import { bestiaryDropQuantityLabel } from '@helpers/kingdom/bestiary.ui';
 import type {
@@ -80,6 +81,7 @@ export class SlotCommissionComponent {
 
   public async doTurnIn(): Promise<void> {
     if (!(await this.fulfill()())) return;
+    playSFX('item-get-minor', 0);
     this.turnIn.emit();
   }
 

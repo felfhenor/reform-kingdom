@@ -9,8 +9,12 @@ import {
 import { getEntry } from '@helpers/content/content';
 import { isRecipeDiscovered, recipeDiscover } from '@helpers/crafting/recipes';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
+import { playGameSFX } from '@helpers/engine/sfx';
 import { globalEffectSumsState } from '@helpers/state-game';
-import { collectiblesAdd } from '@helpers/item/collectibles';
+import {
+  collectiblesAdd,
+  isCollectibleDiscovered,
+} from '@helpers/item/collectibles';
 import { assertNeverReward } from '@helpers/item/loot';
 import { addMaterial, goldCoinId } from '@helpers/item/materials';
 import { armoryAddLootDrop } from '@helpers/kingdom/loot-filter';
@@ -94,6 +98,7 @@ export function grantResolvedDrops(
   drops: ResolvedDrop[],
 ): void {
   const itemsFound: Record<ItemId, number> = {};
+  let foundMajorReward = false;
 
   drops.forEach((drop) => {
     switch (drop.kind) {
@@ -135,6 +140,9 @@ export function grantResolvedDrops(
       }
 
       case 'Collectible': {
+        if (!isCollectibleDiscovered(drop.collectibleId)) {
+          foundMajorReward = true;
+        }
         collectiblesAdd(drop.collectibleId, 1);
 
         const collectible = getEntry<CollectibleContent>(drop.collectibleId);
@@ -155,6 +163,7 @@ export function grantResolvedDrops(
         if (isRecipeDiscovered(drop.recipeId)) return; // already found, no duplicate log entry
 
         recipeDiscover(drop.recipeId);
+        foundMajorReward = true;
 
         const recipe = getEntry<RecipeContent>(drop.recipeId);
         if (!recipe) return;
@@ -174,6 +183,7 @@ export function grantResolvedDrops(
         if (isWorkerRescued(drop.workerId)) return; // silent no-op, no duplicate
 
         workerRescue(drop.workerId);
+        foundMajorReward = true;
 
         const worker = getEntry<WorkerContent>(drop.workerId);
         if (!worker) return;
@@ -228,4 +238,6 @@ export function grantResolvedDrops(
     );
     emitRewardVfx(combat, info, quantity);
   });
+
+  if (foundMajorReward) playGameSFX('item-get-major');
 }

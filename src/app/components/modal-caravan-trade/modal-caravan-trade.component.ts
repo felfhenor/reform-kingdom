@@ -36,6 +36,7 @@ import { commissionFulfill } from '@helpers/commission/commission-fulfill';
 import { commissionRowViewModel } from '@helpers/commission/commission-fulfill.ui';
 import { getEntry } from '@helpers/content/content';
 import { notifySuccess } from '@helpers/engine/notify';
+import { playSFX } from '@helpers/engine/sfx';
 import { activeCaravanNode } from '@helpers/engine/ui';
 import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
 import type {
@@ -182,6 +183,7 @@ export class ModalCaravanTradeComponent {
     const previewedItem = quantity === 1 ? row.equipmentItem : undefined;
     const name = caravanTradeDisplay(row.trade, previewedItem)?.name ?? 'item';
     if (!(await caravanExecuteTrade(entry, row.index, quantity))) return;
+    playSFX('item-get-minor', 0);
 
     const qtyLabel = quantity > 1 ? ` x${quantity}` : '';
     notifySuccess(
@@ -197,6 +199,7 @@ export class ModalCaravanTradeComponent {
 
     const name = caravanTokenTradeDisplay(row.trade)?.name ?? 'item';
     if (!(await caravanExecuteTokenTrade(entry, row.index))) return;
+    playSFX('item-get-minor', 0);
 
     notifySuccess(`You bought ${name}!`);
   }

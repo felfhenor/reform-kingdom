@@ -7,6 +7,7 @@ import {
 } from '@helpers/config';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { heroLevelUpVfxEmit } from '@helpers/engine/hero-level-up-vfx';
+import { playGameSFX } from '@helpers/engine/sfx';
 import { characterStats, characterXpForLevel } from '@helpers/hero/party';
 import { skillTreeEarnedSp } from '@helpers/hero/skill-tree';
 import { globalEffectSumsState, updateGamestate } from '@helpers/state-game';
@@ -138,6 +139,7 @@ function announceCharacterXpGain(
   if (after.level > beforeLevel) {
     analyticsSendDesignEvent('Hero:LevelUp', after.level);
     heroLevelUpVfxEmit(after.id);
+    playGameSFX('victory');
   }
   logCharacterProgress(beforeLevel, after);
 }

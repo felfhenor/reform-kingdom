@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
 vi.mock('@helpers/task/task-events');
+vi.mock('@helpers/engine/sfx');
 
 import { combatantDamageEvents } from '@helpers/combat/combat-damage-events';
 import { combatLog } from '@helpers/combat/combat-log';
@@ -13,6 +14,7 @@ import { ensureJob } from '@helpers/content/ensure-job';
 import { ensureSkill } from '@helpers/content/ensure-skill';
 import { defaultStats } from '@helpers/defaults';
 import { heroLevelUpVfx$ } from '@helpers/engine/hero-level-up-vfx';
+import { playGameSFX } from '@helpers/engine/sfx';
 import {
   healingTicksForLevel,
   healPartyToFull,
@@ -167,6 +169,7 @@ describe('partyGainXp', () => {
     expect(messages()).toEqual([]);
     expect(events).toEqual([]);
     expect(vfx).toEqual([]);
+    expect(playGameSFX).not.toHaveBeenCalled();
     expect(taskEventLevelReached).not.toHaveBeenCalled();
   });
 
@@ -238,7 +241,7 @@ describe('partyGainXp', () => {
     ]);
   });
 
-  it('announces a level-up with analytics, vfx, a log line and the task event', () => {
+  it('announces a level-up with analytics, vfx, a sound, a log line and the task event', () => {
     seedParty(hero('Jala'));
     const events = captureAnalyticsEvents();
     const vfx = captureLevelUpVfx();
@@ -247,6 +250,7 @@ describe('partyGainXp', () => {
 
     expect(events).toEqual(['Hero:LevelUp']);
     expect(vfx).toEqual(['Jala']);
+    expect(playGameSFX).toHaveBeenCalledWith('victory');
     expect(messages()).toEqual(['**Jala** reached level 2!']);
     expect(taskEventLevelReached).toHaveBeenCalledWith(2);
   });

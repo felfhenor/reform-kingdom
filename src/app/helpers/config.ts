@@ -88,6 +88,8 @@ export const LOADING_HERO_CYCLE_MS = 2500;
 export const UI_SCALE_BASE_WIDTH = 1920;
 export const UI_SCALE_BASE_HEIGHT = 1080;
 export const UI_SCALE_AUTO_MAX = 2;
+// A catch-up batch or several heroes leveling at once should play one sound, not a stack.
+export const GAME_SFX_MIN_INTERVAL_MS = 1000;
 
 // Savefile
 

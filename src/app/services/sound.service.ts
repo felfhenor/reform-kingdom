@@ -1,11 +1,12 @@
 import { computed, effect, Injectable, signal } from '@angular/core';
-import { sfx$ } from '@helpers/engine/sfx.ui';
+import { sfx$ } from '@helpers/engine/sfx';
 import { getOption } from '@helpers/state-options';
 import type { BGM, SFX } from '@interfaces';
 import { zip } from 'es-toolkit/compat';
 
 const soundsToLoad: Record<SFX, string> = {
   'ui-click': './audio/sfx/ui-click.mp3',
+  death: './audio/sfx/death.mp3',
   'item-get-major': './audio/sfx/item-get-major.mp3',
   'item-get-minor': './audio/sfx/item-get-minor.mp3',
   'ui-error': './audio/sfx/ui-error.mp3',
@@ -17,6 +18,7 @@ const soundsToLoad: Record<SFX, string> = {
 
 const soundVolumeMixing: Record<SFX, number> = {
   'ui-click': 0.5,
+  death: 1,
   'item-get-major': 1,
   'item-get-minor': 0.5,
   'ui-error': 1.5,
@@ -165,6 +167,9 @@ export class SoundService {
 
   public playSound(soundName: SFX, rate: number) {
     if (!getOption('sfxPlay')) return;
+    // Game-triggered sounds would otherwise queue on a suspended context and all play on the first click.
+    if (this.context.state !== 'running' && !navigator.userActivation.isActive)
+      return;
 
     const sound = this.audioRefs[soundName]!;
 
