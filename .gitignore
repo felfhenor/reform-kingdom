@@ -62,3 +62,8 @@ electron/out
 /simulation-logs
 
 .claude
+
+# Trailer shot-runner (scripts/trailer)
+scripts/trailer/Savefile.rek
+scripts/trailer/.env
+scripts/trailer/output/
