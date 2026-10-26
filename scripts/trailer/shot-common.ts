@@ -1,8 +1,42 @@
 import type { EncounterContent } from '@interfaces';
+import type { Locator } from 'playwright';
 import type { TrailerContext } from './types';
 
 // Covers the whole chained encounter (each win starts the next fight), not just one fight.
 const ENCOUNTER_MAX_MS = 60_000;
+// Purple first, then blue, so item shots land on a showpiece.
+const SHOWPIECE_RARITIES = ['Mystical', 'Rare'];
+// Parks the cursor off any control so no hover highlight lingers on camera.
+const MOUSE_PARK = { x: 1_919, y: 1_079 };
+
+export async function shotClick(
+  t: TrailerContext,
+  target: Locator,
+): Promise<void> {
+  await target.click();
+  await t.page.mouse.move(MOUSE_PARK.x, MOUSE_PARK.y);
+}
+
+// The first enabled row under `scope` holding a purple (else blue) item, or undefined if none render in time.
+export async function shotShowpieceRow(
+  scope: Locator,
+  timeoutMs = 2_000,
+): Promise<Locator | undefined> {
+  const rows = SHOWPIECE_RARITIES.map((rarity) =>
+    scope.locator(`button:not([aria-disabled="true"]):has(.outline-${rarity})`),
+  );
+  // count() doesn't wait, and lists render a frame after whatever click opened them.
+  const anyRendered = await rows[0]
+    .or(rows[1])
+    .first()
+    .waitFor({ timeout: timeoutMs })
+    .then(() => true)
+    .catch(() => false);
+  if (!anyRendered) return undefined;
+
+  const counts = await Promise.all(rows.map((row) => row.count()));
+  return rows.find((_, index) => counts[index] > 0)?.first();
+}
 
 // A loss also ends combat, by recalling the party away, which shouldn't pass as a good take.
 export async function shotFightToEnd(
