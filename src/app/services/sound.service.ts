@@ -205,8 +205,9 @@ export class SoundService {
     gainNode.connect(this.context.destination);
 
     if (this.bgm) {
-      gainNode.gain.linearRampToValueAtTime(0, 0);
-      gainNode.gain.linearRampToValueAtTime(this.bgmVolume(), CROSSFADE_TIME);
+      const currTime = this.context.currentTime;
+      gainNode.gain.setValueAtTime(0, currTime);
+      gainNode.gain.linearRampToValueAtTime(volume, currTime + CROSSFADE_TIME);
     }
 
     source.start(0);
@@ -222,7 +223,8 @@ export class SoundService {
     const bgm = this.bgm;
     const bgmGain = this.bgmGain;
 
-    bgmGain.gain.linearRampToValueAtTime(this.bgmVolume(), currTime);
+    bgmGain.gain.cancelScheduledValues(currTime);
+    bgmGain.gain.setValueAtTime(bgmGain.gain.value, currTime);
     bgmGain.gain.linearRampToValueAtTime(0, currTime + CROSSFADE_TIME);
 
     setTimeout(() => {
@@ -233,6 +235,8 @@ export class SoundService {
   public changeBGMVolume(newVolume: number) {
     if (!this.bgmGain) return;
 
-    this.bgmGain.gain.setValueAtTime(newVolume, this.context.currentTime);
+    const currTime = this.context.currentTime;
+    this.bgmGain.gain.cancelScheduledValues(currTime);
+    this.bgmGain.gain.setValueAtTime(newVolume, currTime);
   }
 }

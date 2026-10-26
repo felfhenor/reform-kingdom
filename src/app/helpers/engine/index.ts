@@ -1,5 +1,6 @@
 export * from './analytics';
 export * from './analytics.ui';
+export * from './bgm.ui';
 export * from './changelog.ui';
 export * from './difficulty-tier';
 export * from './discord';
