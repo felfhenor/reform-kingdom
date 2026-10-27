@@ -3,6 +3,7 @@ import {
   INDICATOR_PROGRESS_BAR_OFFSET_Y,
   NODE_STATUS_ICON_RADIUS,
 } from '@helpers/config';
+import { cssColorVar } from '@helpers/engine/css-color';
 import { uiTextFontFamily, uiTextLetterSpacing } from '@helpers/engine/font.ui';
 import type {
   DifficultyTier,
@@ -32,10 +33,6 @@ const PROGRESS_BAR_COLOR_BY_KIND: Record<WorldNodeProgressKind, number> = {
   Explore: 0xf8fafc,
 };
 
-const difficultyColorCache = new Map<DifficultyTier, string>();
-
-const NODE_STATUS_BEATEN_COLOR = 0x3baf66;
-const NODE_STATUS_NOT_BEATEN_COLOR = 0xef4444;
 
 export function pixiIndicatorPlayerAtLocationCreate(tileSize: number): {
   graphics: Graphics;
@@ -164,18 +161,8 @@ export function pixiNodeLabelColor(info: WorldNodeLabelInfo): ColorSource {
     : NODE_LABEL_COLOR_BY_KIND[info.kind];
 }
 
-// Read from CSS so the palette lives in one place; empty reads aren't cached so they can recover.
 function pixiDifficultyColor(tier: DifficultyTier): string {
-  const cached = difficultyColorCache.get(tier);
-  if (cached) return cached;
-
-  const color = getComputedStyle(document.documentElement)
-    .getPropertyValue(`--difficulty-${tier.toLowerCase()}`)
-    .trim();
-  if (!color) return '#ffffff';
-
-  difficultyColorCache.set(tier, color);
-  return color;
+  return cssColorVar(`--difficulty-${tier.toLowerCase()}`);
 }
 
 // Small beaten/not-beaten badge for the bottom-right corner of a node's sprite. Position is set
@@ -197,7 +184,11 @@ export function pixiIndicatorNodeStatusUpdate(
   graphics
     .clear()
     .circle(0, 0, radius)
-    .fill(beaten ? NODE_STATUS_BEATEN_COLOR : NODE_STATUS_NOT_BEATEN_COLOR)
+    .fill(
+      cssColorVar(
+        beaten ? '--node-status-beaten' : '--node-status-not-beaten',
+      ),
+    )
     .stroke({ width: 1.5, color: 0x000000 });
 
   if (beaten) {

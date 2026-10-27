@@ -1,0 +1,36 @@
+// Okabe-Ito based swaps for every red/green pairing; checked under protan, deutan and tritan simulation.
+:root.colorblind {
+  --difficulty-toohigh: #e66100;
+  --difficulty-hard: #e69f00;
+  --difficulty-medium: #f0e442;
+  --difficulty-easy: #009e73;
+  --difficulty-trivial: #9ca3af;
+
+  // Spread by lightness, not hue; the darkened-for-white-text tiers all collapse to one brown.
+  --difficulty-badge-TooHigh: #c35200;
+  --difficulty-badge-Hard: #e69f00;
+  --difficulty-badge-Medium: #f0e442;
+  --difficulty-badge-Easy: #0072b2;
+  --difficulty-badge-Trivial: #70757e;
+
+  --node-status-beaten: #0072b2;
+  --node-status-not-beaten: #d55e00;
+
+  --value-positive: #56b4e9;
+  --value-negative: #e69f00;
+
+  --health-high: #56b4e9;
+  --health-mid: #f0e442;
+  --health-low: #e66100;
+
+  // Lighter than info so the two stay apart; dark content text keeps badges readable.
+  --color-success: oklch(75% 0.13 185);
+  --color-success-content: oklch(20% 0.03 185);
+}
+
+.colorblind {
+  .badge-difficulty-Hard,
+  .badge-difficulty-Medium {
+    --badge-fg: #000;
+  }
+}

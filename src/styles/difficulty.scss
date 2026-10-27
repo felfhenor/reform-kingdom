@@ -5,6 +5,9 @@
   --difficulty-medium: #facc15;
   --difficulty-easy: #3baf66;
   --difficulty-trivial: #9ca3af;
+
+  --node-status-beaten: #3baf66;
+  --node-status-not-beaten: #ef4444;
 }
 
 .text-difficulty-TooHigh {
@@ -37,8 +40,12 @@ $difficulty-badge-colors: (
 );
 
 @each $tier, $color in $difficulty-badge-colors {
+  :root {
+    --difficulty-badge-#{$tier}: #{$color};
+  }
+
   .badge-difficulty-#{$tier} {
-    --badge-color: #{$color};
+    --badge-color: var(--difficulty-badge-#{$tier});
     --badge-fg: #fff;
   }
 }

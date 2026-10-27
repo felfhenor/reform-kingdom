@@ -14,7 +14,8 @@ export type GameOption =
   | 'partyViewAlwaysExpand'
   | 'craftingViewAlwaysExpand'
   | 'adventureLogOverlay'
-  | 'cleanFont';
+  | 'cleanFont'
+  | 'colorblindMode';
 
 export type UiScale = 'auto' | number;
 

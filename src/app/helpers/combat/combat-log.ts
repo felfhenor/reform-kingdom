@@ -211,12 +211,12 @@ export function combatLogHealthColor(
   const healthPercentage = Math.round((100 * health) / totalHealth);
 
   if (healthPercentage >= 75) {
-    return 'text-green-400';
+    return 'text-health-high';
   } else if (healthPercentage > 25) {
-    return 'text-yellow-400';
+    return 'text-health-mid';
   }
 
-  return 'text-rose-400';
+  return 'text-health-low';
 }
 
 // Combat/travel messages use markdown-style emphasis (e.g. "**Jala** attacks

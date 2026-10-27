@@ -2,6 +2,7 @@ export * from './analytics';
 export * from './analytics.ui';
 export * from './bgm.ui';
 export * from './changelog.ui';
+export * from './css-color';
 export * from './difficulty-tier';
 export * from './discord';
 export * from './discord.ui';

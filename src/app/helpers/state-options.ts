@@ -23,6 +23,7 @@ export function defaultOptions(): GameOptions {
 
     showBackdropGrid: false,
     cleanFont: false,
+    colorblindMode: false,
 
     analyticsEnabled: false,
     analyticsOptInDismissed: false,

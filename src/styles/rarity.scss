@@ -12,14 +12,35 @@
   --color-mystical-dark: #9333ea;
   --color-legendary: #facc15;
   --color-legendary-dark: #a16207;
+
+  // Tailwind's green-600/red-600; literal since theme vars are only emitted when used.
+  --value-positive: oklch(62.7% 0.194 149.214);
+  --value-negative: oklch(57.7% 0.245 27.325);
+
+  // Tailwind's green-400/yellow-400/rose-400.
+  --health-high: oklch(79.2% 0.209 151.711);
+  --health-mid: oklch(85.2% 0.199 91.936);
+  --health-low: oklch(71.2% 0.194 13.428);
 }
 
 .text-value-positive {
-  @apply text-green-600;
+  color: var(--value-positive);
 }
 
 .text-value-negative {
-  @apply text-red-600;
+  color: var(--value-negative);
+}
+
+.text-health-high {
+  color: var(--health-high);
+}
+
+.text-health-mid {
+  color: var(--health-mid);
+}
+
+.text-health-low {
+  color: var(--health-low);
 }
 
 .text-Common {

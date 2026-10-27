@@ -1,4 +1,5 @@
 import { effect, Injectable } from '@angular/core';
+import { cssColorCacheClear } from '@helpers/engine/css-color';
 import {
   FONT_FAMILY_CLEAN,
   FONT_FAMILY_DEFAULT,
@@ -18,6 +19,14 @@ export class ThemeService {
       const useCleanFont = !!getOption('cleanFont');
       document.body.classList.toggle('clean-font', useCleanFont);
       void this.applyTextFontFamily(useCleanFont);
+    });
+
+    effect(() => {
+      document.documentElement.classList.toggle(
+        'colorblind',
+        !!getOption('colorblindMode'),
+      );
+      cssColorCacheClear();
     });
 
     effect(() => {
