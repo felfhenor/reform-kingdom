@@ -67,3 +67,6 @@ electron/out
 scripts/trailer/Savefile.rek
 scripts/trailer/.env
 scripts/trailer/output/
+
+# Capsule art compositor (scripts/capsule)
+scripts/capsule/output/
