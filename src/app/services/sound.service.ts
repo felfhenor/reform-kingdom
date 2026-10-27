@@ -78,7 +78,9 @@ export class SoundService {
 
     // Short ramp instead of a step so alt-tabbing doesn't click.
     effect(() => {
-      const target = this.isMutedByFocus() ? 0 : 1;
+      const target = this.isMutedByFocus()
+        ? 0
+        : (getOption('masterVolume') ?? 1);
       this.masterGain.gain.setTargetAtTime(
         target,
         this.context.currentTime,
