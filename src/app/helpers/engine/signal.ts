@@ -64,8 +64,10 @@ export function indexedDbSignal<T>(
   onLoad?: (value: T) => void,
   onError?: (e: unknown) => void,
   onSaveError?: (e: unknown) => void,
-): WritableSignal<T> {
+): WritableSignal<T> & { flush: () => Promise<boolean> } {
   let isInitialized = false;
+  // IndexedDB commits writes in order, so the newest one landing means every earlier one has too.
+  let pendingWrite: Promise<boolean> = Promise.resolve(true);
 
   const writableSignal = signal(initialValue);
   const originalSet = writableSignal.set;
@@ -103,10 +105,14 @@ export function indexedDbSignal<T>(
   const saveToDBSync = (value: T): void => {
     if (!isInitialized || !idbIsAvailable()) return;
 
-    idbPut(indexedDbKey, value).catch((e) => {
-      error('IndexedDbSignal', 'Failed to save value:', e);
-      onSaveError?.(e);
-    });
+    pendingWrite = idbPut(indexedDbKey, value).then(
+      () => true,
+      (e: unknown) => {
+        error('IndexedDbSignal', 'Failed to save value:', e);
+        onSaveError?.(e);
+        return false;
+      },
+    );
   };
 
   writableSignal.set = (value: T) => {
@@ -122,5 +128,5 @@ export function indexedDbSignal<T>(
 
   void loadFromDB();
 
-  return writableSignal;
+  return Object.assign(writableSignal, { flush: () => pendingWrite });
 }

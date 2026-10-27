@@ -127,7 +127,9 @@ vi.mock('@helpers/engine/signal', () => {
       mockSignal(initialValue),
     ),
     indexedDbSignal: vi.fn((key: string, initialValue: unknown) =>
-      mockSignal(initialValue),
+      Object.assign(mockSignal(initialValue), {
+        flush: vi.fn(() => Promise.resolve(true)),
+      }),
     ),
   };
 });

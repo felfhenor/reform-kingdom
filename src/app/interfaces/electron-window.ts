@@ -23,6 +23,7 @@ export type ElectronWindowBridge = {
   windowOnChange: (
     callback: (state: ElectronWindowState) => void,
   ) => () => void;
+  windowOnSaveBeforeClose: (callback: () => Promise<boolean>) => () => void;
 };
 
 export type WindowWithElectronWindowBridge = Window & {

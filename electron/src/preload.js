@@ -11,6 +11,20 @@ contextBridge.exposeInMainWorld('reformElectron', {
     ipcRenderer.invoke('window:set-fullscreen', fullscreen),
   windowSetSize: (width, height) =>
     ipcRenderer.invoke('window:set-size', width, height),
+  // A throwing save still answers, so the main process doesn't sit out its timeout.
+  windowOnSaveBeforeClose: (callback) => {
+    const listener = () =>
+      Promise.resolve()
+        .then(callback)
+        .catch(() => false)
+        .then((saved) =>
+          ipcRenderer.send('window:save-before-close:done', saved),
+        );
+    ipcRenderer.on('window:save-before-close', listener);
+    ipcRenderer.send('window:save-before-close:ready');
+    return () =>
+      ipcRenderer.removeListener('window:save-before-close', listener);
+  },
   windowOnChange: (callback) => {
     const listener = (_event, state) => callback(state);
     ipcRenderer.on('window:changed', listener);

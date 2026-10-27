@@ -581,4 +581,18 @@ describe('migrateOptionsState', () => {
       );
     },
   );
+
+  it('drops the old debug save interval in favor of the autosave default', () => {
+    const stale: Partial<GameOptions> & { debugSaveInterval: number } = {
+      ...defaultOptions(),
+      debugSaveInterval: 1,
+    };
+    delete stale.autosaveInterval;
+    setOptions(stale as GameOptions);
+
+    migrateOptionsState();
+
+    expect(options()).not.toHaveProperty('debugSaveInterval');
+    expect(options().autosaveInterval).toBe(defaultOptions().autosaveInterval);
+  });
 });

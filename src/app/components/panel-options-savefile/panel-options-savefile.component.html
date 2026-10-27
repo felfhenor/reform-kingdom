@@ -127,6 +127,35 @@
 
   <div class="card shadow-sm">
     <div class="card-body p-3 gap-2">
+      <div class="type-section-title">Autosave</div>
+
+      <div class="form-control">
+        <label class="label label-checkbox gap-2">
+          <span class="label-text !ml-0 mr-2">Save Every</span>
+          <ng-select
+            class="w-32"
+            [items]="autosaveIntervalChoices"
+            bindLabel="label"
+            bindValue="value"
+            [clearable]="false"
+            [searchable]="false"
+            [(ngModel)]="autosaveInterval"
+            (ngModelChange)="setOption('autosaveInterval', $event)"
+          ></ng-select>
+          <app-icon
+            name="gameHelp"
+            size="inline"
+            class="text-lighter"
+            [tp]="'How often the game saves while you play.'"
+            [tpPlacement]="'top'"
+          />
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body p-3 gap-2">
       <div class="type-section-title">Automatic Backups</div>
 
       <p>

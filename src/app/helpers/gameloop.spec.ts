@@ -88,7 +88,7 @@ function useOptions(overrides: Partial<GameOptions> = {}): void {
     ...defaultOptions(),
     gameloopPaused: false,
     debugTickMultiplier: 1,
-    debugSaveInterval: 999_999,
+    autosaveInterval: 999_999,
     ...overrides,
   });
 }
@@ -198,7 +198,7 @@ describe('gameloop', () => {
   });
 
   it('saves once the save interval has passed, and not before', async () => {
-    useOptions({ debugSaveInterval: 5 });
+    useOptions({ autosaveInterval: 5 });
 
     await gameloop(4);
     expect(lastSaveTick()).toBe(0);
@@ -255,7 +255,7 @@ describe('gameloop', () => {
     });
 
     it('skips the save for the failed batch', async () => {
-      useOptions({ debugSaveInterval: 0 });
+      useOptions({ autosaveInterval: 0 });
 
       await gameloop(1);
       expect(lastSaveTick()).toBe(0);

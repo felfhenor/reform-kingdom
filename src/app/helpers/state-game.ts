@@ -208,9 +208,11 @@ export function resetGameState(): void {
   setGameState(defaultGameState());
 }
 
-export function saveGameState(): void {
-  if (isSavingBlocked) return;
+// Resolves false only if the write failed; most callers don't need to wait.
+export function saveGameState(): Promise<boolean> {
+  if (isSavingBlocked) return Promise.resolve(true);
   _savedGamestate.set(formatGameStateForSave(_liveGameState()));
+  return _savedGamestate.flush();
 }
 
 export function formatGameStateForSave(gameState: GameState): GameState {

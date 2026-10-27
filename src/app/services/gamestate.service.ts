@@ -1,5 +1,6 @@
 import {
   ApplicationRef,
+  DestroyRef,
   effect,
   inject,
   Injectable,
@@ -7,6 +8,8 @@ import {
   untracked,
 } from '@angular/core';
 import { GAMELOOP_INTERVAL_MS } from '@helpers/config';
+import { electronWindowOnSaveBeforeClose } from '@helpers/engine/electron-window.ui';
+import { notifyError } from '@helpers/engine/notify';
 import { isPageVisible } from '@helpers/engine/page-visibility';
 import { gameloop } from '@helpers/gameloop';
 import { migrateOptionsState } from '@helpers/migrate';
@@ -15,6 +18,7 @@ import {
   gamestate,
   hasGameStateLoaded,
   isGameStateReady,
+  saveGameState,
 } from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
 import { townReputationBuffReconcile } from '@helpers/town/reputation/town-reputation-buff.ui';
@@ -29,6 +33,7 @@ export class GamestateService {
   private logger = inject(LoggerService);
   private contentService = inject(ContentService);
   private applicationRef = inject(ApplicationRef);
+  private destroyRef = inject(DestroyRef);
 
   public hasLoaded = signal<boolean>(false);
 
@@ -75,6 +80,35 @@ export class GamestateService {
 
   init() {
     this.doGameloop();
+    this.saveWhenHidden();
+    this.saveBeforeClose();
+  }
+
+  // Minimizing or switching away may be the last chance to save, so don't wait for the next autosave.
+  private saveWhenHidden() {
+    const onVisibilityChange = () => {
+      if (!isPageVisible() && isGameStateReady()) saveGameState();
+    };
+
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    this.destroyRef.onDestroy(() =>
+      document.removeEventListener('visibilitychange', onVisibilityChange),
+    );
+  }
+
+  private saveBeforeClose() {
+    const stop = electronWindowOnSaveBeforeClose(async () => {
+      if (!isGameStateReady()) return true;
+
+      const saved = await saveGameState();
+      if (!saved) {
+        notifyError(
+          'Your game could not be saved. Close again to quit without saving.',
+        );
+      }
+      return saved;
+    });
+    this.destroyRef.onDestroy(() => stop?.());
   }
 
   private doGameloop() {

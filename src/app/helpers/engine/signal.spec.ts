@@ -111,6 +111,50 @@ describe('indexedDbSignal', () => {
 
     expect(onSaveError).toHaveBeenCalledExactlyOnceWith(failure);
   });
+
+  it('flush waits for the newest of several writes to land', async () => {
+    vi.mocked(idbGet).mockResolvedValueOnce('stored');
+    let finishWrite = () => undefined as void;
+    vi.mocked(idbPut)
+      .mockResolvedValueOnce(undefined)
+      .mockReturnValueOnce(
+        new Promise<void>((resolve) => (finishWrite = resolve)),
+      );
+
+    const value = indexedDbSignal('key', 'initial');
+    await flush();
+    value.set('first');
+    value.set('second');
+
+    let result: boolean | undefined;
+    void value.flush().then((saved) => (result = saved));
+    await flush();
+    expect(result).toBeUndefined();
+
+    finishWrite();
+    await flush();
+    expect(result).toBe(true);
+  });
+
+  it('flush resolves false instead of rejecting when the write fails', async () => {
+    vi.mocked(idbGet).mockResolvedValueOnce('stored');
+    vi.mocked(idbPut).mockRejectedValueOnce(new Error('quota'));
+
+    const value = indexedDbSignal('key', 'initial');
+    await flush();
+    value.set('next');
+
+    await expect(value.flush()).resolves.toBe(false);
+  });
+
+  it('flush resolves true when no write has been attempted', async () => {
+    vi.mocked(idbGet).mockReturnValueOnce(new Promise(() => undefined));
+
+    const value = indexedDbSignal('key', 'initial');
+    value.set('early');
+
+    await expect(value.flush()).resolves.toBe(true);
+  });
 });
 
 describe('localStorageSignal', () => {

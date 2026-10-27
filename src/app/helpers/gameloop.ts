@@ -122,7 +122,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
     gamestateTickEnd();
 
     const currentTick = timerTicksElapsed();
-    const nextSaveTick = timerLastSaveTick() + getOption('debugSaveInterval');
+    const nextSaveTick = timerLastSaveTick() + getOption('autosaveInterval');
     if (currentTick >= nextSaveTick) {
       updateGamestate((state) => {
         state.clock.lastSaveTick = currentTick;

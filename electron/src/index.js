@@ -6,6 +6,7 @@ const rpc = require('discord-rpc');
 
 const Config = require('electron-config');
 const { registerSavefileBackupHandlers } = require('./savefile-backups');
+const { watchSaveBeforeClose } = require('./save-before-close');
 const {
   registerWindowSettingsHandlers,
   watchFullscreenHotkeys,
@@ -82,6 +83,7 @@ const createWindow = () => {
 
   watchWindowState(mainWindow);
   watchFullscreenHotkeys(mainWindow);
+  watchSaveBeforeClose(mainWindow);
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);

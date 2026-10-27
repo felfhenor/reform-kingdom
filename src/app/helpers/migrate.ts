@@ -309,6 +309,8 @@ export function migrateOptionsState() {
   delete (newState as Partial<Record<string, unknown>>)[
     'debugAllowBackgroundOperations'
   ];
+  // Was a debug-only slider, so players never chose it; everyone starts on the new default.
+  delete (newState as Partial<Record<string, unknown>>)['debugSaveInterval'];
 
   setOptions(newState);
 }

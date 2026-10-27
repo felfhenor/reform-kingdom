@@ -32,7 +32,7 @@ export type GameOptions = Record<GameOption, boolean> & {
   sfxVolume: number;
   bgmVolume: number;
   debugTickMultiplier: number;
-  debugSaveInterval: number;
+  autosaveInterval: number;
   optionsTab: OptionsTab;
   mapZoom: number;
   mapFrameRate: number;

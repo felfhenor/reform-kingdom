@@ -10,7 +10,6 @@ export function defaultOptions(): GameOptions {
     debugConsoleLogStateUpdates: false,
     debugGameloopTimerUpdates: false,
     debugTickMultiplier: 1,
-    debugSaveInterval: 15,
 
     masterVolume: 1,
 
@@ -21,6 +20,7 @@ export function defaultOptions(): GameOptions {
     bgmVolume: 0.1,
 
     gameloopPaused: false,
+    autosaveInterval: 15,
     // Web tabs share one save with no cross-tab lock, so only the desktop build defaults on.
     runInBackground: isInElectron(),
     muteWhenUnfocused: false,

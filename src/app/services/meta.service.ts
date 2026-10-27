@@ -153,6 +153,7 @@ export class MetaService {
     window.open('https://seiyria.itch.io/reform-kingdom');
   }
 
+  // The desktop shell saves before letting the window close.
   public quit() {
     window.close();
   }
