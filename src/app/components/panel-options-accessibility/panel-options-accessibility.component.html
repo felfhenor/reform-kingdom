@@ -5,10 +5,9 @@
         <div class="type-section-title">Interface</div>
 
         <div class="form-control">
-          <label class="label label-checkbox gap-2">
-            <span class="label-text !ml-0 mr-2 min-w-[100px]">UI Scale</span>
+          <label class="label label-option">
+            <span class="label-text">UI Scale</span>
             <ng-select
-              class="w-32"
               [items]="uiScaleChoices"
               bindLabel="label"
               bindValue="value"
@@ -34,10 +33,9 @@
         <div class="type-section-title">Sprites</div>
 
         <div class="form-control">
-          <label class="label label-checkbox gap-2">
-            <span class="label-text !ml-0 mr-2 min-w-[100px]">Map Zoom</span>
+          <label class="label label-option">
+            <span class="label-text">Map Zoom</span>
             <ng-select
-              class="w-32"
               [items]="mapZoomChoices"
               bindLabel="label"
               bindValue="value"
@@ -108,12 +106,9 @@
         <div class="type-section-title">Motion</div>
 
         <div class="form-control">
-          <label class="label label-checkbox gap-2">
-            <span class="label-text !ml-0 mr-2 min-w-[100px]">
-              Reduce Motion
-            </span>
+          <label class="label label-option">
+            <span class="label-text">Reduce Motion</span>
             <ng-select
-              class="w-44"
               [items]="motionChoices()"
               bindLabel="label"
               bindValue="value"

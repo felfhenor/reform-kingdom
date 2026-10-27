@@ -72,6 +72,21 @@ body {
   }
 }
 
+// Fixed label/control columns so every labeled dropdown and slider in Options lines up.
+.label-option {
+  justify-content: left;
+  @apply gap-2;
+
+  > .label-text {
+    @apply w-52 shrink-0 m-0;
+  }
+
+  > .ng-select,
+  > .range {
+    @apply w-56 shrink-0;
+  }
+}
+
 app-game {
   display: block;
   height: 100vh;

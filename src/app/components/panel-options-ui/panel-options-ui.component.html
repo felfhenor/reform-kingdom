@@ -116,12 +116,9 @@
           <div class="type-section-title">Display</div>
 
           <div class="form-control">
-            <label class="label label-checkbox gap-2">
-              <span class="label-text !ml-0 mr-2 min-w-[100px]">
-                Display Mode
-              </span>
+            <label class="label label-option">
+              <span class="label-text">Display Mode</span>
               <ng-select
-                class="w-48"
                 [items]="displayModeChoices"
                 bindLabel="label"
                 bindValue="value"
@@ -142,12 +139,9 @@
 
           @if (displayMode() === 'windowed') {
             <div class="form-control">
-              <label class="label label-checkbox gap-2">
-                <span class="label-text !ml-0 mr-2 min-w-[100px]">
-                  Window Size
-                </span>
+              <label class="label label-option">
+                <span class="label-text">Window Size</span>
                 <ng-select
-                  class="w-48"
                   [items]="windowSizeChoices()"
                   bindLabel="label"
                   bindValue="id"
@@ -175,12 +169,9 @@
         <div class="type-section-title">Performance</div>
 
         <div class="form-control">
-          <label class="label label-checkbox gap-2">
-            <span class="label-text !ml-0 mr-2 min-w-[100px]">
-              Map Frame Rate
-            </span>
+          <label class="label label-option">
+            <span class="label-text">Map Frame Rate</span>
             <ng-select
-              class="w-32"
               [items]="mapFrameRateChoices"
               bindLabel="label"
               bindValue="value"
@@ -231,8 +222,8 @@
           <div class="type-section-title">Audio</div>
 
           <div class="form-control">
-            <label class="label cursor-pointer label-checkbox">
-              <span class="label-text !ml-0 mr-2">Master Volume</span>
+            <label class="label cursor-pointer label-option">
+              <span class="label-text">Master Volume</span>
               <input
                 #masterVolume
                 type="range"
@@ -280,10 +271,8 @@
 
           @if (getOption('bgmPlay')) {
             <div class="form-control">
-              <label class="label cursor-pointer label-checkbox">
-                <span class="label-text !ml-0 mr-2">
-                  Background Music Volume
-                </span>
+              <label class="label cursor-pointer label-option">
+                <span class="label-text">Background Music Volume</span>
                 <input
                   #bgmVolume
                   type="range"
@@ -315,8 +304,8 @@
 
           @if (getOption('sfxPlay')) {
             <div class="form-control">
-              <label class="label cursor-pointer label-checkbox">
-                <span class="label-text !ml-0 mr-2">Sound Effects Volume</span>
+              <label class="label cursor-pointer label-option">
+                <span class="label-text">Sound Effects Volume</span>
                 <input
                   #sfxVolume
                   type="range"
