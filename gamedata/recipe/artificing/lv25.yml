@@ -1,0 +1,88 @@
+- id: a0dd7a52-dba6-418d-a306-e3e3e4c52997
+  name: 'Weapon: Demonic Staff'
+  result:
+    equipmentId: Demonic Staff
+
+  requirements:
+    - itemId: Fel Copper Ingot
+      quantity: 2
+
+    - itemId: Felwood Rod
+      quantity: 4
+
+    - itemId: Morganite
+      quantity: 1
+
+    - itemId: Pixie Claw
+      quantity: 1
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450
+
+- id: f89e63e0-60c9-4abc-a34c-10d1d54c0081
+  name: 'Weapon: Demonic Mace'
+  result:
+    equipmentId: Demonic Mace
+
+  requirements:
+    - itemId: Fel Copper Ingot
+      quantity: 4
+
+    - itemId: Felwood Rod
+      quantity: 6
+
+    - itemId: Fel Essence
+      quantity: 1
+
+    - itemId: Pixie Claw
+      quantity: 1
+
+    - itemId: Beholder Eyeball
+      quantity: 1
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450
+
+- id: b8a335ee-eb06-49b8-8443-27f8ed0bee5a
+  name: 'Material: Frozen Felrock'
+  result:
+    itemId: Frozen Felrock
+    quantity: 3
+
+  requirements:
+    - itemId: Felrock
+      quantity: 3
+
+    - itemId: Felfrost
+      quantity: 1
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 26
+  maxTradeskillLevel: 27
+  tradeskillXP: 20
+  craftTime: 5
+
+- id: 85990da7-c627-4ec6-9fd6-237a4c594cf2
+  name: 'Material: Fel Flux'
+  result:
+    itemId: Fel Flux
+    quantity: 1
+
+  requirements:
+    - itemId: Fel Essence
+      quantity: 3
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 26
+  maxTradeskillLevel: 27
+  tradeskillXP: 20
+  craftTime: 5

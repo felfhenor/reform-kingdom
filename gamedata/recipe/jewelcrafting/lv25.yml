@@ -1,0 +1,54 @@
+- id: 5c40bdbf-4ee4-47ff-a3d7-862ad5403e47
+  name: 'Accessory: Fel Taming Chain'
+  result:
+    equipmentId: Fel Taming Chain
+
+  requirements:
+    - itemId: Fel Copper Ingot
+      quantity: 4
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450
+
+- id: 78787d45-cae0-4eef-86b4-d8857f2b4545
+  name: 'Offhand: Fel Morganite Brooch'
+  result:
+    equipmentId: Fel Morganite Brooch
+
+  requirements:
+    - itemId: Fel Copper Ingot
+      quantity: 2
+
+    - itemId: Morganite
+      quantity: 3
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450
+
+- id: 4b414e0f-9510-4583-b8ef-536c50bad6ac
+  name: 'Material: Diamond'
+  result:
+    itemId: Diamond
+    chance: 50
+
+  requirements:
+    - itemId: Frozen Felrock
+      quantity: 1
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 26
+  maxTradeskillLevel: 27
+  tradeskillXP: 20
+  craftTime: 20

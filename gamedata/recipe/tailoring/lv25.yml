@@ -1,0 +1,104 @@
+- id: 5c5cb3cf-64f6-4064-b6fc-8738b91092e9
+  name: 'Armor: Demonic Tunic'
+  result:
+    equipmentId: Demonic Tunic
+
+  requirements:
+    - itemId: Fel Fiber
+      quantity: 4
+
+    - itemId: Fel Essence
+      quantity: 1
+
+    - itemId: Felrock
+      quantity: 4
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450
+
+- id: 3449d8e2-f79f-4201-b1dd-1926648a3acf
+  name: 'Headgear: Demonic Tophat'
+  result:
+    equipmentId: Demonic Tophat
+
+  requirements:
+    - itemId: Fel Fiber
+      quantity: 3
+
+    - itemId: Morganite
+      quantity: 1
+
+    - itemId: Fel Essence
+      quantity: 1
+
+    - itemId: Felrock
+      quantity: 2
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450
+
+- id: 08a43472-4dde-4868-9acd-2c7f9f1d7698
+  name: 'Weapon: Demonic Whip'
+  result:
+    equipmentId: Demonic Whip
+
+  requirements:
+    - itemId: Fel Fiber
+      quantity: 8
+
+    - itemId: Felwood Rod
+      quantity: 1
+
+    - itemId: Fel Essence
+      quantity: 1
+
+    - itemId: Pixie Claw
+      quantity: 1
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450
+
+- id: d2e74247-0482-43fc-a060-df7e1ef55673
+  name: 'Material: Spellthread'
+  result:
+    itemId: Spellthread
+
+  requirements:
+    - itemId: Frostneedle
+      quantity: 1
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 26
+  maxTradeskillLevel: 27
+  tradeskillXP: 20
+  craftTime: 20
+
+- id: 985e2314-cec8-429e-958e-4fca82fc926f
+  name: 'Material: Steelthread'
+  result:
+    itemId: Steelthread
+
+  requirements:
+    - itemId: Frostneedle
+      quantity: 1
+
+    - itemId: Fel Steel Ingot
+      quantity: 1
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 27
+  maxTradeskillLevel: 28
+  tradeskillXP: 20
+  craftTime: 20

@@ -1,0 +1,34 @@
+- id: 681ac71f-07c9-4a3c-94b1-b1280b964af0
+  name: Fel Flux
+  description: A dark agent used by demons when refining their metals. At it's core, it's triply-refined fel essence.
+  rarity: Uncommon
+
+  sprite: '0111'
+
+- id: 3a7f5f33-f0e6-47d0-8c3a-69fafaab68c1
+  name: Frozen Felrock
+  description: Formed by felrock being frozen, this material is much harder after a year of sitting in a cave.
+  rarity: Common
+
+  sprite: '0108'
+
+- id: 24dac2fb-e9ea-498f-821d-40a7409f1f02
+  name: Felfrost
+  description: Crystallized frost formed in the harshest possible environment. It's used to refine materials to make them harder, stronger, and more resilient.
+  rarity: Common
+
+  sprite: '0106'
+
+- id: f97a77c6-4687-4569-a82e-43684f1fba4e
+  name: Frostwood
+  description: A piece of wood that's frozen to the core.
+  rarity: Common
+
+  sprite: '0109'
+
+- id: 4e013ee9-ec9f-4099-a7e2-eb97ecce436c
+  name: Frostneedle
+  description: A tree leaf refined to a sharp point by the frost encompassing it.
+  rarity: Common
+
+  sprite: '0107'

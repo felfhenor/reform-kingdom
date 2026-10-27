@@ -1,0 +1,34 @@
+- id: 75a970da-5b2c-4b12-b698-8b6d2776c5e0
+  name: Diamond
+  description: Found in frozen felrock, this mineral is among the hardest to be found in the world.
+  rarity: Uncommon
+
+  sprite: '0110'
+
+- id: f3e5372d-f800-4c46-a644-bb975d03c986
+  name: Fel Iron Ingot
+  description: Formed by refining miremetal and fel essence, this material is among the hardest that's still usable for equipment crafting.
+  rarity: Uncommon
+
+  sprite: '0113'
+
+- id: 33ad018f-3e59-488f-8539-96136e2560ad
+  name: Fel Steel Ingot
+  description: A product of some of the toughest materials - fel iron and fel flux - this material is second to none in the crafting realm.
+  rarity: Uncommon
+
+  sprite: '0112'
+
+- id: a9abbda5-3b50-4ca3-ab4e-c2267104f8c9
+  name: Spellthread
+  description: A magically-infused thread created with fel essence and frostneedles. It's very strong, yet flexible.
+  rarity: Uncommon
+
+  sprite: '0105'
+
+- id: 18f7b783-a911-4798-96af-0468642c9957
+  name: Steelthread
+  description: A powerful thread created with fel steel and frostneedles. It's very thin and rigid.
+  rarity: Uncommon
+
+  sprite: '0104'

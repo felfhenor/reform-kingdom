@@ -1,0 +1,219 @@
+- id: 067b2a6e-0060-4eb7-aceb-a5af84dcd945
+  name: Chillwoods
+  description: A forest full of trees frozen solid. A hauntingly scenic region where snow piles upon snow.
+
+  levelRange:
+    min: 50
+    max: 51
+
+  workerLevelRange:
+    min: 28
+    max: 36
+
+  xpGainedIfInLevelRange: 12
+  gatherTime: 15
+  gatherReductionPerUpgradeLevel: 2
+
+  levels:
+    - developTime: 300
+      costs:
+        - itemId: Gold Coin
+          required: 125000
+
+        - itemId: Frostwood
+          required: 50
+
+        - itemId: Miremetal Ingot
+          required: 25
+
+        - itemId: Fel Flux
+          required: 10
+
+    - developTime: 600
+      costs:
+        - itemId: Gold Coin
+          required: 250000
+
+        - itemId: Frostwood
+          required: 75
+
+        - itemId: Fel Iron Ingot
+          required: 75
+
+        - itemId: Spellthread
+          required: 25
+
+        - itemId: Steelthread
+          required: 25
+
+  gatherResults:
+    # level 1
+    - chance: 1
+      levelRequirement: 0
+      tradeskillIds: [Woodworking]
+      items:
+        - itemId: Frostwood
+          quantity: 1
+
+    - chance: 1
+      levelRequirement: 0
+      tradeskillIds: [Artificing]
+      items:
+        - itemId: Felfrost
+          quantity: 1
+
+    - chance: 1
+      levelRequirement: 0
+      tradeskillIds: [Tailoring]
+      items:
+        - itemId: Frostneedle
+          quantity: 1
+
+    # level 2
+    - chance: 1
+      levelRequirement: 1
+      tradeskillIds: [Woodworking]
+      items:
+        - itemId: Frostwood
+          quantity: 2
+
+    - chance: 1
+      levelRequirement: 1
+      tradeskillIds: [Artificing]
+      items:
+        - itemId: Felfrost
+          quantity: 2
+
+    - chance: 1
+      levelRequirement: 1
+      tradeskillIds: [Tailoring]
+      items:
+        - itemId: Frostneedle
+          quantity: 2
+
+    # level 3
+    - chance: 1
+      levelRequirement: 2
+      tradeskillIds: [Woodworking]
+      items:
+        - itemId: Frostwood
+          quantity: 3
+
+    - chance: 1
+      levelRequirement: 2
+      tradeskillIds: [Artificing]
+      items:
+        - itemId: Felfrost
+          quantity: 3
+
+    - chance: 1
+      levelRequirement: 2
+      tradeskillIds: [Tailoring]
+      items:
+        - itemId: Frostneedle
+          quantity: 3
+
+- id: 4b6e50a3-953c-43ea-b6ad-77c6dcd7febd
+  name: Felfrost Cellar
+  description: A cave that goes deep into the summit where demons facilitate the growth of felfrost and refine metals with sub-zero temperatures.
+
+  levelRange:
+    min: 50
+    max: 51
+
+  workerLevelRange:
+    min: 28
+    max: 36
+
+  xpGainedIfInLevelRange: 12
+  gatherTime: 15
+  gatherReductionPerUpgradeLevel: 2
+
+  levels:
+    - developTime: 300
+      costs:
+        - itemId: Gold Coin
+          required: 125000
+
+        - itemId: Felfrost
+          required: 50
+
+        - itemId: Fel Iron Ingot
+          required: 25
+
+        - itemId: Frostneedle
+          required: 10
+
+    - developTime: 600
+      costs:
+        - itemId: Gold Coin
+          required: 250000
+
+        - itemId: Felfrost
+          required: 75
+
+        - itemId: Fel Steel Ingot
+          required: 75
+
+        - itemId: Fel Flux
+          required: 25
+
+  gatherResults:
+    # level 1
+    - chance: 1
+      levelRequirement: 0
+      tradeskillIds: [Blacksmithing]
+      items:
+        - itemId: Frozen Felrock
+          quantity: 1
+
+    - chance: 1
+      levelRequirement: 0
+      tradeskillIds: [Artificing]
+      items:
+        - itemId: Felfrost
+          quantity: 1
+
+    # level 2
+    - chance: 1
+      levelRequirement: 1
+      tradeskillIds: [Blacksmithing]
+      items:
+        - itemId: Frozen Felrock
+          quantity: 2
+
+    - chance: 1
+      levelRequirement: 1
+      tradeskillIds: [Artificing]
+      items:
+        - itemId: Felfrost
+          quantity: 2
+
+    - chance: 1
+      levelRequirement: 1
+      tradeskillIds: [Blacksmithing]
+      items:
+        - itemId: Fel Flux
+          quantity: 1
+
+    # level 3
+    - chance: 1
+      levelRequirement: 2
+      tradeskillIds: [Blacksmithing]
+      items:
+        - itemId: Frozen Felrock
+          quantity: 3
+
+    - chance: 1
+      levelRequirement: 2
+      tradeskillIds: [Artificing]
+      items:
+        - itemId: Felfrost
+          quantity: 3
+
+    - chance: 1
+      levelRequirement: 2
+      tradeskillIds: [Blacksmithing]
+      items:
+        - itemId: Fel Flux
+          quantity: 2

@@ -1,0 +1,80 @@
+- id: 7f986636-2f3a-44b6-8af4-3ca0bd3a16b1
+  name: Fel Summit Outpost
+  description: An outpost destroyed by the harsh elements.
+
+  levels:
+    - developTime: 300
+      costs:
+        - itemId: Gold Coin
+          required: 75000
+
+        - itemId: Frozen Felrock
+          required: 50
+
+        - itemId: Frostwood
+          required: 50
+
+    - developTime: 600
+      costs:
+        - itemId: Gold Coin
+          required: 125000
+
+        - itemId: Frozen Felrock
+          required: 100
+
+        - itemId: Frostwood
+          required: 100
+
+        - itemId: Frostneedle
+          required: 50
+
+    - developTime: 900
+      costs:
+        - itemId: Gold Coin
+          required: 175000
+
+        - itemId: Frozen Felrock
+          required: 125
+
+        - itemId: Frostwood
+          required: 125
+
+        - itemId: Fel Iron Ingot
+          required: 25
+
+        - itemId: Spellthread
+          required: 50
+
+    - developTime: 1200
+      costs:
+        - itemId: Gold Coin
+          required: 225000
+
+        - itemId: Frozen Felrock
+          required: 175
+
+        - itemId: Frostwood
+          required: 175
+
+        - itemId: Fel Steel Ingot
+          required: 25
+
+        - itemId: Steelthread
+          required: 25
+
+    - developTime: 1500
+      costs:
+        - itemId: Gold Coin
+          required: 300000
+
+        - itemId: Frozen Felrock
+          required: 225
+
+        - itemId: Frostwood
+          required: 225
+
+        - itemId: Fel Steel Ingot
+          required: 50
+
+        - itemId: Diamond
+          required: 25

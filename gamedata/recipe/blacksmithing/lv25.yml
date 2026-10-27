@@ -1,0 +1,165 @@
+- id: bc933d20-981e-44ec-88df-187023a2f0d5
+  name: 'Offhand: Demonic Stiletto'
+  result:
+    equipmentId: Demonic Stiletto
+
+  requirements:
+    - itemId: Fel Copper Ingot
+      quantity: 3
+
+    - itemId: Felwood Rod
+      quantity: 2
+
+    - itemId: Fel Essence
+      quantity: 1
+
+    - itemId: Beholder Eyeball
+      quantity: 1
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450
+
+- id: 4b8e80af-dcae-4fe8-a190-20ef4bde8f86
+  name: 'Weapon: Demonic Sword'
+  result:
+    equipmentId: Demonic Sword
+
+  requirements:
+    - itemId: Fel Copper Ingot
+      quantity: 5
+
+    - itemId: Felwood Rod
+      quantity: 3
+
+    - itemId: Fel Essence
+      quantity: 1
+
+    - itemId: Beholder Eyeball
+      quantity: 1
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450
+
+- id: 2552dde7-272d-4d51-99b8-94efc29d62d5
+  name: 'Weapon: Demonic Dagger'
+  result:
+    equipmentId: Demonic Dagger
+
+  requirements:
+    - itemId: Fel Copper Ingot
+      quantity: 3
+
+    - itemId: Felwood Rod
+      quantity: 1
+
+    - itemId: Fel Essence
+      quantity: 1
+
+    - itemId: Beholder Eyeball
+      quantity: 1
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450
+
+- id: abe87a7f-556a-49c6-ba9b-4b8a7593c8f3
+  name: 'Headgear: Demonic Helm'
+  result:
+    equipmentId: Demonic Helm
+
+  requirements:
+    - itemId: Fel Copper Ingot
+      quantity: 3
+
+    - itemId: Fel Fiber
+      quantity: 1
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450
+
+- id: a9067456d-8912-40f5-bb7e-d49efcc8e2cc
+  name: 'Armor: Demonic Platemail'
+  result:
+    equipmentId: Demonic Platemail
+
+  requirements:
+    - itemId: Fel Copper Ingot
+      quantity: 6
+
+    - itemId: Fel Fiber
+      quantity: 2
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 25
+  maxTradeskillLevel: 28
+  tradeskillXP: 175
+  craftTime: 450
+
+- id: c5abea18-8a36-4124-9008-2f0c42ec57ba
+  name: 'Material: Miremetal Ore'
+  result:
+    itemId: Miremetal Ore
+    quantity: 3
+
+  requirements:
+    - itemId: Frozen Felrock
+      quantity: 1
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 26
+  maxTradeskillLevel: 27
+  tradeskillXP: 20
+  craftTime: 5
+
+- id: 0d99465a-3a35-4126-b401-7c6bdba6f9b5
+  name: 'Material: Fel Iron Ingot'
+  result:
+    itemId: Fel Iron Ingot
+
+  requirements:
+    - itemId: Miremetal Ore
+      quantity: 1
+
+    - itemId: Fel Essence
+      quantity: 1
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 26
+  maxTradeskillLevel: 27
+  tradeskillXP: 20
+  craftTime: 20
+
+- id: f70bb8f8-e0a1-4cdf-bc53-90c85e32e89c
+  name: 'Material: Fel Steel Ingot'
+  result:
+    itemId: Fel Steel Ingot
+
+  requirements:
+    - itemId: Fel Iron Ingot
+      quantity: 1
+
+    - itemId: Fel Flux
+      quantity: 1
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 27
+  maxTradeskillLevel: 28
+  tradeskillXP: 20
+  craftTime: 20
