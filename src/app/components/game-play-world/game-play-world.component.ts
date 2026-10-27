@@ -49,6 +49,7 @@ import {
   pixiResponsiveCanvasSetup,
   pixiWorldContainersCreate,
 } from '@helpers/pixi/pixi-app-setup.ui';
+import { pixiMapMaxFps } from '@helpers/pixi/pixi-frame-rate.ui';
 import {
   cameraBoundsCalculate,
   cameraOffsetFromDrag,
@@ -320,6 +321,11 @@ export class GamePlayWorldComponent implements OnDestroy {
     });
 
     effect(() => {
+      const maxFps = pixiMapMaxFps();
+      if (this.app) this.app.ticker.maxFPS = maxFps;
+    });
+
+    effect(() => {
       const showBackdropGrid = getOption('showBackdropGrid');
       if (this.gridOverlay) this.gridOverlay.visible = showBackdropGrid;
     });
@@ -531,8 +537,9 @@ export class GamePlayWorldComponent implements OnDestroy {
       backgroundAlpha: 0,
       antialias: false,
     });
-    // The mapZoom effect can't apply this itself - `this.app` didn't exist when it last ran.
+    // The mapZoom/FPS effects can't apply these themselves - `this.app` didn't exist when they last ran.
     this.app.stage.scale.set(getOption('mapZoom'));
+    this.app.ticker.maxFPS = pixiMapMaxFps();
     this.refreshViewportGeometry();
 
     const containers = pixiWorldContainersCreate(this.app);

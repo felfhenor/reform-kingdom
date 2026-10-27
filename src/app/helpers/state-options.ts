@@ -22,6 +22,7 @@ export function defaultOptions(): GameOptions {
     // Web tabs share one save with no cross-tab lock, so only the desktop build defaults on.
     runInBackground: isInElectron(),
     muteWhenUnfocused: false,
+    lowerFrameRateWhenUnfocused: false,
     optionsTab: 'UI',
 
     showBackdropGrid: false,
@@ -33,6 +34,7 @@ export function defaultOptions(): GameOptions {
     analyticsOptInDismissed: false,
 
     mapZoom: 1,
+    mapFrameRate: 30,
     uiScale: 'auto',
 
     partyViewAlwaysExpand: true,

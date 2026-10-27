@@ -30,6 +30,7 @@ setInterval(() => uiClockTick.update((tick) => tick + 1), 1000);
 
 export const windowHeight = signal<number>(window.innerHeight);
 export const windowWidth = signal<number>(window.innerWidth);
+export const windowFocused = signal<boolean>(document.hasFocus());
 
 export const showAnySubmenu = signal<boolean>(false);
 

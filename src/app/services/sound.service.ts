@@ -1,12 +1,6 @@
-import {
-  computed,
-  DestroyRef,
-  effect,
-  inject,
-  Injectable,
-  signal,
-} from '@angular/core';
+import { computed, effect, Injectable, signal } from '@angular/core';
 import { sfx$ } from '@helpers/engine/sfx';
+import { windowFocused } from '@helpers/engine/ui';
 import { getOption } from '@helpers/state-options';
 import type { BGM, SFX } from '@interfaces';
 import { zip } from 'es-toolkit/compat';
@@ -69,9 +63,8 @@ export class SoundService {
 
   private lastBGMVolume = signal<number>(0);
 
-  private isWindowFocused = signal<boolean>(document.hasFocus());
   private isMutedByFocus = computed(
-    () => !!getOption('muteWhenUnfocused') && !this.isWindowFocused(),
+    () => !!getOption('muteWhenUnfocused') && !windowFocused(),
   );
 
   private bgmVolume = computed(() =>
@@ -82,15 +75,6 @@ export class SoundService {
 
   constructor() {
     this.masterGain.connect(this.context.destination);
-
-    const onFocus = () => this.isWindowFocused.set(true);
-    const onBlur = () => this.isWindowFocused.set(false);
-    window.addEventListener('focus', onFocus);
-    window.addEventListener('blur', onBlur);
-    inject(DestroyRef).onDestroy(() => {
-      window.removeEventListener('focus', onFocus);
-      window.removeEventListener('blur', onBlur);
-    });
 
     // Short ramp instead of a step so alt-tabbing doesn't click.
     effect(() => {

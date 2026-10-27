@@ -16,7 +16,8 @@ export type GameOption =
   | 'cleanFont'
   | 'colorblindMode'
   | 'runInBackground'
-  | 'muteWhenUnfocused';
+  | 'muteWhenUnfocused'
+  | 'lowerFrameRateWhenUnfocused';
 
 export type UiScale = 'auto' | number;
 
@@ -33,6 +34,7 @@ export type GameOptions = Record<GameOption, boolean> & {
   debugSaveInterval: number;
   optionsTab: OptionsTab;
   mapZoom: number;
+  mapFrameRate: number;
   uiScale: UiScale;
   motionPreference: MotionPreference;
   adventureLogOverlayKinds: Record<AdventureLogEntryKind, boolean>;

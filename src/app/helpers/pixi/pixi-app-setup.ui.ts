@@ -20,8 +20,6 @@ export async function pixiAppInitialize(
     preference: 'webgpu',
   });
 
-  app.ticker.maxFPS = 30;
-
   const canvas = app.canvas as HTMLCanvasElement;
   canvas.addEventListener('webglcontextlost', (event) => {
     warn('PixiWorld', 'WebGL context lost, preventing default behavior');

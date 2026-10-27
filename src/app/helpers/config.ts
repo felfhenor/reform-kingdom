@@ -316,6 +316,8 @@ export const NODE_REVEAL_RING_RADIUS_TILES = 1.5;
 export const INDICATOR_PROGRESS_BAR_HEIGHT = 6;
 export const INDICATOR_PROGRESS_BAR_OFFSET_Y = -50;
 export const NODE_STATUS_ICON_RADIUS = 7;
+// Still fast enough for node timers and the 150ms status refresh to read as live.
+export const MAP_UNFOCUSED_MAX_FPS = 10;
 // World px per noise pixel - matches the terrain art's chunky pixel size so the overlay reads as pixel art.
 export const TERRAIN_NOISE_CELL_PX = 2;
 // Noise pixels per cluster-noise lattice unit; larger = broader patches of speckles.

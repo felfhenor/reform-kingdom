@@ -9,7 +9,7 @@ import {
   isMotionReduced,
   motionSystemPreferenceSet,
 } from '@helpers/engine/motion';
-import { windowHeight, windowWidth } from '@helpers/engine/ui';
+import { windowFocused, windowHeight, windowWidth } from '@helpers/engine/ui';
 import { uiScaleCurrent } from '@helpers/engine/ui-scale.ui';
 import { getOption } from '@helpers/state-options';
 
@@ -41,6 +41,15 @@ export class ThemeService {
     inject(DestroyRef).onDestroy(() =>
       reducedMotionQuery.removeEventListener('change', onReducedMotionChange),
     );
+
+    const onFocus = () => windowFocused.set(true);
+    const onBlur = () => windowFocused.set(false);
+    window.addEventListener('focus', onFocus);
+    window.addEventListener('blur', onBlur);
+    inject(DestroyRef).onDestroy(() => {
+      window.removeEventListener('focus', onFocus);
+      window.removeEventListener('blur', onBlur);
+    });
 
     effect(() => {
       document.documentElement.classList.toggle(

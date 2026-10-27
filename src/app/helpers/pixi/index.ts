@@ -1,6 +1,7 @@
 export * from './pixi-app-setup.ui';
 export * from './pixi-camera';
 export * from './pixi-floating-text';
+export * from './pixi-frame-rate.ui';
 export * from './pixi-grid.ui';
 export * from './pixi-indicators';
 export * from './pixi-map-render';
