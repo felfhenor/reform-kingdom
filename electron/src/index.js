@@ -15,7 +15,20 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
+// A second copy would tick and save the same game alongside this one.
+const hasInstanceLock = app.requestSingleInstanceLock();
+if (!hasInstanceLock) {
+  app.exit(0);
+}
+
 let mainWindow = undefined;
+
+app.on('second-instance', () => {
+  if (!mainWindow) return;
+  if (mainWindow.isMinimized()) mainWindow.restore();
+  mainWindow.show();
+  mainWindow.focus();
+});
 
 const createWindow = () => {
   const size = screen.getPrimaryDisplay().workAreaSize;
@@ -165,4 +178,4 @@ const handleRPC = () => {
   rpcClient.login({ clientId: DISCORD_CLIENT_ID }).catch(console.error);
 };
 
-handleRPC();
+if (hasInstanceLock) handleRPC();
