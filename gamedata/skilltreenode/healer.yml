@@ -200,6 +200,16 @@
     - kind: GrantSkill
       skillId: 'Empower II'
 
+- id: ccf69404-0aba-415d-8174-7770b6605a7f
+  name: 'Healer: Purify Evil I'
+  jobId: Healer
+  level: 45
+  row: Divine Might
+  track: 2
+  effects:
+    - kind: GrantSkill
+      skillId: 'Purify Evil I'
+
 # --- Abilities (intrinsic, on Restoration's first track) ---
 
 - id: df883512-741b-48ab-a053-a03b4c2058e1

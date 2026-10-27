@@ -368,3 +368,44 @@
     - type: TakeCombatStatNumber
       combatStat: agroValue
       value: -100
+
+- id: caec72d4-9913-47dd-93e4-854e6de87b81
+  name: Focused
+  sprite: '0029'
+
+  effectType: Buff
+  elements: [Air]
+
+  trigger: TurnStart
+
+  onApply:
+    - type: SendMessage
+      combatMessage: '**{{ combatant.name }}** is focused!'
+
+    - type: AddCombatStatNumber
+      combatStat: debuffIgnoreChance
+      value: 20
+
+    - type: AddCombatStatNumber
+      combatStat: epCostIncreasePercent
+      value: -20
+
+    - type: AddCombatStatNumber
+      combatStat: missChance
+      value: -10
+
+  onUnapply:
+    - type: SendMessage
+      combatMessage: '**{{ combatant.name }}** has lost their focus.'
+
+    - type: TakeCombatStatNumber
+      combatStat: debuffIgnoreChance
+      value: 20
+
+    - type: TakeCombatStatNumber
+      combatStat: epCostIncreasePercent
+      value: -20
+
+    - type: TakeCombatStatNumber
+      combatStat: missChance
+      value: -10

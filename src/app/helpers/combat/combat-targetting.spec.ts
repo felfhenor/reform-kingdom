@@ -802,6 +802,27 @@ describe('combatSkillHasValidTargetsForMode', () => {
     expect(hasTarget()).toBe(true);
   });
 
+  it('IfNoShield filters out a caster that still has a shield', () => {
+    const caster = buildTestCombatant({ id: 'caster', shield: 10 });
+    const combat = buildCombat({ heroes: [caster] });
+    const skill = buildEquipmentSkill({
+      techniques: [
+        buildTechnique({
+          targetType: 'Self',
+          targetBehaviors: [{ behavior: 'IfNoShield' }],
+        }),
+      ],
+    });
+    const context: CombatTargetModeContext = { combatant: caster };
+    const hasTarget = () =>
+      combatSkillHasValidTargetsForMode(combat, caster, skill, 'Self', context);
+
+    expect(hasTarget()).toBe(false);
+
+    caster.shield = 0;
+    expect(hasTarget()).toBe(true);
+  });
+
   it('is false when the only candidate is dead and the technique needs a living target', () => {
     const caster = buildTestCombatant({ id: 'caster', hp: 0 });
     const combat = buildCombat({ heroes: [caster] });

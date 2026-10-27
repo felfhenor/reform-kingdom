@@ -163,6 +163,29 @@
     - kind: GrantSkill
       skillId: 'Refresh II'
 
+# --- Spellweaving / track 2 ---
+
+- id: 470b7120-9795-4f39-92cb-f756717391c9
+  name: 'Magician: Spellshield I'
+  jobId: Magician
+  level: 40
+  row: Spellweaving
+  track: 2
+  effects:
+    - kind: GrantSkill
+      skillId: 'Spellshield I'
+
+- id: abc63d40-4f67-4b6e-a490-580154944edf
+  name: 'Magician: Spellshield II'
+  jobId: Magician
+  level: 50
+  row: Spellweaving
+  track: 2
+  requiredSkillTreeNodeIds: ['Magician: Spellshield I']
+  effects:
+    - kind: GrantSkill
+      skillId: 'Spellshield II'
+
 # --- Abilities (intrinsic) ---
 
 - id: 70f4cb3b-f2f4-4922-bfdc-8af7ecf64c88

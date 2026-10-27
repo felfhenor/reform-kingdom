@@ -86,6 +86,7 @@ function filterCombatantTargetListForSkillTechniqueBehavior(
       ),
     IfNoSummon: (list) =>
       list.filter((c) => !combatantHasLivingSummon(combat, c)),
+    IfNoShield: (list) => list.filter((c) => (c.shield ?? 0) <= 0),
     PreferHeroes: (list) => list,
   };
 

@@ -85,6 +85,29 @@
     - kind: GrantSkill
       skillId: 'Earthshake IV'
 
+# --- Fieldcraft / track 2 ---
+
+- id: bde0ebc6-d683-4324-b249-613128f6ef57
+  name: 'Explorer: Rejuvenating Gust I'
+  jobId: Explorer
+  level: 40
+  row: Fieldcraft
+  track: 2
+  effects:
+    - kind: GrantSkill
+      skillId: 'Rejuvenating Gust I'
+
+- id: 0b316e24-7816-4b83-9c0f-dc530ba8cdac
+  name: 'Explorer: Rejuvenating Gust II'
+  jobId: Explorer
+  level: 50
+  row: Fieldcraft
+  track: 2
+  requiredSkillTreeNodeIds: ['Explorer: Rejuvenating Gust I']
+  effects:
+    - kind: GrantSkill
+      skillId: 'Rejuvenating Gust II'
+
 # --- Fortune / track 0 ---
 
 - id: 163c8ae0-dbb1-41a1-9491-a25c77039ab9

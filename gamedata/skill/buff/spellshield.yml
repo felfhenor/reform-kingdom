@@ -1,0 +1,59 @@
+- id: ef5b9d77-c3d7-46dc-9e70-6e622a8cbb60
+  name: Spellshield I
+  family: Spellshield
+  description: Ward an unshielded ally with a shield for 15% of the caster's max HP.
+
+  sprite: '0073'
+
+  rarity: Common
+
+  epCost: 20
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: []
+      attributes: [ShieldsTarget, NeverMisses]
+      targets: 1
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNoShield
+        - behavior: PreferHeroes
+      damageScaling:
+        Health: 0.15
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** shields **{{ target.name }}** for {{ absdamage }} {{ targetStatus }}.'
+
+- id: 8a98b78e-a056-4e90-b245-39ac94f350fc
+  name: Spellshield II
+  family: Spellshield
+  description: Ward an unshielded ally with a shield for 25% of the caster's max HP.
+
+  sprite: '0073'
+
+  rarity: Uncommon
+
+  epCost: 30
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: []
+      attributes: [ShieldsTarget, NeverMisses]
+      targets: 1
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNoShield
+        - behavior: PreferHeroes
+      damageScaling:
+        Health: 0.25
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** shields **{{ target.name }}** for {{ absdamage }} {{ targetStatus }}.'

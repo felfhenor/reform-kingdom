@@ -1,0 +1,59 @@
+- id: e397a59c-ab74-4240-a737-1737643b3626
+  name: Defensive Stance I
+  family: Defensive Stance
+  description: Brace yourself, shielding for 25% of your max HP.
+
+  sprite: '0072'
+
+  rarity: Common
+
+  epCost: 10
+  usesPerCombat: -1
+  cooldown: 3
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: []
+      attributes: [ShieldsTarget, NeverMisses]
+      targets: 1
+      targetType: Self
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNoShield
+      damageScaling:
+        Health: 0.25
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** braces, shielding themself for {{ absdamage }} {{ targetStatus }}.'
+
+- id: cfe84acc-7063-4a02-b648-7d11ce861564
+  name: Defensive Stance II
+  family: Defensive Stance
+  description: Brace yourself, shielding yourself for 50% of your max HP.
+
+  sprite: '0072'
+
+  rarity: Uncommon
+
+  epCost: 16
+  usesPerCombat: -1
+  cooldown: 3
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: []
+      attributes: [ShieldsTarget, NeverMisses]
+      targets: 1
+      targetType: Self
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNoShield
+      damageScaling:
+        Health: 0.5
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** braces, shielding themself for {{ absdamage }} {{ targetStatus }}.'

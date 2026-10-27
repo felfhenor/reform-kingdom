@@ -133,6 +133,27 @@
     - kind: GrantSkill
       skillId: 'Arrow Rain III'
 
+- id: 7dc69841-734a-43b3-a337-bc41c562fe87
+  name: 'Ranger: Nature Lance I'
+  jobId: Ranger
+  level: 40
+  row: Nature
+  track: 2
+  effects:
+    - kind: GrantSkill
+      skillId: 'Nature Lance I'
+
+- id: d7a8bdab-1e15-4c84-a3ef-45a1ae8471c5
+  name: 'Ranger: Nature Lance II'
+  jobId: Ranger
+  level: 50
+  row: Nature
+  track: 2
+  requiredSkillTreeNodeIds: ['Ranger: Nature Lance I']
+  effects:
+    - kind: GrantSkill
+      skillId: 'Nature Lance II'
+
 # --- Nature / track 0 ---
 
 - id: 1beb2fe3-3f52-4613-952e-14ad01fe4f9a

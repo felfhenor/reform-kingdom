@@ -103,6 +103,8 @@ function skillTargetBehaviorCondition(
       return [`Only if it lacks ${effectName()}`];
     case 'IfNoSummon':
       return ['Only if no summon is active'];
+    case 'IfNoShield':
+      return ['Only if unshielded'];
     case 'PreferHeroes':
       return ['Heroes first'];
     default:

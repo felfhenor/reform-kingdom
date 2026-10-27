@@ -1,0 +1,32 @@
+- id: 9978f2db-d5bd-4e2d-bd41-76db96771488
+  name: Purify Evil I
+  family: Purify Evil I
+  description: Envelop and burn an enemy with holy light, stunning them for 2 turns.
+
+  sprite: '0074'
+
+  rarity: Common
+
+  epCost: 15
+  usesPerCombat: -1
+  cooldown: 4
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - attributes: [Debuff]
+      elements: []
+      targets: 2
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Stunned
+
+      statusEffects:
+        - statusEffectId: Stunned
+          chance: 100
+          duration: 1
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}**.'

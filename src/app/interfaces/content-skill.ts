@@ -26,6 +26,7 @@ export type EquipmentSkillTargetBehavior =
   | 'IfStatusEffect'
   | 'IfNotStatusEffect'
   | 'IfNoSummon'
+  | 'IfNoShield'
   | 'PreferHeroes';
 
 export type EquipmentSkillAttribute =

@@ -165,6 +165,27 @@
     - kind: GrantSkill
       skillId: 'Taunt I'
 
+- id: 8bf0c098-399b-4676-95ca-940b4dfccf6c
+  name: 'Warrior: Defensive Stance I'
+  jobId: Warrior
+  level: 35
+  row: Shield Arts
+  track: 1
+  effects:
+    - kind: GrantSkill
+      skillId: 'Defensive Stance I'
+
+- id: 0cfc6420-4264-4846-a231-c572f92951f1
+  name: 'Warrior: Defensive Stance II'
+  jobId: Warrior
+  level: 45
+  row: Shield Arts
+  track: 1
+  requiredSkillTreeNodeIds: ['Warrior: Defensive Stance I']
+  effects:
+    - kind: GrantSkill
+      skillId: 'Defensive Stance II'
+
 # --- Abilities (intrinsic) ---
 
 - id: 707418b2-49d8-49f5-93a3-225f2bbb1be6

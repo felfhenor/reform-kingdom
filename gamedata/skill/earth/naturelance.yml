@@ -1,0 +1,77 @@
+- id: d6858141-ef99-4252-bbe4-e36824f3e7f9
+  name: Nature Lance I
+  family: Nature Lance
+  description: Gather nature's force for 1 turn, then pierce an enemy for {{ value }} damage, inflicting Bleeding and Redirect.
+
+  sprite: '0075'
+
+  rarity: Common
+
+  epCost: 20
+  usesPerCombat: -1
+  delay: 1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Earth]
+      attributes:
+        [DamagesTarget, NeverMisses, AllowPlink, Debuff, BypassDefense]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 3
+        Agility: 1.5
+
+      statusEffects:
+        - statusEffectId: Bleeding
+          chance: 100
+          duration: 3
+
+        - statusEffectId: Redirect
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** pierces **{{ target.name }}** with nature for {{ damageText }} {{ targetStatus }}.'
+
+- id: 9438a14d-1697-444a-a5c4-5381fd82b5d2
+  name: Nature Lance II
+  family: Nature Lance
+  description: Gather nature's force for 1 turn, then pierce an enemy for {{ value }} damage, inflicting Bleeding and Redirect.
+
+  sprite: '0075'
+
+  rarity: Uncommon
+
+  epCost: 30
+  usesPerCombat: -1
+  delay: 1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Earth]
+      attributes:
+        [DamagesTarget, NeverMisses, AllowPlink, Debuff, BypassDefense]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 4.5
+        Agility: 2
+
+      statusEffects:
+        - statusEffectId: Bleeding
+          chance: 100
+          duration: 3
+
+        - statusEffectId: Redirect
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** pierces **{{ target.name }}** with nature for {{ damageText }} {{ targetStatus }}.'

@@ -1,0 +1,91 @@
+- id: 2c1350e9-cf8b-4c08-9f8c-2dabce269211
+  name: Rejuvenating Gust I
+  family: Rejuvenating Gust
+  description: Waft a soothing breeze to 2 wounded allies, healing them for {{ value }} HP, and make 2 allies Focused.
+
+  sprite: '0076'
+
+  rarity: Common
+
+  epCost: 15
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Air]
+      attributes: [HealsTarget, BypassDefense, NeverMisses]
+      targets: 2
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: NotMaxHealth
+      damageScaling:
+        Agility: 1
+        Intelligence: 0.5
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing {{ targetStatus }}.'
+
+    - elements: []
+      attributes: [Buff, NeverMisses]
+      targets: 2
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Focused
+
+      statusEffects:
+        - statusEffectId: Focused
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** helps **{{ target.name }}** focus.'
+
+- id: ebacd4bc-b62f-4d39-a74d-116e9b7fac39
+  name: Rejuvenating Gust II
+  family: Rejuvenating Gust
+  description: Waft a soothing breeze to 2 wounded allies, healing them for {{ value }} HP, and make 2 allies Focused.
+
+  sprite: '0076'
+
+  rarity: Uncommon
+
+  epCost: 24
+  usesPerCombat: -1
+
+  statusEffectDurationBoost: {}
+  statusEffectChanceBoost: {}
+
+  techniques:
+    - elements: [Air]
+      attributes: [HealsTarget, BypassDefense, NeverMisses]
+      targets: 2
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: NotMaxHealth
+      damageScaling:
+        Agility: 1.5
+        Intelligence: 0.75
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing {{ targetStatus }}.'
+
+    - elements: []
+      attributes: [Buff, NeverMisses]
+      targets: 2
+      targetType: Allies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNotStatusEffect
+          statusEffectId: Focused
+
+      statusEffects:
+        - statusEffectId: Focused
+          chance: 100
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** helps **{{ target.name }}** focus.'
