@@ -6,6 +6,10 @@ const rpc = require('discord-rpc');
 
 const Config = require('electron-config');
 const { registerSavefileBackupHandlers } = require('./savefile-backups');
+const {
+  registerWindowSettingsHandlers,
+  watchWindowState,
+} = require('./window-settings');
 const config = new Config();
 
 const showDevTools = process.argv.includes('--dev');
@@ -46,6 +50,8 @@ const createWindow = () => {
   if (!opts.height) opts.height = size.height;
   if (!opts.x) opts.x = 0;
   if (!opts.y) opts.y = 0;
+  // Only ever set to true: an explicit false disables the fullscreen button on macOS.
+  if (config.get('fullscreen')) opts.fullscreen = true;
 
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -58,11 +64,22 @@ const createWindow = () => {
   });
 
   mainWindow.setMenu(null);
-  mainWindow.once('ready-to-show', mainWindow.show);
-
-  mainWindow.on('close', () => {
-    config.set('winBounds', mainWindow.getBounds());
+  mainWindow.once('ready-to-show', () => {
+    if (config.get('maximized')) mainWindow.maximize();
+    mainWindow.show();
   });
+
+  // Saved as it changes so a killed process still remembers it.
+  mainWindow.on('enter-full-screen', () => config.set('fullscreen', true));
+  mainWindow.on('leave-full-screen', () => config.set('fullscreen', false));
+
+  // Normal bounds, so a maximized or fullscreen close doesn't reopen as a screen-sized plain window.
+  mainWindow.on('close', () => {
+    config.set('winBounds', mainWindow.getNormalBounds());
+    config.set('maximized', mainWindow.isMaximized());
+  });
+
+  watchWindowState(mainWindow);
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
@@ -105,6 +122,7 @@ const createWindow = () => {
 // Some APIs can only be used after this event occurs.
 app.on('ready', () => {
   registerSavefileBackupHandlers();
+  registerWindowSettingsHandlers(() => mainWindow);
   createWindow();
 });
 

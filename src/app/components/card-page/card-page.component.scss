@@ -68,9 +68,10 @@
   }
 }
 
+// Capped at the container so a modal-embedded page (11/12 of the viewport) can't outgrow its box.
 .page-card {
-  min-width: 1500px;
-  max-width: 1500px;
+  min-width: min(1500px, 100%);
+  max-width: min(1500px, 100%);
 
   @media (max-width: 1599px) {
     min-width: min(1400px, 95vw);
