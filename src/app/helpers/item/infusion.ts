@@ -116,7 +116,6 @@ export function infusionMaterialCost(itemId: ItemId): number {
       ELEMENT_BOON_BONUS.infusionBlock(content),
       VALUE_MULTIPLIER_PER_ELEMENT,
     );
-  // No per-tradeskill weighting - just a flat rate per point of value across every tradeskill it targets.
   const gatherYieldCost =
     GOLD_PER_GATHER_YIELD_POINT *
     sumBy(content.infusionGatherYieldBonuses ?? [], (bonus) => bonus.value);

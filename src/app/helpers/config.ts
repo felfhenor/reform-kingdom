@@ -265,14 +265,14 @@ export const ARMORY_OVERFLOW_MULTIPLIER = 1.25;
 export const ARMORY_ENCUMBERED_THRESHOLD = 0.75;
 
 // Same rate infusion pricing uses, plus a per-level component so higher-tier drops are worth more.
-export const SELL_GOLD_PER_STAT_POINT = 20;
-export const SELL_GOLD_PER_LEVEL = 10;
+export const SELL_GOLD_PER_STAT_POINT = 5;
+export const SELL_GOLD_PER_LEVEL = 2;
 
 // Combat stats are rarer/more specialized than a raw base stat point, so they're worth more.
-export const SELL_GOLD_PER_COMBAT_STAT_POINT = 50;
+export const SELL_GOLD_PER_COMBAT_STAT_POINT = 12;
 
 // Same rate infusion pricing uses for a resistance point - the rarest, most specialized bonus.
-export const SELL_GOLD_PER_RESISTANCE_POINT = 100;
+export const SELL_GOLD_PER_RESISTANCE_POINT = 20;
 
 export const REFORGE_GOLD_PER_LEVEL = 25;
 
