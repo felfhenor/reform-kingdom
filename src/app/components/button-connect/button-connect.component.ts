@@ -8,7 +8,6 @@ import { discordCopyInvite } from '@helpers/engine/discord.ui';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import {
   tablerBrandDiscord,
-  tablerBrandGithub,
   tablerDownload,
   tablerMail,
   tablerRss,
@@ -28,7 +27,6 @@ import { TippyDirective } from '@ngneat/helipopper';
   providers: [
     provideIcons({
       tablerBrandDiscord,
-      tablerBrandGithub,
       tablerMail,
       tablerRss,
       tablerDownload,
@@ -46,13 +44,6 @@ export class ButtonConnectComponent {
       currentColor: '#ccc',
       icon: 'tablerBrandDiscord',
       copyWhenEmbedded: true,
-    },
-    {
-      name: 'GitHub',
-      link: 'https://github.com/felfhenor/reform-kingdom',
-      color: '#fff',
-      currentColor: '#ccc',
-      icon: 'tablerBrandGithub',
     },
     {
       name: 'Blog',
