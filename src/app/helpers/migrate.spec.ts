@@ -563,4 +563,22 @@ describe('migrateOptionsState', () => {
     expect(options()).not.toHaveProperty('uiTheme');
     expect(options().sfxVolume).toBe(defaultOptions().sfxVolume);
   });
+
+  it.each([true, false])(
+    'replaces the old debug background flag (%s) with runInBackground',
+    (oldValue) => {
+      const stale: Partial<GameOptions> & {
+        debugAllowBackgroundOperations: boolean;
+      } = { ...defaultOptions(), debugAllowBackgroundOperations: oldValue };
+      delete stale.runInBackground;
+      setOptions(stale as GameOptions);
+
+      migrateOptionsState();
+
+      expect(options()).not.toHaveProperty('debugAllowBackgroundOperations');
+      expect(options().runInBackground).toBe(
+        oldValue || defaultOptions().runInBackground,
+      );
+    },
+  );
 });

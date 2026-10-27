@@ -1,4 +1,11 @@
-import { computed, effect, Injectable, signal } from '@angular/core';
+import {
+  computed,
+  DestroyRef,
+  effect,
+  inject,
+  Injectable,
+  signal,
+} from '@angular/core';
 import { sfx$ } from '@helpers/engine/sfx';
 import { getOption } from '@helpers/state-options';
 import type { BGM, SFX } from '@interfaces';
@@ -42,6 +49,8 @@ const CROSSFADE_TIME = 2; // seconds
 })
 export class SoundService {
   private context = new AudioContext();
+  // Every source routes through here so a focus mute also silences fading-out BGM and in-flight SFX.
+  private masterGain = this.context.createGain();
   private audioRefs: Partial<Record<SFX | BGM, AudioBuffer>> = {};
 
   private bgmGain?: GainNode;
@@ -60,6 +69,11 @@ export class SoundService {
 
   private lastBGMVolume = signal<number>(0);
 
+  private isWindowFocused = signal<boolean>(document.hasFocus());
+  private isMutedByFocus = computed(
+    () => !!getOption('muteWhenUnfocused') && !this.isWindowFocused(),
+  );
+
   private bgmVolume = computed(() =>
     getOption<'bgmPlay'>('bgmPlay') ? getOption<'bgmVolume'>('bgmVolume') : 0,
   );
@@ -67,6 +81,27 @@ export class SoundService {
   private sfxVolume = computed(() => 0.5 * getOption<'sfxVolume'>('sfxVolume'));
 
   constructor() {
+    this.masterGain.connect(this.context.destination);
+
+    const onFocus = () => this.isWindowFocused.set(true);
+    const onBlur = () => this.isWindowFocused.set(false);
+    window.addEventListener('focus', onFocus);
+    window.addEventListener('blur', onBlur);
+    inject(DestroyRef).onDestroy(() => {
+      window.removeEventListener('focus', onFocus);
+      window.removeEventListener('blur', onBlur);
+    });
+
+    // Short ramp instead of a step so alt-tabbing doesn't click.
+    effect(() => {
+      const target = this.isMutedByFocus() ? 0 : 1;
+      this.masterGain.gain.setTargetAtTime(
+        target,
+        this.context.currentTime,
+        0.03,
+      );
+    });
+
     effect(() => {
       const bgmVolume = this.bgmVolume();
       if (bgmVolume !== this.lastBGMVolume()) {
@@ -180,7 +215,7 @@ export class SoundService {
     const gain = this.context.createGain();
     gain.gain.value = this.sfxVolume() * soundVolumeMixing[soundName];
     source.connect(gain);
-    gain.connect(this.context.destination);
+    gain.connect(this.masterGain);
 
     source.start(0);
 
@@ -207,7 +242,7 @@ export class SoundService {
     const gainNode = this.context.createGain();
     gainNode.gain.value = volume;
     source.connect(gainNode);
-    gainNode.connect(this.context.destination);
+    gainNode.connect(this.masterGain);
 
     if (this.bgm) {
       const currTime = this.context.currentTime;

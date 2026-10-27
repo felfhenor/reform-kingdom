@@ -8,6 +8,27 @@
           <label class="label cursor-pointer label-checkbox">
             <input
               type="checkbox"
+              [checked]="getOption('runInBackground')"
+              class="checkbox"
+              (click)="
+                setOption('runInBackground', !getOption('runInBackground'))
+              "
+            />
+            <span class="label-text">Run in Background</span>
+            <app-icon
+              name="gameHelp"
+              size="inline"
+              class="text-lighter ml-1"
+              [tp]="'Keeps the game running while it is minimized or in another tab.'"
+              [tpPlacement]="'top'"
+            />
+          </label>
+        </div>
+
+        <div class="form-control">
+          <label class="label cursor-pointer label-checkbox">
+            <input
+              type="checkbox"
               [checked]="getOption('showBackdropGrid')"
               class="checkbox"
               (click)="
@@ -93,6 +114,23 @@
       <div class="card shadow-sm">
         <div class="card-body p-3 gap-2">
           <div class="type-section-title">Audio</div>
+
+          <div class="form-control">
+            <label class="label cursor-pointer label-checkbox">
+              <input
+                type="checkbox"
+                [checked]="getOption('muteWhenUnfocused')"
+                class="checkbox"
+                (click)="
+                  setOption(
+                    'muteWhenUnfocused',
+                    !getOption('muteWhenUnfocused')
+                  )
+                "
+              />
+              <span class="label-text">Mute When Unfocused</span>
+            </label>
+          </div>
 
           <div class="form-control">
             <label class="label cursor-pointer label-checkbox">

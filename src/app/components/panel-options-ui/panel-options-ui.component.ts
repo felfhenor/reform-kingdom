@@ -1,12 +1,14 @@
 import { DecimalPipe } from '@angular/common';
 import { Component } from '@angular/core';
+import { IconComponent } from '@components/icon/icon.component';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { defaultOptions } from '@helpers/state-options';
 import type { AdventureLogEntryKind } from '@interfaces';
+import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-panel-options-ui',
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, IconComponent, TippyDirective],
   templateUrl: './panel-options-ui.component.html',
   styleUrl: './panel-options-ui.component.scss',
 })

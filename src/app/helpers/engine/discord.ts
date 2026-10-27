@@ -1,5 +1,6 @@
 import { caravanBrandName, caravanState } from '@helpers/caravan/caravan';
 import { getEntry } from '@helpers/content/content';
+import { isInElectron } from '@helpers/engine/electron';
 import { activeTownNode, gamePlayView } from '@helpers/engine/ui';
 import { isGlobalEffectActive } from '@helpers/hero/global-effects';
 import { isTitleCrawlPending } from '@helpers/lore/title-crawl';
@@ -23,10 +24,6 @@ import type {
   WorldNodeEntry,
 } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
-
-export function isInElectron() {
-  return navigator.userAgent.toLowerCase().includes(' electron/');
-}
 
 let discordMainStatus = '';
 export function discordSetMainStatus(status: string) {

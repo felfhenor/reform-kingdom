@@ -15,7 +15,7 @@ import { ButtonSavefileImportComponent } from '@components/button-savefile-impor
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { SAVEFILE_BACKUP_MAX } from '@helpers/config';
-import { isInElectron } from '@helpers/engine/discord';
+import { isInElectron } from '@helpers/engine/electron';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { ticksToDurationParts } from '@helpers/engine/timer.ui';
 import { closeAllMenus } from '@helpers/engine/ui';

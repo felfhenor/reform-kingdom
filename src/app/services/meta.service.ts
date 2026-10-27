@@ -1,6 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '@environments/environment';
-import { isInElectron } from '@helpers/engine/discord';
+import { isInElectron } from '@helpers/engine/electron';
 import {
   liveVersion,
   localVersion,

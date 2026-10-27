@@ -1,5 +1,6 @@
 import type { Signal } from '@angular/core';
 import { environment } from '@environments/environment';
+import { isInElectron } from '@helpers/engine/electron';
 import { localStorageSignal } from '@helpers/engine/signal';
 import type { GameOptions } from '@interfaces';
 
@@ -8,7 +9,6 @@ export function defaultOptions(): GameOptions {
     showDebug: !environment.production,
     debugConsoleLogStateUpdates: false,
     debugGameloopTimerUpdates: false,
-    debugAllowBackgroundOperations: false,
     debugTickMultiplier: 1,
     debugSaveInterval: 15,
 
@@ -19,6 +19,9 @@ export function defaultOptions(): GameOptions {
     bgmVolume: 0.1,
 
     gameloopPaused: false,
+    // Web tabs share one save with no cross-tab lock, so only the desktop build defaults on.
+    runInBackground: isInElectron(),
+    muteWhenUnfocused: false,
     optionsTab: 'UI',
 
     showBackdropGrid: false,

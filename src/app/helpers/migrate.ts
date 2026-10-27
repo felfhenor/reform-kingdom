@@ -303,5 +303,12 @@ export function migrateOptionsState() {
   const newState = merge(defaultOptions(), state);
   delete (newState as Partial<Record<string, unknown>>)['uiTheme'];
 
+  const legacy = state as Partial<Record<string, unknown>>;
+  if (legacy['debugAllowBackgroundOperations'] === true)
+    newState.runInBackground = true;
+  delete (newState as Partial<Record<string, unknown>>)[
+    'debugAllowBackgroundOperations'
+  ];
+
   setOptions(newState);
 }

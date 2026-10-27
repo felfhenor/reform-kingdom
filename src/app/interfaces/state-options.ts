@@ -4,7 +4,6 @@ export type GameOption =
   | 'showDebug'
   | 'debugConsoleLogStateUpdates'
   | 'debugGameloopTimerUpdates'
-  | 'debugAllowBackgroundOperations'
   | 'sfxPlay'
   | 'bgmPlay'
   | 'gameloopPaused'
@@ -15,7 +14,9 @@ export type GameOption =
   | 'craftingViewAlwaysExpand'
   | 'adventureLogOverlay'
   | 'cleanFont'
-  | 'colorblindMode';
+  | 'colorblindMode'
+  | 'runInBackground'
+  | 'muteWhenUnfocused';
 
 export type UiScale = 'auto' | number;
 

@@ -101,7 +101,7 @@ export class GamestateService {
     interval(GAMELOOP_INTERVAL_MS).subscribe(() => {
       if (lastRunTime <= 0 || !this.hasLoaded() || isRunning) return;
 
-      if (!isPageVisible() && !getOption('debugAllowBackgroundOperations')) {
+      if (!isPageVisible() && !getOption('runInBackground')) {
         return;
       }
 

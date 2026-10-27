@@ -10,7 +10,6 @@ import { ensureTown } from '@helpers/content/ensure-town';
 import {
   discordSetMainStatus,
   discordUpdateStatus,
-  isInElectron,
 } from '@helpers/engine/discord';
 import { activeTownNode, setGamePlayView } from '@helpers/engine/ui';
 import { defaultOptions, setOption, setOptions } from '@helpers/state-options';
@@ -107,15 +106,6 @@ beforeEach(() => {
     warrior,
     magician,
   ]);
-});
-
-describe('isInElectron', () => {
-  it('detects electron from the user agent', () => {
-    expect(isInElectron()).toBe(true);
-
-    runningInElectron(false);
-    expect(isInElectron()).toBe(false);
-  });
 });
 
 describe('discordUpdateStatus', () => {

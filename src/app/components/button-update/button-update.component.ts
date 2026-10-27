@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { ButtonGlowComponent } from '@components/button-glow/button-glow.component';
 import { SFXDirective } from '@directives/sfx.directive';
-import { isInElectron } from '@helpers/engine/discord';
+import { isInElectron } from '@helpers/engine/electron';
 import { MetaService } from '@services/meta.service';
 
 @Component({
