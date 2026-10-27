@@ -10,6 +10,7 @@ import {
   untracked,
   type Signal,
 } from '@angular/core';
+import { isMotionReduced } from '@helpers/engine/motion';
 import type { DamageEventVariant } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
 import { animate, type DOMTarget, type JSAnimation } from 'animejs';
@@ -54,15 +55,13 @@ function gridDistance(
 })
 export class AnimationService {
   private locale = inject(LOCALE_ID);
-  public readonly reducedMotion = matchMedia('(prefers-reduced-motion: reduce)')
-    .matches;
   // Angular can fire a leave handler twice for one element; a second shatter would clone the shards too.
   private shattering = new WeakMap<Element, Promise<unknown>>();
 
   popIn(target: Element): JSAnimation {
     return animate(target as DOMTarget, {
       opacity: [0, 0.85],
-      scale: [0.8, 1],
+      ...this.motion({ scale: [0.8, 1] }),
       duration: 220,
       ease: 'outBack',
     });
@@ -82,7 +81,7 @@ export class AnimationService {
     el.style.opacity = '0';
     const anim = animate(el as DOMTarget, {
       opacity: [0, 1],
-      translateX: [20, 0],
+      ...this.motion({ translateX: [20, 0] }),
       duration: 240,
       delay: Math.min(index, 8) * 60,
       ease: 'outQuad',
@@ -102,9 +101,11 @@ export class AnimationService {
     el.style.overflow = 'hidden';
     return animate(el as DOMTarget, {
       opacity: [1, 0],
-      translateX: [0, 24],
-      height: { from: height, to: 0, delay: 120, duration: 180 },
-      marginBottom: { from: 0, to: -gap, delay: 120, duration: 180 },
+      ...this.motion({
+        translateX: [0, 24],
+        height: { from: height, to: 0, delay: 120, duration: 180 },
+        marginBottom: { from: 0, to: -gap, delay: 120, duration: 180 },
+      }),
       duration: 200,
       ease: 'inQuad',
     });
@@ -127,7 +128,7 @@ export class AnimationService {
   slideIn(target: Element): JSAnimation {
     return animate(target as DOMTarget, {
       opacity: [0, 1],
-      translateY: [-8, 0],
+      ...this.motion({ translateY: [-8, 0] }),
       duration: 220,
       ease: 'outQuad',
     });
@@ -160,7 +161,7 @@ export class AnimationService {
 
     const anim = animate(span, {
       opacity: [1, 0],
-      translateY: [0, -16],
+      ...this.motion({ translateY: [0, -16] }),
       duration: 900,
       ease: 'outQuad',
     });
@@ -176,6 +177,8 @@ export class AnimationService {
     target: Element,
     arrival: 'popIn' | 'pulse' = 'popIn',
   ): JSAnimation {
+    if (isMotionReduced()) return this[arrival](target);
+
     const from = source.getBoundingClientRect();
     const to = target.getBoundingClientRect();
 
@@ -211,6 +214,8 @@ export class AnimationService {
   // Bounces `target` without touching opacity - unlike popIn (which fades in from 0),
   // this is for drawing attention to an already-visible element that just changed.
   pulse(target: Element): JSAnimation {
+    if (isMotionReduced()) return this.goldGlow(target);
+
     return animate(target as DOMTarget, {
       scale: [
         { to: 0.95, duration: 200, ease: 'outQuad' },
@@ -269,7 +274,7 @@ export class AnimationService {
     (target as HTMLElement).style.opacity = '0';
     return animate(target as DOMTarget, {
       opacity: [0, 1],
-      translateY: [8, 0],
+      ...this.motion({ translateY: [8, 0] }),
       duration: 220,
       delay: Math.min(index, 8) * 45,
       ease: 'outQuad',
@@ -389,13 +394,15 @@ export class AnimationService {
         { to: 1, duration: holdMs },
         { to: 0, duration: duration - 80 - holdMs, ease: 'inQuad' },
       ],
-      scale: this.damageNumberScaleKeyframes(scale, isHeal, variant),
-      translateY: [
-        { from: startY, to: startY - rise, duration, ease: 'outQuad' },
-      ],
-      translateX: this.damageNumberShiftKeyframes(duration, variant),
-      rotate: [{ from: tilt, to: tilt * 0.3, duration, ease: 'outQuad' }],
-      ...(variant === 'critical' ? { color: this.critFlashKeyframes() } : {}),
+      ...this.motion({
+        scale: this.damageNumberScaleKeyframes(scale, isHeal, variant),
+        translateY: [
+          { from: startY, to: startY - rise, duration, ease: 'outQuad' },
+        ],
+        translateX: this.damageNumberShiftKeyframes(duration, variant),
+        rotate: [{ from: tilt, to: tilt * 0.3, duration, ease: 'outQuad' }],
+        ...(variant === 'critical' ? { color: this.critFlashKeyframes() } : {}),
+      }),
     });
   }
 
@@ -469,6 +476,8 @@ export class AnimationService {
   }
 
   levelUp(target: Element): JSAnimation {
+    if (isMotionReduced()) return this.goldGlow(target);
+
     this.pulse(target);
     return this.goldGlow(target);
   }
@@ -476,6 +485,8 @@ export class AnimationService {
   // Hides `target` and scatters clipped clones of it as shards that dissolve into smoke; meant for a leave handler,
   // since the shards live inside `target` and go away with it.
   shatterIntoSmoke(target: Element): Promise<unknown> {
+    if (isMotionReduced()) return this.fadeOut(target).then(() => undefined);
+
     const running = this.shattering.get(target);
     if (running) return running;
 
@@ -598,6 +609,11 @@ export class AnimationService {
       delay: delay + 60,
       ease: 'outQuad',
     });
+  }
+
+  // Movement is dropped under reduced motion; fades and glows still play.
+  private motion<T extends object>(props: T): T | Record<string, never> {
+    return isMotionReduced() ? {} : props;
   }
 }
 

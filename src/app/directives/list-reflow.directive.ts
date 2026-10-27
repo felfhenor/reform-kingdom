@@ -9,6 +9,7 @@ import {
   input,
   untracked,
 } from '@angular/core';
+import { isMotionReduced } from '@helpers/engine/motion';
 import { AnimationService } from '@services/animation.service';
 import { clamp } from 'es-toolkit/compat';
 
@@ -54,7 +55,6 @@ export class ListReflowDirective {
   // Observers only exist while enabled, so a grid that opts out pays nothing and keeps its own positioning.
   private start(): void {
     if (this.stopObserving) return;
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     const mutations = new MutationObserver(() => this.reflow());
     const onScroll = () => (this.scroll = this.currentScroll());
@@ -205,6 +205,7 @@ export class ListReflowDirective {
       }
       return;
     }
+    if (isMotionReduced()) return;
 
     const offset = this.currentOffset(child);
     this.running.get(child)?.cancel();

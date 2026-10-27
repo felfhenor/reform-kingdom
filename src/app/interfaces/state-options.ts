@@ -19,6 +19,8 @@ export type GameOption =
 
 export type UiScale = 'auto' | number;
 
+export type MotionPreference = 'system' | 'reduced' | 'full';
+
 export type NotificationCategory = 'Error' | 'Success' | 'Warning';
 
 export type OptionsTab = 'UI' | 'Accessibility' | 'Savefile' | 'Misc' | 'Debug';
@@ -31,5 +33,6 @@ export type GameOptions = Record<GameOption, boolean> & {
   optionsTab: OptionsTab;
   mapZoom: number;
   uiScale: UiScale;
+  motionPreference: MotionPreference;
   adventureLogOverlayKinds: Record<AdventureLogEntryKind, boolean>;
 };

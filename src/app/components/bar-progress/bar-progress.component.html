@@ -4,7 +4,7 @@
 >
   <!-- scaleX under a CSS transition runs on the compositor, so the fill keeps moving through main-thread stalls. -->
   <div
-    class="relative h-full origin-left overflow-hidden bg-current transition-transform duration-400 ease-out motion-reduce:transition-none"
+    class="relative h-full origin-left overflow-hidden bg-current transition-transform duration-400 ease-out bar-progress-fill"
     [style.transform]="`scaleX(${fillScale()})`"
   >
     @if (shimmer()) {

@@ -4,6 +4,7 @@ import {
   NODE_STATUS_ICON_RADIUS,
 } from '@helpers/config';
 import { cssColorVar } from '@helpers/engine/css-color';
+import { isMotionReduced } from '@helpers/engine/motion';
 import { uiTextFontFamily, uiTextLetterSpacing } from '@helpers/engine/font.ui';
 import type {
   DifficultyTier,
@@ -33,7 +34,6 @@ const PROGRESS_BAR_COLOR_BY_KIND: Record<WorldNodeProgressKind, number> = {
   Explore: 0xf8fafc,
 };
 
-
 export function pixiIndicatorPlayerAtLocationCreate(tileSize: number): {
   graphics: Graphics;
   ticker: () => void;
@@ -55,6 +55,11 @@ export function pixiIndicatorPlayerAtLocationCreate(tileSize: number): {
     const now = performance.now();
     const deltaTime = now - lastTime;
     lastTime = now;
+
+    if (isMotionReduced()) {
+      graphics.alpha = 0.8;
+      return;
+    }
 
     alpha += direction * animationSpeed * deltaTime;
     if (alpha <= 0.4) direction = 1;
@@ -185,9 +190,7 @@ export function pixiIndicatorNodeStatusUpdate(
     .clear()
     .circle(0, 0, radius)
     .fill(
-      cssColorVar(
-        beaten ? '--node-status-beaten' : '--node-status-not-beaten',
-      ),
+      cssColorVar(beaten ? '--node-status-beaten' : '--node-status-not-beaten'),
     )
     .stroke({ width: 1.5, color: 0x000000 });
 

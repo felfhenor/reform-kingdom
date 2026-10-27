@@ -7,6 +7,7 @@ import {
   GATHER_VFX_QUOTE_WRAP_WIDTH,
 } from '@helpers/config';
 import { uiTextFontFamily, uiTextLetterSpacing } from '@helpers/engine/font.ui';
+import { isMotionReduced } from '@helpers/engine/motion';
 import type { GatherVfxEvent } from '@interfaces';
 import type { Texture } from 'pixi.js';
 import { Container, Sprite, Text } from 'pixi.js';
@@ -146,7 +147,7 @@ export function pixiFloatingTextCreate(
     // centers the row on the tile horizontally.
     container.position.set(
       nodePosition.x + tileSize / 2 + jitterX,
-      nodePosition.y - tileSize - 10 + state.offsetY,
+      nodePosition.y - tileSize - 10 + (isMotionReduced() ? 0 : state.offsetY),
     );
     return true;
   };

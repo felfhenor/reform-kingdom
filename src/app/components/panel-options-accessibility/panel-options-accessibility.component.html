@@ -102,5 +102,36 @@
         </div>
       </div>
     </div>
+
+    <div class="card shadow-sm">
+      <div class="card-body p-3 gap-2">
+        <div class="type-section-title">Motion</div>
+
+        <div class="form-control">
+          <label class="label label-checkbox gap-2">
+            <span class="label-text !ml-0 mr-2 min-w-[100px]">
+              Reduce Motion
+            </span>
+            <ng-select
+              class="w-44"
+              [items]="motionChoices()"
+              bindLabel="label"
+              bindValue="value"
+              [clearable]="false"
+              [searchable]="false"
+              [(ngModel)]="motionPreference"
+              (ngModelChange)="setOption('motionPreference', $event)"
+            ></ng-select>
+            <app-icon
+              name="gameHelp"
+              size="inline"
+              class="text-lighter"
+              [tp]="'Removes sliding, bouncing, shaking and looping animations. Fades and highlights stay as-is. Follow System uses the reduce motion setting from your operating system.'"
+              [tpPlacement]="'top'"
+            />
+          </label>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

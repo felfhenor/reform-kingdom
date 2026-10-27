@@ -1,4 +1,5 @@
 import { NODE_REVEAL_RING_RADIUS_TILES } from '@helpers/config';
+import { isMotionReduced } from '@helpers/engine/motion';
 import { nodeRevealState } from '@helpers/pixi/pixi-node-reveal';
 import type { Container } from 'pixi.js';
 import { Graphics } from 'pixi.js';
@@ -26,8 +27,11 @@ export function pixiNodeRevealCreate(
       return false;
     }
 
-    sprite.scale.set(baseScale.x * state.scale, baseScale.y * state.scale);
-    ring.scale.set(state.ringScale);
+    // Reduced motion keeps the ring as a fading highlight but drops the bounce and growth.
+    const isReduced = isMotionReduced();
+    const scale = isReduced ? 1 : state.scale;
+    sprite.scale.set(baseScale.x * scale, baseScale.y * scale);
+    ring.scale.set(isReduced ? 1 : state.ringScale);
     ring.alpha = state.ringAlpha;
     return true;
   };

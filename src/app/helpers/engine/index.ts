@@ -18,6 +18,7 @@ export * from './leveled-range';
 export * from './loading.ui';
 export * from './logging';
 export * from './modal-stack';
+export * from './motion';
 export * from './notify';
 export * from './number';
 export * from './page-visibility';

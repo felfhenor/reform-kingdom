@@ -24,6 +24,7 @@ export function defaultOptions(): GameOptions {
     showBackdropGrid: false,
     cleanFont: false,
     colorblindMode: false,
+    motionPreference: 'system',
 
     analyticsEnabled: false,
     analyticsOptInDismissed: false,

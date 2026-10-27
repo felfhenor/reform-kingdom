@@ -1,0 +1,36 @@
+// Loops and movement outside AnimationService and Pixi; informational fades (skill casts, overlays) keep playing.
+:root.reduce-motion {
+  --swal2-show-animation: none;
+  --swal2-hide-animation: none;
+  --swal2-toast-show-animation: none;
+  --swal2-toast-hide-animation: none;
+
+  .button-glow-active {
+    animation: none;
+    box-shadow: 0 0 6px 2px rgb(251 191 36 / 85%);
+  }
+
+  // Newest number nearest the hero, so an expiring one leaves from the top instead of dropping everything above it.
+  .damage-number-stack {
+    flex-direction: column;
+  }
+
+  .animate-pulse,
+  .region-intro,
+  .pause-vignette {
+    animation: none;
+  }
+
+  .spot-outline,
+  .tutorial-callout,
+  .bar-progress-fill,
+  .modal-box {
+    transition: none;
+  }
+
+  // Scoped through the container to outrank sweetalert2's (0,3,1) icon selectors.
+  .swal2-container .swal2-icon-show,
+  .swal2-container .swal2-icon-show * {
+    animation: none;
+  }
+}

@@ -1,10 +1,14 @@
-import { effect, Injectable } from '@angular/core';
+import { DestroyRef, effect, inject, Injectable } from '@angular/core';
 import { cssColorCacheClear } from '@helpers/engine/css-color';
 import {
   FONT_FAMILY_CLEAN,
   FONT_FAMILY_DEFAULT,
   uiTextFontFamily,
 } from '@helpers/engine/font.ui';
+import {
+  isMotionReduced,
+  motionSystemPreferenceSet,
+} from '@helpers/engine/motion';
 import { windowHeight, windowWidth } from '@helpers/engine/ui';
 import { uiScaleCurrent } from '@helpers/engine/ui-scale.ui';
 import { getOption } from '@helpers/state-options';
@@ -27,6 +31,22 @@ export class ThemeService {
         !!getOption('colorblindMode'),
       );
       cssColorCacheClear();
+    });
+
+    const reducedMotionQuery = matchMedia('(prefers-reduced-motion: reduce)');
+    const onReducedMotionChange = () =>
+      motionSystemPreferenceSet(reducedMotionQuery.matches);
+    onReducedMotionChange();
+    reducedMotionQuery.addEventListener('change', onReducedMotionChange);
+    inject(DestroyRef).onDestroy(() =>
+      reducedMotionQuery.removeEventListener('change', onReducedMotionChange),
+    );
+
+    effect(() => {
+      document.documentElement.classList.toggle(
+        'reduce-motion',
+        isMotionReduced(),
+      );
     });
 
     effect(() => {

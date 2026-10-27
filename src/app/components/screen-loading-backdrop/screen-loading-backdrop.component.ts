@@ -22,6 +22,7 @@ import {
   loadingIconPool,
 } from '@helpers/engine/loading.ui';
 import { rngChoiceOther, rngNumber, rngRandom } from '@helpers/rng';
+import { isMotionReduced } from '@helpers/engine/motion';
 import { AnimationService } from '@services/animation.service';
 import { ContentService } from '@services/content.service';
 
@@ -106,7 +107,7 @@ export class ScreenLoadingBackdropComponent {
     effect(() => {
       const els = this.cellEls();
       if (this.hasStartedReveal || els.length === 0) return;
-      if (this.anim.reducedMotion) return;
+      if (isMotionReduced()) return;
 
       this.hasStartedReveal = true;
       const { cols, rows } = this.grid();
@@ -122,7 +123,7 @@ export class ScreenLoadingBackdropComponent {
 
   protected ripple(event: MouseEvent): void {
     const els = this.cellEls();
-    if (els.length === 0 || this.anim.reducedMotion) return;
+    if (els.length === 0 || isMotionReduced()) return;
 
     const { cols } = this.grid();
     const rect = this.host.nativeElement.getBoundingClientRect();

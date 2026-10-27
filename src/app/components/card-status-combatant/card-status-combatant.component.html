@@ -27,7 +27,7 @@
   @if (damageNumbers && damageNumbers.length > 0) {
     <!-- Spans the full card width so each number's left jitter is relative to the card at any expand state. -->
     <div
-      class="absolute flex flex-col-reverse items-center pointer-events-none left-0 right-0 bottom-full z-30"
+      class="damage-number-stack absolute flex flex-col-reverse items-center pointer-events-none left-0 right-0 bottom-full z-30"
     >
       @for (num of damageNumbers; track num.event.id) {
         <span

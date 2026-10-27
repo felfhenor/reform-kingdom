@@ -17,6 +17,7 @@ import { getEntriesByType } from '@helpers/content/content';
 import { LOADING_HERO_CYCLE_MS } from '@helpers/config';
 import { rngChoice, rngChoiceOther } from '@helpers/rng';
 import type { JobContent } from '@interfaces';
+import { isMotionReduced } from '@helpers/engine/motion';
 import { AnimationService } from '@services/animation.service';
 import { ContentService } from '@services/content.service';
 import { LoadingService } from '@services/loading.service';
@@ -57,7 +58,7 @@ export class ScreenLoadingComponent {
     }, LOADING_HERO_CYCLE_MS);
 
     afterNextRender(() => {
-      if (this.anim.reducedMotion) return;
+      if (isMotionReduced()) return;
       const bob = this.anim.bob(this.heroEl().nativeElement);
       destroyRef.onDestroy(() => bob.cancel());
     });
@@ -66,20 +67,18 @@ export class ScreenLoadingComponent {
   }
 
   protected onHeroEnter(event: AnimationCallbackEvent): void {
-    if (!this.anim.reducedMotion) this.anim.iconSwapIn(event.target);
+    if (!isMotionReduced()) this.anim.iconSwapIn(event.target);
   }
 
   protected onHeroLeave(event: AnimationCallbackEvent): void {
-    if (this.anim.reducedMotion) {
+    if (isMotionReduced()) {
       event.animationComplete();
       return;
     }
 
-    this.anim
-      .iconSwapOut(event.target)
-      .finished.then(
-        () => event.animationComplete(),
-        () => event.animationComplete(),
-      );
+    this.anim.iconSwapOut(event.target).finished.then(
+      () => event.animationComplete(),
+      () => event.animationComplete(),
+    );
   }
 }
