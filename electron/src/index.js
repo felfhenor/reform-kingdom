@@ -65,7 +65,9 @@ const createWindow = () => {
 
   mainWindow.setMenu(null);
   mainWindow.once('ready-to-show', () => {
-    if (config.get('maximized')) mainWindow.maximize();
+    // The two flags are saved at different times, so a killed fullscreen session can leave both set.
+    if (config.get('maximized') && !mainWindow.isFullScreen())
+      mainWindow.maximize();
     mainWindow.show();
   });
 
