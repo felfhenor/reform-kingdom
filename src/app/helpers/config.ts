@@ -416,11 +416,13 @@ export const WORKER_XP_END = 10000;
 // Stamina a worker needs per tradeskill level of a recipe's minimum, to be assigned to craft it.
 export const WORKER_CRAFT_STAMINA_PER_TRADESKILL_LEVEL = 5;
 
-// Common desktop sizes at or above the Electron window's 1440x900 minimum.
+// Common desktop sizes at or above the Electron window's 1280x720 minimum.
 export const WINDOW_SIZE_PRESETS: ReadonlyArray<{
   width: number;
   height: number;
 }> = [
+  { width: 1280, height: 720 },
+  { width: 1366, height: 768 },
   { width: 1440, height: 900 },
   { width: 1600, height: 900 },
   { width: 1680, height: 1050 },

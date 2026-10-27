@@ -130,6 +130,13 @@
                 [(ngModel)]="displayMode"
                 (ngModelChange)="setDisplayMode($event)"
               ></ng-select>
+              <app-icon
+                name="gameHelp"
+                size="inline"
+                class="text-lighter"
+                [tp]="'F11 or Alt+Enter also toggles fullscreen.'"
+                [tpPlacement]="'top'"
+              />
             </label>
           </div>
 

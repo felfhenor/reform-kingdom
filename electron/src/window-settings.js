@@ -1,5 +1,48 @@
 const { ipcMain, screen } = require('electron');
 
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+// Saved bounds can point at an unplugged or since-resized monitor, so they're dropped or pulled back on-screen.
+const windowRestorableBounds = (bounds) => {
+  if (!bounds) return undefined;
+
+  const titleBar = { x: bounds.x + bounds.width / 2, y: bounds.y + 8 };
+  const display = screen
+    .getAllDisplays()
+    .find(
+      ({ workArea: area }) =>
+        titleBar.x >= area.x &&
+        titleBar.x < area.x + area.width &&
+        titleBar.y >= area.y &&
+        titleBar.y < area.y + area.height,
+    );
+  if (!display) return undefined;
+
+  const { workArea } = display;
+  const width = Math.min(bounds.width, workArea.width);
+  const height = Math.min(bounds.height, workArea.height);
+  return {
+    width,
+    height,
+    x: clamp(bounds.x, workArea.x, workArea.x + workArea.width - width),
+    y: clamp(bounds.y, workArea.y, workArea.y + workArea.height - height),
+  };
+};
+
+// The usual desktop-game fullscreen toggles; handled here so they work no matter what the page has focused.
+const watchFullscreenHotkeys = (win) => {
+  win.webContents.on('before-input-event', (event, input) => {
+    const isToggle =
+      input.type === 'keyDown' &&
+      !input.isAutoRepeat &&
+      (input.key === 'F11' || (input.alt && input.key === 'Enter'));
+    if (!isToggle) return;
+
+    event.preventDefault();
+    win.setFullScreen(!win.isFullScreen());
+  });
+};
+
 // Sizes cross IPC in physical pixels so presets mean the same thing at any display scaling.
 const windowState = (win, fullscreen = win.isFullScreen()) => {
   const { workArea, scaleFactor } = screen.getDisplayMatching(
@@ -92,4 +135,9 @@ const registerWindowSettingsHandlers = (getWindow) => {
   });
 };
 
-module.exports = { registerWindowSettingsHandlers, watchWindowState };
+module.exports = {
+  registerWindowSettingsHandlers,
+  watchFullscreenHotkeys,
+  watchWindowState,
+  windowRestorableBounds,
+};

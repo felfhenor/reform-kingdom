@@ -8,7 +8,9 @@ const Config = require('electron-config');
 const { registerSavefileBackupHandlers } = require('./savefile-backups');
 const {
   registerWindowSettingsHandlers,
+  watchFullscreenHotkeys,
   watchWindowState,
+  windowRestorableBounds,
 } = require('./window-settings');
 const config = new Config();
 
@@ -35,21 +37,18 @@ app.on('second-instance', () => {
 });
 
 const createWindow = () => {
-  const size = screen.getPrimaryDisplay().workAreaSize;
+  const { workArea } = screen.getPrimaryDisplay();
+  const workAreas = screen.getAllDisplays().map((display) => display.workArea);
 
+  // Capped at the smallest display so a small or heavily scaled laptop screen can still fit the whole window.
   const opts = {
     show: false,
     icon: './icons/icon.png',
-    minWidth: 1440,
-    minHeight: 900,
+    minWidth: Math.min(1280, ...workAreas.map((area) => area.width)),
+    minHeight: Math.min(720, ...workAreas.map((area) => area.height)),
+    ...workArea,
+    ...windowRestorableBounds(config.get('winBounds')),
   };
-
-  Object.assign(opts, config.get('winBounds'));
-
-  if (!opts.width) opts.width = size.width;
-  if (!opts.height) opts.height = size.height;
-  if (!opts.x) opts.x = 0;
-  if (!opts.y) opts.y = 0;
   // Only ever set to true: an explicit false disables the fullscreen button on macOS.
   if (config.get('fullscreen')) opts.fullscreen = true;
 
@@ -82,6 +81,7 @@ const createWindow = () => {
   });
 
   watchWindowState(mainWindow);
+  watchFullscreenHotkeys(mainWindow);
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
