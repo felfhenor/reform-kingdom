@@ -26,6 +26,7 @@ import type {
   SkillTreeNodeId,
   StatusEffectContent,
 } from '@interfaces';
+import { capitalize } from 'es-toolkit';
 
 function turnsText(
   duration: number,
@@ -136,7 +137,7 @@ function skillModifierText(
     case 'EpCost':
       return `-${format(modifier.value)}% EP cost`;
     case 'Attribute':
-      return modifier.attribute.replace(/([a-z])([A-Z])/g, '$1 $2');
+      return capitalize(modifier.attribute.replace(/([a-z])([A-Z])/g, '$1 $2'));
     default:
       return '';
   }
