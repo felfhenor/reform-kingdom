@@ -13,7 +13,6 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonSavefileExportComponent } from '@components/button-savefile-export/button-savefile-export.component';
 import { ButtonSavefileImportComponent } from '@components/button-savefile-import/button-savefile-import.component';
-import { IconComponent } from '@components/icon/icon.component';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
@@ -37,7 +36,6 @@ import {
 import { gamestate } from '@helpers/state-game';
 import type { SavefileBackup, SavefileBackupReason } from '@interfaces';
 import { NgSelectComponent } from '@ng-select/ng-select';
-import { TippyDirective } from '@ngneat/helipopper';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
@@ -55,8 +53,6 @@ type AutosaveIntervalChoice = { label: string; value: number };
     SFXDirective,
     FormsModule,
     NgSelectComponent,
-    IconComponent,
-    TippyDirective,
   ],
   templateUrl: './panel-options-savefile.component.html',
   styleUrl: './panel-options-savefile.component.scss',

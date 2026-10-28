@@ -2,11 +2,20 @@
   <div class="flex-1 flex flex-col gap-4">
     <div class="card shadow-sm">
       <div class="card-body p-3 gap-2">
-        <div class="type-section-title">Interface</div>
+        <div class="type-section-title">Visuals</div>
 
         <div class="form-control">
           <label class="label label-option">
-            <span class="label-text">UI Scale</span>
+            <span class="label-text">
+              UI Scale
+              <app-icon
+                name="gameHelp"
+                size="inline"
+                class="text-lighter"
+                [tp]="'Scales the world screen overlays and the main panels. They will automatically grow in size on resolutions beyond 1920x1080.'"
+                [tpPlacement]="'top'"
+              />
+            </span>
             <ng-select
               [items]="uiScaleChoices"
               bindLabel="label"
@@ -16,25 +25,21 @@
               [(ngModel)]="uiScale"
               (ngModelChange)="setOption('uiScale', $event)"
             ></ng-select>
-            <app-icon
-              name="gameHelp"
-              size="inline"
-              class="text-lighter"
-              [tp]="'Scales the world screen overlays and the main panels. They will automatically grow in size on resolutions beyond 1920x1080.'"
-              [tpPlacement]="'top'"
-            />
           </label>
         </div>
-      </div>
-    </div>
-
-    <div class="card shadow-sm">
-      <div class="card-body p-3 gap-2">
-        <div class="type-section-title">Sprites</div>
 
         <div class="form-control">
           <label class="label label-option">
-            <span class="label-text">Map Zoom</span>
+            <span class="label-text">
+              Map Zoom
+              <app-icon
+                name="gameHelp"
+                size="inline"
+                class="text-lighter"
+                [tp]="'Zooms in on the map view only. Does not affect the rest of the UI. Use UI Scale for that!'"
+                [tpPlacement]="'top'"
+              />
+            </span>
             <ng-select
               [items]="mapZoomChoices"
               bindLabel="label"
@@ -44,42 +49,33 @@
               [(ngModel)]="mapZoom"
               (ngModelChange)="setOption('mapZoom', $event)"
             ></ng-select>
-            <app-icon
-              name="gameHelp"
-              size="inline"
-              class="text-lighter"
-              [tp]="'Zooms in on the map view only. Does not affect the rest of the UI. Use UI Scale for that!'"
-              [tpPlacement]="'top'"
-            />
           </label>
         </div>
-      </div>
-    </div>
-
-    <div class="card shadow-sm">
-      <div class="card-body p-3 gap-2">
-        <div class="type-section-title">Text</div>
 
         <div class="form-control">
-          <label class="label cursor-pointer label-checkbox">
+          <label class="label cursor-pointer label-option">
+            <span class="label-text">Clean Font</span>
             <input
               type="checkbox"
               [checked]="getOption('cleanFont')"
               class="checkbox"
               (click)="setOption('cleanFont', !getOption('cleanFont'))"
             />
-            <span class="label-text">Clean Font</span>
           </label>
         </div>
-      </div>
-    </div>
-
-    <div class="card shadow-sm">
-      <div class="card-body p-3 gap-2">
-        <div class="type-section-title">Color</div>
 
         <div class="form-control">
-          <label class="label cursor-pointer label-checkbox">
+          <label class="label cursor-pointer label-option">
+            <span class="label-text">
+              Colorblind-Friendly
+              <app-icon
+                name="gameHelp"
+                size="inline"
+                class="text-lighter"
+                [tp]="'Replaces red/green color pairs (difficulty, map clear markers, success/failure, gains/losses, combat log health) with a palette chosen to stay distinguishable with common types of color blindness. Helps with protanopia, deuteranopia, and tritanopia.'"
+                [tpPlacement]="'top'"
+              />
+            </span>
             <input
               type="checkbox"
               [checked]="getOption('colorblindMode')"
@@ -87,14 +83,6 @@
               (click)="
                 setOption('colorblindMode', !getOption('colorblindMode'))
               "
-            />
-            <span class="label-text">Colorblind-Friendly Colors</span>
-            <app-icon
-              name="gameHelp"
-              size="inline"
-              class="text-lighter ml-1"
-              [tp]="'Replaces red/green color pairs (difficulty, map clear markers, success/failure, gains/losses, combat log health) with a palette chosen to stay distinguishable with common types of color blindness. Helps with protanopia, deuteranopia, and tritanopia.'"
-              [tpPlacement]="'top'"
             />
           </label>
         </div>
@@ -107,7 +95,16 @@
 
         <div class="form-control">
           <label class="label label-option">
-            <span class="label-text">Reduce Motion</span>
+            <span class="label-text">
+              Reduce Motion
+              <app-icon
+                name="gameHelp"
+                size="inline"
+                class="text-lighter"
+                [tp]="'Removes sliding, bouncing, shaking and looping animations. Fades and highlights stay as-is. Follow System uses the reduce motion setting from your operating system.'"
+                [tpPlacement]="'top'"
+              />
+            </span>
             <ng-select
               [items]="motionChoices()"
               bindLabel="label"
@@ -117,13 +114,6 @@
               [(ngModel)]="motionPreference"
               (ngModelChange)="setOption('motionPreference', $event)"
             ></ng-select>
-            <app-icon
-              name="gameHelp"
-              size="inline"
-              class="text-lighter"
-              [tp]="'Removes sliding, bouncing, shaking and looping animations. Fades and highlights stay as-is. Follow System uses the reduce motion setting from your operating system.'"
-              [tpPlacement]="'top'"
-            />
           </label>
         </div>
       </div>

@@ -5,7 +5,17 @@
         <div class="type-section-title">Miscellaneous</div>
 
         <div class="form-control">
-          <label class="label cursor-pointer label-checkbox gap-2">
+          <label class="label cursor-pointer label-option">
+            <span class="label-text">
+              Analytics
+              <app-icon
+                name="gameHelp"
+                size="inline"
+                class="text-lighter"
+                [tp]="'Analytics are not tied to your email or any identifying information. What is collected: events related to game progress, discoveries, and in-game actions. Analytics cannot be enabled when the game is played in an embedded environment.'"
+                [tpPlacement]="'top'"
+              />
+            </span>
             <input
               type="checkbox"
               [checked]="getOption('analyticsEnabled')"
@@ -14,14 +24,6 @@
               (click)="
                 setOption('analyticsEnabled', !getOption('analyticsEnabled'))
               "
-            />
-            <span class="label-text">Analytics</span>
-            <app-icon
-              name="gameHelp"
-              size="inline"
-              class="text-lighter"
-              [tp]="'Analytics are not tied to your email or any identifying information. What is collected: events related to game progress, discoveries, and in-game actions. Analytics cannot be enabled when the game is played in an embedded environment.'"
-              [tpPlacement]="'top'"
             />
           </label>
         </div>

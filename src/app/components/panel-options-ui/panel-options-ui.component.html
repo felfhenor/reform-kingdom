@@ -5,7 +5,17 @@
         <div class="type-section-title">Gameplay</div>
 
         <div class="form-control">
-          <label class="label cursor-pointer label-checkbox">
+          <label class="label cursor-pointer label-option">
+            <span class="label-text">
+              Run in Background
+              <app-icon
+                name="gameHelp"
+                size="inline"
+                class="text-lighter ml-1"
+                [tp]="'Keeps the game running while it is minimized or in another tab.'"
+                [tpPlacement]="'top'"
+              />
+            </span>
             <input
               type="checkbox"
               [checked]="getOption('runInBackground')"
@@ -14,19 +24,12 @@
                 setOption('runInBackground', !getOption('runInBackground'))
               "
             />
-            <span class="label-text">Run in Background</span>
-            <app-icon
-              name="gameHelp"
-              size="inline"
-              class="text-lighter ml-1"
-              [tp]="'Keeps the game running while it is minimized or in another tab.'"
-              [tpPlacement]="'top'"
-            />
           </label>
         </div>
 
         <div class="form-control">
-          <label class="label cursor-pointer label-checkbox">
+          <label class="label cursor-pointer label-option">
+            <span class="label-text">Backdrop Grid</span>
             <input
               type="checkbox"
               [checked]="getOption('showBackdropGrid')"
@@ -35,12 +38,12 @@
                 setOption('showBackdropGrid', !getOption('showBackdropGrid'))
               "
             />
-            <span class="label-text">Backdrop Grid</span>
           </label>
         </div>
 
         <div class="form-control">
-          <label class="label cursor-pointer label-checkbox">
+          <label class="label cursor-pointer label-option">
+            <span class="label-text">Always Expand Party View</span>
             <input
               type="checkbox"
               [checked]="getOption('partyViewAlwaysExpand')"
@@ -52,12 +55,12 @@
                 )
               "
             />
-            <span class="label-text">Always Expand Party View</span>
           </label>
         </div>
 
         <div class="form-control">
-          <label class="label cursor-pointer label-checkbox">
+          <label class="label cursor-pointer label-option">
+            <span class="label-text">Always Expand Craft View</span>
             <input
               type="checkbox"
               [checked]="getOption('craftingViewAlwaysExpand')"
@@ -69,12 +72,12 @@
                 )
               "
             />
-            <span class="label-text">Always Expand Crafting View</span>
           </label>
         </div>
 
         <div class="form-control">
-          <label class="label cursor-pointer label-checkbox">
+          <label class="label cursor-pointer label-option">
+            <span class="label-text">Adventure Log Overlay</span>
             <input
               type="checkbox"
               [checked]="getOption('adventureLogOverlay')"
@@ -86,22 +89,21 @@
                 )
               "
             />
-            <span class="label-text">Adventure Log Overlay</span>
           </label>
         </div>
 
         @if (getOption('adventureLogOverlay')) {
-          <div class="flex flex-col gap-1 pl-6">
+          <div class="flex flex-col gap-1">
             @for (kind of adventureLogKinds; track kind) {
               <div class="form-control">
-                <label class="label cursor-pointer label-checkbox">
+                <label class="label cursor-pointer label-option">
+                  <span class="label-text pl-6">{{ kind }} Messages</span>
                   <input
                     type="checkbox"
                     [checked]="getOption('adventureLogOverlayKinds')[kind]"
                     class="checkbox checkbox-sm"
                     (click)="toggleAdventureLogOverlayKind(kind)"
                   />
-                  <span class="label-text">Show {{ kind }} Messages</span>
                 </label>
               </div>
             }
@@ -170,7 +172,16 @@
 
         <div class="form-control">
           <label class="label label-option">
-            <span class="label-text">Map Frame Rate</span>
+            <span class="label-text">
+              Map Frame Rate
+              <app-icon
+                name="gameHelp"
+                size="inline"
+                class="text-lighter"
+                [tp]="'How often the world map redraws. Lower values use less power. Does not affect game speed.'"
+                [tpPlacement]="'top'"
+              />
+            </span>
             <ng-select
               [items]="mapFrameRateChoices"
               bindLabel="label"
@@ -180,18 +191,21 @@
               [(ngModel)]="mapFrameRate"
               (ngModelChange)="setOption('mapFrameRate', $event)"
             ></ng-select>
-            <app-icon
-              name="gameHelp"
-              size="inline"
-              class="text-lighter"
-              [tp]="'How often the world map redraws. Lower values use less power. Does not affect game speed.'"
-              [tpPlacement]="'top'"
-            />
           </label>
         </div>
 
         <div class="form-control">
-          <label class="label cursor-pointer label-checkbox">
+          <label class="label cursor-pointer label-option">
+            <span class="label-text">
+              Background Throttle
+              <app-icon
+                name="gameHelp"
+                size="inline"
+                class="text-lighter ml-1"
+                [tp]="'Drops the world map to 10 FPS while the game window is not focused, such as when it is on another monitor.'"
+                [tpPlacement]="'top'"
+              />
+            </span>
             <input
               type="checkbox"
               [checked]="getOption('lowerFrameRateWhenUnfocused')"
@@ -202,14 +216,6 @@
                   !getOption('lowerFrameRateWhenUnfocused')
                 )
               "
-            />
-            <span class="label-text">Lower Frame Rate When Unfocused</span>
-            <app-icon
-              name="gameHelp"
-              size="inline"
-              class="text-lighter ml-1"
-              [tp]="'Drops the world map to 10 FPS while the game window is not focused, such as when it is on another monitor.'"
-              [tpPlacement]="'top'"
             />
           </label>
         </div>
@@ -241,38 +247,21 @@
           </div>
 
           <div class="form-control">
-            <label class="label cursor-pointer label-checkbox">
-              <input
-                type="checkbox"
-                [checked]="getOption('muteWhenUnfocused')"
-                class="checkbox"
-                (click)="
-                  setOption(
-                    'muteWhenUnfocused',
-                    !getOption('muteWhenUnfocused')
-                  )
-                "
-              />
-              <span class="label-text">Mute When Unfocused</span>
-            </label>
-          </div>
-
-          <div class="form-control">
-            <label class="label cursor-pointer label-checkbox">
+            <label class="label cursor-pointer label-option">
+              <span class="label-text">Play Background Music</span>
               <input
                 type="checkbox"
                 [checked]="getOption('bgmPlay')"
                 class="checkbox"
                 (click)="setOption('bgmPlay', !getOption('bgmPlay'))"
               />
-              <span class="label-text">Play Background Music</span>
             </label>
           </div>
 
           @if (getOption('bgmPlay')) {
             <div class="form-control">
               <label class="label cursor-pointer label-option">
-                <span class="label-text">Background Music Volume</span>
+                <span class="label-text pl-6">Volume</span>
                 <input
                   #bgmVolume
                   type="range"
@@ -291,21 +280,21 @@
           }
 
           <div class="form-control">
-            <label class="label cursor-pointer label-checkbox">
+            <label class="label cursor-pointer label-option">
+              <span class="label-text">Play Sound Effects</span>
               <input
                 type="checkbox"
                 [checked]="getOption('sfxPlay')"
                 class="checkbox"
                 (click)="setOption('sfxPlay', !getOption('sfxPlay'))"
               />
-              <span class="label-text">Play Sound Effects</span>
             </label>
           </div>
 
           @if (getOption('sfxPlay')) {
             <div class="form-control">
               <label class="label cursor-pointer label-option">
-                <span class="label-text">Sound Effects Volume</span>
+                <span class="label-text pl-6">Volume</span>
                 <input
                   #sfxVolume
                   type="range"
@@ -322,6 +311,23 @@
               </label>
             </div>
           }
+
+          <div class="form-control">
+            <label class="label cursor-pointer label-option">
+              <span class="label-text">Mute When Unfocused</span>
+              <input
+                type="checkbox"
+                [checked]="getOption('muteWhenUnfocused')"
+                class="checkbox"
+                (click)="
+                  setOption(
+                    'muteWhenUnfocused',
+                    !getOption('muteWhenUnfocused')
+                  )
+                "
+              />
+            </label>
+          </div>
         </div>
       </div>
     </div>

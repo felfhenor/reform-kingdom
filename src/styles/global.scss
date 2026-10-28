@@ -75,10 +75,10 @@ body {
 // Fixed label/control columns so every labeled dropdown and slider in Options lines up.
 .label-option {
   justify-content: left;
-  @apply gap-2;
+  @apply gap-2 min-h-[36px] leading-none;
 
   > .label-text {
-    @apply w-52 shrink-0 m-0;
+    @apply w-64 shrink-0 m-0 flex items-center gap-2;
   }
 
   > .ng-select,
