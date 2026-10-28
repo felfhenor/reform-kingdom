@@ -178,6 +178,11 @@ export class PlayHeroesSkillTreeComponent {
     this.learn(id);
   }
 
+  public unlearnIfAvailable(id: SkillTreeNodeId): void {
+    if (this.states().get(id) !== 'pending') return;
+    this.unlearn(id);
+  }
+
   public unlearn(id: SkillTreeNodeId): void {
     const character = this.character();
     if (!character) return;

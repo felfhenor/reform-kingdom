@@ -63,6 +63,7 @@ export class PanelHeroesSkillTreeGridComponent {
   public selectedId = input<SkillTreeNodeId>();
   public selected = output<SkillTreeNodeId>();
   public learnRequested = output<SkillTreeNodeId>();
+  public unlearnRequested = output<SkillTreeNodeId>();
 
   public readonly nodeSize = SKILL_TREE_NODE_SIZE;
   public readonly columnGap = SKILL_TREE_COLUMN_GAP;
