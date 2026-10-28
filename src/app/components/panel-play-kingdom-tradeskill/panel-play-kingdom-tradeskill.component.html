@@ -229,10 +229,12 @@
               </div>
             }
 
-            <span
-              class="type-meta lg:w-20 lg:shrink-0 lg:text-center tabular-nums"
-            >
-              {{ formatDuration(entry.recipe.craftTime * quantity) }}
+            <span class="px-2">
+              <span
+                class="type-meta lg:w-16 lg:shrink-0 lg:text-center tabular-nums badge badge-sm badge-data"
+              >
+                {{ formatDuration(entry.recipe.craftTime * quantity) }}
+              </span>
             </span>
 
             <div class="flex gap-2 items-center">
