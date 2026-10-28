@@ -13,11 +13,11 @@ import {
 import { modalHasAnyOpen } from '@helpers/engine/modal-stack';
 import { gamePlayView } from '@helpers/engine/ui';
 import { regionIntroPending } from '@helpers/lore/region-intro';
-import { isTitleCrawlPending } from '@helpers/lore/title-crawl';
 import { regionIntroMarkSeen } from '@helpers/lore/region-intro.ui';
+import { isTitleCrawlPending } from '@helpers/lore/title-crawl';
 import { AnimationService } from '@services/animation.service';
 
-const REVEAL_MS_PER_CHARACTER = 30;
+const REVEAL_MS_PER_CHARACTER = 20;
 const LINGER_AFTER_REVEAL_MS = 4000;
 const graphemeSegmenter = new Intl.Segmenter(undefined, {
   granularity: 'grapheme',
