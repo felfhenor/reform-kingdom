@@ -62,7 +62,7 @@
       quantity: 8
 
     - itemId: Red Slime Core
-      quantity: 2
+      quantity: 1
 
   tradeskillId: Blacksmithing
   minTradeskillLevel: 7
@@ -80,7 +80,7 @@
       quantity: 10
 
     - itemId: Red Slime Core
-      quantity: 2
+      quantity: 1
 
   tradeskillId: Blacksmithing
   minTradeskillLevel: 8

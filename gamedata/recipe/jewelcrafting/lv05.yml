@@ -5,13 +5,13 @@
 
   requirements:
     - itemId: Malachite
-      quantity: 3
+      quantity: 1
 
     - itemId: Copper Ingot
       quantity: 1
 
     - itemId: Green Slime Core
-      quantity: 2
+      quantity: 1
 
   tradeskillId: Jewelcrafting
   minTradeskillLevel: 5
@@ -44,13 +44,13 @@
 
   requirements:
     - itemId: Malachite
-      quantity: 3
+      quantity: 1
 
     - itemId: Copper Ingot
       quantity: 1
 
     - itemId: Red Slime Core
-      quantity: 2
+      quantity: 1
 
   tradeskillId: Jewelcrafting
   minTradeskillLevel: 6
@@ -68,7 +68,7 @@
       quantity: 3
 
     - itemId: Red Slime Core
-      quantity: 2
+      quantity: 1
 
   tradeskillId: Jewelcrafting
   minTradeskillLevel: 6
@@ -83,13 +83,13 @@
 
   requirements:
     - itemId: Malachite
-      quantity: 3
+      quantity: 1
 
     - itemId: Copper Ingot
       quantity: 1
 
     - itemId: Purple Slime Core
-      quantity: 2
+      quantity: 1
 
   tradeskillId: Jewelcrafting
   minTradeskillLevel: 7
@@ -143,7 +143,7 @@
       quantity: 5
 
     - itemId: Malachite
-      quantity: 5
+      quantity: 3
 
   tradeskillId: Jewelcrafting
   minTradeskillLevel: 9
