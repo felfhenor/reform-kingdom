@@ -86,7 +86,7 @@ function worldNodeMonsterDrops(entry: WorldNodeEntry): DroppedReward[] {
       if (!isRewardDiscovered(reward)) return;
 
       const canDropFromNode =
-        levelRange.min >= reward.minLevel && levelRange.max <= reward.maxLevel;
+        levelRange.max >= reward.minLevel && levelRange.min <= reward.maxLevel;
       if (!canDropFromNode) return;
 
       const key = rewardKey(reward);
