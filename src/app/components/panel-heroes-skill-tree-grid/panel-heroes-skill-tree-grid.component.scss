@@ -5,14 +5,13 @@
 }
 
 .skill-tree-node {
-  outline: 1px solid
+  outline: 3px dotted
     color-mix(in oklch, var(--color-base-content) 25%, transparent);
   outline-offset: 1px;
 }
 
 .skill-tree-node-learned {
-  outline: 2px solid
-    color-mix(in oklch, var(--color-base-content) 60%, transparent);
+  outline: 3px solid var(--color-primary);
 }
 
 .skill-tree-node-learned.skill-tree-node-skill {
@@ -20,7 +19,7 @@
 }
 
 .skill-tree-node-pending {
-  outline: 2px dashed var(--color-warning);
+  outline: 3px dashed var(--color-warning);
 }
 
 .skill-tree-node-locked {
