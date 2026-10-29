@@ -1,0 +1,29 @@
+- id: cc916873-2736-4302-a240-f50f2c167816
+  name: Frostcore
+  description: The chilled core of a destroyed construct, snowed upon by the harsh winter winds.
+  rarity: Uncommon
+
+  sprite: '0114'
+
+  infusionStats:
+    Vitality: 5.1
+
+- id: bda450a9-e96d-4dde-a994-945000d9f801
+  name: Frostskin
+  description: The slimy skin of a frost toad, chilled by the harsh winter winds.
+  rarity: Uncommon
+
+  sprite: '0115'
+
+  infusionStats:
+    Resistance: 5.3
+
+- id: cc916873-2736-4302-a240-f50f2c167816
+  name: Frostsoul
+  description: The frozen soul of a destroyed construct, captured by the harsh winter winds.
+  rarity: Uncommon
+
+  sprite: '0116'
+
+  infusionStats:
+    Intelligence: 5.1
