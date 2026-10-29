@@ -13,17 +13,23 @@
 
   <div body class="flex flex-col gap-4">
     <div>
-      <div class="type-label mb-2">Rarity</div>
-      <div class="flex gap-2 flex-wrap">
+      <div class="type-label mb-2">Rarities to Sell</div>
+      <div class="flex gap-2 w-full">
         @for (rarity of rarities; track rarity) {
           <button
             type="button"
-            class="btn btn-sm bg-{{ rarity }}"
+            class="flex-1 btn btn-sm justify-start gap-2 bg-{{ rarity }}"
             [class.btn-outline]="!filters().keepRarities[rarity]"
             (click)="toggleRarity(rarity)"
             appSfx="ui-click"
             [sfxTrigger]="['click', 'hover']"
           >
+            <input
+              type="checkbox"
+              [checked]="!filters().keepRarities[rarity]"
+              class="checkbox checkbox-xs"
+            />
+
             {{ rarity }}
           </button>
         }
@@ -31,7 +37,7 @@
     </div>
 
     <div>
-      <div class="type-label mb-2">Minimum Item Level</div>
+      <div class="type-label mb-2">Minimum Item Level to Sell</div>
       <input
         type="number"
         min="1"
@@ -42,17 +48,22 @@
     </div>
 
     <div>
-      <div class="type-label mb-2">Item Types</div>
+      <div class="type-label mb-2">Item Types To Auto-Sell</div>
       <div class="grid grid-cols-4 gap-2">
         @for (type of equipmentTypes; track type) {
           <button
             type="button"
-            class="btn btn-neutral btn-sm justify-center"
+            class="btn btn-neutral btn-sm justify-start gap-2"
             [class.btn-outline]="!filters().keepEquipmentTypes[type]"
             (click)="toggleType(type)"
             appSfx="ui-click"
             [sfxTrigger]="['click', 'hover']"
           >
+            <input
+              type="checkbox"
+              [checked]="!filters().keepEquipmentTypes[type]"
+              class="checkbox checkbox-xs"
+            />
             {{ type }}
           </button>
         }
