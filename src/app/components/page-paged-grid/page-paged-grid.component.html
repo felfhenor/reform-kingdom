@@ -62,6 +62,14 @@
       </div>
     }
 
+    @if (showGrid() && pagedEntries().length === 0) {
+      <app-blank-slate
+        class="text-center w-full flex items-center justify-center"
+      >
+        {{ emptyMessage() }}
+      </app-blank-slate>
+    }
+
     <div
       class="flex-1 grid content-start justify-items-center overflow-hidden grid-cols-[repeat(auto-fill,64px)] auto-rows-[64px] gap-2 p-2"
       #gridContainer
@@ -69,12 +77,6 @@
       [appListReflowEnabled]="reflow()"
     >
       @if (showGrid()) {
-        @if (pagedEntries().length === 0) {
-          <app-blank-slate class="col-span-full text-center">
-            {{ emptyMessage() }}
-          </app-blank-slate>
-        }
-
         <ng-content />
       } @else {
         <ng-content select="[custom]" />
