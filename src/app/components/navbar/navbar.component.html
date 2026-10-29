@@ -73,6 +73,7 @@
           [class.here]="activeGamePlayView() === 'decree'"
           tp="Decree [5]"
           (click)="changeGamePlayView('decree')"
+          (contextmenu)="toggleAutoMode()"
           appSfx="ui-click"
           [sfxOffset]="4"
           [sfxTrigger]="['click', 'hover']"
@@ -82,6 +83,12 @@
           [appHideUntilLevel]="5"
           appTutorialTarget="nav-decree"
         >
+          <input
+            type="checkbox"
+            [checked]="autoModeEnabled()"
+            class="checkbox checkbox-xs"
+          />
+
           Decree
         </button>
       </li>

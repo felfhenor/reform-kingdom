@@ -6,11 +6,11 @@ import { ButtonSettingsComponent } from '@components/button-settings/button-sett
 import { ButtonUpdateComponent } from '@components/button-update/button-update.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { ModalCaravanTradeComponent } from '@components/modal-caravan-trade/modal-caravan-trade.component';
+import { ModalExchangeNodeComponent } from '@components/modal-exchange-node/modal-exchange-node.component';
 import { ModalOutpostTeleportComponent } from '@components/modal-outpost-teleport/modal-outpost-teleport.component';
 import { ModalTasksComponent } from '@components/modal-tasks/modal-tasks.component';
-import { ModalExchangeNodeComponent } from '@components/modal-exchange-node/modal-exchange-node.component';
-import { ModalTrainerVisitComponent } from '@components/modal-trainer-visit/modal-trainer-visit.component';
 import { ModalTownMaterialSaleComponent } from '@components/modal-town-material-sale/modal-town-material-sale.component';
+import { ModalTrainerVisitComponent } from '@components/modal-trainer-visit/modal-trainer-visit.component';
 import { ModalComponent } from '@components/modal/modal.component';
 import { HideUntilLevelDirective } from '@directives/hide-until-level.directive';
 import { RequireNotSetupDirective } from '@directives/no-setup.directive';
@@ -30,11 +30,11 @@ import {
   caravanTradeOpen,
   closeAllMenus,
   gamePlayView,
+  heroesSubviewClear,
   isWorldCameraPanned,
   kingdomSubview,
-  heroesSubviewClear,
-  navigationGuarded,
   kingdomSubviewClear,
+  navigationGuarded,
   setGamePlayView,
   townOpen,
   trainerVisitOpen,
@@ -59,6 +59,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 import { BarResourceComponent } from '@components/bar-resource/bar-resource.component';
 import { PanelDebugButtonsComponent } from '@components/panel-debug-buttons/panel-debug-buttons.component';
+import { autoModeIsEnabled, autoModeToggle } from '@helpers/decree';
 
 @Component({
   selector: 'app-navbar',
@@ -110,6 +111,8 @@ export class NavbarComponent {
   public showRecenterButton = computed(
     () => this.activeGamePlayView() === 'world' && isWorldCameraPanned(),
   );
+
+  public autoModeEnabled = computed(() => autoModeIsEnabled());
 
   public recenterCamera() {
     worldCameraRecenter();
@@ -229,5 +232,9 @@ export class NavbarComponent {
     }
 
     this.openPauseMenu();
+  }
+
+  public toggleAutoMode(): void {
+    autoModeToggle(!this.autoModeEnabled());
   }
 }
