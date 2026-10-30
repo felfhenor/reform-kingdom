@@ -246,6 +246,8 @@ export type Combat = {
   encounterId?: EncounterId;
   encounterRandomId?: EncounterRandomId;
   fightIndex?: number;
+  // Raw kill XP from this node's earlier fights, only paid out once the whole node is cleared.
+  heldXp?: number[];
   // Untyped (not TownId) to avoid a circular import.
   raidTownId?: string;
   summonCount?: number;

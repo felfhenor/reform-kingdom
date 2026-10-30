@@ -27,6 +27,7 @@ import type {
 export function encounterRandomStartFight(
   entry: WorldNodeEntry,
   fightIndex: number,
+  heldXp: number[] = [],
 ): void {
   const content = worldNodeEncounterRandom(entry);
   if (!content) return;
@@ -48,6 +49,7 @@ export function encounterRandomStartFight(
     ),
     encounterRandomId: content.id,
     fightIndex,
+    heldXp,
     ambushedBy: combatRollAmbush(),
   };
 
@@ -103,22 +105,30 @@ function grantEncounterRandomCompletionRewards(
   markEncounterRandomCompleted(content.id);
 }
 
+export function encounterRandomNextFightIndex(
+  combat: Combat,
+): number | undefined {
+  if (!combat.encounterRandomId) return undefined;
+
+  const nextFightIndex = (combat.fightIndex ?? 0) + 1;
+  const nodeState = encounterRandomState(combat.encounterRandomId);
+  return nodeState?.fights[nextFightIndex] ? nextFightIndex : undefined;
+}
+
 // Returns true if another generated fight was started - callers must not
 // reset combat state in that case.
 export function encounterRandomHandleVictory(
   combat: Combat,
   monsterDrops: ResolvedDrop[],
+  heldXp: number[] = [],
 ): boolean {
   if (!combat.encounterRandomId) {
     grantResolvedDrops(combat, monsterDrops);
     return false;
   }
 
-  const nodeState = encounterRandomState(combat.encounterRandomId);
-  const nextFightIndex = (combat.fightIndex ?? 0) + 1;
-  const nextFight = nodeState?.fights[nextFightIndex];
-
-  if (!nextFight) {
+  const nextFightIndex = encounterRandomNextFightIndex(combat);
+  if (nextFightIndex === undefined) {
     grantEncounterRandomCompletionRewards(combat, monsterDrops);
     taskRecordEncounterClear(combat.locationName);
     return false;
@@ -129,6 +139,6 @@ export function encounterRandomHandleVictory(
   const entry = worldNodeByName(combat.locationName);
   if (!entry) return false;
 
-  encounterRandomStartFight(entry, nextFightIndex);
+  encounterRandomStartFight(entry, nextFightIndex, heldXp);
   return true;
 }

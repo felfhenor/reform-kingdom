@@ -48,6 +48,7 @@ export function encounterStartFight(
   encounterId: EncounterId,
   fightIndex: number,
   locationName: string,
+  heldXp: number[] = [],
 ): void {
   const created = encounterCreateFightCombat(
     encounterId,
@@ -57,7 +58,11 @@ export function encounterStartFight(
   if (!created) return;
 
   // Rolled per real fight only - auto-wins never fight.
-  const combat: Combat = { ...created, ambushedBy: combatRollAmbush() };
+  const combat: Combat = {
+    ...created,
+    heldXp,
+    ambushedBy: combatRollAmbush(),
+  };
 
   combatMessageLog(combat, `Encountering monster group #${fightIndex + 1}...`);
 

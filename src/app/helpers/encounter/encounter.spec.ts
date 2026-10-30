@@ -68,6 +68,14 @@ describe('encounterStartFight', () => {
     expect(combatLog()[0].message).toContain('#2');
   });
 
+  it("carries the node's held xp into the fight, starting empty", () => {
+    start(0);
+    expect(worldCombatState()?.heldXp).toEqual([]);
+
+    inTick(() => encounterStartFight(ruins.id, 1, 'Field Ruins', [30]));
+    expect(worldCombatState()?.heldXp).toEqual([30]);
+  });
+
   it('can roll as low as the bottom of the level range', () => {
     vi.mocked(rngNumberRange).mockImplementationOnce((min) => min);
 

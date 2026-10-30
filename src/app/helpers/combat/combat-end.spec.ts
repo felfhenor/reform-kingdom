@@ -14,7 +14,10 @@ import { combatantMessageToken, combatLog } from '@helpers/combat/combat-log';
 import { combatCheckIfOver, isCombatOver } from '@helpers/combat/combat-end';
 import { monsterXpReward, xpForOverLevel } from '@helpers/combat/monster';
 import { commissionRecordMonsterKill } from '@helpers/commission/commission-kill-progress';
-import { ensureEncounter } from '@helpers/content/ensure-encounternode';
+import {
+  ensureEncounter,
+  ensureEncounterRandom,
+} from '@helpers/content/ensure-encounternode';
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { ensureItem } from '@helpers/content/ensure-item';
 import { ensureMonster } from '@helpers/content/ensure-monster';
@@ -27,7 +30,10 @@ import {
   autoModeResetNodeFailureCounts,
 } from '@helpers/decree/auto-mode-state';
 import { encounterStartFight } from '@helpers/encounter/encounter';
-import { encounterRandomHandleVictory } from '@helpers/encounter/encounter-random-combat';
+import {
+  encounterRandomHandleVictory,
+  encounterRandomNextFightIndex,
+} from '@helpers/encounter/encounter-random-combat';
 import { playGameSFX } from '@helpers/engine/sfx';
 import {
   partyGainXp,
@@ -210,6 +216,7 @@ describe('combatCheckIfOver', () => {
         encounterId,
         1,
         'Field Ruins',
+        [100],
       );
       expect(gamestate().materials[oreId]?.quantity).toBe(3);
       expect(gamestate().world.combat).toEqual(combat);
@@ -254,9 +261,11 @@ describe('combatCheckIfOver', () => {
 
       endFight(combat);
 
-      expect(encounterRandomHandleVictory).toHaveBeenCalledWith(combat, [
-        expect.objectContaining({ itemId: oreId, quantity: 3 }),
-      ]);
+      expect(encounterRandomHandleVictory).toHaveBeenCalledWith(
+        combat,
+        [expect.objectContaining({ itemId: oreId, quantity: 3 })],
+        [100],
+      );
       expect(gamestate().world.combat).toEqual(combat);
 
       vi.mocked(encounterRandomHandleVictory).mockReturnValue(false);
@@ -290,6 +299,58 @@ describe('combatCheckIfOver', () => {
       expect(xp(4)).toBe(xpForOverLevel(raw, 4, 5));
       expect(xp(7)).toBe(xpForOverLevel(raw, 7, 5));
       expect(xp(7)).toBeLessThan(xp(4));
+    });
+
+    it('holds xp until the last fight of the node, then pays out every held kill', () => {
+      seedContent([
+        goblin,
+        encounter({ fights: [{ monsters: [] }, { monsters: [] }] }),
+        ...items,
+      ]);
+
+      endFight(fight({ encounterId, fightIndex: 0, heldXp: [40] }));
+      expect(partyGainXp).not.toHaveBeenCalled();
+      expect(autoModeRecordNodeSuccess).not.toHaveBeenCalled();
+      expect(autoModeRecordClauseSuccess).not.toHaveBeenCalled();
+      expect(encounterStartFight).toHaveBeenCalledWith(
+        encounterId,
+        1,
+        'Field Ruins',
+        [40, 100],
+      );
+
+      const xp = xpAtLevel(fight({ encounterId, fightIndex: 1, heldXp: [40] }));
+      expect(xp(4)).toBe(140);
+      expect(xp(7)).toBe(xpForOverLevel(40, 7, 5) + xpForOverLevel(100, 7, 5));
+      expect(autoModeRecordNodeSuccess).toHaveBeenCalledWith('Field Ruins');
+    });
+
+    it("pays out a random encounter's held xp on its last fight", () => {
+      const wilds = ensureEncounterRandom({
+        id: 'wilds' as EncounterRandomId,
+        levelRange: { min: 3, max: 5 },
+      });
+      seedContent([goblin, wilds, ...items]);
+
+      const xp = xpAtLevel(
+        fight({ encounterRandomId: wilds.id, heldXp: [40] }),
+      );
+
+      expect(xp(4)).toBe(140);
+    });
+
+    it('holds xp while a random encounter has fights left', () => {
+      vi.mocked(encounterRandomNextFightIndex).mockReturnValueOnce(1);
+      vi.mocked(encounterRandomHandleVictory).mockReturnValueOnce(true);
+
+      endFight(fight({ encounterRandomId: 'wilds' as EncounterRandomId }));
+
+      expect(partyGainXp).not.toHaveBeenCalled();
+      expect(encounterRandomHandleVictory).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.anything(),
+        [100],
+      );
     });
 
     it("caps a raid win at the town's assaulter max level", () => {

@@ -10,6 +10,7 @@ import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { ensureMonster } from '@helpers/content/ensure-monster';
 import {
   encounterRandomHandleVictory,
+  encounterRandomNextFightIndex,
   encounterRandomStartFight,
 } from '@helpers/encounter/encounter-random-combat';
 import { worldCombatState, worldExploreRandomState } from '@helpers/state-game';
@@ -160,6 +161,16 @@ describe('encounterRandomStartFight', () => {
   });
 });
 
+describe('encounterRandomNextFightIndex', () => {
+  it('finds the next generated fight, if any', () => {
+    seedFights(fight(12, goblin.id), fight(18, slime.id));
+
+    expect(encounterRandomNextFightIndex(wonFight(0))).toBe(1);
+    expect(encounterRandomNextFightIndex(wonFight(1))).toBeUndefined();
+    expect(encounterRandomNextFightIndex(buildCombat())).toBeUndefined();
+  });
+});
+
 describe('encounterRandomHandleVictory', () => {
   it('only grants the kill drops for a fight outside any random encounter', () => {
     const combat = buildCombat();
@@ -170,16 +181,19 @@ describe('encounterRandomHandleVictory', () => {
     expect(taskRecordEncounterClear).not.toHaveBeenCalled();
   });
 
-  it('grants the kill drops and moves straight on to the next fight', () => {
+  it('grants the kill drops and moves on to the next fight, carrying the held xp', () => {
     seedFights(fight(12, goblin.id), fight(18, slime.id));
     const combat = wonFight(0);
 
-    expect(inTick(() => encounterRandomHandleVictory(combat, killDrops))).toBe(
-      true,
-    );
+    expect(
+      inTick(() => encounterRandomHandleVictory(combat, killDrops, [30, 40])),
+    ).toBe(true);
 
     expect(grantResolvedDrops).toHaveBeenCalledWith(combat, killDrops);
-    expect(worldCombatState()).toMatchObject({ fightIndex: 1 });
+    expect(worldCombatState()).toMatchObject({
+      fightIndex: 1,
+      heldXp: [30, 40],
+    });
     expect(worldExploreRandomState()[encounterId].completedThisCycle).toBe(
       false,
     );

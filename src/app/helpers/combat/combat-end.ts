@@ -18,7 +18,10 @@ import {
   autoModeResetNodeFailureCounts,
 } from '@helpers/decree/auto-mode-state';
 import { encounterStartFight } from '@helpers/encounter/encounter';
-import { encounterRandomHandleVictory } from '@helpers/encounter/encounter-random-combat';
+import {
+  encounterRandomHandleVictory,
+  encounterRandomNextFightIndex,
+} from '@helpers/encounter/encounter-random-combat';
 import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
@@ -102,17 +105,20 @@ function encounterMaxLevel(combat: Combat): number | undefined {
   return undefined;
 }
 
+function rollVictoryXp(combat: Combat): number[] {
+  return rewardingMonsters(combat).map(({ monster, level }) =>
+    monsterXpReward(monster, level),
+  );
+}
+
 // Kills are rolled once, then scaled against each hero's own level.
 function victoryXpAtLevel(
   combat: Combat,
-  monsters: DefeatedMonster[],
+  rawXps: number[],
 ): (heroLevel: number) => number {
   const maxLevel = encounterMaxLevel(combat);
   if (maxLevel === undefined) return () => 0;
 
-  const rawXps = monsters.map(({ monster, level }) =>
-    monsterXpReward(monster, level),
-  );
   return (heroLevel) =>
     sumBy(rawXps, (rawXp) => xpForOverLevel(rawXp, heroLevel, maxLevel));
 }
@@ -137,15 +143,18 @@ function logVictoryXp(combat: Combat, gains: CharacterXpGain[]): void {
   });
 }
 
-function grantVictoryRewards(combat: Combat): void {
+function recordVictoryKills(combat: Combat): void {
   defeatedMonsters(combat.guardians).forEach(({ monster, level }) => {
     monsterRecordKill(monster.id, level, combat.locationName);
   });
 
-  const monsters = rewardingMonsters(combat);
-  monsters.forEach(({ monster }) => commissionRecordMonsterKill(monster.id));
+  rewardingMonsters(combat).forEach(({ monster }) =>
+    commissionRecordMonsterKill(monster.id),
+  );
+}
 
-  const gains = partyGainXp(victoryXpAtLevel(combat, monsters));
+function grantVictoryXp(combat: Combat, rawXps: number[]): void {
+  const gains = partyGainXp(victoryXpAtLevel(combat, rawXps));
   logVictoryXp(combat, gains);
   if (gains.some(({ leveledUp }) => leveledUp)) {
     autoModeResetNodeFailureCounts();
@@ -211,7 +220,8 @@ export function combatResolveAutoWin(
   combat: Combat,
   isFinalFight: boolean,
 ): void {
-  grantVictoryRewards(combat);
+  recordVictoryKills(combat);
+  grantVictoryXp(combat, rollVictoryXp(combat));
   grantEncounterFightDrops(combat, rollMonsterDrops(combat), isFinalFight);
 
   // Once per encounter, so the decree counts the whole auto-win as one success.
@@ -239,15 +249,27 @@ function nextFightFor(
   return { encounterId: combat.encounterId, fightIndex };
 }
 
+function combatHasNextFight(combat: Combat): boolean {
+  return combat.encounterRandomId
+    ? encounterRandomNextFightIndex(combat) !== undefined
+    : nextFightFor(combat) !== undefined;
+}
+
 // Returns true if another fight was started; callers must not reset combat state then.
 function handleCombatVictory(combat: Combat): boolean {
   combatMessageLog(combat, 'Heroes have won the combat!');
   analyticsSendDesignEvent('Combat:Encounter:Win');
 
   syncPartyHpFromCombat(combat.heroes);
-  autoModeRecordClauseSuccess();
-  autoModeRecordNodeSuccess(combat.locationName);
-  grantVictoryRewards(combat);
+  recordVictoryKills(combat);
+
+  // Only a cleared node counts as progress, so auto mode can't reset its failure counts on a node it never clears.
+  const heldXp = [...(combat.heldXp ?? []), ...rollVictoryXp(combat)];
+  if (!combatHasNextFight(combat)) {
+    autoModeRecordClauseSuccess();
+    autoModeRecordNodeSuccess(combat.locationName);
+    grantVictoryXp(combat, heldXp);
+  }
 
   // Final-fight kill drops are granted together with completion rewards so duplicate materials log once.
   const monsterDrops = rollMonsterDrops(combat);
@@ -258,7 +280,7 @@ function handleCombatVictory(combat: Combat): boolean {
   }
 
   if (combat.encounterRandomId) {
-    return encounterRandomHandleVictory(combat, monsterDrops);
+    return encounterRandomHandleVictory(combat, monsterDrops, heldXp);
   }
 
   const nextFight = nextFightFor(combat);
@@ -269,6 +291,7 @@ function handleCombatVictory(combat: Combat): boolean {
     nextFight.encounterId,
     nextFight.fightIndex,
     combat.locationName,
+    heldXp,
   );
   return true;
 }
