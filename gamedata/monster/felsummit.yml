@@ -16,9 +16,9 @@
   rarity: Uncommon
 
   xp:
-    min: 170
-    max: 175
-    bonusPerLevel: 5
+    min: 77
+    max: 79
+    bonusPerLevel: 3
 
   drops:
     - itemId: Frostcore
@@ -82,9 +82,9 @@
   rarity: Uncommon
 
   xp:
-    min: 165
-    max: 170
-    bonusPerLevel: 5
+    min: 75
+    max: 77
+    bonusPerLevel: 3
 
   drops:
     - itemId: Frostsoul
@@ -142,9 +142,9 @@
   rarity: Uncommon
 
   xp:
-    min: 160
-    max: 165
-    bonusPerLevel: 4
+    min: 72
+    max: 75
+    bonusPerLevel: 2
 
   drops:
     - itemId: Frostskin

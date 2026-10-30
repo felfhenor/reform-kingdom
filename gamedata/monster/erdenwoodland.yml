@@ -14,9 +14,9 @@
   rarity: Common
 
   xp:
-    min: 50
-    max: 55
-    bonusPerLevel: 4
+    min: 28
+    max: 31
+    bonusPerLevel: 3
 
   drops:
     - itemId: Weak Spider Silk
@@ -76,9 +76,9 @@
   rarity: Common
 
   xp:
-    min: 45
-    max: 50
-    bonusPerLevel: 4
+    min: 25
+    max: 28
+    bonusPerLevel: 3
 
   drops:
     - itemId: Bat Wing
@@ -128,8 +128,8 @@
   rarity: Common
 
   xp:
-    min: 55
-    max: 60
+    min: 31
+    max: 33
     bonusPerLevel: 2
 
   drops:
@@ -181,8 +181,8 @@
   rarity: Common
 
   xp:
-    min: 35
-    max: 45
+    min: 20
+    max: 25
     bonusPerLevel: 2
 
   drops:

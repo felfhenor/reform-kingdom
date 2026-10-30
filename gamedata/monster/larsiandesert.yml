@@ -15,9 +15,9 @@
   rarity: Common
 
   xp:
-    min: 60
-    max: 65
-    bonusPerLevel: 5
+    min: 33
+    max: 36
+    bonusPerLevel: 3
 
   drops:
     - chance: 100
@@ -83,9 +83,9 @@
   rarity: Common
 
   xp:
-    min: 60
-    max: 65
-    bonusPerLevel: 5
+    min: 33
+    max: 36
+    bonusPerLevel: 3
 
   drops:
     - chance: 100
@@ -156,9 +156,9 @@
   rarity: Common
 
   xp:
-    min: 60
-    max: 65
-    bonusPerLevel: 5
+    min: 39
+    max: 43
+    bonusPerLevel: 4
 
   drops:
     - chance: 100
@@ -235,9 +235,9 @@
   rarity: Uncommon
 
   xp:
-    min: 60
-    max: 65
-    bonusPerLevel: 3
+    min: 33
+    max: 36
+    bonusPerLevel: 2
 
   drops:
     - chance: 10
@@ -297,9 +297,9 @@
   rarity: Common
 
   xp:
-    min: 40
-    max: 45
-    bonusPerLevel: 3
+    min: 26
+    max: 30
+    bonusPerLevel: 2
 
   drops:
     - chance: 10

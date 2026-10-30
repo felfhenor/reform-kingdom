@@ -17,9 +17,9 @@
   rarity: Uncommon
 
   xp:
-    min: 125
-    max: 130
-    bonusPerLevel: 5
+    min: 69
+    max: 72
+    bonusPerLevel: 3
 
   drops:
     - itemId: Demon Horn
@@ -106,9 +106,9 @@
   rarity: Uncommon
 
   xp:
-    min: 125
-    max: 130
-    bonusPerLevel: 5
+    min: 57
+    max: 59
+    bonusPerLevel: 3
 
   drops:
     - itemId: Demon Horn
@@ -174,9 +174,9 @@
   rarity: Uncommon
 
   xp:
-    min: 150
-    max: 155
-    bonusPerLevel: 4
+    min: 68
+    max: 70
+    bonusPerLevel: 2
 
   drops:
     - itemId: Fel Essence
@@ -242,9 +242,9 @@
   rarity: Uncommon
 
   xp:
-    min: 150
-    max: 155
-    bonusPerLevel: 4
+    min: 68
+    max: 70
+    bonusPerLevel: 2
 
   drops:
     - itemId: Fel Essence
@@ -315,9 +315,9 @@
   rarity: Uncommon
 
   xp:
-    min: 155
-    max: 160
-    bonusPerLevel: 5
+    min: 70
+    max: 72
+    bonusPerLevel: 3
 
   drops:
     - itemId: Fel Essence

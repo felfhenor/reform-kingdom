@@ -15,9 +15,9 @@
   rarity: Uncommon
 
   xp:
-    min: 55
-    max: 60
-    bonusPerLevel: 3
+    min: 36
+    max: 39
+    bonusPerLevel: 2
 
   drops:
     - itemId: Spirit Flesh

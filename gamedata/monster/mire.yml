@@ -15,9 +15,9 @@
   rarity: Common
 
   xp:
-    min: 35
-    max: 40
-    bonusPerLevel: 3
+    min: 23
+    max: 26
+    bonusPerLevel: 2
 
   drops:
     - itemId: Spirit Flesh
@@ -73,9 +73,9 @@
   rarity: Uncommon
 
   xp:
-    min: 40
-    max: 50
-    bonusPerLevel: 4
+    min: 26
+    max: 33
+    bonusPerLevel: 3
 
   drops:
     - itemId: Spirit Flesh
@@ -131,9 +131,9 @@
   rarity: Common
 
   xp:
-    min: 30
-    max: 35
-    bonusPerLevel: 3
+    min: 20
+    max: 23
+    bonusPerLevel: 2
 
   drops:
     - itemId: Oozehide
@@ -189,9 +189,9 @@
   rarity: Common
 
   xp:
-    min: 30
-    max: 35
-    bonusPerLevel: 3
+    min: 20
+    max: 23
+    bonusPerLevel: 2
 
   drops:
     - itemId: Oozehide

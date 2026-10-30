@@ -13,7 +13,7 @@
 
   xp:
     min: 3
-    max: 5
+    max: 4
     bonusPerLevel: 2
 
   drops:
@@ -83,8 +83,8 @@
   rarity: Common
 
   xp:
-    min: 10
-    max: 15
+    min: 8
+    max: 12
     bonusPerLevel: 3
 
   drops:
@@ -160,8 +160,8 @@
   rarity: Common
 
   xp:
-    min: 10
-    max: 15
+    min: 8
+    max: 12
     bonusPerLevel: 2
 
   drops:
@@ -225,8 +225,8 @@
   rarity: Uncommon
 
   xp:
-    min: 30
-    max: 35
+    min: 23
+    max: 27
     bonusPerLevel: 3
 
   drops:
@@ -296,8 +296,8 @@
   rarity: Common
 
   xp:
-    min: 20
-    max: 25
+    min: 15
+    max: 19
     bonusPerLevel: 2
 
   drops:
@@ -357,8 +357,8 @@
   rarity: Common
 
   xp:
-    min: 20
-    max: 25
+    min: 15
+    max: 19
     bonusPerLevel: 3
 
   drops:
@@ -420,8 +420,8 @@
   rarity: Common
 
   xp:
-    min: 20
-    max: 25
+    min: 15
+    max: 19
     bonusPerLevel: 2
 
   drops:
@@ -479,8 +479,8 @@
   rarity: Common
 
   xp:
-    min: 20
-    max: 25
+    min: 15
+    max: 19
     bonusPerLevel: 3
 
   drops:
@@ -533,8 +533,8 @@
   rarity: Common
 
   xp:
-    min: 25
-    max: 30
+    min: 19
+    max: 23
     bonusPerLevel: 3
 
   drops:
@@ -589,9 +589,9 @@
   rarity: Rare
 
   xp:
-    min: 100
-    max: 150
-    bonusPerLevel: 10
+    min: 75
+    max: 113
+    bonusPerLevel: 8
 
   drops:
     - itemId: Silk Spool
@@ -652,9 +652,9 @@
   rarity: Common
 
   xp:
-    min: 25
-    max: 30
-    bonusPerLevel: 4
+    min: 19
+    max: 23
+    bonusPerLevel: 3
 
   drops:
     - itemId: Orc Bone
@@ -720,9 +720,9 @@
   rarity: Common
 
   xp:
-    min: 25
-    max: 30
-    bonusPerLevel: 5
+    min: 19
+    max: 23
+    bonusPerLevel: 4
 
   drops:
     - itemId: Orc Bone
@@ -784,9 +784,9 @@
   rarity: Common
 
   xp:
-    min: 25
-    max: 30
-    bonusPerLevel: 5
+    min: 17
+    max: 20
+    bonusPerLevel: 4
 
   drops:
     - itemId: Elven Wood
@@ -862,9 +862,9 @@
   rarity: Common
 
   xp:
-    min: 25
-    max: 30
-    bonusPerLevel: 5
+    min: 19
+    max: 23
+    bonusPerLevel: 4
 
   drops:
     - itemId: Elven Wood
@@ -940,9 +940,9 @@
   rarity: Common
 
   xp:
-    min: 25
-    max: 30
-    bonusPerLevel: 5
+    min: 19
+    max: 23
+    bonusPerLevel: 4
 
   drops:
     - itemId: Elven Wood
@@ -1025,9 +1025,9 @@
   rarity: Common
 
   xp:
-    min: 30
-    max: 35
-    bonusPerLevel: 4
+    min: 23
+    max: 27
+    bonusPerLevel: 3
 
   drops:
     - equipmentId: Hawk Charm
@@ -1083,9 +1083,9 @@
   rarity: Rare
 
   xp:
-    min: 250
-    max: 300
-    bonusPerLevel: 10
+    min: 163
+    max: 195
+    bonusPerLevel: 7
 
   drops:
     - itemId: Gold Coin

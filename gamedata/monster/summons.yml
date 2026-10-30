@@ -15,9 +15,9 @@
   rarity: Rare
 
   xp:
-    min: 125
-    max: 130
-    bonusPerLevel: 5
+    min: 57
+    max: 59
+    bonusPerLevel: 3
 
   drops: []
 
