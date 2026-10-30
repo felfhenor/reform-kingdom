@@ -206,6 +206,12 @@ body {
   --badge-fg: var(--color-base-content);
 }
 
+// Darker than --color-oath so white text clears 4.5:1.
+@utility badge-oath {
+  --badge-color: oklch(50% 0.1 190);
+  --badge-fg: #fff;
+}
+
 @utility badge-attention {
   --badge-color: var(--color-attention);
   --badge-fg: oklch(22% 0.05 80);

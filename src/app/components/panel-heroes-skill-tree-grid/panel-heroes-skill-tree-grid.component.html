@@ -37,9 +37,8 @@
   @let choice = oathChoice(oath);
 
   <span
-    class="badge badge-xs whitespace-nowrap text-base-300 absolute top-full left-1/2 -translate-x-1/2 z-10"
-    [class.bg-oath]="choice?.state !== 'pending'"
-    [class.border-oath]="choice?.state !== 'pending'"
+    class="badge badge-xs whitespace-nowrap absolute top-full left-1/2 -translate-x-1/2 z-10"
+    [class.badge-oath]="choice?.state !== 'pending'"
     [class.badge-warning]="choice?.state === 'pending'"
   >
     {{ choice?.name ?? 'Oath' }}
