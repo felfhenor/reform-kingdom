@@ -23,12 +23,15 @@ import type {
   WorkerTripCargo,
 } from '@interfaces';
 
-function workerTripCargo(
+export function workerTurnHome(
+  workerId: WorkerId,
   status: WorkerStatusTravelingTo | WorkerStatusGathering,
-): WorkerTripCargo {
-  return status.kind === 'Gathering'
-    ? { itemId: status.itemId, quantity: status.itemsGathered }
-    : { quantity: 0 };
+): void {
+  const cargo: WorkerTripCargo =
+    status.kind === 'Gathering'
+      ? { itemId: status.itemId, quantity: status.itemsGathered }
+      : { quantity: 0 };
+  workerTripBeginReturn(kingdomWorkerTripHost(workerId), cargo);
 }
 
 // Same node with nothing carried just switches item in place.
@@ -69,7 +72,7 @@ function workerStartAssignment(
     return;
   }
 
-  workerTripBeginReturn(host, workerTripCargo(status));
+  workerTurnHome(workerId, status);
 }
 
 // Returns early ("not rescued") if `workers[workerId]` doesn't exist -
@@ -125,12 +128,7 @@ export function workerRecall(workerId: WorkerId): void {
   if (!status || status.kind === 'TravelingBack' || status.kind === 'AtDuchy')
     return;
 
-  if (status.kind !== 'Crafting') {
-    workerTripBeginReturn(
-      kingdomWorkerTripHost(workerId),
-      workerTripCargo(status),
-    );
-  }
+  if (status.kind !== 'Crafting') workerTurnHome(workerId, status);
 
   const workerName = getEntry<WorkerContent>(workerId)?.name;
   analyticsSendDesignEvent(

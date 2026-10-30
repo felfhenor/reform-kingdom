@@ -11,6 +11,7 @@ import {
   workerStartCrafting,
 } from '@helpers/worker/worker-crafting';
 import { workerStatsForLevel } from '@helpers/worker/worker-progression';
+import { workerTurnHome } from '@helpers/worker/worker-travel';
 import type {
   ItemContent,
   RecipeContent,
@@ -22,7 +23,7 @@ import type {
   WorkerId,
 } from '@interfaces';
 
-// A worker that's out gathering picks the craft up once it gets home.
+// A worker that's out gathering turns home with its haul and starts the craft there.
 export async function workerAssignCraft(
   workerId: WorkerId,
   recipeId: RecipeId,
@@ -46,6 +47,11 @@ export async function workerAssignCraft(
     return state;
   });
   if (!assigned) return false;
+
+  const status = gamestate().workers[workerId]?.status;
+  if (status?.kind === 'TravelingTo' || status?.kind === 'Gathering') {
+    workerTurnHome(workerId, status);
+  }
 
   const workerName = getEntry<WorkerContent>(workerId)?.name;
   const recipeName = getEntry<RecipeContent>(recipeId)?.name;
