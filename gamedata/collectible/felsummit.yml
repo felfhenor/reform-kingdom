@@ -1,0 +1,57 @@
+- id: b78f629a-e2e4-4053-889b-381f23894d2c
+  name: Chillspikes
+  rarity: Common
+  description: A frozen set of spikes that litter the snowlands anywhere frost constructs walk.
+  sprite: '0067'
+
+- id: 0c2232ed-3146-477a-af08-e39f653b3fa1
+  name: Food-eating Prototype
+  rarity: Common
+  description: A failed device, originally meant to tune mana waves between two demon users. It found new life on the dinner table.
+  sprite: '0068'
+
+- id: 727bc02a-8ef2-457f-bd89-8813b909202e
+  name: Soul Totem
+  rarity: Uncommon
+  description: A strange, wintry totem that attracts all manner of spirits to it.
+  sprite: '0071'
+
+  effects:
+    - effectType: GainCombatStat
+      stat: debuffIgnoreChance
+      value: 0.01
+
+- id: 84caa11b-306d-4663-9d1b-864028c09231
+  name: Failed Frostcores
+  rarity: Uncommon
+  description: Frostcores that failed the refinement process. They still provide some utility as magical items, though.
+  sprite: '0069'
+
+  effects:
+    - effectType: GlobalDecreeClauseCapBoost
+      value: 1
+
+- id: f608d0b9-754f-4d5d-8d45-4f40aea7e1b2
+  name: Soul Cubes
+  rarity: Uncommon
+  description: Imperfect and incomplete cubes of frostsoul essence, created by ghostly energies being flash-frozen.
+  sprite: '0070'
+
+  effects:
+    - effectType: GainStats
+      stat: Spirit
+      value: 1
+
+- id: 57ded4db-52cd-482e-8045-4300f7ca950e
+  name: Broken Zelk Doll
+  rarity: Rare
+  description: One of many dolls buried with the Zelk. This one did not survive the test of time.
+  sprite: '0072'
+
+  effects:
+    - effectType: GainStats
+      stat: Spirit
+      value: 1
+    - effectType: GainStats
+      stat: Constitution
+      value: 1

@@ -1,0 +1,44 @@
+- id: 14c8c708-7713-4657-ae95-8a3d9661a3ed
+  name: Mausoleum of the Zelks
+  description: A mausoleum filled to the brim with ancient corpses of a lost people. All manner of creatures find their way in here, attracted by the strong magic contained within.
+
+  levelRange:
+    min: 60
+    max: 61
+
+  encounterRange:
+    min: 2
+    max: 3
+
+  combatantRange:
+    min: 2
+    max: 4
+
+  creaturePool:
+    - monsterId: Fel Demon
+      weight: 1
+    - monsterId: Vengeful Spirit
+      weight: 1
+    - monsterId: Frost Golem
+      weight: 1
+    - monsterId: Frost Toad
+      weight: 1
+
+  completionRewards:
+    - itemId: Duskhall Flux
+      min: 15
+      max: 25
+      chance: 100
+
+    - collectibleId: Broken Zelk Doll
+      chance: 100
+
+    - itemId: Gold Coin
+      min: 45000
+      max: 50000
+      chance: 100
+
+    - itemId: Memory Flux
+      min: 1
+      max: 1
+      chance: 25

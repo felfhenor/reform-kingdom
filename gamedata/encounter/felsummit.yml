@@ -1,0 +1,149 @@
+- id: 14aba9eb-91cc-47f0-99d5-67e17d0974ed
+  name: Koralin
+  description: A town on the edge of the harsh winds, protected by the nearby mountain range. Here, demons do adminstrative work for their various frost creations.
+  levelRange:
+    min: 50
+    max: 52
+
+  fights:
+    - monsters:
+        - monsterId: Fel Demon
+        - monsterId: Frost Golem
+
+    - monsters:
+        - monsterId: Fel Demon
+        - monsterId: Fel Demon
+        - monsterId: Frost Golem
+
+    - monsters:
+        - monsterId: Fel Demon
+        - monsterId: Frost Golem
+        - monsterId: Frost Golem
+
+  completionRewards:
+    - collectibleId: Food-eating Prototype
+      chance: 25
+
+    - itemId: Gold Coin
+      chance: 100
+      min: 3500
+      max: 4000
+
+- id: ac349f86-8a3e-4ee2-b786-5ca8928b7ddf
+  name: Frostsoul Forest
+  description: An eerie forest full of spirits and demons who harvest them. It's chilling in more ways than one.
+  levelRange:
+    min: 52
+    max: 54
+
+  fights:
+    - monsters:
+        - monsterId: Fel Demon
+        - monsterId: Vengeful Spirit
+
+    - monsters:
+        - monsterId: Fel Demon
+        - monsterId: Vengeful Spirit
+        - monsterId: Frost Golem
+
+    - monsters:
+        - monsterId: Vengeful Spirit
+        - monsterId: Vengeful Spirit
+        - monsterId: Frost Golem
+
+  completionRewards:
+    - collectibleId: Soul Totem
+      chance: 25
+
+    - itemId: Gold Coin
+      chance: 100
+      min: 1500
+      max: 2000
+
+- id: 97e1d2bd-8254-4290-b4e8-7b50a55f1965
+  name: Chillswept Snowfield
+  description: A beautiful expanse, twinkling as far as the eye can see. The snow looks tame, but the horrors are hidden beneath.
+  levelRange:
+    min: 54
+    max: 56
+
+  fights:
+    - monsters:
+        - monsterId: Frost Toad
+        - monsterId: Frost Golem
+
+    - monsters:
+        - monsterId: Frost Toad
+        - monsterId: Frost Golem
+        - monsterId: Frost Golem
+
+    - monsters:
+        - monsterId: Frost Toad
+        - monsterId: Frost Toad
+        - monsterId: Frost Golem
+
+  completionRewards:
+    - collectibleId: Chillspikes
+      chance: 25
+
+- id: 128ee236-5e3c-461c-8571-450c11d9f32c
+  name: Frostcore Refinery
+  description: A temperature-controlled cave where demons refine the materials they collect into frostcores. From there, they turn them into golems and send them out to gather more materials in a never-ending cycle.
+  levelRange:
+    min: 56
+    max: 58
+
+  fights:
+    - monsters:
+        - monsterId: Fel Demon
+        - monsterId: Frost Golem
+
+    - monsters:
+        - monsterId: Fel Demon
+        - monsterId: Fel Demon
+        - monsterId: Frost Golem
+
+    - monsters:
+        - monsterId: Fel Demon
+        - monsterId: Fel Demon
+        - monsterId: Fel Demon
+
+  completionRewards:
+    - collectibleId: Failed Frostcores
+      chance: 25
+
+    - itemId: Gold Coin
+      chance: 100
+      min: 4500
+      max: 5000
+
+- id: 25507534-e1ae-44e0-819e-bb7183163e79
+  name: Frigid Graveyard
+  description: A graveyard where demons harvest souls. Frostcores mysteriously fail when entering this area, as if it's protected by powerful magic.
+  levelRange:
+    min: 58
+    max: 60
+
+  fights:
+    - monsters:
+        - monsterId: Fel Demon
+        - monsterId: Vengeful Spirit
+
+    - monsters:
+        - monsterId: Fel Demon
+        - monsterId: Fel Demon
+        - monsterId: Vengeful Spirit
+
+    - monsters:
+        - monsterId: Vengeful Spirit
+        - monsterId: Vengeful Spirit
+        - monsterId: Fel Demon
+
+  completionRewards:
+    - collectibleId: Soul Cubes
+      chance: 25
+
+    - itemId: Gold Coin
+      chance: 100
+      min: 2500
+      max: 3000
