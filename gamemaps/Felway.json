@@ -459,6 +459,30 @@
                  "width":64,
                  "x":1472,
                  "y":1152
+                }, 
+                {
+                 "gid":409,
+                 "height":64,
+                 "id":165,
+                 "name":"Frostway Entrance",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"tag",
+                         "type":"string",
+                         "value":"FrostwayToFelSummit"
+                        }, 
+                        {
+                         "name":"toTag",
+                         "type":"string",
+                         "value":"FelSummitToFrostway"
+                        }],
+                 "rotation":0,
+                 "type":"TeleportNode",
+                 "visible":true,
+                 "width":64,
+                 "x":1280,
+                 "y":1344
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -467,7 +491,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":165,
+ "nextobjectid":166,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

@@ -423,8 +423,19 @@
                  "id":162,
                  "name":"Mysterious Boat",
                  "opacity":1,
+                 "properties":[
+                        {
+                         "name":"tag",
+                         "type":"string",
+                         "value":"BoatToChronoport"
+                        }, 
+                        {
+                         "name":"toTag",
+                         "type":"string",
+                         "value":"ChronoportToBoat"
+                        }],
                  "rotation":0,
-                 "type":"Teleport",
+                 "type":"TeleportNode",
                  "visible":true,
                  "width":64,
                  "x":1920,
@@ -442,6 +453,30 @@
                  "width":64,
                  "x":1920,
                  "y":640
+                }, 
+                {
+                 "gid":409,
+                 "height":64,
+                 "id":164,
+                 "name":"Frostway Exit",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"tag",
+                         "type":"string",
+                         "value":"FelSummitToFrostway"
+                        }, 
+                        {
+                         "name":"toTag",
+                         "type":"string",
+                         "value":"FrostwayToFelSummit"
+                        }],
+                 "rotation":0,
+                 "type":"TeleportNode",
+                 "visible":true,
+                 "width":64,
+                 "x":1792,
+                 "y":2560
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -450,7 +485,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":164,
+ "nextobjectid":165,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

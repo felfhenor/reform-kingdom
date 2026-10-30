@@ -327,7 +327,20 @@
          "draworder":"topdown",
          "id":6,
          "name":"Decorative Objects",
-         "objects":[],
+         "objects":[
+                {
+                 "gid":417,
+                 "height":64,
+                 "id":214,
+                 "name":"",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":2112,
+                 "y":1664
+                }],
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
@@ -641,7 +654,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":213,
+ "nextobjectid":215,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",
