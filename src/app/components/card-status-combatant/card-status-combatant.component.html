@@ -115,8 +115,10 @@
 
         <!-- Always rendered (fixed height) so a skill flashing in/out never reflows the name/subtitle above it. -->
         <span class="flex items-center h-[16px]">
-          @let skillCast = skillCastByCombatant().get(data.combatantId);
-          @if (skillCast) {
+          @for (
+            skillCast of skillCastByCombatant().get(data.combatantId) ?? [];
+            track skillCast.id
+          ) {
             <span class="skill-cast">
               <app-atlas-image
                 class="zoom-inline shrink-0"

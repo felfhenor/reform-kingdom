@@ -16,8 +16,8 @@ type DisplayedDamageNumber = {
   xOffsetSeed: number;
 };
 
-// Must match the skill-cast-fade CSS duration so the flash doesn't pop out mid-fade.
-const SKILL_CAST_LIFETIME_MS = 1500;
+// Must match the skill-cast-fade CSS duration, and stay under one combat round so each cast reads as its own flash.
+const SKILL_CAST_LIFETIME_MS = 900;
 const DAMAGE_NUMBER_LIFETIME_MS = 1100;
 const DAMAGE_NUMBER_LIFETIME_BY_VARIANT: Record<DamageEventVariant, number> = {
   critical: 1700,
@@ -48,10 +48,11 @@ export class CombatStatusPlaybackService {
     return grouped;
   });
 
+  // A one-item list so the template can track by id and remount (replaying the fade) on every cast.
   public skillCastByCombatant = computed(() => {
-    const grouped = new Map<string, CombatantSkillCastEvent>();
+    const grouped = new Map<string, CombatantSkillCastEvent[]>();
     this.displayedSkillCasts().forEach((event) => {
-      grouped.set(event.combatantId, event);
+      grouped.set(event.combatantId, [event]);
     });
     return grouped;
   });
@@ -120,7 +121,11 @@ export class CombatStatusPlaybackService {
   private showSkillCastEvents(events: CombatantSkillCastEvent[]): void {
     combatantSkillCastEventsClear(events.map((event) => event.id));
 
-    this.displayedSkillCasts.update((current) => [...current, ...events]);
+    const casters = new Set(events.map((event) => event.combatantId));
+    this.displayedSkillCasts.update((current) => [
+      ...current.filter((entry) => !casters.has(entry.combatantId)),
+      ...events,
+    ]);
 
     setTimeout(() => {
       const ids = new Set(events.map((event) => event.id));
