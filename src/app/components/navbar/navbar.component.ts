@@ -59,7 +59,13 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 import { BarResourceComponent } from '@components/bar-resource/bar-resource.component';
 import { PanelDebugButtonsComponent } from '@components/panel-debug-buttons/panel-debug-buttons.component';
-import { autoModeIsEnabled, autoModeToggle } from '@helpers/decree';
+import {
+  autoModeIsEnabled,
+  autoModeToggle,
+  decreeActiveClauseId,
+  decreeClauses,
+  decreeClauseSummary,
+} from '@helpers/decree';
 
 @Component({
   selector: 'app-navbar',
@@ -113,6 +119,14 @@ export class NavbarComponent {
   );
 
   public autoModeEnabled = computed(() => autoModeIsEnabled());
+
+  public enabledClauses = computed(() =>
+    decreeClauses().filter((clause) => clause.enabled),
+  );
+
+  public activeClauseId = computed(() => decreeActiveClauseId());
+
+  protected clauseSummary = decreeClauseSummary;
 
   public recenterCamera() {
     worldCameraRecenter();

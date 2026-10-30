@@ -71,7 +71,7 @@
         <button
           class="btn btn-sm btn-neutral btn-outline"
           [class.here]="activeGamePlayView() === 'decree'"
-          tp="Decree [5]"
+          [tp]="decreeTooltip"
           (click)="changeGamePlayView('decree')"
           (contextmenu)="toggleAutoMode()"
           appSfx="ui-click"
@@ -91,6 +91,24 @@
 
           Decree
         </button>
+
+        <ng-template #decreeTooltip>
+          @let activeId = activeClauseId();
+          <div class="flex flex-col gap-2 p-2 max-w-[400px]">
+            <span class="font-semibold">Decree [5]</span>
+            @for (clause of enabledClauses(); track clause.id) {
+              <span
+                class="text-xs"
+                [class.text-success]="clause.id === activeId"
+                [class.font-semibold]="clause.id === activeId"
+              >
+                {{ $index + 1 }}. {{ clauseSummary(clause) }}
+              </span>
+            } @empty {
+              <span class="text-xs text-lighter">No active clauses.</span>
+            }
+          </div>
+        </ng-template>
       </li>
     </ul>
   </div>
