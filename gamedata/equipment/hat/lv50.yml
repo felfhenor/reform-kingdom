@@ -1,0 +1,15 @@
+- id: c79acee1-749e-4b7a-a85f-b016fc4b57e3
+  name: Chillcloth Cap
+  description: A snug spellthread cap. Snow slides right off of it.
+  levelRequirement: 50
+  rarity: Uncommon
+  type: Hat
+  sprite: '0270'
+  slots: 1
+  baseStats:
+    Vitality: 28.2
+    Health: 61
+    Energy: 34
+
+  elementalResistances:
+    Water: 10

@@ -1,0 +1,15 @@
+- id: 53fc6d87-1ade-4b6b-af61-201388b0ad95
+  name: Frostbitten Whip
+  description: A spellthread lash studded with frostneedles.
+  levelRequirement: 50
+  rarity: Uncommon
+  type: Whip
+  sprite: '0261'
+  slots: 1
+  baseStats:
+    Intelligence: 25.4
+    Resistance: 23
+    Strength: 12.2
+
+  elementalBoons:
+    Water: 10

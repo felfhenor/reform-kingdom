@@ -90,3 +90,66 @@
   maxTradeskillLevel: 28
   tradeskillXP: 175
   craftTime: 450
+
+- id: f32a15b4-4134-4f08-97a5-f88d81758f67
+  name: 'Ammo: Frostbitten Bolt'
+  result:
+    equipmentId: Frostbitten Bolt
+
+  requirements:
+    - itemId: Felfrost
+      quantity: 1
+
+    - itemId: Frostneedle
+      quantity: 1
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 27
+  maxTradeskillLevel: 30
+  tradeskillXP: 185
+  craftTime: 510
+
+- id: a7cbc8ca-7421-47af-a39f-18c0e0c86d22
+  name: 'Weapon: Frostbitten Trident'
+  result:
+    equipmentId: Frostbitten Trident
+
+  requirements:
+    - itemId: Felfrost
+      quantity: 3
+
+    - itemId: Frostwood
+      quantity: 4
+
+    - itemId: Frostneedle
+      quantity: 1
+
+    - itemId: Fel Iron Ingot
+      quantity: 1
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 27
+  maxTradeskillLevel: 30
+  tradeskillXP: 185
+  craftTime: 510
+
+- id: db4a7760-c7f3-4d95-831c-9351aa1666a7
+  name: 'Weapon: Frostbitten Longbow'
+  result:
+    equipmentId: Frostbitten Longbow
+
+  requirements:
+    - itemId: Felfrost
+      quantity: 2
+
+    - itemId: Frostwood
+      quantity: 3
+
+    - itemId: Spellthread
+      quantity: 1
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 27
+  maxTradeskillLevel: 30
+  tradeskillXP: 185
+  craftTime: 510

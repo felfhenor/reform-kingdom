@@ -1,0 +1,17 @@
+- id: 8a827b5d-f9fc-4866-ad21-210326309385
+  name: Felforged Snow Boots
+  description: A pair of fel iron-soled boots for crossing deep snow.
+  levelRequirement: 50
+  rarity: Uncommon
+  type: Trinket
+  sprite: '0276'
+  slots: 1
+  baseStats:
+    Luck: 11.6
+    Agility: 4
+
+  elementalResistances:
+    Water: 5
+
+  debuffResistances:
+    StatDown: 10

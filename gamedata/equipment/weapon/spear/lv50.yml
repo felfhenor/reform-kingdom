@@ -1,0 +1,12 @@
+- id: 5eae4551-834c-4818-842b-b97c855b9d38
+  name: Frostbitten Trident
+  description: A frostwood trident capped with fel iron and coated in felfrost.
+  levelRequirement: 50
+  rarity: Uncommon
+  type: Spear
+  sprite: '0268'
+  slots: 1
+  baseStats:
+    Strength: 45.8
+
+  elements: [Water]

@@ -1,0 +1,15 @@
+- id: ae0aacf0-1997-4a28-a376-59a100459a23
+  name: Chillcloth Coat
+  description: A long coat of spellthread woven around felfrost. It keeps the cold out, but lets the heat in.
+  levelRequirement: 50
+  rarity: Uncommon
+  type: Cloth Armor
+  sprite: '0269'
+  slots: 1
+  baseStats:
+    Vitality: 39.6
+    Resistance: 31
+
+  elementalResistances:
+    Water: 15
+    Fire: -10

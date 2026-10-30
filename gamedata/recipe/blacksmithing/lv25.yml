@@ -163,3 +163,69 @@
   maxTradeskillLevel: 28
   tradeskillXP: 20
   craftTime: 20
+
+- id: 7d6d8c91-1679-4078-98b7-756f4b63b4db
+  name: 'Offhand: Felforged Blocker'
+  result:
+    equipmentId: Felforged Blocker
+
+  requirements:
+    - itemId: Fel Iron Ingot
+      quantity: 4
+
+    - itemId: Frostwood
+      quantity: 2
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 27
+  maxTradeskillLevel: 30
+  tradeskillXP: 185
+  craftTime: 510
+
+- id: c06cf441-4974-45a8-b4c4-83abd9a96d8f
+  name: 'Headgear: Felforged Protector'
+  result:
+    equipmentId: Felforged Protector
+
+  requirements:
+    - itemId: Fel Iron Ingot
+      quantity: 3
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 27
+  maxTradeskillLevel: 30
+  tradeskillXP: 185
+  craftTime: 510
+
+- id: 2ece302e-fcca-4558-bd08-61f88087b55a
+  name: 'Armor: Felforged Armor'
+  result:
+    equipmentId: Felforged Armor
+
+  requirements:
+    - itemId: Fel Iron Ingot
+      quantity: 6
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 27
+  maxTradeskillLevel: 30
+  tradeskillXP: 185
+  craftTime: 510
+
+- id: 0a945fe0-b1e8-44f7-85d8-8ba3d1f0f75c
+  name: 'Weapon: Felforged Slicer'
+  result:
+    equipmentId: Felforged Slicer
+
+  requirements:
+    - itemId: Fel Iron Ingot
+      quantity: 3
+
+    - itemId: Frostwood
+      quantity: 1
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 27
+  maxTradeskillLevel: 30
+  tradeskillXP: 185
+  craftTime: 510

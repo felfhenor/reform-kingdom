@@ -86,3 +86,111 @@
   maxTradeskillLevel: 27
   tradeskillXP: 20
   craftTime: 5
+
+- id: 79e45e79-0b04-4900-ae5c-c0a763c76e53
+  name: 'Weapon: Felforged Smasher'
+  result:
+    equipmentId: Felforged Smasher
+
+  requirements:
+    - itemId: Fel Iron Ingot
+      quantity: 4
+
+    - itemId: Frostwood
+      quantity: 2
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 27
+  maxTradeskillLevel: 30
+  tradeskillXP: 185
+  craftTime: 510
+
+- id: d216383b-a0ff-4a7e-b05f-e94590019663
+  name: 'Weapon: Frostbitten Multifocus'
+  result:
+    equipmentId: Frostbitten Multifocus
+
+  requirements:
+    - itemId: Frostwood
+      quantity: 6
+
+    - itemId: Diamond
+      quantity: 1
+
+    - itemId: Spellthread
+      quantity: 1
+
+    - itemId: Felfrost
+      quantity: 1
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 27
+  maxTradeskillLevel: 30
+  tradeskillXP: 185
+  craftTime: 510
+
+- id: c80ef453-4ee2-499c-a2d0-eaf6696e96c7
+  name: 'Artifact: Felforged Spellglove'
+  result:
+    equipmentId: Felforged Spellglove
+
+  requirements:
+    - itemId: Diamond
+      quantity: 2
+
+    - itemId: Fel Iron Ingot
+      quantity: 2
+
+    - itemId: Felfrost
+      quantity: 2
+
+    - itemId: Spellthread
+      quantity: 2
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 27
+  maxTradeskillLevel: 30
+  tradeskillXP: 185
+  craftTime: 510
+
+- id: 709cbeea-b1c4-4687-aaa4-714e0ef2ddf0
+  name: 'Offhand: Felforged Dodger'
+  result:
+    equipmentId: Felforged Dodger
+
+  requirements:
+    - itemId: Frostwood
+      quantity: 2
+
+    - itemId: Diamond
+      quantity: 3
+
+    - itemId: Fel Iron Ingot
+      quantity: 1
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 27
+  maxTradeskillLevel: 30
+  tradeskillXP: 185
+  craftTime: 510
+
+- id: 8e949fa6-a329-452f-b2cc-2e08c8c7508a
+  name: 'Weapon: Felforged Diamondtip'
+  result:
+    equipmentId: Felforged Diamondtip
+
+  requirements:
+    - itemId: Diamond
+      quantity: 4
+
+    - itemId: Frostwood
+      quantity: 1
+
+    - itemId: Fel Iron Ingot
+      quantity: 2
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 27
+  maxTradeskillLevel: 30
+  tradeskillXP: 185
+  craftTime: 510

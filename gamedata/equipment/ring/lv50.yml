@@ -1,0 +1,14 @@
+- id: d123e038-c6eb-4693-a685-e5c22a9ab504
+  name: Diamond Band
+  description: A plain fel iron ring set with a single diamond.
+  levelRequirement: 50
+  rarity: Uncommon
+  type: Ring
+  sprite: '0275'
+  slots: 1
+  baseStats:
+    Energy: 60
+    Health: 20
+
+  elementalResistances:
+    Water: 5

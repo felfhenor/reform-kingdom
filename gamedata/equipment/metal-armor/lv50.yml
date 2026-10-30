@@ -1,0 +1,15 @@
+- id: 997976a0-4cfc-4f9f-ae26-39210e42ba44
+  name: Felforged Armor
+  description: A full suit of fel iron plate, tempered against the cold. Demons can't stay warm enough on their own to mitigate the chill - this helps.
+  levelRequirement: 50
+  rarity: Uncommon
+  type: Metal Armor
+  sprite: '0265'
+  slots: 1
+  baseStats:
+    Vitality: 34
+    Resistance: 26.4
+
+  elementalResistances:
+    Water: 15
+    Fire: -10

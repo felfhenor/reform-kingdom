@@ -52,3 +52,75 @@
   maxTradeskillLevel: 27
   tradeskillXP: 20
   craftTime: 20
+
+- id: c4a628f8-3da0-40ab-a3be-756dc3c5e7a5
+  name: 'Ring: Diamond Band'
+  result:
+    equipmentId: Diamond Band
+
+  requirements:
+    - itemId: Fel Iron Ingot
+      quantity: 1
+
+    - itemId: Diamond
+      quantity: 1
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 27
+  maxTradeskillLevel: 30
+  tradeskillXP: 185
+  craftTime: 510
+
+- id: b613433a-336f-4c72-8937-026594adef3e
+  name: 'Offhand: Felforged Bracers'
+  result:
+    equipmentId: Felforged Bracers
+
+  requirements:
+    - itemId: Fel Iron Ingot
+      quantity: 2
+
+    - itemId: Spellthread
+      quantity: 4
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 27
+  maxTradeskillLevel: 30
+  tradeskillXP: 185
+  craftTime: 510
+
+- id: 6d4e9313-efa1-4f7f-8090-bdb91ab7718c
+  name: 'Accessory: Felforged Chain'
+  result:
+    equipmentId: Felforged Chain
+
+  requirements:
+    - itemId: Fel Iron Ingot
+      quantity: 4
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 27
+  maxTradeskillLevel: 30
+  tradeskillXP: 185
+  craftTime: 510
+
+- id: 7539e87a-852c-4011-9ba2-7d12e60efdf6
+  name: 'Accessory: Felforged Snow Boots'
+  result:
+    equipmentId: Felforged Snow Boots
+
+  requirements:
+    - itemId: Fel Iron Ingot
+      quantity: 2
+
+    - itemId: Felfrost
+      quantity: 2
+
+    - itemId: Spellthread
+      quantity: 2
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 27
+  maxTradeskillLevel: 30
+  tradeskillXP: 185
+  craftTime: 510

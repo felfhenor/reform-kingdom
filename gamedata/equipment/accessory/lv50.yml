@@ -1,0 +1,16 @@
+- id: b0d4bcc7-864d-4a99-b5a2-70142706c7e6
+  name: Felforged Chain
+  description: A thick fel iron chain, used by demons to help haul metals down the mountain.
+  levelRequirement: 50
+  rarity: Uncommon
+  type: Accessory
+  sprite: '0279'
+  slots: 1
+  baseStats:
+    Strength: 9
+
+  elementalResistances:
+    Water: 5
+
+  debuffResistances:
+    Stun: 10

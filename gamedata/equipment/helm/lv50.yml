@@ -1,0 +1,14 @@
+- id: 5dbffc0a-eed5-4546-956e-a78b8512f9db
+  name: Felforged Protector
+  description: A fel iron helm worn by the demons who stand watch on the summit. It has a permanet layer of frost on it.
+  levelRequirement: 50
+  rarity: Uncommon
+  type: Helm
+  sprite: '0264'
+  slots: 1
+  baseStats:
+    Vitality: 36.4
+    Health: 60
+
+  elementalResistances:
+    Water: 10

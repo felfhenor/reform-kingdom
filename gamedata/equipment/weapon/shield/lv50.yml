@@ -1,0 +1,15 @@
+- id: 84b990c4-7f1e-4ffb-b300-1ee2b6c0a5cf
+  name: Felforged Blocker
+  description: A heavy shield of fel iron, braced with frostwood.
+  levelRequirement: 50
+  rarity: Uncommon
+  type: Shield
+  sprite: '0263'
+  slots: 1
+  baseStats:
+    Vitality: 23.4
+    Resistance: 16.8
+
+  elementalResistances:
+    Fire: 5
+    Water: 10

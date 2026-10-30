@@ -1,0 +1,13 @@
+- id: 30b3d7b4-b8da-456c-bba4-c9d4bddb8b89
+  name: Frostbitten Longbow
+  description: A tall frostwood bow strung with spellthread. Fired arrows carry the chill of the mountain.
+  levelRequirement: 50
+  rarity: Uncommon
+  type: Bow
+  sprite: '0262'
+  slots: 1
+  baseStats:
+    Strength: 29
+    Agility: 20.2
+
+  elements: [Water]

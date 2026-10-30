@@ -1,0 +1,17 @@
+- id: 747d0066-a7c9-4e7b-8937-0a291d4a8ef9
+  name: Felforged Smasher
+  description: A fel iron mace on a frostwood haft. Demons use it to crack felfrost with ease.
+  levelRequirement: 50
+  rarity: Uncommon
+  type: Mace
+  sprite: '0271'
+  slots: 1
+  baseStats:
+    Strength: 26.4
+    Intelligence: 22.8
+
+  elementalResistances:
+    Water: 10
+
+  debuffResistances:
+    Stun: 10

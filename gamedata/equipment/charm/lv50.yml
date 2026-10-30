@@ -1,0 +1,15 @@
+- id: 41c4db89-5adf-42fe-aae8-492d21c44c0a
+  name: Felforged Bracers
+  description: A pair of fel iron bracers wrapped in spellthread.
+  levelRequirement: 50
+  rarity: Uncommon
+  type: Charm
+  sprite: '0278'
+  slots: 1
+  baseStats:
+    Intelligence: 15.1
+    Spirit: 5
+    Energy: 40
+
+  debuffResistances:
+    Accuracy: 10

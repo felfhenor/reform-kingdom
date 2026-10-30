@@ -1,0 +1,14 @@
+- id: 930e1e48-ef41-4d60-b2a6-f62ecfa6e1ee
+  name: Frostbitten Multifocus
+  description: A frostwood staff crowned with a diamond. Felfrost gathers along the staff, honing its wielder's water magic.
+  levelRequirement: 50
+  rarity: Uncommon
+  type: Staff
+  sprite: '0272'
+  slots: 1
+  baseStats:
+    Intelligence: 35
+    Vitality: 26.6
+
+  elementalBoons:
+    Water: 15

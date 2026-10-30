@@ -1,0 +1,14 @@
+- id: deb77fed-9e1a-44bb-b12b-6a203cb2450c
+  name: Felforged Slicer
+  description: A fel iron blade with a frostwood grip.
+  levelRequirement: 50
+  rarity: Uncommon
+  type: Sword
+  sprite: '0266'
+  slots: 1
+  baseStats:
+    Strength: 28.4
+    Vitality: 28.4
+
+  elementalResistances:
+    Water: 10

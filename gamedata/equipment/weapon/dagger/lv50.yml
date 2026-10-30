@@ -1,0 +1,14 @@
+- id: aa9b9be2-2340-4d70-8abc-df3727817589
+  name: Felforged Diamondtip
+  description: A fel iron dagger with a diamond point. Useful for carving or other knifely tasks.
+  levelRequirement: 50
+  rarity: Uncommon
+  type: Dagger
+  sprite: '0274'
+  slots: 1
+  baseStats:
+    Agility: 28.6
+    Strength: 23
+
+  monsterTypeDamage:
+    Demon: 10

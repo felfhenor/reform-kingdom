@@ -1,0 +1,17 @@
+- id: 38bfb1b4-014e-4a49-8e76-788f650e9459
+  name: Felforged Dodger
+  description: A diamond-studded dirk on a frostwood handle.
+  levelRequirement: 50
+  rarity: Uncommon
+  type: Dirk
+  sprite: '0273'
+  slots: 1
+  baseStats:
+    Strength: 31
+    Agility: 18.4
+
+  elementalResistances:
+    Water: 5
+
+  debuffResistances:
+    Accuracy: 10

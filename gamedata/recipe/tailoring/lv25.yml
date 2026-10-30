@@ -102,3 +102,63 @@
   maxTradeskillLevel: 28
   tradeskillXP: 20
   craftTime: 20
+
+- id: c6427d57-e228-4a5a-b01c-d7bd6f60a4c5
+  name: 'Armor: Chillcloth Coat'
+  result:
+    equipmentId: Chillcloth Coat
+
+  requirements:
+    - itemId: Spellthread
+      quantity: 6
+
+    - itemId: Felfrost
+      quantity: 4
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 27
+  maxTradeskillLevel: 30
+  tradeskillXP: 185
+  craftTime: 510
+
+- id: 918c5eb7-83fc-4a1e-8782-9b064f1a636b
+  name: 'Headgear: Chillcloth Cap'
+  result:
+    equipmentId: Chillcloth Cap
+
+  requirements:
+    - itemId: Spellthread
+      quantity: 2
+
+    - itemId: Felfrost
+      quantity: 2
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 27
+  maxTradeskillLevel: 30
+  tradeskillXP: 185
+  craftTime: 510
+
+- id: 908ad859-8691-46e8-b82d-5bcfb8a441de
+  name: 'Weapon: Frostbitten Whip'
+  result:
+    equipmentId: Frostbitten Whip
+
+  requirements:
+    - itemId: Felfrost
+      quantity: 2
+
+    - itemId: Frostwood
+      quantity: 1
+
+    - itemId: Spellthread
+      quantity: 6
+
+    - itemId: Frostneedle
+      quantity: 3
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 27
+  maxTradeskillLevel: 30
+  tradeskillXP: 185
+  craftTime: 510

@@ -1,0 +1,13 @@
+- id: 75be8288-3c82-49c4-8939-0a4ec4fb7ce0
+  name: Frostbitten Bolt
+  description: An arrow tipped with a frostneedle and sealed in felfrost. It's chill layered upon cold.
+  levelRequirement: 50
+  rarity: Uncommon
+  type: Arrow
+  sprite: '0267'
+  slots: 1
+  baseStats:
+    Strength: 23
+    Agility: 13.8
+
+  elements: [Water]

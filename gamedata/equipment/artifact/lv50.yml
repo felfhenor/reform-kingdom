@@ -1,0 +1,14 @@
+- id: 9dba4aac-6d89-45c3-94b2-eb3b6c500942
+  name: Felforged Spellglove
+  description: A fel iron gauntlet set with diamonds and lined with spellthread.
+  levelRequirement: 50
+  rarity: Uncommon
+  type: Artifact
+  sprite: '0277'
+  slots: 1
+  baseStats:
+    Intelligence: 20.6
+    Resistance: 9
+
+  elementalBoons:
+    Water: 10
