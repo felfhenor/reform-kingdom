@@ -19,6 +19,7 @@
     "./schemas/caravan.schema.json": "gamedata/caravan/**/*.yml",
     "./schemas/caravantrader.schema.json": "gamedata/caravantrader/**/*.yml",
     "./schemas/collectible.schema.json": "gamedata/collectible/**/*.yml",
+    "./schemas/collectiblegate.schema.json": "gamedata/collectiblegate/**/*.yml",
     "./schemas/commissionoffer.schema.json": "gamedata/commissionoffer/**/*.yml",
     "./schemas/encounter.schema.json": "gamedata/encounter/**/*.yml",
     "./schemas/encounterrandom.schema.json": "gamedata/encounterrandom/**/*.yml",

@@ -18,6 +18,7 @@ import { getMaterialQuantity } from '@helpers/item/materials';
 import { telegraphedRaidTownIds } from '@helpers/town/raid/town-raid-state';
 import { homeNodeGet, isPlayerAtHome } from '@helpers/town/town-spawn';
 import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';
+import { isWorldNodeGateOpen } from '@helpers/world-node/world-node-gate';
 import { discoveredGatherNodesFor } from '@helpers/world-node/world-node-gathering-discovery';
 import { worldNodeObtainableMissingRewards } from '@helpers/world-node/world-node-rewards';
 import {
@@ -69,7 +70,7 @@ function canStopEnRoute(
   entry: WorldNodeEntry,
   riskTolerance: DecreeRiskLevel,
 ): boolean {
-  if (!isWorldNodeVisible(entry)) return false;
+  if (!isWorldNodeVisible(entry) || !isWorldNodeGateOpen(entry)) return false;
   if (worldNodeGathering(entry) || worldNodeEncounterRandom(entry)) {
     return false;
   }

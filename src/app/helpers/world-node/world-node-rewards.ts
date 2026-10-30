@@ -24,7 +24,7 @@ import type {
   RewardContentInfo,
   RewardIdentity,
   WorkerContent,
-  WorldNodeCompletionRewardProgress,
+  WorldNodeObtainedProgress,
   WorldNodeEntry,
 } from '@interfaces';
 
@@ -142,7 +142,7 @@ export function isRewardDiscovered(reward: DroppedReward): boolean {
 // Obtained/total counts for the "X/Y Rewards" info-popup badge.
 export function worldNodeCompletionRewardProgress(
   entry: WorldNodeEntry,
-): WorldNodeCompletionRewardProgress {
+): WorldNodeObtainedProgress {
   const rewards = worldNodeCompletionRewards(entry);
 
   return {

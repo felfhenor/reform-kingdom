@@ -27,20 +27,24 @@ import { orderBy } from 'es-toolkit/compat';
 const CRAFTING_SOURCE_NAME = 'Crafting';
 const UNMET_TRADER_NAME = 'an unmet trader';
 
+export function museumCollectibleEntry(
+  collectible: CollectibleContent,
+): MuseumCollectibleEntry {
+  const discovered = isCollectibleDiscovered(collectible.id);
+
+  return {
+    collectible,
+    discovered,
+    quantity: getCollectibleQuantity(collectible.id),
+    source: museumCollectibleSource(collectible.id, discovered),
+  };
+}
+
 // Includes undiscovered collectibles (quantity: 0) so the museum can render them as silhouettes.
 export function getMuseumCollectibleEntries(): MuseumCollectibleEntry[] {
-  const collectibles = getEntriesByType<CollectibleContent>('collectible');
-
-  const entries = collectibles.map((collectible) => {
-    const discovered = isCollectibleDiscovered(collectible.id);
-
-    return {
-      collectible,
-      discovered,
-      quantity: getCollectibleQuantity(collectible.id),
-      source: museumCollectibleSource(collectible.id, discovered),
-    };
-  });
+  const entries = getEntriesByType<CollectibleContent>('collectible').map(
+    museumCollectibleEntry,
+  );
 
   return orderBy(
     entries,
@@ -72,6 +76,24 @@ function museumCollectibleSource(
 
 function collectibleSourceName(source: CollectibleSource): string {
   return source.type === 'crafting' ? CRAFTING_SOURCE_NAME : source.name;
+}
+
+export function museumCollectibleSourceLabel({
+  source,
+  discovered,
+}: MuseumCollectibleEntry): string | undefined {
+  switch (source?.type) {
+    case 'crafting':
+      return `Source: ${CRAFTING_SOURCE_NAME}`;
+    case 'trader':
+      return `From: ${source.name}`;
+    case 'node':
+      return `${discovered ? 'Found in' : 'Discoverable in'}: ${source.name}`;
+    case 'raid':
+      return `From defending: ${source.name}`;
+    default:
+      return undefined;
+  }
 }
 
 export function filterMuseumCollectibleEntries(

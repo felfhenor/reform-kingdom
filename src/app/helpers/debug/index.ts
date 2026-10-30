@@ -1,4 +1,5 @@
 export * from './analysis-affixes';
+export * from './analysis-collectiblegates';
 export * from './analysis-commissionrewards';
 export * from './analysis-commissionusage';
 export * from './analysis-completionrewards';
@@ -20,6 +21,7 @@ export * from './analysis-monsterstats';
 export * from './analysis-nodedevelopmenttimes';
 export * from './analysis-nodelevels';
 export * from './analysis-nodenames';
+export * from './analysis-nodetypes';
 export * from './analysis-obtainability';
 export * from './analysis-outposts';
 export * from './analysis-recipeingredientorder';

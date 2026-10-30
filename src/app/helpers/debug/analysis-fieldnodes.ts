@@ -1,7 +1,7 @@
 /**
  * Validates that every "field node" (a Tiled `ExploreNode`, `ExploreRandomNode`,
- * `GatherNode`, `Shrine`, `Outpost`, `Trainer`, or `ExchangeNode` object placed on a world map) has a matching
- * `Encounter`, `EncounterRandom`, `Gathering`, `Shrine`, `Outpost`, `Trainer`, or `ExchangeNode` content entry,
+ * `GatherNode`, `Shrine`, `Outpost`, `Trainer`, `ExchangeNode`, or `CollectibleGate` object placed on a world map) has a matching
+ * `Encounter`, `EncounterRandom`, `Gathering`, `Shrine`, `Outpost`, `Trainer`, `ExchangeNode`, or `CollectibleGate` content entry,
  * matched by name.
  */
 
@@ -10,6 +10,7 @@ import { allMaps } from '@helpers/maps';
 import type {
   AnalysisCheck,
   AnalysisRunResult,
+  CollectibleGateContent,
   EncounterContent,
   EncounterRandomContent,
   ExchangeNodeContent,
@@ -29,6 +30,7 @@ const FIELD_NODE_TYPES = [
   'Outpost',
   'Trainer',
   'ExchangeNode',
+  'CollectibleGate',
 ];
 
 export function runFieldNodesAnalysis(): AnalysisRunResult {
@@ -55,6 +57,11 @@ export function runFieldNodesAnalysis(): AnalysisRunResult {
   const exchangeNodeNames = new Set(
     getEntriesByType<ExchangeNodeContent>('exchangenode').map((e) => e.name),
   );
+  const collectibleGateNames = new Set(
+    getEntriesByType<CollectibleGateContent>('collectiblegate').map(
+      (g) => g.name,
+    ),
+  );
   const nodeNames = new Set([
     ...encounterNames,
     ...encounterRandomNames,
@@ -63,6 +70,7 @@ export function runFieldNodesAnalysis(): AnalysisRunResult {
     ...outpostNames,
     ...trainerNames,
     ...exchangeNodeNames,
+    ...collectibleGateNames,
   ]);
 
   const checks: AnalysisCheck[] = [];
@@ -89,6 +97,7 @@ export function runFieldNodesAnalysis(): AnalysisRunResult {
         if (outpostNames.has(node.name)) kind = 'outpost';
         if (trainerNames.has(node.name)) kind = 'trainer';
         if (exchangeNodeNames.has(node.name)) kind = 'exchange node';
+        if (collectibleGateNames.has(node.name)) kind = 'collectible gate';
 
         checks.push({
           id,
@@ -103,7 +112,7 @@ export function runFieldNodesAnalysis(): AnalysisRunResult {
         id,
         label: node.name,
         status: 'fail',
-        message: `Field node "${node.name}" on map "${gameMap.name}" (tile x=${node.x}, y=${node.y}) has no Encounter, EncounterRandom, Gathering, Shrine, Outpost, Trainer, or ExchangeNode entry whose "name" is "${node.name}". Add one, then rerun "npm run gamedata:build".`,
+        message: `Field node "${node.name}" on map "${gameMap.name}" (tile x=${node.x}, y=${node.y}) has no Encounter, EncounterRandom, Gathering, Shrine, Outpost, Trainer, ExchangeNode, or CollectibleGate entry whose "name" is "${node.name}". Add one, then rerun "npm run gamedata:build".`,
       });
     });
   });
@@ -115,6 +124,6 @@ export function runFieldNodesAnalysis(): AnalysisRunResult {
     summary:
       failures === 0
         ? `Every field node (${total} checked) has a corresponding content entry.`
-        : `${failures} of ${total} field node(s) have no matching encounter, random encounter, gathering, shrine, outpost, trainer, or exchange node entry.`,
+        : `${failures} of ${total} field node(s) have no matching encounter, random encounter, gathering, shrine, outpost, trainer, exchange node, or collectible gate entry.`,
   };
 }

@@ -2,6 +2,7 @@ import { getMap } from '@helpers/maps';
 import { tiledObjectSpriteFrame } from '@helpers/pixi/tiled-map';
 import {
   worldNodeCaravan,
+  worldNodeCollectibleGate,
   worldNodeEncounter,
   worldNodeEncounterRandom,
   worldNodeExchange,
@@ -31,6 +32,7 @@ export function worldNodeDescription(
     worldNodeOutpost(entry)?.description ??
     worldNodeTrainer(entry)?.description ??
     worldNodeExchange(entry)?.description ??
+    worldNodeCollectibleGate(entry)?.description ??
     worldNodeTown(entry)?.description
   );
 }

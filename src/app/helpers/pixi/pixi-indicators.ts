@@ -27,6 +27,7 @@ const NODE_LABEL_COLOR_BY_KIND: Record<WorldNodeInteractionKind, number> = {
   Outpost: 0xe879f9,
   Trainer: 0x818cf8,
   Exchange: 0xf8fafc,
+  Gate: 0x60a5fa,
 };
 
 const PROGRESS_BAR_COLOR_BY_KIND: Record<WorldNodeProgressKind, number> = {

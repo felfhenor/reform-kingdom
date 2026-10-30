@@ -31,7 +31,8 @@
             !isShrineNode() &&
             !isOutpostNode() &&
             !isTrainerNode() &&
-            !exchangeNode()
+            !exchangeNode() &&
+            !isGateNode()
           ) {
             <div class="badge" [class]="levelBadgeClass()">
               Lv. {{ levelLabel() }}
@@ -46,6 +47,8 @@
             <app-panel-map-node-badges-caravan [entry]="entry" />
           } @else if (isTownNode()) {
             <app-panel-map-node-badges-town [entry]="entry" />
+          } @else if (isGateNode()) {
+            <app-panel-map-node-badges-gate [entry]="entry" />
           }
         </div>
 

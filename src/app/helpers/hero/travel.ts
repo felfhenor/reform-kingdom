@@ -42,6 +42,7 @@ import { homeNodeGet } from '@helpers/town/town-spawn';
 import { currentLocationSet } from '@helpers/world';
 import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';
 import { outpostDeathPenaltyMultiplier } from '@helpers/world-node/world-node-outpost';
+import { isWorldNodeGateOpen } from '@helpers/world-node/world-node-gate';
 import {
   isWorldNodeCollectibleGateMet,
   worldNodeByName,
@@ -149,7 +150,11 @@ export function travelStart(
   if (!canPartyTravel()) return false;
 
   const destinationEntry = worldNodeByName(destinationNodeName);
-  if (destinationEntry && !isWorldNodeCollectibleGateMet(destinationEntry)) {
+  if (
+    destinationEntry &&
+    (!isWorldNodeCollectibleGateMet(destinationEntry) ||
+      !isWorldNodeGateOpen(destinationEntry))
+  ) {
     return false;
   }
 

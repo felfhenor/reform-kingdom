@@ -287,6 +287,7 @@ const program = TJS.getProgramFromFiles(
     path.resolve(__dirname, '../src/app/interfaces/content-caravan.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-caravan-trader.ts'),
     path.resolve(__dirname, '../src/app/interfaces/content-collectible.ts'),
+    path.resolve(__dirname, '../src/app/interfaces/content-collectiblegate.ts'),
     path.resolve(
       __dirname,
       '../src/app/interfaces/content-commission-offer.ts',
@@ -355,6 +356,7 @@ const contentTypeMap = {
   caravan: 'CaravanContent',
   caravantrader: 'CaravanTraderContent',
   collectible: 'CollectibleContent',
+  collectiblegate: 'CollectibleGateContent',
   commissionoffer: 'CommissionOfferContent',
   encounter: 'EncounterContent',
   encounterrandom: 'EncounterRandomContent',

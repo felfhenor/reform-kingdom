@@ -13,6 +13,7 @@ import {
   worldNodeDevelopmentLevel,
   worldNodeDevelopmentTimerText,
 } from '@helpers/world-node/world-node-development-state';
+import { worldNodeGateProgress } from '@helpers/world-node/world-node-gate';
 import { worldNodeCompletionRewardProgress } from '@helpers/world-node/world-node-rewards';
 import {
   worldNodeInteractionKind,
@@ -26,14 +27,17 @@ import {
 import type {
   DifficultyTier,
   ExploreNodeFarmOption,
+  WorldNodeObtainedProgress,
   WorldNodeEntry,
   WorldNodeLabelInfo,
   WorldNodeStatusInfo,
 } from '@interfaces';
 
-// `(obtained/total)` suffix for the map label, hidden once every reward's been found (or if there are none).
-function nodeRewardProgressSuffix(entry: WorldNodeEntry): string {
-  const { obtained, total } = worldNodeCompletionRewardProgress(entry);
+// `(obtained/total)` suffix for the map label, hidden once complete (or if there's nothing to count).
+function nodeProgressSuffix({
+  obtained,
+  total,
+}: WorldNodeObtainedProgress): string {
   return total > 0 && obtained < total ? ` (${obtained}/${total})` : '';
 }
 
@@ -65,7 +69,11 @@ export function worldNodeLabelInfo(
   const suffixLevel = worldNodeDevelopmentLevel(entry.nodeName);
   const nodeNameLine =
     (suffixLevel > 0 ? `${entry.nodeName} +${suffixLevel}` : entry.nodeName) +
-    nodeRewardProgressSuffix(entry);
+    nodeProgressSuffix(
+      kind === 'Gate'
+        ? worldNodeGateProgress(entry)
+        : worldNodeCompletionRewardProgress(entry),
+    );
   const lines =
     kind === 'Trade' ? [caravanBrandName(entry.nodeName)] : [nodeNameLine];
   // Caravan level range shows in the node panel instead; the floating label stays name + timer only.

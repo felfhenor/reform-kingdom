@@ -3,6 +3,7 @@ export * from './content-initializers';
 export * from './ensure-affix';
 export * from './ensure-astralprojector';
 export * from './ensure-caravan';
+export * from './ensure-collectiblegate';
 export * from './ensure-commission';
 export * from './ensure-encounternode';
 export * from './ensure-exchangenode';

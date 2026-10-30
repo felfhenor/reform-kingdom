@@ -4,6 +4,7 @@ export type ContentType =
   | 'caravan'
   | 'caravantrader'
   | 'collectible'
+  | 'collectiblegate'
   | 'commissionoffer'
   | 'encounter'
   | 'encounterrandom'

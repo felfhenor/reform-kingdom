@@ -1,0 +1,50 @@
+- id: 22d0b01f-cc5d-411e-a06d-6592b000a40f
+  name: Memory Gateway
+  description: A gateway the land has all but forgotten. The lands will remember it when their keepsakes are united in this place. In that moment, the progress of your journey will be saved.
+
+  requiredCollectibleIds:
+    - Goblin Ruby
+    - Purple Lotus
+    - Slime Chunks
+    - Venom Orb
+    - Jelly Flower
+    - Gobslime Flower
+    - Copper Catcher
+    - Salt Barrel
+    - Gobweb
+    - Copper Pickaxe
+    - Elven Leaf
+    - Elven Dowsing Bangle
+    - Trained Hawk Feathers
+    - Fel Demon Feather
+    - Swamp Clam
+    - Cane of Etheria
+    - Craggle Pebble
+    - Mirefrog Tongue
+    - Cyclops Skull
+    - Ghost Orbs
+    - Woodwolf Skull
+    - Demon Supply Pouch
+    - Weapon Claim Tag
+    - Outlaw Flag
+    - Darkway Torch
+    - Ritual Crown
+    - Chillspikes
+    - Food-eating Prototype
+    - Soul Totem
+    - Failed Frostcores
+    - Soul Cubes
+    - Broken Zelk Doll
+    - Fel Sewing Gloves
+    - Fel Sword Prototype
+    - Fel Ancient Magic Helm
+    - Fel Crown
+    - Fel Knightcrest Shield
+    - Ritualistic Fel Tines
+    - Three-Leaf Clover
+    - Desertcrab Claw
+    - Mystical Mirror
+    - Elven Satchel
+    - Deadwoods Sunflower
+    - Sandslime Kataclump
+    - Templar Summoning Scroll

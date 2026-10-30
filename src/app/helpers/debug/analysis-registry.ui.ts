@@ -1,3 +1,4 @@
+import { runCollectibleGatesAnalysis } from '@helpers/debug/analysis-collectiblegates';
 import { runCommissionRewardsAnalysis } from '@helpers/debug/analysis-commissionrewards';
 import { runCommissionUsageAnalysis } from '@helpers/debug/analysis-commissionusage';
 import { runCompletionRewardsAnalysis } from '@helpers/debug/analysis-completionrewards';
@@ -16,6 +17,7 @@ import { runMonsterDropsAnalysis } from '@helpers/debug/analysis-monsterdrops';
 import { runMonsterStatsAnalysis } from '@helpers/debug/analysis-monsterstats';
 import { runNodeLevelsAnalysis } from '@helpers/debug/analysis-nodelevels';
 import { runNodeNamesAnalysis } from '@helpers/debug/analysis-nodenames';
+import { runNodeTypesAnalysis } from '@helpers/debug/analysis-nodetypes';
 import { runObtainabilityAnalysis } from '@helpers/debug/analysis-obtainability';
 import { runOutpostsAnalysis } from '@helpers/debug/analysis-outposts';
 import { runNodeDevelopmentTimesAnalysis } from '@helpers/debug/analysis-nodedevelopmenttimes';
@@ -188,6 +190,16 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     run: runNodeNamesAnalysis,
   },
   {
+    id: 'nodetypes',
+    title: 'Node Types',
+    description:
+      'Every map node has a known type (no blanks or typos) that matches its content.',
+    category: 'World & Maps',
+    strict: true,
+    inputKeys: [],
+    run: runNodeTypesAnalysis,
+  },
+  {
     id: 'teleportnodes',
     title: 'Teleport Nodes',
     description: 'Teleport node tags/toTags are present, unique, and resolve.',
@@ -210,7 +222,7 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     id: 'fieldnodes',
     title: 'Field Nodes',
     description:
-      'Every field node has a matching encounter, random encounter, gathering, shrine, outpost, trainer, or exchange node entry.',
+      'Every field node has a matching encounter, random encounter, gathering, shrine, outpost, trainer, exchange node, or collectible gate entry.',
     category: 'World & Maps',
     strict: true,
     inputKeys: [],
@@ -265,6 +277,16 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     strict: true,
     inputKeys: [],
     run: runExchangeNodesAnalysis,
+  },
+  {
+    id: 'collectiblegates',
+    title: 'Collectible Gates',
+    description:
+      'Every collectible gate is placed on a map and requires only real, obtainable collectibles; warns on explore node collectibles no gate requires.',
+    category: 'World & Maps',
+    strict: true,
+    inputKeys: [],
+    run: runCollectibleGatesAnalysis,
   },
   {
     id: 'outposts',

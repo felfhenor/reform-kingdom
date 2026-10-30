@@ -1,0 +1,27 @@
+@let gate = progress();
+
+<div
+  class="badge tabular-nums"
+  [class.badge-data]="gate.obtained !== gate.total"
+  [class.badge-success]="gate.obtained === gate.total"
+  [tp]="missingTooltip"
+  [tpPlacement]="'top'"
+  [tpIsEnabled]="rows().length > 0"
+>
+  {{ gate.obtained | number }}/{{ gate.total | number }} Collectibles
+</div>
+
+<ng-template #missingTooltip>
+  <div class="flex flex-col gap-2 p-2 max-w-[400px]">
+    @for (row of rows(); track row.entry.collectible.id) {
+      <div class="flex flex-col">
+        <span class="type-unknown text-sm">???</span>
+        <span class="type-meta">{{ row.sourceLabel ?? 'Source unknown' }}</span>
+      </div>
+    }
+
+    @if (hiddenCount() > 0) {
+      <div class="type-meta">...and {{ hiddenCount() | number }} more</div>
+    }
+  </div>
+</ng-template>

@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('@helpers/hero/travel-cost');
 
 import { OUTPOST_TELEPORT_LEVEL } from '@helpers/config';
+import { ensureCollectibleGate } from '@helpers/content/ensure-collectiblegate';
 import { ensureNodeOverride } from '@helpers/content/ensure-nodeoverride';
 import {
   travelPathTotalTicks,
@@ -15,6 +16,7 @@ import {
   travelPathTo,
 } from '@helpers/pathfinding/pathfinding-travel';
 import type {
+  CollectibleGateId,
   CollectibleId,
   CurrentLocation,
   NodeOverrideId,
@@ -146,6 +148,68 @@ describe('travelPathTo', () => {
         x: 1,
         y: 1,
       });
+    });
+  });
+
+  describe('a CollectibleGate node', () => {
+    const requiredIds = ['ruby', 'lotus'] as CollectibleId[];
+
+    function seedGateMap(foundIds: CollectibleId[] = []): void {
+      seedWorldNodes(
+        [
+          node('Memory Gateway', 'Carrina', 1, 1, 'CollectibleGate'),
+          node('Behind', 'Carrina', 2, 1),
+        ],
+        [],
+        {
+          Carrina: {
+            width: 3,
+            height: 3,
+            denseTiles: [carrina(1, 0), carrina(1, 2)],
+          },
+        },
+      );
+      seedContent([
+        ensureCollectibleGate({
+          id: 'Memory Gateway' as CollectibleGateId,
+          name: 'Memory Gateway',
+          requiredCollectibleIds: requiredIds,
+        }),
+      ]);
+      seedGamestate((state) => {
+        state.world.currentLocation = carrina(0, 1);
+        foundIds.forEach((id) => applyCollectibleGrant(state, id, 1));
+      });
+    }
+
+    it('cannot be traveled to while shut', () => {
+      seedGateMap(requiredIds.slice(0, 1));
+
+      expect(travelPathTo('Memory Gateway')).toBeUndefined();
+    });
+
+    it('can be traveled to once every collectible is found', () => {
+      seedGateMap(requiredIds);
+
+      expect(travelPathTo('Memory Gateway')).toEqual([
+        { kind: 'Move', mapName: 'Carrina', x: 1, y: 1 },
+      ]);
+    });
+
+    it('leads on to the node behind it from its own tile', () => {
+      seedGateMap(requiredIds);
+
+      expect(travelPathFrom(carrina(1, 1), 'Behind')).toEqual([
+        { kind: 'Move', mapName: 'Carrina', x: 2, y: 1 },
+      ]);
+    });
+
+    it('is open to content tooling that ignores collectible gates', () => {
+      seedGateMap();
+
+      expect(
+        travelPathFrom(carrina(0, 1), 'Memory Gateway', true, true),
+      ).toHaveLength(1);
     });
   });
 

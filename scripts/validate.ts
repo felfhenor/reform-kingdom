@@ -9,6 +9,8 @@ import type { AnalysisRunResult } from '@interfaces';
 import { runFieldNodesAnalysis } from '@helpers/debug/analysis-fieldnodes';
 import { runTeleportNodesAnalysis } from '@helpers/debug/analysis-teleportnodes';
 import { runNodeNamesAnalysis } from '@helpers/debug/analysis-nodenames';
+import { runNodeTypesAnalysis } from '@helpers/debug/analysis-nodetypes';
+import { runCollectibleGatesAnalysis } from '@helpers/debug/analysis-collectiblegates';
 import { runCompletionRewardsAnalysis } from '@helpers/debug/analysis-completionrewards';
 import { runRecipeRewardsAnalysis } from '@helpers/debug/analysis-reciperewards';
 import { runRecipeNamesAnalysis } from '@helpers/debug/analysis-recipenames';
@@ -45,6 +47,7 @@ const ANALYSIS_CHECKS: Array<{ title: string; run: () => AnalysisRunResult }> =
     { title: 'validate:fieldnodes', run: runFieldNodesAnalysis },
     { title: 'validate:teleportnodes', run: runTeleportNodesAnalysis },
     { title: 'validate:nodenames', run: runNodeNamesAnalysis },
+    { title: 'validate:nodetypes', run: runNodeTypesAnalysis },
     { title: 'validate:completionrewards', run: runCompletionRewardsAnalysis },
     { title: 'validate:reciperewards', run: runRecipeRewardsAnalysis },
     { title: 'validate:recipenames', run: runRecipeNamesAnalysis },
@@ -74,6 +77,7 @@ const ANALYSIS_CHECKS: Array<{ title: string; run: () => AnalysisRunResult }> =
       run: runNodeDevelopmentTimesAnalysis,
     },
     { title: 'validate:exchangenodes', run: runExchangeNodesAnalysis },
+    { title: 'validate:collectiblegates', run: runCollectibleGatesAnalysis },
     { title: 'validate:trainers', run: runTrainersAnalysis },
     { title: 'validate:tasks', run: runTasksAnalysis },
     { title: 'validate:skills', run: runSkillsAnalysis },

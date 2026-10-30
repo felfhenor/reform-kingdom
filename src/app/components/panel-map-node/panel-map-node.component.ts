@@ -12,6 +12,7 @@ import { PanelMapNodeActionsTownComponent } from '@components/panel-map-node-act
 import { PanelMapNodeActionsTrainerComponent } from '@components/panel-map-node-actions-trainer/panel-map-node-actions-trainer.component';
 import { PanelMapNodeBadgesCaravanComponent } from '@components/panel-map-node-badges-caravan/panel-map-node-badges-caravan.component';
 import { PanelMapNodeBadgesExploreComponent } from '@components/panel-map-node-badges-explore/panel-map-node-badges-explore.component';
+import { PanelMapNodeBadgesGateComponent } from '@components/panel-map-node-badges-gate/panel-map-node-badges-gate.component';
 import { PanelMapNodeBadgesGatherComponent } from '@components/panel-map-node-badges-gather/panel-map-node-badges-gather.component';
 import { PanelMapNodeBadgesTownComponent } from '@components/panel-map-node-badges-town/panel-map-node-badges-town.component';
 import { PanelMapNodeStatusEncounterComponent } from '@components/panel-map-node-status-encounter/panel-map-node-status-encounter.component';
@@ -68,6 +69,7 @@ import { worldNodeLevelRange } from '@helpers/world-node/world-node-status';
 import { worldNodeDifficultyTier } from '@helpers/world-node/world-node-status.ui';
 import {
   worldNodeCaravan,
+  worldNodeCollectibleGate,
   worldNodeEncounter,
   worldNodeEncounterRandom,
   worldNodeExchange,
@@ -98,6 +100,7 @@ import { sortBy } from 'es-toolkit/compat';
     PanelMapNodeActionsExchangeComponent,
     PanelMapNodeBadgesCaravanComponent,
     PanelMapNodeBadgesExploreComponent,
+    PanelMapNodeBadgesGateComponent,
     PanelMapNodeBadgesGatherComponent,
     PanelMapNodeBadgesTownComponent,
     PanelMapNodeStatusEncounterComponent,
@@ -228,6 +231,11 @@ export class PanelMapNodeComponent {
   public isTownNode = computed(() => {
     const entry = this.node();
     return !!entry && !!worldNodeTown(entry);
+  });
+
+  public isGateNode = computed(() => {
+    const entry = this.node();
+    return !!entry && !!worldNodeCollectibleGate(entry);
   });
 
   public isKingdomNode = computed(

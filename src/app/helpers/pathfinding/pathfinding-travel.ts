@@ -9,6 +9,7 @@ import {
   unlockedTeleportNodes,
 } from '@helpers/pathfinding/pathfinding';
 import { worldCurrentLocationState } from '@helpers/state-game';
+import { isWorldNodeGateOpen } from '@helpers/world-node/world-node-gate';
 import { outpostsWithTeleportUnlocked } from '@helpers/world-node/world-node-outpost';
 import {
   isWorldNodeCollectibleGateMet,
@@ -187,7 +188,7 @@ function travelPathViaHops(
 }
 
 // Cleared when maps reload, a collectible is found (can flip a gated TeleportNode - see
-// unlockedTeleportNodes) or the +5 outpost set changes; otherwise (origin, destination) always resolves the same.
+// unlockedTeleportNodes - or open a CollectibleGate) or the +5 outpost set changes; otherwise (origin, destination) always resolves the same.
 let cachedMapsRef: ReturnType<typeof allMaps> | undefined;
 let cachedDiscoveredCollectibleCount: number | undefined;
 let cachedOutpostTeleportKey: string | undefined;
@@ -265,6 +266,9 @@ function computeTravelPathFrom(
 ): TravelStep[] | undefined {
   const destination = worldNodeByName(destinationNodeName);
   if (!destination) return undefined;
+  if (!ignoreCollectibleGate && !isWorldNodeGateOpen(destination)) {
+    return undefined;
+  }
 
   // Traveling "to" a TeleportNode means crossing it, not just standing next
   // to it - so the jump to its paired arrival tile is part of this path.

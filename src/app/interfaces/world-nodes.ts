@@ -69,14 +69,16 @@ export type WorldNodeInteractionKind =
   | 'Shrine'
   | 'Outpost'
   | 'Trainer'
-  | 'Exchange';
+  | 'Exchange'
+  | 'Gate';
 
 export type WorldNodeProgressKind = Extract<
   WorldNodeInteractionKind,
   'Gather' | 'Explore'
 >;
 
-export type WorldNodeCompletionRewardProgress = {
+// Completion rewards obtained, or a CollectibleGate's required collectibles found.
+export type WorldNodeObtainedProgress = {
   obtained: number;
   total: number;
 };

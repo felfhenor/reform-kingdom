@@ -23,6 +23,7 @@ import {
   TICKS_PER_STEP_ON_PATH,
 } from '@helpers/config';
 import { ensureCaravan } from '@helpers/content/ensure-caravan';
+import { ensureCollectibleGate } from '@helpers/content/ensure-collectiblegate';
 import {
   ensureEncounter,
   ensureEncounterRandom,
@@ -41,6 +42,7 @@ import {
   travelRelocateTo,
   travelStart,
 } from '@helpers/hero/travel';
+import { applyCollectibleGrant } from '@helpers/item/collectibles';
 import { gatheringStart, gatheringStop } from '@helpers/item/gathering';
 import { mapHopsBetween } from '@helpers/pathfinding/pathfinding';
 import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
@@ -55,6 +57,7 @@ import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-nod
 import { outpostDeathPenaltyMultiplier } from '@helpers/world-node/world-node-outpost';
 import type {
   CaravanId,
+  CollectibleGateId,
   CollectibleId,
   Combat,
   CurrentLocation,
@@ -111,6 +114,12 @@ function seedWorld(pathTiles: { x: number; y: number }[] = []): void {
         type: 'ExploreRandomNode',
         mapName: 'Carrina',
         x: 11,
+      },
+      {
+        name: 'Memory Gateway',
+        type: 'CollectibleGate',
+        mapName: 'Carrina',
+        x: 12,
       },
     ],
     pathTiles.map((tile) => ({ mapName: 'Carrina', ...tile })),
@@ -265,6 +274,24 @@ describe('travelStart', () => {
     const before = gamestate();
     expect(start('Spider Tower')).toBe(false);
     expect(gamestate()).toBe(before);
+  });
+
+  it('refuses a shut CollectibleGate until its collectibles are found', () => {
+    const key = 'gate-key' as CollectibleId;
+    seedContent([
+      ensureCollectibleGate({
+        id: 'gate' as CollectibleGateId,
+        name: 'Memory Gateway',
+        requiredCollectibleIds: [key],
+      }),
+    ]);
+    seedIdle();
+    const before = gamestate();
+    expect(start('Memory Gateway')).toBe(false);
+    expect(gamestate()).toBe(before);
+
+    seedIdle((state) => applyCollectibleGrant(state, key, 1));
+    expect(start('Memory Gateway')).toBe(true);
   });
 
   it('redirects mid-travel, but not to the destination already being traveled to', () => {

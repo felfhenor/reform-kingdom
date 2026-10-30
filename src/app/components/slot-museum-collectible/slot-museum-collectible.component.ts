@@ -9,6 +9,7 @@ import { DetailItemPreviewComponent } from '@components/detail-item-preview/deta
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { itemPreviewDisplay } from '@helpers/item/item-preview';
+import { museumCollectibleSourceLabel } from '@helpers/kingdom/museum.ui';
 import type { MuseumCollectibleEntry } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
@@ -32,6 +33,10 @@ export class SlotMuseumCollectibleComponent {
 
   public display = computed(() =>
     itemPreviewDisplay('collectible', this.entry().collectible),
+  );
+
+  public sourceLabel = computed(() =>
+    museumCollectibleSourceLabel(this.entry()),
   );
 
   public displayQuantity = computed(() => {

@@ -1,5 +1,4 @@
 @let e = entry();
-@let source = e.source;
 
 @if (e.discovered) {
   <div
@@ -34,16 +33,8 @@
 </ng-template>
 
 <ng-template #sourceLine>
-  @if (source?.type === 'crafting') {
-    <div class="text-xs">Source: Crafting</div>
-  } @else if (source?.type === 'trader') {
-    <div class="text-xs">From: {{ source.name }}</div>
-  } @else if (source?.type === 'node') {
-    <div class="text-xs">
-      {{ e.discovered ? 'Found in' : 'Discoverable in' }}: {{ source.name }}
-    </div>
-  } @else if (source?.type === 'raid') {
-    <div class="text-xs">From defending: {{ source.name }}</div>
+  @if (sourceLabel(); as label) {
+    <div class="text-xs">{{ label }}</div>
   } @else if (!e.discovered) {
     <div class="type-meta">Source unknown</div>
   }

@@ -31,18 +31,22 @@ export type TiledObject = {
   properties?: Array<{ name: string; type: string; value: unknown }>;
 };
 
-export type WorldNodeType =
-  | 'Kingdom'
-  | 'NonPlayerKingdom'
-  | 'CaravanNode'
-  | 'ExploreNode'
-  | 'ExploreRandomNode'
-  | 'GatherNode'
-  | 'Shrine'
-  | 'Outpost'
-  | 'Trainer'
-  | 'ExchangeNode'
-  | 'TeleportNode';
+export const WORLD_NODE_TYPES = [
+  'Kingdom',
+  'NonPlayerKingdom',
+  'CaravanNode',
+  'ExploreNode',
+  'ExploreRandomNode',
+  'GatherNode',
+  'Shrine',
+  'Outpost',
+  'Trainer',
+  'ExchangeNode',
+  'TeleportNode',
+  'CollectibleGate',
+] as const;
+
+export type WorldNodeType = (typeof WORLD_NODE_TYPES)[number];
 
 export type KingdomObject = TiledObject & { type: 'Kingdom' };
 export type NonPlayerKingdomObject = TiledObject & {
@@ -58,6 +62,7 @@ export type ShrineNodeObject = TiledObject & { type: 'Shrine' };
 export type OutpostNodeObject = TiledObject & { type: 'Outpost' };
 export type TrainerNodeObject = TiledObject & { type: 'Trainer' };
 export type ExchangeNodeObject = TiledObject & { type: 'ExchangeNode' };
+export type CollectibleGateObject = TiledObject & { type: 'CollectibleGate' };
 
 export type TeleportNodeProperty =
   | { name: 'tag'; type: 'string'; value: string }
@@ -79,7 +84,8 @@ export type WorldNodeObject =
   | OutpostNodeObject
   | TrainerNodeObject
   | ExchangeNodeObject
-  | TeleportNodeObject;
+  | TeleportNodeObject
+  | CollectibleGateObject;
 
 export type TiledObjectSpriteFrame = {
   imagePath: string;

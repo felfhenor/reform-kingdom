@@ -11,6 +11,8 @@ export * from './world-node-development.ui';
 export * from './world-node-discovery';
 export * from './world-node-encounter';
 export * from './world-node-encounter.ui';
+export * from './world-node-gate';
+export * from './world-node-gate.ui';
 export * from './world-node-gathering';
 export * from './world-node-gathering-discovery';
 export * from './world-node-gathering-discovery.ui';

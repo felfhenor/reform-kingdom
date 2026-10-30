@@ -7,6 +7,7 @@ import { isWorldNodeDiscovered } from '@helpers/world-node/world-node-discovery'
 import { isWorldMapVisited } from '@helpers/world-node/world-map-discovery';
 import type {
   CaravanContent,
+  CollectibleGateContent,
   CollectibleId,
   EncounterContent,
   EncounterRandomContent,
@@ -163,6 +164,13 @@ export function worldNodeExchange(
   return content?.__type === 'exchangenode' ? content : undefined;
 }
 
+export function worldNodeCollectibleGate(
+  entry: WorldNodeEntry,
+): CollectibleGateContent | undefined {
+  const content = getEntry<CollectibleGateContent>(entry.nodeName);
+  return content?.__type === 'collectiblegate' ? content : undefined;
+}
+
 export function worldNodeTown(entry: WorldNodeEntry): TownContent | undefined {
   const content = getEntry<TownContent>(entry.nodeName);
   return content?.__type === 'town' ? content : undefined;
@@ -188,6 +196,7 @@ export function isWorldNodeHidden(entry: WorldNodeEntry): boolean {
     worldNodeOutpost(entry)?.hidden ??
     worldNodeTrainer(entry)?.hidden ??
     worldNodeExchange(entry)?.hidden ??
+    worldNodeCollectibleGate(entry)?.hidden ??
     false
   );
 }
@@ -207,6 +216,7 @@ export function worldNodeCollectibleGateIds(
     worldNodeOutpost(entry)?.invisibleUntilCollectibleIdsFound ??
     worldNodeTrainer(entry)?.invisibleUntilCollectibleIdsFound ??
     worldNodeExchange(entry)?.invisibleUntilCollectibleIdsFound ??
+    worldNodeCollectibleGate(entry)?.invisibleUntilCollectibleIdsFound ??
     []
   );
 }

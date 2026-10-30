@@ -7,6 +7,7 @@ import {
   LEVEL_UP_NODE_FAILURE_LIMIT,
   OVERLEVEL_XP_HARD_CAP_LEVELS,
 } from '@helpers/config';
+import { ensureCollectibleGate } from '@helpers/content/ensure-collectiblegate';
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import {
   clauseTargetNode,
@@ -22,6 +23,7 @@ import {
 } from '@helpers/decree/decree-evaluation';
 import { applyCollectibleGrant } from '@helpers/item/collectibles';
 import type {
+  CollectibleGateId,
   CollectibleId,
   DecreeClauseId,
   GameState,
@@ -274,6 +276,33 @@ describe('a node walled in behind another node', () => {
     });
 
     expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
+  });
+
+  it('is skipped until a collectible gateway opens', () => {
+    const gate = ensureCollectibleGate({
+      id: 'gate' as CollectibleGateId,
+      name: 'Slimed Waystation',
+      requiredCollectibleIds: [found],
+    });
+    const seedGateWorld = (edit?: (state: GameState) => void) =>
+      seedDecreeWorld(
+        [
+          {
+            content: explore('Spider Tower', 10),
+            steps: 3,
+            via: 'Slimed Waystation',
+          },
+          { name: 'Slimed Waystation', type: 'CollectibleGate' },
+        ],
+        edit,
+        [gate],
+      );
+
+    seedGateWorld();
+    expect(nearestUnfinishedExploreNode('High')).toBeUndefined();
+
+    const nodes = seedGateWorld(looted);
+    expect(nearestUnfinishedExploreNode('High')).toEqual(nodes['Spider Tower']);
   });
 
   it('is reached past a gateway with nothing to fight at any risk tolerance', () => {
