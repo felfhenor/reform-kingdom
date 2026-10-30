@@ -40,7 +40,7 @@
   name: Fel Arrow
   description: An arrow made with fel materiel. It's versatile and usable by the average demon.
   levelRequirement: 38
-  rarity: Uncommon
+  rarity: Common
   type: Arrow
   sprite: '0210'
   slots: 1

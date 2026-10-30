@@ -2,7 +2,7 @@
   name: Larsian Helm
   description: A helm crafted from petrifiwood, it protects the wearer well.
   levelRequirement: 24
-  rarity: Uncommon
+  rarity: Common
   type: Helm
   sprite: '0125'
   slots: 1
@@ -17,7 +17,7 @@
   name: Crimson Helm
   description: A helm crafted from crimson, it massively increases the lifespan of the wearer.
   levelRequirement: 28
-  rarity: Uncommon
+  rarity: Common
   type: Helm
   sprite: '0159'
   slots: 1

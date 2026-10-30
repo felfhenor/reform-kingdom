@@ -2,7 +2,7 @@
   name: Larsian Sunhat
   description: A hat made of Larsian specialty goods. It keeps the wearers head cool at all times.
   levelRequirement: 24
-  rarity: Uncommon
+  rarity: Common
   type: Hat
   sprite: '0134'
   slots: 1

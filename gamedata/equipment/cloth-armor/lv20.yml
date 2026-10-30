@@ -2,7 +2,7 @@
   name: Larsian Cloak
   description: A cloak style popularized in Larsia. It keeps the wearer cool and allows the wearer to be very mobile.
   levelRequirement: 24
-  rarity: Uncommon
+  rarity: Common
   type: Cloth Armor
   sprite: '0133'
   slots: 1

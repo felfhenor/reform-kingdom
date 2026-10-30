@@ -2,7 +2,7 @@
   name: Larsian Arrow
   description: An arrow made from timberfuzz with a cactspine tip. These fly fast and hurt a lot.
   levelRequirement: 24
-  rarity: Uncommon
+  rarity: Common
   type: Arrow
   sprite: '0131'
   slots: 1
@@ -18,7 +18,7 @@
   name: Crimson-tipped Arrow
   description: An arrow made of the finest elven wood and tipped with crimson. The intensity and sharpness is hardly felt with how effective it is.
   levelRequirement: 28
-  rarity: Uncommon
+  rarity: Common
   type: Arrow
   sprite: '0158'
   slots: 1

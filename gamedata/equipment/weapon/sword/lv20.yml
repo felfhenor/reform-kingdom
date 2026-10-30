@@ -22,7 +22,7 @@
   name: Crimson Sword
   description: A sword crafted with petrifiwood and timberfuzz, making a sturdy weapon that's also easy to use.
   levelRequirement: 28
-  rarity: Uncommon
+  rarity: Common
   type: Sword
   sprite: '0150'
   slots: 1

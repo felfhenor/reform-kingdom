@@ -29,7 +29,7 @@
   name: Bone-Hewn Cloak
   description: A cloak made of leather and bone, rattling faintly with each step.
   levelRequirement: 4
-  rarity: Uncommon
+  rarity: Common
   type: Cloth Armor
   sprite: '0017'
   slots: 1

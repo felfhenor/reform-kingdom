@@ -12,7 +12,7 @@
 - id: 03613b82-57f3-47bb-8cbd-d855ca9fa2d3
   name: Wergenslime Bag
   description: A bag held together entirely by sticks and slime, against everyone's better judgment.
-  rarity: Common
+  rarity: Uncommon
   levelRequirement: 5
   type: Accessory
   sprite: '0037'

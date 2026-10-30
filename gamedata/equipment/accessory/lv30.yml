@@ -1,7 +1,7 @@
 - id: 3324af3c-8840-4a61-953c-f6e0a8d5d646
   name: Crimson Course
   description: A pair of earrings made of crimson that helps the wearer resist external blood flow.
-  rarity: Uncommon
+  rarity: Common
   levelRequirement: 30
   type: Accessory
   sprite: '0165'

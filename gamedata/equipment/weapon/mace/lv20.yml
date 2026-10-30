@@ -23,7 +23,7 @@
   name: Crimgold Greatmace
   description: An oversized mace made of crimson. It hurts!
   levelRequirement: 28
-  rarity: Uncommon
+  rarity: Common
   type: Mace
   sprite: '0167'
   slots: 1

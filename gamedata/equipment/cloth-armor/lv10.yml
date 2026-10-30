@@ -36,7 +36,7 @@
   name: Oozemire Tunic
   description: A tunic made of mirethread and ooze, somehow holding together.
   levelRequirement: 18
-  rarity: Common
+  rarity: Uncommon
   type: Cloth Armor
   sprite: '0104'
   slots: 1

@@ -2,7 +2,7 @@
   name: Crimsilk Cloak
   description: A fancy elven cloak spun with crimson, utilizing their signature elfsilk. It provides decent protection from both weaponry and the elements.
   levelRequirement: 30
-  rarity: Uncommon
+  rarity: Common
   type: Cloth Armor
   sprite: '0186'
   slots: 1
@@ -31,7 +31,7 @@
   name: Fel Villager Cloak
   description: A cloak typically made for demon villagers to resist the harsh Felway climate.
   levelRequirement: 38
-  rarity: Uncommon
+  rarity: Common
   type: Cloth Armor
   sprite: '0230'
   slots: 1

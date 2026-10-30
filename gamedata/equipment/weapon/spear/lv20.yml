@@ -18,7 +18,7 @@
   name: Larsian Spear
   description: A spear made of petrifiwood and timberfuzz - a sturdy combination.
   levelRequirement: 24
-  rarity: Uncommon
+  rarity: Common
   type: Spear
   sprite: '0129'
   slots: 1

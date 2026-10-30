@@ -5,7 +5,7 @@
   name: Larsian Whip
   description: A whip made of magical cactspine and strongreed. It stings on contact!
   levelRequirement: 24
-  rarity: Uncommon
+  rarity: Common
   type: Whip
   sprite: '0118'
   slots: 1
@@ -21,7 +21,7 @@
   name: Crimson Whip
   description: A whip made of spun crimson. It increases the strength of its user as well as their intelligence.
   levelRequirement: 28
-  rarity: Uncommon
+  rarity: Common
   type: Whip
   sprite: '0153'
   slots: 1

@@ -2,7 +2,7 @@
   name: Crimsilk Hat
   description: A simple but elegant hat made of crimson and elfsilk. It increases the physical prowess of the wearer.
   levelRequirement: 30
-  rarity: Uncommon
+  rarity: Common
   type: Hat
   sprite: '0188'
   slots: 1
@@ -32,7 +32,7 @@
   name: Fel Villager Hat
   description: A hat typically made for demon villagers to resist the harsh Felway climate.
   levelRequirement: 38
-  rarity: Uncommon
+  rarity: Common
   type: Hat
   sprite: '0231'
   slots: 1

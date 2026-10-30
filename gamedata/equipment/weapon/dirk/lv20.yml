@@ -17,7 +17,7 @@
   name: Larsian Dirk
   description: A dirk made in the Larsian style. It allows for excellent maneuverability in combat.
   levelRequirement: 24
-  rarity: Uncommon
+  rarity: Common
   type: Dirk
   sprite: '0124'
   slots: 1
@@ -31,7 +31,7 @@
   name: Crimson Dirk
   description: A simple dirk made of crimson.
   levelRequirement: 28
-  rarity: Uncommon
+  rarity: Common
   type: Dirk
   sprite: '0151'
   slots: 1

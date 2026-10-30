@@ -5,7 +5,7 @@
   name: Larsian Staff
   description: A staff made of magical cactspine.
   levelRequirement: 24
-  rarity: Uncommon
+  rarity: Common
   type: Staff
   sprite: '0120'
   slots: 1
@@ -20,7 +20,7 @@
   name: Crimson Staff
   description: A staff made purely of crimson.
   levelRequirement: 28
-  rarity: Uncommon
+  rarity: Common
   type: Staff
   sprite: '0152'
   slots: 1

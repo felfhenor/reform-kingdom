@@ -18,7 +18,7 @@
   name: Miremetal Dirk
   description: A dirk made of miremetal. It's excellent for blocking and parrying.
   levelRequirement: 15
-  rarity: Common
+  rarity: Uncommon
   type: Dirk
   sprite: '0093'
   slots: 1

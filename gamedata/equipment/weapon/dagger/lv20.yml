@@ -5,7 +5,7 @@
   name: Larsian Dagger
   description: A dagger made in the Larsian style. The grip feels solid and the blade feels sharp.
   levelRequirement: 24
-  rarity: Uncommon
+  rarity: Common
   type: Dagger
   sprite: '0128'
   slots: 1
@@ -20,7 +20,7 @@
   name: Crimson Dagger
   description: A simple dagger made of crimson.
   levelRequirement: 28
-  rarity: Uncommon
+  rarity: Common
   type: Dagger
   sprite: '0156'
   slots: 1

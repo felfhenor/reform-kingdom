@@ -34,7 +34,7 @@
   name: Fel Villager Armor
   description: An armor piece commonly worn by those defending demon villages.
   levelRequirement: 38
-  rarity: Uncommon
+  rarity: Common
   type: Metal Armor
   sprite: '0223'
   slots: 1

@@ -32,7 +32,7 @@
   name: Fel Infantry Sword
   description: A simple demonic sword made for simple demons to wield.
   levelRequirement: 38
-  rarity: Uncommon
+  rarity: Common
   type: Sword
   sprite: '0211'
   slots: 1

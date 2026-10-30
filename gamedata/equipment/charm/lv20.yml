@@ -20,7 +20,7 @@
   name: Desert Bangle
   description: A bangle made by the Larsians to help keep the wearer cool and resist the scorching desert heat.
   levelRequirement: 24
-  rarity: Uncommon
+  rarity: Common
   type: Charm
   sprite: '0138'
   slots: 1

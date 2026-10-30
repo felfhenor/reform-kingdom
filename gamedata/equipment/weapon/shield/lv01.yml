@@ -17,7 +17,7 @@
   name: Pan Board
   description: A repurposed shield that is used to pan copper.
   levelRequirement: 4
-  rarity: Common
+  rarity: Uncommon
   type: Shield
   sprite: '0048'
   slots: 1

@@ -39,7 +39,7 @@
   name: Elfsilk Hat
   description: An elegant hat crafted by elves and their uniquely-refined silk.
   levelRequirement: 9
-  rarity: Common
+  rarity: Uncommon
   type: Hat
   sprite: '0065'
   slots: 1

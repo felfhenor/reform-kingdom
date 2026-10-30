@@ -2,7 +2,7 @@
   name: Larsian Breastplate
   description: A breastplate made of petrifiwood. It protects the water well, and keeps them cool in the desert.
   levelRequirement: 24
-  rarity: Uncommon
+  rarity: Common
   type: Metal Armor
   sprite: '0123'
   slots: 1
@@ -20,7 +20,7 @@
   name: Crimson Breastplate
   description: A breastplate made of crimson. It does a good job of keeping the wearers blood on the inside!
   levelRequirement: 28
-  rarity: Uncommon
+  rarity: Common
   type: Metal Armor
   sprite: '0161'
   slots: 1

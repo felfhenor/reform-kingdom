@@ -34,7 +34,7 @@
   name: Fel Spear
   description: A simple spear often utilized by demon villagers to chase off or hunt local wildlife.
   levelRequirement: 38
-  rarity: Uncommon
+  rarity: Common
   type: Spear
   sprite: '0214'
   slots: 1

@@ -32,7 +32,7 @@
   name: Orcish Mace
   description: A mace with a very sharp side. The orc who made this clearly knew what they were doing.
   levelRequirement: 19
-  rarity: Uncommon
+  rarity: Rare
   type: Mace
   sprite: '0147'
   slots: 2

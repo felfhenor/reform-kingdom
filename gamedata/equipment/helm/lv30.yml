@@ -28,7 +28,7 @@
   name: Fel Villager Helm
   description: A helmet commonly used by demons whilst fighting off creatures from the fields they tend.
   levelRequirement: 38
-  rarity: Uncommon
+  rarity: Common
   type: Helm
   sprite: '0224'
   slots: 1

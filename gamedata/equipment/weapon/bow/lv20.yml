@@ -5,7 +5,7 @@
   name: Larsian Bow
   description: A bow made of strange Larsian materials. It works, but feels inefficient.
   levelRequirement: 24
-  rarity: Uncommon
+  rarity: Common
   type: Bow
   sprite: '0130'
   slots: 1

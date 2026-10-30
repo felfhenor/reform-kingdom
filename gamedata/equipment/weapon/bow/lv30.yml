@@ -2,7 +2,7 @@
   name: Crimwood Bow
   description: A bow made of both crimson and elven corewood. The construction is so solid and lightweight it's hard to remember that it's there.
   levelRequirement: 30
-  rarity: Uncommon
+  rarity: Common
   type: Bow
   sprite: '0164'
   slots: 1
@@ -35,7 +35,7 @@
   name: Ancestral Crossbow
   description: A crossbow made by the original elves, whose production method is highly classified. It sharpens the eyes of the wielder.
   levelRequirement: 37
-  rarity: Uncommon
+  rarity: Mystical
   type: Bow
   sprite: '0193'
   slots: 4

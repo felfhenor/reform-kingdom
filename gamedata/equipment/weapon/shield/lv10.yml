@@ -5,7 +5,7 @@
   name: Elven Shield Copycat
   description: A shield made of elven wood, but... not quite as well as they would do it. Its clumsy weight throws off the wielder's footing.
   levelRequirement: 11
-  rarity: Common
+  rarity: Uncommon
   type: Shield
   sprite: '0058'
   slots: 1

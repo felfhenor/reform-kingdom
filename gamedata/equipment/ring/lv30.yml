@@ -2,7 +2,7 @@
   name: Crimson Ring
   description: A simple crimson ring with broad appeal.
   levelRequirement: 32
-  rarity: Uncommon
+  rarity: Common
   type: Ring
   sprite: '0178'
   slots: 1

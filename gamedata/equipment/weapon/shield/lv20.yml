@@ -23,7 +23,7 @@
   name: Crimson Shield
   description: A simple protective shield made of crimson.
   levelRequirement: 28
-  rarity: Uncommon
+  rarity: Common
   type: Shield
   sprite: '0155'
   slots: 1

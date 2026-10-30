@@ -19,7 +19,7 @@
   name: Miremetal Dagger
   description: A dagger made of miremetal, favored by mire scouts for its silent draw.
   levelRequirement: 15
-  rarity: Uncommon
+  rarity: Common
   type: Dagger
   sprite: '0085'
   slots: 1

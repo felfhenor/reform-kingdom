@@ -2,7 +2,7 @@
   name: Miremetal Crown
   description: A crown made of miremetal and set with 3 gems, worn by mire chieftains long before the Duchy arrived.
   levelRequirement: 15
-  rarity: Common
+  rarity: Uncommon
   type: Hat
   sprite: '0097'
   slots: 2
@@ -35,7 +35,7 @@
   name: Oozemire Hat
   description: A hat made of mirethread and ooze. It feels strange and slimy.
   levelRequirement: 19
-  rarity: Common
+  rarity: Uncommon
   type: Hat
   sprite: '0105'
   slots: 1
