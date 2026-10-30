@@ -1,4 +1,5 @@
 import type { HasSprite } from '@interfaces/artable';
+import type { EquipmentContent } from '@interfaces/content-equipment';
 import type { JobContent } from '@interfaces/content-job';
 import type { EquipmentSkillContent } from '@interfaces/content-skill';
 import type { WorkerContent } from '@interfaces/content-worker';
@@ -191,6 +192,7 @@ export type SkillStatBonusContext = {
   skillsByFamily: Map<string, EquipmentSkillContent[]>;
   heroFamilies: Set<string>;
   jobs: JobContent[];
+  equipment: EquipmentContent[];
 };
 
 export type SkillSourceKind =

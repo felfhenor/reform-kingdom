@@ -90,15 +90,25 @@ function heroCastableFamilies(
   );
 }
 
+// A wearer can also get the family from other gear it equips, e.g. a whip paired with an artifact.
 function equippableFamilies(
   gear: NonNullable<SkillStatBonusSource['equipment']>,
-  jobs: JobContent[],
+  context: SkillStatBonusContext,
 ): Set<string> {
-  const learned = jobs
-    .filter((job) => job.equippableTypes.includes(gear.type))
-    .flatMap(jobFamilies);
+  const wearers = context.jobs.filter((job) =>
+    job.equippableTypes.includes(gear.type),
+  );
+  const wearerGear = context.equipment.filter((entry) =>
+    wearers.some((job) => job.equippableTypes.includes(entry.type)),
+  );
 
-  return new Set([...gear.grantedSkillIds.flatMap(familyOfSkill), ...learned]);
+  return new Set([
+    ...gear.grantedSkillIds.flatMap(familyOfSkill),
+    ...wearers.flatMap(jobFamilies),
+    ...wearerGear.flatMap((entry) =>
+      entry.grantedSkillIds.flatMap(familyOfSkill),
+    ),
+  ]);
 }
 
 function skillScalesOffStat(skill: Skill): boolean {
@@ -124,7 +134,7 @@ function unusableFamilyIssues(
 
   const { equipment } = source;
   if (!equipment) return [];
-  if (equippableFamilies(equipment, context.jobs).has(skillFamily)) return [];
+  if (equippableFamilies(equipment, context).has(skillFamily)) return [];
 
   return [
     analysisWarn(
@@ -254,6 +264,7 @@ export function runSkillBonusesAnalysis(): AnalysisRunResult {
     ),
     heroFamilies: heroCastableFamilies(jobs, equipment, affixes),
     jobs,
+    equipment,
   };
 
   const sources = skillStatBonusSources(
