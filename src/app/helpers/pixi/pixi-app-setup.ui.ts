@@ -11,7 +11,8 @@ export async function pixiAppInitialize(
   await app.init({
     width: config.width,
     height: config.height,
-    backgroundAlpha: config.backgroundAlpha ?? 0,
+    background: '#000000',
+    backgroundAlpha: config.backgroundAlpha ?? 1,
     antialias: config.antialias ?? false,
     powerPreference: 'high-performance',
     sharedTicker: true,

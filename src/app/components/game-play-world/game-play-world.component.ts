@@ -534,7 +534,6 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.app = await pixiAppInitialize(element, {
       width: element.clientWidth,
       height: element.clientHeight,
-      backgroundAlpha: 0,
       antialias: false,
     });
     // The mapZoom/FPS effects can't apply these themselves - `this.app` didn't exist when they last ran.
