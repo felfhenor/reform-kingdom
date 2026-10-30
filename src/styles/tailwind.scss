@@ -218,15 +218,15 @@ body {
   --badge-fg: #fff;
 }
 
-// Amber dot for "needs you" on rail items and tabs; the parent must be position: relative.
-@utility attention-dot {
+// Corner dot tinted by a text-* class (text-attention for "needs you"); the parent must be position: relative.
+@utility status-dot {
   position: absolute;
   top: 3px;
   right: 3px;
   width: 8px;
   height: 8px;
-  background: var(--color-attention);
-  box-shadow: 0 0 6px 1px rgb(251 191 36 / 80%);
+  background: currentColor;
+  box-shadow: 0 0 6px 1px color-mix(in oklab, currentColor 80%, transparent);
 }
 
 // Rail dividers repeat the kingdom page's section tints, brightened so a thin rule still reads.

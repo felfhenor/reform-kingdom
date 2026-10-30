@@ -7,6 +7,11 @@ export type ResourceBarColor = 'hp' | 'ep' | 'xp' | 'reputation' | 'shield';
 
 export type ProgressBarColor = DaisyColor | ResourceBarColor | 'muted';
 
+export type ArmoryFillColor = Extract<
+  ProgressBarColor,
+  'muted' | 'success' | 'warning' | 'error'
+>;
+
 export type ProgressBarSize = 'default' | 'sm' | 'md';
 
 export type BlankSlateSize = 'inline' | 'page';

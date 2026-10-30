@@ -21,6 +21,8 @@ import {
   kingdomSubviewShow,
   uiClockTick,
 } from '@helpers/engine/ui';
+import { armoryCap, armoryGet } from '@helpers/kingdom/armory';
+import { armoryStatusDotClass } from '@helpers/kingdom/armory.ui';
 import { kingdomNavSections } from '@helpers/kingdom/kingdom-nav.ui';
 import type { KingdomNavEntry, KingdomNavGroup, Tradeskill } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -71,6 +73,7 @@ export class PanelKingdomNavComponent {
       items: section.entries.map((entry) => ({
         entry,
         isIdle: this.isTradeskillIdle(entry),
+        statusDotClass: this.statusDotClass(entry),
         tooltip: this.tooltip(entry),
       })),
     }));
@@ -85,6 +88,12 @@ export class PanelKingdomNavComponent {
       entry.kind === 'tradeskill' &&
       tradeskillBuilding(entry.tradeskill).queue.length === 0
     );
+  }
+
+  private statusDotClass(entry: KingdomNavEntry): string | undefined {
+    return entry.subview === 'armory'
+      ? armoryStatusDotClass(armoryGet().length, armoryCap())
+      : undefined;
   }
 
   private tooltip(entry: KingdomNavEntry): string {

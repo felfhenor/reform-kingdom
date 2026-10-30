@@ -11,7 +11,6 @@ import { ModalLootFiltersComponent } from '@components/modal-loot-filters/modal-
 import { PagePagedGridComponent } from '@components/page-paged-grid/page-paged-grid.component';
 import { SlotArmoryItemComponent } from '@components/slot-armory-item/slot-armory-item.component';
 import { SFXDirective } from '@directives/sfx.directive';
-import { ARMORY_ENCUMBERED_THRESHOLD } from '@helpers/config';
 import { modalOpen } from '@helpers/engine/modal-stack';
 import { goldCoinId } from '@helpers/item/materials';
 import {
@@ -21,6 +20,7 @@ import {
   getArmoryEntries,
 } from '@helpers/kingdom/armory';
 import {
+  armoryBadgeClass,
   filterArmoryEntries,
   sellEquipmentItems,
 } from '@helpers/kingdom/armory.ui';
@@ -58,12 +58,9 @@ export class PlayKingdomArmoryComponent {
 
   public armorySize = computed(() => armoryGet().length);
   public armoryCapValue = computed(() => armoryCap());
-  public badgeColor = computed(() => {
-    const ratio = this.armorySize() / armoryCap();
-    if (ratio < ARMORY_ENCUMBERED_THRESHOLD) return 'badge-data';
-    if (ratio < 1) return 'badge-warning';
-    return 'badge-error';
-  });
+  public badgeColor = computed(() =>
+    armoryBadgeClass(this.armorySize(), this.armoryCapValue()),
+  );
 
   public lootFilterActive = computed(() =>
     isLootFilterActive(lootFilterSettings()),

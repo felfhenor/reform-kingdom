@@ -1,4 +1,3 @@
-import { ARMORY_ENCUMBERED_THRESHOLD } from '@helpers/config';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
 import { gainGold, goldCoinId } from '@helpers/item/materials';
@@ -8,24 +7,59 @@ import {
   tradeLog,
 } from '@helpers/item/trade';
 import { armoryEntriesFor, equipmentSellValue } from '@helpers/kingdom/armory';
-import { syncArmoryGlobalEffects } from '@helpers/kingdom/armory-global-effects';
+import {
+  armoryWarningTier,
+  syncArmoryGlobalEffects,
+} from '@helpers/kingdom/armory-global-effects';
 import { updateGamestate } from '@helpers/state-game';
 import type {
   AdventureLogRewardPart,
+  ArmoryFillColor,
+  ArmoryWarningTier,
   EquipmentArmoryEntry,
   EquipmentItemId,
-  ProgressBarColor,
 } from '@interfaces';
 import { sum } from 'es-toolkit/compat';
+
+// Matches each warning effect's icon tint.
+const ARMORY_TIER_FILL_COLOR: Record<ArmoryWarningTier, ArmoryFillColor> = {
+  Encumbered: 'success',
+  Overburdened: 'warning',
+  'Over Capacity': 'error',
+};
+
+// Literal class names so Tailwind's scanner picks them up.
+const ARMORY_BADGE_CLASS: Record<ArmoryFillColor, string> = {
+  muted: 'badge-data',
+  success: 'badge-success',
+  warning: 'badge-warning',
+  error: 'badge-error',
+};
+
+const ARMORY_STATUS_DOT_CLASS: Record<ArmoryFillColor, string | undefined> = {
+  muted: undefined,
+  success: 'text-success',
+  warning: 'text-warning',
+  error: 'text-error',
+};
 
 export function armoryFillColor(
   armorySize: number,
   cap: number,
-): ProgressBarColor {
-  const ratio = armorySize / cap;
-  if (ratio >= 1) return 'error';
-  if (ratio >= ARMORY_ENCUMBERED_THRESHOLD) return 'warning';
-  return 'muted';
+): ArmoryFillColor {
+  const tier = armoryWarningTier(armorySize, cap);
+  return tier ? ARMORY_TIER_FILL_COLOR[tier] : 'muted';
+}
+
+export function armoryBadgeClass(armorySize: number, cap: number): string {
+  return ARMORY_BADGE_CLASS[armoryFillColor(armorySize, cap)];
+}
+
+export function armoryStatusDotClass(
+  armorySize: number,
+  cap: number,
+): string | undefined {
+  return ARMORY_STATUS_DOT_CLASS[armoryFillColor(armorySize, cap)];
 }
 
 export function filterArmoryEntries(

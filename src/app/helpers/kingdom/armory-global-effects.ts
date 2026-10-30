@@ -11,16 +11,17 @@ import {
   applyGlobalEffectRemove,
 } from '@helpers/hero/global-effect-state';
 import type {
+  ArmoryWarningTier,
   GameState,
   GlobalEffectContent,
   GlobalEffectId,
 } from '@interfaces';
 
-const ARMORY_WARNING_NAMES = [
+const ARMORY_WARNING_NAMES: ArmoryWarningTier[] = [
   'Encumbered',
   'Overburdened',
   'Over Capacity',
-] as const;
+];
 
 export function armoryCapForBoost(armorySizeBoost: number): number {
   return ARMORY_CAP + armorySizeBoost;
@@ -40,9 +41,11 @@ export function armoryOverflowCapForState(state: GameState): number {
   return armoryOverflowCapForBoost(state.globalEffectSums.armorySizeBoost);
 }
 
-function currentArmoryWarningTier(
-  ratio: number,
-): (typeof ARMORY_WARNING_NAMES)[number] | undefined {
+export function armoryWarningTier(
+  armorySize: number,
+  cap: number,
+): ArmoryWarningTier | undefined {
+  const ratio = armorySize / cap;
   if (ratio >= ARMORY_OVERFLOW_MULTIPLIER) return 'Over Capacity';
   if (ratio >= 1) return 'Overburdened';
   if (ratio >= ARMORY_ENCUMBERED_THRESHOLD) return 'Encumbered';
@@ -51,8 +54,9 @@ function currentArmoryWarningTier(
 
 // Call whenever the armory changes (add or remove) - folds into the caller's own state mutation, atomic whether or not that happens inside a tick.
 export function syncArmoryGlobalEffects(state: GameState): void {
-  const activeTier = currentArmoryWarningTier(
-    state.armory.length / armoryCapForState(state),
+  const activeTier = armoryWarningTier(
+    state.armory.length,
+    armoryCapForState(state),
   );
 
   ARMORY_WARNING_NAMES.forEach((name) => {

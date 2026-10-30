@@ -46,7 +46,10 @@
           <app-icon-kingdom [name]="item.entry.icon" class="zoom-row" />
         }
         @if (item.isIdle) {
-          <i class="attention-dot"></i>
+          <i class="status-dot text-attention"></i>
+        }
+        @if (item.statusDotClass) {
+          <i class="status-dot" [class]="item.statusDotClass"></i>
         }
       </button>
     }

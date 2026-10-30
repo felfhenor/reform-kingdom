@@ -82,6 +82,8 @@ export type EquipmentSplitRepair = {
   extras: EquipmentItem[];
 };
 
+export type ArmoryWarningTier = 'Encumbered' | 'Overburdened' | 'Over Capacity';
+
 // Pairs an owned instance with its resolved content, for per-instance list
 // views (armory list, equip picker) where duplicate copies of the same
 // content id must stay visually distinct (e.g. different infusions).

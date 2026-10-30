@@ -10,6 +10,7 @@ import { defaultGameState } from '@helpers/defaults';
 import { applyGlobalEffectAdd } from '@helpers/hero/global-effect-state';
 import {
   armoryCapForBoost,
+  armoryWarningTier,
   syncArmoryGlobalEffects,
 } from '@helpers/kingdom/armory-global-effects';
 import type { EquipmentId, GameState, GlobalEffectId } from '@interfaces';
@@ -108,5 +109,14 @@ describe('syncArmoryGlobalEffects', () => {
     seedContent([encumbered, overCapacity]);
 
     expect(syncedTiers(stateWith(ARMORY_CAP))).toEqual([]);
+  });
+});
+
+describe('armoryWarningTier', () => {
+  it('picks the tier from size against the given cap', () => {
+    expect(armoryWarningTier(3, 80)).toBeUndefined();
+    expect(armoryWarningTier(60, 80)).toBe('Encumbered');
+    expect(armoryWarningTier(80, 80)).toBe('Overburdened');
+    expect(armoryWarningTier(100, 80)).toBe('Over Capacity');
   });
 });
