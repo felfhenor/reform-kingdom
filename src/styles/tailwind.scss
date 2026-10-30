@@ -212,9 +212,10 @@ body {
   --badge-fg: #fff;
 }
 
+// Darker than --color-attention so white text clears 4.5:1.
 @utility badge-attention {
-  --badge-color: var(--color-attention);
-  --badge-fg: oklch(22% 0.05 80);
+  --badge-color: oklch(55% 0.13 75);
+  --badge-fg: #fff;
 }
 
 // Amber dot for "needs you" on rail items and tabs; the parent must be position: relative.
