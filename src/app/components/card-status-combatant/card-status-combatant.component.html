@@ -119,11 +119,11 @@
           @if (skillCast) {
             <span class="skill-cast">
               <app-atlas-image
-                class="zoom-inline"
+                class="zoom-inline shrink-0"
                 spritesheet="skill"
                 [assetName]="skillCast.skillSprite"
               />
-              {{ skillCast.skillName }}
+              <span class="truncate">{{ skillCast.skillName }}</span>
             </span>
           }
         </span>
