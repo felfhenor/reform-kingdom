@@ -6,37 +6,30 @@
   emptyMessage="No equipment found."
   [reflow]="true"
 >
-  <span header>Armory</span>
+  <span header class="flex items-center gap-2">
+    Armory
+    <span class="badge badge-sm tabular-nums {{ badgeColor() }}">
+      {{ armorySize() | number }}/{{ armoryCapValue() | number }}
+    </span>
+  </span>
 
   <div toolbar-actions class="flex items-center gap-2">
-    <span class="badge tabular-nums {{ badgeColor() }}">
-      {{ armorySize() }}/{{ armoryCapValue() }}
-    </span>
-
     @if (sellMode()) {
-      <span class="badge badge-data min-w-[80px] tabular-nums">
-        {{ selectedCount() }} selected
-      </span>
-
-      <span
-        class="badge badge-data text-sm flex items-center gap-2 min-w-[120px]"
-      >
-        <app-currency-cost
-          [type]="goldCoinItemId"
-          [amount]="selectedGoldTotal()"
-        />
-      </span>
-
+      @let count = selectedCount();
       <button
         type="button"
-        class="btn btn-sm btn-primary"
-        [disabled]="selectedCount() === 0"
+        class="btn btn-sm btn-primary tabular-nums"
+        [disabled]="count === 0"
         (click)="$event.shiftKey || sellSwal.fire()"
         (click.shift)="confirmSell()"
         appSfx="ui-success"
         [sfxTrigger]="['click', 'hover']"
       >
-        Confirm Sell
+        Sell {{ count | number }} {{ count === 1 ? 'item' : 'items' }}
+        <app-currency-cost
+          [type]="goldCoinItemId"
+          [amount]="selectedGoldTotal()"
+        />
       </button>
 
       <button

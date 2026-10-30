@@ -328,10 +328,6 @@
                 Cancel
               </button>
             }
-
-            @if (atRowCap() && !isEditing()) {
-              <span class="badge badge-warning">Orders limit reached.</span>
-            }
           </div>
         </div>
       </div>
@@ -342,7 +338,12 @@
         <div class="card-body p-3 gap-2 flex-1 min-h-0 flex flex-col">
           <div class="type-section-title justify-between">
             Orders
-            <span class="badge badge-sm badge-data tabular-nums">
+
+            <span
+              class="badge badge-sm tabular-nums"
+              [class.badge-data]="!atRowCap()"
+              [class.badge-warning]="atRowCap()"
+            >
               {{ clauses().length }}/{{ rowCap }}
             </span>
           </div>
