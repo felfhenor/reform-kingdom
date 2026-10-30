@@ -13,3 +13,22 @@
 
   elementalResistances:
     Water: 10
+
+- id: b2cd276d-8751-46d0-9f97-4d1ee6d3fa88
+  name: Frostweave Cap
+  description: A steelthread cap lined with frostskin.
+  levelRequirement: 54
+  rarity: Rare
+  type: Hat
+  sprite: '0298'
+  slots: 2
+  baseStats:
+    Vitality: 31.6
+    Health: 68
+    Energy: 38
+
+  elementalResistances:
+    Water: 10
+
+  combatStats:
+    debuffIgnoreChance: 5

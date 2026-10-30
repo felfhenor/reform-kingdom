@@ -8,8 +8,28 @@
   slots: 1
   baseStats:
     Vitality: 39.6
-    Resistance: 31
+    Resistance: 31.3
 
   elementalResistances:
     Water: 15
     Fire: -10
+
+- id: b1c0e9b3-c625-4f4f-817c-286df7f1e4a9
+  name: Frostweave Coat
+  description: A heavy coat of steelthread lined with frostskin.
+  levelRequirement: 54
+  rarity: Rare
+  type: Cloth Armor
+  sprite: '0297'
+  slots: 2
+  baseStats:
+    Vitality: 44.4
+    Resistance: 34.8
+    Energy: 15
+
+  elementalResistances:
+    Water: 15
+    Fire: -5
+
+  debuffResistances:
+    Accuracy: 10

@@ -8,10 +8,28 @@
   slots: 1
   baseStats:
     Luck: 11.6
-    Agility: 4
+    Agility: 4.2
 
   elementalResistances:
     Water: 5
 
   debuffResistances:
     StatDown: 10
+
+- id: f128bfab-ad29-4791-b168-cb80cea9d990
+  name: Frostskin Legwings
+  description: Frostskin flaps that strap to the legs, granting a strange, whimsical speed.
+  levelRequirement: 54
+  rarity: Rare
+  type: Trinket
+  sprite: '0292'
+  slots: 1
+  baseStats:
+    Luck: 13.1
+    Agility: 6.6
+
+  elementalResistances:
+    Water: 5
+
+  combatStats:
+    repeatActionChance: 3

@@ -194,3 +194,114 @@
   maxTradeskillLevel: 30
   tradeskillXP: 185
   craftTime: 510
+
+- id: c8bbfbe0-449f-41a8-9c65-737c7ef81be5
+  name: 'Weapon: Froststeel Club'
+  result:
+    equipmentId: Froststeel Club
+
+  requirements:
+    - itemId: Fel Steel Ingot
+      quantity: 4
+
+    - itemId: Frostwood
+      quantity: 2
+
+    - itemId: Frostsoul
+      quantity: 2
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 28
+  maxTradeskillLevel: 31
+  tradeskillXP: 190
+  craftTime: 540
+
+- id: e55c6c53-fda4-4095-a1f8-dd9fe81565bf
+  name: 'Weapon: Frigid Energizer'
+  result:
+    equipmentId: Frigid Energizer
+
+  requirements:
+    - itemId: Frostwood
+      quantity: 6
+
+    - itemId: Spellthread
+      quantity: 1
+
+    - itemId: Felfrost
+      quantity: 1
+
+    - itemId: Frostsoul
+      quantity: 2
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 28
+  maxTradeskillLevel: 31
+  tradeskillXP: 190
+  craftTime: 540
+
+- id: 2b1fb838-69c5-4a55-9f33-a4ab6f9f8ad8
+  name: 'Artifact: Frostsoul Earrings'
+  result:
+    equipmentId: Frostsoul Earrings
+
+  requirements:
+    - itemId: Fel Steel Ingot
+      quantity: 1
+
+    - itemId: Frostsoul
+      quantity: 2
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 28
+  maxTradeskillLevel: 31
+  tradeskillXP: 190
+  craftTime: 540
+
+- id: f400d79e-622d-4e1b-918a-442ec90aab44
+  name: 'Offhand: Froststeel Dodger'
+  result:
+    equipmentId: Froststeel Dodger
+
+  requirements:
+    - itemId: Frostwood
+      quantity: 2
+
+    - itemId: Diamond
+      quantity: 3
+
+    - itemId: Fel Steel Ingot
+      quantity: 1
+
+    - itemId: Frostsoul
+      quantity: 1
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 28
+  maxTradeskillLevel: 31
+  tradeskillXP: 190
+  craftTime: 540
+
+- id: 81442277-8561-495e-ac43-7f43405ea79e
+  name: 'Weapon: Froststeel Diamondtip'
+  result:
+    equipmentId: Froststeel Diamondtip
+
+  requirements:
+    - itemId: Diamond
+      quantity: 4
+
+    - itemId: Frostwood
+      quantity: 1
+
+    - itemId: Fel Steel Ingot
+      quantity: 2
+
+    - itemId: Frostsoul
+      quantity: 2
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 28
+  maxTradeskillLevel: 31
+  tradeskillXP: 190
+  craftTime: 540

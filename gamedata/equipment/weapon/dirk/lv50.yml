@@ -7,7 +7,7 @@
   sprite: '0273'
   slots: 1
   baseStats:
-    Strength: 31
+    Strength: 31.7
     Agility: 18.4
 
   elementalResistances:
@@ -15,3 +15,21 @@
 
   debuffResistances:
     Accuracy: 10
+
+- id: 0878bb26-1acc-4438-8466-4f04163e9282
+  name: Froststeel Dodger
+  description: A diamond-studded fel steel dirk.
+  levelRequirement: 54
+  rarity: Rare
+  type: Dirk
+  sprite: '0289'
+  slots: 1
+  baseStats:
+    Strength: 34.7
+    Agility: 20.6
+
+  elementalResistances:
+    Water: 10
+
+  debuffResistances:
+    Accuracy: 15

@@ -13,3 +13,22 @@
 
   elementalBoons:
     Water: 10
+
+- id: adf6296b-777d-4abd-91ae-5011e52dd322
+  name: Frigid Whip
+  description: A steelthread whip with frostsouls woven into its lash.
+  levelRequirement: 54
+  rarity: Rare
+  type: Whip
+  sprite: '0285'
+  slots: 1
+  baseStats:
+    Intelligence: 28.4
+    Resistance: 25.8
+    Strength: 13.7
+
+  elementalBoons:
+    Water: 10
+
+  grantedSkillIds:
+    - Chilling Touch II

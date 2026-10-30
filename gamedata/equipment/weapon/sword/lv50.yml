@@ -12,3 +12,23 @@
 
   elementalResistances:
     Water: 10
+
+- id: e823f465-0e28-43cb-8849-b4faed2dc6d1
+  name: Froststeel Cutter
+  description: A broad fel steel blade, quenched with frostsouls.
+  levelRequirement: 54
+  rarity: Rare
+  type: Sword
+  sprite: '0283'
+  slots: 1
+  baseStats:
+    Strength: 31.8
+    Vitality: 31.8
+
+  elementalResistances:
+    Water: 10
+
+  skillStatBonuses:
+    - skillFamily: Sweep
+      stat: Vitality
+      value: 0.25

@@ -8,7 +8,27 @@
   slots: 1
   baseStats:
     Agility: 28.6
-    Strength: 23
+    Strength: 23.2
 
   monsterTypeDamage:
     Demon: 10
+
+- id: 8424a81e-3268-4c82-9164-ed89470059ce
+  name: Froststeel Diamondtip
+  description: A fel steel dagger with a diamond point. It's quick enough to strike twice.
+  levelRequirement: 54
+  rarity: Rare
+  type: Dagger
+  sprite: '0290'
+  slots: 1
+  baseStats:
+    Agility: 32.1
+    Strength: 25.8
+
+  monsterTypeDamage:
+    Demon: 10
+
+  skillStatBonuses:
+    - skillFamily: Double Strike
+      stat: Agility
+      value: 0.5

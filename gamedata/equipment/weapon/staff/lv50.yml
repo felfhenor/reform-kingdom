@@ -7,8 +7,29 @@
   sprite: '0272'
   slots: 1
   baseStats:
-    Intelligence: 35
+    Intelligence: 35.8
     Vitality: 26.6
 
   elementalBoons:
     Water: 15
+
+- id: 8c07b9d7-f34b-4e43-bbf2-69d964915efb
+  name: Frigid Energizer
+  description: A frostwood staff with two frostsouls caught in its head. It vibrates with antipodal power.
+  levelRequirement: 54
+  rarity: Rare
+  type: Staff
+  sprite: '0288'
+  slots: 1
+  baseStats:
+    Intelligence: 39.2
+    Vitality: 29.8
+    Energy: 30
+
+  elementalBoons:
+    Water: 15
+
+  skillStatBonuses:
+    - skillFamily: Frostfire Bolt
+      stat: Intelligence
+      value: 0.25

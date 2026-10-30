@@ -7,9 +7,28 @@
   sprite: '0265'
   slots: 1
   baseStats:
-    Vitality: 34
+    Vitality: 34.7
     Resistance: 26.4
 
   elementalResistances:
     Water: 15
     Fire: -10
+
+- id: 63db2fdd-5661-4f16-aae0-b7367d3938fe
+  name: Froststeel Plate
+  description: Fel steel plate fitted over a pair of frostcores.
+  levelRequirement: 54
+  rarity: Rare
+  type: Metal Armor
+  sprite: '0282'
+  slots: 2
+  baseStats:
+    Vitality: 38.2
+    Resistance: 29.6
+
+  elementalResistances:
+    Water: 15
+    Fire: -5
+
+  combatStats:
+    damageReflectPercent: 5

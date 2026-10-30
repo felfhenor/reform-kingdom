@@ -12,3 +12,18 @@
 
   elementalResistances:
     Water: 5
+
+- id: 1e704a13-0bf8-4193-b1a0-b618848ebf2d
+  name: Frostsoul Ring
+  description: A fel steel band set with a diamond, a frostsoul swirling inside the stone.
+  levelRequirement: 54
+  rarity: Rare
+  type: Ring
+  sprite: '0291'
+  slots: 1
+  baseStats:
+    Health: 90
+    Energy: 45
+
+  elementalResistances:
+    Water: 10

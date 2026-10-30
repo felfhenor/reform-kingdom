@@ -12,3 +12,21 @@
 
   elementalResistances:
     Water: 10
+
+- id: 73a950d9-4352-4b63-be72-ba9bf10429e9
+  name: Froststeel Helm
+  description: A fel steel helm built around the frozen core of a construct.
+  levelRequirement: 54
+  rarity: Rare
+  type: Helm
+  sprite: '0281'
+  slots: 2
+  baseStats:
+    Vitality: 40.1
+    Health: 70
+
+  elementalResistances:
+    Water: 10
+
+  debuffResistances:
+    Stun: 15

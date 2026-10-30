@@ -7,7 +7,24 @@
   sprite: '0267'
   slots: 1
   baseStats:
-    Strength: 23
+    Strength: 23.7
     Agility: 13.8
 
   elements: [Water]
+
+- id: 1cfebd7f-624f-4203-9bc4-886734878efe
+  name: Frigid Bolt
+  description: A fel steel-tipped arrow with a frostsoul bound to its shaft. In another language, it would be called a soul seeker.
+  levelRequirement: 54
+  rarity: Rare
+  type: Arrow
+  sprite: '0296'
+  slots: 1
+  baseStats:
+    Strength: 25.8
+    Agility: 15.4
+
+  skillStatBonuses:
+    - skillFamily: Snipe
+      stat: Agility
+      value: 0.5

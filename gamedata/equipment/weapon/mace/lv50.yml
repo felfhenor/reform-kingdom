@@ -15,3 +15,21 @@
 
   debuffResistances:
     Stun: 10
+
+- id: 9081c686-fe72-4351-ba66-6dd11009c582
+  name: Froststeel Club
+  description: A fel steel club studded with frozen spikes.
+  levelRequirement: 54
+  rarity: Rare
+  type: Mace
+  sprite: '0287'
+  slots: 1
+  baseStats:
+    Strength: 29.6
+    Intelligence: 25.5
+
+  elementalResistances:
+    Water: 10
+
+  grantedSkillIds:
+    - Spiked Smash II

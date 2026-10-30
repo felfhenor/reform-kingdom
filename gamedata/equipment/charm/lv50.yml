@@ -13,3 +13,19 @@
 
   debuffResistances:
     Accuracy: 10
+
+- id: 7f9e27b2-6331-4461-a09c-ab9a7e8f76d3
+  name: Frostsoul Pendant
+  description: A diamond pendant on a thread chain, cradling a frostsoul. The frostsoul will hold on for new life.
+  levelRequirement: 54
+  rarity: Rare
+  type: Charm
+  sprite: '0295'
+  slots: 1
+  baseStats:
+    Vitality: 16.4
+    Resistance: 19.4
+    Health: 40
+
+  combatStats:
+    reviveChance: 5

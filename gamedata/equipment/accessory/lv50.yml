@@ -7,10 +7,32 @@
   sprite: '0279'
   slots: 1
   baseStats:
-    Strength: 9
+    Strength: 9.3
 
   elementalResistances:
     Water: 5
 
   debuffResistances:
     Stun: 10
+
+- id: 60288d7f-7b37-4ea0-bea9-b33df4311c31
+  name: Ornate Frost Gloves
+  description: A pair of finely-stitched frostskin gloves. They keep the hands warm enough to work in the bitter cold.
+  levelRequirement: 54
+  rarity: Rare
+  type: Accessory
+  sprite: '0293'
+  slots: 1
+  baseStats:
+    Strength: 7.2
+    Agility: 7.1
+
+  elementalResistances:
+    Water: 10
+
+  gatherYieldBonuses:
+    - tradeskillId: Woodworking
+      value: 1
+
+    - tradeskillId: Blacksmithing
+      value: 1

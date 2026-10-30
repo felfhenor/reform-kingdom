@@ -7,7 +7,24 @@
   sprite: '0262'
   slots: 1
   baseStats:
-    Strength: 29
+    Strength: 29.8
     Agility: 20.2
 
   elements: [Water]
+
+- id: dab9238b-d57b-4308-bf5e-8feaf9daf0a6
+  name: Froststeel Recurve
+  description: A frostwood recurve strung with steelthread.
+  levelRequirement: 54
+  rarity: Rare
+  type: Bow
+  sprite: '0286'
+  slots: 1
+  baseStats:
+    Strength: 32.5
+    Agility: 22.6
+
+  elements: [Water]
+
+  grantedSkillIds:
+    - Snipe II

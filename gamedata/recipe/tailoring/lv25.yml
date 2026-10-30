@@ -162,3 +162,75 @@
   maxTradeskillLevel: 30
   tradeskillXP: 185
   craftTime: 510
+
+- id: 63c0e289-e6fd-4d07-a6d2-0278c5b952e9
+  name: 'Armor: Frostweave Coat'
+  result:
+    equipmentId: Frostweave Coat
+
+  requirements:
+    - itemId: Steelthread
+      quantity: 6
+
+    - itemId: Felfrost
+      quantity: 4
+
+    - itemId: Spellthread
+      quantity: 2
+
+    - itemId: Frostskin
+      quantity: 1
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 28
+  maxTradeskillLevel: 31
+  tradeskillXP: 190
+  craftTime: 540
+
+- id: 44ddd5bd-83ac-4429-9f68-cf5794808067
+  name: 'Headgear: Frostweave Cap'
+  result:
+    equipmentId: Frostweave Cap
+
+  requirements:
+    - itemId: Steelthread
+      quantity: 2
+
+    - itemId: Felfrost
+      quantity: 2
+
+    - itemId: Spellthread
+      quantity: 1
+
+    - itemId: Frostskin
+      quantity: 1
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 28
+  maxTradeskillLevel: 31
+  tradeskillXP: 190
+  craftTime: 540
+
+- id: f30150c2-a249-45f9-80ea-e71233f73e81
+  name: 'Weapon: Frigid Whip'
+  result:
+    equipmentId: Frigid Whip
+
+  requirements:
+    - itemId: Felfrost
+      quantity: 4
+
+    - itemId: Steelthread
+      quantity: 6
+
+    - itemId: Frostneedle
+      quantity: 1
+
+    - itemId: Frostsoul
+      quantity: 2
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 28
+  maxTradeskillLevel: 31
+  tradeskillXP: 190
+  craftTime: 540

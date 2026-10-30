@@ -8,7 +8,27 @@
   slots: 1
   baseStats:
     Intelligence: 20.6
-    Resistance: 9
+    Resistance: 9.2
 
   elementalBoons:
     Water: 10
+
+- id: 5dbac7d7-d8df-49d5-be29-b39560e77a63
+  name: Frostsoul Earrings
+  description: A pair of fel steel earrings, each holding a frostsoul. They whisper of the bitter cold.
+  levelRequirement: 54
+  rarity: Rare
+  type: Artifact
+  sprite: '0294'
+  slots: 1
+  baseStats:
+    Intelligence: 23.5
+    Resistance: 10.1
+
+  elementalBoons:
+    Water: 10
+
+  skillStatBonuses:
+    - skillFamily: Chilling Touch
+      stat: Intelligence
+      value: 0.25

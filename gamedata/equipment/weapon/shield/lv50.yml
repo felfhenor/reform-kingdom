@@ -13,3 +13,22 @@
   elementalResistances:
     Fire: 5
     Water: 10
+
+- id: 2b5aec8c-822c-4c8b-b8f2-10ef5f6be25f
+  name: Froststeel Tomb
+  description: A towering slab of fel steel sealed in frostskin. It helps support weakened party members.
+  levelRequirement: 54
+  rarity: Rare
+  type: Shield
+  sprite: '0280'
+  slots: 1
+  baseStats:
+    Vitality: 26.2
+    Resistance: 18.8
+
+  elementalResistances:
+    Fire: 5
+    Water: 15
+
+  combatStats:
+    coverThreshold: 20

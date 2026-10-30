@@ -10,3 +10,19 @@
     Strength: 45.8
 
   elements: [Water]
+
+- id: 0df10ec6-de2a-41ea-8c02-5b61d8bb1fe3
+  name: Froststeel Tip
+  description: A long frostwood spear with a fel steel point, packed in felfrost.
+  levelRequirement: 54
+  rarity: Rare
+  type: Spear
+  sprite: '0284'
+  slots: 1
+  baseStats:
+    Strength: 51.3
+
+  elements: [Water]
+
+  monsterTypeDamage:
+    Demon: 10

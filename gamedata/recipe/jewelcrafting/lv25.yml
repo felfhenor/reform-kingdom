@@ -124,3 +124,90 @@
   maxTradeskillLevel: 30
   tradeskillXP: 185
   craftTime: 510
+
+- id: 23546309-ac4d-4e62-b195-0810926a6602
+  name: 'Ring: Frostsoul Ring'
+  result:
+    equipmentId: Frostsoul Ring
+
+  requirements:
+    - itemId: Fel Steel Ingot
+      quantity: 1
+
+    - itemId: Diamond
+      quantity: 1
+
+    - itemId: Frostsoul
+      quantity: 1
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 28
+  maxTradeskillLevel: 31
+  tradeskillXP: 190
+  craftTime: 540
+
+- id: 756980ec-9ef0-4541-81d0-1a07d6f66c8c
+  name: 'Offhand: Frostsoul Pendant'
+  result:
+    equipmentId: Frostsoul Pendant
+
+  requirements:
+    - itemId: Spellthread
+      quantity: 3
+
+    - itemId: Steelthread
+      quantity: 1
+
+    - itemId: Frostsoul
+      quantity: 1
+
+    - itemId: Diamond
+      quantity: 1
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 28
+  maxTradeskillLevel: 31
+  tradeskillXP: 190
+  craftTime: 540
+
+- id: 972faf54-0c10-4083-90d1-d07f60efa4d5
+  name: 'Accessory: Ornate Frost Gloves'
+  result:
+    equipmentId: Ornate Frost Gloves
+
+  requirements:
+    - itemId: Spellthread
+      quantity: 1
+
+    - itemId: Steelthread
+      quantity: 2
+
+    - itemId: Frostsoul
+      quantity: 1
+
+    - itemId: Frostskin
+      quantity: 1
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 28
+  maxTradeskillLevel: 31
+  tradeskillXP: 190
+  craftTime: 540
+
+- id: 20a4c66a-ff7e-4325-9a1e-562e12c96b6e
+  name: 'Accessory: Frostskin Legwings'
+  result:
+    equipmentId: Frostskin Legwings
+
+  requirements:
+    - itemId: Frostskin
+      quantity: 2
+
+    - itemId: Steelthread
+      quantity: 2
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 28
+  maxTradeskillLevel: 31
+  tradeskillXP: 190
+  craftTime: 540

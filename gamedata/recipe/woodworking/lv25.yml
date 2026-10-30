@@ -153,3 +153,75 @@
   maxTradeskillLevel: 30
   tradeskillXP: 185
   craftTime: 510
+
+- id: 904eef8e-23cd-4a54-99e9-a326932df9e0
+  name: 'Ammo: Frigid Bolt'
+  result:
+    equipmentId: Frigid Bolt
+
+  requirements:
+    - itemId: Frostwood
+      quantity: 2
+
+    - itemId: Fel Steel Ingot
+      quantity: 1
+
+    - itemId: Frostsoul
+      quantity: 1
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 28
+  maxTradeskillLevel: 31
+  tradeskillXP: 190
+  craftTime: 540
+
+- id: ab13a8c5-f315-4a67-8a47-0891b77fbf5f
+  name: 'Weapon: Froststeel Tip'
+  result:
+    equipmentId: Froststeel Tip
+
+  requirements:
+    - itemId: Felfrost
+      quantity: 6
+
+    - itemId: Frostwood
+      quantity: 4
+
+    - itemId: Frostneedle
+      quantity: 1
+
+    - itemId: Fel Steel Ingot
+      quantity: 1
+
+    - itemId: Frostsoul
+      quantity: 2
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 28
+  maxTradeskillLevel: 31
+  tradeskillXP: 190
+  craftTime: 540
+
+- id: 29b31e4d-192d-4f13-94f6-557a585033c4
+  name: 'Weapon: Froststeel Recurve'
+  result:
+    equipmentId: Froststeel Recurve
+
+  requirements:
+    - itemId: Felfrost
+      quantity: 4
+
+    - itemId: Frostwood
+      quantity: 3
+
+    - itemId: Steelthread
+      quantity: 1
+
+    - itemId: Frostsoul
+      quantity: 2
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 28
+  maxTradeskillLevel: 31
+  tradeskillXP: 190
+  craftTime: 540

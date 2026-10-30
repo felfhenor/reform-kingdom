@@ -229,3 +229,81 @@
   maxTradeskillLevel: 30
   tradeskillXP: 185
   craftTime: 510
+
+- id: 22d8462c-c0a2-45ce-8b49-3851f44bd2fb
+  name: 'Offhand: Froststeel Tomb'
+  result:
+    equipmentId: Froststeel Tomb
+
+  requirements:
+    - itemId: Fel Steel Ingot
+      quantity: 4
+
+    - itemId: Frostwood
+      quantity: 4
+
+    - itemId: Frostskin
+      quantity: 1
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 28
+  maxTradeskillLevel: 31
+  tradeskillXP: 190
+  craftTime: 540
+
+- id: ed78d9be-bca0-4919-bf10-fec48a58cdee
+  name: 'Headgear: Froststeel Helm'
+  result:
+    equipmentId: Froststeel Helm
+
+  requirements:
+    - itemId: Fel Steel Ingot
+      quantity: 3
+
+    - itemId: Frostcore
+      quantity: 1
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 28
+  maxTradeskillLevel: 31
+  tradeskillXP: 190
+  craftTime: 540
+
+- id: 14ad956f-3360-4c70-b43a-cf6bd0467599
+  name: 'Armor: Froststeel Plate'
+  result:
+    equipmentId: Froststeel Plate
+
+  requirements:
+    - itemId: Fel Steel Ingot
+      quantity: 6
+
+    - itemId: Frostcore
+      quantity: 2
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 28
+  maxTradeskillLevel: 31
+  tradeskillXP: 190
+  craftTime: 540
+
+- id: 13ec5bb4-c829-42d7-93d7-3119c1e9a469
+  name: 'Weapon: Froststeel Cutter'
+  result:
+    equipmentId: Froststeel Cutter
+
+  requirements:
+    - itemId: Fel Steel Ingot
+      quantity: 3
+
+    - itemId: Frostwood
+      quantity: 1
+
+    - itemId: Frostsoul
+      quantity: 2
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 28
+  maxTradeskillLevel: 31
+  tradeskillXP: 190
+  craftTime: 540
