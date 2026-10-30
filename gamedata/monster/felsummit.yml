@@ -1,0 +1,186 @@
+- id: 0879ef4e-f9e6-498d-a700-e01b20ff5736
+  name: Frost Golem
+  description: A construct of ice and felrock, created by the Fel to guard the summit and gather materials.
+
+  types: [Amalgamation]
+  elementalResistances:
+    Water: 50
+    Earth: 25
+    Fire: -25
+
+  sprite: '0156'
+  frames: 4
+
+  targetting: []
+
+  rarity: Uncommon
+
+  xp:
+    min: 170
+    max: 175
+    bonusPerLevel: 5
+
+  drops:
+    - itemId: Frostcore
+      min: 1
+      max: 1
+      chance: 30
+
+    - itemId: Felfrost
+      min: 1
+      max: 3
+      chance: 50
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Earthshake III
+      weight: 3
+
+    - skillId: Chilling Touch II
+      weight: 2
+
+    - skillId: Defensive Stance II
+      weight: 1
+
+  baseStats:
+    Health: 250
+    Energy: 50
+    Luck: 5
+    Intelligence: 15
+    Strength: 35
+    Vitality: 40
+    Resistance: 30
+    Agility: 2
+
+  statsPerLevel:
+    Health: 7
+    Energy: 3
+    Luck: 0.3
+    Intelligence: 0.3
+    Strength: 0.6
+    Vitality: 0.7
+    Resistance: 0.6
+    Agility: 0.2
+
+- id: 475cde21-b3cb-4e05-907b-21026d9225d5
+  name: Vengeful Spirit
+  description: The spirit of a traveler who lost their way on the summit. It resents everyone who still walks the path it fell on.
+
+  types: [Spirit]
+  elementalResistances:
+    Water: 25
+    Fire: -25
+
+  sprite: '0160'
+  frames: 4
+
+  targetting:
+    - type: Weakest
+
+  rarity: Uncommon
+
+  xp:
+    min: 165
+    max: 170
+    bonusPerLevel: 5
+
+  drops:
+    - itemId: Frostsoul
+      min: 1
+      max: 1
+      chance: 30
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Chilling Touch II
+      weight: 3
+
+    - skillId: Piercing Scream II
+      weight: 3
+
+    - skillId: Hex I
+      weight: 1
+
+  baseStats:
+    Health: 130
+    Energy: 100
+    Luck: 5
+    Intelligence: 40
+    Strength: 10
+    Vitality: 15
+    Resistance: 35
+    Agility: 8
+
+  statsPerLevel:
+    Health: 6
+    Energy: 4
+    Luck: 0.3
+    Intelligence: 0.7
+    Strength: 0.2
+    Vitality: 0.3
+    Resistance: 0.6
+    Agility: 0.4
+
+- id: fc9788b2-a1cc-438b-9799-c4cdb36d110e
+  name: Frost Toad
+  description: A stealthy toad that buries itself in the snow, waiting to chomp anything that wanders too close.
+
+  types: [Beast]
+  elementalResistances:
+    Water: 50
+    Fire: -25
+
+  sprite: '0164'
+  frames: 4
+
+  targetting: []
+
+  rarity: Uncommon
+
+  xp:
+    min: 160
+    max: 165
+    bonusPerLevel: 4
+
+  drops:
+    - itemId: Frostskin
+      min: 1
+      max: 1
+      chance: 30
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Slime Toss
+      weight: 3
+
+    - skillId: Slow Web II
+      weight: 2
+
+    - skillId: Leech I
+      weight: 2
+
+  baseStats:
+    Health: 200
+    Energy: 60
+    Luck: 8
+    Intelligence: 15
+    Strength: 30
+    Vitality: 30
+    Resistance: 20
+    Agility: 10
+
+  statsPerLevel:
+    Health: 6
+    Energy: 3
+    Luck: 0.4
+    Intelligence: 0.3
+    Strength: 0.6
+    Vitality: 0.5
+    Resistance: 0.5
+    Agility: 0.5

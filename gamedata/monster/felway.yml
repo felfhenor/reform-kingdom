@@ -39,15 +39,35 @@
       max: 1
       chance: 10
 
+    - itemId: Fel Flux
+      min: 1
+      max: 2
+      chance: 25
+      minLevel: 50
+
   skills:
     - skillId: Attack
       weight: 1
 
     - skillId: Double Strike III
       weight: 4
+      maxLevel: 49
+
+    - skillId: Double Strike IV
+      weight: 4
+      minLevel: 50
 
     - skillId: Broil I
       weight: 2
+      maxLevel: 49
+
+    - skillId: Broil II
+      weight: 2
+      minLevel: 50
+
+    - skillId: Defensive Stance II
+      weight: 1
+      minLevel: 50
 
   baseStats:
     Health: 175
