@@ -86,8 +86,6 @@ export function ensureSkill(
     techniques: ensureArray(skill.techniques, ensureEquipmentSkillTechnique),
     usesPerCombat: skill.usesPerCombat ?? -1,
     epCost: skill.epCost ?? 0,
-    statusEffectDurationBoost: skill.statusEffectDurationBoost ?? {},
-    statusEffectChanceBoost: skill.statusEffectChanceBoost ?? {},
     requiredWeaponTypes: ensureEnumArray(
       skill.requiredWeaponTypes,
       VALID_EQUIPMENT_ITEM_TYPES,

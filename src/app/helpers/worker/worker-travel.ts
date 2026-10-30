@@ -6,6 +6,7 @@ import {
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { workerAssignmentIsValid } from '@helpers/worker/worker-assignment';
 import { workerStopCrafting } from '@helpers/worker/worker-crafting';
+import { workerGatheringStatusStart } from '@helpers/worker/worker-shared';
 import {
   workerTripBeginOutbound,
   workerTripBeginReturn,
@@ -16,7 +17,60 @@ import type {
   WorkerContent,
   WorkerGatherAssignment,
   WorkerId,
+  WorkerStatus,
+  WorkerStatusGathering,
+  WorkerStatusTravelingTo,
+  WorkerTripCargo,
 } from '@interfaces';
+
+function workerTripCargo(
+  status: WorkerStatusTravelingTo | WorkerStatusGathering,
+): WorkerTripCargo {
+  return status.kind === 'Gathering'
+    ? { itemId: status.itemId, quantity: status.itemsGathered }
+    : { quantity: 0 };
+}
+
+// Same node with nothing carried just switches item in place.
+function workerRetargetItem(workerId: WorkerId, itemId: ItemId): void {
+  updateGamestate((state) => {
+    const status = state.workers[workerId]?.status;
+    if (status?.kind === 'TravelingTo') status.itemId = itemId;
+    if (status?.kind === 'Gathering' && status.itemsGathered === 0) {
+      state.workers[workerId].status = workerGatheringStatusStart(
+        status.nodeName,
+        itemId,
+      );
+    }
+    return state;
+  });
+}
+
+// A worker out on a different job turns back with any haul and picks the new one up once home.
+function workerStartAssignment(
+  workerId: WorkerId,
+  status: WorkerStatus,
+  assignment: WorkerGatherAssignment,
+): void {
+  const host = kingdomWorkerTripHost(workerId);
+  if (status.kind === 'AtDuchy' || status.kind === 'Crafting') {
+    workerTripBeginOutbound(host, assignment);
+    return;
+  }
+
+  if (status.kind === 'TravelingBack') return;
+
+  const sameNode = status.nodeName === assignment.nodeName;
+  if (sameNode && status.itemId === assignment.itemId) return;
+
+  const hasHaul = status.kind === 'Gathering' && status.itemsGathered > 0;
+  if (sameNode && !hasHaul) {
+    workerRetargetItem(workerId, assignment.itemId);
+    return;
+  }
+
+  workerTripBeginReturn(host, workerTripCargo(status));
+}
 
 // Returns early ("not rescued") if `workers[workerId]` doesn't exist -
 // there's nothing else to gate on, since an unrescued worker has no state.
@@ -42,11 +96,7 @@ export function workerAssign(
     return state;
   });
 
-  // Only kicks off a trip immediately if the worker is at the Duchy -
-  // changing assignment mid-trip takes effect on the next loop, not this one.
-  if (worker.status.kind === 'AtDuchy' || worker.status.kind === 'Crafting') {
-    workerTripBeginOutbound(kingdomWorkerTripHost(workerId), assignment);
-  }
+  workerStartAssignment(workerId, worker.status, assignment);
 
   const workerName = getEntry<WorkerContent>(workerId)?.name;
   analyticsSendDesignEvent(
@@ -76,11 +126,10 @@ export function workerRecall(workerId: WorkerId): void {
     return;
 
   if (status.kind !== 'Crafting') {
-    const gathering = status.kind === 'Gathering';
-    workerTripBeginReturn(kingdomWorkerTripHost(workerId), {
-      itemId: gathering ? status.itemId : undefined,
-      quantity: gathering ? status.itemsGathered : 0,
-    });
+    workerTripBeginReturn(
+      kingdomWorkerTripHost(workerId),
+      workerTripCargo(status),
+    );
   }
 
   const workerName = getEntry<WorkerContent>(workerId)?.name;

@@ -165,12 +165,13 @@
             @if (canRecall()) {
               <button
                 class="btn btn-sm btn-error btn-outline w-fit"
+                [tp]="'Cancel this workers current order. If they are currently gathering, they will return to the Duchy. If they are currently crafting, they will cease immediately.'"
                 (click)="recall()"
                 appSfx="ui-error"
                 [sfxOffset]="0"
                 [sfxTrigger]="['click', 'hover']"
               >
-                Recall
+                Cancel Order
               </button>
             }
           </div>

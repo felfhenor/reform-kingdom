@@ -72,16 +72,20 @@ export class PanelKingdomWorkersAssignmentCraftComponent {
   public content = computed(() => getEntry<WorkerContent>(this.workerId()));
   public level = computed(() => this.worker()?.level ?? 1);
 
-  public draftRecipeId = linkedSignal<WorkerId, RecipeId | undefined>({
-    source: this.workerId,
-    computation: () => undefined,
-  });
-
   public assignedRecipeId = computed(() => {
     const assignment = this.worker()?.assignment;
     return assignment && 'recipeId' in assignment
       ? assignment.recipeId
       : undefined;
+  });
+
+  // Resets once a confirmed recipe lands, so the old one never flashes back in between.
+  public draftRecipeId = linkedSignal<unknown, RecipeId | undefined>({
+    source: () => ({
+      workerId: this.workerId(),
+      recipeId: this.assignedRecipeId(),
+    }),
+    computation: () => undefined,
   });
 
   public isActive = computed(() => !!this.assignedRecipeId());
@@ -141,8 +145,9 @@ export class PanelKingdomWorkersAssignmentCraftComponent {
     const recipeId = this.displayedRecipeId();
     if (!recipeId) return;
 
-    void workerAssignCraft(this.workerId(), recipeId);
-    this.draftRecipeId.set(undefined);
+    void workerAssignCraft(this.workerId(), recipeId).then((assigned) => {
+      if (!assigned) this.draftRecipeId.set(undefined);
+    });
   }
 
   private recipeOption(

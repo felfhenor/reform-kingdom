@@ -80,38 +80,44 @@ export class PanelKingdomWorkersAssignmentGatherComponent {
   public worker = computed(() => workersState()[this.workerId()]);
   public content = computed(() => getEntry<WorkerContent>(this.workerId()));
 
-  public draftNodeName = linkedSignal<WorkerId, string | undefined>({
-    source: this.workerId,
-    computation: () => undefined,
-  });
-  public draftItemId = linkedSignal<WorkerId, ItemId | undefined>({
-    source: this.workerId,
-    computation: () => undefined,
-  });
-
   public level = computed(() => this.worker()?.level ?? 1);
 
-  // Live status while traveling/gathering, else the stored gather assignment (it may already
-  // point at a different, not-yet-started job even mid-trip).
+  public gatherAssignment = computed<WorkerGatherAssignment | undefined>(
+    () => {
+      const assignment = this.worker()?.assignment;
+      return assignment && !('recipeId' in assignment) ? assignment : undefined;
+    },
+    { equal: (a, b) => a?.nodeName === b?.nodeName && a?.itemId === b?.itemId },
+  );
+
+  // Falls back to the live trip so a pending craft still shows what's being gathered.
   public currentAssignment = computed<WorkerGatherAssignment | undefined>(
     () => {
-      const worker = this.worker();
-      if (!worker) return undefined;
+      const assignment = this.gatherAssignment();
+      if (assignment) return assignment;
 
-      const status = worker.status;
-      if (status.kind === 'TravelingTo' || status.kind === 'Gathering') {
-        return { nodeName: status.nodeName, itemId: status.itemId };
-      }
-
-      const assignment = worker.assignment;
-      return assignment && !('recipeId' in assignment) ? assignment : undefined;
+      const status = this.worker()?.status;
+      return status?.kind === 'TravelingTo' || status?.kind === 'Gathering'
+        ? { nodeName: status.nodeName, itemId: status.itemId }
+        : undefined;
     },
   );
 
-  public isActive = computed(() => {
-    const assignment = this.worker()?.assignment;
-    return !!assignment && !('recipeId' in assignment);
+  // Keyed on the stored job, so drafts reset only once a confirm lands, never on trip progress.
+  private draftSource = computed(() => ({
+    workerId: this.workerId(),
+    assignment: this.gatherAssignment(),
+  }));
+  public draftNodeName = linkedSignal<unknown, string | undefined>({
+    source: this.draftSource,
+    computation: () => undefined,
   });
+  public draftItemId = linkedSignal<unknown, ItemId | undefined>({
+    source: this.draftSource,
+    computation: () => undefined,
+  });
+
+  public isActive = computed(() => !!this.gatherAssignment());
 
   // Keeps the last gather job on screen after the worker switches to crafting.
   public shownAssignment = linkedSignal<
@@ -207,7 +213,8 @@ export class PanelKingdomWorkersAssignmentGatherComponent {
     const itemId = this.displayedItemId();
     if (!nodeName || !itemId) return;
 
-    workerAssign(this.workerId(), nodeName, itemId);
+    if (workerAssign(this.workerId(), nodeName, itemId)) return;
+
     this.draftNodeName.set(undefined);
     this.draftItemId.set(undefined);
   }

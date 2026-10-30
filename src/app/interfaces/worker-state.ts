@@ -22,7 +22,7 @@ export type WorkerStatusAtDuchy = {
 };
 
 // A snapshot taken at trip-start, distinct from the live `WorkerState.assignment` -
-// this is what makes "change assignment" apply only to the next trip.
+// a worker reassigned mid-trip turns back and starts the new job once home.
 export type WorkerStatusTravelingTo = {
   kind: 'TravelingTo';
   nodeName: string;

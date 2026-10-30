@@ -208,6 +208,90 @@ describe('workerAssign', () => {
     });
   });
 
+  it('turns a worker on a different job home with its haul', () => {
+    seedWorker(staminaFor(tripCost()));
+    seedWorkerState({
+      assignment: { nodeName: woods, itemId: 'tin-ore' as ItemId },
+      status: {
+        kind: 'Gathering',
+        nodeName: woods,
+        itemId: 'tin-ore' as ItemId,
+        itemsGathered: 2,
+        ticksIntoGather: 0,
+      },
+    });
+
+    inTick(() => workerAssign(workerId, woods, copperId));
+
+    expect(workersState()[workerId]).toMatchObject({
+      assignment,
+      status: {
+        kind: 'TravelingBack',
+        carriedItemId: 'tin-ore',
+        carriedQuantity: 2,
+      },
+    });
+  });
+
+  it('switches item in place for an empty-handed worker at the same node', () => {
+    seedWorker(staminaFor(tripCost()));
+    seedWorkerState({
+      status: {
+        kind: 'Gathering',
+        nodeName: woods,
+        itemId: 'tin-ore' as ItemId,
+        itemsGathered: 0,
+        ticksIntoGather: 3,
+      },
+    });
+
+    inTick(() => workerAssign(workerId, woods, copperId));
+
+    expect(workersState()[workerId]).toMatchObject({
+      assignment,
+      status: { kind: 'Gathering', itemId: copperId, ticksIntoGather: 0 },
+    });
+  });
+
+  it('switches item without turning back for a worker heading to the same node', () => {
+    seedWorker(staminaFor(tripCost()));
+    seedWorkerState({
+      status: {
+        kind: 'TravelingTo',
+        nodeName: woods,
+        itemId: 'tin-ore' as ItemId,
+        path,
+        ticksIntoStep: 1,
+      },
+    });
+
+    inTick(() => workerAssign(workerId, woods, copperId));
+
+    expect(workersState()[workerId].status).toEqual({
+      kind: 'TravelingTo',
+      nodeName: woods,
+      itemId: copperId,
+      path,
+      ticksIntoStep: 1,
+    });
+  });
+
+  it('keeps a worker on its way when reassigned to the same job', () => {
+    seedWorker(staminaFor(tripCost()));
+    const outbound: WorkerState['status'] = {
+      kind: 'TravelingTo',
+      nodeName: woods,
+      itemId: copperId,
+      path,
+      ticksIntoStep: 1,
+    };
+    seedWorkerState({ assignment, status: outbound });
+
+    inTick(() => workerAssign(workerId, woods, copperId));
+
+    expect(workersState()[workerId].status).toEqual(outbound);
+  });
+
   it('refuses an unrescued worker or an invalid assignment', () => {
     seedWorker(staminaFor(tripCost() - 1));
     seedGamestate();

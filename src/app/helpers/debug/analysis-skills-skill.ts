@@ -1,12 +1,10 @@
 import { COMBAT_ELEMENT_CHARGES_PER_ELEMENT } from '@helpers/config';
-import { getEntry } from '@helpers/content/content';
 import { skillHasElementCosts } from '@helpers/hero/skill';
 import { analysisFail, analysisWarn } from '@helpers/debug/analysis-utils';
 import type {
   AnalysisIssue,
   EquipmentSkillContent as Skill,
   EquipmentSkillTargetType,
-  StatusEffectContent,
 } from '@interfaces';
 import { GameElementOrder } from '@interfaces';
 
@@ -137,33 +135,6 @@ function descriptionIssues(skill: Skill): AnalysisIssue[] {
   return issues;
 }
 
-function boostIssues(skill: Skill): AnalysisIssue[] {
-  const applied = new Set<string>(
-    skill.techniques.flatMap((t) =>
-      t.statusEffects.map((s) => getEntry(s.statusEffectId)?.id ?? ''),
-    ),
-  );
-  const boostKeys = [
-    ...Object.keys(skill.statusEffectDurationBoost),
-    ...Object.keys(skill.statusEffectChanceBoost),
-  ];
-
-  return boostKeys.flatMap((key) => {
-    const effect = getEntry<StatusEffectContent>(key);
-    if (effect?.__type !== 'statuseffect') {
-      return [analysisFail(`boosts unknown status effect "${key}".`)];
-    }
-    if (!applied.has(effect.id)) {
-      return [
-        analysisWarn(
-          `boosts status effect "${effect.name}", which none of its techniques apply.`,
-        ),
-      ];
-    }
-    return [];
-  });
-}
-
 export function skillIssues(skill: Skill): AnalysisIssue[] {
   return [
     ...fieldIssues(skill),
@@ -171,6 +142,5 @@ export function skillIssues(skill: Skill): AnalysisIssue[] {
     ...elementCostIssues(skill),
     ...specialIssues(skill),
     ...descriptionIssues(skill),
-    ...boostIssues(skill),
   ];
 }
