@@ -24,6 +24,42 @@ export function isLootFilterActive(filters: LootFilterSettings): boolean {
   );
 }
 
+const andList = new Intl.ListFormat('en', { type: 'conjunction' });
+const orList = new Intl.ListFormat('en', { type: 'disjunction' });
+
+function unkept(record: Record<string, boolean>): string[] {
+  return Object.keys(record).filter((key) => !record[key]);
+}
+
+function lootFilterSoldRules(filters: LootFilterSettings): string[] {
+  const types = unkept(filters.keepEquipmentTypes);
+  const rarities = unkept(filters.keepRarities);
+  const level = filters.minimumItemLevel;
+
+  return [
+    ...(types.length > 0 ? [`${andList.format(types)} items`] : []),
+    ...(level > LOOT_FILTER_DEFAULT_MIN_ITEM_LEVEL
+      ? [`anything below level ${level.toLocaleString()}`]
+      : []),
+    ...(rarities.length > 0 ? [`anything ${orList.format(rarities)}`] : []),
+  ].map((x) => x.toLowerCase());
+}
+
+export function lootFilterSummary(filters: LootFilterSettings): string {
+  if (!isLootFilterActive(filters)) {
+    return 'Nothing is automatically sold. Everything found or crafted goes into your armory.';
+  }
+
+  const rules = andList.format(lootFilterSoldRules(filters));
+  const sources = orList.format(
+    Object.entries(filters.sellFromSources)
+      .filter(([, sells]) => sells)
+      .map(([source]) => source.toLowerCase()),
+  );
+
+  return `From ${sources}, ${rules} will be automatically sold.`;
+}
+
 export function lootFilterSetSourceSells(
   source: LootSource,
   sell: boolean,

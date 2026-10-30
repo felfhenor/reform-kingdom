@@ -9,6 +9,7 @@ import {
   lootFilterSetRarityKept,
   lootFilterSetSourceSells,
   lootFilterSettings,
+  lootFilterSummary,
 } from '@helpers/kingdom/loot-filter.ui';
 import type {
   DropRarity,
@@ -39,6 +40,7 @@ export class ModalLootFiltersComponent {
   public readonly equipmentTypes = allEquipmentItemTypes();
 
   public filters = computed<LootFilterSettings>(() => lootFilterSettings());
+  public summary = computed(() => lootFilterSummary(this.filters()));
 
   public toggleSource(source: LootSource): void {
     lootFilterSetSourceSells(source, !this.filters().sellFromSources[source]);

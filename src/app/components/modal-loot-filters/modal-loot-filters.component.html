@@ -6,10 +6,7 @@
 >
   <span title>Loot Filters</span>
 
-  <p subtitle>
-    Equipment found or crafted that doesn't match these filters is automatically
-    sold. By default, everything is allowed into your armory.
-  </p>
+  <p subtitle [textContent]="summary()" class="min-h-[60px]"></p>
 
   <div body class="flex flex-col gap-4">
     <div>
@@ -60,7 +57,7 @@
     </div>
 
     <div>
-      <div class="type-label mb-2">Minimum Item Level to Sell</div>
+      <div class="type-label mb-2">Minimum Item Level to Keep</div>
       <input
         type="number"
         min="1"
