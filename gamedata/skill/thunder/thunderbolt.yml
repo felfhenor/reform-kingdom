@@ -10,8 +10,6 @@
   epCost: 10
   usesPerCombat: -1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: [Air]
@@ -37,8 +35,6 @@
   epCost: 18
   usesPerCombat: -1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: [Air]
@@ -64,8 +60,6 @@
   epCost: 27
   usesPerCombat: -1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: [Air]
@@ -91,8 +85,6 @@
   epCost: 39
   usesPerCombat: -1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: [Air]

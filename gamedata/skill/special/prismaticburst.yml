@@ -20,8 +20,6 @@
     Earth: 1
     Air: 1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: [Fire]
@@ -98,8 +96,6 @@
     Earth: 1
     Air: 1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: [Fire]
@@ -176,8 +172,6 @@
     Earth: 1
     Air: 1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: [Fire]
@@ -254,8 +248,6 @@
     Earth: 1
     Air: 1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: [Fire]
@@ -332,8 +324,6 @@
     Earth: 1
     Air: 1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: [Fire]

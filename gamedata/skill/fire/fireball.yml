@@ -10,8 +10,6 @@
   epCost: 4
   usesPerCombat: -1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: [Fire]
@@ -42,8 +40,6 @@
   epCost: 8
   usesPerCombat: -1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: [Fire]
@@ -74,8 +70,6 @@
   epCost: 12
   usesPerCombat: -1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: [Fire]
@@ -106,8 +100,6 @@
   epCost: 21
   usesPerCombat: -1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: [Fire]

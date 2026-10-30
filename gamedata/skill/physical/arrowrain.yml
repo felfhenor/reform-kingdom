@@ -11,8 +11,6 @@
 
   requiredWeaponTypes: [Bow]
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
@@ -52,8 +50,6 @@
 
   requiredWeaponTypes: [Bow]
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
@@ -105,8 +101,6 @@
 
   requiredWeaponTypes: [Bow]
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]

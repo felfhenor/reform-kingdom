@@ -10,8 +10,6 @@
   epCost: 75
   usesPerCombat: -1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - attributes: [Debuff]

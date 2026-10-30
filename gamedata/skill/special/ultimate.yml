@@ -17,8 +17,6 @@
     Fire: 2
     Water: 1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: [Fire]
@@ -55,8 +53,6 @@
     Water: 2
     Air: 1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: [Water]
@@ -97,8 +93,6 @@
     Earth: 2
     Air: 1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: [Earth]
@@ -149,8 +143,6 @@
     Water: 2
     Air: 1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: []
@@ -200,8 +192,6 @@
     Air: 2
     Earth: 1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: []
@@ -252,8 +242,6 @@
     Earth: 2
     Air: 1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: [Earth]
@@ -296,8 +284,6 @@
     Fire: 2
     Earth: 1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: []
@@ -411,8 +397,6 @@
     Air: 2
     Fire: 1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: [Air]
@@ -450,8 +434,6 @@
     Earth: 1
     Air: 1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: []
@@ -486,8 +468,6 @@
     Earth: 2
     Water: 1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: []

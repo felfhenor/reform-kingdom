@@ -13,8 +13,6 @@
   elementCosts:
     Water: 1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: []
@@ -49,8 +47,6 @@
   elementCosts:
     Air: 1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: []
@@ -80,8 +76,6 @@
   elementCosts:
     Earth: 2
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: []
@@ -112,8 +106,6 @@
   elementCosts:
     Water: 2
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: []
@@ -150,8 +142,6 @@
     Fire: 1
     Air: 1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: [Water]

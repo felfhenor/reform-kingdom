@@ -10,8 +10,6 @@
   epCost: 4
   usesPerCombat: -1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - attributes: [Debuff]
@@ -42,8 +40,6 @@
   epCost: 6
   usesPerCombat: -1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff, CanBeReflected]
@@ -77,8 +73,6 @@
   epCost: 9
   usesPerCombat: -1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff, CanBeReflected]
@@ -112,8 +106,6 @@
   epCost: 16
   usesPerCombat: -1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff, CanBeReflected]

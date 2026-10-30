@@ -51,8 +51,6 @@ export type EquipmentSkillContentModifiable = {
   techniques: EquipmentSkillContentTechnique[];
   usesPerCombat: -1 | number;
   epCost: number;
-  statusEffectDurationBoost: Record<StatusEffectId, number>;
-  statusEffectChanceBoost: Record<StatusEffectId, number>;
 };
 
 export type EquipmentSkillTargetBehaviorData = {
@@ -117,7 +115,12 @@ export type EquipmentSkillContent = IsContentItem &
   };
 
 export type EquipmentSkill = EquipmentSkillContent & {
-  mods?: Partial<EquipmentSkillContentModifiable>;
+  mods?: Partial<
+    EquipmentSkillContentModifiable & {
+      statusEffectDurationBoost: Record<StatusEffectId, number>;
+      statusEffectChanceBoost: Record<StatusEffectId, number>;
+    }
+  >;
   // The skill tree modifiers folded into this copy, for its description.
   modifiers?: HeroEffectSkillModifier[];
 };

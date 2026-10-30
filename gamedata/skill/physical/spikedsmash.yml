@@ -11,8 +11,6 @@
 
   requiredWeaponTypes: [Mace]
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff, CanBeReflected]
@@ -44,8 +42,6 @@
 
   requiredWeaponTypes: [Mace]
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff, CanBeReflected]

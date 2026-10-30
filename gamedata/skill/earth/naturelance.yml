@@ -11,8 +11,6 @@
   usesPerCombat: -1
   delay: 1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: [Earth]
@@ -50,8 +48,6 @@
   usesPerCombat: -1
   delay: 1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: [Earth]

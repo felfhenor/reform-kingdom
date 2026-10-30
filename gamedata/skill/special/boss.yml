@@ -17,8 +17,6 @@
     Water: 1
     Earth: 1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: []
@@ -57,8 +55,6 @@
   elementCosts:
     Earth: 2
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: []
@@ -90,8 +86,6 @@
   epCost: 4
   usesPerCombat: -1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: [Earth]
@@ -125,8 +119,6 @@
   elementCosts:
     Air: 2
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: [Air]
@@ -176,8 +168,6 @@
     Earth: 1
     Air: 1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: [Earth]

@@ -9,8 +9,6 @@
   epCost: 20
   usesPerCombat: -1
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - attributes: [NeverMisses]

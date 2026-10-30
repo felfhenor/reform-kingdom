@@ -10,8 +10,6 @@
   usesPerCombat: -1
   delay: 2
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
@@ -38,8 +36,6 @@
   usesPerCombat: -1
   delay: 2
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
@@ -66,8 +62,6 @@
   usesPerCombat: -1
   delay: 2
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]

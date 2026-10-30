@@ -11,8 +11,6 @@
   usesPerCombat: -1
   cooldown: 4
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - attributes: [Debuff]

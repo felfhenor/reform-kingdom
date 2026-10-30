@@ -11,8 +11,6 @@
 
   requiredWeaponTypes: [Shield]
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff, CanBeReflected]
@@ -45,8 +43,6 @@
 
   requiredWeaponTypes: [Shield]
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff, CanBeReflected]
@@ -79,8 +75,6 @@
 
   requiredWeaponTypes: [Shield]
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff, CanBeReflected]

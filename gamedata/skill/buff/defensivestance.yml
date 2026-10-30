@@ -11,8 +11,6 @@
   usesPerCombat: -1
   cooldown: 3
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: []
@@ -41,8 +39,6 @@
   usesPerCombat: -1
   cooldown: 3
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - elements: []

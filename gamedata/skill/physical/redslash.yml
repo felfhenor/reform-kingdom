@@ -9,8 +9,6 @@
   epCost: 10
   usesPerCombat: 2
 
-  statusEffectDurationBoost: {}
-  statusEffectChanceBoost: {}
 
   techniques:
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
