@@ -4,7 +4,11 @@
 
   @apply overflow-y-auto overflow-x-hidden;
 
+  // Sits under the 40px navbar; a full 100vh would let the document scroll the navbar away.
   &.playing {
+    height: calc(100vh - 40px);
+    max-height: calc(100vh - 40px);
+
     @apply overflow-hidden;
   }
 }

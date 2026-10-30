@@ -16,6 +16,8 @@ import { ListReflowDirective } from '@directives/list-reflow.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 
 const CELL_FOOTPRINT_PX = 72;
+// auto-fill columns lose the p-2 padding (16) but not the last cell's gap (-8); +1 covers clientWidth rounding up.
+const GRID_COLUMN_INSET_PX = 9;
 
 @Component({
   selector: 'app-page-paged-grid',
@@ -97,7 +99,7 @@ export class PagePagedGridComponent<T> implements OnDestroy {
     const updateItemsPerPage = () => {
       const columns = Math.max(
         1,
-        Math.floor(el.clientWidth / CELL_FOOTPRINT_PX),
+        Math.floor((el.clientWidth - GRID_COLUMN_INSET_PX) / CELL_FOOTPRINT_PX),
       );
       const rows = Math.max(1, Math.floor(el.clientHeight / CELL_FOOTPRINT_PX));
       this.itemsPerPage.set(columns * rows);

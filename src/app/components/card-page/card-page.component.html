@@ -8,20 +8,16 @@
     [class.my-4]="!isEmbeddedInModal()"
   >
     <div class="card-body h-full">
-      <h1 class="type-page-title flex justify-between relative min-h-8">
-        <div>
+      <h1 class="type-page-title grid grid-cols-[1fr_auto_1fr] gap-4 min-h-8">
+        <div class="justify-self-start">
           <ng-content select="[pageactions]"></ng-content>
         </div>
 
-        <div
-          class="absolute flex justify-center w-full text-xl pointer-events-none"
-        >
+        <div class="text-xl">
           <ng-content select="[header]"></ng-content>
         </div>
 
-        <div></div>
-
-        <div class="text-sm font-normal">
+        <div class="justify-self-end text-sm font-normal">
           <ng-content select="[pageactionssecondary]"></ng-content>
         </div>
       </h1>

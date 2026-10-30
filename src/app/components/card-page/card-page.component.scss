@@ -94,11 +94,10 @@
   }
 }
 
-@media (max-width: 1365px) {
-  .card-content {
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
+// Scrolling also drops its min-height to 0, so h-full content under the title fits the card.
+.card-content {
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 @media (max-width: 768px) {
