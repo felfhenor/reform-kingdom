@@ -10,7 +10,7 @@
   tradeskillId: Artificing
   minTradeskillLevel: 10
   maxTradeskillLevel: 13
-  tradeskillXP: 25
+  tradeskillXP: 40
   craftTime: 120
 
 - id: 1482302b-1ed5-4085-aada-6349c94b1f1f
@@ -28,7 +28,7 @@
   tradeskillId: Artificing
   minTradeskillLevel: 10
   maxTradeskillLevel: 14
-  tradeskillXP: 35
+  tradeskillXP: 40
   craftTime: 180
 
 - id: 8eb26eb6-f5a5-4bf3-a52a-6ab1e3d079ed
@@ -43,7 +43,7 @@
   tradeskillId: Artificing
   minTradeskillLevel: 10
   maxTradeskillLevel: 14
-  tradeskillXP: 50
+  tradeskillXP: 40
   craftTime: 120
 
 - id: 2adb8ece-b5e7-4385-9f4d-6ae136c9a619
@@ -58,7 +58,7 @@
   tradeskillId: Artificing
   minTradeskillLevel: 11
   maxTradeskillLevel: 15
-  tradeskillXP: 65
+  tradeskillXP: 47
   craftTime: 180
 
 - id: 6b7daa9d-1933-46f6-910e-fa808dd82909
@@ -76,7 +76,7 @@
   tradeskillId: Artificing
   minTradeskillLevel: 11
   maxTradeskillLevel: 13
-  tradeskillXP: 15
+  tradeskillXP: 9
   craftTime: 15
 
 - id: a62a5151-d96e-424c-9e9d-ec61e7871175
@@ -94,7 +94,7 @@
   tradeskillId: Artificing
   minTradeskillLevel: 12
   maxTradeskillLevel: 15
-  tradeskillXP: 65
+  tradeskillXP: 54
   craftTime: 180
 
 - id: c3f7b43d-570e-408e-8490-0eac7e176b77
@@ -112,7 +112,7 @@
   tradeskillId: Artificing
   minTradeskillLevel: 12
   maxTradeskillLevel: 15
-  tradeskillXP: 85
+  tradeskillXP: 54
   craftTime: 240
 
 - id: a6cba0cb-1b6e-46db-b55d-de585a4265d3
@@ -130,7 +130,7 @@
   tradeskillId: Artificing
   minTradeskillLevel: 13
   maxTradeskillLevel: 16
-  tradeskillXP: 75
+  tradeskillXP: 61
   craftTime: 180
 
 - id: df0d0420-ac43-4888-9193-eb02df7dedd3
@@ -154,7 +154,7 @@
   tradeskillId: Artificing
   minTradeskillLevel: 13
   maxTradeskillLevel: 16
-  tradeskillXP: 95
+  tradeskillXP: 61
   craftTime: 240
 
 - id: 13374ed9-731a-4eb7-a49a-57ac51477dad
@@ -169,7 +169,7 @@
   tradeskillId: Artificing
   minTradeskillLevel: 14
   maxTradeskillLevel: 17
-  tradeskillXP: 85
+  tradeskillXP: 69
   craftTime: 180
 
 - id: 7da4d46f-0080-4256-b0b3-e7b1fa90bfcd
@@ -187,7 +187,7 @@
   tradeskillId: Artificing
   minTradeskillLevel: 14
   maxTradeskillLevel: 17
-  tradeskillXP: 95
+  tradeskillXP: 69
   craftTime: 240
 
 - id: 318a19a9-d26e-4488-97f0-2e1d128ffd1b
@@ -226,5 +226,5 @@
   tradeskillId: Artificing
   minTradeskillLevel: 14
   maxTradeskillLevel: 17
-  tradeskillXP: 15
+  tradeskillXP: 14
   craftTime: 20

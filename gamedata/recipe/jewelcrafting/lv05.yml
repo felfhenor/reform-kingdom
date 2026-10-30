@@ -16,7 +16,7 @@
   tradeskillId: Jewelcrafting
   minTradeskillLevel: 5
   maxTradeskillLevel: 8
-  tradeskillXP: 15
+  tradeskillXP: 13
   craftTime: 60
 
 - id: 07df2dae-b5b9-4866-97e1-5e238bb29aa7
@@ -29,12 +29,12 @@
       quantity: 3
 
     - itemId: Green Slime Core
-      quantity: 5
+      quantity: 1
 
   tradeskillId: Jewelcrafting
   minTradeskillLevel: 5
   maxTradeskillLevel: 8
-  tradeskillXP: 10
+  tradeskillXP: 3
   craftTime: 10
 
 - id: 21fd4996-7fe0-44e0-bf63-5e499bb2e2d2
@@ -55,7 +55,7 @@
   tradeskillId: Jewelcrafting
   minTradeskillLevel: 6
   maxTradeskillLevel: 9
-  tradeskillXP: 15
+  tradeskillXP: 17
   craftTime: 60
 
 - id: 5081fc45-26a3-40a4-9bef-c3d226360bb4
@@ -73,7 +73,7 @@
   tradeskillId: Jewelcrafting
   minTradeskillLevel: 6
   maxTradeskillLevel: 9
-  tradeskillXP: 10
+  tradeskillXP: 3
   craftTime: 10
 
 - id: 461dfeb1-7fbf-44c5-bba4-b4703fe630e6
@@ -94,7 +94,7 @@
   tradeskillId: Jewelcrafting
   minTradeskillLevel: 7
   maxTradeskillLevel: 10
-  tradeskillXP: 15
+  tradeskillXP: 22
   craftTime: 60
 
 - id: 6f9f1649-c22c-4a75-8efe-dbc6486ce2ef
@@ -107,12 +107,12 @@
       quantity: 3
 
     - itemId: Purple Slime Core
-      quantity: 5
+      quantity: 1
 
   tradeskillId: Jewelcrafting
   minTradeskillLevel: 7
   maxTradeskillLevel: 10
-  tradeskillXP: 10
+  tradeskillXP: 4
   craftTime: 10
 
 - id: 69bdc98e-bfb4-4840-a3cb-c8e24c19c266
@@ -130,7 +130,7 @@
   tradeskillId: Jewelcrafting
   minTradeskillLevel: 8
   maxTradeskillLevel: 11
-  tradeskillXP: 30
+  tradeskillXP: 28
   craftTime: 180
 
 - id: 44aff973-9974-4823-b3ca-d6b2e2e6d12f
@@ -148,5 +148,5 @@
   tradeskillId: Jewelcrafting
   minTradeskillLevel: 9
   maxTradeskillLevel: 12
-  tradeskillXP: 35
+  tradeskillXP: 34
   craftTime: 240

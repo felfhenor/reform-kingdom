@@ -10,7 +10,7 @@
   tradeskillId: Blacksmithing
   minTradeskillLevel: 20
   maxTradeskillLevel: 23
-  tradeskillXP: 10
+  tradeskillXP: 24
   craftTime: 10
 
 - id: 55f81843-73e6-46be-b21b-98903b93391b
@@ -25,7 +25,7 @@
   tradeskillId: Blacksmithing
   minTradeskillLevel: 20
   maxTradeskillLevel: 23
-  tradeskillXP: 10
+  tradeskillXP: 24
   craftTime: 20
 
 - id: 5d712b43-080c-41ef-8520-7332f2c6a56a
@@ -43,7 +43,7 @@
   tradeskillId: Blacksmithing
   minTradeskillLevel: 20
   maxTradeskillLevel: 23
-  tradeskillXP: 150
+  tradeskillXP: 121
   craftTime: 300
 
 - id: b18f0068-1536-437a-b55d-7a104fce4492
@@ -61,7 +61,7 @@
   tradeskillId: Blacksmithing
   minTradeskillLevel: 20
   maxTradeskillLevel: 23
-  tradeskillXP: 150
+  tradeskillXP: 121
   craftTime: 300
 
 - id: e7ba5181-b2c4-4f3a-9d7b-6a20df12ee6d
@@ -76,7 +76,7 @@
   tradeskillId: Blacksmithing
   minTradeskillLevel: 20
   maxTradeskillLevel: 23
-  tradeskillXP: 150
+  tradeskillXP: 121
   craftTime: 300
 
 - id: e996ccb3-a9b6-4655-a0d4-054846455f5e
@@ -94,7 +94,7 @@
   tradeskillId: Blacksmithing
   minTradeskillLevel: 21
   maxTradeskillLevel: 24
-  tradeskillXP: 155
+  tradeskillXP: 131
   craftTime: 330
 
 - id: 00462590-afad-448f-96c0-a05580ae3c08
@@ -109,7 +109,7 @@
   tradeskillId: Blacksmithing
   minTradeskillLevel: 21
   maxTradeskillLevel: 24
-  tradeskillXP: 155
+  tradeskillXP: 131
   craftTime: 330
 
 - id: ad89aecb-d289-4b2e-8617-c038f5509c99
@@ -124,7 +124,7 @@
   tradeskillId: Blacksmithing
   minTradeskillLevel: 21
   maxTradeskillLevel: 24
-  tradeskillXP: 155
+  tradeskillXP: 131
   craftTime: 330
 
 - id: 26f90c7b-5441-41b2-9317-4d4541203e16
@@ -142,7 +142,7 @@
   tradeskillId: Blacksmithing
   minTradeskillLevel: 22
   maxTradeskillLevel: 25
-  tradeskillXP: 160
+  tradeskillXP: 141
   craftTime: 360
 
 - id: b2403e70-dc15-473f-9baa-2c360b7f61c8
@@ -160,7 +160,7 @@
   tradeskillId: Blacksmithing
   minTradeskillLevel: 22
   maxTradeskillLevel: 25
-  tradeskillXP: 160
+  tradeskillXP: 141
   craftTime: 360
 
 - id: d95b3d0c-5961-4a38-8f20-3ee9bb75f52b
@@ -181,7 +181,7 @@
   tradeskillId: Blacksmithing
   minTradeskillLevel: 23
   maxTradeskillLevel: 26
-  tradeskillXP: 165
+  tradeskillXP: 151
   craftTime: 330
 
 - id: 05c12be4-0d8e-4724-876c-e41bd4d1c3c1
@@ -202,7 +202,7 @@
   tradeskillId: Blacksmithing
   minTradeskillLevel: 23
   maxTradeskillLevel: 26
-  tradeskillXP: 165
+  tradeskillXP: 151
   craftTime: 330
 
 - id: 24bbff4b-7e8f-4272-9c32-ddb3405c1086
@@ -218,7 +218,7 @@
   tradeskillId: Blacksmithing
   minTradeskillLevel: 24
   maxTradeskillLevel: 25
-  tradeskillXP: 20
+  tradeskillXP: 32
   craftTime: 5
 
 - id: ca4f1531-028c-4509-bd8c-29cb6264af3b
@@ -236,7 +236,7 @@
   tradeskillId: Blacksmithing
   minTradeskillLevel: 24
   maxTradeskillLevel: 25
-  tradeskillXP: 20
+  tradeskillXP: 32
   craftTime: 20
 
 - id: 95291a28-a554-44d8-ac90-fa3a8ad9247a
@@ -254,7 +254,7 @@
   tradeskillId: Blacksmithing
   minTradeskillLevel: 24
   maxTradeskillLevel: 27
-  tradeskillXP: 170
+  tradeskillXP: 161
   craftTime: 420
 
 - id: f6f7dec6-5eba-4f2f-9f59-2fcac28a386f
@@ -272,5 +272,5 @@
   tradeskillId: Blacksmithing
   minTradeskillLevel: 24
   maxTradeskillLevel: 27
-  tradeskillXP: 170
+  tradeskillXP: 161
   craftTime: 420

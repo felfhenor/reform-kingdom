@@ -16,7 +16,7 @@
   tradeskillId: Tailoring
   minTradeskillLevel: 25
   maxTradeskillLevel: 28
-  tradeskillXP: 175
+  tradeskillXP: 172
   craftTime: 450
 
 - id: 3449d8e2-f79f-4201-b1dd-1926648a3acf
@@ -40,7 +40,7 @@
   tradeskillId: Tailoring
   minTradeskillLevel: 25
   maxTradeskillLevel: 28
-  tradeskillXP: 175
+  tradeskillXP: 172
   craftTime: 450
 
 - id: 08a43472-4dde-4868-9acd-2c7f9f1d7698
@@ -64,7 +64,7 @@
   tradeskillId: Tailoring
   minTradeskillLevel: 25
   maxTradeskillLevel: 28
-  tradeskillXP: 175
+  tradeskillXP: 172
   craftTime: 450
 
 - id: d2e74247-0482-43fc-a060-df7e1ef55673
@@ -82,7 +82,7 @@
   tradeskillId: Tailoring
   minTradeskillLevel: 26
   maxTradeskillLevel: 27
-  tradeskillXP: 20
+  tradeskillXP: 37
   craftTime: 20
 
 - id: 985e2314-cec8-429e-958e-4fca82fc926f
@@ -100,7 +100,7 @@
   tradeskillId: Tailoring
   minTradeskillLevel: 27
   maxTradeskillLevel: 28
-  tradeskillXP: 20
+  tradeskillXP: 39
   craftTime: 20
 
 - id: c6427d57-e228-4a5a-b01c-d7bd6f60a4c5
@@ -118,7 +118,7 @@
   tradeskillId: Tailoring
   minTradeskillLevel: 27
   maxTradeskillLevel: 30
-  tradeskillXP: 185
+  tradeskillXP: 194
   craftTime: 510
 
 - id: 918c5eb7-83fc-4a1e-8782-9b064f1a636b
@@ -136,7 +136,7 @@
   tradeskillId: Tailoring
   minTradeskillLevel: 27
   maxTradeskillLevel: 30
-  tradeskillXP: 185
+  tradeskillXP: 194
   craftTime: 510
 
 - id: 908ad859-8691-46e8-b82d-5bcfb8a441de
@@ -160,7 +160,7 @@
   tradeskillId: Tailoring
   minTradeskillLevel: 27
   maxTradeskillLevel: 30
-  tradeskillXP: 185
+  tradeskillXP: 194
   craftTime: 510
 
 - id: 63c0e289-e6fd-4d07-a6d2-0278c5b952e9
@@ -184,7 +184,7 @@
   tradeskillId: Tailoring
   minTradeskillLevel: 28
   maxTradeskillLevel: 31
-  tradeskillXP: 190
+  tradeskillXP: 205
   craftTime: 540
 
 - id: 44ddd5bd-83ac-4429-9f68-cf5794808067
@@ -208,7 +208,7 @@
   tradeskillId: Tailoring
   minTradeskillLevel: 28
   maxTradeskillLevel: 31
-  tradeskillXP: 190
+  tradeskillXP: 205
   craftTime: 540
 
 - id: f30150c2-a249-45f9-80ea-e71233f73e81
@@ -232,5 +232,5 @@
   tradeskillId: Tailoring
   minTradeskillLevel: 28
   maxTradeskillLevel: 31
-  tradeskillXP: 190
+  tradeskillXP: 205
   craftTime: 540

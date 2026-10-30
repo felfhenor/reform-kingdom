@@ -13,7 +13,7 @@
   tradeskillId: Woodworking
   minTradeskillLevel: 20
   maxTradeskillLevel: 23
-  tradeskillXP: 10
+  tradeskillXP: 24
   craftTime: 10
 
 - id: db39ce09-e8fe-4198-90fd-5088648d5bc9
@@ -34,7 +34,7 @@
   tradeskillId: Woodworking
   minTradeskillLevel: 20
   maxTradeskillLevel: 23
-  tradeskillXP: 150
+  tradeskillXP: 121
   craftTime: 300
 
 - id: fde2f773-b5b5-40db-bf6a-33d73841dde7
@@ -52,7 +52,7 @@
   tradeskillId: Woodworking
   minTradeskillLevel: 20
   maxTradeskillLevel: 23
-  tradeskillXP: 150
+  tradeskillXP: 121
   craftTime: 300
 
 - id: b17bbf7b-07b4-4cdf-a361-399d5956bfb6
@@ -73,7 +73,7 @@
   tradeskillId: Woodworking
   minTradeskillLevel: 21
   maxTradeskillLevel: 24
-  tradeskillXP: 155
+  tradeskillXP: 131
   craftTime: 330
 
 - id: 433efa70-1948-4bab-9e78-d2603db3334d
@@ -94,7 +94,7 @@
   tradeskillId: Woodworking
   minTradeskillLevel: 21
   maxTradeskillLevel: 24
-  tradeskillXP: 155
+  tradeskillXP: 131
   craftTime: 30
 
 - id: 612b9981-d2e4-4cd2-9dec-c6adcda65fe7
@@ -115,7 +115,7 @@
   tradeskillId: Woodworking
   minTradeskillLevel: 22
   maxTradeskillLevel: 25
-  tradeskillXP: 160
+  tradeskillXP: 141
   craftTime: 360
 
 - id: 652e958a-cd54-449e-98f4-8448ccf72315
@@ -133,7 +133,7 @@
   tradeskillId: Woodworking
   minTradeskillLevel: 22
   maxTradeskillLevel: 25
-  tradeskillXP: 160
+  tradeskillXP: 141
   craftTime: 360
 
 - id: 58aad5d7-fe3d-49d3-99c6-7f159e189228
@@ -163,7 +163,7 @@
   tradeskillId: Woodworking
   minTradeskillLevel: 22
   maxTradeskillLevel: 25
-  tradeskillXP: 320
+  tradeskillXP: 141
   craftTime: 720
 
 - id: 2d18747c-e066-4871-b2fa-656777c2504b
@@ -181,7 +181,7 @@
   tradeskillId: Woodworking
   minTradeskillLevel: 23
   maxTradeskillLevel: 26
-  tradeskillXP: 165
+  tradeskillXP: 151
   craftTime: 390
 
 - id: 439284dc-e7be-4d11-911c-50ecdbe47c5e
@@ -199,7 +199,7 @@
   tradeskillId: Woodworking
   minTradeskillLevel: 24
   maxTradeskillLevel: 25
-  tradeskillXP: 20
+  tradeskillXP: 32
   craftTime: 20
 
 - id: 7f8113c0-ad55-4375-ad39-74f78387e333
@@ -217,7 +217,7 @@
   tradeskillId: Woodworking
   minTradeskillLevel: 24
   maxTradeskillLevel: 27
-  tradeskillXP: 170
+  tradeskillXP: 161
   craftTime: 420
 
 - id: 929cb505-4cf6-4b11-b678-a94f907469fa
@@ -235,5 +235,5 @@
   tradeskillId: Woodworking
   minTradeskillLevel: 24
   maxTradeskillLevel: 27
-  tradeskillXP: 170
+  tradeskillXP: 161
   craftTime: 420

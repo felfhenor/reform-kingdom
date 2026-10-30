@@ -34,7 +34,7 @@
   tradeskillId: Jewelcrafting
   minTradeskillLevel: 15
   maxTradeskillLevel: 19
-  tradeskillXP: 95
+  tradeskillXP: 77
   craftTime: 180
 
 - id: 68dc3706-c1cf-45b7-ad64-918bfd35f75b
@@ -55,7 +55,7 @@
   tradeskillId: Jewelcrafting
   minTradeskillLevel: 15
   maxTradeskillLevel: 18
-  tradeskillXP: 150
+  tradeskillXP: 77
   craftTime: 300
 
 - id: e2fb007c-ddfa-4538-a5a0-61d67899979b
@@ -89,7 +89,7 @@
   tradeskillId: Jewelcrafting
   minTradeskillLevel: 16
   maxTradeskillLevel: 19
-  tradeskillXP: 115
+  tradeskillXP: 86
   craftTime: 240
 
 - id: 8bab043b-e17b-47e7-8d52-2a368ecdac28
@@ -110,7 +110,7 @@
   tradeskillId: Jewelcrafting
   minTradeskillLevel: 17
   maxTradeskillLevel: 20
-  tradeskillXP: 120
+  tradeskillXP: 94
   craftTime: 240
 
 - id: df3d5009-a248-45f3-b5e4-3285c42d22db
@@ -131,7 +131,7 @@
   tradeskillId: Jewelcrafting
   minTradeskillLevel: 18
   maxTradeskillLevel: 21
-  tradeskillXP: 125
+  tradeskillXP: 103
   craftTime: 240
 
 - id: 1a3a9e24-ab7c-437d-a597-2741151a565d
@@ -152,7 +152,7 @@
   tradeskillId: Jewelcrafting
   minTradeskillLevel: 19
   maxTradeskillLevel: 22
-  tradeskillXP: 130
+  tradeskillXP: 112
   craftTime: 240
 
 - id: d9dff21e-eb8b-4aaf-a006-deb35b4feb5d
@@ -170,5 +170,5 @@
   tradeskillId: Jewelcrafting
   minTradeskillLevel: 19
   maxTradeskillLevel: 22
-  tradeskillXP: 450
+  tradeskillXP: 22
   craftTime: 900

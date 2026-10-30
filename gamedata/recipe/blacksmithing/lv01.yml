@@ -59,7 +59,7 @@
   tradeskillId: Blacksmithing
   minTradeskillLevel: 4
   maxTradeskillLevel: 7
-  tradeskillXP: 12
+  tradeskillXP: 9
   craftTime: 60
 
 - id: ef512ec9-393d-4944-940a-2b5dffd7ce3a
@@ -76,7 +76,7 @@
   tradeskillId: Blacksmithing
   minTradeskillLevel: 4
   maxTradeskillLevel: 6
-  tradeskillXP: 8
+  tradeskillXP: 9
   craftTime: 20
 
 - id: 62f920bf-4086-44d0-8c86-359de5d90481
@@ -94,7 +94,7 @@
   tradeskillId: Blacksmithing
   minTradeskillLevel: 3
   maxTradeskillLevel: 6
-  tradeskillXP: 8
+  tradeskillXP: 5
   craftTime: 20
 
 - id: 4e099da6-9f4b-4cab-b678-6bb1b2844638
@@ -112,7 +112,7 @@
   tradeskillId: Blacksmithing
   minTradeskillLevel: 5
   maxTradeskillLevel: 7
-  tradeskillXP: 10
+  tradeskillXP: 13
   craftTime: 30
 
 - id: f42a7755-461f-47ec-870c-af4d766e272c

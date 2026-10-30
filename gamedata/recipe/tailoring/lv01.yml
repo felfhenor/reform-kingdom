@@ -65,7 +65,7 @@
   tradeskillId: Tailoring
   minTradeskillLevel: 4
   maxTradeskillLevel: 7
-  tradeskillXP: 10
+  tradeskillXP: 9
   craftTime: 60
 
 - id: bb1911ff-2619-4ec1-8380-16aa51323023
@@ -86,7 +86,7 @@
   tradeskillId: Tailoring
   minTradeskillLevel: 4
   maxTradeskillLevel: 7
-  tradeskillXP: 10
+  tradeskillXP: 9
   craftTime: 60
 
 - id: 0318d0cc-f5b3-448c-af06-3991c72ffefc
