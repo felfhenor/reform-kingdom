@@ -104,7 +104,7 @@
       quantity: 1
 
   tradeskillId: Woodworking
-  minTradeskillLevel: 27
+  minTradeskillLevel: 26
   maxTradeskillLevel: 30
   tradeskillXP: 194
   craftTime: 510
@@ -128,7 +128,7 @@
       quantity: 1
 
   tradeskillId: Woodworking
-  minTradeskillLevel: 27
+  minTradeskillLevel: 26
   maxTradeskillLevel: 30
   tradeskillXP: 194
   craftTime: 510

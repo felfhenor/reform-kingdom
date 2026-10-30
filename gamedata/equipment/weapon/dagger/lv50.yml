@@ -9,6 +9,7 @@
   baseStats:
     Agility: 28.6
     Strength: 23.2
+    Intelligence: 12.1
 
   monsterTypeDamage:
     Demon: 10
@@ -24,6 +25,7 @@
   baseStats:
     Agility: 32.1
     Strength: 25.8
+    Intelligence: 15.1
 
   monsterTypeDamage:
     Demon: 10

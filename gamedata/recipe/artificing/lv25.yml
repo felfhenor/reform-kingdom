@@ -124,7 +124,7 @@
       quantity: 1
 
   tradeskillId: Artificing
-  minTradeskillLevel: 27
+  minTradeskillLevel: 26
   maxTradeskillLevel: 30
   tradeskillXP: 194
   craftTime: 510
@@ -168,8 +168,11 @@
     - itemId: Fel Iron Ingot
       quantity: 1
 
+    - itemId: Spellthread
+      quantity: 1
+
   tradeskillId: Artificing
-  minTradeskillLevel: 27
+  minTradeskillLevel: 26
   maxTradeskillLevel: 30
   tradeskillXP: 194
   craftTime: 510
@@ -188,6 +191,9 @@
 
     - itemId: Fel Iron Ingot
       quantity: 2
+
+    - itemId: Spellthread
+      quantity: 1
 
   tradeskillId: Artificing
   minTradeskillLevel: 27

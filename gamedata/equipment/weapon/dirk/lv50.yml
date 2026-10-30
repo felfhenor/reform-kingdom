@@ -9,6 +9,7 @@
   baseStats:
     Strength: 31.7
     Agility: 18.4
+    Intelligence: 10.2
 
   elementalResistances:
     Water: 5
@@ -27,6 +28,7 @@
   baseStats:
     Strength: 34.7
     Agility: 20.6
+    Intelligence: 12.8
 
   elementalResistances:
     Water: 10

@@ -177,7 +177,7 @@
       quantity: 2
 
   tradeskillId: Blacksmithing
-  minTradeskillLevel: 27
+  minTradeskillLevel: 26
   maxTradeskillLevel: 30
   tradeskillXP: 194
   craftTime: 510
@@ -192,7 +192,7 @@
       quantity: 3
 
   tradeskillId: Blacksmithing
-  minTradeskillLevel: 27
+  minTradeskillLevel: 26
   maxTradeskillLevel: 30
   tradeskillXP: 194
   craftTime: 510
