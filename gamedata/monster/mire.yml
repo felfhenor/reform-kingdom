@@ -36,24 +36,24 @@
       weight: 3
 
   baseStats:
-    Health: 75
-    Energy: 35
+    Health: 86
+    Energy: 40
     Luck: 1
-    Intelligence: 13
-    Strength: 10
-    Vitality: 4
-    Resistance: 10
-    Agility: 5
+    Intelligence: 15
+    Strength: 12
+    Vitality: 5
+    Resistance: 12
+    Agility: 6
 
   statsPerLevel:
-    Health: 7
-    Energy: 4
-    Luck: 1
-    Intelligence: 0.5
-    Strength: 0.4
+    Health: 8.1
+    Energy: 4.6
+    Luck: 1.2
+    Intelligence: 0.6
+    Strength: 0.5
     Vitality: 0.2
-    Resistance: 0.75
-    Agility: 0.5
+    Resistance: 0.9
+    Agility: 0.6
 
 - id: 0148e305-80ae-4da7-9409-7a15fbb132b7
   name: Banshee
@@ -94,24 +94,24 @@
       weight: 3
 
   baseStats:
-    Health: 150
-    Energy: 65
+    Health: 173
+    Energy: 75
     Luck: 1
-    Intelligence: 19
-    Strength: 13
-    Vitality: 13
-    Resistance: 18
-    Agility: 5
+    Intelligence: 22
+    Strength: 15
+    Vitality: 15
+    Resistance: 21
+    Agility: 6
 
   statsPerLevel:
-    Health: 7
-    Energy: 4
-    Luck: 1
-    Intelligence: 0.65
-    Strength: 0.4
-    Vitality: 0.35
-    Resistance: 0.95
-    Agility: 0.9
+    Health: 8.1
+    Energy: 4.6
+    Luck: 1.2
+    Intelligence: 0.7
+    Strength: 0.5
+    Vitality: 0.4
+    Resistance: 1.1
+    Agility: 1
 
 - id: d430f23e-4731-45bc-87e4-5404a09a89eb
   name: Poison Dartfrog
@@ -152,24 +152,24 @@
       weight: 3
 
   baseStats:
-    Health: 50
-    Energy: 25
+    Health: 57
+    Energy: 29
     Luck: 1
-    Intelligence: 10
-    Strength: 8
-    Vitality: 4
-    Resistance: 13
-    Agility: 9
+    Intelligence: 12
+    Strength: 9
+    Vitality: 5
+    Resistance: 15
+    Agility: 10
 
   statsPerLevel:
-    Health: 5
-    Energy: 4
-    Luck: 1
-    Intelligence: 0.6
-    Strength: 0.6
-    Vitality: 0.4
-    Resistance: 0.5
-    Agility: 0.75
+    Health: 5.8
+    Energy: 4.6
+    Luck: 1.2
+    Intelligence: 0.7
+    Strength: 0.7
+    Vitality: 0.5
+    Resistance: 0.6
+    Agility: 0.9
 
 - id: b1067f91-f48a-4548-a91b-25a5df8fd533
   name: Toxic Toad
@@ -210,21 +210,21 @@
       weight: 3
 
   baseStats:
-    Health: 65
-    Energy: 35
+    Health: 75
+    Energy: 40
     Luck: 1
-    Intelligence: 10
-    Strength: 8
-    Vitality: 4
-    Resistance: 13
-    Agility: 9
+    Intelligence: 12
+    Strength: 9
+    Vitality: 5
+    Resistance: 15
+    Agility: 10
 
   statsPerLevel:
-    Health: 8
-    Energy: 4
-    Luck: 1
-    Intelligence: 0.6
-    Strength: 0.6
-    Vitality: 0.4
-    Resistance: 0.5
-    Agility: 0.75
+    Health: 9.2
+    Energy: 4.6
+    Luck: 1.2
+    Intelligence: 0.7
+    Strength: 0.7
+    Vitality: 0.5
+    Resistance: 0.6
+    Agility: 0.9

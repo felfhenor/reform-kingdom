@@ -50,21 +50,21 @@
       weight: 1
 
   baseStats:
-    Health: 125
-    Energy: 35
+    Health: 144
+    Energy: 40
     Luck: 1
-    Intelligence: 13
-    Strength: 6
-    Vitality: 6
-    Resistance: 15
-    Agility: 5
+    Intelligence: 15
+    Strength: 7
+    Vitality: 7
+    Resistance: 17
+    Agility: 6
 
   statsPerLevel:
-    Health: 10
-    Energy: 3
-    Luck: 1
-    Intelligence: 0.6
+    Health: 11.5
+    Energy: 3.5
+    Luck: 1.2
+    Intelligence: 0.7
     Strength: 0.3
     Vitality: 0.1
-    Resistance: 1
+    Resistance: 1.2
     Agility: 0.3

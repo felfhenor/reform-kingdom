@@ -45,23 +45,23 @@
       weight: 1
 
   baseStats:
-    Health: 250
-    Energy: 50
-    Luck: 5
-    Intelligence: 15
-    Strength: 35
-    Vitality: 40
-    Resistance: 30
+    Health: 288
+    Energy: 57
+    Luck: 6
+    Intelligence: 17
+    Strength: 40
+    Vitality: 46
+    Resistance: 35
     Agility: 2
 
   statsPerLevel:
-    Health: 7
-    Energy: 3
+    Health: 8.1
+    Energy: 3.5
     Luck: 0.3
     Intelligence: 0.3
-    Strength: 0.6
-    Vitality: 0.7
-    Resistance: 0.6
+    Strength: 0.7
+    Vitality: 0.8
+    Resistance: 0.7
     Agility: 0.2
 
 - id: 475cde21-b3cb-4e05-907b-21026d9225d5
@@ -106,24 +106,24 @@
       weight: 1
 
   baseStats:
-    Health: 130
-    Energy: 100
-    Luck: 5
-    Intelligence: 40
-    Strength: 10
-    Vitality: 15
-    Resistance: 35
-    Agility: 8
+    Health: 150
+    Energy: 115
+    Luck: 6
+    Intelligence: 46
+    Strength: 12
+    Vitality: 17
+    Resistance: 40
+    Agility: 9
 
   statsPerLevel:
-    Health: 6
-    Energy: 4
+    Health: 6.9
+    Energy: 4.6
     Luck: 0.3
-    Intelligence: 0.7
+    Intelligence: 0.8
     Strength: 0.2
     Vitality: 0.3
-    Resistance: 0.6
-    Agility: 0.4
+    Resistance: 0.7
+    Agility: 0.5
 
 - id: fc9788b2-a1cc-438b-9799-c4cdb36d110e
   name: Frost Toad
@@ -166,21 +166,21 @@
       weight: 2
 
   baseStats:
-    Health: 200
-    Energy: 60
-    Luck: 8
-    Intelligence: 15
-    Strength: 30
-    Vitality: 30
-    Resistance: 20
-    Agility: 10
+    Health: 230
+    Energy: 69
+    Luck: 9
+    Intelligence: 17
+    Strength: 35
+    Vitality: 35
+    Resistance: 23
+    Agility: 12
 
   statsPerLevel:
-    Health: 6
-    Energy: 3
-    Luck: 0.4
+    Health: 6.9
+    Energy: 3.5
+    Luck: 0.5
     Intelligence: 0.3
-    Strength: 0.6
-    Vitality: 0.5
-    Resistance: 0.5
-    Agility: 0.5
+    Strength: 0.7
+    Vitality: 0.6
+    Resistance: 0.6
+    Agility: 0.6

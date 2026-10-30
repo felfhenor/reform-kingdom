@@ -29,23 +29,23 @@
       weight: 2
 
   baseStats:
-    Health: 100
-    Energy: 55
+    Health: 115
+    Energy: 63
     Luck: 1
-    Intelligence: 15
-    Strength: 15
-    Vitality: 10
-    Resistance: 10
-    Agility: 5
+    Intelligence: 17
+    Strength: 17
+    Vitality: 12
+    Resistance: 12
+    Agility: 6
 
   statsPerLevel:
-    Health: 5
-    Energy: 2
+    Health: 5.8
+    Energy: 2.3
     Luck: 0.2
     Intelligence: 0.3
-    Strength: 0.9
-    Vitality: 0.8
-    Resistance: 0.5
+    Strength: 1
+    Vitality: 0.9
+    Resistance: 0.6
     Agility: 0.3
 
 - id: 117491b9-6f30-481c-b3b3-acecb71aa6bc
@@ -79,21 +79,21 @@
       weight: 3
 
   baseStats:
-    Health: 175
-    Energy: 55
+    Health: 201
+    Energy: 63
     Luck: 1
-    Intelligence: 10
-    Strength: 20
-    Vitality: 10
-    Resistance: 10
-    Agility: 5
+    Intelligence: 12
+    Strength: 23
+    Vitality: 12
+    Resistance: 12
+    Agility: 6
 
   statsPerLevel:
-    Health: 7
-    Energy: 2
+    Health: 8.1
+    Energy: 2.3
     Luck: 0.2
     Intelligence: 0.3
-    Strength: 0.9
-    Vitality: 0.8
-    Resistance: 0.5
+    Strength: 1
+    Vitality: 0.9
+    Resistance: 0.6
     Agility: 0.3

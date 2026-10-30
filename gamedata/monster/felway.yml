@@ -70,24 +70,24 @@
       minLevel: 50
 
   baseStats:
-    Health: 175
-    Energy: 50
-    Luck: 5
-    Intelligence: 15
-    Strength: 20
-    Vitality: 30
-    Resistance: 15
-    Agility: 5
+    Health: 201
+    Energy: 57
+    Luck: 6
+    Intelligence: 17
+    Strength: 23
+    Vitality: 35
+    Resistance: 17
+    Agility: 6
 
   statsPerLevel:
-    Health: 5
-    Energy: 3
+    Health: 5.8
+    Energy: 3.5
     Luck: 0.3
-    Intelligence: 0.4
-    Strength: 0.5
-    Vitality: 0.5
-    Resistance: 0.6
-    Agility: 0.4
+    Intelligence: 0.5
+    Strength: 0.6
+    Vitality: 0.6
+    Resistance: 0.7
+    Agility: 0.5
 
 - id: c14f8831-ebfc-45ed-8132-2548ea07e506
   name: Fel Villager
@@ -139,24 +139,24 @@
       weight: 1
 
   baseStats:
-    Health: 150
-    Energy: 75
-    Luck: 5
-    Intelligence: 20
-    Strength: 20
-    Vitality: 30
-    Resistance: 25
-    Agility: 5
+    Health: 173
+    Energy: 86
+    Luck: 6
+    Intelligence: 23
+    Strength: 23
+    Vitality: 35
+    Resistance: 29
+    Agility: 6
 
   statsPerLevel:
-    Health: 5
-    Energy: 3
+    Health: 5.8
+    Energy: 3.5
     Luck: 0.3
-    Intelligence: 0.4
-    Strength: 0.6
-    Vitality: 0.6
-    Resistance: 0.5
-    Agility: 0.4
+    Intelligence: 0.5
+    Strength: 0.7
+    Vitality: 0.7
+    Resistance: 0.6
+    Agility: 0.5
 
 - id: db10b14b-4bd9-4b97-9930-b7de956f97b0
   name: Beholder
@@ -207,23 +207,23 @@
       weight: 2
 
   baseStats:
-    Health: 100
-    Energy: 100
-    Luck: 5
-    Intelligence: 30
-    Strength: 15
-    Vitality: 15
-    Resistance: 40
-    Agility: 5
+    Health: 115
+    Energy: 115
+    Luck: 6
+    Intelligence: 35
+    Strength: 17
+    Vitality: 17
+    Resistance: 46
+    Agility: 6
 
   statsPerLevel:
-    Health: 5
-    Energy: 4
+    Health: 5.8
+    Energy: 4.6
     Luck: 0.3
-    Intelligence: 0.5
+    Intelligence: 0.6
     Strength: 0.3
     Vitality: 0.3
-    Resistance: 0.6
+    Resistance: 0.7
     Agility: 0.2
 
 - id: dc21bc0b-8a21-4a22-8949-a0e15d9cc9bd
@@ -281,23 +281,23 @@
       weight: 1
 
   baseStats:
-    Health: 125
-    Energy: 100
-    Luck: 5
-    Intelligence: 35
-    Strength: 5
-    Vitality: 20
-    Resistance: 20
-    Agility: 5
+    Health: 144
+    Energy: 115
+    Luck: 6
+    Intelligence: 40
+    Strength: 6
+    Vitality: 23
+    Resistance: 23
+    Agility: 6
 
   statsPerLevel:
-    Health: 5
-    Energy: 4
+    Health: 5.8
+    Energy: 4.6
     Luck: 0.3
-    Intelligence: 0.6
+    Intelligence: 0.7
     Strength: 0.3
-    Vitality: 0.6
-    Resistance: 0.4
+    Vitality: 0.7
+    Resistance: 0.5
     Agility: 0.2
 
 - id: 5ae12695-4cc0-4392-a3be-3ec379f28662
@@ -351,21 +351,21 @@
       weight: 2
 
   baseStats:
-    Health: 175
-    Energy: 50
-    Luck: 5
-    Intelligence: 5
-    Strength: 30
-    Vitality: 30
-    Resistance: 10
-    Agility: 5
+    Health: 201
+    Energy: 57
+    Luck: 6
+    Intelligence: 6
+    Strength: 35
+    Vitality: 35
+    Resistance: 12
+    Agility: 6
 
   statsPerLevel:
-    Health: 6
-    Energy: 4
+    Health: 6.9
+    Energy: 4.6
     Luck: 0.3
     Intelligence: 0.3
-    Strength: 0.5
-    Vitality: 0.4
-    Resistance: 0.6
-    Agility: 0.8
+    Strength: 0.6
+    Vitality: 0.5
+    Resistance: 0.7
+    Agility: 0.9

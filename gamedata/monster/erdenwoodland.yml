@@ -40,24 +40,24 @@
       weight: 2
 
   baseStats:
-    Health: 200
-    Energy: 55
+    Health: 230
+    Energy: 63
     Luck: 1
-    Intelligence: 10
-    Strength: 25
-    Vitality: 10
-    Resistance: 10
-    Agility: 5
+    Intelligence: 12
+    Strength: 29
+    Vitality: 12
+    Resistance: 12
+    Agility: 6
 
   statsPerLevel:
-    Health: 3
-    Energy: 1
-    Luck: 0.05
-    Intelligence: 0.4
-    Strength: 0.7
+    Health: 3.5
+    Energy: 1.2
+    Luck: 0.1
+    Intelligence: 0.5
+    Strength: 0.8
     Vitality: 0.1
     Resistance: 0.3
-    Agility: 0.8
+    Agility: 0.9
 
 - id: 6bf11f29-73af-4713-852d-65720ddb173b
   name: Darkbat
@@ -95,24 +95,24 @@
       weight: 2
 
   baseStats:
-    Health: 300
-    Energy: 45
-    Luck: 5
-    Intelligence: 10
-    Strength: 15
-    Vitality: 25
-    Resistance: 10
-    Agility: 35
+    Health: 345
+    Energy: 52
+    Luck: 6
+    Intelligence: 12
+    Strength: 17
+    Vitality: 29
+    Resistance: 12
+    Agility: 40
 
   statsPerLevel:
-    Health: 2
-    Energy: 1
-    Luck: 0.05
-    Intelligence: 0.4
-    Strength: 0.6
-    Vitality: 0.8
+    Health: 2.3
+    Energy: 1.2
+    Luck: 0.1
+    Intelligence: 0.5
+    Strength: 0.7
+    Vitality: 0.9
     Resistance: 0.3
-    Agility: 0.6
+    Agility: 0.7
 
 - id: c7bc7139-2ad2-486b-839a-1e0a479cecdc
   name: Woodwolf
@@ -145,24 +145,24 @@
       weight: 2
 
   baseStats:
-    Health: 350
-    Energy: 35
+    Health: 402
+    Energy: 40
     Luck: 1
-    Intelligence: 20
-    Strength: 25
-    Vitality: 20
-    Resistance: 25
-    Agility: 20
+    Intelligence: 23
+    Strength: 29
+    Vitality: 23
+    Resistance: 29
+    Agility: 23
 
   statsPerLevel:
-    Health: 6
-    Energy: 2
+    Health: 6.9
+    Energy: 2.3
     Luck: 0.1
-    Intelligence: 0.7
-    Strength: 0.5
-    Vitality: 0.4
-    Resistance: 0.6
-    Agility: 0.7
+    Intelligence: 0.8
+    Strength: 0.6
+    Vitality: 0.5
+    Resistance: 0.7
+    Agility: 0.8
 
 - id: c8cbbcdc-1160-473f-a7ca-512583830f03
   name: Elf Ritualist
@@ -230,21 +230,21 @@
       weight: 2
 
   baseStats:
-    Health: 95
-    Energy: 50
+    Health: 109
+    Energy: 57
     Luck: 1
-    Intelligence: 25
-    Strength: 25
-    Vitality: 15
-    Resistance: 30
-    Agility: 10
+    Intelligence: 29
+    Strength: 29
+    Vitality: 17
+    Resistance: 35
+    Agility: 12
 
   statsPerLevel:
-    Health: 10
-    Energy: 7
-    Luck: 0.5
-    Intelligence: 0.9
-    Strength: 0.75
-    Vitality: 0.6
-    Resistance: 0.55
+    Health: 11.5
+    Energy: 8.1
+    Luck: 0.6
+    Intelligence: 1
+    Strength: 0.9
+    Vitality: 0.7
+    Resistance: 0.6
     Agility: 0.3
