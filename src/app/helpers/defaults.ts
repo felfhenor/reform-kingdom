@@ -119,6 +119,10 @@ export function defaultGatheringState(): GatheringState {
 
 export function defaultLootFilterSettings(): LootFilterSettings {
   return {
+    sellFromSources: {
+      Combat: true,
+      Crafting: true,
+    },
     keepRarities: {
       Common: true,
       Uncommon: true,

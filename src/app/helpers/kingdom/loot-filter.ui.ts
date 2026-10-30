@@ -4,6 +4,7 @@ import type {
   DropRarity,
   EquipmentItemType,
   LootFilterSettings,
+  LootSource,
 } from '@interfaces';
 
 export function lootFilterSettings(): LootFilterSettings {
@@ -11,14 +12,26 @@ export function lootFilterSettings(): LootFilterSettings {
 }
 
 export function isLootFilterActive(filters: LootFilterSettings): boolean {
+  const anySourceSells = Object.values(filters.sellFromSources).some(Boolean);
   const allRaritiesKept = Object.values(filters.keepRarities).every(Boolean);
   const allTypesKept = Object.values(filters.keepEquipmentTypes).every(Boolean);
 
   return (
-    !allRaritiesKept ||
-    !allTypesKept ||
-    filters.minimumItemLevel > LOOT_FILTER_DEFAULT_MIN_ITEM_LEVEL
+    anySourceSells &&
+    (!allRaritiesKept ||
+      !allTypesKept ||
+      filters.minimumItemLevel > LOOT_FILTER_DEFAULT_MIN_ITEM_LEVEL)
   );
+}
+
+export function lootFilterSetSourceSells(
+  source: LootSource,
+  sell: boolean,
+): void {
+  updateGamestate((state) => {
+    state.lootFilters.sellFromSources[source] = sell;
+    return state;
+  });
 }
 
 export function lootFilterSetRarityKept(

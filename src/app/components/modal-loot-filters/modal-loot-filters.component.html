@@ -13,13 +13,36 @@
 
   <div body class="flex flex-col gap-4">
     <div>
+      <div class="type-label mb-2">Sources To Auto-Sell From</div>
+      <div class="flex gap-2 w-full">
+        @for (source of sources; track source) {
+          <button
+            type="button"
+            class="flex-1 btn btn-neutral btn-sm justify-start gap-2"
+            [class.btn-outline]="!filters().sellFromSources[source]"
+            (click)="toggleSource(source)"
+            appSfx="ui-click"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            <input
+              type="checkbox"
+              [checked]="filters().sellFromSources[source]"
+              class="checkbox checkbox-xs"
+            />
+            {{ source }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div>
       <div class="type-label mb-2">Rarities to Sell</div>
       <div class="flex gap-2 w-full">
         @for (rarity of rarities; track rarity) {
           <button
             type="button"
             class="flex-1 btn btn-sm justify-start gap-2 bg-{{ rarity }}"
-            [class.btn-outline]="!filters().keepRarities[rarity]"
+            [class.btn-outline]="filters().keepRarities[rarity]"
             (click)="toggleRarity(rarity)"
             appSfx="ui-click"
             [sfxTrigger]="['click', 'hover']"
@@ -54,7 +77,7 @@
           <button
             type="button"
             class="btn btn-neutral btn-sm justify-start gap-2"
-            [class.btn-outline]="!filters().keepEquipmentTypes[type]"
+            [class.btn-outline]="filters().keepEquipmentTypes[type]"
             (click)="toggleType(type)"
             appSfx="ui-click"
             [sfxTrigger]="['click', 'hover']"

@@ -60,7 +60,7 @@ function drop(
   equipmentId = sword.id,
 ): LootDropOutcome {
   seedGamestate(edit);
-  return inTick(() => armoryAddLootDrop(equipmentId));
+  return inTick(() => armoryAddLootDrop(equipmentId, 'Combat'));
 }
 
 beforeEach(() => {
@@ -69,13 +69,14 @@ beforeEach(() => {
 
 describe('equipmentPassesLootFilter', () => {
   it('keeps only drops of a kept rarity and type at or above the minimum level', () => {
-    expect(equipmentPassesLootFilter(sword, defaultLootFilterSettings())).toBe(
-      true,
-    );
+    expect(
+      equipmentPassesLootFilter(sword, defaultLootFilterSettings(), 'Combat'),
+    ).toBe(true);
     expect(
       equipmentPassesLootFilter(
         sword,
         filtersWith((f) => (f.minimumItemLevel = sword.levelRequirement)),
+        'Combat',
       ),
     ).toBe(true);
 
@@ -84,8 +85,18 @@ describe('equipmentPassesLootFilter', () => {
       filtersWith((f) => (f.minimumItemLevel = sword.levelRequirement + 1)),
       filtersWith((f) => (f.keepEquipmentTypes.Sword = false)),
     ].forEach((filters) => {
-      expect(equipmentPassesLootFilter(sword, filters)).toBe(false);
+      expect(equipmentPassesLootFilter(sword, filters, 'Combat')).toBe(false);
     });
+  });
+
+  it('keeps everything from a source that is not set to auto-sell', () => {
+    const filters = filtersWith((f) => {
+      f.keepEquipmentTypes.Sword = false;
+      f.sellFromSources.Crafting = false;
+    });
+
+    expect(equipmentPassesLootFilter(sword, filters, 'Crafting')).toBe(true);
+    expect(equipmentPassesLootFilter(sword, filters, 'Combat')).toBe(false);
   });
 });
 
@@ -116,6 +127,16 @@ describe('armoryAddLootDrop', () => {
     expect(getGoldQuantity()).toBe(goldEarned);
     expect(armoryState()).toHaveLength(armoryOverflowCapForState(gamestate()));
     expect(isEquipmentDiscovered(sword.id)).toBe(true);
+  });
+
+  it('keeps a rejected drop when its source does not auto-sell', () => {
+    const outcome = drop((state) => {
+      rejectSwords(state);
+      state.lootFilters.sellFromSources.Combat = false;
+    });
+
+    expect(outcome).toEqual({ kind: 'Kept', content: sword });
+    expect(getGoldQuantity()).toBe(0);
   });
 
   it('lets drops overflow the normal armory cap', () => {

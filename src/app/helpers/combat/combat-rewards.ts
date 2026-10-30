@@ -103,7 +103,7 @@ export function grantResolvedDrops(
   drops.forEach((drop) => {
     switch (drop.kind) {
       case 'Equipment': {
-        const outcome = armoryAddLootDrop(drop.equipmentId);
+        const outcome = armoryAddLootDrop(drop.equipmentId, 'Combat');
 
         if (outcome.kind === 'NoRoom') {
           combatMessageLog(

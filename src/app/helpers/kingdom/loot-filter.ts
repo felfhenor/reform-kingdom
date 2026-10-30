@@ -10,26 +10,37 @@ import type {
   EquipmentId,
   LootDropOutcome,
   LootFilterSettings,
+  LootSource,
 } from '@interfaces';
 
 export function equipmentPassesLootFilter(
   content: EquipmentContent,
   filters: LootFilterSettings,
+  source: LootSource,
 ): boolean {
+  if (!filters.sellFromSources[source]) return true;
   if (!filters.keepRarities[content.rarity]) return false;
   if (content.levelRequirement < filters.minimumItemLevel) return false;
   if (!filters.keepEquipmentTypes[content.type]) return false;
   return true;
 }
 
-export function equipmentAutoSells(equipmentId: EquipmentId): boolean {
+export function equipmentAutoSells(
+  equipmentId: EquipmentId,
+  source: LootSource,
+): boolean {
   const content = getEntry<EquipmentContent>(equipmentId);
-  return !!content && !equipmentPassesLootFilter(content, lootFiltersState());
+  return (
+    !!content && !equipmentPassesLootFilter(content, lootFiltersState(), source)
+  );
 }
 
 // A drop that fails the filter is sold before it ever reaches the armory,
 // so only a *kept* drop can be lost to a full armory (NoRoom).
-export function armoryAddLootDrop(equipmentId: EquipmentId): LootDropOutcome {
+export function armoryAddLootDrop(
+  equipmentId: EquipmentId,
+  source: LootSource,
+): LootDropOutcome {
   let outcome: LootDropOutcome = { kind: 'NoRoom' };
 
   updateGamestate((state) => {
@@ -47,7 +58,7 @@ export function armoryAddLootDrop(equipmentId: EquipmentId): LootDropOutcome {
 
     const item = newEquipmentItem(equipmentId);
 
-    if (!equipmentPassesLootFilter(content, state.lootFilters)) {
+    if (!equipmentPassesLootFilter(content, state.lootFilters, source)) {
       ledgerMark(state.discoveredEquipment, equipmentId);
 
       const goldEarned = Math.round(

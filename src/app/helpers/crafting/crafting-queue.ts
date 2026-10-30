@@ -345,7 +345,7 @@ function grantCraftResult(tradeskill: Tradeskill, recipe: RecipeContent): void {
   if ('equipmentId' in recipe.result) {
     logCraftedEquipment(
       tradeskill,
-      armoryAddLootDrop(recipe.result.equipmentId),
+      armoryAddLootDrop(recipe.result.equipmentId, 'Crafting'),
     );
     return;
   }
@@ -423,7 +423,7 @@ function advanceQueueEntry(
 function craftResultBlockedByArmory(recipe: RecipeContent): boolean {
   return (
     'equipmentId' in recipe.result &&
-    !equipmentAutoSells(recipe.result.equipmentId) &&
+    !equipmentAutoSells(recipe.result.equipmentId, 'Crafting') &&
     !armoryHasRoom(1)
   );
 }

@@ -566,6 +566,22 @@ describe('craftProcessTick', () => {
     expect(blacksmithing().queue).toEqual([]);
   });
 
+  it('holds a filtered equipment craft when crafting is not an auto-sell source', () => {
+    seedRecipe({ result: { equipmentId: copperDaggerId } });
+    const armory = fullArmory();
+    seedBlacksmithing({ queue: [entry({ ticksIntoCraft: 4 })] }, (state) => {
+      state.armory = armory;
+      state.lootFilters.minimumItemLevel = 99;
+      state.lootFilters.sellFromSources.Crafting = false;
+    });
+
+    processTick();
+    processTick();
+
+    expect(gamestate().armory).toHaveLength(armory.length);
+    expect(blacksmithing().queue[0].ticksIntoCraft).toBe(5);
+  });
+
   it('resumes and completes a held equipment craft once armory room frees up', () => {
     seedRecipe({ result: { equipmentId: copperDaggerId } });
     seedBlacksmithing({ queue: [entry({ ticksIntoCraft: 5 })] });

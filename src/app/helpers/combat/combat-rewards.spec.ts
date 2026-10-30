@@ -117,6 +117,15 @@ describe('grantResolvedDrops', () => {
     expect(gatherVfxEmit).not.toHaveBeenCalled();
   });
 
+  it('keeps filtered equipment when combat is not an auto-sell source', () => {
+    grant([{ kind: 'Equipment', equipmentId: sword.id }], fight(), (state) => {
+      state.lootFilters.minimumItemLevel = sword.levelRequirement + 1;
+      state.lootFilters.sellFromSources.Combat = false;
+    });
+
+    expect(armoryState().map((item) => item.equipmentId)).toEqual([sword.id]);
+  });
+
   it('loses equipment once the armory is past even its loot overflow, saying so', () => {
     const full = Array.from(
       { length: armoryOverflowCapForState(defaultGameState()) },

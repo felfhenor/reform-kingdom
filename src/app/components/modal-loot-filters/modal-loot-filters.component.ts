@@ -7,13 +7,17 @@ import {
   lootFilterSetEquipmentTypeKept,
   lootFilterSetMinimumItemLevel,
   lootFilterSetRarityKept,
+  lootFilterSetSourceSells,
   lootFilterSettings,
 } from '@helpers/kingdom/loot-filter.ui';
 import type {
   DropRarity,
   EquipmentItemType,
   LootFilterSettings,
+  LootSource,
 } from '@interfaces';
+
+const SOURCES: LootSource[] = ['Combat', 'Crafting'];
 
 const RARITIES: DropRarity[] = [
   'Common',
@@ -30,10 +34,15 @@ const RARITIES: DropRarity[] = [
   templateUrl: './modal-loot-filters.component.html',
 })
 export class ModalLootFiltersComponent {
+  public readonly sources = SOURCES;
   public readonly rarities = RARITIES;
   public readonly equipmentTypes = allEquipmentItemTypes();
 
   public filters = computed<LootFilterSettings>(() => lootFilterSettings());
+
+  public toggleSource(source: LootSource): void {
+    lootFilterSetSourceSells(source, !this.filters().sellFromSources[source]);
+  }
 
   public toggleRarity(rarity: DropRarity): void {
     lootFilterSetRarityKept(rarity, !this.filters().keepRarities[rarity]);
