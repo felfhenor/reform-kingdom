@@ -31,4 +31,9 @@
 - id: ebe78b04-20f9-4152-b40d-3121c83bc6f4
   name: Fel Summit
   mapName: FelSummit
-  description: A vast expanse of tundra - a view from the top of the world - broken up by myriad mountain ranges. Here, the Fel gather resources to prepare their most elite for war. The terrain is cruel, the winds harsh, and the snow nigh unnavigable. Yet, you must persist.
+  description: A vast expanse of tundra broken up by myriad mountain ranges. Here, the Fel gather resources to prepare their most elite for war. The terrain is cruel, the winds harsh, and the snow nigh unnavigable. Yet, you must persist.
+
+- id: ccad90f2-9897-4c45-854f-d5cffff19bce
+  name: Astral Observatory
+  mapName: AstralObservatory
+  description: A place of no time and no space. A view from the top of the world. Here, there is everything. Here, there is nothing. Nothing except the Demon of Forgetting, Fel. Here, you'll remember everything. I hope.
