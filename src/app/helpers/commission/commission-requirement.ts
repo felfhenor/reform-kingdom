@@ -48,6 +48,8 @@ function commissionOfferRequirementCraftable(
 export function eligibleCommissionOffers(
   slots: CommissionOfferSlot[],
 ): EligibleCommissionOffer[] {
+  if (slots.length === 0) return [];
+
   const obtainable = new Set<string>([
     ...allGatherableMaterialIds(),
     ...caravanTraderSoldGoodIds(),

@@ -1,0 +1,180 @@
+- id: 30601436-eef3-47f4-846d-4cc11f8a3e94
+  name: Dies Irae
+  description: A dedication to those the Founder never wants to forget. Powerful gear can be traded with the memories of the Lost to acquire their unique items.
+  emptyText: You do not have anything the well can remember.
+  actionLabel: Remember
+
+  invisibleUntilCollectibleIdsFound:
+    - Founder's Thoughts
+
+  exchanges:
+    - kind: Equipment
+      inputEquipmentId: Frigid Bolt
+      outputEquipmentId: Arrows of Fiore
+      costs:
+        - itemId: Memory Flux
+          required: 2
+        - itemId: Duskhall Flux
+          required: 2
+
+    - kind: Equipment
+      inputEquipmentId: Frostweave Coat
+      outputEquipmentId: Shroud of the Templars
+      costs:
+        - itemId: Memory Flux
+          required: 2
+        - itemId: Duskhall Flux
+          required: 2
+
+    - kind: Equipment
+      inputEquipmentId: Frostweave Cap
+      outputEquipmentId: Cowl of Gaius
+      costs:
+        - itemId: Memory Flux
+          required: 1
+        - itemId: Duskhall Flux
+          required: 1
+
+    - kind: Equipment
+      inputEquipmentId: Froststeel Helm
+      outputEquipmentId: Crown of the Larsian King
+      costs:
+        - itemId: Memory Flux
+          required: 1
+        - itemId: Duskhall Flux
+          required: 1
+
+    - kind: Equipment
+      inputEquipmentId: Froststeel Plate
+      outputEquipmentId: Hauberk of Dekar
+      costs:
+        - itemId: Memory Flux
+          required: 2
+        - itemId: Duskhall Flux
+          required: 2
+
+    - kind: Equipment
+      inputEquipmentId: Froststeel Recurve
+      outputEquipmentId: Greatbow of Sefirah
+      costs:
+        - itemId: Memory Flux
+          required: 3
+        - itemId: Duskhall Flux
+          required: 3
+
+    - kind: Equipment
+      inputEquipmentId: Froststeel Diamondtip
+      outputEquipmentId: Baselard of Izchak
+      costs:
+        - itemId: Memory Flux
+          required: 2
+        - itemId: Duskhall Flux
+          required: 2
+
+    - kind: Equipment
+      inputEquipmentId: Froststeel Dodger
+      outputEquipmentId: Stiletto of Culcula
+      costs:
+        - itemId: Memory Flux
+          required: 2
+        - itemId: Duskhall Flux
+          required: 2
+
+    - kind: Equipment
+      inputEquipmentId: Froststeel Club
+      outputEquipmentId: Mace of Medina
+      costs:
+        - itemId: Memory Flux
+          required: 2
+        - itemId: Duskhall Flux
+          required: 2
+
+    - kind: Equipment
+      inputEquipmentId: Froststeel Tomb
+      outputEquipmentId: Aegis of the Founding Stone
+      costs:
+        - itemId: Memory Flux
+          required: 2
+        - itemId: Duskhall Flux
+          required: 2
+
+    - kind: Equipment
+      inputEquipmentId: Froststeel Tip
+      outputEquipmentId: Spear of Parcilyte
+      costs:
+        - itemId: Memory Flux
+          required: 3
+        - itemId: Duskhall Flux
+          required: 3
+
+    - kind: Equipment
+      inputEquipmentId: Frigid Energizer
+      outputEquipmentId: Staff of the Cimmerians
+      costs:
+        - itemId: Memory Flux
+          required: 3
+        - itemId: Duskhall Flux
+          required: 3
+
+    - kind: Equipment
+      inputEquipmentId: Froststeel Cutter
+      outputEquipmentId: Sword of the Founder
+      costs:
+        - itemId: Memory Flux
+          required: 2
+        - itemId: Duskhall Flux
+          required: 2
+
+    - kind: Equipment
+      inputEquipmentId: Frigid Whip
+      outputEquipmentId: Whip of Welch
+      costs:
+        - itemId: Memory Flux
+          required: 2
+        - itemId: Duskhall Flux
+          required: 2
+
+    - kind: Equipment
+      inputEquipmentId: Ornate Frost Gloves
+      outputEquipmentId: Gloves of Maxim
+      costs:
+        - itemId: Memory Flux
+          required: 1
+        - itemId: Duskhall Flux
+          required: 1
+
+    - kind: Equipment
+      inputEquipmentId: Frostsoul Earrings
+      outputEquipmentId: Earrings of Elena
+      costs:
+        - itemId: Memory Flux
+          required: 1
+        - itemId: Duskhall Flux
+          required: 1
+
+    - kind: Equipment
+      inputEquipmentId: Frostsoul Pendant
+      outputEquipmentId: Pendant of Bairan
+      costs:
+        - itemId: Memory Flux
+          required: 1
+        - itemId: Duskhall Flux
+          required: 1
+
+    - kind: Equipment
+      inputEquipmentId: Frostsoul Ring
+      outputEquipmentId: Ring of Renaud
+      costs:
+        - itemId: Memory Flux
+          required: 1
+        - itemId: Duskhall Flux
+          required: 1
+
+    - kind: Equipment
+      inputEquipmentId: Frostskin Legwings
+      outputEquipmentId: Legwings of Selan Rose
+      costs:
+        - itemId: Memory Flux
+          required: 1
+        - itemId: Duskhall Flux
+          required: 1

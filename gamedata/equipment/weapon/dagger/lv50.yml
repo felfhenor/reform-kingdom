@@ -34,3 +34,25 @@
     - skillFamily: Double Strike
       stat: Agility
       value: 0.5
+
+- id: a63c6571-9455-4692-90da-fe0608fb6924
+  name: Baselard of Izchak
+  description: A memoriam baselard, reforged by the Founder's technique against the forgetting. It remembers Izchak, whose coin paid for the kingdom's first roads.
+  levelRequirement: 58
+  rarity: Mystical
+  type: Dagger
+  sprite: '0310'
+  slots: 2
+  baseStats:
+    Agility: 35.3
+    Strength: 28.4
+    Intelligence: 16.6
+    Luck: 10
+
+  monsterTypeDamage:
+    Humanoid: 15
+
+  skillStatBonuses:
+    - skillFamily: Double Strike
+      stat: Vitality
+      value: 0.5

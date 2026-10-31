@@ -32,3 +32,29 @@
 
   combatStats:
     coverThreshold: 20
+
+- id: d1ab2623-48ee-4120-8cd2-6c5900614416
+  name: Aegis of the Founding Stone
+  description: A memoriam shield, reforged by the Founder's technique against the forgetting. It remembers the Founding Stone as it was before it cracked.
+  levelRequirement: 58
+  rarity: Mystical
+  type: Shield
+  sprite: '0313'
+  slots: 2
+  baseStats:
+    Vitality: 28.8
+    Resistance: 20.7
+
+  combatStats:
+    coverThreshold: 25
+
+  elementalResistances:
+    Fire: 10
+    Air: 10
+    Earth: 10
+    Water: 10
+
+  skillStatBonuses:
+    - skillFamily: Smashing Board
+      stat: Resistance
+      value: 0.5

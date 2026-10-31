@@ -33,3 +33,28 @@
 
   grantedSkillIds:
     - Spiked Smash II
+
+- id: 6ad14a8a-6002-42ff-986e-2dffecb35cc4
+  name: Mace of Medina
+  description: A memoriam mace, reforged by the Founder's technique against the forgetting. It remembers Medina, who turned the desert's sand into soil.
+  levelRequirement: 58
+  rarity: Mystical
+  type: Mace
+  sprite: '0312'
+  slots: 2
+  baseStats:
+    Strength: 32.6
+    Intelligence: 28.1
+
+  elements: [Earth]
+
+  grantedSkillIds:
+    - Spiked Smash II
+
+  elementalBoons:
+    Earth: 15
+
+  skillStatBonuses:
+    - skillFamily: Spiked Smash
+      stat: Strength
+      value: 0.5

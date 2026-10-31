@@ -33,3 +33,24 @@
 
   combatStats:
     repeatActionChance: 3
+
+- id: 9cfa614d-ebb7-4197-bb29-671dca53eea7
+  name: Legwings of Selan Rose
+  description: Memoriam legwings, reforged by the Founder's technique against the forgetting. They remember Selan Rose, a tireless traveler who never once hurried.
+  levelRequirement: 58
+  rarity: Mystical
+  type: Trinket
+  sprite: '0308'
+  slots: 2
+  baseStats:
+    Luck: 14.4
+    Agility: 7.3
+
+  elementalResistances:
+    Fire: 5
+    Air: 5
+    Earth: 5
+    Water: 5
+
+  combatStats:
+    repeatActionChance: 5

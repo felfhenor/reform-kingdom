@@ -27,3 +27,24 @@
 
   elementalResistances:
     Water: 10
+
+- id: 37334288-4a41-486b-9ddf-6c36d45c836d
+  name: Ring of Renaud
+  description: A memoriam ring, reforged by the Founder's technique against the forgetting. It remembers Renaud Hall, whose family still trades where Elfheim will not.
+  levelRequirement: 58
+  rarity: Mystical
+  type: Ring
+  sprite: '0307'
+  slots: 2
+  baseStats:
+    Health: 99
+    Energy: 50
+
+  elementalResistances:
+    Fire: 5
+    Air: 5
+    Earth: 5
+    Water: 5
+
+  debuffResistances:
+    StatDown: 10

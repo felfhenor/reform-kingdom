@@ -35,3 +35,27 @@
 
   debuffResistances:
     Accuracy: 15
+
+- id: 9d6a596a-5ded-43cf-8d9f-afbd7b4b9753
+  name: Stiletto of Culcula
+  description: A memoriam stiletto, reforged by the Founder's technique against the forgetting. It remembers Culcula, who was the first to become lost.
+  levelRequirement: 58
+  rarity: Mystical
+  type: Dirk
+  sprite: '0311'
+  slots: 2
+  baseStats:
+    Strength: 38.2
+    Agility: 22.7
+    Intelligence: 14.1
+
+  elementalBoons:
+    Air: 15
+
+  debuffResistances:
+    Accuracy: 15
+
+  skillStatBonuses:
+    - skillFamily: Earthshake
+      stat: Strength
+      value: 0.5

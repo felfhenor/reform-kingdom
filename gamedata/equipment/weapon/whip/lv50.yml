@@ -32,3 +32,30 @@
 
   grantedSkillIds:
     - Chilling Touch II
+
+- id: d1ae3d64-f40d-483f-bb34-395a13a3c358
+  name: Whip of Welch
+  description: A memoriam whip, reforged by the Founder's technique against the forgetting. It remembers Weaver Welch, lost in the Spider Tower with an armful of silk.
+  levelRequirement: 58
+  rarity: Mystical
+  type: Whip
+  sprite: '0317'
+  slots: 2
+  baseStats:
+    Intelligence: 31.2
+    Resistance: 28.4
+    Strength: 15.1
+
+  monsterTypeDamage:
+    Insect: 20
+
+  debuffResistances:
+    Poison: 15
+
+  grantedSkillIds:
+    - Chilling Touch II
+
+  skillStatBonuses:
+    - skillFamily: Thunderbolt
+      stat: Intelligence
+      value: 0.5

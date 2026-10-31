@@ -30,3 +30,28 @@
 
   debuffResistances:
     Stun: 15
+
+- id: 44b726f0-fac7-420e-a84a-e336dffb5794
+  name: Crown of the Larsian King
+  description: A memoriam helm, reforged by the Founder's technique against the forgetting. It remembers the Larsian king, whose city kept its shape through trade alone.
+  levelRequirement: 58
+  rarity: Mystical
+  type: Helm
+  sprite: '0305'
+  slots: 2
+  baseStats:
+    Vitality: 44.1
+    Health: 77
+    Resistance: 10
+
+  elementalResistances:
+    Fire: 10
+    Earth: 10
+
+  debuffResistances:
+    Stun: 20
+
+  skillStatBonuses:
+    - skillFamily: Sweep
+      stat: Resistance
+      value: 0.25

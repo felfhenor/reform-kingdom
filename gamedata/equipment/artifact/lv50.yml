@@ -32,3 +32,24 @@
     - skillFamily: Chilling Touch
       stat: Intelligence
       value: 0.25
+
+- id: 1b0bf4de-86f6-43ed-b6ba-409328e72774
+  name: Earrings of Elena
+  description: Memoriam earrings, reforged by the Founder's technique against the forgetting. They remember Elena Jadd, who kept to Elfheim's path when Fiore left it.
+  levelRequirement: 58
+  rarity: Mystical
+  type: Artifact
+  sprite: '0301'
+  slots: 2
+  baseStats:
+    Intelligence: 25.9
+    Resistance: 11.1
+
+  elementalBoons:
+    Air: 10
+    Water: 10
+
+  skillStatBonuses:
+    - skillFamily: Broil
+      stat: Intelligence
+      value: 0.5

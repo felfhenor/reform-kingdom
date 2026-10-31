@@ -28,3 +28,26 @@
     - skillFamily: Snipe
       stat: Agility
       value: 0.5
+
+- id: 56bd3f8b-1a36-49ef-a83a-b09c3c5d1fa4
+  name: Arrows of Fiore
+  description: Memoriam arrows, reforged by the Founder's technique against the forgetting. They remember Fiore Jadd, who nearly vanished on a demon's altar.
+  levelRequirement: 58
+  rarity: Mystical
+  type: Arrow
+  sprite: '0300'
+  slots: 2
+  baseStats:
+    Strength: 28.4
+    Agility: 16.9
+
+  monsterTypeDamage:
+    Demon: 25
+
+  debuffResistances:
+    StatDown: 15
+
+  skillStatBonuses:
+    - skillFamily: Arrow Rain
+      stat: Agility
+      value: 0.5

@@ -28,3 +28,29 @@
 
   grantedSkillIds:
     - Snipe II
+
+- id: 123312f4-140d-4e3f-8c2e-e5865078d8c7
+  name: Greatbow of Sefirah
+  description: A memoriam greatbow, reforged by the Founder's technique against the forgetting. It remembers Sefirah Hornacis, the explorer the Miserable Mire swallowed whole.
+  levelRequirement: 58
+  rarity: Mystical
+  type: Bow
+  sprite: '0309'
+  slots: 2
+  baseStats:
+    Strength: 35.8
+    Agility: 24.9
+
+  combatStats:
+    repeatActionChance: 10
+
+  monsterTypeDamage:
+    Demon: 15
+
+  grantedSkillIds:
+    - Snipe III
+
+  skillStatBonuses:
+    - skillFamily: Rapidfire
+      stat: Agility
+      value: 0.5

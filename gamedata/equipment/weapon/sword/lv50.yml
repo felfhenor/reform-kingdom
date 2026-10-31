@@ -32,3 +32,27 @@
     - skillFamily: Sweep
       stat: Vitality
       value: 0.25
+
+- id: fb71c5ce-1782-48f8-a0ac-899a006f0867
+  name: Sword of the Founder
+  description: A memoriam sword, reforged by the Founder's technique against the forgetting. It remembers the Founder's decree that nothing more be lost.
+  levelRequirement: 58
+  rarity: Mystical
+  type: Sword
+  sprite: '0316'
+  slots: 2
+  baseStats:
+    Strength: 35
+    Vitality: 35
+    Agility: 8
+
+  combatStats:
+    debuffIgnoreChance: 10
+
+  monsterTypeDamage:
+    Demon: 20
+
+  skillStatBonuses:
+    - skillFamily: Sweep
+      stat: Strength
+      value: 0.5

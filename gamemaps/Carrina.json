@@ -1158,7 +1158,46 @@
          "draworder":"topdown",
          "id":9,
          "name":"Path Objects",
-         "objects":[],
+         "objects":[
+                {
+                 "gid":435,
+                 "height":64,
+                 "id":305,
+                 "name":"",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":1728,
+                 "y":1600
+                }, 
+                {
+                 "gid":435,
+                 "height":64,
+                 "id":306,
+                 "name":"",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":1792,
+                 "y":1600
+                }, 
+                {
+                 "gid":435,
+                 "height":64,
+                 "id":307,
+                 "name":"",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":1856,
+                 "y":1600
+                }],
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
@@ -1653,6 +1692,43 @@
                  "width":64,
                  "x":2112,
                  "y":2560
+                }, 
+                {
+                 "gid":422,
+                 "height":64,
+                 "id":304,
+                 "name":"Observatory Chronoport",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"tag",
+                         "type":"string",
+                         "value":"CarrinaToChronoport"
+                        },
+                        {
+                         "name":"toTag",
+                         "type":"string",
+                         "value":"ChronoportToCarrina"
+                        }],
+                 "rotation":0,
+                 "type":"TeleportNode",
+                 "visible":true,
+                 "width":64,
+                 "x":1920,
+                 "y":1600
+                },
+                {
+                 "gid":406,
+                 "height":64,
+                 "id":308,
+                 "name":"Dies Irae",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"ExchangeNode",
+                 "visible":true,
+                 "width":64,
+                 "x":1728,
+                 "y":1088
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1661,7 +1737,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":303,
+ "nextobjectid":309,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

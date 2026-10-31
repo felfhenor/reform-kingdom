@@ -43,3 +43,17 @@
 - id: 07a664f1-597b-4861-90d2-1f0ec395d79c
   name: Elfway Exit
   description: A teleportation circle leading to Carrina from the Erden Woodland.
+
+- id: bb008d41-a80f-401a-81b7-a0f91b8657af
+  name: Observatory Chronoport
+  description: A chronoport leading from Carrina to the Astral Observatory. Created by a link between the Founder and the current Heroes.
+
+  invisibleUntilCollectibleIdsFound:
+    - Founder's Thoughts
+
+- id: fdca9cf8-3cb7-483c-8d50-14ab5b9557b7
+  name: Carrina Chronoport
+  description: A chronoport leading from the Astral Observatory back to Carrina.
+
+  invisibleUntilCollectibleIdsFound:
+    - Founder's Thoughts

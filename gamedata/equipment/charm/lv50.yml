@@ -29,3 +29,24 @@
 
   combatStats:
     reviveChance: 5
+
+- id: 58bebde6-538d-4075-8716-e072d16c1879
+  name: Pendant of Bairan
+  description: A memoriam pendant, reforged by the Founder's technique against the forgetting. It remembers Bairan Faust, who trains at an oasis where nothing is allowed to die.
+  levelRequirement: 58
+  rarity: Mystical
+  type: Charm
+  sprite: '0302'
+  slots: 2
+  baseStats:
+    Vitality: 18
+    Resistance: 21.3
+    Health: 44
+
+  combatStats:
+    reviveChance: 8
+
+  skillStatBonuses:
+    - skillFamily: Lifesurge
+      stat: Vitality
+      value: 0.5

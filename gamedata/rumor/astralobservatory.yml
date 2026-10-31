@@ -1,0 +1,8 @@
+- id: cfbd61a1-7144-471e-b043-5014b099d7c8
+  name: Rumor of the Founder's Well
+  rarity: Mystical
+  description: I made a well in the Duchy that remembers what the forgetting takes. A caravan wandering the stars carries the thoughts that lead there and back.
+  requireMapVisit: AstralObservatory
+  subject:
+    kind: Collectible
+    collectibleId: Founder's Thoughts

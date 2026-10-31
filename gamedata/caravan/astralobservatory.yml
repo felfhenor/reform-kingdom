@@ -1,0 +1,18 @@
+- id: e38a2f4c-6fe1-491c-a3e4-5f649c84f2e0
+  name: Founder's Blessed - Astral Observatory
+  description: A Blessed of the Founder. They go where they're needed most, and offer what's needed when it's needed most.
+
+  traderResetTime: 3600
+
+  level:
+    min: 65
+    max: 65
+
+  markupPercentages:
+    sell: 0
+    buy: 0
+
+  traderCategories:
+    - Founder's Blessed
+
+  commissionOffers: []

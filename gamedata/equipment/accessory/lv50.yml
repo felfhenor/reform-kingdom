@@ -36,3 +36,29 @@
 
     - tradeskillId: Blacksmithing
       value: 1
+
+- id: 2ee4702d-4023-417f-b7a1-692066935603
+  name: Gloves of Maxim
+  description: Memoriam gloves, reforged by the Founder's technique against the forgetting. They remember Maxim Tasnica, who dug through the mire for every lost artifact.
+  levelRequirement: 58
+  rarity: Mystical
+  type: Accessory
+  sprite: '0299'
+  slots: 2
+  baseStats:
+    Strength: 7.9
+    Agility: 7.8
+
+  elementalResistances:
+    Water: 10
+    Earth: 10
+
+  gatherYieldBonuses:
+    - tradeskillId: Blacksmithing
+      value: 1
+
+    - tradeskillId: Jewelcrafting
+      value: 1
+
+    - tradeskillId: Artificing
+      value: 1

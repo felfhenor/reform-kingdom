@@ -88,7 +88,7 @@
 
   trades:
     - type: sell
-      value: 200
+      value: 15000
       itemId: Duskhall Flux
       limit: 4
       weight: 2

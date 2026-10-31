@@ -33,3 +33,27 @@
     - skillFamily: Frostfire Bolt
       stat: Intelligence
       value: 0.25
+
+- id: 8728bbbc-d6e8-4a7a-86eb-b6faf8d3c345
+  name: Staff of the Cimmerians
+  description: A memoriam staff, reforged by the Founder's technique against the forgetting. It remembers the Cimmerians, and the stars they prayed beneath.
+  levelRequirement: 58
+  rarity: Mystical
+  type: Staff
+  sprite: '0315'
+  slots: 2
+  baseStats:
+    Intelligence: 43.1
+    Vitality: 32.8
+    Energy: 33
+
+  elementalBoons:
+    Fire: 10
+    Air: 10
+    Earth: 10
+    Water: 10
+
+  skillStatBonuses:
+    - skillFamily: Starshine
+      stat: Intelligence
+      value: 0.5

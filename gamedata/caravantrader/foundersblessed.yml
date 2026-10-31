@@ -1,0 +1,20 @@
+- id: ab8e6e71-3769-4207-bbd4-9118b4ac97c1
+  name: Rachel Aewenditi
+  description: The Founder sends their regards and their flux. I'm afraid neither comes cheap.
+  category: Founder's Blessed
+  level: 65
+
+  tokenTrades:
+    - collectibleId: Founder's Thoughts
+      tokenCost: 10
+
+  trades:
+    - type: sell
+      value: 50000
+      itemId: Memory Flux
+      weight: 1
+
+    - type: sell
+      value: 50000
+      itemId: Duskhall Flux
+      weight: 1

@@ -26,3 +26,25 @@
 
   monsterTypeDamage:
     Demon: 10
+
+- id: ce648dde-77ab-4f92-846c-cd52679e51b1
+  name: Spear of Parcilyte
+  description: A memoriam spear, reforged by the Founder's technique against the forgetting. It remembers Parcilyte, the Founder's general, as the orcs always have.
+  levelRequirement: 58
+  rarity: Mystical
+  type: Spear
+  sprite: '0314'
+  slots: 2
+  baseStats:
+    Strength: 56.4
+
+  combatStats:
+    repeatActionChance: 5
+
+  monsterTypeDamage:
+    Demon: 25
+
+  skillStatBonuses:
+    - skillFamily: Charged Strike
+      stat: Strength
+      value: 0.5

@@ -32,3 +32,28 @@
 
   combatStats:
     debuffIgnoreChance: 5
+
+- id: 8fac1783-bd3c-475b-955c-82464cc00a97
+  name: Cowl of Gaius
+  description: A memoriam cowl, reforged by the Founder's technique against the forgetting. It remembers the mountain monk Gaius Reinhardt, and every secret kept on that mountain.
+  levelRequirement: 58
+  rarity: Mystical
+  type: Hat
+  sprite: '0304'
+  slots: 2
+  baseStats:
+    Vitality: 34.8
+    Health: 75
+    Energy: 42
+
+  elementalResistances:
+    Air: 10
+    Earth: 10
+
+  combatStats:
+    debuffIgnoreChance: 8
+
+  skillStatBonuses:
+    - skillFamily: Cure
+      stat: Vitality
+      value: 0.5

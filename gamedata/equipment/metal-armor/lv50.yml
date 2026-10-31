@@ -16,7 +16,7 @@
 
 - id: 63db2fdd-5661-4f16-aae0-b7367d3938fe
   name: Froststeel Plate
-  description: Fel steel plate fitted over a pair of frostcores.
+  description: A fel steel plate fitted over a pair of frostcores.
   levelRequirement: 54
   rarity: Rare
   type: Metal Armor
@@ -32,3 +32,24 @@
 
   combatStats:
     damageReflectPercent: 5
+
+- id: 7aefa7d5-5698-4c7e-8067-6a6d2d41152f
+  name: Hauberk of Dekar
+  description: A memoriam hauberk, reforged by the Founder's technique against the forgetting. It remembers Dekar Anten, who was lost in the Gobslime Shrine until someone came looking.
+  levelRequirement: 58
+  rarity: Mystical
+  type: Metal Armor
+  sprite: '0306'
+  slots: 2
+  baseStats:
+    Vitality: 42
+    Resistance: 32.6
+
+  elementalResistances:
+    Fire: 10
+    Air: 10
+    Earth: 10
+    Water: 10
+
+  combatStats:
+    damageReflectPercent: 8

@@ -431,6 +431,43 @@
                  "width":64,
                  "x":1408,
                  "y":1088
+                }, 
+                {
+                 "gid":422,
+                 "height":64,
+                 "id":168,
+                 "name":"Carrina Chronoport",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"tag",
+                         "type":"string",
+                         "value":"ChronoportToCarrina"
+                        }, 
+                        {
+                         "name":"toTag",
+                         "type":"string",
+                         "value":"CarrinaToChronoport"
+                        }],
+                 "rotation":0,
+                 "type":"TeleportNode",
+                 "visible":true,
+                 "width":64,
+                 "x":1280,
+                 "y":1792
+                }, 
+                {
+                 "gid":433,
+                 "height":64,
+                 "id":169,
+                 "name":"Founder's Blessed - Astral Observatory",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"CaravanNode",
+                 "visible":true,
+                 "width":64,
+                 "x":1088,
+                 "y":1408
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -439,7 +476,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":168,
+ "nextobjectid":170,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",
