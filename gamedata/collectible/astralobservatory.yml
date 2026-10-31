@@ -27,3 +27,9 @@
   rarity: Mystical
   description: 'A vivid memory of a nameless elf. He runs through the woods, bow in hand. He looses 3 arrows, and each of them hit: a snake, a wolf, and a spider. His prowess as a hunter is unmatched.'
   sprite: '0078'
+
+- id: 78a7e3a8-2f6c-46d9-8f9c-f4d212ecdb4a
+  name: Memory of the Forgetter
+  rarity: Legendary
+  description: 'A vivid memory of a nameless chronovore. He traveled through time and space. He devoured so many memories. He covets all, he consumes all. His end is fitting: he will be remembered as the Forgetter.'
+  sprite: '0079'
