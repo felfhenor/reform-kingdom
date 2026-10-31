@@ -1,0 +1,29 @@
+- id: 50606c8d-af2d-4de6-9602-2b0c9e44c122
+  name: Memory of the Fallen
+  rarity: Mystical
+  description: 'A vivid memory of a nameless orc. He wields an axe not for combat, but to chop down trees. He builds a home, surrounded by crystal clear waters. He inspires many more to follow in his footsteps.'
+  sprite: '0074'
+
+- id: 6bab521d-0423-48fc-acac-c0642e2817fe
+  name: Memory of the Land
+  rarity: Mystical
+  description: 'A vivid memory of a nameless farmer. She grows flowers in the fertile land surrounding Larsia. The nearby river flows with vigor, and a waterfall from the mountain range brings fresh, clean water.'
+  sprite: '0075'
+
+- id: a769abad-65d9-495f-8b30-a2d494b60b0c
+  name: Memory of the Hungry
+  rarity: Mystical
+  description: 'A vivid memory of a nameless artisan. Unparalleled in acuity, unrivaled in practice, she creates machines of wonder. She powers them with a mysterious force called "magic". She tirelessly creates to achieve her dream.'
+  sprite: '0076'
+
+- id: 00652973-1b92-4682-9be8-6a82e9e7808e
+  name: Memory of the Ritualists
+  rarity: Mystical
+  description: 'A vivid memory of a nameless ascetic. By dawn, they pray. By evening, they feast. A secluded temple in the mountains is where they call home. They lead many like them.'
+  sprite: '0077'
+
+- id: 503dd877-ccd9-4a3e-bb55-a969b05a3151
+  name: Memory of the Hunters
+  rarity: Mystical
+  description: 'A vivid memory of a nameless elf. He runs through the woods, bow in hand. He looses 3 arrows, and each of them hit: a snake, a wolf, and a spider. His prowess as a hunter is unmatched.'
+  sprite: '0078'

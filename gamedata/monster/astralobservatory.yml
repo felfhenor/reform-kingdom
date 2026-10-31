@@ -1,0 +1,347 @@
+- id: 9b19e62b-cb3a-42d5-8ae6-67f853a42e97
+  name: Forgetter of the Peaks
+  description: A fragment of Fel, charged with the slow forgetting of the ancient valley where the demons now reside.
+
+  types: [Humanoid, Spirit]
+  elementalResistances:
+    Fire: 75
+    Air: 25
+    Water: -50
+
+  sprite: '0176'
+  frames: 4
+
+  targetting:
+    - type: Weakest
+
+  rarity: Mystical
+
+  xp:
+    min: 4400
+    max: 4500
+    bonusPerLevel: 4
+
+  drops:
+    - itemId: Memory Flux
+      min: 1
+      max: 1
+      chance: 100
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Holy Smite IV
+      weight: 3
+
+    - skillId: Cure IV
+      weight: 2
+
+    - skillId: Starshine IV
+      weight: 2
+
+    - skillId: Purify Evil I
+      weight: 1
+
+    - skillId: Spellshield II
+      weight: 1
+
+  baseStats:
+    Health: 3000
+    Energy: 300
+    Luck: 10
+    Intelligence: 30
+    Strength: 15
+    Vitality: 40
+    Resistance: 50
+    Agility: 10
+
+  statsPerLevel:
+    Health: 150
+    Energy: 5
+    Luck: 0.3
+    Intelligence: 0.8
+    Strength: 0.3
+    Vitality: 1.4
+    Resistance: 1.6
+    Agility: 0.4
+
+- id: e4fd6686-8d2a-40c8-a71a-bfbe4297bae7
+  name: Forgetter of the Frost
+  description: A fragment of Fel, charged with the slow forgetting of the ancient land of the Zelks.
+
+  types: [Amalgamation, Insect]
+  elementalResistances:
+    Water: 75
+    Earth: 25
+    Fire: -50
+
+  sprite: '0184'
+  frames: 4
+
+  targetting:
+    - type: Strongest
+
+  rarity: Mystical
+
+  xp:
+    min: 4400
+    max: 4500
+    bonusPerLevel: 4
+
+  drops:
+    - itemId: Memory Flux
+      min: 1
+      max: 1
+      chance: 100
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Double Strike IV
+      weight: 3
+
+    - skillId: Sweep IV
+      weight: 2
+
+    - skillId: Chilling Touch II
+      weight: 2
+
+    - skillId: Taunt I
+      weight: 1
+
+    - skillId: Defensive Stance II
+      weight: 1
+
+  baseStats:
+    Health: 4000
+    Energy: 200
+    Luck: 6
+    Intelligence: 20
+    Strength: 35
+    Vitality: 60
+    Resistance: 30
+    Agility: 4
+
+  statsPerLevel:
+    Health: 190
+    Energy: 4
+    Luck: 0.3
+    Intelligence: 0.4
+    Strength: 1.0
+    Vitality: 1.4
+    Resistance: 1
+    Agility: 0.3
+
+- id: 3e4ef347-b30b-419c-8df2-4f7c99cd761d
+  name: Forgetter of the Sands
+  description: A fragment of Fel, charged with the slow forgetting of the desert and the ancient Cimmerians who manage to be remembered still.
+
+  types: [Beast, Humanoid]
+  elementalResistances:
+    Earth: 75
+    Fire: 25
+    Air: -50
+
+  sprite: '0168'
+  frames: 4
+
+  targetting:
+    - itemId: Memory Flux
+      min: 1
+      max: 1
+      chance: 100
+
+  rarity: Mystical
+
+  xp:
+    min: 4400
+    max: 4500
+    bonusPerLevel: 4
+
+  drops: []
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Earthshake IV
+      weight: 3
+
+    - skillId: Analyze IV
+      weight: 2
+
+    - skillId: Pocket Sand
+      weight: 2
+
+    - skillId: Lucky Charm III
+      weight: 1
+
+    - skillId: Rejuvenating Gust II
+      weight: 1
+
+  baseStats:
+    Health: 3200
+    Energy: 250
+    Luck: 12
+    Intelligence: 20
+    Strength: 20
+    Vitality: 45
+    Resistance: 45
+    Agility: 20
+
+  statsPerLevel:
+    Health: 160
+    Energy: 4.5
+    Luck: 0.3
+    Intelligence: 0.5
+    Strength: 0.6
+    Vitality: 1.4
+    Resistance: 1.4
+    Agility: 1
+
+- id: 03e33bc6-cb0c-4384-a7e3-c5481f0cb3c3
+  name: Forgetter of the Mire
+  description: A fragment of Fel, charged with the slow forgetting of the bog and the orcs that live within.
+
+  types: [Spirit, Amalgamation]
+  elementalResistances:
+    Water: 50
+    Earth: 50
+    Fire: -35
+    Air: -35
+
+  sprite: '0172'
+  frames: 4
+
+  targetting:
+    - type: Random
+      jobId: Magician
+
+  rarity: Mystical
+
+  xp:
+    min: 4400
+    max: 4500
+    bonusPerLevel: 4
+
+  drops:
+    - itemId: Memory Flux
+      min: 1
+      max: 1
+      chance: 100
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Frostfire Bolt III
+      weight: 3
+
+    - skillId: Thunderbolt III
+      weight: 2
+
+    - skillId: Toxic Breath
+      weight: 2
+
+    - skillId: Spellshield II
+      weight: 1
+
+    - skillId: Refresh II
+      weight: 1
+
+  baseStats:
+    Health: 3400
+    Energy: 350
+    Luck: 6
+    Intelligence: 35
+    Strength: 10
+    Vitality: 25
+    Resistance: 70
+    Agility: 8
+
+  statsPerLevel:
+    Health: 170
+    Energy: 6
+    Luck: 0.3
+    Intelligence: 1
+    Strength: 0.2
+    Vitality: 0.8
+    Resistance: 2
+    Agility: 0.4
+
+- id: f1ab7785-afdc-4166-92d5-36f5ea021ad4
+  name: Forgetter of the Forest
+  description: A fragment of Fel, charged with the slow forgetting of the forest of the elves.
+
+  types: [Insect, Beast]
+  elementalResistances:
+    Air: 75
+    Water: 25
+    Earth: -50
+
+  sprite: '0180'
+  frames: 4
+
+  targetting:
+    - type: Random
+      jobId: Healer
+
+  rarity: Mystical
+
+  xp:
+    min: 4400
+    max: 4500
+    bonusPerLevel: 4
+
+  drops:
+    - itemId: Memory Flux
+      min: 1
+      max: 1
+      chance: 100
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Rapidfire III
+      weight: 2
+
+    - skillId: Barbed Shot II
+      weight: 2
+
+    - skillId: Venom Bite II
+      weight: 2
+
+    - skillId: Nature Lance II
+      weight: 2
+
+    - skillId: Gale Volley
+      weight: 1
+
+    - skillId: Verdant Barrage
+      weight: 1
+
+    - skillId: Regrowth II
+      weight: 1
+
+  baseStats:
+    Health: 4500
+    Energy: 250
+    Luck: 10
+    Intelligence: 15
+    Strength: 35
+    Vitality: 50
+    Resistance: 40
+    Agility: 20
+
+  statsPerLevel:
+    Health: 220
+    Energy: 4.5
+    Luck: 0.4
+    Intelligence: 0.4
+    Strength: 1.1
+    Vitality: 1.7
+    Resistance: 1.2
+    Agility: 1
