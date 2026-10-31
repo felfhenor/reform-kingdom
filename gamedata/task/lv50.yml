@@ -1,0 +1,213 @@
+- id: 3cc7b288-9f3b-4607-b545-d4076ae51eb5
+  name: Reach Level 50
+  description: Keep adventuring until a hero reaches level 50.
+  order: 800
+  requireMapVisit: Felway
+  requirement:
+    kind: ReachLevel
+    level: 50
+  rewards:
+    - itemId: Gold Coin
+      quantity: 100000
+    - itemId: Memory Flux
+      quantity: 3
+
+- id: a6069f65-aefd-4852-8074-0a4b73fc74a9
+  name: Reach Blacksmithing Level 25
+  description: Craft Blacksmithing recipes until the building reaches level 25.
+  order: 805
+  requireMapVisit: FelSummit
+  requirement:
+    kind: TradeskillLevel
+    tradeskillId: Blacksmithing
+    level: 25
+  rewards:
+    - itemId: Gold Coin
+      quantity: 15000
+    - itemId: Frozen Felrock
+      quantity: 15
+
+- id: 75b0006f-18f2-4e62-92ca-22f01c487b6b
+  name: Gather 25 Frozen Felrock
+  description: Travel to the Felfrost Cellar and acquire 25 Frozen Felrock.
+  order: 810
+  requireMapVisit: FelSummit
+  requirement:
+    kind: GatherItem
+    nodeName: Felfrost Cellar
+    itemId: Frozen Felrock
+    quantity: 25
+  rewards:
+    - itemId: Fel Flux
+      quantity: 10
+
+- id: 8b570840-ecba-4f7b-b5b2-c86490926a8f
+  name: Reach Tailoring Level 25
+  description: Craft Tailoring recipes until the building reaches level 25.
+  order: 815
+  requireMapVisit: FelSummit
+  requirement:
+    kind: TradeskillLevel
+    tradeskillId: Tailoring
+    level: 25
+  rewards:
+    - itemId: Gold Coin
+      quantity: 15000
+    - itemId: Frostneedle
+      quantity: 15
+
+- id: afed70bc-b628-4678-9bc5-bd3840827f15
+  name: Clear Koralin
+  description: Defeat every demon and frost construct in the town of Koralin.
+  order: 820
+  requireMapVisit: FelSummit
+  whisper: They seem just like us. Just less human.
+  requirement:
+    kind: ClearEncounter
+    nodeName: Koralin
+    quantity: 1
+  rewards:
+    - itemId: Fel Essence
+      quantity: 20
+
+- id: 1b7f7df1-a936-41d5-9bee-203080d6444e
+  name: Reach Jewelcrafting Level 25
+  description: Craft Jewelcrafting recipes until the building reaches level 25.
+  order: 825
+  requireMapVisit: FelSummit
+  requirement:
+    kind: TradeskillLevel
+    tradeskillId: Jewelcrafting
+    level: 25
+  rewards:
+    - itemId: Gold Coin
+      quantity: 15000
+    - itemId: Diamond
+      quantity: 5
+
+- id: f6acd3e4-7964-4b77-b428-8397be716692
+  name: Gather 25 Felfrost
+  description: Travel to the Felfrost Cellar and acquire 25 Felfrost.
+  order: 830
+  requireMapVisit: FelSummit
+  whisper: Even the frost here remembers being something else. Nothing the Fel touch stays what it was.
+  requirement:
+    kind: GatherItem
+    nodeName: Felfrost Cellar
+    itemId: Felfrost
+    quantity: 25
+  rewards:
+    - itemId: Fel Iron Ingot
+      quantity: 5
+
+- id: 8fb89c68-7756-4a66-937a-6043475d31d0
+  name: Reach Woodworking Level 25
+  description: Craft Woodworking recipes until the building reaches level 25.
+  order: 835
+  requireMapVisit: FelSummit
+  requirement:
+    kind: TradeskillLevel
+    tradeskillId: Woodworking
+    level: 25
+  rewards:
+    - itemId: Gold Coin
+      quantity: 15000
+    - itemId: Frostwood
+      quantity: 15
+
+- id: ee2c5c7c-62f3-44bc-8454-26881c49eb42
+  name: Defeat 30 Frost Golems
+  description: Defeat 30 Frost Golems that guard the Fel Summit.
+  order: 840
+  requireMapVisit: FelSummit
+  requirement:
+    kind: DefeatMonster
+    monsterId: Frost Golem
+    quantity: 30
+  rewards:
+    - itemId: Frostcore
+      quantity: 10
+
+- id: a1ec1ec6-9b8f-4840-865f-38b65517e61d
+  name: Reach Artificing Level 25
+  description: Craft Artificing recipes until the building reaches level 25.
+  order: 845
+  requireMapVisit: FelSummit
+  requirement:
+    kind: TradeskillLevel
+    tradeskillId: Artificing
+    level: 25
+  rewards:
+    - itemId: Gold Coin
+      quantity: 15000
+    - itemId: Felfrost
+      quantity: 15
+
+- id: f3ab7c6f-a085-4a96-b1cf-ce6be2d7ed7a
+  name: Clear the Frostcore Refinery
+  description: Defeat every demon and frost construct guarding the Frostcore Refinery.
+  order: 850
+  requireMapVisit: FelSummit
+  whisper: So this is where they make the cores. Every golem on this summit was born here, from pieces of a land that no longer remembers them. Sad.
+  requirement:
+    kind: ClearEncounter
+    nodeName: Frostcore Refinery
+    quantity: 1
+  rewards:
+    - itemId: Fel Flux
+      quantity: 15
+
+- id: 37ac25b0-c296-43ab-8978-54c83c078a40
+  name: Reach Level 55
+  description: Keep adventuring until a hero reaches level 55.
+  order: 860
+  requireMapVisit: FelSummit
+  requirement:
+    kind: ReachLevel
+    level: 55
+  rewards:
+    - itemId: Gold Coin
+      quantity: 125000
+    - itemId: Memory Flux
+      quantity: 3
+
+- id: e2924d77-fc99-4d8a-87ee-854e12d65a01
+  name: Defeat 30 Frost Toads
+  description: Defeat 30 Frost Toads lurking beneath the snow of the Fel Summit.
+  order: 870
+  requireMapVisit: FelSummit
+  requirement:
+    kind: DefeatMonster
+    monsterId: Frost Toad
+    quantity: 30
+  rewards:
+    - itemId: Frostskin
+      quantity: 10
+
+- id: 11158ce2-b96e-4a22-ae8f-344573cec72c
+  name: Defeat 30 Vengeful Spirits
+  description: Defeat 30 Vengeful Spirits that haunt the Fel Summit.
+  order: 880
+  requireMapVisit: FelSummit
+  whisper: They were travelers once, lost like Sefirah and Selan. Nobody came looking for them, and now they've forgotten what they were looking for. The Zelks were an angry people, after all.
+  requirement:
+    kind: DefeatMonster
+    monsterId: Vengeful Spirit
+    quantity: 30
+  rewards:
+    - itemId: Frostsoul
+      quantity: 10
+
+- id: 74fb0ea3-3401-42dd-a102-e1f4b3f8f0cd
+  name: Reach Level 60
+  description: Keep adventuring until a hero reaches level 60.
+  order: 890
+  requireMapVisit: FelSummit
+  requirement:
+    kind: ReachLevel
+    level: 60
+  rewards:
+    - itemId: Gold Coin
+      quantity: 150000
+    - itemId: Memory Flux
+      quantity: 5
