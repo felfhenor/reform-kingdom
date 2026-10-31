@@ -7,8 +7,7 @@ import type {
 } from '@interfaces';
 import { uniq } from 'es-toolkit/compat';
 
-// Every monster referenced anywhere in any town's guardian tiers - these are
-// combat allies, not discoverable monsters, so the bestiary excludes them.
+// Every monster referenced anywhere in any town's guardian tiers.
 export function townGuardianMonsterIds(): MonsterId[] {
   const towns = getEntriesByType<TownContent>('town');
 
