@@ -7,13 +7,12 @@ import {
 import { backfillReservedEquipment } from '@helpers/crafting/crafting-reserved-equipment';
 import { recipeResultQuantity } from '@helpers/crafting/recipe-result';
 import {
-  isRecipeAvailable,
-  isRecipeCraftable,
-  isRecipeDiscovered,
+  isRecipeKnown,
   recipeBackdropSprite,
   recipeResultContent,
   recipeResultOwnedQuantity,
   recipeResultSpritesheet,
+  recipesProducing,
 } from '@helpers/crafting/recipes';
 import {
   craftXpChance,
@@ -49,7 +48,10 @@ function isRequirementDiscovered(requirement: RecipeRequirement): boolean {
     return isCollectibleDiscovered(requirement.collectibleId);
   }
   if ('equipmentId' in requirement) {
-    return isEquipmentDiscovered(requirement.equipmentId);
+    return (
+      isEquipmentDiscovered(requirement.equipmentId) ||
+      recipesProducing(requirement.equipmentId).some(isRecipeKnown)
+    );
   }
   return isMaterialDiscovered(requirement.itemId);
 }
@@ -125,10 +127,7 @@ export function getCraftableRecipeEntries(
 
   const entries: CraftRecipeEntry[] = getEntriesByType<RecipeContent>('recipe')
     .filter(
-      (recipe) =>
-        recipe.tradeskillId === tradeskillId &&
-        (isRecipeAvailable(recipe) ||
-          (isRecipeDiscovered(recipe.id) && isRecipeCraftable(recipe.id))),
+      (recipe) => recipe.tradeskillId === tradeskillId && isRecipeKnown(recipe),
     )
     .map((recipe) => {
       const levelLocked = building.level < recipe.minTradeskillLevel;

@@ -252,6 +252,31 @@ describe('getCraftableRecipeEntries', () => {
     ]);
   });
 
+  it('shows an undiscovered equipment requirement once the player knows a recipe for it', () => {
+    const forge = recipe('forge', {
+      minTradeskillLevel: 1,
+      requirements: [{ equipmentId: hammerId }],
+    });
+    seedContent([
+      ...baseContent,
+      forge,
+      recipe('hammer', {
+        minTradeskillLevel: 3,
+        result: { equipmentId: hammerId },
+      }),
+    ]);
+    const forgeRequirement = () =>
+      getCraftableRecipeEntries('Blacksmithing').find(
+        (entry) => entry.recipe.id === forge.id,
+      )?.requirementEntries[0].content?.id;
+
+    seedBlacksmithing(2);
+    expect(forgeRequirement()).toBeUndefined();
+
+    seedBlacksmithing(3);
+    expect(forgeRequirement()).toBe(hammerId);
+  });
+
   it('shows the content of discovered requirements', () => {
     seedContent([
       ...baseContent,

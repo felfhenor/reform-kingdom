@@ -15,6 +15,7 @@ import {
   isRecipeCraftable,
   isRecipeDiscovered,
   isRecipeDropGated,
+  isRecipeKnown,
   isRecipeTownUnique,
   isRecipeAvailable,
   recipeCanUnlockWithTokens,
@@ -176,21 +177,21 @@ describe('isRecipeCraftable', () => {
   });
 });
 
+const highLevel = { ...equipmentRecipe, minTradeskillLevel: 5 };
+
+function seedTailoring(level: number, ...discovered: RecipeId[]): void {
+  seedGamestate((state) => {
+    state.tradeskills[tailoringId] = {
+      ...defaultTradeskillBuilding(),
+      level,
+    };
+    discovered.forEach(
+      (id) => (state.discoveredRecipes[id] = { foundAt: 1000 }),
+    );
+  });
+}
+
 describe('isRecipeAvailable', () => {
-  const highLevel = { ...equipmentRecipe, minTradeskillLevel: 5 };
-
-  function seedTailoring(level: number, ...discovered: RecipeId[]): void {
-    seedGamestate((state) => {
-      state.tradeskills[tailoringId] = {
-        ...defaultTradeskillBuilding(),
-        level,
-      };
-      discovered.forEach(
-        (id) => (state.discoveredRecipes[id] = { foundAt: 1000 }),
-      );
-    });
-  }
-
   it('needs the building level and, if gated, discovery', () => {
     seedTailoring(1);
     expect(isRecipeAvailable(equipmentRecipe)).toBe(false);
@@ -206,6 +207,16 @@ describe('isRecipeAvailable', () => {
   it('is false when the tradeskill is missing from content', () => {
     seedTailoring(1);
     expect(isRecipeAvailable(itemRecipe)).toBe(false);
+  });
+});
+
+describe('isRecipeKnown', () => {
+  it('includes a found recipe above the building level, but not an unfound gated one', () => {
+    seedTailoring(1);
+    expect(isRecipeKnown(highLevel)).toBe(false);
+
+    seedTailoring(1, equipmentRecipe.id);
+    expect(isRecipeKnown(highLevel)).toBe(true);
   });
 });
 

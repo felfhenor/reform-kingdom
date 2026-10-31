@@ -117,6 +117,14 @@ export function isRecipeAvailable(recipe: RecipeContent): boolean {
   return isRecipeCraftable(recipe.id);
 }
 
+// On the tradeskill's craft list: available now, or a found recipe still above the building's level.
+export function isRecipeKnown(recipe: RecipeContent): boolean {
+  return (
+    isRecipeAvailable(recipe) ||
+    (isRecipeDiscovered(recipe.id) && isRecipeCraftable(recipe.id))
+  );
+}
+
 export function recipesProducing(
   resultId: ItemId | EquipmentId,
 ): RecipeContent[] {
