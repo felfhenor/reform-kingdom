@@ -44,6 +44,22 @@
   name: Elfway Exit
   description: A teleportation circle leading to Carrina from the Erden Woodland.
 
+- id: 0f8bb1bc-065a-4993-8df3-a528429b6472
+  name: Frostway Entrance
+  description: A cave with a powerfully cold breeze flowing through it.
+
+- id: 60a5440c-91da-43cf-be45-9bd2dfa4a435
+  name: Frostway Exit
+  description: A frozen cave that slowly melts as you travel through it.
+
+- id: 964d1345-8ac2-49c8-99b2-e8178cc1deda
+  name: Mysterious Boat
+  description: An ominous boat moored in an even more ominous lagoon. What could this boat be for?
+
+- id: a58e4c40-f70a-465b-b0e2-5d5c0d52a5d4
+  name: Chronoport
+  description: A portal from the compressed timespace of the Astral Observatory back to the Fel Summit.
+
 - id: bb008d41-a80f-401a-81b7-a0f91b8657af
   name: Observatory Chronoport
   description: A chronoport leading from Carrina to the Astral Observatory. Created by a link between the Founder and the current Heroes.
