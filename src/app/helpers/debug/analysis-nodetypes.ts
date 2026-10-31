@@ -5,6 +5,7 @@
  */
 
 import { getEntry } from '@helpers/content/content';
+import { isTiledWorldNodeType } from '@helpers/pixi/tiled-map';
 import { worldNodeLookup } from '@helpers/world-node/world-nodes';
 import type {
   AnalysisCheck,
@@ -29,10 +30,6 @@ const NODE_TYPE_BY_CONTENT_TYPE: Partial<Record<ContentType, WorldNodeType>> = {
   town: 'NonPlayerKingdom',
   collectiblegate: 'CollectibleGate',
 };
-
-function isWorldNodeType(type: string): type is WorldNodeType {
-  return (WORLD_NODE_TYPES as readonly string[]).includes(type);
-}
 
 function expectedNodeType(nodeName: string): WorldNodeType | undefined {
   const content = getEntry<IsContentItem>(nodeName);
@@ -59,7 +56,7 @@ function nodeTypeProblem(ref: MapNodeCheckRef): string | undefined {
   const hint = suggestion ? ` Did you mean "${suggestion}"?` : '';
 
   if (node.type === '') return `has no type.${hint}`;
-  if (!isWorldNodeType(node.type)) {
+  if (!isTiledWorldNodeType(node.type)) {
     return `has unknown type "${node.type}".${hint}`;
   }
 

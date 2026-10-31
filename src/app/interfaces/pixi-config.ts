@@ -59,3 +59,60 @@ export type PartyPositionSample = {
   time: number;
   position: CurrentLocation;
 };
+
+// Low-poly shard floating behind maps that leave tile gaps; field positions are fractions of the wrap field.
+export type BackdropShard = {
+  fieldX: number;
+  fieldY: number;
+  depth: number;
+  sizePx: number;
+  vertices: number[];
+  color: number;
+  alpha: number;
+  hasHighlightEdge: boolean;
+  // 0 for shards that never glint.
+  glintReachPx: number;
+  periodMs: number;
+  phaseMs: number;
+  tumbleAxis: number;
+  tumblePhase: number;
+  tumbleSpeedPerMs: number;
+  shimmerPhase: number;
+  floatPhaseX: number;
+  floatPhaseY: number;
+  floatSpeedX: number;
+  floatSpeedY: number;
+  floatAmplitudeX: number;
+  floatAmplitudeY: number;
+  wobbleAmplitude: number;
+  // Set on "memory" shards: picks which landmark tile is etched into the shard, as a fraction of the available tiles.
+  memoryPick?: number;
+};
+
+export type BackdropShardState = {
+  offsetX: number;
+  offsetY: number;
+  rotation: number;
+  // cos of the turn angle about the shard's tumble axis; negative while its back face is showing.
+  facing: number;
+  light: number;
+  alpha: number;
+  scale: number;
+  shimmer: number;
+  glint: number;
+  glintScale: number;
+};
+
+export type BackdropUpdate = (
+  nowMs: number,
+  cameraPx: CameraPosition,
+  viewWidth: number,
+  viewHeight: number,
+) => void;
+
+export type BackdropStar = {
+  fieldX: number;
+  fieldY: number;
+  radiusPx: number;
+  phase: number;
+};

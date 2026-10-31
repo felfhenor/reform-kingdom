@@ -9,6 +9,8 @@ import { describe, expect, it } from 'vitest';
 import {
   tiledLayerTileAt,
   tiledMapGetLayer,
+  tiledMapHasGaps,
+  tiledMapsNodeTileIds,
   tiledMapsTilesetImagePaths,
   tiledMapTileLayers,
   tiledObjectProperty,
@@ -65,6 +67,65 @@ describe('Tiled Map Helper Functions', () => {
       const map = buildMap({ layers: [tileLayer, objectLayer] });
 
       expect(tiledMapTileLayers(map)).toEqual([tileLayer]);
+    });
+  });
+
+  describe('tiledMapHasGaps', () => {
+    const layer = (data: number[]): TiledLayer => ({
+      id: 1,
+      name: 'Tiles',
+      type: 'tilelayer',
+      visible: true,
+      width: 2,
+      height: 2,
+      data,
+    });
+
+    it('is false when every cell is covered by some tile layer', () => {
+      const map = buildMap({
+        layers: [layer([1, 0, 1, 0]), layer([0, 2, 0, 2])],
+      });
+      expect(tiledMapHasGaps(map)).toBe(false);
+    });
+
+    it('is true when a cell is empty on every tile layer', () => {
+      const map = buildMap({
+        layers: [layer([1, 0, 1, 0]), layer([0, 2, 0, 0])],
+      });
+      expect(tiledMapHasGaps(map)).toBe(true);
+    });
+  });
+
+  describe('tiledMapsNodeTileIds', () => {
+    const nodeLayer = (objects: Partial<TiledObject>[]): TiledLayer => ({
+      id: 2,
+      name: 'Nodes',
+      type: 'objectgroup',
+      visible: true,
+      objects: objects as TiledObject[],
+    });
+
+    it('collects unique tileset-local ids of world-node tiles, ignoring decor and other tilesets', () => {
+      const tileset = buildTileset({
+        name: 'landmarks',
+        firstgid: 10,
+        tilecount: 5,
+      });
+      const flippedGid = (0x80000000 | 12) >>> 0;
+      const map = buildMap({
+        tilesets: [buildTileset({ name: 'terrain', tilecount: 9 }), tileset],
+        layers: [
+          nodeLayer([
+            { type: 'Kingdom', gid: 11 },
+            { type: 'ExploreNode', gid: flippedGid },
+            { type: 'GatherNode', gid: 11 },
+            { type: '', gid: 13 },
+            { type: 'Shrine', gid: 3 },
+          ]),
+        ],
+      });
+
+      expect(tiledMapsNodeTileIds([map], 'landmarks')).toEqual([1, 2]);
     });
   });
 

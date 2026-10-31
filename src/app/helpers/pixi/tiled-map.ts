@@ -5,7 +5,9 @@ import type {
   TiledObject,
   TiledObjectSpriteFrame,
   TiledTileset,
+  WorldNodeType,
 } from '@interfaces';
+import { WORLD_NODE_TYPES } from '@interfaces';
 import { sortBy, uniq } from 'es-toolkit/compat';
 
 // Tiled's gid flip flags occupy the top 3 bits of the stored gid, so a
@@ -15,6 +17,16 @@ const GID_FLIP_FLAGS_MASK = 0x1fffffff;
 
 export function tiledMapTileLayers(map: TiledMap): TiledLayer[] {
   return map.layers.filter((layer) => layer.type === 'tilelayer');
+}
+
+// True when some cell has no tile on any tile layer, letting whatever is under the map show through.
+export function tiledMapHasGaps(map: TiledMap): boolean {
+  const layers = tiledMapTileLayers(map);
+  const cellCount = map.width * map.height;
+  for (let index = 0; index < cellCount; index++) {
+    if (layers.every((layer) => !layer.data?.[index])) return true;
+  }
+  return false;
 }
 
 export function tiledMapGetLayer(
@@ -78,6 +90,31 @@ export function tiledObjectProperty<T>(
 ): T | undefined {
   return object.properties?.find((property) => property.name === name)
     ?.value as T | undefined;
+}
+
+export function isTiledWorldNodeType(type: string): type is WorldNodeType {
+  return (WORLD_NODE_TYPES as readonly string[]).includes(type);
+}
+
+// Tileset-local ids of the tiles world nodes are drawn with, across every given map.
+export function tiledMapsNodeTileIds(
+  maps: TiledMap[],
+  tilesetName: string,
+): number[] {
+  const ids = maps.flatMap((map) => {
+    const tileset = map.tilesets.find((t) => t.name === tilesetName);
+    if (!tileset) return [];
+
+    return map.layers
+      .flatMap((layer) => layer.objects ?? [])
+      .filter((object) => isTiledWorldNodeType(object.type))
+      .map(
+        (object) =>
+          ((object.gid ?? 0) & GID_FLIP_FLAGS_MASK) - tileset.firstgid,
+      )
+      .filter((id) => id >= 0 && id < tileset.tilecount);
+  });
+  return sortBy(uniq(ids));
 }
 
 export function tiledObjectSpriteFrame(

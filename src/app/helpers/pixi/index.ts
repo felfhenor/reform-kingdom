@@ -1,4 +1,6 @@
 export * from './pixi-app-setup.ui';
+export * from './pixi-backdrop-shards';
+export * from './pixi-backdrop-shards.ui';
 export * from './pixi-camera';
 export * from './pixi-floating-text';
 export * from './pixi-frame-rate.ui';

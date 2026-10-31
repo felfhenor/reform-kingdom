@@ -49,6 +49,7 @@ import {
   pixiResponsiveCanvasSetup,
   pixiWorldContainersCreate,
 } from '@helpers/pixi/pixi-app-setup.ui';
+import { pixiBackdropShardsCreate } from '@helpers/pixi/pixi-backdrop-shards.ui';
 import { pixiMapMaxFps } from '@helpers/pixi/pixi-frame-rate.ui';
 import {
   cameraBoundsCalculate,
@@ -109,6 +110,7 @@ import { worldNodeDiscoverIfHidden } from '@helpers/world-node/world-nodes.ui';
 import { isPlayerAtLocation } from '@helpers/world.ui';
 import type {
   AtlasedImage,
+  BackdropUpdate,
   CameraBounds,
   CameraPosition,
   CurrentLocation,
@@ -230,6 +232,7 @@ export class GamePlayWorldComponent implements OnDestroy {
   private map?: TiledMap;
   private loadedMapName?: string;
   private mapContainer?: Container;
+  private backdropUpdate?: BackdropUpdate;
   private gridOverlay?: Graphics;
   private playerIndicatorContainer?: Container;
   private partyFollowerContainer?: Container;
@@ -497,6 +500,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.app = undefined;
     this.map = undefined;
     this.mapContainer = undefined;
+    this.backdropUpdate = undefined;
     this.gridOverlay = undefined;
     this.playerIndicatorContainer = undefined;
     this.partyFollowerContainer = undefined;
@@ -586,6 +590,10 @@ export class GamePlayWorldComponent implements OnDestroy {
     containers.nodeLabelLayer.attach(...renderedMap.nodeLabels.values());
     this.nodeWrappers = renderedMap.nodeWrappers;
     this.nodeStatusIcons = renderedMap.nodeStatusIcons;
+
+    const backdrop = pixiBackdropShardsCreate(map, mapName, textures);
+    if (backdrop) containers.backdropContainer.addChild(backdrop.container);
+    this.backdropUpdate = backdrop?.update;
     this.updateNodeLabels();
     this.updateNodeWrapperVisibility();
     this.updateNodeStatusIcons();
@@ -633,6 +641,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.updateEncounterProgressIndicator();
       this.maybeUpdateNodeStatus(performance.now());
       this.positionCamera();
+      this.updateBackdrop();
       this.renderPartyFollowerIndicators();
       this.updateWorkerIndicators();
       this.updateFloatingTexts();
@@ -1139,6 +1148,21 @@ export class GamePlayWorldComponent implements OnDestroy {
 
     this.positionNodeSelectionIndicator(camera);
     this.lastCamera = camera;
+  }
+
+  private updateBackdrop(): void {
+    if (!this.backdropUpdate || !this.app || !this.map) return;
+
+    const zoom = this.app.stage.scale.x;
+    this.backdropUpdate(
+      performance.now(),
+      {
+        x: this.lastCamera.x * this.map.tilewidth,
+        y: this.lastCamera.y * this.map.tileheight,
+      },
+      this.app.screen.width / zoom,
+      this.app.screen.height / zoom,
+    );
   }
 
   private positionNodeSelectionIndicator(camera: CameraPosition): void {

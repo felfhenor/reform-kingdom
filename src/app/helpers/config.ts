@@ -325,6 +325,51 @@ export const TERRAIN_NOISE_FEATURE_CELLS = 4;
 // Peak speckle chance per noise pixel, reached only at the densest point of a cluster.
 export const TERRAIN_NOISE_DENSITY = 0.1;
 export const TERRAIN_NOISE_ALPHA = 0.07;
+export const BACKDROP_SHARD_COUNT = 160;
+// Parallax factor range; lower = farther away, so it drifts less than the map while panning.
+export const BACKDROP_SHARD_DEPTH_MIN = 0.15;
+export const BACKDROP_SHARD_DEPTH_MAX = 0.6;
+export const BACKDROP_SHARD_BASE_SIZE_PX = 21;
+export const BACKDROP_SHARD_ALPHA_MIN = 0.55;
+export const BACKDROP_SHARD_ALPHA_MAX = 0.95;
+export const BACKDROP_SHARD_SHADE_MIN = 0.75;
+export const BACKDROP_SHARD_SHADE_MAX = 1.1;
+export const BACKDROP_SHARD_QUAD_CHANCE = 0.18;
+export const BACKDROP_SHARD_HIGHLIGHT_EDGE_CHANCE = 0.28;
+// Memory shards carry a fragment of node art, drawn larger so the image stays legible.
+export const BACKDROP_SHARD_MEMORY_CHANCE = 0.12;
+export const BACKDROP_SHARD_MEMORY_SIZE_SCALE = 2.6;
+export const BACKDROP_SHARD_PERIOD_MIN_MS = 6000;
+export const BACKDROP_SHARD_PERIOD_MAX_MS = 16000;
+// Share of each cycle spent flaring, so only a handful of shards twinkle at once.
+export const BACKDROP_SHARD_FLARE_FRACTION = 0.15;
+// One full 3D turn about the shard's own in-plane axis.
+export const BACKDROP_SHARD_TUMBLE_PERIOD_MIN_MS = 30000;
+export const BACKDROP_SHARD_TUMBLE_PERIOD_MAX_MS = 60000;
+// A share of shards turn faster than the slow drift, so some motion is always visible.
+export const BACKDROP_SHARD_FAST_TUMBLE_CHANCE = 0.35;
+export const BACKDROP_SHARD_FAST_TUMBLE_PERIOD_MIN_MS = 12000;
+export const BACKDROP_SHARD_FAST_TUMBLE_PERIOD_MAX_MS = 20000;
+// Only some shards glint when they flare, and glints are capped so big memory shards don't throw huge stars.
+export const BACKDROP_SHARD_GLINT_CHANCE = 0.25;
+export const BACKDROP_SHARD_GLINT_REACH_MAX_PX = 14;
+// Edge-on shards dim to this, and back faces dim further, so the turn reads as lit from the front.
+export const BACKDROP_SHARD_LIGHT_MIN = 0.45;
+export const BACKDROP_SHARD_BACKFACE_LIGHT = 0.7;
+export const BACKDROP_SHARD_SHIMMER_PERIOD_MS = 450;
+export const BACKDROP_SHARD_FLOAT_SPEED_X = 0.00035;
+export const BACKDROP_SHARD_FLOAT_SPEED_Y = 0.0003;
+export const BACKDROP_SHARD_WOBBLE_SPEED = 0.00025;
+// Field padding so shards wrap offscreen instead of popping in at the viewport edge.
+export const BACKDROP_FIELD_MARGIN_PX = 60;
+// Muted plums and browns echoing splash-dark.
+export const BACKDROP_SHARD_COLORS: ReadonlyArray<number> = [
+  0x452c3b, 0x543641, 0x674543, 0x745249, 0x5b4844, 0x815b4d, 0x8f6c53,
+  0x433142, 0x6d4c54, 0x4f3e3c, 0x9b7a5d, 0x5f3a49,
+];
+export const BACKDROP_STAR_COUNT = 260;
+export const BACKDROP_STAR_DEPTH = 0.05;
+export const BACKDROP_STAR_PULSE_SPEED = 0.0005;
 
 // How far each trailing party member's screen position lags behind the leader's, in party order (position 2 = 1x, position 3 = 2x, ...).
 export const PARTY_FORMATION_FOLLOW_DELAY_MS = 450;

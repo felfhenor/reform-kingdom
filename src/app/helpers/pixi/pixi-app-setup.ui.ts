@@ -48,6 +48,7 @@ export function pixiResponsiveCanvasSetup(
 }
 
 export function pixiWorldContainersCreate(app: Application): {
+  backdropContainer: Container;
   mapContainer: Container;
   partyFollowerContainer: Container;
   playerIndicatorContainer: Container;
@@ -58,6 +59,7 @@ export function pixiWorldContainersCreate(app: Application): {
   nodeLabelLayer: RenderLayer;
   floatingTextContainer: Container;
 } {
+  const backdropContainer = new Container();
   const mapContainer = new Container();
   const partyFollowerContainer = new Container();
   const playerIndicatorContainer = new Container();
@@ -68,6 +70,8 @@ export function pixiWorldContainersCreate(app: Application): {
   const nodeLabelLayer = new RenderLayer();
   const floatingTextContainer = new Container();
 
+  // Screen-anchored like the token layers; only visible through gaps in the map's tile layers.
+  app.stage.addChild(backdropContainer);
   app.stage.addChild(mapContainer);
   // Added before the leader so it renders underneath when the party stacks up on the same tile.
   app.stage.addChild(partyFollowerContainer);
@@ -94,6 +98,7 @@ export function pixiWorldContainersCreate(app: Application): {
   floatingTextContainer.cullable = false;
 
   return {
+    backdropContainer,
     mapContainer,
     partyFollowerContainer,
     playerIndicatorContainer,
