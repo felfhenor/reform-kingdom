@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -25,6 +26,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     SlotRarityOutlineComponent,
     ListRowDirective,
     SFXDirective,
+    DecimalPipe,
   ],
   templateUrl: './slot-caravan-trade.component.html',
   styleUrl: './slot-caravan-trade.component.scss',

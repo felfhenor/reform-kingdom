@@ -51,7 +51,7 @@
 
         @if (entry.ownedQuantity > 0) {
           <span class="badge badge-sm badge-data">
-            Owned: {{ entry.ownedQuantity }}
+            Owned: {{ entry.ownedQuantity | number }}
           </span>
         }
 
