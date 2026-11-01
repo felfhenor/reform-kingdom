@@ -12,7 +12,7 @@
         @for (slot of row; track slot) {
           @if (isSlotVisible(slot)) {
             <app-slot-equipment
-              class="min-h-[66px]"
+              class="min-h-[66px] max-w-[66px]"
               [attr.data-equip-slot]="slot"
               [slot]="slot"
               [equippedItem]="equippedItemFor(slot)"
