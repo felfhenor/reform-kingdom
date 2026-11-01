@@ -20,7 +20,7 @@
       </div>
 
       <span class="type-meta">
-        {{ levelLabel() }} {{ e.monster.types.join('/') }} ·
+        {{ levelLabel() }} {{ e.monster.types.sort().join('/') }} ·
         {{ e.kills | number }} killed
       </span>
 
