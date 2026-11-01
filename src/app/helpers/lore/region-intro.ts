@@ -9,6 +9,11 @@ export function regionForMap(mapName: string): RegionContent | undefined {
   );
 }
 
+// Falls back to the raw map name for maps with no region.
+export function regionNameForMap(mapName: string): string {
+  return regionForMap(mapName)?.name ?? mapName;
+}
+
 export function isRegionIntroSeen(mapName: string): boolean {
   return ledgerHas(regionIntrosState(), mapName);
 }

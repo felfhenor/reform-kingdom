@@ -1,0 +1,69 @@
+<app-modal
+  modalId="rumors"
+  [showCloseButton]="true"
+  [allowEscToClose]="true"
+  [closeOnBackdropClick]="true"
+  widthClass="max-w-3xl"
+>
+  <span title>Rumors</span>
+  <p subtitle>Rumors sold by caravans, and the places they reveal.</p>
+
+  <div body class="flex flex-col gap-2 max-h-[60vh] overflow-y-auto">
+    @for (row of rows(); track row.rumorId) {
+      <div class="flex items-center gap-4 p-3 bg-base-200">
+        @if (row.destination) {
+          <app-slot-rarity-outline [entry]="row" spritesheet="item" />
+        } @else {
+          <app-icon-unknown />
+        }
+
+        <div class="flex flex-col flex-1 min-w-0 gap-1">
+          @if (row.destination) {
+            <span class="type-entity-name text-{{ row.rarity }}">
+              {{ row.name }}
+            </span>
+          } @else {
+            <span class="type-unknown">???</span>
+          }
+          <span class="type-meta">{{ row.description }}</span>
+          @if (row.destination; as destination) {
+            <span class="type-meta flex items-center gap-1 mt-2">
+              Leads to
+              <app-sprite-node class="zoom-inline" [entry]="destination.node" />
+              <strong>{{ destination.node.nodeName }}</strong>
+              in
+              {{ destination.regionName }}
+            </span>
+          }
+        </div>
+
+        @if (row.destination; as destination) {
+          <div class="flex justify-end shrink-0">
+            @if (destination.isPartyHere) {
+              <span class="badge badge-success">You are here</span>
+            } @else if (destination.travelEtaSeconds !== undefined) {
+              <button
+                type="button"
+                class="btn btn-xs btn-neutral tabular-nums"
+                disabled
+              >
+                {{ etaLabel(destination.travelEtaSeconds) }}
+              </button>
+            } @else {
+              <button
+                type="button"
+                class="btn btn-xs btn-neutral"
+                [disabled]="!destination.canTravel"
+                (click)="travelTo(destination.node.nodeName)"
+                appSfx="ui-click"
+                [sfxTrigger]="['click', 'hover']"
+              >
+                Travel Here
+              </button>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+</app-modal>

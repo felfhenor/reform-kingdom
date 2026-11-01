@@ -10,6 +10,7 @@ import {
   caravanTicksUntilReset,
   caravanTimerLabel,
   caravanTimerUrgency,
+  caravanTraderMapNames,
   backfillDiscoveredTraders,
   isCaravanDiscovered,
   isTraderDiscovered,
@@ -85,6 +86,22 @@ describe('caravanEligibleTraders', () => {
     ]);
 
     expect(caravanEligibleTraders(caravan)).toEqual([atMin, atMax]);
+  });
+});
+
+describe('caravanTraderMapNames', () => {
+  it('lists each map with a caravan the trader is eligible for, once', () => {
+    const local = trader({ id: traderA });
+    const branch = { ...caravan, id: 'branch' as CaravanId, name: 'Branch' };
+    seedContent([caravan, branch, otherCaravan, local]);
+    seedWorldNodes([
+      { name: caravan.name, type: 'CaravanNode', mapName: 'Carrina', x: 1 },
+      { name: branch.name, type: 'CaravanNode', mapName: 'Carrina', x: 2 },
+      { name: otherCaravan.name, type: 'CaravanNode', mapName: 'Elfheim' },
+    ]);
+
+    expect(caravanTraderMapNames(local.id)).toEqual(['Carrina']);
+    expect(caravanTraderMapNames(traderB)).toEqual([]);
   });
 });
 

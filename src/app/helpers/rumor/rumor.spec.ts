@@ -1,25 +1,31 @@
 import { describe, expect, it } from 'vitest';
 
+import { ensureCaravanTrader } from '@helpers/content/ensure-caravan';
 import { ensureGathering } from '@helpers/content/ensure-gathernode';
 import { ensureRegion } from '@helpers/content/ensure-region';
 import { ensureCollectible } from '@helpers/content/ensure-item';
 import { ensureRumor } from '@helpers/content/ensure-rumor';
 import { applyCollectibleGrant } from '@helpers/item/collectibles';
 import {
+  isRumorBought,
   isRumorHearable,
   isRumorRevealed,
   isRumorSubjectFound,
   rumorPickHearable,
   rumorRevealNodeName,
   rumorsHearable,
+  rumorsSold,
+  rumorTraders,
   rumorTeaser,
 } from '@helpers/rumor/rumor';
 import type {
+  CaravanTrade,
+  CaravanTraderId,
   CollectibleId,
   GatheringId,
+  IsContentItem,
   JobId,
   RegionId,
-  RumorContent,
   RumorId,
   TrainerTeachingId,
 } from '@interfaces';
@@ -67,8 +73,8 @@ const luckRumor = ensureRumor({
   subject: { kind: 'TrainerTeaching', trainerTeachingId: luck },
 });
 
-function seedWorld(rumors: RumorContent[] = []): void {
-  seedContent([relic, hiddenGlade, gatedGrove, ...rumors]);
+function seedWorld(content: IsContentItem[] = []): void {
+  seedContent([relic, hiddenGlade, gatedGrove, ...content]);
   seedWorldNodes([
     { name: hiddenGlade.name, type: 'GatherNode' },
     { name: gatedGrove.name, type: 'GatherNode' },
@@ -169,6 +175,36 @@ describe('rumor reveals', () => {
     seedGamestate();
     expect(isRumorRevealed(gladeRumor.id)).toBe(false);
     expect(isRumorRevealed('gone' as RumorId)).toBe(true);
+  });
+});
+
+describe('rumor purchases', () => {
+  const trader = ensureCaravanTrader({
+    id: 'trader' as CaravanTraderId,
+    trades: [{ rumorId: gladeRumor.id } as CaravanTrade],
+  });
+
+  it('counts a Node rumor as bought once its node is revealed', () => {
+    seedWorld([gladeRumor, relicRumor]);
+    seedGamestate();
+    expect(isRumorBought(gladeRumor)).toBe(false);
+
+    seedGamestate((state) => {
+      state.worldDiscoveries[hiddenGlade.name] = { foundAt: 1 };
+    });
+    expect(isRumorBought(gladeRumor)).toBe(true);
+    expect(isRumorBought(relicRumor)).toBe(false);
+  });
+
+  it('only counts Node rumors some caravan sells as sold', () => {
+    seedWorld([gladeRumor, groveRumor, relicRumor, trader]);
+    expect(rumorTraders(gladeRumor.id)).toEqual([trader]);
+    expect(rumorsSold()).toEqual([gladeRumor]);
+  });
+
+  it('does not count a rumor no caravan sells as sold', () => {
+    seedWorld([gladeRumor]);
+    expect(rumorsSold()).toEqual([]);
   });
 });
 

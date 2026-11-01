@@ -267,6 +267,19 @@
             }
           </button>
 
+          @if (boughtRumorCount() > 0) {
+            <button
+              class="btn btn-neutral btn-sm"
+              (click)="openRumorsModal()"
+              appSfx="ui-click"
+              [sfxOffset]="6"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              <app-icon-kingdom name="rumor" class="zoom-inline" />
+              Rumors
+            </button>
+          }
+
           @if (isFeatureAvailable('workshop')) {
             <button
               class="btn btn-neutral btn-sm"

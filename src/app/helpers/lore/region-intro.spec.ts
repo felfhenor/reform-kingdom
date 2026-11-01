@@ -5,6 +5,7 @@ import {
   isRegionIntroSeen,
   regionForMap,
   regionIntroPending,
+  regionNameForMap,
 } from '@helpers/lore/region-intro';
 import type { RegionId } from '@interfaces';
 import { seedContent } from '@/testing/content';
@@ -32,6 +33,15 @@ describe('regionForMap', () => {
 
     expect(regionForMap('CraggledMire')?.name).toBe('Craggled Mire');
     expect(regionForMap('Craggled Mire')).toBeUndefined();
+  });
+});
+
+describe('regionNameForMap', () => {
+  it('falls back to the map name when no region claims it', () => {
+    seedRegions();
+
+    expect(regionNameForMap('CraggledMire')).toBe('Craggled Mire');
+    expect(regionNameForMap('Nowhere')).toBe('Nowhere');
   });
 });
 

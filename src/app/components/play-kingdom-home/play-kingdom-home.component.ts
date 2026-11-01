@@ -43,6 +43,7 @@ import {
   worldHomeNodeNameState,
 } from '@helpers/state-game';
 import { raidDefenseRowViewModels } from '@helpers/town/raid/town-raid-defense.ui';
+import { rumorsBought } from '@helpers/rumor/rumor.ui';
 import { tasksClaimableIds } from '@helpers/task/task.ui';
 import { homeNodeResetToDuchy } from '@helpers/town/town-spawn.ui';
 import { workersLevelUpStatusEntries } from '@helpers/worker/worker-progression.ui';
@@ -129,6 +130,8 @@ export class PlayKingdomHomeComponent {
   public raidDefenseCount = computed(() => raidDefenseRowViewModels().length);
 
   public claimableTaskCount = computed(() => tasksClaimableIds().length);
+
+  public boughtRumorCount = computed(() => rumorsBought().length);
 
   // Commissions ready to turn in right now - shown as a nudge on the tile.
   public fulfillableCommissionCount = computed(
@@ -225,6 +228,10 @@ export class PlayKingdomHomeComponent {
 
   public openTasksModal(): void {
     modalOpen('tasks');
+  }
+
+  public openRumorsModal(): void {
+    modalOpen('rumors');
   }
 
   public resetHome(): void {

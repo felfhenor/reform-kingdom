@@ -75,6 +75,7 @@ const KINGDOM_EXTRA_ICONS: Record<
   kingdom: true,
   reclass: true,
   requesteddefenses: true,
+  rumor: true,
   sethome: true,
   tasks: true,
 };

@@ -49,6 +49,7 @@ export type KingdomIcon =
   | 'kingdom'
   | 'reclass'
   | 'requesteddefenses'
+  | 'rumor'
   | 'sethome'
   | 'tasks';
 

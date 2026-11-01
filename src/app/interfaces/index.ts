@@ -77,6 +77,7 @@ export * from './pixi-config';
 export * from './regalia';
 export * from './roman-numerals';
 export * from './savefile';
+export * from './rumor.ui';
 export * from './sfx';
 export * from './skill-preview.ui';
 export * from './sfx.ui';

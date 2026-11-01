@@ -2,7 +2,7 @@ import { TASK_WIDGET_ENTRY_COUNT } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { modalClose } from '@helpers/engine/modal-stack';
 import { setGamePlayView, worldCameraFocus } from '@helpers/engine/ui';
-import { regionForMap } from '@helpers/lore/region-intro';
+import { regionNameForMap } from '@helpers/lore/region-intro';
 import {
   bestiaryState,
   tasksState,
@@ -50,7 +50,7 @@ function taskLocate(task: TaskContent): TaskRowViewModel['locate'] {
   const node = nodeName ? worldNodeByName(nodeName) : undefined;
   if (!node) return undefined;
 
-  const mapName = regionForMap(node.mapName)?.name ?? node.mapName;
+  const mapName = regionNameForMap(node.mapName);
   const disabledReason =
     node.mapName === worldCurrentLocationState().mapName
       ? ''

@@ -13,7 +13,10 @@ import {
   worldCaravansState,
 } from '@helpers/state-game';
 import { worldNodeAtCurrentLocation } from '@helpers/world';
-import { worldNodeCaravan } from '@helpers/world-node/world-nodes';
+import {
+  worldNodeCaravan,
+  worldNodesOfType,
+} from '@helpers/world-node/world-nodes';
 import type {
   CaravanContent,
   CaravanId,
@@ -24,7 +27,7 @@ import type {
   GameStateCaravans,
   GameStateDiscoveredTraders,
 } from '@interfaces';
-import { clamp } from 'es-toolkit/compat';
+import { clamp, uniq } from 'es-toolkit/compat';
 
 export function caravanState(
   caravanId: CaravanId,
@@ -47,6 +50,20 @@ export function caravanEligibleTraders(
       trader.level >= content.level.min &&
       trader.level <= content.level.max,
   );
+}
+
+// Every map with a caravan this trader could be stationed at.
+export function caravanTraderMapNames(traderId: CaravanTraderId): string[] {
+  const mapNames = worldNodesOfType('CaravanNode')
+    .filter((entry) => {
+      const caravan = worldNodeCaravan(entry);
+      return (
+        !!caravan &&
+        caravanEligibleTraders(caravan).some((trader) => trader.id === traderId)
+      );
+    })
+    .map((entry) => entry.mapName);
+  return uniq(mapNames);
 }
 
 // Trader ids currently staffing any OTHER caravan node, so a reroll never

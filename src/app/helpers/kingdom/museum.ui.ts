@@ -25,7 +25,7 @@ import { RARITY_PRIORITY } from '@interfaces';
 import { orderBy } from 'es-toolkit/compat';
 
 const CRAFTING_SOURCE_NAME = 'Crafting';
-const UNMET_TRADER_NAME = 'an unmet trader';
+export const UNMET_TRADER_NAME = 'an unmet trader';
 
 export function museumCollectibleEntry(
   collectible: CollectibleContent,

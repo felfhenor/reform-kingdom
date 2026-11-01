@@ -5,11 +5,13 @@ import { rngChoice } from '@helpers/rng';
 import { worldPartyState } from '@helpers/state-game';
 import { characterAllTeachingIds } from '@helpers/trainer/trainer-teaching';
 import { isWorldMapVisited } from '@helpers/world-node/world-map-discovery';
+import { isWorldNodeDiscovered } from '@helpers/world-node/world-node-discovery';
 import {
   isWorldNodeVisible,
   worldNodeByName,
 } from '@helpers/world-node/world-nodes';
 import type {
+  CaravanTraderContent,
   ItemContent,
   RumorContent,
   RumorId,
@@ -54,10 +56,32 @@ export function rumorPickHearable(): RumorContent | undefined {
   return rumors.length === 0 ? undefined : rngChoice(rumors);
 }
 
+export function rumorNodeName(rumor: RumorContent): string | undefined {
+  return rumor.subject.kind === 'Node' ? rumor.subject.nodeName : undefined;
+}
+
 // Only a Node rumor can be sold as a reveal; anything else has no node to mark.
 export function rumorRevealNodeName(rumorId: RumorId): string | undefined {
   const rumor = getEntry<RumorContent>(rumorId);
-  return rumor?.subject.kind === 'Node' ? rumor.subject.nodeName : undefined;
+  return rumor ? rumorNodeName(rumor) : undefined;
+}
+
+export function rumorTraders(rumorId: RumorId): CaravanTraderContent[] {
+  return getEntriesByType<CaravanTraderContent>('caravantrader').filter(
+    (trader) => trader.trades.some((trade) => trade.rumorId === rumorId),
+  );
+}
+
+export function rumorsSold(): RumorContent[] {
+  return getEntriesByType<RumorContent>('rumor').filter(
+    (rumor) => !!rumorNodeName(rumor) && rumorTraders(rumor.id).length > 0,
+  );
+}
+
+// Inferred from the reveal ledger, so a node found by clicking first also counts.
+export function isRumorBought(rumor: RumorContent): boolean {
+  const nodeName = rumorNodeName(rumor);
+  return !!nodeName && isWorldNodeDiscovered(nodeName);
 }
 
 // A missing rumor counts as revealed so a stale trade can never be bought.
