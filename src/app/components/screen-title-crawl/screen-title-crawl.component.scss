@@ -5,6 +5,11 @@
   z-index: 40;
 }
 
+// On the host, so its animationend never reaches the fade-out listener on .crawl.
+:host(.crawl-entering) {
+  animation: crawl-fade 2500ms ease-out reverse;
+}
+
 .crawl {
   @apply absolute inset-0 overflow-hidden bg-black text-white;
 

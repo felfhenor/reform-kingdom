@@ -53,5 +53,6 @@ export * from './analysis-utils';
 export * from './analysis-workerreachability';
 export * from './analysis-workerstamina';
 export * from './debug';
+export * from './debug-story.ui';
 export * from './debug-tasks.ui';
 export * from './debug.ui';

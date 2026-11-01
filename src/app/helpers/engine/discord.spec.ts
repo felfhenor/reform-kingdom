@@ -209,6 +209,15 @@ describe('discordUpdateStatus', () => {
     ).toBe('Starting a grand adventure');
   });
 
+  it('shows the ending while the victory popup is up', () => {
+    expect(
+      presenceFor((state) => {
+        state.meta.outroCrawlSeen = true;
+        state.world.combat = buildCombat();
+      }).state,
+    ).toBe('Finishing a grand adventure');
+  });
+
   it('prefixes the activity with paused while the game is paused', () => {
     setOption('gameloopPaused', true);
 

@@ -109,6 +109,11 @@ export const ADVENTURE_LOG_OVERLAY_MAX_LINES = 15;
 // Ticks, not wall-clock time, so lines don't expire while the game is paused.
 export const ADVENTURE_LOG_OVERLAY_LIFETIME_TICKS = 20;
 
+// Rows the Adventure Log page renders up front and adds per scroll-to-bottom; rendering all 500 made opening it sluggish.
+export const ADVENTURE_LOG_PAGE_SIZE = 50;
+// Distance from the bottom of the Adventure Log at which the next page renders, so it's in place before the user reaches it.
+export const ADVENTURE_LOG_LOAD_MORE_THRESHOLD_PX = 600;
+
 // A "practically forever" duration for a global effect that's removed explicitly (on a state change or leaving a map), not by natural expiry - long enough it never lapses on its own during normal play. Used by the Idle and Auto Mode effects.
 export const ONE_YEAR_TICKS = 60 * 60 * 24 * 365;
 

@@ -164,6 +164,8 @@ export type GameStateMeta = {
   createdAt: number;
   // Set only by the new-game screen, so saves from before the crawl existed never play it.
   titleCrawlPending: boolean;
+  outroCrawlSeen: boolean;
+  victoryPopupSeen: boolean;
 };
 
 export type GameState = {

@@ -1,17 +1,16 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   DestroyRef,
   inject,
+  input,
+  output,
   signal,
 } from '@angular/core';
 import { SFXDirective } from '@directives/sfx.directive';
-import { modalIsOpen } from '@helpers/engine/modal-stack';
+import { modalHasAnyOpen, modalIsOpen } from '@helpers/engine/modal-stack';
 import { isGameloopPaused } from '@helpers/gameloop';
-import {
-  TITLE_CRAWL_PARAGRAPHS,
-  titleCrawlFinish,
-} from '@helpers/lore/title-crawl.ui';
 import { setOption } from '@helpers/state-options';
 
 const SECONDS_PER_PARAGRAPH = 7;
@@ -23,12 +22,21 @@ const SKIP_HOLD_MS = 1000;
   imports: [SFXDirective],
   templateUrl: './screen-title-crawl.component.html',
   styleUrl: './screen-title-crawl.component.scss',
+  host: {
+    '[class.crawl-entering]': 'fadeIn()',
+  },
 })
 export class ScreenTitleCrawlComponent {
-  public paragraphs = TITLE_CRAWL_PARAGRAPHS;
-  public crawlSeconds = TITLE_CRAWL_PARAGRAPHS.length * SECONDS_PER_PARAGRAPH;
+  public paragraphs = input.required<string[]>();
+  public fadeIn = input(false);
+  public finished = output<boolean>();
 
-  public isPaused = isGameloopPaused;
+  public crawlSeconds = computed(
+    () => this.paragraphs().length * SECONDS_PER_PARAGRAPH,
+  );
+
+  // An open modal holds it too, so it can't play out unseen beneath one.
+  public isPaused = computed(() => isGameloopPaused() || modalHasAnyOpen());
   public isFadingOut = signal(false);
   public skipProgress = signal(0);
 
@@ -38,14 +46,15 @@ export class ScreenTitleCrawlComponent {
 
   constructor() {
     // The pause option survives reloads, but the pause menu doesn't - a leftover pause would freeze the crawl before any text shows.
-    if (this.isPaused() && !modalIsOpen('pause-menu')) {
+    if (isGameloopPaused() && !modalIsOpen('pause-menu')) {
       setOption('gameloopPaused', false);
     }
 
-    // Capture phase so navbar hotkeys can't act under the crawl; only Esc (pause menu) and Space-to-resume get through.
+    // Capture phase so navbar hotkeys can't act under the crawl; only Esc (pause menu), Space-to-resume and open modals get through.
     const onKeydown = (event: KeyboardEvent) => {
       const isSpace = event.key === ' ';
-      if (event.key === 'Escape' || (isSpace && this.isPaused())) return;
+      if (event.key === 'Escape' || modalHasAnyOpen()) return;
+      if (isSpace && isGameloopPaused()) return;
       event.preventDefault();
       event.stopImmediatePropagation();
       if (isSpace && !event.repeat) this.startSkipHold();
@@ -85,7 +94,7 @@ export class ScreenTitleCrawlComponent {
   public onFadeEnd(event: AnimationEvent): void {
     if (event.target !== event.currentTarget) return;
 
-    void titleCrawlFinish(this.wasSkipped);
+    this.finished.emit(this.wasSkipped);
   }
 
   private skip(): void {

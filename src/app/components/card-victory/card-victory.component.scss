@@ -1,0 +1,6 @@
+@reference 'tailwindcss';
+
+:host {
+  @apply fixed inset-0 block;
+  z-index: 40;
+}

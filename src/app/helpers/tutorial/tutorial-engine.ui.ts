@@ -10,7 +10,7 @@ import {
 } from '@helpers/engine/ui';
 import { gameloopShouldRun } from '@helpers/gameloop';
 import { regionIntroPending } from '@helpers/lore/region-intro';
-import { isTitleCrawlPending } from '@helpers/lore/title-crawl';
+import { isStoryScreenPending } from '@helpers/lore/outro';
 import {
   isGameStateReady,
   worldCurrentLocationState,
@@ -188,7 +188,7 @@ export function tutorialCheckAutoTrigger(): void {
     !gameloopShouldRun() ||
     activeTutorial() ||
     modalHasAnyOpen() ||
-    isTitleCrawlPending() ||
+    isStoryScreenPending() ||
     isWorldViewSettling()
   )
     return;

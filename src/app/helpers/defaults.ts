@@ -35,6 +35,8 @@ export function defaultGameState(): GameState {
       isPaused: false,
       createdAt: Date.now(),
       titleCrawlPending: false,
+      outroCrawlSeen: false,
+      victoryPopupSeen: false,
     },
     gameId: rngUuid() as GameId,
     clock: {

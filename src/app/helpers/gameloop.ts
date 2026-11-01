@@ -18,7 +18,7 @@ import { restingProcessTick } from '@helpers/hero/resting';
 import { travelProcessTick } from '@helpers/hero/travel';
 import { gatheringProcessTick } from '@helpers/item/gathering';
 import { astralProjectorProcessTick } from '@helpers/kingdom/astral-projector';
-import { isTitleCrawlPending } from '@helpers/lore/title-crawl';
+import { isStoryScreenPending } from '@helpers/lore/outro';
 import { isSetup } from '@helpers/setup';
 import {
   gamestateTickEnd,
@@ -59,11 +59,11 @@ export async function gameloop(totalTicks: number): Promise<void> {
   if (!isGameStateReady()) return;
   if (!gameloopShouldRun()) return;
 
-  // Before the pause/title crawl guards, so the presence still reflects those states.
+  // Before the pause/story screen guards, so the presence still reflects those states.
   discordUpdateStatus();
 
   if (isGameloopPaused()) return;
-  if (isTitleCrawlPending()) return;
+  if (isStoryScreenPending()) return;
   if (isProcessingTicks) return;
 
   isProcessingTicks = true;
@@ -111,6 +111,9 @@ export async function gameloop(totalTicks: number): Promise<void> {
       if (worldCombatState()) {
         combatDoCombatIteration();
       }
+
+      // Fel can fall mid-batch; the outro should open on that tick, not after the rest of the batch.
+      if (isStoryScreenPending()) break;
 
       if ((i + 1) % TICKS_PER_YIELD === 0) {
         await schedulerYield();

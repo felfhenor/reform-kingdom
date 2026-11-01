@@ -7,10 +7,10 @@
   <div class="crawl-viewport">
     <div
       class="crawl-text"
-      [style.animation-duration.s]="crawlSeconds"
+      [style.animation-duration.s]="crawlSeconds()"
       (animationend)="onScrollEnd()"
     >
-      @for (paragraph of paragraphs; track $index) {
+      @for (paragraph of paragraphs(); track $index) {
         <p>{{ paragraph }}</p>
       }
     </div>

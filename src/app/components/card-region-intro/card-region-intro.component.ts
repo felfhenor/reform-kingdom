@@ -14,7 +14,7 @@ import { modalHasAnyOpen } from '@helpers/engine/modal-stack';
 import { gamePlayView } from '@helpers/engine/ui';
 import { regionIntroPending } from '@helpers/lore/region-intro';
 import { regionIntroMarkSeen } from '@helpers/lore/region-intro.ui';
-import { isTitleCrawlPending } from '@helpers/lore/title-crawl';
+import { isStoryScreenPending } from '@helpers/lore/outro';
 import { AnimationService } from '@services/animation.service';
 
 const REVEAL_MS_PER_CHARACTER = 20;
@@ -42,7 +42,7 @@ export class CardRegionIntroComponent {
     this.isPageShown() &&
     gamePlayView() === 'world' &&
     !modalHasAnyOpen() &&
-    !isTitleCrawlPending()
+    !isStoryScreenPending()
       ? regionIntroPending(this.mapName())
       : undefined,
   );

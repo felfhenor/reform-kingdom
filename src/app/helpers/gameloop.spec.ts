@@ -47,7 +47,12 @@ import { restingProcessTick } from '@helpers/hero/resting';
 import { travelProcessTick } from '@helpers/hero/travel';
 import { gatheringProcessTick } from '@helpers/item/gathering';
 import { astralProjectorProcessTick } from '@helpers/kingdom/astral-projector';
-import { gamestate, isGameStateReady } from '@helpers/state-game';
+import { ensureCollectible } from '@helpers/content/ensure-item';
+import {
+  gamestate,
+  isGameStateReady,
+  updateGamestate,
+} from '@helpers/state-game';
 import { defaultOptions, setOptions } from '@helpers/state-options';
 import { townSpecialtyPriorityProcessTick } from '@helpers/town/crafting/town-craft-priority-state';
 import { townCraftProcessTick } from '@helpers/town/crafting/town-craft-queue';
@@ -56,8 +61,9 @@ import { townShopProcessTick } from '@helpers/town/shop/town-shop-tick';
 import { townCommissionProcessTick } from '@helpers/town/town-commission-generate';
 import { townWorkerProcessTick } from '@helpers/town/worker/town-worker-tick';
 import { workersProcessTick } from '@helpers/worker/worker-tick';
-import type { GameOptions } from '@interfaces';
+import type { CollectibleId, GameOptions } from '@interfaces';
 import { buildCombat } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
 
 const subsystems: Mock[] = [
@@ -127,6 +133,27 @@ describe('gameloop', () => {
     expect(combatDoCombatIteration).toHaveBeenCalledTimes(2);
   });
 
+  it('stops the batch on the tick a story screen opens', async () => {
+    const forgetterId = 'memory-of-the-forgetter' as CollectibleId;
+    seedContent([
+      ensureCollectible({ id: forgetterId, name: 'Memory of the Forgetter' }),
+    ]);
+    seedGamestate((state) => {
+      state.meta.isSetup = true;
+      state.world.combat = buildCombat();
+    });
+    vi.mocked(combatDoCombatIteration).mockImplementationOnce(() => {
+      updateGamestate((state) => {
+        state.collectibles[forgetterId] = { quantity: 1, foundAt: 1 };
+        return state;
+      });
+    });
+
+    await gameloop(5);
+
+    expect(numTicks()).toBe(1);
+  });
+
   it('scales the batch by the tick multiplier, between 1 and 3600 ticks', async () => {
     useOptions({ debugTickMultiplier: 3 });
     await gameloop(2);
@@ -141,7 +168,7 @@ describe('gameloop', () => {
     expect(numTicks()).toBe(7 + 3600);
   });
 
-  it('does nothing before setup, before the save is ready, off the game page, while paused, or during the title crawl', async () => {
+  it('does nothing before setup, before the save is ready, off the game page, while paused, or during a story screen', async () => {
     seedGamestate();
     await gameloop(1);
 
@@ -161,6 +188,12 @@ describe('gameloop', () => {
     seedGamestate((state) => {
       state.meta.isSetup = true;
       state.meta.titleCrawlPending = true;
+    });
+    await gameloop(1);
+
+    seedGamestate((state) => {
+      state.meta.isSetup = true;
+      state.meta.outroCrawlSeen = true;
     });
     await gameloop(1);
 

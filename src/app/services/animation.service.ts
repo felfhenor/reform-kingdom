@@ -493,6 +493,8 @@ export class AnimationService {
     const el = target as HTMLElement;
     // A CSS animation ending mid-shatter would make Angular treat the leave as finished.
     el.style.animation = 'none';
+    // Shards and smoke fly past the box, so an overflow-clipped card (page-card) would trap them inside it.
+    el.style.overflow = 'visible';
     const source = el.cloneNode(true) as HTMLElement;
     const points = this.shatterGrid(el.offsetWidth, el.offsetHeight);
     el.style.visibility = 'hidden';

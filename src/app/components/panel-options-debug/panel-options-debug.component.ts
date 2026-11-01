@@ -33,6 +33,11 @@ import {
   debugTelegraphRaid,
   debugUndiscoverRecipe,
 } from '@helpers/debug/debug.ui';
+import {
+  debugResetIntroCrawl,
+  debugResetOutroCrawl,
+  debugResetVictoryCard,
+} from '@helpers/debug/debug-story.ui';
 import { debugResetTasks } from '@helpers/debug/debug-tasks.ui';
 import { worldPartyState } from '@helpers/state-game';
 import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
@@ -204,6 +209,18 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
 
   public resetTasks(): void {
     debugResetTasks();
+  }
+
+  public resetIntroCrawl(): void {
+    debugResetIntroCrawl();
+  }
+
+  public resetOutroCrawl(): void {
+    debugResetOutroCrawl();
+  }
+
+  public resetVictoryCard(): void {
+    debugResetVictoryCard();
   }
 
   public resetAllTutorials(): void {

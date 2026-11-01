@@ -3,6 +3,7 @@ import { getEntry } from '@helpers/content/content';
 import { isInElectron } from '@helpers/engine/electron';
 import { activeTownNode, gamePlayView } from '@helpers/engine/ui';
 import { isGlobalEffectActive } from '@helpers/hero/global-effects';
+import { isStoryScreenPending } from '@helpers/lore/outro';
 import { isTitleCrawlPending } from '@helpers/lore/title-crawl';
 import {
   worldGatheringState,
@@ -107,6 +108,7 @@ function discordIdleState(): string {
 
 function discordActivityState(): string {
   if (isTitleCrawlPending()) return 'Starting a grand adventure';
+  if (isStoryScreenPending()) return 'Finishing a grand adventure';
 
   const activity =
     discordCombatState() ??

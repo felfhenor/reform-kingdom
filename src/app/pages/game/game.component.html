@@ -5,5 +5,16 @@
 </div>
 
 @if (isTitleCrawlPending()) {
-  <app-screen-title-crawl />
+  <app-screen-title-crawl
+    [paragraphs]="titleCrawlParagraphs"
+    (finished)="titleCrawlFinish($event)"
+  />
+} @else if (isOutroCrawlPending()) {
+  <app-screen-title-crawl
+    [paragraphs]="outroCrawlParagraphs"
+    [fadeIn]="true"
+    (finished)="outroCrawlFinish($event)"
+  />
+} @else if (isVictoryPopupPending()) {
+  <app-card-victory />
 }

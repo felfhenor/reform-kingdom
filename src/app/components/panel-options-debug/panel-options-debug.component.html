@@ -516,6 +516,36 @@
         </button>
         <button
           type="button"
+          class="btn btn-error btn-outline btn-sm"
+          appAnalyticsClick="Options:Debug:ResetIntroCrawl"
+          (click)="resetIntroCrawl()"
+          appSfx="ui-error"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Reset Intro Crawl
+        </button>
+        <button
+          type="button"
+          class="btn btn-error btn-outline btn-sm"
+          appAnalyticsClick="Options:Debug:ResetOutroCrawl"
+          (click)="resetOutroCrawl()"
+          appSfx="ui-error"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Reset Outro Crawl
+        </button>
+        <button
+          type="button"
+          class="btn btn-error btn-outline btn-sm"
+          appAnalyticsClick="Options:Debug:ResetVictoryCard"
+          (click)="resetVictoryCard()"
+          appSfx="ui-error"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Reset Victory Card
+        </button>
+        <button
+          type="button"
           class="btn btn-neutral btn-sm"
           appAnalyticsClick="Options:Debug:FillBestiary"
           (click)="fillBestiary()"

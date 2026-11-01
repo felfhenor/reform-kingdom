@@ -1,0 +1,47 @@
+<div #backdrop class="absolute inset-0 bg-black/60"></div>
+
+<div class="relative flex h-full items-center justify-center p-4">
+  <div #card class="card bg-base-100 shadow-xl page-card w-full max-w-xl">
+    <div class="card-body">
+      <h2 class="type-page-title justify-center">The Kingdom Remembers</h2>
+      <p class="type-flavor text-center">
+        You have reached the end of the story.
+      </p>
+
+      <div class="my-2 flex flex-col gap-4">
+        <p>Fel is defeated, and the kingdom is re-formed!</p>
+
+        <p>
+          Your work isn't over yet. There's still unfinshed business to take
+          care of, and there may be a few surprises waiting beyond the story's
+          end.
+        </p>
+
+        <p>
+          Fel isn't done with you, either. Return to Forgetter's Fane whenever
+          you'd like to defeat him again. You won't see this popup anymore,
+          though!
+        </p>
+
+        <p>This is a good time to back up your savefile, too.</p>
+
+        <p>Thank you for playing!</p>
+      </div>
+
+      <div class="card-actions justify-end">
+        <app-button-savefile-export />
+
+        <button
+          #continueButton
+          type="button"
+          class="btn btn-primary"
+          (click)="dismiss()"
+          appSfx="ui-success"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Continue
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
