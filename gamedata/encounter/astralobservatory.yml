@@ -10,6 +10,7 @@
         - monsterId: Demon Knight
         - monsterId: Forgetter of the Peaks
         - monsterId: Fel Demon
+      postFightWhisper: Maybe now the valley will remember...
 
   completionRewards:
     - collectibleId: Memory of the Ritualists
@@ -27,6 +28,7 @@
         - monsterId: Frost Golem
         - monsterId: Forgetter of the Frost
         - monsterId: Vengeful Spirit
+      postFightWhisper: No one can truly forget the harsh winds. Not even Fel.
 
   completionRewards:
     - collectibleId: Memory of the Hungry
@@ -44,6 +46,7 @@
         - monsterId: Akroki Vanguard
         - monsterId: Forgetter of the Sands
         - monsterId: Akroki Mage
+      postFightWhisper: I'm sure the sands will now remember how to be soil, and soon Medina's flowers will return.
 
   completionRewards:
     - collectibleId: Memory of the Land
@@ -61,6 +64,7 @@
         - monsterId: Banshee
         - monsterId: Forgetter of the Mire
         - monsterId: Toxic Toad
+      postFightWhisper: Maybe now the bog will be lush again. Or maybe the orcs want it how it is.
 
   completionRewards:
     - collectibleId: Memory of the Fallen
@@ -78,6 +82,7 @@
         - monsterId: Woodwolf
         - monsterId: Forgetter of the Forest
         - monsterId: Woodspider
+      postFightWhisper: Now, the forest will grow again. The elves will be thrilled.
 
   completionRewards:
     - collectibleId: Memory of the Hunters
