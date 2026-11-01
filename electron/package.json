@@ -8,7 +8,7 @@
   "scripts": {
     "start": "npm run start:localref",
     "start:localbuild": "npm run build:copy && npm run build:replacebasehref && npm run build:replaceimgrefs && electron-forge start -- --dev",
-    "start:localref": "cross-env APP_URL=http://localhost:9866 electron-forge start -- --dev",
+    "start:localref": "cross-env APP_URL=http://localhost:9766 electron-forge start -- --dev",
     "start:prodref": "cross-env APP_URL=https://reformkingdom.felfhenor.com electron-forge start -- --dev",
     "build": "npm run build:copy && npm run build:replacebasehref && npm run build:replaceimgrefs && npm run build:createicons",
     "build:createicons": "node -e \"require('fs').mkdirSync('./icons',{recursive:true})\" && cpy ../public/favicon/web-app-manifest-512x512.png --rename icon.png ./icons --flat && png2icons ./icons/icon.png icon -allp -hm -i && cpy ./icon.icns ./icons && cpy ./icon.ico ./icons && rimraf icon.icns && rimraf icon.ico",
