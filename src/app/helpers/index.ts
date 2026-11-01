@@ -12,6 +12,7 @@ export * from './engine';
 export * from './exchange';
 export * from './game-init';
 export * from './gameloop';
+export * from './gameloop-slow';
 export * from './hero';
 export * from './item';
 export * from './kingdom';

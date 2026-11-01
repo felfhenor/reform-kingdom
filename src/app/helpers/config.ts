@@ -70,6 +70,10 @@ export const LOADING_IDLE_TIMEOUT_MS = 3000;
 export const LOADING_STALL_WARN_MS = 30000;
 // Per-entry cap on what's sent to the desktop log file; debug state dumps can run to megabytes.
 export const LOG_FILE_MAX_ENTRY_LENGTH = 20000;
+// Average busy time per tick (yields excluded) past which a gameloop batch is logged as slow; ~3 frames.
+export const GAMELOOP_SLOW_TICK_WARN_MS = 50;
+// Slow batches in between are counted rather than logged, so a struggling machine doesn't flood the log.
+export const GAMELOOP_SLOW_TICK_WARN_COOLDOWN_MS = 60000;
 // Images only stylesheets reference; decoded during loading so nothing paints untextured after it. Paths match the CSS exactly.
 export const LOADING_PRELOAD_IMAGES = [
   '/asset/texture-bg.png',

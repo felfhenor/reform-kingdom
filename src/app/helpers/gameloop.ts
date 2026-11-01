@@ -12,6 +12,7 @@ import { encounterRandomProcessTick } from '@helpers/encounter/encounter-random-
 import { debug, error } from '@helpers/engine/logging';
 import { schedulerYield } from '@helpers/engine/scheduler';
 import { timerLastSaveTick, timerTicksElapsed } from '@helpers/engine/timer';
+import { gameloopReportDuration } from '@helpers/gameloop-slow';
 import { globalEffectsProcessTick } from '@helpers/hero/global-effects';
 import { jobAbilityRegenProcessTick } from '@helpers/hero/job-ability-regen';
 import { restingProcessTick } from '@helpers/hero/resting';
@@ -79,6 +80,9 @@ export async function gameloop(totalTicks: number): Promise<void> {
     });
 
     timer.startTimer('gameloop');
+    const startedAt = performance.now();
+    let yieldedMs = 0;
+    let ticksRun = 0;
 
     // Tick one at a time (not one bulk +=) so tick-driven systems see an accurate timerTicksElapsed() each iteration.
     for (let i = 0; i < numTicks; i++) {
@@ -86,6 +90,7 @@ export async function gameloop(totalTicks: number): Promise<void> {
         state.clock.numTicks += 1;
         return state;
       });
+      ticksRun++;
 
       travelProcessTick();
       globalEffectsProcessTick();
@@ -115,14 +120,18 @@ export async function gameloop(totalTicks: number): Promise<void> {
       // Fel can fall mid-batch; the outro should open on that tick, not after the rest of the batch.
       if (isStoryScreenPending()) break;
 
+      // Yield time is excluded from the slow-tick check; a backgrounded tab can stall it for a second.
       if ((i + 1) % TICKS_PER_YIELD === 0) {
+        const yieldStartedAt = performance.now();
         await schedulerYield();
+        yieldedMs += performance.now() - yieldStartedAt;
       }
     }
 
     timer.dumpTimers((timers) => debug('Gameloop:Timers', timers));
 
     gamestateTickEnd();
+    gameloopReportDuration(ticksRun, performance.now() - startedAt - yieldedMs);
 
     const currentTick = timerTicksElapsed();
     const nextSaveTick = timerLastSaveTick() + getOption('autosaveInterval');
