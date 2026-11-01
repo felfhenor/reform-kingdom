@@ -126,10 +126,18 @@ vi.mock('@helpers/engine/signal', () => {
     localStorageSignal: vi.fn((key: string, initialValue: unknown) =>
       mockSignal(initialValue),
     ),
-    indexedDbSignal: vi.fn((key: string, initialValue: unknown) =>
-      Object.assign(mockSignal(initialValue), {
-        flush: vi.fn(() => Promise.resolve(true)),
-      }),
+    // Reports an empty store as loaded, as the real one does, so saving isn't held forever.
+    indexedDbSignal: vi.fn(
+      (
+        key: string,
+        initialValue: unknown,
+        onLoad?: (value: unknown) => void,
+      ) => {
+        queueMicrotask(() => onLoad?.(initialValue));
+        return Object.assign(mockSignal(initialValue), {
+          flush: vi.fn(() => Promise.resolve(true)),
+        });
+      },
     ),
   };
 });

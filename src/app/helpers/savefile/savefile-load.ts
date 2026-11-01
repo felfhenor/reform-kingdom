@@ -9,9 +9,13 @@ import { notifyError, notifyWarning } from '@helpers/engine/notify';
 import { gameloopIsProcessing } from '@helpers/gameloop';
 import { migrateGameState } from '@helpers/migrate';
 import { savefileBackupStore } from '@helpers/savefile/savefile-backup-storage';
-import { savefileValidationErrors } from '@helpers/savefile/savefile-validate';
+import {
+  savefileIsWorthKeeping,
+  savefileValidationErrors,
+} from '@helpers/savefile/savefile-validate';
 import {
   gamestate,
+  gameStateLoadAlternate,
   gameStateLoadError,
   isGameStateReady,
   saveGameState,
@@ -106,7 +110,13 @@ async function savefileLoadStoredState(raw: unknown): Promise<void> {
   }
 
   // The stored copy is still the pre-migration one here, so this is the last chance to keep it.
-  const backedUp = await savefileBackupStore(raw, 'load');
+  // The desktop build's other stored copy is overwritten by the same first save, so it's kept too.
+  const alternate = gameStateLoadAlternate();
+  const toBackUp = savefileIsWorthKeeping(alternate) ? [raw, alternate] : [raw];
+  let backedUp = true;
+  for (const state of toBackUp) {
+    backedUp = (await savefileBackupStore(state, 'load')) && backedUp;
+  }
   if (!backedUp) {
     notifyWarning(
       'Could not back up your savefile before loading it. If this keeps happening, reset unreadable backups in Settings > Savefile.',

@@ -25,6 +25,7 @@ import { ticksToDurationParts } from '@helpers/engine/timer.ui';
 import { closeAllMenus } from '@helpers/engine/ui';
 import { gameReset } from '@helpers/game-init';
 import { savefileBackupsRead } from '@helpers/savefile/savefile-backup-storage';
+import { savefileDiskOpenFolder } from '@helpers/savefile/savefile-disk.ui';
 import {
   savefileFailureMessage,
   savefileLoadStatus,
@@ -183,6 +184,11 @@ export class PanelOptionsSavefileComponent
   async openLogsFolder() {
     if (await electronLogOpenFolder()) return;
     notifyError('Could not open the logs folder.');
+  }
+
+  async openSavefileFolder() {
+    if (await savefileDiskOpenFolder()) return;
+    notifyError('Could not open the savefile folder.');
   }
 
   reloadGame() {

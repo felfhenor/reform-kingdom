@@ -24,7 +24,9 @@ import {
 } from '@helpers/savefile/savefile-load';
 import {
   gamestate,
+  gameStateLoadAlternate,
   gameStateLoadError,
+  hasGameStateLoaded,
   isGameStateReady,
   saveGameState,
   setGameState,
@@ -73,6 +75,8 @@ beforeEach(() => {
   setGameStateSavingBlocked(false);
   gameStateLoadError.set(undefined);
   isGameStateReady.set(true);
+  hasGameStateLoaded.set(true);
+  gameStateLoadAlternate.set(undefined);
   storedSave.set(untouched);
   savefileLoadStatus.set({ state: 'pending' });
 });
@@ -125,8 +129,36 @@ describe('savefileLoad', () => {
       vi.mocked(savefileBackupStore).mock.invocationCallOrder[0],
     ).toBeLessThan(vi.mocked(migrateGameState).mock.invocationCallOrder[0]);
     expect(savefileLoadStatus()).toEqual({ state: 'ok' });
-    expect(storedSave()).toEqual(stored);
+    expect(storedSave()).toEqual({
+      ...stored,
+      meta: { ...stored.meta, savedAt: expect.any(Number) },
+    });
     expect(savingIsBlocked()).toBe(false);
+  });
+
+  it('also backs up the stored copy that was not loaded', async () => {
+    const stored = current();
+    const alternate = setupState(99);
+    gameStateLoadAlternate.set(alternate);
+
+    await savefileLoad();
+
+    expect(savefileBackupStore).toHaveBeenCalledWith(stored, 'load');
+    expect(savefileBackupStore).toHaveBeenCalledWith(alternate, 'load');
+  });
+
+  it('warns when the stored copy that was not loaded could not be backed up', async () => {
+    current();
+    gameStateLoadAlternate.set(setupState(99));
+    vi.mocked(savefileBackupStore)
+      .mockResolvedValueOnce(true)
+      .mockResolvedValueOnce(false);
+    const notifications = captureNotifications();
+
+    await savefileLoad();
+
+    expect(notifications.map(({ type }) => type)).toEqual(['warning']);
+    expect(savefileLoadStatus()).toEqual({ state: 'ok' });
   });
 
   it('still loads, with a warning, when the backup could not be written', async () => {

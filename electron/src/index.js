@@ -32,6 +32,7 @@ if (hasInstanceLock && !isSquirrelEvent) {
 const rpc = require('discord-rpc');
 const Config = require('electron-config');
 const { registerSavefileBackupHandlers } = require('./savefile-backups');
+const { registerSavefileStoreHandlers } = require('./savefile-store');
 const { watchSaveBeforeClose } = require('./save-before-close');
 const {
   registerWindowSettingsHandlers,
@@ -153,6 +154,7 @@ app.on('ready', () => {
     if (sender === mainWindow?.webContents) onGameLogAttached();
   });
   registerSavefileBackupHandlers();
+  registerSavefileStoreHandlers();
   registerWindowSettingsHandlers(() => mainWindow);
   createWindow();
 });

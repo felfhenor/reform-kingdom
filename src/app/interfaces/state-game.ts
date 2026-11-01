@@ -166,6 +166,8 @@ export type GameStateMeta = {
   titleCrawlPending: boolean;
   outroCrawlSeen: boolean;
   victoryPopupSeen: boolean;
+  // Wall-clock stamp of the last save; missing on saves from before it existed.
+  savedAt?: number;
 };
 
 export type GameState = {

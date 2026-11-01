@@ -1,10 +1,16 @@
 import { computed, signal } from '@angular/core';
 import { defaultGameState } from '@helpers/defaults';
 import { SAVEFILE_SAVE_ERROR_NOTIFY_INTERVAL_MS } from '@helpers/config';
-import { debug, error } from '@helpers/engine/logging';
-import { notifyError } from '@helpers/engine/notify';
+import { debug, error, info } from '@helpers/engine/logging';
+import { notifyError, notifyWarning } from '@helpers/engine/notify';
 import { schedulerYield } from '@helpers/engine/scheduler';
 import { indexedDbSignal } from '@helpers/engine/signal';
+import {
+  savefileDiskRead,
+  savefileDiskWrite,
+  savefileNewerStorage,
+} from '@helpers/savefile/savefile-disk';
+import { savefileIsWorthKeeping } from '@helpers/savefile/savefile-validate';
 import { type GameState } from '@interfaces';
 import { produce } from 'immer';
 
@@ -111,31 +117,71 @@ export const GAMESTATE_STORAGE_KEY = 'gamestate';
 
 let lastSaveErrorNotifyAt = -Infinity;
 
+function notifySaveFailed(message: string): void {
+  const now = Date.now();
+  if (now - lastSaveErrorNotifyAt < SAVEFILE_SAVE_ERROR_NOTIFY_INTERVAL_MS) {
+    return;
+  }
+
+  lastSaveErrorNotifyAt = now;
+  notifyError(message);
+}
+
+// The stored copy that wasn't loaded, so the load can back it up before the first save overwrites it.
+export const gameStateLoadAlternate = signal<unknown>(undefined);
+
+// Set when browser storage couldn't be read, so its copy is left as-is for the session.
+let isBrowserSaveBlocked = false;
+
+// Only ever increases, so a system clock change can't make an older save look newer.
+let lastSavedAt = 0;
+
+function gameStateLoadFinish(state: GameState, alternate: unknown): void {
+  _liveGameState.set(state);
+  lastSavedAt = state.meta.savedAt ?? 0;
+  gameStateLoadAlternate.set(alternate);
+  hasGameStateLoaded.set(true);
+}
+
+async function gameStateLoadStored(browserState: GameState): Promise<void> {
+  const diskState = await savefileDiskRead();
+  if (hasGameStateLoaded()) return;
+
+  if (savefileNewerStorage(browserState, diskState) === 'browser') {
+    gameStateLoadFinish(browserState, diskState);
+    return;
+  }
+
+  info('GameState:Load', 'Loading the newer disk savefile.');
+  gameStateLoadFinish(diskState as GameState, browserState);
+}
+
+// Browser storage breaking is the main reason the desktop build keeps a disk copy.
+async function gameStateLoadStoredFailed(e: unknown): Promise<void> {
+  error('GameState:Load', 'Could not read the savefile from storage.', e);
+  const diskState = await savefileDiskRead();
+  if (hasGameStateLoaded()) return;
+
+  if (savefileIsWorthKeeping(diskState)) {
+    isBrowserSaveBlocked = true;
+    notifyWarning(
+      'Your savefile could not be read from browser storage, so the copy on disk was loaded.',
+    );
+    gameStateLoadFinish(diskState, undefined);
+    return;
+  }
+
+  isSavingBlocked = true;
+  gameStateLoadError.set(e ?? new Error('Unknown storage error'));
+  hasGameStateLoaded.set(true);
+}
+
 const _savedGamestate = indexedDbSignal<GameState>(
   GAMESTATE_STORAGE_KEY,
   defaultGameState(),
-  (state: GameState) => {
-    if (hasGameStateLoaded()) return;
-
-    _liveGameState.set(state);
-
-    hasGameStateLoaded.set(true);
-  },
-  (e: unknown) => {
-    error('GameState:Load', 'Could not read the savefile from storage.', e);
-    isSavingBlocked = true;
-    gameStateLoadError.set(e ?? new Error('Unknown storage error'));
-    hasGameStateLoaded.set(true);
-  },
-  () => {
-    const now = Date.now();
-    if (now - lastSaveErrorNotifyAt < SAVEFILE_SAVE_ERROR_NOTIFY_INTERVAL_MS) {
-      return;
-    }
-
-    lastSaveErrorNotifyAt = now;
-    notifyError('Your game could not be saved to storage.');
-  },
+  (state) => void gameStateLoadStored(state),
+  (e) => void gameStateLoadStoredFailed(e),
+  () => notifySaveFailed('Your game could not be saved to storage.'),
 );
 
 export function setGameState(state: GameState, commit = true): void {
@@ -208,15 +254,31 @@ export function resetGameState(): void {
   setGameState(defaultGameState());
 }
 
-// Resolves false only if the write failed; most callers don't need to wait.
-export function saveGameState(): Promise<boolean> {
-  if (isSavingBlocked) return Promise.resolve(true);
-  _savedGamestate.set(formatGameStateForSave(_liveGameState()));
-  return _savedGamestate.flush();
+// Resolves false only if every write failed; most callers don't need to wait.
+// Held until the stored copy loads, so an early save can't overwrite it with the default state.
+export async function saveGameState(): Promise<boolean> {
+  if (isSavingBlocked || !hasGameStateLoaded()) return true;
+
+  lastSavedAt = Math.max(Date.now(), lastSavedAt + 1);
+  const state = formatGameStateForSave(_liveGameState(), lastSavedAt);
+  if (!isBrowserSaveBlocked) _savedGamestate.set(state);
+
+  const [browserSaved, diskSaved] = await Promise.all([
+    isBrowserSaveBlocked ? false : _savedGamestate.flush(),
+    savefileDiskWrite(state),
+  ]);
+  if (diskSaved === false)
+    notifySaveFailed('Your game could not be saved to disk.');
+  return browserSaved || diskSaved === true;
 }
 
-export function formatGameStateForSave(gameState: GameState): GameState {
+// The stamp is how the desktop build tells which of its two stored copies is newer.
+export function formatGameStateForSave(
+  gameState: GameState,
+  savedAt: number,
+): GameState {
   const optimized = structuredClone(gameState);
+  optimized.meta.savedAt = savedAt;
   return optimized;
 }
 

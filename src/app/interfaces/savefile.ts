@@ -11,7 +11,9 @@ export type SavefileBackup = {
   state: GameState;
 };
 
-export type SavefileBackupSource = 'browser' | 'disk';
+export type SavefileStorage = 'browser' | 'disk';
+
+export type SavefileBackupSource = SavefileStorage;
 
 export type SavefileBackupReadResult = {
   backups: SavefileBackup[];
@@ -38,4 +40,14 @@ export type ElectronSavefileBridge = {
 
 export type WindowWithElectronBridge = Window & {
   reformElectron?: ElectronSavefileBridge;
+};
+
+export type ElectronSavefileStoreBridge = {
+  savefileWrite: (json: string) => Promise<boolean>;
+  savefileRead: () => Promise<string | undefined>;
+  savefileOpenFolder: () => Promise<boolean>;
+};
+
+export type WindowWithElectronSavefileStoreBridge = Window & {
+  reformElectron?: Partial<ElectronSavefileStoreBridge>;
 };
