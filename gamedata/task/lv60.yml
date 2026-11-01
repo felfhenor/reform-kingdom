@@ -1,0 +1,14 @@
+- id: 25858f63-6fe2-4dbf-9bb3-08edd9023a48
+  name: Clear Forgetter's Fane
+  description: Break through the Forgetter's Barrier and defeat Fel in his temple.
+  order: 900
+  requireMapVisit: AstralObservatory
+  requirement:
+    kind: ClearEncounter
+    nodeName: Forgetter's Fane
+    quantity: 1
+  rewards:
+    - itemId: Duskhall Flux
+      quantity: 25
+    - itemId: Memory Flux
+      quantity: 25
