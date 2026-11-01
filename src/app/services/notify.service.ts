@@ -13,10 +13,11 @@ export class NotifyService {
 
   async init() {
     notification$.subscribe((messageData) => {
-      const { message, type } = messageData;
+      const { message, type, onClick } = messageData;
       this.logger.debug(`Notify:${type}`, message);
 
-      this.toast?.[type]?.(message);
+      const toast = this.toast?.[type]?.(message);
+      if (onClick) toast?.onTap.subscribe(onClick);
     });
   }
 }

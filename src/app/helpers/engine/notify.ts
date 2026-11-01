@@ -6,6 +6,7 @@ const notification = new Subject<{
   message: string;
   type: 'info' | 'error' | 'success' | 'warning';
   category: NotificationCategory;
+  onClick?: () => void;
 }>();
 export const notification$ = notification.asObservable();
 
@@ -25,7 +26,7 @@ export function notifyWarning(message: string): void {
   notification.next({ message, type: 'warning', category: 'Warning' });
 }
 
-export function notifySuccess(message: string): void {
+export function notifySuccess(message: string, onClick?: () => void): void {
   if (!isPageVisible()) return;
-  notification.next({ message, type: 'success', category: 'Success' });
+  notification.next({ message, type: 'success', category: 'Success', onClick });
 }
