@@ -21,7 +21,7 @@
 }
 
 .crawl-viewport {
-  @apply absolute inset-0 flex justify-center;
+  @apply absolute inset-0 flex justify-center select-none;
   mask-image: linear-gradient(
     to bottom,
     transparent 0%,
