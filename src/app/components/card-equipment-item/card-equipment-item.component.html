@@ -1,6 +1,7 @@
 @let content = equipment();
 
 <button
+  class="pl-2 items-start"
   appListRow
   [disabled]="disabled()"
   [tp]="tooltip"
@@ -10,12 +11,12 @@
   [sfxTrigger]="['click', 'hover']"
 >
   <app-slot-rarity-outline
-    class="shrink-0"
+    class="shrink-0 mt-2"
     [entry]="content"
     spritesheet="equipment"
   ></app-slot-rarity-outline>
 
-  <span class="flex flex-col items-start gap-2 min-w-0">
+  <span class="flex flex-col items-start gap-2 min-w-0 mt-1">
     <span
       class="type-entity-name truncate max-w-full text-{{ content.rarity }}"
     >
