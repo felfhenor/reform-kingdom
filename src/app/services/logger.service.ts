@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ErrorHandler } from '@angular/core';
-import { inject, Injectable, signal } from '@angular/core';
+import { DestroyRef, inject, Injectable, signal } from '@angular/core';
 import { environment } from '@environments/environment';
+import { isInElectron } from '@helpers/engine/electron';
 import { debug, error, info, log, warn } from '@helpers/engine/logging';
 import { localVersion, versionInfoToSemver } from '@helpers/engine/version';
 import Rollbar from 'rollbar';
@@ -27,10 +28,14 @@ export class LoggerService {
   ];
 
   private lastId = signal<string>('');
-
-  constructor() {}
+  private destroyRef = inject(DestroyRef);
 
   init() {
+    if (isInElectron()) {
+      this.captureGlobalErrors();
+      void this.logSessionInfo();
+    }
+
     if (environment.rollbar.accessToken) {
       const rollbarConfig = structuredClone(environment.rollbar);
 
@@ -49,6 +54,48 @@ export class LoggerService {
           );
         },
       });
+    }
+  }
+
+  // Angular's ErrorHandler misses errors thrown outside it (timers, rxjs, failed asset loads), so these get them into game.log.
+  private captureGlobalErrors() {
+    const onError = (event: ErrorEvent | Event) => {
+      if (event instanceof ErrorEvent) {
+        this.error(
+          'Window:Error',
+          event.error ?? event.message,
+          `(${event.filename}:${event.lineno}:${event.colno})`,
+        );
+        return;
+      }
+
+      const target = event.target as { src?: string; href?: string } | null;
+      this.error('Window:ResourceError', target?.src ?? target?.href ?? event);
+    };
+    const onRejection = (event: PromiseRejectionEvent) =>
+      this.error('Window:UnhandledRejection', event.reason);
+
+    window.addEventListener('error', onError, true);
+    window.addEventListener('unhandledrejection', onRejection);
+    this.destroyRef.onDestroy(() => {
+      window.removeEventListener('error', onError, true);
+      window.removeEventListener('unhandledrejection', onRejection);
+    });
+  }
+
+  private async logSessionInfo() {
+    this.info('Session', navigator.userAgent);
+    this.info(
+      'Session',
+      `viewport ${window.innerWidth}x${window.innerHeight} @${window.devicePixelRatio}x, screen ${screen.width}x${screen.height}, language ${navigator.language}, cores ${navigator.hardwareConcurrency}`,
+    );
+
+    // A nearly full quota is the usual reason saves start failing.
+    try {
+      const { usage, quota } = await navigator.storage.estimate();
+      this.info('Session', `storage ${usage} / ${quota} bytes used`);
+    } catch (e) {
+      this.warn('Session', 'Could not estimate storage', e);
     }
   }
 

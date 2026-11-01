@@ -7,6 +7,8 @@ export * from './difficulty-tier';
 export * from './discord';
 export * from './discord.ui';
 export * from './electron';
+export * from './electron-log';
+export * from './electron-log.ui';
 export * from './electron-window.ui';
 export * from './embed';
 export * from './font.ui';

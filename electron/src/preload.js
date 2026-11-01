@@ -1,6 +1,9 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('reformElectron', {
+  logWrite: (level, category, message) =>
+    ipcRenderer.send('log:write', level, category, message),
+  logOpenFolder: () => ipcRenderer.invoke('log:open-folder'),
   savefileBackupWrite: (id, json) =>
     ipcRenderer.invoke('savefile-backup:write', id, json),
   savefileBackupReadAll: () => ipcRenderer.invoke('savefile-backup:read-all'),

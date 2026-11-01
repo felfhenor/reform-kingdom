@@ -2,8 +2,34 @@ const { app, screen, shell, BrowserWindow } = require('electron');
 const path = require('path');
 const url = require('url');
 
-const rpc = require('discord-rpc');
+const { coreLog, initLogging, registerLogHandlers } = require('./logging');
+const {
+  logReadyDiagnostics,
+  logSessionHeader,
+  watchAppLifecycle,
+  watchWindowLifecycle,
+} = require('./lifecycle-logging');
 
+// Handle creating/removing shortcuts on Windows when installing/uninstalling.
+const isSquirrelEvent = require('electron-squirrel-startup');
+if (isSquirrelEvent) {
+  app.quit();
+}
+
+// A second copy would tick and save the same game alongside this one.
+const hasInstanceLock = app.requestSingleInstanceLock();
+if (!hasInstanceLock) {
+  app.exit(0);
+}
+
+if (hasInstanceLock && !isSquirrelEvent) {
+  initLogging();
+  logSessionHeader();
+  watchAppLifecycle();
+}
+
+// Required after logging starts, so a dependency that fails to load still lands in core.log.
+const rpc = require('discord-rpc');
 const Config = require('electron-config');
 const { registerSavefileBackupHandlers } = require('./savefile-backups');
 const { watchSaveBeforeClose } = require('./save-before-close');
@@ -14,21 +40,12 @@ const {
   windowRestorableBounds,
 } = require('./window-settings');
 const config = new Config();
+coreLog().info('Session', `config ${config.path}`);
 
 const showDevTools = process.argv.includes('--dev');
 
-// Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require('electron-squirrel-startup')) {
-  app.quit();
-}
-
-// A second copy would tick and save the same game alongside this one.
-const hasInstanceLock = app.requestSingleInstanceLock();
-if (!hasInstanceLock) {
-  app.exit(0);
-}
-
 let mainWindow = undefined;
+let onGameLogAttached = () => {};
 
 app.on('second-instance', () => {
   if (!mainWindow) return;
@@ -63,6 +80,7 @@ const createWindow = () => {
     },
   });
 
+  onGameLogAttached = watchWindowLifecycle(mainWindow);
   mainWindow.setMenu(null);
   mainWindow.once('ready-to-show', () => {
     // The two flags are saved at different times, so a killed fullscreen session can leave both set.
@@ -93,6 +111,7 @@ const createWindow = () => {
   // and load the index.html of the app.
   const indexPath =
     process.env.APP_URL || path.join(__dirname, '..', 'browser', 'index.html');
+  coreLog().info('Load', `loading ${indexPath}`);
 
   // prod or prod-like
   if (indexPath.includes('.html')) {
@@ -103,12 +122,16 @@ const createWindow = () => {
     });
 
     setTimeout(() => {
-      mainWindow.loadURL(filePath);
+      mainWindow
+        .loadURL(filePath)
+        .catch((e) => coreLog().error('Load', 'loadURL failed', e));
     }, 0);
 
     // dev or dev-like
   } else {
-    mainWindow.loadURL(indexPath);
+    mainWindow
+      .loadURL(indexPath)
+      .catch((e) => coreLog().error('Load', 'loadURL failed', e));
   }
 
   // Open the DevTools in dev mode
@@ -125,6 +148,10 @@ const createWindow = () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', () => {
+  logReadyDiagnostics();
+  registerLogHandlers((sender) => {
+    if (sender === mainWindow?.webContents) onGameLogAttached();
+  });
   registerSavefileBackupHandlers();
   registerWindowSettingsHandlers(() => mainWindow);
   createWindow();
@@ -154,6 +181,7 @@ const DISCORD_CLIENT_ID = '1538621457343455332';
 
 const handleRPC = () => {
   const isRegistered = rpc.register(DISCORD_CLIENT_ID); // only needed if we want spectate / join / ask to join
+  coreLog().info('Discord', `registered: ${!!isRegistered}`);
   if (!isRegistered) return;
 
   const rpcClient = new rpc.Client({ transport: 'ipc' });
@@ -168,16 +196,15 @@ const handleRPC = () => {
       .executeJavaScript('window.discordRPCStatus')
       .then((result) => {
         if (!result) {
-          rpcClient.clearActivity();
           startTimestamp = null;
-          return;
+          return rpcClient.clearActivity();
         }
 
         if (!startTimestamp) {
           startTimestamp = new Date();
         }
 
-        rpcClient.setActivity({
+        return rpcClient.setActivity({
           startTimestamp,
           state: result.state || 'Idle',
           details: result.details,
@@ -186,10 +213,12 @@ const handleRPC = () => {
           largeImageKey: result.largeImageKey || 'defaultimage',
           largeImageText: result.largeImageText,
         });
-      });
+      })
+      .catch((e) => coreLog().warn('Discord', 'Could not update activity', e));
   };
 
   rpcClient.on('ready', () => {
+    coreLog().info('Discord', 'connected');
     setActivity();
 
     setInterval(() => {
@@ -197,7 +226,10 @@ const handleRPC = () => {
     }, 15e3);
   });
 
-  rpcClient.login({ clientId: DISCORD_CLIENT_ID }).catch(console.error);
+  // Expected whenever Discord isn't running, so it's info rather than an error.
+  rpcClient
+    .login({ clientId: DISCORD_CLIENT_ID })
+    .catch((e) => coreLog().info('Discord', 'not connected', e.message));
 };
 
 if (hasInstanceLock) handleRPC();

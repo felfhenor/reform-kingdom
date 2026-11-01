@@ -1,4 +1,5 @@
 const { app, ipcMain } = require('electron');
+const { coreLog } = require('./logging');
 
 // Long enough for a large IndexedDB write, short enough that a hung renderer can't keep the game open.
 const SAVE_TIMEOUT_MS = 5000;
@@ -18,7 +19,9 @@ const watchSaveBeforeClose = (win) => {
   app.on('before-quit', () => (isQuitting = true));
 
   ipcMain.on('window:save-before-close:ready', (event) => {
-    if (event.sender === win.webContents) isRendererListening = true;
+    if (event.sender !== win.webContents) return;
+    isRendererListening = true;
+    coreLog().info('SaveBeforeClose', 'renderer listening');
   });
   win.webContents.on('did-navigate', () => (isRendererListening = false));
   win.webContents.on(
@@ -35,6 +38,7 @@ const watchSaveBeforeClose = (win) => {
 
   const finish = (saved) => {
     isSaving = false;
+    coreLog().info('SaveBeforeClose', `save finished, saved: ${saved}`);
     if (saved) return closeNow();
 
     isQuitting = false;
@@ -44,10 +48,17 @@ const watchSaveBeforeClose = (win) => {
   };
 
   win.on('close', (event) => {
-    if (canClose || !isRendererListening) return;
+    if (canClose || !isRendererListening) {
+      coreLog().info(
+        'SaveBeforeClose',
+        `closing without save (skip armed: ${canClose}, renderer listening: ${isRendererListening})`,
+      );
+      return;
+    }
     event.preventDefault();
     if (isSaving) return;
     isSaving = true;
+    coreLog().info('SaveBeforeClose', 'close held, asking renderer to save');
 
     const onDone = (ipcEvent, saved) => {
       if (ipcEvent.sender !== win.webContents) return;
@@ -56,6 +67,10 @@ const watchSaveBeforeClose = (win) => {
       finish(saved);
     };
     const timeout = setTimeout(() => {
+      coreLog().warn(
+        'SaveBeforeClose',
+        `renderer did not answer within ${SAVE_TIMEOUT_MS}ms, closing anyway`,
+      );
       ipcMain.removeListener('window:save-before-close:done', onDone);
       finish(true);
     }, SAVE_TIMEOUT_MS);

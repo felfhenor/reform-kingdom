@@ -146,6 +146,29 @@
     </div>
   </div>
 
+  @if (writesToDisk) {
+    <div class="card shadow-sm">
+      <div class="card-body p-3 gap-2">
+        <div class="type-section-title">Local Directories</div>
+
+        <div class="form-control">
+          <label class="label label-option">
+            <span class="label-text">Logs Folder</span>
+            <button
+              class="btn btn-neutral"
+              (click)="openLogsFolder()"
+              appAnalyticsClick="Savefile:OpenLogsFolder"
+              appSfx="ui-click"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              Open Logs Folder
+            </button>
+          </label>
+        </div>
+      </div>
+    </div>
+  }
+
   <div class="card shadow-sm">
     <div class="card-body p-3 gap-2">
       <div class="type-section-title">Automatic Backups</div>

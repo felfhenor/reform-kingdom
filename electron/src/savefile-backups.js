@@ -1,6 +1,7 @@
 const { app, ipcMain } = require('electron');
 const fs = require('fs/promises');
 const path = require('path');
+const { coreLog } = require('./logging');
 
 // Dev runs share userData with the installed game, so they get their own folder to avoid pruning its backups.
 const backupDir = () =>
@@ -41,6 +42,12 @@ const readAllBackups = async () => {
     files.map((file) => fs.readFile(path.join(backupDir(), file), 'utf8')),
   );
 
+  contents
+    .filter((result) => result.status === 'rejected')
+    .forEach((result) =>
+      coreLog().warn('SavefileBackup', 'unreadable backup', result.reason),
+    );
+
   return contents
     .filter((result) => result.status === 'fulfilled')
     .map((result) => result.value);
@@ -57,10 +64,26 @@ const pruneBackups = async (_event, keepIds) => {
   );
 };
 
+// Failures still reject back to the renderer; this only records them.
+const logged =
+  (name, handler) =>
+  async (...args) => {
+    try {
+      return await handler(...args);
+    } catch (e) {
+      coreLog().error('SavefileBackup', `${name} failed`, e);
+      throw e;
+    }
+  };
+
 const registerSavefileBackupHandlers = () => {
-  ipcMain.handle('savefile-backup:write', writeBackup);
-  ipcMain.handle('savefile-backup:read-all', readAllBackups);
-  ipcMain.handle('savefile-backup:prune', pruneBackups);
+  coreLog().info('SavefileBackup', `backups at ${backupDir()}`);
+  ipcMain.handle('savefile-backup:write', logged('write', writeBackup));
+  ipcMain.handle(
+    'savefile-backup:read-all',
+    logged('read-all', readAllBackups),
+  );
+  ipcMain.handle('savefile-backup:prune', logged('prune', pruneBackups));
 };
 
 module.exports = { registerSavefileBackupHandlers };

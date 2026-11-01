@@ -19,6 +19,7 @@ import {
 import { provideServiceWorker } from '@angular/service-worker';
 
 import { provideHttpClient } from '@angular/common/http';
+import { error } from '@helpers/engine/logging';
 
 import { provideNgIconsConfig } from '@ng-icons/core';
 import { NgSelectConfig } from '@ng-select/ng-select';
@@ -66,8 +67,8 @@ export const appConfig: ApplicationConfig = {
       routes,
       withComponentInputBinding(),
       withRouterConfig({ paramsInheritanceStrategy: 'always' }),
-      withNavigationErrorHandler((error) => {
-        console.error('Navigation error:', error);
+      withNavigationErrorHandler((err) => {
+        error('Router', 'Navigation error:', err);
         return '/';
       }),
     ),

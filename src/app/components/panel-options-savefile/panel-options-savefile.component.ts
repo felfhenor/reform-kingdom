@@ -18,6 +18,8 @@ import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { SAVEFILE_BACKUP_MAX } from '@helpers/config';
 import { isInElectron } from '@helpers/engine/electron';
+import { electronLogOpenFolder } from '@helpers/engine/electron-log.ui';
+import { notifyError } from '@helpers/engine/notify';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { ticksToDurationParts } from '@helpers/engine/timer.ui';
 import { closeAllMenus } from '@helpers/engine/ui';
@@ -176,6 +178,11 @@ export class PanelOptionsSavefileComponent
     } finally {
       this.isBusy.set(false);
     }
+  }
+
+  async openLogsFolder() {
+    if (await electronLogOpenFolder()) return;
+    notifyError('Could not open the logs folder.');
   }
 
   reloadGame() {

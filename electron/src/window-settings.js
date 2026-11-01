@@ -1,4 +1,5 @@
 const { ipcMain, screen } = require('electron');
+const { coreLog } = require('./logging');
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
@@ -105,6 +106,7 @@ const registerWindowSettingsHandlers = (getWindow) => {
     const win = getWindow();
     if (!win) return undefined;
 
+    coreLog().info('WindowSettings', `set fullscreen ${!!fullscreen}`);
     win.setFullScreen(!!fullscreen);
     return windowState(win, !!fullscreen);
   });
@@ -122,6 +124,11 @@ const registerWindowSettingsHandlers = (getWindow) => {
       height >= state.minHeight &&
       width <= state.maxWidth &&
       height <= state.maxHeight;
+    coreLog().info(
+      'WindowSettings',
+      `set size ${width}x${height} (valid: ${isValid}, fullscreen: ${win.isFullScreen()})`,
+      state,
+    );
     if (isValid && !win.isFullScreen()) {
       if (win.isMaximized()) win.unmaximize();
       win.setContentSize(

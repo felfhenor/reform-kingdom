@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { electronLogWrite } from '@helpers/engine/electron-log';
+import type { LogLevel } from '@interfaces';
 import { color } from 'console-log-colors';
 
 // Avoids `@angular/common`'s formatDate - importing it triggers an Angular JIT check that crashes outside a browser (e.g. scripts/analyze-*, scripts/validate-*).
@@ -12,11 +14,7 @@ const TIMESTAMP_FORMAT = new Intl.DateTimeFormat('en-US', {
   hour12: true,
 });
 
-export function _logMessage(
-  level: 'debug' | 'error' | 'log' | 'info' | 'warn',
-  category: string,
-  ...data: any
-) {
+export function _logMessage(level: LogLevel, category: string, ...data: any) {
   const colors: Record<typeof level, keyof typeof color> = {
     debug: 'gray',
     error: 'red',
@@ -28,6 +26,7 @@ export function _logMessage(
 
   const timestamp = TIMESTAMP_FORMAT.format(new Date());
   console[level](colorFunc(`[${timestamp}] {${category}}`), ...data);
+  electronLogWrite(level, category, data);
 }
 
 export function log(category: string, ...data: any) {
