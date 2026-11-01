@@ -5,7 +5,7 @@
   [class.flex-wrap]="layout() === 'row'"
   [class.gap-x-3]="layout() === 'row'"
 >
-  @for (key of baseRows(); track key) {
+  @for (key of baseRows(); track $index) {
     @let keyInfo = info(key);
     <div
       class="flex items-center gap-2"
