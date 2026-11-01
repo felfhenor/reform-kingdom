@@ -8,6 +8,8 @@ import type {
   EquipmentItemType,
   EquipmentSlot,
   JobId,
+  JobStatPriority,
+  SkillTreeNodeId,
 } from '@interfaces';
 import { EquipmentTypeToSlot } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
@@ -17,7 +19,11 @@ import { ensureEquipment } from '@helpers/content/ensure-item';
 import { ensureStats } from '@helpers/content/ensure-helpers-stats';
 import { defaultEquipment } from '@helpers/defaults';
 import { equippedItems } from '@helpers/item/equipment';
-import { planEquipmentOptimization } from '@helpers/item/equipment-optimize';
+import {
+  characterStatPriority,
+  planEquipmentOptimization,
+} from '@helpers/item/equipment-optimize';
+import { ensureSkillTreeNode } from '@helpers/content/ensure-skilltreenode';
 import { ensureJob } from '@helpers/content/ensure-job';
 import { getEntry } from '@helpers/content/content';
 import {
@@ -752,4 +758,57 @@ describe('planEquipmentOptimization', () => {
       expect(winners).toEqual([]);
     },
   );
+});
+
+describe('characterStatPriority', () => {
+  const jobId = 'job-ranger' as JobId;
+  const stalkerPriority: JobStatPriority[] = [
+    { stat: 'Agility', multiplier: 2 },
+  ];
+  const job = ensureJob({
+    id: jobId,
+    treeVersion: 1,
+    specializationRows: ['Stalker', 'Wayfinder'],
+    statPriority: [{ stat: 'Strength', multiplier: 1.5 }],
+    specializationStatPriority: { Stalker: stalkerPriority },
+  });
+  const specNode = (id: string, name: string) =>
+    ensureSkillTreeNode({
+      id: id as SkillTreeNodeId,
+      name: `Ranger: ${name}`,
+      jobId,
+      row: '',
+    });
+
+  function hunter(nodeIds: string[]): Character {
+    return buildHero({
+      jobId,
+      skillTreeNodes: { [jobId]: nodeIds as SkillTreeNodeId[] },
+      skillTreeVersions: { [jobId]: 1 },
+    });
+  }
+
+  beforeEach(() => {
+    seedContent([
+      job,
+      specNode('stalker', 'Stalker'),
+      specNode('wayfinder', 'Wayfinder'),
+    ]);
+  });
+
+  it('uses the held specialization’s priority', () => {
+    expect(characterStatPriority(hunter(['stalker']), job)).toEqual(
+      stalkerPriority,
+    );
+  });
+
+  it('falls back to the job’s priority without a specialization', () => {
+    expect(characterStatPriority(hunter([]), job)).toEqual(job.statPriority);
+  });
+
+  it('falls back to the job’s priority when the specialization has none', () => {
+    expect(characterStatPriority(hunter(['wayfinder']), job)).toEqual(
+      job.statPriority,
+    );
+  });
 });

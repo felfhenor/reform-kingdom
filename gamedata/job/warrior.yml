@@ -43,6 +43,32 @@
     - stat: Energy
       multiplier: 0.25
 
+  specializationStatPriority:
+    Swashbuckler:
+      - stat: Strength
+        multiplier: 1.5
+      - stat: Agility
+        multiplier: 2
+      - stat: Luck
+        multiplier: 2.5
+      - stat: Vitality
+        multiplier: 1
+      - stat: Health
+        multiplier: 0.25
+      - stat: Energy
+        multiplier: 0.25
+    Bastion:
+      - stat: Vitality
+        multiplier: 1.5
+      - stat: Health
+        multiplier: 0.5
+      - stat: Resistance
+        multiplier: 1.75
+      - stat: Strength
+        multiplier: 1
+      - stat: Energy
+        multiplier: 0.25
+
   equippableTypes:
     - Cloth Armor
     - Metal Armor

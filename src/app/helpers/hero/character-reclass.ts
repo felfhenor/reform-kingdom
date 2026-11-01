@@ -14,7 +14,10 @@ import {
   stateRegaliaLoad,
   stateRegaliaSettle,
 } from '@helpers/hero/regalia-state';
-import { planEquipmentOptimization } from '@helpers/item/equipment-optimize';
+import {
+  characterStatPriority,
+  planEquipmentOptimization,
+} from '@helpers/item/equipment-optimize';
 import { applyMaterialDelta, goldCoinId } from '@helpers/item/materials';
 import { updateGamestate } from '@helpers/state-game';
 import type {
@@ -122,7 +125,7 @@ function reclassCharacterOptimize(
   const winners = planEquipmentOptimization(
     character,
     state.armory,
-    job.statPriority,
+    characterStatPriority(character, job),
   );
   const { equipment, armory } = applyOptimizationWinners(state.armory, winners);
   state.armory = armory;

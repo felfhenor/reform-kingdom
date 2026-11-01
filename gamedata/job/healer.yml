@@ -41,6 +41,34 @@
     - stat: Health
       multiplier: 0.25
 
+  specializationStatPriority:
+    Lifegiver:
+      - stat: Intelligence
+        multiplier: 1.75
+      - stat: Resistance
+        multiplier: 2
+      - stat: Energy
+        multiplier: 0.75
+      - stat: Vitality
+        multiplier: 1
+      - stat: Health
+        multiplier: 0.25
+      - stat: Strength
+        multiplier: 0.5
+    Templar:
+      - stat: Strength
+        multiplier: 1.5
+      - stat: Intelligence
+        multiplier: 1.5
+      - stat: Vitality
+        multiplier: 1.25
+      - stat: Resistance
+        multiplier: 1.5
+      - stat: Health
+        multiplier: 0.25
+      - stat: Energy
+        multiplier: 0.25
+
   equippableTypes:
     - Cloth Armor
     - Metal Armor

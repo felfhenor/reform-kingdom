@@ -4,6 +4,7 @@ vi.mock('@helpers/task/task-events');
 
 import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
 import { ensureJob } from '@helpers/content/ensure-job';
+import { ensureSkillTreeNode } from '@helpers/content/ensure-skilltreenode';
 import { defaultEquipment, defaultStats } from '@helpers/defaults';
 import {
   characterEquipFromArmory,
@@ -31,6 +32,7 @@ import type {
   GameState,
   ItemId,
   JobId,
+  SkillTreeNodeId,
 } from '@interfaces';
 import { captureAnalyticsEvents } from '@/testing/analytics';
 import {
@@ -62,6 +64,15 @@ const helmet = gear('helmet', 'Hat', {
   baseStats: { ...defaultStats(), Vitality: 3 },
 });
 const oldHat = gear('old-hat', 'Hat');
+const circlet = gear('circlet', 'Hat', {
+  baseStats: { ...defaultStats(), Strength: 4 },
+});
+const bastion = ensureSkillTreeNode({
+  id: 'bastion' as SkillTreeNodeId,
+  name: 'Warrior: Bastion',
+  jobId,
+  row: '',
+});
 const crown = gear('crown', 'Hat', { levelRequirement: 99 });
 const sword = gear('sword', 'Sword', {
   baseStats: { ...defaultStats(), Strength: 10 },
@@ -126,7 +137,13 @@ beforeEach(() => {
       baseStats: { ...defaultStats(), Strength: 5, Vitality: 5 },
       equippableTypes: ['Hat', 'Sword', 'Spear', 'Shield'],
       statPriority: [{ stat: 'Strength', multiplier: 1 }],
+      specializationRows: ['Swashbuckler', 'Bastion'],
+      specializationStatPriority: {
+        Bastion: [{ stat: 'Vitality', multiplier: 5 }],
+      },
     }),
+    bastion,
+    circlet,
     helmet,
     oldHat,
     crown,
@@ -215,6 +232,23 @@ describe('optimizeCharacterEquipment', () => {
     expect(jala().equipment.Weapon).toEqual(best);
     expect(jala().equipment.Offhand).toEqual(offhand);
     expect(armoryState()).toEqual([weaker]);
+  });
+
+  it.each([
+    ['the job’s', [], 'circlet'],
+    ['a held specialization’s', ['bastion'], 'helmet'],
+  ])('ranks by %s stat priority', async (_, nodeIds, expected) => {
+    const items = [helmet, circlet].map((hat) => buildEquipmentItem(hat.id));
+    seedHero({}, items, (state) => {
+      state.world.party[0].skillTreeNodes = {
+        [jobId]: nodeIds as SkillTreeNodeId[],
+      };
+      state.world.party[0].skillTreeVersions = { [jobId]: 1 };
+    });
+
+    await optimize();
+
+    expect(jala().equipment.Helmet?.equipmentId).toBe(expected);
   });
 
   it('swaps a two-hander for a stronger one-hander plus offhand, keeping the two-hander', async () => {

@@ -7,7 +7,15 @@ import {
   ensureEnumArray,
 } from '@helpers/content/ensure-helpers-core';
 import { ensureStats } from '@helpers/content/ensure-helpers-stats';
-import type { JobContent, JobId } from '@interfaces';
+import type { JobContent, JobId, JobStatPriority } from '@interfaces';
+import { mapValues } from 'es-toolkit/compat';
+
+function ensureStatPriority(statPriority: unknown): JobStatPriority[] {
+  return ensureArray(statPriority, (prio) => ({
+    stat: prio.stat ?? 'UNKNOWN',
+    multiplier: prio.multiplier ?? 1,
+  }));
+}
 
 export function ensureJob(job: Partial<JobContent>): Required<JobContent> {
   return {
@@ -24,10 +32,11 @@ export function ensureJob(job: Partial<JobContent>): Required<JobContent> {
       job.equippableTypes,
       VALID_EQUIPMENT_ITEM_TYPES,
     ),
-    statPriority: ensureArray(job.statPriority, (prio) => ({
-      stat: prio.stat ?? 'UNKNOWN',
-      multiplier: prio.multiplier ?? 1,
-    })),
+    statPriority: ensureStatPriority(job.statPriority),
+    specializationStatPriority: mapValues(
+      job.specializationStatPriority ?? {},
+      ensureStatPriority,
+    ),
     treeVersion: job.treeVersion ?? 1,
     treeRows: ensureEnumArray(job.treeRows, VALID_SKILL_TREE_ROWS),
     specializationRows: ensureEnumArray(

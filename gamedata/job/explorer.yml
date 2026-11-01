@@ -43,6 +43,28 @@
     - stat: Energy
       multiplier: 0.25
 
+  specializationStatPriority:
+    Treasure Hunter:
+      - stat: Luck
+        multiplier: 3.5
+      - stat: Agility
+        multiplier: 2
+      - stat: Health
+        multiplier: 0.25
+      - stat: Energy
+        multiplier: 0.25
+    Dungeon Delver:
+      - stat: Intelligence
+        multiplier: 1.75
+      - stat: Resistance
+        multiplier: 2
+      - stat: Luck
+        multiplier: 2.5
+      - stat: Health
+        multiplier: 0.25
+      - stat: Energy
+        multiplier: 0.25
+
   equippableTypes:
     - Cloth Armor
     - Accessory

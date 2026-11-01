@@ -1,4 +1,6 @@
 import { getEntry } from '@helpers/content/content';
+import { characterSpecNode } from '@helpers/hero/skill-tree';
+import { skillTreeNodeShortName } from '@helpers/hero/skill-tree-content';
 import {
   affixEffectsOfKind,
   equipmentItemAffixEffects,
@@ -25,7 +27,9 @@ import type {
   EquipmentItem,
   EquipmentItemId,
   EquipmentSlot,
+  JobContent,
   JobStatPriority,
+  SkillTreeRow,
 } from '@interfaces';
 import { EquipmentTypeToSlot, StatOrder } from '@interfaces';
 
@@ -210,6 +214,19 @@ function planSlotGroup(
   );
 
   return bestLayoutPicks(character, groupSlots, layouts, score);
+}
+
+export function characterStatPriority(
+  character: Character,
+  job: JobContent,
+): JobStatPriority[] {
+  const spec = characterSpecNode(character, job.id);
+  const specPriority = spec
+    ? job.specializationStatPriority[
+        skillTreeNodeShortName(spec) as SkillTreeRow
+      ]
+    : undefined;
+  return specPriority ?? job.statPriority;
 }
 
 // Only returns items that should be equipped - anything already equipped that stays the best pick is omitted.

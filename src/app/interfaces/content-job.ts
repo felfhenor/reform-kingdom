@@ -34,6 +34,10 @@ export type JobContent = IsContentItem &
 
     // Stats "Optimize Equipment" favors, highest priority first; ties fall back to level requirement.
     statPriority: JobStatPriority[];
+    // Replaces statPriority while the hero holds that specialization.
+    specializationStatPriority: Partial<
+      Record<SkillTreeRow, JobStatPriority[]>
+    >;
 
     // Bumping it resets every hero's tree for this job on next load.
     treeVersion: number;

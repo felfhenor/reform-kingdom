@@ -318,12 +318,23 @@ function columnCountIssues(job: JobContent): AnalysisIssue[] {
   return issues;
 }
 
+function specStatPriorityIssues(job: JobContent): AnalysisIssue[] {
+  return Object.keys(job.specializationStatPriority)
+    .filter((spec) => !(job.specializationRows as string[]).includes(spec))
+    .map((spec) =>
+      analysisFail(
+        `specializationStatPriority has ${spec}, which isn't in specializationRows.`,
+      ),
+    );
+}
+
 function jobTreeIssues(job: JobContent): AnalysisIssue[] {
   const nodes = skillTreeJobNodes(job.id);
   const placed = placedNodes(nodes);
 
   return [
     ...columnCountIssues(job),
+    ...specStatPriorityIssues(job),
     ...placed.flatMap((node) => placementIssues(job, node)),
     ...slotIssues(placed),
     ...placed.flatMap((node) => requirementIssues(nodes, node)),

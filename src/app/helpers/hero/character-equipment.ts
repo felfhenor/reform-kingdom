@@ -10,7 +10,10 @@ import {
   equippedItems,
   slotsHoldingEquipment,
 } from '@helpers/item/equipment';
-import { planEquipmentOptimization } from '@helpers/item/equipment-optimize';
+import {
+  characterStatPriority,
+  planEquipmentOptimization,
+} from '@helpers/item/equipment-optimize';
 import {
   canInfuseEquipmentItem,
   infusionMaterialCost,
@@ -138,7 +141,7 @@ export async function optimizeCharacterEquipment(
     planEquipmentOptimization(
       character,
       state.armory,
-      job.statPriority,
+      characterStatPriority(character, job),
     ).forEach(({ item, content }) => {
       stateEquipFromArmory(state, characterId, item, content);
       equipped.push(content);
