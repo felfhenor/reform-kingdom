@@ -1,8 +1,7 @@
 /**
  * Validates CollectibleGate content: each gate is placed on a map as a
  * CollectibleGate node, and every required collectible exists, is
- * obtainable (a node source must be placed on a map), and is listed once. Also warns about explore/mystical node
- * collectibles that no gate asks for.
+ * obtainable (a node source must be placed on a map), and is listed once.
  */
 
 import { getEntriesByType, getEntry } from '@helpers/content/content';
@@ -71,38 +70,9 @@ function checkGate(gate: CollectibleGateContent): AnalysisCheck {
       };
 }
 
-// Explore and mystical (random explore) node collectibles are meant to open a gate; trader/crafting/raid ones are optional.
-function checkNodeCollectiblesGated(
-  gates: CollectibleGateContent[],
-): AnalysisCheck {
-  const gatedIds = new Set(
-    gates.flatMap((gate) => gate.requiredCollectibleIds),
-  );
-  const ungated = getEntriesByType<CollectibleContent>('collectible').filter(
-    (collectible) =>
-      getCollectibleSource(collectible.id)?.type === 'node' &&
-      !gatedIds.has(collectible.id),
-  );
-
-  return ungated.length > 0
-    ? {
-        id: 'collectiblegates:ungated',
-        label: 'Ungated node collectibles',
-        status: 'warning',
-        message: `${ungated.length} explore node collectible(s) aren't required by any collectible gate: ${ungated.map((c) => c.name).join(', ')}.`,
-      }
-    : {
-        id: 'collectiblegates:ungated',
-        label: 'Ungated node collectibles',
-        status: 'pass',
-        message:
-          'Every explore node collectible is required by a collectible gate.',
-      };
-}
-
 export function runCollectibleGatesAnalysis(): AnalysisRunResult {
   const gates = getEntriesByType<CollectibleGateContent>('collectiblegate');
-  const checks = [...gates.map(checkGate), checkNodeCollectiblesGated(gates)];
+  const checks = gates.map(checkGate);
   const failures = checks.filter((c) => c.status === 'fail').length;
 
   return {
