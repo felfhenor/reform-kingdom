@@ -46,6 +46,7 @@ export type ElectronSavefileStoreBridge = {
   savefileWrite: (json: string) => Promise<boolean>;
   savefileRead: () => Promise<string | undefined>;
   savefileOpenFolder: () => Promise<boolean>;
+  savefileExportWithLogs: () => Promise<boolean>;
 };
 
 export type WindowWithElectronSavefileStoreBridge = Window & {

@@ -149,13 +149,13 @@
   @if (writesToDisk) {
     <div class="card shadow-sm">
       <div class="card-body p-3 gap-2">
-        <div class="type-section-title">Local Directories</div>
+        <div class="type-section-title">Local Directories & Files</div>
 
         <div class="form-control">
           <label class="label label-option">
             <span class="label-text">Logs Folder</span>
             <button
-              class="btn btn-neutral"
+              class="btn btn-neutral min-w-[220px]"
               (click)="openLogsFolder()"
               appAnalyticsClick="Savefile:OpenLogsFolder"
               appSfx="ui-click"
@@ -170,13 +170,29 @@
           <label class="label label-option">
             <span class="label-text">Savefile Folder</span>
             <button
-              class="btn btn-neutral"
+              class="btn btn-neutral min-w-[220px]"
               (click)="openSavefileFolder()"
               appAnalyticsClick="Savefile:OpenSavefileFolder"
               appSfx="ui-click"
               [sfxTrigger]="['click', 'hover']"
             >
               Open Savefile Folder
+            </button>
+          </label>
+        </div>
+
+        <div class="form-control">
+          <label class="label label-option">
+            <span class="label-text">Savefile & Logs</span>
+            <button
+              class="btn btn-neutral min-w-[220px]"
+              [disabled]="isBusy()"
+              (click)="exportSaveAndLogs()"
+              appAnalyticsClick="Savefile:ExportSaveAndLogs"
+              appSfx="ui-click"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              Export Savefile & Logs
             </button>
           </label>
         </div>

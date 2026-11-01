@@ -25,7 +25,10 @@ import { ticksToDurationParts } from '@helpers/engine/timer.ui';
 import { closeAllMenus } from '@helpers/engine/ui';
 import { gameReset } from '@helpers/game-init';
 import { savefileBackupsRead } from '@helpers/savefile/savefile-backup-storage';
-import { savefileDiskOpenFolder } from '@helpers/savefile/savefile-disk.ui';
+import {
+  savefileDiskExportWithLogs,
+  savefileDiskOpenFolder,
+} from '@helpers/savefile/savefile-disk.ui';
 import {
   savefileFailureMessage,
   savefileLoadStatus,
@@ -189,6 +192,18 @@ export class PanelOptionsSavefileComponent
   async openSavefileFolder() {
     if (await savefileDiskOpenFolder()) return;
     notifyError('Could not open the savefile folder.');
+  }
+
+  async exportSaveAndLogs() {
+    if (this.isBusy()) return;
+
+    this.isBusy.set(true);
+    try {
+      if (await savefileDiskExportWithLogs()) return;
+      notifyError('Could not export your savefile and logs.');
+    } finally {
+      this.isBusy.set(false);
+    }
   }
 
   reloadGame() {

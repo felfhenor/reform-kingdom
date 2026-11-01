@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('reformElectron', {
   savefileWrite: (json) => ipcRenderer.invoke('savefile:write', json),
   savefileRead: () => ipcRenderer.invoke('savefile:read'),
   savefileOpenFolder: () => ipcRenderer.invoke('savefile:open-folder'),
+  savefileExportWithLogs: () => ipcRenderer.invoke('savefile:export-with-logs'),
   savefileBackupWrite: (id, json) =>
     ipcRenderer.invoke('savefile-backup:write', id, json),
   savefileBackupReadAll: () => ipcRenderer.invoke('savefile-backup:read-all'),

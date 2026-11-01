@@ -1,7 +1,13 @@
 const { app, ipcMain, shell } = require('electron');
 const fs = require('fs/promises');
 const path = require('path');
-const { coreLog } = require('./logging');
+const { coreLog, logsDir } = require('./logging');
+const {
+  configure,
+  Uint8ArrayReader,
+  Uint8ArrayWriter,
+  ZipWriter,
+} = require('@zip.js/zip.js');
 
 // Dev runs share userData with the installed game, so they get their own folder to keep its save.
 const savefileDir = () =>
@@ -83,6 +89,71 @@ const openSavefileFolder = async () => {
   return !error;
 };
 
+const readZipEntry = async (dir, zipFolder, name) => {
+  try {
+    return {
+      name: `${zipFolder}/${name}`,
+      data: await fs.readFile(path.join(dir, name)),
+    };
+  } catch (e) {
+    coreLog().warn('Savefile', `left ${name} out of the export`, e);
+    return undefined;
+  }
+};
+
+// A locked or odd file is skipped rather than failing the export, since that's when players need it most.
+const readFolderFiles = async (dir, zipFolder) => {
+  let entries;
+  try {
+    entries = await fs.readdir(dir, { withFileTypes: true });
+  } catch (e) {
+    if (e.code !== 'ENOENT')
+      coreLog().warn('Savefile', `could not list ${dir} for export`, e);
+    return [];
+  }
+
+  const files = await Promise.all(
+    entries
+      .filter((entry) => entry.isFile())
+      .map((entry) => readZipEntry(dir, zipFolder, entry.name)),
+  );
+  return files.filter(Boolean);
+};
+
+// The main process has no web workers to hand compression off to.
+configure({ useWebWorkers: false });
+
+const createZip = async (files) => {
+  const zip = new ZipWriter(new Uint8ArrayWriter());
+  for (const { name, data } of files)
+    await zip.add(name, new Uint8ArrayReader(data));
+  return zip.close();
+};
+
+// Written straight to Downloads and revealed, so a player can attach it to a bug report in two clicks.
+const exportWithLogs = async () => {
+  try {
+    await writeQueue;
+    const files = [
+      ...(await readFolderFiles(savefileDir(), 'savefiles')),
+      ...(await readFolderFiles(logsDir(), 'logs')),
+    ];
+    const stamp = new Date().toISOString().replaceAll(/[:.]/g, '-');
+    const target = path.join(
+      app.getPath('downloads'),
+      `reformkingdom-savefile-and-logs-${stamp}.zip`,
+    );
+    await fs.mkdir(path.dirname(target), { recursive: true });
+    await fs.writeFile(target, await createZip(files));
+    coreLog().info('Savefile', `exported ${files.length} files to ${target}`);
+    shell.showItemInFolder(target);
+    return true;
+  } catch (e) {
+    coreLog().error('Savefile', 'export with logs failed', e);
+    return false;
+  }
+};
+
 // Matches the close-save timeout: long enough for a big write, short enough that a stalled disk can't keep the game running.
 const QUIT_WRITE_TIMEOUT_MS = 5000;
 
@@ -111,6 +182,7 @@ const registerSavefileStoreHandlers = () => {
   ipcMain.handle('savefile:write', writeSavefile);
   ipcMain.handle('savefile:read', readSavefile);
   ipcMain.handle('savefile:open-folder', openSavefileFolder);
+  ipcMain.handle('savefile:export-with-logs', exportWithLogs);
 };
 
 module.exports = { registerSavefileStoreHandlers };
