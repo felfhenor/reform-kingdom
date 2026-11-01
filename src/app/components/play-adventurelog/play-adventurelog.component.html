@@ -11,8 +11,8 @@
     />
   </div>
 
-  <div class="flex flex-col gap-2 p-4 h-full overflow-y-auto">
-    @for (entry of visibleEntries(); track entry.messageId) {
+  <div #scrollContainer class="flex flex-col gap-2 p-4 h-full overflow-y-auto">
+    @for (entry of renderedEntries(); track entry.messageId) {
       <div
         class="flex gap-2 text-sm flex-wrap"
         (animate.enter)="onEnter($event, entry.messageId)"
@@ -32,5 +32,7 @@
     } @empty {
       <app-blank-slate>Nothing has happened yet.</app-blank-slate>
     }
+
+    <div #loadMoreSentinel class="shrink-0 h-px"></div>
   </div>
 </app-card-page>
