@@ -307,3 +307,24 @@
   maxTradeskillLevel: 31
   tradeskillXP: 205
   craftTime: 540
+
+- id: 07a45146-3084-44d6-a860-dc93586d18bb
+  name: 'Offhand: Crystalfrost Bulwark'
+  result:
+    equipmentId: Crystalfrost Bulwark
+
+  requirements:
+    - itemId: Fel Steel Ingot
+      quantity: 4
+
+    - itemId: Frostwood
+      quantity: 3
+
+    - itemId: Crystalfrost Scales
+      quantity: 2
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 28
+  maxTradeskillLevel: 31
+  tradeskillXP: 205
+  craftTime: 540

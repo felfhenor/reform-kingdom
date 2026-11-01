@@ -51,3 +51,20 @@
     - skillFamily: Arrow Rain
       stat: Agility
       value: 0.5
+
+- id: 0b3fccfc-5568-43f8-941c-1345cbb6b484
+  name: Froststrung Bolt
+  description: A frostwood bolt fletched with frostskin and bound with toadstring. It's sticky to the touch.
+  levelRequirement: 56
+  rarity: Rare
+  type: Arrow
+  sprite: '0327'
+  slots: 1
+  baseStats:
+    Strength: 26.6
+    Agility: 15.9
+
+  elements: [Water]
+
+  debuffResistances:
+    Poison: 10

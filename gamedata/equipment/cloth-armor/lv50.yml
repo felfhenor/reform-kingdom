@@ -55,3 +55,25 @@
 
   combatStats:
     reviveChance: 5
+
+- id: aee214ee-18ed-4a3d-b5d7-78419a63cd35
+  name: Deathchill Mantle
+  description: A steelthread mantle lined with deathchill cloth.
+  levelRequirement: 56
+  rarity: Rare
+  type: Cloth Armor
+  sprite: '0325'
+  slots: 1
+  baseStats:
+    Vitality: 46.2
+    Resistance: 36.6
+    Energy: 16
+
+  elementalResistances:
+    Water: 15
+    Fire: -5
+
+  skillStatBonuses:
+    - skillFamily: Spellshield
+      stat: Health
+      value: 0.1

@@ -311,3 +311,21 @@
   maxTradeskillLevel: 31
   tradeskillXP: 205
   craftTime: 540
+
+- id: 5566ad32-9f5f-418c-97ff-8255d6fcca4c
+  name: 'Material: Refined Frostcore'
+  result:
+    itemId: Refined Frostcore
+
+  requirements:
+    - itemId: Frostcore
+      quantity: 3
+
+    - itemId: Felfrost
+      quantity: 2
+
+  tradeskillId: Artificing
+  minTradeskillLevel: 28
+  maxTradeskillLevel: 29
+  tradeskillXP: 41
+  craftTime: 20

@@ -225,3 +225,24 @@
   maxTradeskillLevel: 31
   tradeskillXP: 205
   craftTime: 540
+
+- id: 9d1c86f6-cd63-4036-8856-f20d5684acf5
+  name: 'Ammo: Froststrung Bolt'
+  result:
+    equipmentId: Froststrung Bolt
+
+  requirements:
+    - itemId: Frostwood
+      quantity: 3
+
+    - itemId: Frostskin
+      quantity: 1
+
+    - itemId: Toadstring
+      quantity: 2
+
+  tradeskillId: Woodworking
+  minTradeskillLevel: 28
+  maxTradeskillLevel: 31
+  tradeskillXP: 205
+  craftTime: 540

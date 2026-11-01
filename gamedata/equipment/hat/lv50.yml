@@ -57,3 +57,20 @@
     - skillFamily: Cure
       stat: Vitality
       value: 0.5
+
+- id: c9e1e7bd-cc60-48bf-b9d5-43f3ef1b5a2a
+  name: Zelk-bone Circlet
+  description: A circlet of bone taken from the Mausoleum of the Zelks. The lost people it remembers were stubborn to the end.
+  levelRequirement: 57
+  rarity: Rare
+  type: Hat
+  sprite: '0323'
+  slots: 1
+  baseStats:
+    Vitality: 33.3
+    Health: 71
+    Energy: 40
+    Luck: 5.1
+
+  combatStats:
+    debuffIgnoreChance: 5

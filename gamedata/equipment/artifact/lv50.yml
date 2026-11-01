@@ -53,3 +53,21 @@
     - skillFamily: Broil
       stat: Intelligence
       value: 0.5
+
+- id: e29245b2-3161-4be9-a385-c9f9e48c765c
+  name: Quartermaster's Ledger
+  description: A Koralin quartermaster's ledger, every ration and resource tracked yet.
+  levelRequirement: 55
+  rarity: Rare
+  type: Artifact
+  sprite: '0319'
+  slots: 1
+  baseStats:
+    Intelligence: 24.8
+    Resistance: 10.4
+
+  elementalBoons:
+    Water: 10
+
+  combatStats:
+    agroValue: -5

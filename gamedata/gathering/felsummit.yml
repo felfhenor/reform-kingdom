@@ -48,21 +48,21 @@
 
   gatherResults:
     # level 1
-    - chance: 1
+    - chance: 5
       levelRequirement: 0
       tradeskillIds: [Woodworking]
       items:
         - itemId: Frostwood
           quantity: 1
 
-    - chance: 1
+    - chance: 5
       levelRequirement: 0
       tradeskillIds: [Artificing]
       items:
         - itemId: Felfrost
           quantity: 1
 
-    - chance: 1
+    - chance: 5
       levelRequirement: 0
       tradeskillIds: [Tailoring]
       items:
@@ -70,21 +70,21 @@
           quantity: 1
 
     # level 2
-    - chance: 1
+    - chance: 5
       levelRequirement: 1
       tradeskillIds: [Woodworking]
       items:
         - itemId: Frostwood
           quantity: 2
 
-    - chance: 1
+    - chance: 5
       levelRequirement: 1
       tradeskillIds: [Artificing]
       items:
         - itemId: Felfrost
           quantity: 2
 
-    - chance: 1
+    - chance: 5
       levelRequirement: 1
       tradeskillIds: [Tailoring]
       items:
@@ -92,26 +92,34 @@
           quantity: 2
 
     # level 3
-    - chance: 1
+    - chance: 5
       levelRequirement: 2
       tradeskillIds: [Woodworking]
       items:
         - itemId: Frostwood
           quantity: 3
 
-    - chance: 1
+    - chance: 5
       levelRequirement: 2
       tradeskillIds: [Artificing]
       items:
         - itemId: Felfrost
           quantity: 3
 
-    - chance: 1
+    - chance: 5
       levelRequirement: 2
       tradeskillIds: [Tailoring]
       items:
         - itemId: Frostneedle
           quantity: 3
+
+    # rare
+    - chance: 1
+      levelRequirement: 2
+      tradeskillIds: [Woodworking]
+      items:
+        - itemId: Steelwood Core
+          quantity: 1
 
 - id: 4b6e50a3-953c-43ea-b6ad-77c6dcd7febd
   name: Felfrost Cellar
@@ -160,14 +168,14 @@
 
   gatherResults:
     # level 1
-    - chance: 1
+    - chance: 5
       levelRequirement: 0
       tradeskillIds: [Blacksmithing]
       items:
         - itemId: Frozen Felrock
           quantity: 1
 
-    - chance: 1
+    - chance: 5
       levelRequirement: 0
       tradeskillIds: [Artificing]
       items:
@@ -175,21 +183,21 @@
           quantity: 1
 
     # level 2
-    - chance: 1
+    - chance: 5
       levelRequirement: 1
       tradeskillIds: [Blacksmithing]
       items:
         - itemId: Frozen Felrock
           quantity: 2
 
-    - chance: 1
+    - chance: 5
       levelRequirement: 1
       tradeskillIds: [Artificing]
       items:
         - itemId: Felfrost
           quantity: 2
 
-    - chance: 1
+    - chance: 5
       levelRequirement: 1
       tradeskillIds: [Blacksmithing]
       items:
@@ -197,23 +205,31 @@
           quantity: 1
 
     # level 3
-    - chance: 1
+    - chance: 5
       levelRequirement: 2
       tradeskillIds: [Blacksmithing]
       items:
         - itemId: Frozen Felrock
           quantity: 3
 
-    - chance: 1
+    - chance: 5
       levelRequirement: 2
       tradeskillIds: [Artificing]
       items:
         - itemId: Felfrost
           quantity: 3
 
-    - chance: 1
+    - chance: 5
       levelRequirement: 2
       tradeskillIds: [Blacksmithing]
       items:
         - itemId: Fel Flux
           quantity: 2
+
+    # rare
+    - chance: 1
+      levelRequirement: 2
+      tradeskillIds: [Jewelcrafting]
+      items:
+        - itemId: Frostpearl
+          quantity: 1

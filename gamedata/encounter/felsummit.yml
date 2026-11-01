@@ -24,6 +24,17 @@
     - collectibleId: Food-eating Prototype
       chance: 25
 
+    - itemId: Koralin Shadowcard
+      chance: 15
+      min: 1
+      max: 1
+
+    - equipmentId: Quartermaster's Ledger
+      chance: 10
+
+    - recipeId: 'Offhand: Crystalfrost Bulwark'
+      chance: 10
+
     - itemId: Gold Coin
       chance: 100
       min: 3500
@@ -54,6 +65,12 @@
   completionRewards:
     - collectibleId: Soul Totem
       chance: 25
+
+    - equipmentId: Soulshield Talisman
+      chance: 10
+
+    - recipeId: 'Ring: Frostpearl Band'
+      chance: 10
 
     - itemId: Gold Coin
       chance: 100
@@ -86,6 +103,17 @@
     - collectibleId: Chillspikes
       chance: 25
 
+    - itemId: Diamond Dust
+      chance: 15
+      min: 1
+      max: 1
+
+    - equipmentId: Frostwalker Boots
+      chance: 10
+
+    - recipeId: 'Ammo: Froststrung Bolt'
+      chance: 10
+
 - id: 128ee236-5e3c-461c-8571-450c11d9f32c
   name: Frostcore Refinery
   description: A temperature-controlled cave where demons refine the materials they collect into frostcores. From there, they turn them into golems and send them out to gather more materials in a never-ending cycle.
@@ -111,6 +139,9 @@
   completionRewards:
     - collectibleId: Failed Frostcores
       chance: 25
+
+    - recipeId: 'Material: Refined Frostcore'
+      chance: 15
 
     - itemId: Gold Coin
       chance: 100
@@ -142,6 +173,17 @@
   completionRewards:
     - collectibleId: Soul Cubes
       chance: 25
+
+    - itemId: Mourning Flower
+      chance: 15
+      min: 1
+      max: 1
+
+    - equipmentId: Gravekeeper's Boon
+      chance: 10
+
+    - recipeId: 'Armor: Deathchill Mantle'
+      chance: 10
 
     - itemId: Gold Coin
       chance: 100

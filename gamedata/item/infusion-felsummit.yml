@@ -1,0 +1,102 @@
+- id: b4a91401-1ceb-4895-bd8f-3e43936ab2f1
+  name: Crystalfrost Scales
+  description: Scales of ice flaked off of a frost golem. They instantly freeze anything that touches them.
+  rarity: Uncommon
+
+  sprite: '0122'
+
+  infusionSkillStatBonuses:
+    - skillFamily: Defensive Stance
+      stat: Health
+      value: 0.05
+
+- id: 07756351-2ced-4307-8bed-c5a4de9503a5
+  name: Deathchill Cloth
+  description: A scrap of a vengeful spirit's shroud.
+  rarity: Uncommon
+
+  sprite: '0121'
+
+  infusionSkillStatBonuses:
+    - skillFamily: Spellshield
+      stat: Health
+      value: 0.05
+
+- id: d26b2dad-9f6a-491c-bda8-665fb1461079
+  name: Toadstring
+  description: A sinewy cord pulled from a frost toad's tongue.
+  rarity: Uncommon
+
+  sprite: '0118'
+
+  infusionDebuffResistances:
+    Poison: 10
+    DamageOverTime: 5
+
+- id: 4a632151-1d8e-4b71-8157-6687e6145695
+  name: Frostpearl
+  description: A pearl of ice found deep in the felfrost.
+  rarity: Rare
+
+  sprite: '0119'
+
+  infusionStats:
+    Luck: 5.2
+
+- id: 5732f335-f609-48a7-9ba2-daacb9629015
+  name: Koralin Shadowcard
+  description: A haunted playing card used by Koralin's cheats. Whoever holds it escapes the purview of any threats.
+  rarity: Rare
+
+  sprite: '0120'
+
+  infusionCombatStats:
+    agroValue: -6
+
+- id: e9d4daa7-350c-4ed3-8f01-e77e50ecd554
+  name: Mourning Flower
+  description: A pale flower that only blooms on the graves of the Frigid Graveyard. It remembers the dead as long as it can.
+  rarity: Rare
+
+  sprite: '0123'
+
+  infusionCombatStats:
+    reviveChance: 1
+    debuffIgnoreChance: 2
+
+- id: 9b301d49-400e-4e2e-a425-5b41d0ef7c38
+  name: Diamond Dust
+  description: Diamond ground finer than snow and lighter than the breeze.
+  rarity: Rare
+
+  sprite: '0124'
+
+  infusionStats:
+    Agility: 3.3
+
+  infusionElementalBoons:
+    Air: 10
+
+- id: 0105223d-02d0-47a0-9c7d-c7bf78cf5940
+  name: Steelwood Core
+  description: The heart of a chillwood tree, frozen so long it's as strong as steel.
+  rarity: Rare
+
+  sprite: '0125'
+
+  infusionStats:
+    Constitution: 3
+
+  infusionGatherYieldBonuses:
+    - tradeskillId: Woodworking
+      value: 1
+
+- id: 904b59ae-5e58-4736-9bbd-fc4021ed829e
+  name: Refined Frostcore
+  description: Several frostcores fused together. It's more sophisticated than a typical frost golem core.
+  rarity: Rare
+
+  sprite: '0117'
+
+  infusionStats:
+    Vitality: 10.5

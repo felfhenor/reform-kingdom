@@ -50,3 +50,24 @@
     - skillFamily: Lifesurge
       stat: Vitality
       value: 0.5
+
+- id: 50ff3f76-aab8-49e6-bf62-b539847090dd
+  name: Soulshield Talisman
+  description: A talisman holding a spirit that was harvested in the Frostsoul Forest. It helps defend its wearer.
+  levelRequirement: 55
+  rarity: Rare
+  type: Charm
+  sprite: '0320'
+  slots: 1
+  baseStats:
+    Vitality: 16.8
+    Resistance: 19.9
+    Health: 41
+
+  elementalResistances:
+    Water: 10
+
+  skillStatBonuses:
+    - skillFamily: Spellshield
+      stat: Health
+      value: 0.1

@@ -54,3 +54,21 @@
 
   combatStats:
     repeatActionChance: 5
+
+- id: d8097958-53f5-47f5-b4ca-97e86f162e0f
+  name: Frostwalker Boots
+  description: Boots with frostskin soles, made for walking across the Chillswept Snowfield without waking what's beneath it.
+  levelRequirement: 55
+  rarity: Rare
+  type: Trinket
+  sprite: '0321'
+  slots: 1
+  baseStats:
+    Luck: 13.5
+    Agility: 6.8
+
+  elementalResistances:
+    Water: 10
+
+  debuffResistances:
+    StatDown: 10

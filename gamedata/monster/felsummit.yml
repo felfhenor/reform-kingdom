@@ -31,6 +31,11 @@
       max: 3
       chance: 50
 
+    - itemId: Crystalfrost Scales
+      min: 1
+      max: 1
+      chance: 5
+
   skills:
     - skillId: Attack
       weight: 1
@@ -92,6 +97,11 @@
       max: 1
       chance: 30
 
+    - itemId: Deathchill Cloth
+      min: 1
+      max: 1
+      chance: 5
+
   skills:
     - skillId: Attack
       weight: 1
@@ -151,6 +161,11 @@
       min: 1
       max: 1
       chance: 30
+
+    - itemId: Toadstring
+      min: 1
+      max: 1
+      chance: 5
 
   skills:
     - skillId: Attack

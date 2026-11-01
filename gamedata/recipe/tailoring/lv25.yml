@@ -234,3 +234,24 @@
   maxTradeskillLevel: 31
   tradeskillXP: 205
   craftTime: 540
+
+- id: 8614dc5f-abf0-4e2d-879d-207d611019a7
+  name: 'Armor: Deathchill Mantle'
+  result:
+    equipmentId: Deathchill Mantle
+
+  requirements:
+    - itemId: Steelthread
+      quantity: 6
+
+    - itemId: Frostsoul
+      quantity: 2
+
+    - itemId: Deathchill Cloth
+      quantity: 2
+
+  tradeskillId: Tailoring
+  minTradeskillLevel: 28
+  maxTradeskillLevel: 31
+  tradeskillXP: 205
+  craftTime: 540

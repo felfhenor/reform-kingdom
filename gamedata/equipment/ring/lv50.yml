@@ -48,3 +48,37 @@
 
   debuffResistances:
     StatDown: 10
+
+- id: 28c5c0a5-f929-4641-a041-8dcfaf06bf52
+  name: Gravekeeper's Boon
+  description: A ring passed between the keepers of the Frigid Graveyard. Its wearers don't stay down for long.
+  levelRequirement: 57
+  rarity: Rare
+  type: Ring
+  sprite: '0322'
+  slots: 1
+  baseStats:
+    Health: 95
+    Energy: 47
+
+  elementalResistances:
+    Water: 5
+
+  combatStats:
+    reviveChance: 2
+
+- id: 8237e30f-0e20-4986-9fca-4a0997ece8d9
+  name: Frostpearl Band
+  description: A fel steel band set with a frostpearl and a diamond.
+  levelRequirement: 56
+  rarity: Rare
+  type: Ring
+  sprite: '0326'
+  slots: 1
+  baseStats:
+    Health: 70
+    Energy: 50
+    Luck: 6.3
+
+  elementalResistances:
+    Water: 10

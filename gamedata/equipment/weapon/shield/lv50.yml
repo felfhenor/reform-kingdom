@@ -58,3 +58,24 @@
     - skillFamily: Smashing Board
       stat: Resistance
       value: 0.5
+
+- id: 3085cb2a-6804-4772-8fe4-7282cfe079b0
+  name: Crystalfrost Bulwark
+  description: A fel steel shield plated with crystalfrost scales.
+  levelRequirement: 56
+  rarity: Rare
+  type: Shield
+  sprite: '0324'
+  slots: 1
+  baseStats:
+    Vitality: 27.2
+    Resistance: 19.5
+
+  elementalResistances:
+    Fire: 5
+    Water: 15
+
+  skillStatBonuses:
+    - skillFamily: Defensive Stance
+      stat: Health
+      value: 0.1

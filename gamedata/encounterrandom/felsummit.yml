@@ -33,6 +33,9 @@
     - collectibleId: Broken Zelk Doll
       chance: 100
 
+    - equipmentId: Zelk-bone Circlet
+      chance: 10
+
     - itemId: Gold Coin
       min: 45000
       max: 50000

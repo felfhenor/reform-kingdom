@@ -211,3 +211,39 @@
   maxTradeskillLevel: 31
   tradeskillXP: 205
   craftTime: 540
+
+- id: d563f03c-1ed5-46ab-b12a-a47e838d1e81
+  name: 'Material: Diamond Dust'
+  result:
+    itemId: Diamond Dust
+
+  requirements:
+    - itemId: Diamond
+      quantity: 2
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 27
+  maxTradeskillLevel: 28
+  tradeskillXP: 39
+  craftTime: 20
+
+- id: 267d4884-23c4-440b-b8c5-159cdb476c47
+  name: 'Ring: Frostpearl Band'
+  result:
+    equipmentId: Frostpearl Band
+
+  requirements:
+    - itemId: Fel Steel Ingot
+      quantity: 1
+
+    - itemId: Diamond
+      quantity: 1
+
+    - itemId: Frostpearl
+      quantity: 2
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 28
+  maxTradeskillLevel: 31
+  tradeskillXP: 205
+  craftTime: 540
