@@ -1,0 +1,14 @@
+- id: d63bf11b-b0ec-4e2f-a9e6-86f2f405302e
+  name: Forgetter's Amulet
+  description: Rodney would be so proud.
+  levelRequirement: 65
+  rarity: Mystical
+  type: Accessory
+  sprite: '0318'
+  slots: 2
+  baseStats:
+    Luck: 25
+    Strength: 50
+    Intelligence: 50
+    Vitality: 50
+    Resistance: 50

@@ -49,6 +49,7 @@ export function encounterStartFight(
   fightIndex: number,
   locationName: string,
   heldXp: number[] = [],
+  startDelayTicks = 0,
 ): void {
   const created = encounterCreateFightCombat(
     encounterId,
@@ -62,6 +63,7 @@ export function encounterStartFight(
     ...created,
     heldXp,
     ambushedBy: combatRollAmbush(),
+    startDelayTicks,
   };
 
   combatMessageLog(combat, `Encountering monster group #${fightIndex + 1}...`);

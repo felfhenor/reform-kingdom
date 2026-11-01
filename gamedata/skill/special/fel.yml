@@ -1,0 +1,300 @@
+- id: 2c105eec-2ce5-428c-b5f1-4d1a9015e06a
+  name: Oblivisci Ignis
+  family: Oblivisci Ignis
+  description: Forget one Fire charge.
+
+  sprite: '0085'
+
+  rarity: Legendary
+
+  epCost: 0
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 5
+
+  elementCosts:
+    Fire: 1
+
+  techniques:
+    - elements: []
+      attributes: [NeverMisses]
+      targets: 1
+      targetType: Self
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling: {}
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** forgets the flame.'
+
+- id: 4c04f8fe-ba05-458f-8362-ae67d32797a2
+  name: Oblivisci Aqua
+  family: Oblivisci Aqua
+  description: Forget one Water charge.
+
+  sprite: '0083'
+
+  rarity: Legendary
+
+  epCost: 0
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 5
+
+  elementCosts:
+    Water: 1
+
+  techniques:
+    - elements: []
+      attributes: [NeverMisses]
+      targets: 1
+      targetType: Self
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling: {}
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** forgets the rain.'
+
+- id: 7965096c-bbc3-421a-9a0d-8aca72a1e6b9
+  name: Oblivisci Terra
+  family: Oblivisci Terra
+  description: Forget one Earth charge.
+
+  sprite: '0082'
+
+  rarity: Legendary
+
+  epCost: 0
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 5
+
+  elementCosts:
+    Earth: 1
+
+  techniques:
+    - elements: []
+      attributes: [NeverMisses]
+      targets: 1
+      targetType: Self
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling: {}
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** forgets the soil.'
+
+- id: d8e79667-1bd6-460c-a46e-3500320a786d
+  name: Oblivisci Ventus
+  family: Oblivisci Ventus
+  description: Forget one Air charge.
+
+  sprite: '0084'
+
+  rarity: Legendary
+
+  epCost: 0
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 5
+
+  elementCosts:
+    Air: 1
+
+  techniques:
+    - elements: []
+      attributes: [NeverMisses]
+      targets: 1
+      targetType: Self
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling: {}
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** forgets the wind.'
+
+- id: 5d94ec1c-d4ae-4ca7-ba42-c0b44562d409
+  name: Forgetter's Caress
+  family: Forgetter's Caress
+  description: Forget a small portion of the target, dealing {{ value }} damage, with a 60% chance of inflicting Hexed.
+
+  sprite: '0081'
+
+  rarity: Legendary
+
+  epCost: 20
+  usesPerCombat: -1
+
+  techniques:
+    - elements: []
+      attributes:
+        [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected, Debuff]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 3
+
+      statusEffects:
+        - statusEffectId: Hexed I
+          chance: 60
+          duration: 3
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
+
+- id: 3d83bdf9-106e-4dad-b388-a8b340cdad56
+  name: Oblivion
+  family: Oblivion
+  description: Unmake every enemy's memories for {{ value }} damage, draining their EP as they forget their spells.
+
+  sprite: '0086'
+
+  rarity: Legendary
+
+  epCost: 25
+  usesPerCombat: -1
+  cooldown: 2
+
+  techniques:
+    - elements: []
+      attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Intelligence: 1.2
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
+
+    - elements: []
+      attributes: [DrainsTargetEnergy, BypassDefense, NeverMisses]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: NotZeroEnergy
+      damageScaling:
+        Intelligence: 0.3
+      statusEffects: []
+
+      combatMessage: '**{{ target.name }}** forgets {{ absdamage }} EP {{ targetStatus }}.'
+
+- id: ad1e33e1-409b-42b2-a557-bc187af0c633
+  name: Nihil
+  family: Nihil
+  description: Consume every element to unmake time and space, each taking {{ value }} damage.
+
+  sprite: '0077'
+
+  rarity: Legendary
+
+  epCost: 40
+  usesPerCombat: -1
+
+  special: true
+  cooldown: 4
+  delay: 1
+
+  elementCosts:
+    Fire: 1
+    Water: 1
+    Earth: 1
+    Air: 1
+
+  techniques:
+    - elements: []
+      attributes:
+        [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected, NeverMisses]
+      targets: 4
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 1.2
+        Intelligence: 1.2
+      statusEffects: []
+
+      combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
+
+- id: e659fb78-c853-4519-bac5-9b48e0e8ce18
+  name: Recall the Ritualists
+  family: Recall the Ritualists
+  description: Recall a Fel Demon from a memory kept safe in times of emergency.
+
+  rarity: Legendary
+  sprite: '0078'
+
+  epCost: 20
+  usesPerCombat: -1
+  cooldown: 4
+
+  techniques:
+    - attributes: [NeverMisses]
+      elements: []
+      targets: 1
+      targetType: Self
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNoSummon
+      damageScaling: {}
+      statusEffects: []
+      summonMonsterId: Fel Demon
+      combatMessage: '**{{ combatant.name }}** remembers **{{ summon.name }}** back into being!'
+
+- id: 1b0835f2-51ca-43e4-a34a-f62d454460fa
+  name: Recall the Hungry
+  family: Recall the Hungry
+  description: Recall a Frost Golem from a memory Fel has not yet forgotten.
+
+  rarity: Legendary
+  sprite: '0080'
+
+  epCost: 20
+  usesPerCombat: -1
+  cooldown: 4
+
+  techniques:
+    - attributes: [NeverMisses]
+      elements: []
+      targets: 1
+      targetType: Self
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNoSummon
+      damageScaling: {}
+      statusEffects: []
+      summonMonsterId: Frost Golem
+      combatMessage: '**{{ combatant.name }}** remembers **{{ summon.name }}** back into being!'
+
+- id: a1f66f74-7f56-4383-b110-cfd458c5ea4c
+  name: Recall the Fallen
+  family: Recall the Fallen
+  description: Recall a Banshee from a memory Fel has not yet forgotten.
+
+  rarity: Legendary
+  sprite: '0079'
+
+  epCost: 20
+  usesPerCombat: -1
+  cooldown: 4
+
+  techniques:
+    - attributes: [NeverMisses]
+      elements: []
+      targets: 1
+      targetType: Self
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNoSummon
+      damageScaling: {}
+      statusEffects: []
+      summonMonsterId: Banshee
+      combatMessage: '**{{ combatant.name }}** remembers **{{ summon.name }}** back into being!'

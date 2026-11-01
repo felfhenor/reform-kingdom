@@ -9,6 +9,7 @@ import {
   ensureCombatStats,
   ensureElementBlock,
   ensureStats,
+  ensureTagResistances,
 } from '@helpers/content/ensure-helpers-stats';
 import type {
   EquipmentSkillId,
@@ -63,5 +64,6 @@ export function ensureMonster(
     skills: ensureArray(monster.skills, ensureMonsterSkill),
     types: ensureEnumArray(monster.types, VALID_MONSTER_TYPES),
     elementalResistances: ensureElementBlock(monster.elementalResistances),
+    debuffResistances: ensureTagResistances(monster.debuffResistances),
   };
 }

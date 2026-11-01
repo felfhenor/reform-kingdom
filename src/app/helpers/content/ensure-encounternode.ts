@@ -24,6 +24,8 @@ function ensureEncounterFight(
 ): EncounterFight {
   return {
     monsters: ensureArray(fight.monsters, ensureEncounterFightMonster),
+    postFightWhisper: fight.postFightWhisper ?? '',
+    postFightDelay: fight.postFightDelay ?? 0,
   };
 }
 

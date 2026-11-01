@@ -354,9 +354,21 @@ export function combatantTakeTurn(
   return {};
 }
 
+function combatWaitStartDelay(current: Combat): boolean {
+  const delay = current.startDelayTicks ?? 0;
+  if (delay <= 0) return false;
+
+  updateGamestate((state) => {
+    if (state.world.combat) state.world.combat.startDelayTicks = delay - 1;
+    return state;
+  });
+  return true;
+}
+
 export function combatDoCombatIteration(): void {
   const current = worldCombatState();
   if (!current) return;
+  if (combatWaitStartDelay(current)) return;
 
   if (combatCheckIfOver(current)) return;
 

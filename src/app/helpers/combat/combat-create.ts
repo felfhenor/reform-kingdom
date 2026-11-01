@@ -219,7 +219,10 @@ export function combatantFromMonster(
       ...defaultAffinities(),
       ...monster.elementalResistances,
     }),
-    tagResistance: defaultTagResistances(),
+    tagResistance: {
+      ...defaultTagResistances(),
+      ...monster.debuffResistances,
+    },
 
     skillUses: {},
     statusEffects: [],

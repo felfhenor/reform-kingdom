@@ -255,6 +255,8 @@ export type Combat = {
   elements?: ElementBlock;
   // The hero whose Ambush succeeded; set means the heroes' free round hasn't run yet.
   ambushedBy?: string;
+  // Ticks to wait before the first round, e.g. a pause between an encounter's fights.
+  startDelayTicks?: number;
 };
 
 // A combatant HP change; amount is signed for display (positive = heal).

@@ -82,3 +82,33 @@
   completionRewards:
     - collectibleId: Memory of the Hunters
       chance: 100
+
+- id: 06df087c-cc8b-4b30-97c8-143ce6ec3944
+  name: Forgetter's Fane
+  description: A temple dedicated to the Forgetter. Here, he surrounds himself with all he tries to forget. It's both his greatest weakness and his strongest power.
+  levelRange:
+    min: 67
+    max: 70
+
+  fights:
+    - monsters:
+        - monsterId: Fragment of Fel
+      postFightWhisper: He's losing part of himself to try to slow you down. Good. That means he's afraid.
+      postFightDelay: 5
+
+    - monsters:
+        - monsterId: Fel, the Forgetter
+      postFightWhisper: That was the face he shows the world. What comes next is the one he hides. Steady now.
+      postFightDelay: 5
+
+    - monsters:
+        - monsterId: Fel Fhenor
+      postFightWhisper: It's done. The demons will disappear without him. The Stone is still cracked, but we can work around that. Back to work.
+      postFightDelay: 5
+
+  completionRewards:
+    - collectibleId: Memory of the Forgetter
+      chance: 100
+
+    - equipmentId: Forgetter's Amulet
+      chance: 100

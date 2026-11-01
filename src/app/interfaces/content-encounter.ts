@@ -13,6 +13,10 @@ export type EncounterFightMonster = {
 
 export type EncounterFight = {
   monsters: EncounterFightMonster[];
+  // The Founder's whisper, logged when this fight is won; empty for none.
+  postFightWhisper?: string;
+  // Seconds before the next fight starts.
+  postFightDelay?: number;
 };
 
 export type EncounterContent = IsContentItem &

@@ -26,6 +26,7 @@ import {
   defaultCombatStats,
   defaultEquipment,
   defaultStats,
+  defaultTagResistances,
 } from '@helpers/defaults';
 import type {
   Character,
@@ -250,6 +251,18 @@ describe('combatantFromMonster', () => {
       ...defaultAffinities(),
       Fire: 75,
       Water: -25,
+    });
+  });
+
+  it('layers its debuff resistances over the defaults', () => {
+    const monster = ensureMonster({
+      id: 'fel' as MonsterId,
+      debuffResistances: { Stun: 100 },
+    });
+
+    expect(combatantFromMonster(monster, 1, 0).tagResistance).toEqual({
+      ...defaultTagResistances(),
+      Stun: 100,
     });
   });
 });

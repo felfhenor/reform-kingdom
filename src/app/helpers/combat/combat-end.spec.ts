@@ -217,10 +217,54 @@ describe('combatCheckIfOver', () => {
         1,
         'Field Ruins',
         [100],
+        0,
       );
       expect(gamestate().materials[oreId]?.quantity).toBe(3);
       expect(gamestate().world.combat).toEqual(combat);
       expect(taskRecordEncounterClear).not.toHaveBeenCalled();
+    });
+
+    it('whispers after a won fight and starts the next one after its delay', () => {
+      seedContent([
+        goblin,
+        encounter({
+          fights: [
+            {
+              monsters: [],
+              postFightWhisper: 'Steady now.',
+              postFightDelay: 5,
+            },
+            { monsters: [] },
+          ],
+        }),
+        ...items,
+      ]);
+
+      endFight(fight({ encounterId, fightIndex: 0 }));
+
+      expect(logMessages()).toContain('*The Founder whispers: "Steady now."*');
+      expect(encounterStartFight).toHaveBeenCalledWith(
+        encounterId,
+        1,
+        'Field Ruins',
+        [100],
+        5,
+      );
+    });
+
+    it("whispers after the node's last fight too", () => {
+      seedContent([
+        goblin,
+        encounter({
+          fights: [{ monsters: [], postFightWhisper: "It's done." }],
+        }),
+        ...items,
+      ]);
+
+      endFight(fight({ encounterId, fightIndex: 0 }));
+
+      expect(logMessages()).toContain(`*The Founder whispers: "It's done."*`);
+      expect(encounterStartFight).not.toHaveBeenCalled();
     });
 
     it('clears the node after its last fight, granting kill drops and completion rewards together', () => {
@@ -317,6 +361,7 @@ describe('combatCheckIfOver', () => {
         1,
         'Field Ruins',
         [40, 100],
+        0,
       );
 
       const xp = xpAtLevel(fight({ encounterId, fightIndex: 1, heldXp: [40] }));

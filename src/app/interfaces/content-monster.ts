@@ -10,16 +10,31 @@ import type {
 import type { ElementBlock } from '@interfaces/element';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { StatBlock } from '@interfaces/stat';
+import type { StatusEffectBlock } from '@interfaces/content-statuseffect';
 import type { StatDisplayDimension } from '@interfaces/stat-display';
 import type { HasDescription } from '@interfaces/traits';
 
 export type MonsterId = Branded<string, 'MonsterId'>;
 
 export type MonsterType =
-  'Humanoid' | 'Demon' | 'Amalgamation' | 'Insect' | 'Beast' | 'Spirit';
+  | 'Humanoid'
+  | 'Demon'
+  | 'Amalgamation'
+  | 'Insect'
+  | 'Beast'
+  | 'Spirit'
+  | 'Forgetter';
 
 export const MonsterTypeDimension: StatDisplayDimension<MonsterType> = {
-  order: ['Humanoid', 'Demon', 'Amalgamation', 'Insect', 'Beast', 'Spirit'],
+  order: [
+    'Humanoid',
+    'Demon',
+    'Amalgamation',
+    'Insect',
+    'Beast',
+    'Spirit',
+    'Forgetter',
+  ],
   label: {
     Humanoid: 'Humanoid Damage',
     Demon: 'Demon Damage',
@@ -27,6 +42,7 @@ export const MonsterTypeDimension: StatDisplayDimension<MonsterType> = {
     Insect: 'Insect Damage',
     Beast: 'Beast Damage',
     Spirit: 'Spirit Damage',
+    Forgetter: 'Forgetter Damage',
   },
   icon: {
     Humanoid: 'gamePerson',
@@ -35,6 +51,7 @@ export const MonsterTypeDimension: StatDisplayDimension<MonsterType> = {
     Insect: 'gameFlyingBeetle',
     Beast: 'gameWolfHead',
     Spirit: 'gameGhost',
+    Forgetter: 'gameBrain',
   },
   color: {
     Humanoid: 'text-pink-400',
@@ -43,6 +60,7 @@ export const MonsterTypeDimension: StatDisplayDimension<MonsterType> = {
     Insect: 'text-amber-900',
     Beast: 'text-red-700',
     Spirit: 'text-purple-700',
+    Forgetter: 'text-slate-400',
   },
 };
 
@@ -64,6 +82,8 @@ export type MonsterContent = IsContentItem &
 
     // Negative = weakness.
     elementalResistances?: ElementBlock;
+
+    debuffResistances?: Partial<StatusEffectBlock>;
 
     // Priority list of targeting modes, tried in order.
     targetting: TargettingPriorityEntry[];

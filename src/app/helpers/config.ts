@@ -240,6 +240,7 @@ export const VALUE_MULTIPLIER_PER_MONSTER_TYPE: Record<MonsterType, number> = {
   Insect: 7,
   Beast: 5,
   Spirit: 15,
+  Forgetter: 20,
 };
 
 export const GOLD_PER_ELEMENT_RESIST_POINT = 50;

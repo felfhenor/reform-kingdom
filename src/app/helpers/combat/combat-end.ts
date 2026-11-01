@@ -27,6 +27,7 @@ import {
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { playGameSFX } from '@helpers/engine/sfx';
+import { founderWhisperLog } from '@helpers/lore/founder-whisper';
 import {
   partyGainXp,
   syncPartyHpFromCombat,
@@ -43,6 +44,7 @@ import type {
   Combat,
   Combatant,
   EncounterContent,
+  EncounterFight,
   EncounterId,
   EncounterRandomContent,
   MonsterContent,
@@ -188,6 +190,11 @@ function rollEncounterCompletionRewards(combat: Combat): ResolvedDrop[] {
   );
 }
 
+function currentEncounterFight(combat: Combat): EncounterFight | undefined {
+  if (combat.fightIndex === undefined) return undefined;
+  return completedEncounter(combat)?.fights[combat.fightIndex];
+}
+
 function recordEncounterClear(combat: Combat): void {
   if (!completedEncounter(combat)) return;
 
@@ -285,6 +292,9 @@ function handleCombatVictory(combat: Combat): boolean {
 
   const nextFight = nextFightFor(combat);
   grantEncounterFightDrops(combat, monsterDrops, !nextFight);
+
+  const fight = currentEncounterFight(combat);
+  if (fight?.postFightWhisper) founderWhisperLog(fight.postFightWhisper);
   if (!nextFight) return false;
 
   encounterStartFight(
@@ -292,6 +302,7 @@ function handleCombatVictory(combat: Combat): boolean {
     nextFight.fightIndex,
     combat.locationName,
     heldXp,
+    fight?.postFightDelay ?? 0,
   );
   return true;
 }

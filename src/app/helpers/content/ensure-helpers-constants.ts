@@ -82,6 +82,7 @@ export const VALID_MONSTER_TYPES: MonsterType[] = [
   'Humanoid',
   'Insect',
   'Spirit',
+  'Forgetter',
 ];
 
 export const VALID_JOB_ABILITY_TYPES: JobAbilityType[] = [

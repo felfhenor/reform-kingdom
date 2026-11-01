@@ -23,6 +23,7 @@ describe('defaultMonsterTypeDamageBonus', () => {
       Insect: 0,
       Beast: 0,
       Spirit: 0,
+      Forgetter: 0,
     });
   });
 });

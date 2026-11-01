@@ -137,6 +137,26 @@ beforeEach(() => {
 });
 
 describe('combatDoCombatIteration', () => {
+  it('waits out a start delay one tick at a time before running any round', () => {
+    available(skill('weighted'));
+    seedGamestate(
+      (state) =>
+        (state.world.combat = buildCombat({
+          rounds: 0,
+          heroes: [caster()],
+          startDelayTicks: 2,
+        })),
+    );
+
+    inTick(combatDoCombatIteration);
+    inTick(combatDoCombatIteration);
+    expect(worldCombatState()).toMatchObject({ rounds: 0, startDelayTicks: 0 });
+    expect(combatantSkillCastEvents()).toEqual([]);
+
+    inTick(combatDoCombatIteration);
+    expect(worldCombatState()?.rounds).toBe(1);
+  });
+
   it('commits the round on a copy, leaving the previous round untouched', () => {
     const previous = buildCombat({ rounds: 1, heroes: [caster()] });
     const snapshot = structuredClone(previous);

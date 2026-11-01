@@ -76,6 +76,14 @@ describe('encounterStartFight', () => {
     expect(worldCombatState()?.heldXp).toEqual([30]);
   });
 
+  it('holds the fight for its start delay, starting immediately by default', () => {
+    start(0);
+    expect(worldCombatState()?.startDelayTicks).toBe(0);
+
+    inTick(() => encounterStartFight(ruins.id, 1, 'Field Ruins', [], 5));
+    expect(worldCombatState()?.startDelayTicks).toBe(5);
+  });
+
   it('can roll as low as the bottom of the level range', () => {
     vi.mocked(rngNumberRange).mockImplementationOnce((min) => min);
 

@@ -46,6 +46,9 @@
     - skillId: Spellshield II
       weight: 1
 
+    - skillId: Oblivisci Aqua
+      weight: 1
+
   baseStats:
     Health: 3000
     Energy: 300
@@ -112,6 +115,9 @@
       weight: 1
 
     - skillId: Defensive Stance II
+      weight: 1
+
+    - skillId: Oblivisci Ignis
       weight: 1
 
   baseStats:
@@ -182,6 +188,9 @@
     - skillId: Rejuvenating Gust II
       weight: 1
 
+    - skillId: Oblivisci Ventus
+      weight: 1
+
   baseStats:
     Health: 3200
     Energy: 250
@@ -250,6 +259,9 @@
       weight: 1
 
     - skillId: Refresh II
+      weight: 1
+
+    - skillId: Oblivisci Ignis
       weight: 1
 
   baseStats:
@@ -327,6 +339,9 @@
     - skillId: Regrowth II
       weight: 1
 
+    - skillId: Oblivisci Terra
+      weight: 1
+
   baseStats:
     Health: 4500
     Energy: 250
@@ -346,3 +361,222 @@
     Vitality: 1.7
     Resistance: 1.2
     Agility: 1
+
+- id: 80aac97f-ea40-4dd3-ba95-957ed6c77778
+  name: Fragment of Fel
+  description: The sixth fragment, the uniter. An otherwise ethereal entity that sleeps and gives power to the rest. Only by defeating the other five fragments can it be sought out.
+
+  types: [Forgetter]
+  elementalResistances:
+    Fire: 60
+    Earth: 60
+    Water: -40
+    Air: -40
+
+  debuffResistances:
+    Stun: 100
+
+  sprite: '0188'
+  frames: 4
+
+  targetting:
+    - type: Weakest
+
+  rarity: Legendary
+
+  xp:
+    min: 5200
+    max: 5300
+    bonusPerLevel: 5
+
+  drops: []
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Forgetter's Caress
+      weight: 3
+
+    - skillId: Holy Smite IV
+      weight: 2
+
+    - skillId: Frostfire Bolt III
+      weight: 2
+
+    - skillId: Cure IV
+      weight: 1
+
+    - skillId: Recall the Ritualists
+      weight: 1
+
+    - skillId: Oblivisci Aqua
+      weight: 1
+
+    - skillId: Oblivisci Ventus
+      weight: 1
+
+  baseStats:
+    Health: 1400
+    Energy: 300
+    Luck: 8
+    Intelligence: 16
+    Strength: 15
+    Vitality: 30
+    Resistance: 50
+    Agility: 10
+
+  statsPerLevel:
+    Health: 90
+    Energy: 6
+    Luck: 0.3
+    Intelligence: 0.5
+    Strength: 0.3
+    Vitality: 1.4
+    Resistance: 1.8
+    Agility: 0.5
+
+- id: c9b066a4-51b4-4e8a-8c11-c77529be204c
+  name: Fel, the Forgetter
+  description: The Forgetter himself. His separate fragments united to form the Demon of Forgetting. A powerful demon, made more powerful by his ability to lead an army of those like him.
+
+  types: [Forgetter]
+  elementalResistances:
+    Water: 60
+    Air: 60
+    Fire: -40
+    Earth: -40
+
+  debuffResistances:
+    Stun: 100
+
+  sprite: '0192'
+  frames: 4
+
+  targetting:
+    - type: Strongest
+
+  rarity: Legendary
+
+  xp:
+    min: 5200
+    max: 5300
+    bonusPerLevel: 5
+
+  drops: []
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Double Strike IV
+      weight: 3
+
+    - skillId: Sweep IV
+      weight: 2
+
+    - skillId: Oblivion
+      weight: 1
+
+    - skillId: Rapidfire III
+      weight: 1
+
+    - skillId: Defensive Stance II
+      weight: 1
+
+    - skillId: Recall the Hungry
+      weight: 1
+
+    - skillId: Oblivisci Ignis
+      weight: 1
+
+    - skillId: Oblivisci Terra
+      weight: 1
+
+  baseStats:
+    Health: 1400
+    Energy: 250
+    Luck: 8
+    Intelligence: 15
+    Strength: 18
+    Vitality: 40
+    Resistance: 35
+    Agility: 15
+
+  statsPerLevel:
+    Health: 90
+    Energy: 5
+    Luck: 0.3
+    Intelligence: 0.5
+    Strength: 0.55
+    Vitality: 1.2
+    Resistance: 1.3
+    Agility: 0.8
+
+- id: 37ade470-fa2e-42a6-a9e4-c84dd7b00fdc
+  name: Fel Fhenor
+  description: Not much is known about the Chronovore. By the time you find out about him, it's too late. If you haven't forgotten yourself, you've certainly forgotten him.
+
+  types: [Forgetter]
+
+  debuffResistances:
+    Stun: 100
+
+  sprite: '0196'
+  frames: 4
+
+  targetting: []
+
+  rarity: Legendary
+
+  xp:
+    min: 5200
+    max: 5300
+    bonusPerLevel: 5
+
+  drops: []
+
+  skills:
+    - skillId: Attack
+      weight: 1
+
+    - skillId: Holy Smite IV
+      weight: 2
+
+    - skillId: Double Strike IV
+      weight: 2
+
+    - skillId: Earthshake IV
+      weight: 1
+
+    - skillId: Frostfire Bolt III
+      weight: 1
+
+    - skillId: Cure IV
+      weight: 1
+
+    - skillId: Recall the Fallen
+      weight: 1
+
+    - skillId: Nihil
+      weight: 1
+
+  baseStats:
+    Health: 1200
+    Energy: 350
+    Luck: 10
+    Intelligence: 18
+    Strength: 18
+    Vitality: 40
+    Resistance: 30
+    Agility: 15
+
+  statsPerLevel:
+    Health: 72
+    Energy: 6
+    Luck: 0.35
+    Intelligence: 0.6
+    Strength: 0.6
+    Vitality: 1.2
+    Resistance: 1.0
+    Agility: 0.8
