@@ -180,6 +180,7 @@ module.exports = {
   coreLog,
   gameLog,
   initLogging,
+  logFilePath,
   logsDir,
   registerLogHandlers,
 };

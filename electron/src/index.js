@@ -4,6 +4,7 @@ const url = require('url');
 
 const { coreLog, initLogging, registerLogHandlers } = require('./logging');
 const {
+  logPreviousSessionEnd,
   logReadyDiagnostics,
   logSessionHeader,
   watchAppLifecycle,
@@ -25,6 +26,7 @@ if (!hasInstanceLock) {
 if (hasInstanceLock && !isSquirrelEvent) {
   initLogging();
   logSessionHeader();
+  logPreviousSessionEnd();
   watchAppLifecycle();
 }
 

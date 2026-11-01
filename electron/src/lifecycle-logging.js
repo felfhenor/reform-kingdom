@@ -1,6 +1,7 @@
 const { app, screen } = require('electron');
+const fs = require('fs');
 const os = require('os');
-const { coreLog, gameLog, logsDir } = require('./logging');
+const { coreLog, gameLog, logFilePath, logsDir } = require('./logging');
 
 const sessionStart = Date.now();
 const sinceStart = () => `+${Date.now() - sessionStart}ms`;
@@ -31,6 +32,46 @@ const logSessionHeader = () => {
   gameLog().info(
     'Session',
     `Started ${new Date().toString()}, app ${app.getVersion()}`,
+  );
+};
+
+// The quit line is near the end, so a capped tail keeps a 50MB log from slowing startup.
+const PREVIOUS_LOG_TAIL_BYTES = 64 * 1024;
+
+const readLogTail = (file) => {
+  const fd = fs.openSync(file, 'r');
+  try {
+    const { size } = fs.fstatSync(fd);
+    const length = Math.min(size, PREVIOUS_LOG_TAIL_BYTES);
+    const buffer = Buffer.alloc(length);
+    fs.readSync(fd, buffer, 0, length, size - length);
+    return buffer.toString('utf8');
+  } finally {
+    fs.closeSync(fd);
+  }
+};
+
+// No quit line means the last run crashed, was killed, or lost power before it could close.
+const logPreviousSessionEnd = () => {
+  const log = coreLog();
+  let tail;
+  try {
+    tail = readLogTail(logFilePath('core', 1));
+  } catch (e) {
+    if (e.code !== 'ENOENT')
+      log.warn('Session', 'Could not read the previous session log', e);
+    return;
+  }
+
+  if (/\{App\} quit, exit code/.test(tail))
+    return log.info('Session', 'previous session closed cleanly');
+  if (tail.includes('Size limit reached'))
+    return log.info('Session', 'previous session hit the log size limit');
+
+  const lastLine = tail.trimEnd().split('\n').at(-1);
+  log.warn(
+    'Session',
+    `previous session did not close cleanly; its last line was: ${lastLine}`,
   );
 };
 
@@ -173,6 +214,7 @@ const watchWindowLifecycle = (win) => {
 };
 
 module.exports = {
+  logPreviousSessionEnd,
   logReadyDiagnostics,
   logSessionHeader,
   sinceStart,
