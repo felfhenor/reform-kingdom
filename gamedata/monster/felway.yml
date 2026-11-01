@@ -1,6 +1,6 @@
 - id: abada04f-1132-47c6-8555-4864e691227b
   name: Fel Demon
-  description: A strong demon, often found serving Fel.
+  description: A strong demon, often found serving Fel. When they're not doing that, they're helping demon villagers manage their pets, or moving boulders for fun.
 
   types: [Demon]
   elementalResistances:
