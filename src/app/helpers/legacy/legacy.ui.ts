@@ -9,8 +9,16 @@ import {
 } from '@helpers/legacy/legacy';
 import { isFelDefeated } from '@helpers/lore/outro';
 import { waitForGameloopIdle } from '@helpers/savefile/savefile-load';
-import type { EdictId, GameId, RunOutcome, SavefileBackup } from '@interfaces';
-import { uniq } from 'es-toolkit/compat';
+import type {
+  EdictId,
+  GameId,
+  HeroRunStats,
+  RunMostUsedSkill,
+  RunOutcome,
+  RunStatRow,
+  SavefileBackup,
+} from '@interfaces';
+import { maxBy, uniq } from 'es-toolkit/compat';
 
 export function legacyRunOutcome(): RunOutcome {
   return isFelDefeated() ? 'Completed' : 'Abandoned';
@@ -48,4 +56,25 @@ export function legacyClearedEdictIds(): EdictId[] {
       .runs.filter((run) => run.outcome === 'Completed')
       .flatMap((run) => run.edicts),
   );
+}
+
+export function legacyHeroStatRows(stats: HeroRunStats): RunStatRow[] {
+  return [
+    { label: 'Kills', value: stats.kills },
+    { label: 'Damage dealt', value: stats.damageDealt },
+    { label: 'Damage taken', value: stats.damageTaken },
+    { label: 'Healing', value: stats.healing },
+    { label: 'Damage blocked', value: stats.damageBlocked },
+    { label: 'Crits', value: stats.crits },
+    { label: 'Status effects applied', value: stats.statusEffectsApplied },
+    { label: 'Deaths', value: stats.deaths },
+    { label: 'Fights', value: stats.fights },
+  ];
+}
+
+export function legacyHeroMostUsedSkill(
+  stats: HeroRunStats,
+): RunMostUsedSkill | undefined {
+  const top = maxBy(Object.entries(stats.skillUses), ([, uses]) => uses);
+  return top ? { skillFamily: top[0], uses: top[1] } : undefined;
 }

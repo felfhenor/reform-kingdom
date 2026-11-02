@@ -9,6 +9,7 @@ import {
 import { Router } from '@angular/router';
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
+import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { RowEdictComponent } from '@components/row-edict/row-edict.component';
 import { FadeInDirective } from '@directives/fade-in.directive';
@@ -17,6 +18,10 @@ import { getEntry } from '@helpers/content/content';
 import { edictEntry } from '@helpers/edict/edict';
 import { ticksToDurationParts } from '@helpers/engine/timer.ui';
 import { legacyRunById } from '@helpers/legacy/legacy';
+import {
+  legacyHeroMostUsedSkill,
+  legacyHeroStatRows,
+} from '@helpers/legacy/legacy.ui';
 import {
   remembranceOverall,
   remembranceRow,
@@ -33,6 +38,7 @@ import { PluralizePipe } from '@pipes/pluralize.pipe';
     BlankSlateComponent,
     DatePipe,
     DecimalPipe,
+    IconItemPreviewComponent,
     IconJobComponent,
     NgTemplateOutlet,
     PluralizePipe,
@@ -59,6 +65,11 @@ export class RunSummaryComponent {
     (this.run()?.party ?? []).map((hero) => ({
       ...hero,
       job: getEntry<JobContent>(hero.jobId),
+      statRows: hero.stats ? legacyHeroStatRows(hero.stats) : undefined,
+      mostUsed: hero.stats ? legacyHeroMostUsedSkill(hero.stats) : undefined,
+      jobsUsedText: (hero.snapshot?.jobsUsed ?? [])
+        .map((jobId) => getEntry<JobContent>(jobId)?.name ?? 'Unknown job')
+        .join(', '),
     })),
   );
 

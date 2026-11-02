@@ -96,6 +96,13 @@ describe('legacyIsValid', () => {
     expect(legacyIsValid(undefined)).toBe(false);
     expect(legacyIsValid({ runs: 'nope' })).toBe(false);
     expect(legacyIsValid({ runs: [] })).toBe(false);
+    const badHero = { name: 'Ada', stats: { kills: 1 } };
+    expect(
+      legacyIsValid({
+        version: 1,
+        runs: [{ ...run('a', 'Completed'), party: [badHero] }],
+      }),
+    ).toBe(false);
     expect(
       legacyIsValid({ version: 1, runs: [{ id: 'a', outcome: 'Completed' }] }),
     ).toBe(false);

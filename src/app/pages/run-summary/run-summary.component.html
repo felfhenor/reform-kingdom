@@ -38,22 +38,92 @@
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1">
-        <div class="card bg-base-100">
+        <div class="card bg-base-100 lg:col-span-2">
           <div class="card-body gap-4">
             <h2 class="type-section-title">Party</h2>
 
-            @for (hero of party(); track $index) {
-              <div class="flex items-center gap-4">
-                <app-icon-job [job]="hero.job" />
-                <div class="flex flex-col">
-                  <span class="type-entity-name">{{ hero.name }}</span>
-                  <span class="type-muted">
-                    Level {{ hero.level | number }}
-                    {{ hero.job?.name ?? 'Unknown job' }}
-                  </span>
-                </div>
-              </div>
+            @if (trackedPlayTime(); as trackedParts) {
+              <p class="type-muted">
+                This run began before stats were tracked, so combat stats only
+                cover the last
+                <ng-container
+                  [ngTemplateOutlet]="duration"
+                  [ngTemplateOutletContext]="{ $implicit: trackedParts }"
+                />
+                of play.
+              </p>
             }
+
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+              @for (hero of party(); track $index) {
+                @let spec = hero.snapshot?.specialization;
+                <div class="flex flex-col gap-4 p-4 bg-base-200">
+                  <div class="flex items-center gap-4">
+                    <app-icon-job [job]="hero.job" />
+                    @if (spec) {
+                      <app-icon-item-preview
+                        [sprite]="spec.sprite"
+                        spritesheet="skilltreenode"
+                      />
+                    }
+                    <div class="flex flex-col min-w-0">
+                      <span class="type-entity-name">{{ hero.name }}</span>
+                      <span class="type-muted">
+                        Level {{ hero.level | number }}
+                        {{ hero.job?.name ?? 'Unknown job' }}
+                        @if (spec) {
+                          · {{ spec.name }}
+                        }
+                      </span>
+                    </div>
+                  </div>
+
+                  @if (hero.statRows; as rows) {
+                    <div class="grid grid-cols-3 gap-2">
+                      @for (row of rows; track row.label) {
+                        <div class="flex flex-col">
+                          <span class="type-meta">{{ row.label }}</span>
+                          <span class="font-bold tabular-nums">
+                            {{ row.value | number: '1.0-0' }}
+                          </span>
+                        </div>
+                      }
+                    </div>
+
+                    <div class="flex flex-col gap-2 text-sm">
+                      @if (hero.stats?.biggestHit; as biggest) {
+                        <span>
+                          <span class="type-meta">Biggest hit:</span>
+                          {{ biggest.amount | number: '1.0-0' }}
+                          ({{ biggest.skillFamily }})
+                        </span>
+                      }
+                      @if (hero.mostUsed; as mostUsed) {
+                        <span>
+                          <span class="type-meta">Most used skill:</span>
+                          {{ mostUsed.skillFamily }} ×{{
+                            mostUsed.uses | number
+                          }}
+                        </span>
+                      }
+                    </div>
+                  } @else {
+                    <p class="type-muted">
+                      Combat stats weren't tracked for this run.
+                    </p>
+                  }
+
+                  @if (hero.snapshot) {
+                    <div class="flex flex-col gap-2 text-sm">
+                      <span>
+                        <span class="type-meta">Jobs:</span>
+                        {{ hero.jobsUsedText }}
+                      </span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
           </div>
         </div>
 

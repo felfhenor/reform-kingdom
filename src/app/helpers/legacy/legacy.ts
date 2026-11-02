@@ -5,6 +5,7 @@ import {
   edictsFragmentTotal,
 } from '@helpers/edict/edict';
 import { error } from '@helpers/engine/logging';
+import { legacyRunHero } from '@helpers/legacy/legacy-hero';
 import { remembranceCategories } from '@helpers/remembrance/remembrance';
 import { savefileDiskLegacyWrite } from '@helpers/savefile/savefile-disk';
 import {
@@ -38,11 +39,23 @@ export function defaultLegacy(): LegacyState {
   return { version: LEGACY_VERSION, runs: [] };
 }
 
+// The optional per-hero fields are checked too, since the summary page reads into them.
+function legacyHeroIsValid(hero: RunRecordHero | null): boolean {
+  const skillUses = hero?.stats?.skillUses;
+  return (
+    !!hero &&
+    (hero.stats === undefined ||
+      (typeof skillUses === 'object' && skillUses !== null)) &&
+    (hero.snapshot === undefined || Array.isArray(hero.snapshot.jobsUsed))
+  );
+}
+
 function legacyRunIsValid(run: RunRecord | null): boolean {
   return (
     typeof run?.id === 'string' &&
     !!run.outcome &&
     Array.isArray(run.party) &&
+    run.party.every(legacyHeroIsValid) &&
     Array.isArray(run.edicts) &&
     Array.isArray(run.stats?.completion)
   );
@@ -119,11 +132,8 @@ export function legacyRunById(id: GameId): RunRecord | undefined {
 }
 
 function legacyRunParty(): RunRecordHero[] {
-  return worldPartyState().map((hero) => ({
-    name: hero.name,
-    jobId: hero.jobId,
-    level: hero.level,
-  }));
+  const { heroes } = runStatsState();
+  return worldPartyState().map((hero) => legacyRunHero(hero, heroes[hero.id]));
 }
 
 function legacyRunEdicts(): Pick<
