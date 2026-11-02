@@ -70,6 +70,19 @@
           }
         </div>
       </div>
+
+      @if (showFirstRunWarning()) {
+        <div
+          role="alert"
+          class="alert alert-warning shrink-0"
+          (animate.enter)="onFadeEnter($event)"
+          (animate.leave)="onFadeLeave($event)"
+        >
+          It looks like this is your first playthrough of re:Form Kingdom. It's
+          not recommended to choose Edicts until you've had the core game
+          experience first!
+        </div>
+      }
     </div>
 
     <div class="card bg-base-100 lg:flex-[2] lg:min-h-0">
@@ -88,6 +101,7 @@
                     [interactive]="true"
                     [picked]="isEdictPicked(edict)"
                     [blocked]="isEdictBlocked(edict)"
+                    [cleared]="isEdictCleared(edict)"
                     (toggled)="toggleEdict(edict)"
                   />
                 }
@@ -107,7 +121,7 @@
           @for (edict of pickedEdicts(); track edict.id) {
             <app-row-edict
               [edict]="edict"
-              (animate.leave)="onEdictRowLeave($event)"
+              (animate.leave)="onFadeLeave($event)"
             />
           } @empty {
             <app-blank-slate>

@@ -83,11 +83,15 @@
   min-width: 300px;
 }
 
-// Shared by skill tree nodes and edict tiles: dotted = not yet earned, excluded = can't be chosen now.
+// Shared by skill tree nodes and edict tiles: dotted = not yet earned, cleared = earned before, excluded = can't be chosen now.
 .node-outline {
   outline: 3px dotted
     color-mix(in oklch, var(--color-base-content) 25%, transparent);
   outline-offset: 1px;
+}
+
+.node-cleared {
+  outline: 3px solid var(--color-success);
 }
 
 .node-excluded {

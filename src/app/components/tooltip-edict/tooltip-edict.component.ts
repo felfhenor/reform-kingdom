@@ -34,7 +34,9 @@ import type { EdictContent } from '@interfaces';
           </div>
 
           <p>{{ e.description }}</p>
-          <p class="type-meta">{{ kindLabel() }} · Not cleared yet</p>
+          <p class="type-meta">
+            {{ kindLabel() }} · {{ cleared() ? 'Finished' : 'Incomplete' }}
+          </p>
 
           @if (blocked()) {
             <p class="type-blocker">
@@ -49,6 +51,7 @@ import type { EdictContent } from '@interfaces';
 export class TooltipEdictComponent {
   public edict = input.required<EdictContent>();
   public blocked = input(false);
+  public cleared = input(false);
 
   public kindLabel = computed(() => edictKindLabel(this.edict().kind));
 

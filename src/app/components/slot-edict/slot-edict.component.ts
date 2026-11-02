@@ -25,13 +25,19 @@ import { TippyDirective } from '@ngneat/helipopper';
   ],
   template: `
     @let e = edict();
-    <app-tooltip-edict #tooltip [edict]="e" [blocked]="blocked()" />
+    <app-tooltip-edict
+      #tooltip
+      [edict]="e"
+      [blocked]="blocked()"
+      [cleared]="cleared()"
+    />
 
     <ng-template #tile>
       <span
         class="h-[64px] w-[64px] flex justify-center items-center bg-gray-400 node-outline"
         [class.ring-2]="picked()"
         [class.ring-primary]="picked()"
+        [class.node-cleared]="cleared()"
         [class.node-excluded]="blocked()"
       >
         <app-atlas-image spritesheet="edict" [assetName]="e.sprite" />
@@ -71,6 +77,7 @@ export class SlotEdictComponent {
   public edict = input.required<EdictContent>();
   public picked = input(false);
   public blocked = input(false);
+  public cleared = input(false);
   public interactive = input(false);
 
   public toggled = output<void>();

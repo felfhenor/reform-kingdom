@@ -2,13 +2,15 @@ import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { error } from '@helpers/engine/logging';
 import { notifyError } from '@helpers/engine/notify';
 import {
+  legacy,
   legacyRecordRun,
   legacyRunById,
   legacyRunFromGame,
 } from '@helpers/legacy/legacy';
 import { isFelDefeated } from '@helpers/lore/outro';
 import { waitForGameloopIdle } from '@helpers/savefile/savefile-load';
-import type { GameId, RunOutcome, SavefileBackup } from '@interfaces';
+import type { EdictId, GameId, RunOutcome, SavefileBackup } from '@interfaces';
+import { uniq } from 'es-toolkit/compat';
 
 export function legacyRunOutcome(): RunOutcome {
   return isFelDefeated() ? 'Completed' : 'Abandoned';
@@ -34,4 +36,16 @@ export async function legacyEndRun(): Promise<GameId | undefined> {
 export function legacyHasUnfinishedBackup(backups: SavefileBackup[]): boolean {
   const newest = backups[0];
   return !!newest && !legacyRunById(newest.gameId as GameId);
+}
+
+export function legacyHasCompletedRun(): boolean {
+  return legacy().runs.some((run) => run.outcome === 'Completed');
+}
+
+export function legacyClearedEdictIds(): EdictId[] {
+  return uniq(
+    legacy()
+      .runs.filter((run) => run.outcome === 'Completed')
+      .flatMap((run) => run.edicts),
+  );
 }

@@ -39,6 +39,10 @@ import {
   edictsTrackRun,
 } from '@helpers/edict/edict.ui';
 import {
+  legacyClearedEdictIds,
+  legacyHasCompletedRun,
+} from '@helpers/legacy/legacy.ui';
+import {
   discordSetMainStatus,
   discordSetStatus,
 } from '@helpers/engine/discord';
@@ -136,6 +140,10 @@ export class GameSetupWorldComponent implements OnInit {
   );
 
   public pickedEdictIds = signal<EdictId[]>([]);
+  private clearedEdictIds = computed(() => legacyClearedEdictIds());
+  public showFirstRunWarning = computed(
+    () => this.pickedEdictIds().length > 0 && !legacyHasCompletedRun(),
+  );
 
   public pickableEdicts = computed(() => edictsPickable());
   public pickedEdicts = computed(() =>
@@ -198,11 +206,19 @@ export class GameSetupWorldComponent implements OnInit {
     return this.pickedEdictIds().includes(edict.id);
   }
 
+  public isEdictCleared(edict: EdictContent): boolean {
+    return this.clearedEdictIds().includes(edict.id);
+  }
+
   public isEdictBlocked(edict: EdictContent): boolean {
     return edictIsBlocked(edict, this.pickedEdicts());
   }
 
-  public onEdictRowLeave(event: AnimationCallbackEvent): void {
+  public onFadeEnter(event: AnimationCallbackEvent): void {
+    this.anim.fadeIn(event.target);
+  }
+
+  public onFadeLeave(event: AnimationCallbackEvent): void {
     this.anim
       .fadeOut(event.target)
       .then(() => event.animationComplete())
