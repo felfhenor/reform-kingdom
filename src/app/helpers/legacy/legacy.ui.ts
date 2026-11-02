@@ -14,7 +14,10 @@ import type {
   GameId,
   HeroRunStats,
   RunMostUsedSkill,
+  RunAward,
+  RunAwardDefinition,
   RunOutcome,
+  RunRecord,
   RunStatRow,
   SavefileBackup,
 } from '@interfaces';
@@ -77,4 +80,29 @@ export function legacyHeroMostUsedSkill(
 ): RunMostUsedSkill | undefined {
   const top = maxBy(Object.entries(stats.skillUses), ([, uses]) => uses);
   return top ? { skillFamily: top[0], uses: top[1] } : undefined;
+}
+
+const RUN_AWARDS: RunAwardDefinition[] = [
+  { label: 'Most Damage', value: (stats) => stats.damageDealt },
+  { label: 'Most Healing', value: (stats) => stats.healing },
+  { label: 'Most Damage Taken', value: (stats) => stats.damageTaken },
+  { label: 'Most Deaths', value: (stats) => stats.deaths },
+  { label: 'Biggest Hit', value: (stats) => stats.biggestHit?.amount ?? 0 },
+  { label: 'Most Crits', value: (stats) => stats.crits },
+];
+
+// Worked out on render, not stored, so tuning awards also updates old runs. A solo hero would win everything, so they get none.
+export function legacyRunAwards(run: RunRecord): RunAward[] {
+  if (run.party.length < 2) return [];
+
+  return RUN_AWARDS.flatMap((award) => {
+    const values = run.party.map((hero) =>
+      hero.stats ? award.value(hero.stats) : 0,
+    );
+    const top = Math.max(...values);
+    // indexOf keeps ties with the hero listed first.
+    return top > 0
+      ? [{ label: award.label, heroIndex: values.indexOf(top) }]
+      : [];
+  });
 }

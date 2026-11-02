@@ -21,6 +21,7 @@ import { legacyRunById } from '@helpers/legacy/legacy';
 import {
   legacyHeroMostUsedSkill,
   legacyHeroStatRows,
+  legacyRunAwards,
 } from '@helpers/legacy/legacy.ui';
 import {
   remembranceOverall,
@@ -61,12 +62,20 @@ export class RunSummaryComponent {
     ticksToDurationParts(this.run()?.ticks ?? 0),
   );
 
+  private awards = computed(() => {
+    const run = this.run();
+    return run ? legacyRunAwards(run) : [];
+  });
+
   public party = computed(() =>
-    (this.run()?.party ?? []).map((hero) => ({
+    (this.run()?.party ?? []).map((hero, index) => ({
       ...hero,
       job: getEntry<JobContent>(hero.jobId),
       statRows: hero.stats ? legacyHeroStatRows(hero.stats) : undefined,
       mostUsed: hero.stats ? legacyHeroMostUsedSkill(hero.stats) : undefined,
+      awards: this.awards()
+        .filter((award) => award.heroIndex === index)
+        .map((award) => award.label),
       jobsUsedText: (hero.snapshot?.jobsUsed ?? [])
         .map((jobId) => getEntry<JobContent>(jobId)?.name ?? 'Unknown job')
         .join(', '),

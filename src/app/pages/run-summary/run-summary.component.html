@@ -78,6 +78,14 @@
                     </div>
                   </div>
 
+                  @if (hero.awards.length > 0) {
+                    <div class="flex flex-wrap gap-2">
+                      @for (award of hero.awards; track award) {
+                        <span class="badge badge-success">{{ award }}</span>
+                      }
+                    </div>
+                  }
+
                   @if (hero.statRows; as rows) {
                     <div class="grid grid-cols-3 gap-2">
                       @for (row of rows; track row.label) {
