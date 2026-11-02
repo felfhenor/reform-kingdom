@@ -135,10 +135,14 @@
 
   <div class="card bg-base-100 shrink-0">
     <div class="card-body flex-row items-center justify-between gap-4 p-4">
-      <span class="tabular-nums">
-        {{ fragmentTotal() | number }} Fragments · score x{{
-          scoreMultiplier() | number: '1.0-2'
-        }}
+      <span class="tabular-nums flex gap-2">
+        <span class="badge badge-data">
+          {{ fragmentTotal() | number }} Fragments
+        </span>
+
+        <span class="badge badge-data">
+          Score x{{ scoreMultiplier() | number: '1.0-2' }}
+        </span>
       </span>
 
       <button
