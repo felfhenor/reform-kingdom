@@ -66,9 +66,9 @@ describe('fights', () => {
     seedGamestate();
 
     inTick(() => {
-      runStatsRecordFightEnd(true);
-      runStatsRecordFightEnd(true);
-      runStatsRecordFightEnd(false);
+      runStatsRecordFightEnd(true, []);
+      runStatsRecordFightEnd(true, []);
+      runStatsRecordFightEnd(false, []);
     });
     expect(runStatsState()).toMatchObject({ fightsWon: 2, fightsLost: 1 });
   });

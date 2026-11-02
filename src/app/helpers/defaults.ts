@@ -6,6 +6,7 @@ import { allEquipmentItemTypes } from '@helpers/item/equipment-types';
 import { rngUuid } from '@helpers/rng';
 import type {
   GameStateRunStats,
+  HeroRunStats,
   AutoModeState,
   CombatStatBlock,
   ElementBlock,
@@ -89,6 +90,21 @@ export function defaultGameState(): GameState {
     regionIntros: {},
     tasks: {},
     runStats: defaultRunStats(),
+  };
+}
+
+export function defaultHeroRunStats(): HeroRunStats {
+  return {
+    kills: 0,
+    damageDealt: 0,
+    damageTaken: 0,
+    deaths: 0,
+    healing: 0,
+    crits: 0,
+    statusEffectsApplied: 0,
+    damageBlocked: 0,
+    fights: 0,
+    skillUses: {},
   };
 }
 

@@ -27,6 +27,7 @@ export * from './combat-skill-elements';
 export * from './combat-skill-events';
 export * from './combat-skill-events.ui';
 export * from './combat-skill-pick';
+export * from './combat-skill-use';
 export * from './combat-state';
 export * from './combat-stats';
 export * from './combat-statuseffects';

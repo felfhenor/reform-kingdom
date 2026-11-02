@@ -1,3 +1,4 @@
+import type { CharacterId } from '@interfaces/character';
 import type { HasSprite } from '@interfaces/artable';
 import type {
   CombatStatBlock,
@@ -154,4 +155,6 @@ export type StatusEffect = StatusEffectContent & {
 
   creatorStats: StatBlock;
   targetStats: StatBlock;
+  // Resolved when applied, so a summon's effect still credits its owner after the summon is replaced.
+  creditHeroId?: CharacterId;
 };

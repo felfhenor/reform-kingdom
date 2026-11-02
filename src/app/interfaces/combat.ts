@@ -272,12 +272,28 @@ export type CombatantDamageEvent = {
 };
 
 // What one technique did to a single target, before it's logged.
+// What a hit really did to HP: positive is damage, negative is healing, both after the shield and the HP clamp.
+export type CombatHpChange = {
+  hpDelta: number;
+  absorbed: number;
+  died: boolean;
+};
+
+export type CombatTechniqueDamage = {
+  dealt: number;
+  hpChange?: CombatHpChange;
+  prevented: number;
+};
+
 export type CombatTechniqueOutcome = {
   damage: number;
   damageText: string;
   isCriticalHit: boolean;
   retaliationDamage: number;
   summon?: Combatant;
+  hpChange?: CombatHpChange;
+  // Damage that defense or resistance kept off a damaging hit.
+  prevented: number;
 };
 
 // Pushed when a combatant resolves which skill to use for their turn, to flash the skill's icon/name on their status card.

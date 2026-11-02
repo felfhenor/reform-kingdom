@@ -2,11 +2,7 @@ import {
   combatantIsDead,
   combatCombatantTakeDamage,
 } from '@helpers/combat/combat-combatant-hp';
-import { combatCoveringAlly } from '@helpers/combat/combat-cover';
-import { getEntry } from '@helpers/content/content';
-import { combatApplySkillToTarget } from '@helpers/combat/combat-damage';
-import { techniqueHasAttribute } from '@helpers/combat/combat-damage-amount';
-import { combatCheckIfOver, isCombatOver } from '@helpers/combat/combat-end';
+import { combatCheckIfOver } from '@helpers/combat/combat-end';
 import {
   beginCombatLogCommits,
   combatantMessageToken,
@@ -14,17 +10,14 @@ import {
   endCombatLogCommits,
 } from '@helpers/combat/combat-log';
 import { pickSkillFromCombatOrders } from '@helpers/combat/combat-order-evaluation';
-import { combatantDamageEventEmit } from '@helpers/combat/combat-damage-events';
 import { combatantPickSkill } from '@helpers/combat/combat-skill-pick';
+import {
+  combatantFireDelayedSkills,
+  combatantUseSkill,
+} from '@helpers/combat/combat-skill-use';
 import { combatantTickSkillCooldowns } from '@helpers/combat/combat-skill-cooldown';
-import {
-  combatantPaySkillCast,
-  combatFillSkillElements,
-} from '@helpers/combat/combat-skill-elements';
-import {
-  combatantAdvanceDelayedSkills,
-  combatantQueueDelayedSkill,
-} from '@helpers/combat/combat-skill-delay';
+import { combatantPaySkillCast } from '@helpers/combat/combat-skill-elements';
+import { combatantQueueDelayedSkill } from '@helpers/combat/combat-skill-delay';
 import { combatantSkillCastEventEmit } from '@helpers/combat/combat-skill-events';
 import {
   combatCanTakeTurn,
@@ -36,9 +29,12 @@ import { combatHasCombatant } from '@helpers/combat/combat-summon';
 import {
   combatAvailableSkillsForCombatant,
   combatGetPossibleCombatantTargetsForSkill,
-  combatGetPossibleCombatantTargetsForSkillTechnique,
-  combatGetTargetsForTechnique,
 } from '@helpers/combat/combat-targetting';
+import {
+  runStatsCombatBegin,
+  runStatsCombatFlush,
+  runStatsRecordSkillUse,
+} from '@helpers/run-stats/run-stats-combat';
 import { updateGamestate, worldCombatState } from '@helpers/state-game';
 
 import { clamp, sortBy } from 'es-toolkit/compat';
@@ -47,15 +43,8 @@ import {
   combatCombatantCombatStatSucceedsChance,
   combatCombatantSkillEpCost,
 } from '@helpers/combat/combat-stats';
-import { skillTechniqueNumTargets } from '@helpers/hero/skill';
 import { rngSucceedsChance } from '@helpers/rng';
-import type {
-  Combat,
-  Combatant,
-  CombatOrderPick,
-  EquipmentSkill,
-  EquipmentSkillContentTechnique,
-} from '@interfaces';
+import type { Combat, Combatant, EquipmentSkill } from '@interfaces';
 
 type CombatTurnResult = {
   takeAnotherTurn?: boolean;
@@ -139,6 +128,7 @@ function combatantAct(combat: Combat, combatant: Combatant): boolean {
   if (!chosenSkill) return false;
 
   combatantMarkSkillUse(combatant, chosenSkill);
+  runStatsRecordSkillUse(combat, combatant, chosenSkill.family);
   combatantSkillCastEventEmit(
     combatant.id,
     chosenSkill.name,
@@ -153,149 +143,6 @@ function combatantAct(combat: Combat, combatant: Combatant): boolean {
 
   combatantUseSkill(combat, combatant, chosenSkill, combatOrderPick);
   return true;
-}
-
-function combatTechniqueMisses(
-  combatant: Combatant,
-  tech: EquipmentSkillContentTechnique,
-): boolean {
-  if (techniqueHasAttribute(tech, 'NeverMisses')) return false;
-  if (combatCombatantCombatStatSucceedsChance(combatant, 'missChance')) {
-    return true;
-  }
-
-  return tech.accuracy < 100 && !rngSucceedsChance(tech.accuracy);
-}
-
-function combatantUseSkill(
-  combat: Combat,
-  combatant: Combatant,
-  chosenSkill: EquipmentSkill,
-  combatOrderPick?: CombatOrderPick,
-): void {
-  combatFillSkillElements(combat, chosenSkill);
-
-  const capturedCreatorStats = { ...combatant.totalStats };
-
-  chosenSkill.techniques.forEach((tech) => {
-    const redirected = combatCombatantCombatStatSucceedsChance(
-      combatant,
-      'redirectionChance',
-    );
-    const baseTargetList = combatGetPossibleCombatantTargetsForSkillTechnique(
-      combat,
-      combatant,
-      chosenSkill,
-      tech,
-      redirected,
-    );
-
-    const numTargets = skillTechniqueNumTargets(chosenSkill, tech);
-    const appliedSkill = tech.echoOf
-      ? (getEntry<EquipmentSkill>(tech.echoOf) ?? chosenSkill)
-      : chosenSkill;
-
-    // A Combat Order's targetMode is an explicit override - it wins outright rather than
-    // joining the combatant's own priority list. Confusion drops it, since it was aimed at the other side.
-    const targetPriority =
-      combatOrderPick?.targetMode && !redirected && !tech.echoOf
-        ? [{ type: combatOrderPick.targetMode }]
-        : combatant.targetting;
-
-    const targets = combatGetTargetsForTechnique(
-      combat,
-      baseTargetList,
-      tech,
-      targetPriority,
-      numTargets,
-      {
-        combatant,
-        targetCharacterId: combatOrderPick?.targetCharacterId,
-        matchingCombatants: combatOrderPick?.matchingCombatants,
-      },
-    );
-
-    targets.forEach((intendedTarget) => {
-      if (isCombatOver(combat)) return;
-
-      const cover = combatCoveringAlly(
-        combatant,
-        intendedTarget,
-        baseTargetList,
-        tech,
-        numTargets,
-      );
-      if (cover) {
-        combatMessageLog(
-          combat,
-          `**${combatantMessageToken(cover)}** covers **${combatantMessageToken(intendedTarget)}**!`,
-          cover,
-        );
-      }
-
-      const target = cover ?? intendedTarget;
-
-      if (combatTechniqueMisses(combatant, tech)) {
-        combatMessageLog(
-          combat,
-          `**${combatantMessageToken(combatant)}**'s **${chosenSkill.name}** misses **${combatantMessageToken(target)}**!`,
-        );
-        combatantDamageEventEmit(target.id, 0, 'miss');
-        return;
-      }
-
-      combatApplySkillToTarget(
-        combat,
-        combatant,
-        target,
-        appliedSkill,
-        tech,
-        capturedCreatorStats,
-      );
-
-      const shouldApplyAgain =
-        !tech.summonMonsterId &&
-        combatCombatantCombatStatSucceedsChance(
-          combatant,
-          'skillStrikeAgainChance',
-        );
-
-      if (shouldApplyAgain && !combatantIsDead(target)) {
-        combatMessageLog(combat, `**${appliedSkill.name}** strikes again!`);
-
-        combatApplySkillToTarget(
-          combat,
-          combatant,
-          target,
-          appliedSkill,
-          tech,
-          capturedCreatorStats,
-        );
-      }
-    });
-  });
-}
-
-// A ready batch stops once the caster dies mid-batch (e.g. from reflect).
-function combatantFireDelayedSkills(
-  combat: Combat,
-  combatant: Combatant,
-): boolean {
-  const ready = combatantAdvanceDelayedSkills(combatant);
-
-  ready.forEach((entry) => {
-    if (isCombatOver(combat) || combatantIsDead(combatant)) return;
-
-    const { skill } = entry;
-    combatantSkillCastEventEmit(combatant.id, skill.name, skill.sprite);
-    combatMessageLog(
-      combat,
-      `**${combatantMessageToken(combatant)}** unleashes **${skill.name}**!`,
-    );
-    combatantUseSkill(combat, combatant, skill, entry);
-  });
-
-  return ready.length > 0;
 }
 
 export function combatantTakeTurn(
@@ -376,6 +223,7 @@ export function combatDoCombatIteration(): void {
   const combat = structuredClone(current);
 
   beginCombatLogCommits();
+  runStatsCombatBegin();
 
   if (combat.ambushedBy) {
     combatDoAmbushRound(combat);
@@ -385,6 +233,7 @@ export function combatDoCombatIteration(): void {
 
   updateGamestate((state) => {
     state.world.combat = combat;
+    runStatsCombatFlush(state);
     return state;
   });
 

@@ -14,6 +14,10 @@ import {
   skillTechniqueStatusEffectDuration,
 } from '@helpers/hero/skill';
 import { rngSucceedsChance } from '@helpers/rng';
+import {
+  runStatsCreditHeroId,
+  runStatsRecordStatusApplied,
+} from '@helpers/run-stats/run-stats-combat';
 import type {
   Combat,
   Combatant,
@@ -89,8 +93,10 @@ export function combatTryApplyTechniqueStatusEffect(
     skill,
     caster,
     target,
-    { duration },
+    { duration, creditHeroId: runStatsCreditHeroId(combat, caster) },
     capturedCreatorStats,
   );
-  combatApplyStatusEffectToTarget(combat, target, statusEffect);
+  if (combatApplyStatusEffectToTarget(combat, target, statusEffect)) {
+    runStatsRecordStatusApplied(combat, caster);
+  }
 }

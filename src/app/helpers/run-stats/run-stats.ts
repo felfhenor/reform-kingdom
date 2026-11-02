@@ -1,5 +1,11 @@
 import { updateGamestate } from '@helpers/state-game';
-import type { GameState, GameStateRunStats } from '@interfaces';
+import { defaultHeroRunStats } from '@helpers/defaults';
+import type {
+  CharacterId,
+  Combat,
+  GameState,
+  GameStateRunStats,
+} from '@interfaces';
 
 // Mutate `state` directly, for callers already inside their own `updateGamestate`.
 
@@ -23,11 +29,25 @@ export function runStatsRecordFelDefeat(state: GameState): void {
 }
 
 // Counts fights, not encounters: each fight of a chained encounter is its own win or loss.
-export function runStatsRecordFightEnd(won: boolean): void {
+export function runStatsRecordFightEnd(
+  won: boolean,
+  heroIds: CharacterId[],
+): void {
   updateGamestate((state) => {
     runStatsRecordFight(state, won);
+    heroIds.forEach((heroId) => {
+      const stats = (state.runStats.heroes[heroId] ??= defaultHeroRunStats());
+      stats.fights += 1;
+    });
     return state;
   });
+}
+
+// Summons aren't party members, so they never add fights to their owner.
+export function runStatsFightHeroIds(combat: Combat): CharacterId[] {
+  return combat.heroes
+    .filter((hero) => !hero.summonerId)
+    .map((hero) => hero.id as CharacterId);
 }
 
 // Saves from before run stats (version 3) only count from this load, so the summary can say how much was missed.

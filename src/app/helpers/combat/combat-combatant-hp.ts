@@ -1,6 +1,10 @@
 import { combatantDamageEventEmit } from '@helpers/combat/combat-damage-events';
 import { combatantClearDelayedSkills } from '@helpers/combat/combat-skill-delay';
-import type { Combatant, DamageEventVariant } from '@interfaces';
+import type {
+  CombatHpChange,
+  Combatant,
+  DamageEventVariant,
+} from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
 export function combatantIsDead(combatant: Combatant): boolean {
@@ -12,14 +16,19 @@ export function combatantHealthPercent(combatant: Combatant): number {
   return (combatant.hp / combatant.totalStats.Health) * 100;
 }
 
+// Reports the real HP change so callers that know the attacker can credit it; this stays combat-agnostic.
 export function combatCombatantTakeDamage(
   combatant: Combatant,
   damage: number,
   variant?: DamageEventVariant,
-) {
-  const hpDamage = damage - combatantShieldAbsorb(combatant, damage);
-  if (damage > 0 && hpDamage === 0) return;
+): CombatHpChange {
+  const absorbed = combatantShieldAbsorb(combatant, damage);
+  const hpDamage = damage - absorbed;
+  if (damage > 0 && hpDamage === 0) {
+    return { hpDelta: 0, absorbed, died: false };
+  }
 
+  const hpBefore = combatant.hp;
   combatant.hp = clamp(combatant.hp - hpDamage, 0, combatant.totalStats.Health);
   if (combatantIsDead(combatant)) combatantClearDelayedSkills(combatant);
 
@@ -31,6 +40,12 @@ export function combatCombatantTakeDamage(
       hpDamage > 0 ? variant : undefined,
     );
   }
+
+  return {
+    hpDelta: hpBefore - combatant.hp,
+    absorbed,
+    died: hpBefore > 0 && combatantIsDead(combatant),
+  };
 }
 
 // The shield drains first; whatever it can't hold bleeds through to HP.

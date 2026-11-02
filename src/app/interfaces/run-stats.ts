@@ -1,4 +1,5 @@
 import type { CharacterId } from '@interfaces/character';
+import type { CombatHpChange } from '@interfaces/combat';
 
 export type RunStatsBiggestHit = {
   amount: number;
@@ -32,4 +33,13 @@ export type RunStatsTotals = {
 
 export type GameStateRunStats = RunStatsTotals & {
   heroes: Partial<Record<CharacterId, HeroRunStats>>;
+};
+
+export type RunStatsHit = {
+  change: CombatHpChange;
+  // Set for status effect ticks, whose creator may be gone; otherwise the source combatant is credited.
+  creditHeroId?: CharacterId;
+  prevented?: number;
+  skillFamily?: string;
+  isCriticalHit?: boolean;
 };

@@ -25,9 +25,11 @@ import {
   skillTechniqueDamageScalingStat,
   skillTechniqueWithStatBonuses,
 } from '@helpers/hero/skill';
+import { runStatsRecordHit } from '@helpers/run-stats/run-stats-combat';
 import type {
   Combat,
   Combatant,
+  CombatTechniqueDamage,
   CombatTechniqueOutcome,
   EquipmentSkill,
   EquipmentSkillContentTechnique,
@@ -145,10 +147,11 @@ function combatTechniqueHit(
 
   let damage = 0;
   let retaliationDamage = 0;
+  let applied: CombatTechniqueDamage | undefined;
   if (techniqueHasAttribute(technique, 'ShieldsTarget')) {
     damage = combatShieldTarget(target, skill, technique);
   } else if (baseDamage > 0) {
-    damage = combatDealTechniqueDamage(
+    applied = combatDealTechniqueDamage(
       combat,
       combatant,
       target,
@@ -157,6 +160,7 @@ function combatTechniqueHit(
       elements,
       isCriticalHit,
     );
+    damage = applied.dealt;
     retaliationDamage = combatReflectedDamage(target, technique, damage);
   }
 
@@ -170,6 +174,8 @@ function combatTechniqueHit(
     isCriticalHit,
     retaliationDamage,
     summon,
+    hpChange: applied?.hpChange,
+    prevented: applied?.prevented ?? 0,
   };
 }
 
@@ -202,14 +208,17 @@ function combatLogTechniqueMessage(
   combatMessageLog(combat, `${message}${critSuffix}`, target);
 }
 
+// The reflecting target is the source, so it's credited with the damage and any kill.
 function combatApplyRetaliation(
   combat: Combat,
   combatant: Combatant,
+  source: Combatant,
   damage: number,
 ): void {
   if (damage <= 0) return;
 
-  combatCombatantTakeDamage(combatant, damage);
+  const change = combatCombatantTakeDamage(combatant, damage);
+  runStatsRecordHit(combat, source, combatant, { change });
   combatMessageLog(
     combat,
     `**${combatantMessageToken(combatant)}** took ${damage} damage in retaliation ${combatantStatusText(combatant)}!`,
@@ -242,7 +251,15 @@ export function combatApplySkillToTarget(
     technique,
     outcome,
   );
-  combatApplyRetaliation(combat, combatant, outcome.retaliationDamage);
+  if (outcome.hpChange) {
+    runStatsRecordHit(combat, combatant, target, {
+      change: outcome.hpChange,
+      prevented: outcome.prevented,
+      skillFamily: skill.family,
+      isCriticalHit: outcome.isCriticalHit && outcome.hpChange.hpDelta > 0,
+    });
+  }
+  combatApplyRetaliation(combat, combatant, target, outcome.retaliationDamage);
 
   (technique.statusEffects || []).forEach((application) =>
     combatTryApplyTechniqueStatusEffect(

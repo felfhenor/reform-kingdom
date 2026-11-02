@@ -10,6 +10,7 @@ import {
   combatMessageLog,
 } from '@helpers/combat/combat-log';
 import { combatCombatantCombatStatSucceedsChance } from '@helpers/combat/combat-stats';
+import { runStatsRecordHit } from '@helpers/run-stats/run-stats-combat';
 import type { Combat, Combatant, CombatStatBlock } from '@interfaces/combat';
 import type { EquipmentSkill } from '@interfaces/content-skill';
 import type {
@@ -119,12 +120,13 @@ export function combatCreateStatusEffect(
   };
 }
 
+// False when nothing landed: already active, or the debuff was shrugged off.
 export function combatApplyStatusEffectToTarget(
   combat: Combat,
   combatant: Combatant,
   statusEffect: StatusEffect,
-): void {
-  if (combatantHasActiveStatusEffect(combatant, statusEffect.id)) return;
+): boolean {
+  if (combatantHasActiveStatusEffect(combatant, statusEffect.id)) return false;
 
   const shouldIgnoreDebuff = combatCombatantCombatStatSucceedsChance(
     combatant,
@@ -137,7 +139,7 @@ export function combatApplyStatusEffectToTarget(
       `**${statusEffect.name}** is shrugged off by **${combatantMessageToken(combatant)}**!`,
       combatant,
     );
-    return;
+    return false;
   }
 
   const expiringEffect = combatant.statusEffects.find(
@@ -150,6 +152,7 @@ export function combatApplyStatusEffectToTarget(
 
   combatant.statusEffects.push(statusEffect);
   combatTriggerApplyStatusEffect(combat, combatant, statusEffect);
+  return true;
 }
 
 export function combatApplyStatDeltaToCombatant(
@@ -198,7 +201,11 @@ function combatHandleStatusEffectBehaviors(
       const healing = statusEffectDamage(effect);
       templateData.healing = healing;
 
-      combatCombatantTakeDamage(combatant, -healing);
+      const change = combatCombatantTakeDamage(combatant, -healing);
+      runStatsRecordHit(combat, undefined, combatant, {
+        change,
+        creditHeroId: effect.creditHeroId,
+      });
     },
     TakeDamage: () => {
       const damage = Math.floor(
@@ -209,7 +216,11 @@ function combatHandleStatusEffectBehaviors(
       templateData.absdamage = Math.abs(damage);
       templateData.damageText = elementalDamageText(damage, effect.elements);
 
-      combatCombatantTakeDamage(combatant, damage);
+      const change = combatCombatantTakeDamage(combatant, damage);
+      runStatsRecordHit(combat, undefined, combatant, {
+        change,
+        creditHeroId: effect.creditHeroId,
+      });
     },
     AddDamageToStat: () => {
       const behaviorData = behavior as StatusEffectBehaviorAddStat;

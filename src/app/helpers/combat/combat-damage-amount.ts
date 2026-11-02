@@ -9,7 +9,9 @@ import { combatCombatantCombatStatValue } from '@helpers/combat/combat-stats';
 import { getEntry } from '@helpers/content/content';
 import type {
   Combat,
+  CombatHpChange,
   Combatant,
+  CombatTechniqueDamage,
   EquipmentSkillAttribute,
   EquipmentSkillContentTechnique,
   GameElement,
@@ -146,14 +148,15 @@ function combatAmplifyDamage(
   return Math.floor(amplified);
 }
 
-// Returns what actually landed - an energy drain can't take more than the target has.
+// Returns what actually landed - an energy drain can't take more than the target has. Energy techniques have no HP change.
 function combatApplyTechniqueDamage(
   target: Combatant,
   technique: EquipmentSkillContentTechnique,
   damage: number,
   isCriticalHit: boolean,
-): number {
+): CombatTechniqueDamage {
   let dealt = damage;
+  let hpChange: CombatHpChange | undefined;
 
   if (techniqueHasAttribute(technique, 'RestoresTargetEnergy')) {
     combatCombatantTakeEnergyDamage(target, dealt);
@@ -161,7 +164,7 @@ function combatApplyTechniqueDamage(
     dealt = Math.min(dealt, target.ep);
     combatCombatantTakeEnergyDamage(target, dealt);
   } else {
-    combatCombatantTakeDamage(
+    hpChange = combatCombatantTakeDamage(
       target,
       dealt,
       isCriticalHit ? 'critical' : undefined,
@@ -172,7 +175,7 @@ function combatApplyTechniqueDamage(
     combatantDamageEventEmit(target.id, 0, 'block');
   }
 
-  return dealt;
+  return { dealt, hpChange, prevented: 0 };
 }
 
 export function combatReflectedDamage(
@@ -203,7 +206,7 @@ export function combatDealTechniqueDamage(
   baseDamage: number,
   elements: GameElement[],
   isCriticalHit: boolean,
-): number {
+): CombatTechniqueDamage {
   const restorative = combatRestorativeAmount(target, technique, baseDamage);
   const mitigated = combatMitigateDamage(
     combatant,
@@ -220,10 +223,13 @@ export function combatDealTechniqueDamage(
     mitigated,
     isCriticalHit,
   );
-  return combatApplyTechniqueDamage(
+  const applied = combatApplyTechniqueDamage(
     target,
     technique,
     amplified,
     isCriticalHit,
   );
+  // Only a damaging hit has anything to block; heals come through as negative amounts.
+  const prevented = restorative > 0 ? Math.max(0, restorative - mitigated) : 0;
+  return { ...applied, prevented };
 }
