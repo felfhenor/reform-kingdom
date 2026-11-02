@@ -40,6 +40,7 @@ export function ensureEdict(
     kind: edict.kind ?? 'Challenge',
     fragments: edict.fragments ?? 0,
     group: edict.group ?? '',
+    enabled: edict.enabled ?? false,
     effects: effects.flatMap((effect) => {
       const ensured = ensureEdictEffect(effect ?? {});
       return ensured ? [ensured] : [];

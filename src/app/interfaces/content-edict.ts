@@ -36,4 +36,7 @@ export type EdictContent = IsContentItem &
     group?: string;
 
     effects?: EdictEffect[];
+
+    // Temporary: only edicts whose effects are built can be picked; drop once all of them are.
+    enabled?: boolean;
   };

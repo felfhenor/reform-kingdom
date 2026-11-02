@@ -1,5 +1,6 @@
 - id: 8e5d5f1e-8a19-4b87-8c5c-e46426c89c8f
   name: Edict of Frailty
+  enabled: true
   sprite: '0011'
   description: Hero stats are reduced by 25%.
   kind: Challenge
@@ -12,6 +13,7 @@
 
 - id: d08f7c2f-05c0-43bc-bb14-7c8a5cc317b7
   name: Edict of Fury
+  enabled: true
   sprite: '0012'
   description: Monster stats are increased by 25%.
   kind: Challenge

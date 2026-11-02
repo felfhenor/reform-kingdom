@@ -1,5 +1,6 @@
 - id: a4855bb8-4d5d-4f4b-bbd9-4cca91413611
   name: Edict of Might
+  enabled: true
   sprite: '0000'
   description: Hero stats are increased by 25%.
   kind: Boon
@@ -12,6 +13,7 @@
 
 - id: a76ae14f-4c67-440f-b8d0-5e32c25eb933
   name: Edict of Calm
+  enabled: true
   sprite: '0001'
   description: Monster stats are reduced by 25%.
   kind: Boon
