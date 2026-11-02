@@ -6,6 +6,7 @@ import type { AstralProjectorId } from '@interfaces/content-astralprojector';
 import type { CaravanId } from '@interfaces/content-caravan';
 import type { CaravanTraderId } from '@interfaces/content-caravan-trader';
 import type { CollectibleId } from '@interfaces/content-collectible';
+import type { EdictId } from '@interfaces/content-edict';
 import type { EquipmentId } from '@interfaces/content-equipment';
 import type { GlobalEffect } from '@interfaces/content-globaleffect';
 import type { ItemId } from '@interfaces/content-item';
@@ -175,6 +176,8 @@ export type GameState = {
   gameId: GameId;
   clock: GameStateClock;
   world: GameStateWorld;
+  // Picked at world setup and fixed for the run.
+  edicts: EdictId[];
   materials: GameStateMaterials;
   discoveredMaterials: GameStateDiscoveredMaterials;
   collectibles: GameStateCollectibles;

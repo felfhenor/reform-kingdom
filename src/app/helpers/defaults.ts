@@ -58,6 +58,7 @@ export function defaultGameState(): GameState {
       commissions: {},
       towns: {},
     },
+    edicts: [],
     materials: {},
     discoveredMaterials: {},
     collectibles: {},

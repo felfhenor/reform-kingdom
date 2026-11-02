@@ -10,6 +10,7 @@ import {
   ensureGathering,
 } from '@helpers/content/ensure-gathernode';
 import { ensureCaravan } from '@helpers/content/ensure-caravan';
+import { ensureEdict } from '@helpers/content/ensure-edict';
 import { ensureJob } from '@helpers/content/ensure-job';
 import { ensureMonster } from '@helpers/content/ensure-monster';
 import { ensureRecipe } from '@helpers/content/ensure-recipe';
@@ -38,6 +39,7 @@ import type {
   CollectibleId,
   DecreeClause,
   DecreeClauseId,
+  EdictId,
   EquipmentId,
   EquipmentSkillId,
   GameOptions,
@@ -87,6 +89,7 @@ const lunge = ensureTrainerTeaching({
 });
 const trainer = ensureTrainer({ id: 'trainer' as TrainerId, name: 'Trainer' });
 const goblin = ensureMonster({ id: 'goblin' as MonsterId, name: 'Goblin' });
+const might = ensureEdict({ id: 'might' as EdictId, name: 'Edict of Might' });
 const content = [
   sword,
   ore,
@@ -97,6 +100,7 @@ const content = [
   lunge,
   trainer,
   goblin,
+  might,
 ];
 
 const gone = <T extends string>(id: string) => `gone-${id}` as T;
@@ -145,6 +149,12 @@ describe('migrateGameState', () => {
         [trainer.id]: { foundAt: 1 },
         [gone<TrainerId>('trainer')]: { foundAt: 1 },
       };
+      save.edicts = [
+        might.id,
+        gone<EdictId>('edict'),
+        ore.id as unknown as EdictId,
+        might.name as EdictId,
+      ];
       save.world.party = [
         buildCharacter({
           equipment: {
@@ -166,6 +176,7 @@ describe('migrateGameState', () => {
     expect(Object.keys(migrated.bestiary)).toEqual([goblin.id]);
     expect(Object.keys(migrated.discoveredRecipes)).toEqual([cloak.id]);
     expect(Object.keys(migrated.discoveredTrainers)).toEqual([trainer.id]);
+    expect(migrated.edicts).toEqual([might.id]);
 
     const [hero] = migrated.world.party;
     expect(hero.equipment.Weapon?.equipmentId).toBe(sword.id);

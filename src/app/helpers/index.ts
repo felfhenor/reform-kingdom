@@ -7,6 +7,7 @@ export * from './crafting';
 export * from './debug';
 export * from './decree';
 export * from './defaults';
+export * from './edict';
 export * from './encounter';
 export * from './engine';
 export * from './exchange';

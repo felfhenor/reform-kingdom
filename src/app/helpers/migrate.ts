@@ -19,6 +19,7 @@ import { recordPrune } from '@helpers/engine/record';
 import { getMap } from '@helpers/maps';
 import { retrofitPartyXp } from '@helpers/hero/character-progress';
 import { recomputeGlobalEffectSums } from '@helpers/hero/global-effect-state';
+import { pruneInvalidEdicts } from '@helpers/edict/edict';
 import { pruneInvalidPartyEquipment } from '@helpers/hero/party';
 import { grantFoundingStoneIfMissing } from '@helpers/item/collectibles';
 import {
@@ -157,6 +158,8 @@ export function migrateGameState() {
     return { ...character, equipment };
   });
   stateRegaliaMigrate(newState);
+
+  newState.edicts = pruneInvalidEdicts(newState.edicts);
 
   newState.armory = pruneInvalidArmoryItems(newState.armory);
   newState.materials = recordPrune(newState.materials, contentExists);
