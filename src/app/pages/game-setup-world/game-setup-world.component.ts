@@ -159,11 +159,11 @@ export class GameSetupWorldComponent implements OnInit {
     // Starting a game without answering the consent prompt counts as declining it.
     setOption('analyticsOptInDismissed', true);
 
+    // Reset first: hero stats read the run's edicts, which must not be the previous run's.
+    gameReset();
     const party = this.heroesModel().map((hero) =>
       createCharacter(hero.name, hero.jobId),
     );
-
-    gameReset();
     setParty(party);
     await titleCrawlQueue();
     await gameStart();

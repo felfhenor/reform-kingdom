@@ -33,8 +33,12 @@ export function combatSummonMonster(
   const side = summoner.isEnemy ? 'guardians' : 'helpers';
   const kept = combat[side].filter((c) => c.summonerId !== summoner.id);
   const summon: Combatant = {
-    ...combatantFromMonster(monster, summoner.level, combatSummonIndex(combat)),
-    isEnemy: summoner.isEnemy,
+    ...combatantFromMonster(
+      monster,
+      summoner.level,
+      combatSummonIndex(combat),
+      summoner.isEnemy,
+    ),
     summonerId: summoner.id,
   };
 

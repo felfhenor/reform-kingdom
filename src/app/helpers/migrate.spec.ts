@@ -184,6 +184,18 @@ describe('migrateGameState', () => {
     expect(hero.teachings).toEqual({ [warrior.id]: [lunge.id] });
   });
 
+  it('loads a save from before edicts, recalculating heroes with none', () => {
+    seedContent(content);
+
+    const migrated = migrate((save) => {
+      delete (save as Partial<GameState>).edicts;
+      save.world.party = [buildCharacter({ jobId: warrior.id })];
+    });
+
+    expect(migrated.edicts).toEqual([]);
+    expect(migrated.world.party).toHaveLength(1);
+  });
+
   it('fills in whatever an older save is missing from the current defaults', () => {
     const migrated = migrate((save) => {
       const legacy = save as Partial<GameState>;

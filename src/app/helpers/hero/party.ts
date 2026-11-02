@@ -7,6 +7,10 @@ import {
 } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { defaultEquipment, defaultStats } from '@helpers/defaults';
+import {
+  edictStatPercents,
+  statsScaledByPercent,
+} from '@helpers/edict/edict-stats';
 import { roundToNearest10 } from '@helpers/engine/number';
 import { characterNonGearEffects } from '@helpers/hero/hero-effect';
 import { characterSkillTreeSeeded } from '@helpers/hero/skill-tree-content';
@@ -102,11 +106,14 @@ export function characterStatsForLevel(
 }
 
 export function characterStats(character: CharacterStatSource): StatBlock {
-  return characterStatsForLevel(
-    character.jobId,
-    character.level,
-    character.equipment,
-    characterNonGearEffects(character),
+  return statsScaledByPercent(
+    characterStatsForLevel(
+      character.jobId,
+      character.level,
+      character.equipment,
+      characterNonGearEffects(character),
+    ),
+    edictStatPercents('Hero'),
   );
 }
 

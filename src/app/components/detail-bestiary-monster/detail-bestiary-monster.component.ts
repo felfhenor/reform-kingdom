@@ -14,11 +14,9 @@ import { RowBestiarySkillComponent } from '@components/row-bestiary-skill/row-be
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotCompletionRewardComponent } from '@components/slot-completion-reward/slot-completion-reward.component';
 import { combatantFromMonster } from '@helpers/combat/combat-create';
-import {
-  monsterSkillsAtLevel,
-  monsterStatsAtLevel,
-} from '@helpers/combat/monster';
+import { monsterSkillsAtLevel } from '@helpers/combat/monster';
 import { getEntry } from '@helpers/content/content';
+import { monsterStatsForRun } from '@helpers/edict/edict-stats';
 import {
   bestiaryDropQuantityLabel,
   bestiaryEntryLevels,
@@ -67,7 +65,7 @@ export class DetailBestiaryMonsterComponent {
   );
 
   public stats = computed<StatBlock>(() =>
-    monsterStatsAtLevel(this.entry().monster, this.selectedLevel()),
+    monsterStatsForRun(this.entry().monster, this.selectedLevel()),
   );
 
   public skills = computed<EquipmentSkillContent[]>(() =>

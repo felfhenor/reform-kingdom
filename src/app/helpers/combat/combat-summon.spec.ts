@@ -3,15 +3,17 @@ import {
   combatHasCombatant,
   combatSummonMonster,
 } from '@helpers/combat/combat-summon';
+import { ensureEdict } from '@helpers/content/ensure-edict';
 import { ensureMonster } from '@helpers/content/ensure-monster';
 import { defaultStats } from '@helpers/defaults';
-import type { MonsterId } from '@interfaces';
+import type { EdictId, MonsterId } from '@interfaces';
 import {
   buildCombat,
   buildMonsterCombatant,
   buildTestCombatant,
 } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 const wolf = ensureMonster({
@@ -49,6 +51,28 @@ describe('combatSummonMonster', () => {
 
     expect(combat.guardians).toEqual([enemy, summon]);
     expect(summon?.isEnemy).toBe(true);
+  });
+
+  it('scales only enemy summons by enemy stat edicts', () => {
+    const fury = ensureEdict({
+      id: 'fury' as EdictId,
+      name: 'Fury',
+      effects: [{ effectType: 'StatPercent', target: 'Enemy', percent: 25 }],
+    });
+    seedContent([wolf, fury]);
+    seedGamestate((state) => {
+      state.edicts = [fury.id];
+    });
+    const hero = buildTestCombatant({ id: 'hero-1' });
+    const enemy = buildMonsterCombatant(wolf, { id: 'enemy-1' });
+    const combat = buildCombat({ heroes: [hero], guardians: [enemy] });
+
+    expect(combatSummonMonster(combat, hero, wolf.id)?.baseStats.Health).toBe(
+      50,
+    );
+    expect(combatSummonMonster(combat, enemy, wolf.id)?.baseStats.Health).toBe(
+      62.5,
+    );
   });
 
   it("replaces only the caster's own previous summon", () => {

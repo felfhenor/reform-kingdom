@@ -10,6 +10,7 @@ import {
 } from '@helpers/combat/monster';
 import { DEBUFF_POTENCY_PER_RANK } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
+import { monsterStatsForRun } from '@helpers/edict/edict-stats';
 import {
   defaultAffinities,
   defaultStats,
@@ -183,15 +184,18 @@ export function combatantFromMonster(
   monster: MonsterContent,
   level: number,
   index: number,
+  isEnemy = true,
 ): Combatant {
-  const stats = monsterStatsAtLevel(monster, level);
+  const stats = isEnemy
+    ? monsterStatsForRun(monster, level)
+    : monsterStatsAtLevel(monster, level);
   const skills = monsterSkillsAtLevel(monster, level);
 
   return {
     id: rngUuid(),
     monsterId: monster.id,
     name: `${monster.name} Lv. ${level} [${combatantIndexLabel(index)}]`,
-    isEnemy: true,
+    isEnemy,
 
     targetting: monster.targetting,
 
@@ -241,10 +245,9 @@ export function combatantsFromTownGuardians(
     return Array.from({ length: entry.quantity }, () => monster);
   });
 
-  return monsters.map((monster, i) => ({
-    ...combatantFromMonster(monster, level, i),
-    isEnemy: false,
-  }));
+  return monsters.map((monster, i) =>
+    combatantFromMonster(monster, level, i, false),
+  );
 }
 
 export function combatCreateForEncounter(

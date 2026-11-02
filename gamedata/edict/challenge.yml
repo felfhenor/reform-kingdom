@@ -5,6 +5,10 @@
   kind: Challenge
   fragments: 3
   group: HeroStats
+  effects:
+    - effectType: StatPercent
+      target: Hero
+      percent: -25
 
 - id: d08f7c2f-05c0-43bc-bb14-7c8a5cc317b7
   name: Edict of Fury
@@ -13,6 +17,10 @@
   kind: Challenge
   fragments: 3
   group: MonsterStats
+  effects:
+    - effectType: StatPercent
+      target: Enemy
+      percent: 25
 
 - id: 3a267cfb-b42d-4b11-8fea-ae17e1041caa
   name: Edict of Humility

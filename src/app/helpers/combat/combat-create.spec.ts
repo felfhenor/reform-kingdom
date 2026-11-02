@@ -13,6 +13,7 @@ import {
   combatantsFromTownGuardians,
   combatCreateForEncounter,
 } from '@helpers/combat/combat-create';
+import { ensureEdict } from '@helpers/content/ensure-edict';
 import { ensureEquipment } from '@helpers/content/ensure-item';
 import { ensureJob } from '@helpers/content/ensure-job';
 import {
@@ -30,6 +31,7 @@ import {
 } from '@helpers/defaults';
 import type {
   Character,
+  EdictId,
   EquipmentContent,
   EquipmentId,
   EquipmentSkillId,
@@ -254,6 +256,43 @@ describe('combatantFromMonster', () => {
     });
   });
 
+  describe('with an enemy stat edict', () => {
+    const fury = ensureEdict({
+      id: 'fury' as EdictId,
+      name: 'Fury',
+      effects: [{ effectType: 'StatPercent', target: 'Enemy', percent: 25 }],
+    });
+    const brute = ensureMonster({
+      id: 'brute' as MonsterId,
+      baseStats: { ...defaultStats(), Strength: 8 },
+    });
+
+    function seedFury(active: boolean): void {
+      seedContent([fury]);
+      seedGamestate((state) => {
+        state.edicts = active ? [fury.id] : [];
+      });
+    }
+
+    it('scales enemies but not monsters fighting for the player', () => {
+      seedFury(true);
+
+      expect(combatantFromMonster(brute, 1, 0).baseStats.Strength).toBe(10);
+      expect(combatantFromMonster(brute, 1, 0, false).baseStats.Strength).toBe(
+        8,
+      );
+    });
+
+    it('leaves stats untouched, zeros included, with no edicts', () => {
+      seedFury(false);
+
+      expect(combatantFromMonster(brute, 1, 0).baseStats).toEqual({
+        ...defaultStats(),
+        Strength: 8,
+      });
+    });
+  });
+
   it('layers its debuff resistances over the defaults', () => {
     const monster = ensureMonster({
       id: 'fel' as MonsterId,
@@ -285,6 +324,30 @@ describe('combatantsFromTownGuardians', () => {
       'Larsian Guard Lv. 25 [D]',
     ]);
     expect(combatants.every((c) => !c.isEnemy && c.level === 25)).toBe(true);
+  });
+
+  it('ignores enemy stat edicts, since guardians fight for the player', () => {
+    const fury = ensureEdict({
+      id: 'fury' as EdictId,
+      name: 'Fury',
+      effects: [{ effectType: 'StatPercent', target: 'Enemy', percent: 25 }],
+    });
+    const brute = ensureMonster({
+      id: 'brute' as MonsterId,
+      name: 'Brute',
+      baseStats: { ...defaultStats(), Strength: 8 },
+    });
+    seedContent([brute, fury]);
+    seedGamestate((state) => {
+      state.edicts = [fury.id];
+    });
+
+    const [guardian] = combatantsFromTownGuardians(
+      [{ monsterId: brute.id, quantity: 1 }],
+      1,
+    );
+
+    expect(guardian.baseStats.Strength).toBe(8);
   });
 });
 

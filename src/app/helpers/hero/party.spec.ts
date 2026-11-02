@@ -6,6 +6,7 @@ import {
   CHARACTER_XP_START,
 } from '@helpers/config';
 import { ensureAffix } from '@helpers/content/ensure-affix';
+import { ensureEdict } from '@helpers/content/ensure-edict';
 import { ensureEquipment } from '@helpers/content/ensure-item';
 import { ensureJob } from '@helpers/content/ensure-job';
 import { ensureSkillTreeNode } from '@helpers/content/ensure-skilltreenode';
@@ -28,6 +29,8 @@ import { trainerTeachingEffects } from '@helpers/trainer/trainer-teaching';
 import type {
   AffixId,
   Character,
+  EdictContent,
+  EdictId,
   EquipmentBlock,
   EquipmentId,
   JobId,
@@ -274,6 +277,34 @@ describe('createCharacter', () => {
     expect(createCharacter('Jala', jobId).equipment).toEqual(
       defaultEquipment(),
     );
+  });
+});
+
+describe('characterStats with stat edicts', () => {
+  const heroEdict = (id: string, percent: number): EdictContent =>
+    ensureEdict({
+      id: id as EdictId,
+      name: id,
+      effects: [{ effectType: 'StatPercent', target: 'Hero', percent }],
+    });
+  const might = heroEdict('might', 25);
+  const frailty = heroEdict('frailty', -25);
+
+  function strengthWith(...edicts: EdictContent[]): number {
+    seedContent([...baseContent, might, frailty]);
+    seedGamestate((state) => {
+      state.edicts = edicts.map((e) => e.id);
+    });
+    return characterStats(hero({ equipment: withGear({}) })).Strength;
+  }
+
+  it('scales hero stats up or down, and opposite edicts cancel', () => {
+    const base = strengthWith();
+
+    expect(base).toBe(5);
+    expect(strengthWith(might)).toBe(6.25);
+    expect(strengthWith(frailty)).toBe(3.75);
+    expect(strengthWith(might, frailty)).toBe(base);
   });
 });
 
