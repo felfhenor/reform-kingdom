@@ -1,6 +1,6 @@
 @let summary = run();
 
-<div class="flex flex-col page-size p-4 gap-4">
+<div class="flex flex-col h-[100vh] p-4 gap-4">
   <div class="flex flex-col gap-4 flex-1 min-h-0 overflow-y-auto">
     @if (summary) {
       @let completed = summary.outcome === 'Completed';
@@ -38,7 +38,7 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1">
         <div class="card bg-base-100">
           <div class="card-body gap-4">
             <h2 class="type-section-title">Party</h2>
@@ -129,7 +129,7 @@
             <div class="flex flex-col gap-2">
               @for (row of completionRows(); track row.name) {
                 <div class="flex items-center gap-4">
-                  <span class="w-48 shrink-0">{{ row.name }}</span>
+                  <span class="w-64 shrink-0">{{ row.name }}</span>
                   <app-bar-progress
                     class="flex-1"
                     [color]="row.isComplete ? 'success' : 'primary'"
