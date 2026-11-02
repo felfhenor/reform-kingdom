@@ -5,6 +5,7 @@ import {
   notifySuccess,
   notifyWarning,
 } from '@helpers/engine/notify';
+import { legacyMergeFrom } from '@helpers/legacy/legacy-merge';
 import {
   savefileBackupsRead,
   savefileBackupsWriteSource,
@@ -13,9 +14,10 @@ import {
   savefileLoadStatus,
   savefileReplace,
 } from '@helpers/savefile/savefile-load';
+import { savefileBundleUnpack } from '@helpers/savefile/savefile-bundle';
 import { savefileValidationErrors } from '@helpers/savefile/savefile-validate';
 import { GAMESTATE_STORAGE_KEY } from '@helpers/state-game';
-import type { GameState, SavefileBackup } from '@interfaces';
+import type { GameState, LegacyMergeResult, SavefileBackup } from '@interfaces';
 
 function backupLabel(backup: SavefileBackup): string {
   return new Date(backup.createdAt).toLocaleString();
@@ -109,8 +111,23 @@ function parseSavefileJson(json: string): unknown {
   }
 }
 
+const LEGACY_IMPORT_WARNINGS: Partial<Record<LegacyMergeResult, string>> = {
+  invalid:
+    "Your savefile was imported, but the file's Legacy couldn't be read.",
+  unsaved:
+    "Your savefile was imported, but the file's Legacy couldn't be saved. Keep the file and try again.",
+};
+
+// A bad Legacy section never undoes the savefile import; it only warns.
+function savefileImportLegacy(section: unknown): void {
+  const warning = LEGACY_IMPORT_WARNINGS[legacyMergeFrom([section])];
+  if (warning) notifyWarning(warning);
+}
+
 export async function savefileImportJson(json: string): Promise<boolean> {
-  const state = parseSavefileJson(json);
+  const { savefile: state, legacy } = savefileBundleUnpack(
+    parseSavefileJson(json),
+  );
   const problems = savefileValidationErrors(state);
   if (problems.length > 0) {
     notifyError(`That file is not a usable savefile: ${problems[0]}`);
@@ -124,6 +141,7 @@ export async function savefileImportJson(json: string): Promise<boolean> {
   }
 
   notifySuccess('Successfully imported savefile!');
+  savefileImportLegacy(legacy);
   return true;
 }
 

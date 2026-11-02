@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
+import { legacyLoad } from '@helpers/legacy/legacy';
+import { savefileBundleCreate } from '@helpers/savefile/savefile-bundle';
 import { savefileExportDownload } from '@helpers/savefile/savefile-load.ui';
 import { gamestate } from '@helpers/state-game';
 
@@ -12,6 +14,9 @@ import { gamestate } from '@helpers/state-game';
 })
 export class ButtonSavefileExportComponent {
   exportSavefile() {
-    savefileExportDownload(gamestate(), `${Date.now()}.rek`);
+    savefileExportDownload(
+      savefileBundleCreate(gamestate(), legacyLoad()),
+      `${Date.now()}.rek`,
+    );
   }
 }

@@ -37,3 +37,5 @@ export type LegacyState = {
   version: number;
   runs: RunRecord[];
 };
+
+export type LegacyMergeResult = 'merged' | 'unchanged' | 'invalid' | 'unsaved';

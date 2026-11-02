@@ -1,5 +1,6 @@
 export * from './savefile-backup';
 export * from './savefile-backup-storage';
+export * from './savefile-bundle';
 export * from './savefile-disk';
 export * from './savefile-disk.ui';
 export * from './savefile-load';

@@ -26,11 +26,12 @@ import type {
 import { sumBy } from 'es-toolkit/compat';
 
 export const LEGACY_STORAGE_KEY = 'legacy';
+export const LEGACY_VERSION = 1;
 
 let legacyWritesBlocked = false;
 
 export function defaultLegacy(): LegacyState {
-  return { version: 1, runs: [] };
+  return { version: LEGACY_VERSION, runs: [] };
 }
 
 function legacyRunIsValid(run: RunRecord | null): boolean {
@@ -94,15 +95,17 @@ export function legacyAddRun(state: LegacyState, run: RunRecord): LegacyState {
   };
 }
 
-// Throws if the write fails (blocked Legacy, quota, private mode), so the caller can keep the run instead of resetting it.
-// Reloads first so a run another tab recorded since this one loaded isn't overwritten.
-export function legacyRecordRun(run: RunRecord): void {
-  const current = legacyLoad();
+// Throws if the write fails (blocked Legacy, quota, private mode); call right after legacyLoad, which sets the block.
+export function legacySave(next: LegacyState): void {
   if (legacyWritesBlocked) throw new Error('Legacy writes are blocked.');
 
-  const next = legacyAddRun(current, run);
   localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify(next));
   legacy.set(next);
+}
+
+// Reloads first so a run another tab recorded since this one loaded isn't overwritten.
+export function legacyRecordRun(run: RunRecord): void {
+  legacySave(legacyAddRun(legacyLoad(), run));
 }
 
 export function legacyRunById(id: GameId): RunRecord | undefined {

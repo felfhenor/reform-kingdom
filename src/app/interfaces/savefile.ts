@@ -1,3 +1,4 @@
+import type { LegacyState } from '@interfaces/legacy';
 import type { GameState } from '@interfaces/state-game';
 
 export type SavefileBackupReason = 'load' | 'import' | 'restore';
@@ -51,4 +52,18 @@ export type ElectronSavefileStoreBridge = {
 
 export type WindowWithElectronSavefileStoreBridge = Window & {
   reformElectron?: Partial<ElectronSavefileStoreBridge>;
+};
+
+// An exported .rek file; older files are a bare GameState.
+export type SavefileBundle = {
+  format: 'reform-kingdom-bundle';
+  version: number;
+  savefile: GameState;
+  legacy?: LegacyState;
+};
+
+// Sections are left unchecked here so each one is validated on its own.
+export type SavefileBundleSections = {
+  savefile: unknown;
+  legacy?: unknown;
 };
