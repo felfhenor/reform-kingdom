@@ -6,6 +6,7 @@ export type ContentType =
   | 'collectible'
   | 'collectiblegate'
   | 'commissionoffer'
+  | 'edict'
   | 'encounter'
   | 'encounterrandom'
   | 'equipment'

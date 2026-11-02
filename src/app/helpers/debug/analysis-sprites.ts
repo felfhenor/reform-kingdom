@@ -23,6 +23,7 @@ const SPRITED_CONTENT_TYPES: ContentType[] = [
   'job',
   'monster',
   'skill',
+  'edict',
 ];
 
 // Strips a trailing roman-numeral tier suffix ("Fireball II" -> "Fireball")

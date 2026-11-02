@@ -1,0 +1,78 @@
+- id: a4855bb8-4d5d-4f4b-bbd9-4cca91413611
+  name: Edict of Might
+  sprite: '0000'
+  description: Hero stats are increased by 25%.
+  kind: Boon
+  fragments: -3
+  group: HeroStats
+
+- id: a76ae14f-4c67-440f-b8d0-5e32c25eb933
+  name: Edict of Calm
+  sprite: '0001'
+  description: Monster stats are reduced by 25%.
+  kind: Boon
+  fragments: -3
+  group: MonsterStats
+
+- id: 1ccc343d-4575-40f9-85b4-ab51ca86ee34
+  name: Edict of Plenty
+  sprite: '0002'
+  description: Gather yield and item drop rate are increased by 50%.
+  kind: Boon
+  fragments: -2
+
+- id: 26a02706-b73d-4009-b9fc-466374f9c8e7
+  name: Edict of the Treasury
+  sprite: '0003'
+  description: Start with extra gold, and shop prices are reduced by 25%.
+  kind: Boon
+  fragments: -2
+
+- id: 76096547-8e80-4964-ab36-f0a85947247e
+  name: Edict of Favor
+  sprite: '0004'
+  description: Combat XP is increased by 50%.
+  kind: Boon
+  fragments: -3
+
+- id: 024c9438-c014-4b73-aaa3-276ed4bcdb64
+  name: Edict of Roads
+  sprite: '0005'
+  description: Travel speed is increased by 50%, on and off paths.
+  kind: Boon
+  fragments: -1
+
+- id: 1abaf8ae-7a55-4513-a0b7-d9a47f1d19e3
+  name: Edict of Mending
+  sprite: '0006'
+  description: Deaths Door and Healing last half as long.
+  kind: Boon
+  fragments: -1
+
+- id: ffea9461-b341-4e11-939d-50837cf7e136
+  name: Edict of Guilds
+  sprite: '0007'
+  description: Recipes need fewer materials.
+  kind: Boon
+  fragments: -1
+
+- id: 7df5e003-4e99-4912-830f-66ca83aad694
+  name: Edict of Blessings
+  sprite: '0008'
+  description: Shrine buffs never expire once prayed for.
+  kind: Boon
+  fragments: -2
+
+- id: bcdc86fc-c2e5-4500-84f8-f188c94c313f
+  name: Edict of Veterans
+  sprite: '0009'
+  description: Heroes start at level 10 with their starting gear.
+  kind: Boon
+  fragments: -4
+
+- id: 1d1c8bf8-9df1-44ee-ad9f-af6c78f7b8d7
+  name: Edict of Mercy
+  sprite: '0010'
+  description: 'A wipe costs nothing: no Deaths Door, just a short Healing.'
+  kind: Boon
+  fragments: -5

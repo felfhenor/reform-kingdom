@@ -21,6 +21,7 @@
     "./schemas/collectible.schema.json": "gamedata/collectible/**/*.yml",
     "./schemas/collectiblegate.schema.json": "gamedata/collectiblegate/**/*.yml",
     "./schemas/commissionoffer.schema.json": "gamedata/commissionoffer/**/*.yml",
+    "./schemas/edict.schema.json": "gamedata/edict/**/*.yml",
     "./schemas/encounter.schema.json": "gamedata/encounter/**/*.yml",
     "./schemas/encounterrandom.schema.json": "gamedata/encounterrandom/**/*.yml",
     "./schemas/equipment.schema.json": "gamedata/equipment/**/*.yml",

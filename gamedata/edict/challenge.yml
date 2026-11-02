@@ -1,0 +1,109 @@
+- id: 8e5d5f1e-8a19-4b87-8c5c-e46426c89c8f
+  name: Edict of Frailty
+  sprite: '0011'
+  description: Hero stats are reduced by 25%.
+  kind: Challenge
+  fragments: 3
+  group: HeroStats
+
+- id: d08f7c2f-05c0-43bc-bb14-7c8a5cc317b7
+  name: Edict of Fury
+  sprite: '0012'
+  description: Monster stats are increased by 25%.
+  kind: Challenge
+  fragments: 3
+  group: MonsterStats
+
+- id: 3a267cfb-b42d-4b11-8fea-ae17e1041caa
+  name: Edict of Humility
+  sprite: '0013'
+  description: Specializations grant no bonus stats. Their skills and oath effects still work.
+  kind: Challenge
+  fragments: 2
+
+- id: fc200585-8c6b-47b2-884d-6ba53d35098b
+  name: Edict of the Wilds
+  sprite: '0014'
+  description: Every monster gets one extra skill from its region's pool. Bestiary discoveries and kills count double, and monster-slaying affixes roll higher.
+  kind: Challenge
+  fragments: 3
+
+- id: bfc84b5e-c4fd-4fb0-8f6c-e4287aa66d15
+  name: Edict of the Tide
+  sprite: '0015'
+  description: Nodes rise to meet your party, so none are ever Trivial. Drops and gathering in old regions scale up with them.
+  kind: Challenge
+  fragments: 4
+
+- id: dbe3fe9d-6e30-4226-9168-88695fe136d6
+  name: Edict of Famine
+  sprite: '0016'
+  description: Combat XP and gold are reduced by 40%. Commissions and town reputation pay much more.
+  kind: Challenge
+  fragments: 2
+
+- id: 513d5b7a-2a6e-47e0-883a-4891d6af6c40
+  name: Edict of Monopoly
+  sprite: '0017'
+  description: Town shop prices are doubled. Exchange and caravan trader rates are better.
+  kind: Challenge
+  fragments: 1
+
+- id: c03e5ab7-1e05-4e4d-a128-be17f5e58b2d
+  name: Edict of Scarcity
+  sprite: '0018'
+  description: Recipes need more materials. Crafted gear always rolls one extra affix.
+  kind: Challenge
+  fragments: 2
+
+- id: d6631919-4f78-4b2e-973a-df63d710909b
+  name: Edict of Curses
+  sprite: '0019'
+  description: Every dropped piece of equipment rolls a curse affix, and one extra good affix.
+  kind: Challenge
+  fragments: 2
+
+- id: eaa60c35-f0c9-463d-8da7-d341c3f56ce8
+  name: Edict of Sieges
+  sprite: '0020'
+  description: Raids come more often and hit harder. Defending successfully earns raid-only rewards and permanent town favor.
+  kind: Challenge
+  fragments: 3
+
+- id: 2f277fdc-eb42-4ad6-a980-8a9d325c0eae
+  name: Edict of Fickle Favor
+  sprite: '0021'
+  description: Town reputation slowly decays. Commissions pay more, and towns at max reputation unlock exclusive recipes.
+  kind: Challenge
+  fragments: 1
+
+- id: 0958d130-a453-47b2-a370-08579c00d88d
+  name: Edict of the Unknown
+  sprite: '0022'
+  description: Monster stats and weaknesses stay hidden until the bestiary has an entry. Completed bestiary entries grant slayer bonuses.
+  kind: Challenge
+  fragments: 2
+
+- id: b86e2e13-f7bd-44e3-bac7-730654d15578
+  name: Edict of Scars
+  sprite: '0023'
+  description: Each wipe gives every hero a lasting injury, removed by a trainer visit or time at a shrine.
+  kind: Challenge
+  fragments: 2
+  group: Death
+
+- id: 240c90bd-0b25-45cb-be0d-cd9ecb2251d4
+  name: Edict of the Fallen
+  sprite: '0024'
+  description: Each wipe kills one random hero, and a lower-level replacement is recruited at the kingdom. The fallen hero's job ability lives on as a weaker party-wide memorial.
+  kind: Challenge
+  fragments: 5
+  group: Death
+
+- id: fabe9a7d-6448-409e-9ed0-103cfa0a6974
+  name: Edict of Iron
+  sprite: '0025'
+  description: A wipe ends the run.
+  kind: Challenge
+  fragments: 8
+  group: Death

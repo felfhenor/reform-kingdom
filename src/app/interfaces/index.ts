@@ -17,6 +17,7 @@ export * from './content-caravan-trader';
 export * from './content-collectible';
 export * from './content-collectiblegate';
 export * from './content-commission-offer';
+export * from './content-edict';
 export * from './content-encounter';
 export * from './content-encounter-random';
 export * from './content-equipment';

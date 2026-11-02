@@ -12,6 +12,7 @@ export type HasAnimation = HasSprite & {
 
 export type AtlasedImage =
   | 'collectible'
+  | 'edict'
   | 'equipment'
   | 'globaleffect'
   | 'item'

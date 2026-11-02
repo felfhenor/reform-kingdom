@@ -1,0 +1,23 @@
+- id: 6223ec9d-1357-4a28-92ea-be8e7a63a9f6
+  name: Edict of the Triad
+  sprite: '0026'
+  description: Your party has 3 heroes. The empty seat grants Deep Study.
+  kind: PartySize
+  fragments: 2
+  group: PartySize
+
+- id: 5c898090-0869-4f8d-b870-1934eb7fed57
+  name: Edict of the Dynamic Duo
+  sprite: '0027'
+  description: Your party has 2 heroes. The empty seats grant Deep Study and Quiet Camp.
+  kind: PartySize
+  fragments: 4
+  group: PartySize
+
+- id: ff806419-684c-489f-a99e-93a69b8bb639
+  name: Edict of the Fretless
+  sprite: '0028'
+  description: Your party has a single hero. The empty seats grant Deep Study, Quiet Camp and Lone Wolf.
+  kind: PartySize
+  fragments: 7
+  group: PartySize

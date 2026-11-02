@@ -6,6 +6,7 @@ import {
 } from '@helpers/content/ensure-caravan';
 import { ensureCollectibleGate } from '@helpers/content/ensure-collectiblegate';
 import { ensureCommissionOffer } from '@helpers/content/ensure-commission';
+import { ensureEdict } from '@helpers/content/ensure-edict';
 import {
   ensureEncounter,
   ensureEncounterRandom,
@@ -53,6 +54,7 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   collectible: ensureCollectible,
   collectiblegate: ensureCollectibleGate,
   commissionoffer: ensureCommissionOffer,
+  edict: ensureEdict,
   encounter: ensureEncounter,
   encounterrandom: ensureEncounterRandom,
   equipment: ensureEquipment,
