@@ -339,6 +339,19 @@
             </button>
           }
 
+          @if (isFeatureAvailable('edicts')) {
+            <button
+              class="btn btn-neutral btn-sm"
+              (click)="openSubview('edicts')"
+              appSfx="ui-click"
+              [sfxOffset]="4"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              <app-icon-kingdom [name]="nav.edicts.icon" class="zoom-inline" />
+              {{ nav.edicts.label }}
+            </button>
+          }
+
           <app-slot-button-container
             [disabled]="!isAtKingdomCurrently()"
             [helpText]="'Reclass heroes. This must be done at the Duchy.'"

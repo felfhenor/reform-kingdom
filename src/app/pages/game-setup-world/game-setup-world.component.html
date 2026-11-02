@@ -1,11 +1,11 @@
-<div class="flex justify-center items-center h-full p-2 flex-col gap-2">
-  <div class="w-full lg:max-w-[800px]">
-    <div class="card bg-base-100">
-      <div class="card-body items-center justify-between">
+<div class="flex flex-col h-full p-2 gap-2 overflow-y-auto lg:overflow-hidden">
+  <div class="flex flex-col lg:flex-row gap-2 lg:flex-1 lg:min-h-0">
+    <div class="card bg-base-100 lg:flex-[3] lg:min-h-0">
+      <div class="card-body flex flex-col gap-4 lg:min-h-0 overflow-y-auto">
         <div
           class="type-page-title w-full flex justify-between items-center relative min-h-8"
         >
-          <div class="absolute flex justify-center w-full pointer-events-none">
+          <div class="absolute w-full pointer-events-none">
             Create Your Hero Party
           </div>
 
@@ -21,7 +21,7 @@
           </button>
         </div>
 
-        <div class="card-actions pt-3 flex flex-col gap-6 w-full">
+        <div class="flex flex-col gap-6 w-full">
           @for (heroField of partyForm; track $index) {
             @let jobId = heroField.jobId().value();
             @let jobData = jobFor(jobId);
@@ -29,7 +29,7 @@
             <div class="flex flex-row gap-2 w-full">
               <app-icon-job [job]="jobData"></app-icon-job>
 
-              <div class="flex flex-col gap-2 flex-1 min-h-[160px]">
+              <div class="flex flex-col gap-2 flex-1 min-w-0">
                 <div class="flex flex-row gap-2">
                   <input
                     type="text"
@@ -62,7 +62,7 @@
                   </ng-select>
                 </div>
 
-                <div class="type-muted">
+                <div class="type-muted min-h-[60px]">
                   {{ jobData?.description }}
                 </div>
               </div>
@@ -71,21 +71,71 @@
         </div>
       </div>
     </div>
+
+    <div class="card bg-base-100 lg:flex-[2] lg:min-h-0">
+      <div class="card-body flex flex-col gap-4 lg:min-h-0">
+        <div class="type-page-title">Choose Your Edicts</div>
+
+        <div class="flex flex-col gap-4 lg:flex-1 lg:min-h-0 overflow-y-auto">
+          @for (group of edictGroups(); track group.kind) {
+            <div class="flex flex-col gap-2">
+              <h2 class="type-section-title">{{ group.label }}</h2>
+
+              <div class="flex flex-wrap gap-4 p-2">
+                @for (edict of group.edicts; track edict.id) {
+                  <app-slot-edict
+                    [edict]="edict"
+                    [interactive]="true"
+                    [picked]="isEdictPicked(edict)"
+                    [blocked]="isEdictBlocked(edict)"
+                    (toggled)="toggleEdict(edict)"
+                  />
+                }
+              </div>
+            </div>
+          } @empty {
+            <app-blank-slate>No edicts are available yet.</app-blank-slate>
+          }
+        </div>
+
+        <h2 class="type-section-title">Your Edicts</h2>
+
+        <div
+          class="flex flex-col shrink-0 max-h-48 overflow-y-auto"
+          appListReflow
+        >
+          @for (edict of pickedEdicts(); track edict.id) {
+            <app-row-edict
+              [edict]="edict"
+              (animate.leave)="onEdictRowLeave($event)"
+            />
+          } @empty {
+            <app-blank-slate>
+              No edicts picked. This is the standard game.
+            </app-blank-slate>
+          }
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="w-full lg:max-w-[800px]">
-    <div class="card bg-base-100">
-      <div class="card-body items-center justify-between">
-        <button
-          class="btn btn-primary btn-block"
-          [disabled]="partyForm().invalid()"
-          (click)="createWorld()"
-          appSfx="ui-click"
-          [sfxTrigger]="['click', 'hover']"
-        >
-          Start Game
-        </button>
-      </div>
+  <div class="card bg-base-100 shrink-0">
+    <div class="card-body flex-row items-center justify-between gap-4 p-4">
+      <span class="tabular-nums">
+        {{ fragmentTotal() | number }} Fragments · score x{{
+          scoreMultiplier() | number: '1.0-2'
+        }}
+      </span>
+
+      <button
+        class="btn btn-primary"
+        [disabled]="partyForm().invalid()"
+        (click)="createWorld()"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        Start Game
+      </button>
     </div>
   </div>
 </div>

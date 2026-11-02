@@ -4,12 +4,6 @@
   @apply block min-h-0 min-w-0;
 }
 
-.skill-tree-node {
-  outline: 3px dotted
-    color-mix(in oklch, var(--color-base-content) 25%, transparent);
-  outline-offset: 1px;
-}
-
 .skill-tree-node-learned {
   outline: 3px solid var(--color-primary);
 }
@@ -25,11 +19,6 @@
 .skill-tree-node-locked {
   filter: grayscale(1);
   opacity: 0.5;
-}
-
-.skill-tree-node-excluded {
-  filter: grayscale(1);
-  opacity: 0.2;
 }
 
 .skill-tree-arrow {

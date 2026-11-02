@@ -1,5 +1,6 @@
 import { hasAnyCommission } from '@helpers/commission/commission-tick.ui';
 import { getEntriesByType } from '@helpers/content/content';
+import { edictsActive } from '@helpers/edict/edict';
 import { kingdomSubviewForTradeskill } from '@helpers/engine/ui';
 import { isInfusionUnlocked } from '@helpers/item/infusion';
 import { isReforgeUnlocked } from '@helpers/item/reforge';
@@ -64,6 +65,12 @@ export const KINGDOM_FEATURE_NAV: Record<
     icon: 'commissions',
     group: 'actions',
     isAvailable: hasAnyCommission,
+  },
+  edicts: {
+    label: 'Edicts',
+    icon: 'edicts',
+    group: 'actions',
+    isAvailable: () => edictsActive().length > 0,
   },
 };
 

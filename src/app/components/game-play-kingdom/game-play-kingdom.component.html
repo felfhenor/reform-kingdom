@@ -42,6 +42,14 @@
         }
       }
 
+      @case ('edicts') {
+        @defer (on immediate) {
+          <app-play-kingdom-edicts></app-play-kingdom-edicts>
+        } @placeholder {
+          <app-page-blank></app-page-blank>
+        }
+      }
+
       @case ('commissions') {
         @defer (on immediate) {
           <app-play-kingdom-commissions></app-play-kingdom-commissions>

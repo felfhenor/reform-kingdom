@@ -62,7 +62,7 @@ describe('edictStatPercents', () => {
 });
 
 describe('statsScaledByPercent', () => {
-  it('scales each stat by its own percent and leaves zero stats at zero', () => {
+  it('rounds scaled Health and Energy only, leaving zero stats at zero', () => {
     const stats = { ...defaultStats(), Strength: 10, Health: 4 };
     const percents = { ...defaultStats(), Strength: 25, Health: -25 };
 

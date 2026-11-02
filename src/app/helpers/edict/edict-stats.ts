@@ -8,6 +8,8 @@ import type {
   StatBlock,
 } from '@interfaces';
 
+const EDICT_ROUNDED_STATS: GameStat[] = ['Health', 'Energy'];
+
 export function edictStatPercents(target: EdictStatTarget): StatBlock {
   const percents = defaultStats();
   const stats = Object.keys(percents) as GameStat[];
@@ -30,9 +32,13 @@ export function statsScaledByPercent(
 ): StatBlock {
   const scaled = { ...stats };
 
-  // Not rounded: hero stats are already fractional, and rounding would change them with no edicts.
   (Object.keys(scaled) as GameStat[]).forEach((stat) => {
-    scaled[stat] *= 1 + percents[stat] / 100;
+    if (percents[stat] === 0) return;
+    const value = scaled[stat] * (1 + percents[stat] / 100);
+    // Pools round so current/max HP and EP stay whole; rounding small stats would swallow the percent.
+    scaled[stat] = EDICT_ROUNDED_STATS.includes(stat)
+      ? Math.round(value)
+      : value;
   });
 
   return scaled;

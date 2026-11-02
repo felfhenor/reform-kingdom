@@ -14,6 +14,7 @@ import { BarGlobalEffectComponent } from '@components/bar-global-effect/bar-glob
 import { CardRegionIntroComponent } from '@components/card-region-intro/card-region-intro.component';
 import { PanelMapNodeComponent } from '@components/panel-map-node/panel-map-node.component';
 import { StatusCraftingComponent } from '@components/status-crafting/status-crafting.component';
+import { StatusEdictsComponent } from '@components/status-edicts/status-edicts.component';
 import { StatusEncounterComponent } from '@components/status-encounter/status-encounter.component';
 import { StatusTaskListComponent } from '@components/status-task-list/status-task-list.component';
 import { StatusTutorialUnlockComponent } from '@components/status-tutorial-unlock/status-tutorial-unlock.component';
@@ -30,9 +31,11 @@ import { uiTextFontFamily, uiTextLetterSpacing } from '@helpers/engine/font.ui';
 import { gatherVfx$ } from '@helpers/engine/gather-vfx';
 import {
   isWorldCameraPanned,
+  kingdomSubview,
   mapNodeDeselect,
   mapNodeSelect,
   selectedMapNode,
+  setGamePlayView,
   worldCameraRequest,
   worldMapReady,
 } from '@helpers/engine/ui';
@@ -50,7 +53,6 @@ import {
   pixiWorldContainersCreate,
 } from '@helpers/pixi/pixi-app-setup.ui';
 import { pixiBackdropShardsCreate } from '@helpers/pixi/pixi-backdrop-shards.ui';
-import { pixiMapMaxFps } from '@helpers/pixi/pixi-frame-rate.ui';
 import {
   cameraBoundsCalculate,
   cameraOffsetFromDrag,
@@ -59,6 +61,7 @@ import {
   viewportTilesCalculate,
 } from '@helpers/pixi/pixi-camera';
 import { pixiFloatingTextCreate } from '@helpers/pixi/pixi-floating-text';
+import { pixiMapMaxFps } from '@helpers/pixi/pixi-frame-rate.ui';
 import { pixiGridOverlayCreate } from '@helpers/pixi/pixi-grid.ui';
 import {
   pixiIndicatorNodeSelectionCreate,
@@ -68,8 +71,8 @@ import {
   pixiIndicatorProgressBarCreate,
   pixiNodeLabelColor,
 } from '@helpers/pixi/pixi-indicators';
-import { pixiNodeRevealCreate } from '@helpers/pixi/pixi-node-reveal.ui';
 import { pixiTiledMapRender } from '@helpers/pixi/pixi-map-render';
+import { pixiNodeRevealCreate } from '@helpers/pixi/pixi-node-reveal.ui';
 import {
   partyFollowerCatchUpPosition,
   partyFollowerCatchUpStart,
@@ -149,6 +152,7 @@ const NODE_STATUS_UPDATE_INTERVAL_MS = 150;
     CardRegionIntroComponent,
     PanelMapNodeComponent,
     BarGlobalEffectComponent,
+    StatusEdictsComponent,
     StatusEncounterComponent,
     StatusCraftingComponent,
     StatusWorkerLevelupComponent,
@@ -173,9 +177,15 @@ const NODE_STATUS_UPDATE_INTERVAL_MS = 150;
       <div
         class="absolute top-0 left-0 right-0 flex flex-col pointer-events-none z-[11]"
       >
-        <app-bar-global-effect
-          class="pointer-events-auto"
-        ></app-bar-global-effect>
+        <div class="flex items-start">
+          <app-status-edicts
+            class="pointer-events-auto cursor-pointer"
+            (click)="viewEdicts()"
+          ></app-status-edicts>
+          <app-bar-global-effect
+            class="pointer-events-auto"
+          ></app-bar-global-effect>
+        </div>
         <!-- In flow under the effect bar, since the bar's height depends on whether any effects are active. -->
         <app-adventure-log-overlay
           class="mx-2 mt-2 w-[32rem] max-w-[calc(100%-2rem)]"
@@ -1447,5 +1457,10 @@ export class GamePlayWorldComponent implements OnDestroy {
       spawnedAt: now,
       nodeName: event.nodeName,
     });
+  }
+
+  public viewEdicts() {
+    setGamePlayView('kingdom');
+    kingdomSubview.set('edicts');
   }
 }

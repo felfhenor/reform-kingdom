@@ -82,3 +82,15 @@
 .search-bar {
   min-width: 300px;
 }
+
+// Shared by skill tree nodes and edict tiles: dotted = not yet earned, excluded = can't be chosen now.
+.node-outline {
+  outline: 3px dotted
+    color-mix(in oklch, var(--color-base-content) 25%, transparent);
+  outline-offset: 1px;
+}
+
+.node-excluded {
+  filter: grayscale(1);
+  opacity: 0.2;
+}

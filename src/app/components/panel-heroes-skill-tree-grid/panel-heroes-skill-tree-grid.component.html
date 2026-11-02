@@ -9,11 +9,12 @@
   <button
     #box
     type="button"
-    class="relative overflow-hidden cursor-pointer skill-tree-node skill-tree-node-{{
+    class="relative overflow-hidden cursor-pointer node-outline skill-tree-node-{{
       state
     }}"
     [attr.data-box-id]="node.id"
     [class.skill-tree-node-skill]="isSkill(node)"
+    [class.node-excluded]="state === 'excluded'"
     [class.ring-2]="isSelected"
     [class.ring-base-content]="isSelected"
     [style.width.px]="nodeSize"

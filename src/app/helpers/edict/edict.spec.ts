@@ -2,8 +2,14 @@ import { describe, expect, it } from 'vitest';
 
 import { ensureEdict } from '@helpers/content/ensure-edict';
 import { ensureItem } from '@helpers/content/ensure-item';
-import { edictsActive, pruneInvalidEdicts } from '@helpers/edict/edict';
-import type { EdictId, ItemId } from '@interfaces';
+import {
+  edictIsBlocked,
+  edictsActive,
+  edictsPickable,
+  edictsSanitized,
+  pruneInvalidEdicts,
+} from '@helpers/edict/edict';
+import type { EdictContent, EdictId, ItemId } from '@interfaces';
 import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
 
@@ -59,5 +65,62 @@ describe('pruneInvalidEdicts', () => {
       might.id,
       famine.id,
     ]);
+  });
+});
+
+const pickable = (
+  id: string,
+  overrides: Partial<EdictContent> = {},
+): EdictContent =>
+  ensureEdict({ id: id as EdictId, name: id, enabled: true, ...overrides });
+
+const frailty = pickable('frailty', { kind: 'Challenge', group: 'HeroStats' });
+const strength = pickable('strength', { kind: 'Boon', group: 'HeroStats' });
+const coin = pickable('coin', { kind: 'Variant' });
+const triad = pickable('triad', { kind: 'PartySize' });
+const loneWolf = pickable('lone-wolf', { kind: 'SeatBoon' });
+const locked = ensureEdict({
+  id: 'locked' as EdictId,
+  name: 'locked',
+  kind: 'Challenge',
+});
+
+describe('edictsPickable', () => {
+  it('lists enabled edicts by kind then name, leaving out seat boons', () => {
+    seedContent([strength, coin, loneWolf, locked, frailty, triad]);
+
+    expect(edictsPickable().map((edict) => edict.id)).toEqual([
+      triad.id,
+      frailty.id,
+      coin.id,
+      strength.id,
+    ]);
+  });
+});
+
+describe('edictIsBlocked', () => {
+  it('blocks an edict when another picked one shares its group', () => {
+    expect(edictIsBlocked(strength, [frailty])).toBe(true);
+    expect(edictIsBlocked(strength, [strength])).toBe(false);
+    expect(edictIsBlocked(coin, [frailty, strength])).toBe(false);
+    expect(edictIsBlocked(coin, [triad])).toBe(false);
+  });
+});
+
+describe('edictsSanitized', () => {
+  it('keeps pickable ids in order, dropping repeats, unpickable and later-blocked ones', () => {
+    seedContent([strength, coin, loneWolf, locked, frailty, triad]);
+
+    expect(
+      edictsSanitized([
+        coin.id,
+        frailty.id,
+        coin.id,
+        loneWolf.id,
+        locked.id,
+        strength.id,
+        gone,
+      ]),
+    ).toEqual([coin.id, frailty.id]);
   });
 });

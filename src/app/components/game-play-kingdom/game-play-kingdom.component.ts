@@ -9,6 +9,7 @@ import { PlayKingdomArmoryComponent } from '@components/play-kingdom-armory/play
 import { PlayKingdomAstralProjectorComponent } from '@components/play-kingdom-astralprojector/play-kingdom-astralprojector.component';
 import { PlayKingdomBestiaryComponent } from '@components/play-kingdom-bestiary/play-kingdom-bestiary.component';
 import { PlayKingdomCommissionsComponent } from '@components/play-kingdom-commissions/play-kingdom-commissions.component';
+import { PlayKingdomEdictsComponent } from '@components/play-kingdom-edicts/play-kingdom-edicts.component';
 import { PlayKingdomHomeComponent } from '@components/play-kingdom-home/play-kingdom-home.component';
 import { PlayKingdomWorkshopComponent } from '@components/play-kingdom-workshop/play-kingdom-workshop.component';
 import { PlayKingdomMuseumComponent } from '@components/play-kingdom-museum/play-kingdom-museum.component';
@@ -32,6 +33,7 @@ import { kingdomSubview } from '@helpers/engine/ui';
     PlayKingdomAstralProjectorComponent,
     PlayKingdomBestiaryComponent,
     PlayKingdomCommissionsComponent,
+    PlayKingdomEdictsComponent,
     PlayKingdomWorkshopComponent,
     PlayKingdomTradeskillArtificingComponent,
     PlayKingdomTradeskillBlacksmithingComponent,

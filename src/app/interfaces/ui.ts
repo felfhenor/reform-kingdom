@@ -27,6 +27,7 @@ export type KingdomSubview =
   | 'bestiary'
   | 'armory'
   | 'commissions'
+  | 'edicts'
   | 'astralprojector'
   | 'workshop'
   | 'tradeskill-artificing'

@@ -57,6 +57,12 @@ export const TRADESKILL_QUEUE_MAX_SIZE = 16;
 // Losing streak at which mostChallengingExploreNodeForRisk gives up on a tier and steps down.
 export const LEVEL_UP_NODE_FAILURE_LIMIT = 5;
 
+// Edict
+
+// Each Fragment moves a run's score multiplier by this much; boons can't push it below the floor.
+export const EDICT_FRAGMENT_MULTIPLIER_STEP = 0.1;
+export const EDICT_SCORE_MULTIPLIER_FLOOR = 0.25;
+
 // Engine
 
 export const GAMELOOP_INTERVAL_MS = 1000;

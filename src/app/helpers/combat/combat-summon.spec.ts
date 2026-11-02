@@ -71,7 +71,7 @@ describe('combatSummonMonster', () => {
       50,
     );
     expect(combatSummonMonster(combat, enemy, wolf.id)?.baseStats.Health).toBe(
-      62.5,
+      63,
     );
   });
 
