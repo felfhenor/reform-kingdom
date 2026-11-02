@@ -25,6 +25,7 @@ import {
 import { isSetup } from '@helpers/setup';
 import { getOption, setOption } from '@helpers/state-options';
 import { MetaService } from '@services/meta.service';
+import type { SavefileBackup } from '@interfaces';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
@@ -66,7 +67,11 @@ export class HomeComponent implements OnInit {
       : '';
   });
 
-  private hasUnfinishedBackup = signal(false);
+  private backups = signal<SavefileBackup[]>([]);
+  // Reactive so a Legacy refilled from backups at startup clears the warning.
+  private hasUnfinishedBackup = computed(() =>
+    legacyHasUnfinishedBackup(this.backups()),
+  );
 
   // A missing save with backups around is exactly what a silently lost save looks like.
   public showBackupsAvailable = computed(
@@ -87,9 +92,7 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
-    void savefileBackupsRead().then(({ backups }) =>
-      this.hasUnfinishedBackup.set(legacyHasUnfinishedBackup(backups)),
-    );
+    void savefileBackupsRead().then(({ backups }) => this.backups.set(backups));
 
     discordSetMainStatus('');
     discordSetStatus({

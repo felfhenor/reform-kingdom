@@ -1,6 +1,7 @@
 import { SAVEFILE_BACKUP_MAX } from '@helpers/config';
 import { idbGet, idbIsAvailable, idbPut } from '@helpers/engine/idb';
 import { error, info } from '@helpers/engine/logging';
+import { legacyLoad } from '@helpers/legacy/legacy';
 import {
   savefileBackupCreate,
   savefileBackupIsDuplicate,
@@ -109,7 +110,7 @@ export async function savefileBackupStore(
   if (unreadableSources.length > 0) return false;
   if (savefileBackupIsDuplicate(state, existing)) return true;
 
-  const backup = savefileBackupCreate(state, reason, Date.now());
+  const backup = savefileBackupCreate(state, reason, Date.now(), legacyLoad());
   const keep = savefileBackupsAdd(existing, backup, SAVEFILE_BACKUP_MAX);
 
   const results = await Promise.allSettled([

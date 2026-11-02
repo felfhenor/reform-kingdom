@@ -1,4 +1,5 @@
 import { defaultGameState } from '@helpers/defaults';
+import { defaultLegacy } from '@helpers/legacy/legacy';
 import {
   savefileBackupCreate,
   savefileBackupIsDuplicate,
@@ -7,6 +8,7 @@ import {
   savefileBackupsNewestFirst,
 } from '@helpers/savefile/savefile-backup';
 import type { GameState } from '@interfaces';
+import { omit } from 'es-toolkit';
 import { describe, expect, it } from 'vitest';
 
 function stateAtTick(numTicks: number, gameId = 'game-1'): GameState {
@@ -18,7 +20,12 @@ function stateAtTick(numTicks: number, gameId = 'game-1'): GameState {
 
 describe('savefileBackupCreate', () => {
   it('records identity and progress alongside the state', () => {
-    const backup = savefileBackupCreate(stateAtTick(50), 'load', 1000);
+    const backup = savefileBackupCreate(
+      stateAtTick(50),
+      'load',
+      1000,
+      defaultLegacy(),
+    );
 
     expect(backup).toMatchObject({
       id: 'backup-1000',
@@ -26,12 +33,15 @@ describe('savefileBackupCreate', () => {
       reason: 'load',
       gameId: 'game-1',
       numTicks: 50,
+      legacy: defaultLegacy(),
     });
   });
 });
 
 describe('savefileBackupIsDuplicate', () => {
-  const existing = [savefileBackupCreate(stateAtTick(50), 'load', 1000)];
+  const existing = [
+    savefileBackupCreate(stateAtTick(50), 'load', 1000, defaultLegacy()),
+  ];
 
   it('matches the same game at the same tick', () => {
     expect(savefileBackupIsDuplicate(stateAtTick(50), existing)).toBe(true);
@@ -51,11 +61,11 @@ describe('savefileBackupIsDuplicate', () => {
 describe('savefileBackupsAdd', () => {
   it('keeps only the newest entries up to the cap', () => {
     const backups = [1000, 2000, 3000].map((at) =>
-      savefileBackupCreate(stateAtTick(at), 'load', at),
+      savefileBackupCreate(stateAtTick(at), 'load', at, defaultLegacy()),
     );
     const added = savefileBackupsAdd(
       backups,
-      savefileBackupCreate(stateAtTick(4000), 'import', 4000),
+      savefileBackupCreate(stateAtTick(4000), 'import', 4000, defaultLegacy()),
       3,
     );
 
@@ -65,8 +75,18 @@ describe('savefileBackupsAdd', () => {
 
 describe('savefileBackupsNewestFirst', () => {
   it('drops copies of the same backup found in both browser and disk storage', () => {
-    const backup = savefileBackupCreate(stateAtTick(1), 'load', 1000);
-    const older = savefileBackupCreate(stateAtTick(0), 'load', 500);
+    const backup = savefileBackupCreate(
+      stateAtTick(1),
+      'load',
+      1000,
+      defaultLegacy(),
+    );
+    const older = savefileBackupCreate(
+      stateAtTick(0),
+      'load',
+      500,
+      defaultLegacy(),
+    );
 
     expect(savefileBackupsNewestFirst([older, backup, { ...backup }])).toEqual([
       backup,
@@ -79,9 +99,19 @@ describe('savefileBackupIsWellFormed', () => {
   it('accepts a created backup', () => {
     expect(
       savefileBackupIsWellFormed(
-        savefileBackupCreate(stateAtTick(1), 'load', 1000),
+        savefileBackupCreate(stateAtTick(1), 'load', 1000, defaultLegacy()),
       ),
     ).toBe(true);
+  });
+
+  it('accepts a backup made before Legacy was backed up', () => {
+    const backup = savefileBackupCreate(
+      stateAtTick(1),
+      'load',
+      1000,
+      defaultLegacy(),
+    );
+    expect(savefileBackupIsWellFormed(omit(backup, ['legacy']))).toBe(true);
   });
 
   it('rejects a backup whose state is corrupt', () => {

@@ -10,6 +10,8 @@ export type SavefileBackup = {
   gameId: string;
   numTicks: number;
   state: GameState;
+  // Missing on backups made before Legacy was backed up.
+  legacy?: LegacyState;
 };
 
 export type SavefileStorage = 'browser' | 'disk';

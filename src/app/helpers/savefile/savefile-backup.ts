@@ -1,6 +1,7 @@
 import { savefileIsValid } from '@helpers/savefile/savefile-validate';
 import type {
   GameState,
+  LegacyState,
   SavefileBackup,
   SavefileBackupReason,
 } from '@interfaces';
@@ -10,6 +11,7 @@ export function savefileBackupCreate(
   state: GameState,
   reason: SavefileBackupReason,
   now: number,
+  legacy: LegacyState,
 ): SavefileBackup {
   return {
     id: `backup-${now}`,
@@ -18,6 +20,7 @@ export function savefileBackupCreate(
     gameId: state.gameId,
     numTicks: state.clock.numTicks,
     state,
+    legacy,
   };
 }
 

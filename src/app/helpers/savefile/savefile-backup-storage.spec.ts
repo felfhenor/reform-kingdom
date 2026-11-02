@@ -23,6 +23,7 @@ vi.mock('@helpers/engine/logging', () => ({
 }));
 
 import { defaultGameState } from '@helpers/defaults';
+import { defaultLegacy } from '@helpers/legacy/legacy';
 import { idbGet, idbPut } from '@helpers/engine/idb';
 import { savefileBackupCreate } from '@helpers/savefile/savefile-backup';
 import {
@@ -97,6 +98,25 @@ describe('savefile-backup-storage', () => {
     expect(bridge.savefileBackupPrune).toHaveBeenCalledWith([kept.id]);
   });
 
+  it('stores the current Legacy with the backup', async () => {
+    const legacy = {
+      ...defaultLegacy(),
+      runs: [
+        {
+          id: 'run-1',
+          outcome: 'Completed',
+          party: [],
+          edicts: [],
+          stats: { completion: [] },
+        },
+      ],
+    };
+    vi.mocked(localStorage.getItem).mockReturnValueOnce(JSON.stringify(legacy));
+
+    await savefileBackupStore(setupState(3), 'load');
+    expect((idb.stored as SavefileBackup[])[0].legacy).toEqual(legacy);
+  });
+
   it('reports failure when the disk write fails', async () => {
     const bridge = fakeBridge();
     vi.mocked(bridge.savefileBackupWrite).mockRejectedValueOnce(
@@ -108,7 +128,12 @@ describe('savefile-backup-storage', () => {
   });
 
   it('still finds disk backups after browser storage was wiped', async () => {
-    const onDisk = savefileBackupCreate(setupState(7), 'load', 500);
+    const onDisk = savefileBackupCreate(
+      setupState(7),
+      'load',
+      500,
+      defaultLegacy(),
+    );
     installBridge(fakeBridge([JSON.stringify(onDisk), '{not json']));
 
     expect(await savefileBackupsRead()).toEqual({

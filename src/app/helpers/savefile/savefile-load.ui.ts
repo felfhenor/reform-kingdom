@@ -1,5 +1,6 @@
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { idbGet } from '@helpers/engine/idb';
+import { error, info } from '@helpers/engine/logging';
 import {
   notifyError,
   notifySuccess,
@@ -19,6 +20,31 @@ import { savefileValidationErrors } from '@helpers/savefile/savefile-validate';
 import { GAMESTATE_STORAGE_KEY } from '@helpers/state-game';
 import type { GameState, LegacyMergeResult, SavefileBackup } from '@interfaces';
 
+const LEGACY_MERGE_WARNINGS: Partial<Record<LegacyMergeResult, string>> = {
+  invalid: "its Legacy couldn't be read.",
+  unsaved: "its Legacy couldn't be saved. Free up storage and try again.",
+};
+
+// A bad Legacy section never undoes the savefile change; it only warns.
+function savefileMergeLegacy(section: unknown, verb: string): void {
+  const warning = LEGACY_MERGE_WARNINGS[legacyMergeFrom([section])];
+  if (warning) notifyWarning(`Your savefile was ${verb}, but ${warning}`);
+}
+
+// Refills a lost Legacy from the copies kept with each backup; never blocks loading.
+export async function savefileBackupsMergeLegacy(): Promise<void> {
+  try {
+    const { backups } = await savefileBackupsRead();
+    const result = legacyMergeFrom(backups.map((backup) => backup.legacy));
+    if (result === 'merged') info('Legacy', 'Restored runs from backups.');
+    if (result === 'unsaved') {
+      error('Legacy', 'Runs from backups could not be saved.');
+    }
+  } catch (e) {
+    error('Legacy', 'Could not merge Legacy from backups:', e);
+  }
+}
+
 function backupLabel(backup: SavefileBackup): string {
   return new Date(backup.createdAt).toLocaleString();
 }
@@ -35,6 +61,7 @@ export async function savefileRestoreBackup(
 
   analyticsSendDesignEvent('Savefile:Restore:Success');
   notifySuccess(`Restored the backup from ${backupLabel(backup)}.`);
+  savefileMergeLegacy(backup.legacy, 'restored');
   return true;
 }
 
@@ -74,6 +101,7 @@ export async function savefileRecover(): Promise<boolean> {
     if (failures.length === 0) {
       analyticsSendDesignEvent('Savefile:Recover:Success');
       notifySuccess(`Recovered your savefile from ${backupLabel(backup)}.`);
+      savefileMergeLegacy(backup.legacy, 'recovered');
       return true;
     }
   }
@@ -111,19 +139,6 @@ function parseSavefileJson(json: string): unknown {
   }
 }
 
-const LEGACY_IMPORT_WARNINGS: Partial<Record<LegacyMergeResult, string>> = {
-  invalid:
-    "Your savefile was imported, but the file's Legacy couldn't be read.",
-  unsaved:
-    "Your savefile was imported, but the file's Legacy couldn't be saved. Keep the file and try again.",
-};
-
-// A bad Legacy section never undoes the savefile import; it only warns.
-function savefileImportLegacy(section: unknown): void {
-  const warning = LEGACY_IMPORT_WARNINGS[legacyMergeFrom([section])];
-  if (warning) notifyWarning(warning);
-}
-
 export async function savefileImportJson(json: string): Promise<boolean> {
   const { savefile: state, legacy } = savefileBundleUnpack(
     parseSavefileJson(json),
@@ -141,7 +156,7 @@ export async function savefileImportJson(json: string): Promise<boolean> {
   }
 
   notifySuccess('Successfully imported savefile!');
-  savefileImportLegacy(legacy);
+  savefileMergeLegacy(legacy, 'imported');
   return true;
 }
 
