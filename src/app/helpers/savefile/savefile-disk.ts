@@ -3,6 +3,8 @@ import { savefileIsWorthKeeping } from '@helpers/savefile/savefile-validate';
 import type {
   ElectronSavefileStoreBridge,
   GameState,
+  LegacyState,
+  SavefileDiskRead,
   SavefileStorage,
   WindowWithElectronSavefileStoreBridge,
 } from '@interfaces';
@@ -15,32 +17,66 @@ export function savefileDiskBridge():
 }
 
 // Undefined when there's no desktop copy to read, including when it can't be read.
-export async function savefileDiskRead(): Promise<unknown> {
-  const read = savefileDiskBridge()?.savefileRead;
+async function diskReadJson(
+  read: (() => Promise<string | undefined>) | undefined,
+  what: string,
+): Promise<unknown> {
   if (!read) return undefined;
 
   try {
     const json = await read();
     return json === undefined ? undefined : JSON.parse(json);
   } catch (e) {
-    error('Savefile:Disk', 'Could not read the savefile from disk.', e);
+    error('Savefile:Disk', `Could not read the ${what} from disk.`, e);
     return undefined;
   }
 }
 
 // Undefined outside the desktop build, where there's no disk copy to keep.
-export async function savefileDiskWrite(
-  state: GameState,
+async function diskWriteJson(
+  write: ((json: string) => Promise<boolean>) | undefined,
+  value: unknown,
+  what: string,
 ): Promise<boolean | undefined> {
-  const write = savefileDiskBridge()?.savefileWrite;
   if (!write) return undefined;
 
   try {
-    return await write(JSON.stringify(state));
+    return await write(JSON.stringify(value));
   } catch (e) {
-    error('Savefile:Disk', 'Could not write the savefile to disk.', e);
+    error('Savefile:Disk', `Could not write the ${what} to disk.`, e);
     return false;
   }
+}
+
+export function savefileDiskRead(): Promise<unknown> {
+  return diskReadJson(savefileDiskBridge()?.savefileRead, 'savefile');
+}
+
+export function savefileDiskWrite(
+  state: GameState,
+): Promise<boolean | undefined> {
+  return diskWriteJson(savefileDiskBridge()?.savefileWrite, state, 'savefile');
+}
+
+export async function savefileDiskLegacyRead(): Promise<SavefileDiskRead> {
+  const read = savefileDiskBridge()?.legacyRead;
+  if (!read) return { status: 'missing' };
+
+  try {
+    const json = await read();
+    return json === undefined
+      ? { status: 'missing' }
+      : { status: 'ok', value: JSON.parse(json) };
+  } catch (e) {
+    error('Savefile:Disk', 'Could not read the Legacy from disk.', e);
+    return { status: 'unreadable' };
+  }
+}
+
+export function savefileDiskLegacyWrite(
+  legacy: LegacyState,
+): Promise<boolean | undefined> {
+  return diskWriteJson(savefileDiskBridge()?.legacyWrite, legacy, 'Legacy');
 }
 
 // Save stamps, not tick counts: a new game or an older restored backup can legitimately have fewer ticks.

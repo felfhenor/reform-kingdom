@@ -6,7 +6,11 @@ import {
   notifySuccess,
   notifyWarning,
 } from '@helpers/engine/notify';
-import { legacyMergeFrom } from '@helpers/legacy/legacy-merge';
+import { legacyLoad } from '@helpers/legacy/legacy';
+import {
+  legacyMergeFrom,
+  legacyShouldSeedDisk,
+} from '@helpers/legacy/legacy-merge';
 import {
   savefileBackupsRead,
   savefileBackupsWriteSource,
@@ -16,6 +20,11 @@ import {
   savefileReplace,
 } from '@helpers/savefile/savefile-load';
 import { savefileBundleUnpack } from '@helpers/savefile/savefile-bundle';
+import {
+  savefileDiskBridge,
+  savefileDiskLegacyRead,
+  savefileDiskLegacyWrite,
+} from '@helpers/savefile/savefile-disk';
 import { savefileValidationErrors } from '@helpers/savefile/savefile-validate';
 import { GAMESTATE_STORAGE_KEY } from '@helpers/state-game';
 import type { GameState, LegacyMergeResult, SavefileBackup } from '@interfaces';
@@ -31,14 +40,26 @@ function savefileMergeLegacy(section: unknown, verb: string): void {
   if (warning) notifyWarning(`Your savefile was ${verb}, but ${warning}`);
 }
 
-// Refills a lost Legacy from the copies kept with each backup; never blocks loading.
-export async function savefileBackupsMergeLegacy(): Promise<void> {
+// Refills a lost Legacy from the backups and the desktop copy, then brings the desktop copy up to date; never blocks loading.
+export async function savefileLegacySync(): Promise<void> {
   try {
     const { backups } = await savefileBackupsRead();
-    const result = legacyMergeFrom(backups.map((backup) => backup.legacy));
+    const disk = await savefileDiskLegacyRead();
+    const result = legacyMergeFrom([
+      ...backups.map((backup) => backup.legacy),
+      disk.status === 'ok' ? disk.value : undefined,
+    ]);
     if (result === 'merged') info('Legacy', 'Restored runs from backups.');
     if (result === 'unsaved') {
       error('Legacy', 'Runs from backups could not be saved.');
+    }
+    // Desktop players with runs from before the disk copy existed get one on their next launch.
+    const stored = legacyLoad();
+    if (
+      savefileDiskBridge()?.legacyWrite &&
+      legacyShouldSeedDisk(result, disk, stored)
+    ) {
+      await savefileDiskLegacyWrite(stored);
     }
   } catch (e) {
     error('Legacy', 'Could not merge Legacy from backups:', e);

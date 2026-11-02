@@ -50,6 +50,8 @@ export type ElectronSavefileStoreBridge = {
   savefileRead: () => Promise<string | undefined>;
   savefileOpenFolder: () => Promise<boolean>;
   savefileExportWithLogs: () => Promise<boolean>;
+  legacyWrite: (json: string) => Promise<boolean>;
+  legacyRead: () => Promise<string | undefined>;
 };
 
 export type WindowWithElectronSavefileStoreBridge = Window & {
@@ -69,3 +71,9 @@ export type SavefileBundleSections = {
   savefile: unknown;
   legacy?: unknown;
 };
+
+// Missing and unreadable are kept apart so an unreadable copy is never treated as absent and overwritten.
+export type SavefileDiskRead =
+  | { status: 'missing' }
+  | { status: 'unreadable' }
+  | { status: 'ok'; value: unknown };

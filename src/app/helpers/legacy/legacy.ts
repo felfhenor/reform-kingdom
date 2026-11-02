@@ -6,6 +6,7 @@ import {
 } from '@helpers/edict/edict';
 import { error } from '@helpers/engine/logging';
 import { remembranceCategories } from '@helpers/remembrance/remembrance';
+import { savefileDiskLegacyWrite } from '@helpers/savefile/savefile-disk';
 import {
   bestiaryState,
   clockState,
@@ -101,6 +102,8 @@ export function legacySave(next: LegacyState): void {
 
   localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify(next));
   legacy.set(next);
+  // The desktop copy is a fallback; localStorage stays the primary, so a failed disk write only logs.
+  void savefileDiskLegacyWrite(next);
 }
 
 // Reloads first so a run another tab recorded since this one loaded isn't overwritten.

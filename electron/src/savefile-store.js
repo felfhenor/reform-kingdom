@@ -18,6 +18,7 @@ const savefileDir = () =>
 
 const savefilePath = () => path.join(savefileDir(), 'savefile.json');
 const savefileTempPath = () => `${savefilePath()}.tmp`;
+const legacyPath = () => path.join(savefileDir(), 'legacy.json');
 
 const syncFile = async (file, contents) => {
   const handle = await fs.open(file, contents ? 'w' : 'r+');
@@ -30,27 +31,32 @@ const syncFile = async (file, contents) => {
 };
 
 // Copied rather than renamed so the tmp stays a complete fallback if the copy is cut short.
-const writeSavefileNow = async (json) => {
+const writeFileNow = async (file, json) => {
   await fs.mkdir(savefileDir(), { recursive: true });
-  await syncFile(savefileTempPath(), json);
-  await fs.copyFile(savefileTempPath(), savefilePath());
-  await syncFile(savefilePath());
+  await syncFile(`${file}.tmp`, json);
+  await fs.copyFile(`${file}.tmp`, file);
+  await syncFile(file);
 };
 
-// Serialized so two saves can never interleave on the same tmp file.
+// Serialized so two writes can never interleave on the same tmp file, and quitting waits for all of them.
 let writeQueue = Promise.resolve();
 
-const writeSavefile = (_event, json) => {
-  const write = writeQueue.then(() => writeSavefileNow(String(json)));
+const queueWrite = (file, json, label) => {
+  const write = writeQueue.then(() => writeFileNow(file, String(json)));
   writeQueue = write.catch(() => {});
   return write.then(
     () => true,
     (e) => {
-      coreLog().error('Savefile', 'write failed', e);
+      coreLog().error('Savefile', `${label} write failed`, e);
       return false;
     },
   );
 };
+
+const writeSavefile = (_event, json) =>
+  queueWrite(savefilePath(), json, 'savefile');
+
+const writeLegacy = (_event, json) => queueWrite(legacyPath(), json, 'legacy');
 
 // Resolves the file's save stamp alongside it, so the newer of the two copies can be chosen.
 const readParseable = async (file) => {
@@ -78,6 +84,43 @@ const readSavefile = async () => {
     return temp.json;
   }
   return main?.json;
+};
+
+// Undefined only when the file doesn't exist; a locked or garbled file throws, so it's never mistaken for missing and overwritten.
+const readJsonOrMissing = async (file) => {
+  try {
+    const json = await fs.readFile(file, 'utf8');
+    JSON.parse(json);
+    return json;
+  } catch (e) {
+    if (e.code === 'ENOENT') return undefined;
+    throw e;
+  }
+};
+
+// Legacy carries no save stamp; the tmp is only the fallback when legacy.json is missing or unreadable.
+const readLegacy = async () => {
+  await writeQueue;
+
+  let mainError;
+  try {
+    const main = await readJsonOrMissing(legacyPath());
+    if (main) return main;
+  } catch (e) {
+    mainError = e;
+    coreLog().warn(
+      'Savefile',
+      'legacy.json unreadable, trying the tmp copy',
+      e,
+    );
+  }
+
+  const temp = await readJsonOrMissing(`${legacyPath()}.tmp`).catch(
+    () => undefined,
+  );
+  if (temp) return temp;
+  if (mainError) throw mainError;
+  return undefined;
 };
 
 // openPath resolves to an error string rather than rejecting.
@@ -183,6 +226,8 @@ const registerSavefileStoreHandlers = () => {
   ipcMain.handle('savefile:read', readSavefile);
   ipcMain.handle('savefile:open-folder', openSavefileFolder);
   ipcMain.handle('savefile:export-with-logs', exportWithLogs);
+  ipcMain.handle('legacy:write', writeLegacy);
+  ipcMain.handle('legacy:read', readLegacy);
 };
 
 module.exports = { registerSavefileStoreHandlers };

@@ -1,5 +1,8 @@
 import { defaultGameState } from '@helpers/defaults';
+import { defaultLegacy } from '@helpers/legacy/legacy';
 import {
+  savefileDiskLegacyRead,
+  savefileDiskLegacyWrite,
   savefileDiskRead,
   savefileDiskWrite,
   savefileNewerStorage,
@@ -99,5 +102,42 @@ describe('savefile disk bridge', () => {
     };
 
     expect(await savefileDiskWrite(savefile('a', 1))).toBe(false);
+  });
+
+  it('round-trips Legacy as JSON, separately from the savefile', async () => {
+    let stored: string | undefined;
+    bridgeWindow.reformElectron = {
+      legacyWrite: vi.fn(async (json: string) => {
+        stored = json;
+        return true;
+      }),
+      legacyRead: vi.fn(async () => stored),
+    };
+
+    expect(await savefileDiskLegacyWrite(defaultLegacy())).toBe(true);
+    expect(await savefileDiskLegacyRead()).toEqual({
+      status: 'ok',
+      value: defaultLegacy(),
+    });
+    expect(await savefileDiskRead()).toBeUndefined();
+  });
+
+  it('skips Legacy on a desktop shell older than its handlers', async () => {
+    bridgeWindow.reformElectron = { savefileRead: async () => undefined };
+
+    expect(await savefileDiskLegacyWrite(defaultLegacy())).toBeUndefined();
+    expect(await savefileDiskLegacyRead()).toEqual({ status: 'missing' });
+  });
+
+  it('keeps an unreadable Legacy apart from a missing one', async () => {
+    bridgeWindow.reformElectron = {
+      legacyRead: async () => {
+        throw new Error('EBUSY');
+      },
+    };
+    expect(await savefileDiskLegacyRead()).toEqual({ status: 'unreadable' });
+
+    bridgeWindow.reformElectron = { legacyRead: async () => '{oops' };
+    expect(await savefileDiskLegacyRead()).toEqual({ status: 'unreadable' });
   });
 });

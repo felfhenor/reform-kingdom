@@ -14,7 +14,7 @@ import { isPageVisible } from '@helpers/engine/page-visibility';
 import { gameloop } from '@helpers/gameloop';
 import { migrateOptionsState } from '@helpers/migrate';
 import { savefileLoad } from '@helpers/savefile/savefile-load';
-import { savefileBackupsMergeLegacy } from '@helpers/savefile/savefile-load.ui';
+import { savefileLegacySync } from '@helpers/savefile/savefile-load.ui';
 import {
   gamestate,
   hasGameStateLoaded,
@@ -69,7 +69,7 @@ export class GamestateService {
     this.logger.info('GameState', 'Migrating gamestate...');
 
     await savefileLoad();
-    void savefileBackupsMergeLegacy();
+    void savefileLegacySync();
     migrateOptionsState();
 
     // The normal sync hook never runs on load, so town-region buffs need re-deriving here.

@@ -5,7 +5,12 @@ import {
   legacyLoad,
   legacySave,
 } from '@helpers/legacy/legacy';
-import type { LegacyMergeResult, LegacyState, RunRecord } from '@interfaces';
+import type {
+  LegacyMergeResult,
+  LegacyState,
+  RunRecord,
+  SavefileDiskRead,
+} from '@interfaces';
 
 // Incoming copies can be older snapshots, so they only ever upgrade a run: Completed first, then the later finish.
 export function legacyRunPreferred(
@@ -65,4 +70,19 @@ export function legacyMergeFrom(values: unknown[]): LegacyMergeResult {
     error('Legacy', 'Failed to save merged Legacy:', e);
     return 'unsaved';
   }
+}
+
+// Only an unchanged merge proves the stored copy already holds every disk run, and a copy this build can't read is never overwritten.
+export function legacyShouldSeedDisk(
+  result: LegacyMergeResult,
+  disk: SavefileDiskRead,
+  stored: LegacyState,
+): boolean {
+  if (result !== 'unchanged' || stored.runs.length === 0) return false;
+  if (disk.status === 'missing') return true;
+  if (disk.status === 'unreadable' || !legacyIsMergeable(disk.value)) {
+    return false;
+  }
+
+  return JSON.stringify(disk.value.runs) !== JSON.stringify(stored.runs);
 }

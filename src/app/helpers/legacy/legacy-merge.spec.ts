@@ -5,6 +5,7 @@ import {
   legacyMergeFrom,
   legacyMergeStates,
   legacyRunPreferred,
+  legacyShouldSeedDisk,
 } from '@helpers/legacy/legacy-merge';
 import type { GameId, LegacyState, RunOutcome, RunRecord } from '@interfaces';
 
@@ -95,5 +96,47 @@ describe('legacyMergeFrom', () => {
     });
 
     expect(legacyMergeFrom([legacyOf(run('b', 'Completed'))])).toBe('unsaved');
+  });
+});
+
+describe('legacyShouldSeedDisk', () => {
+  const stored = legacyOf(run('a', 'Completed'));
+  const ok = (value: unknown) => ({ status: 'ok' as const, value });
+
+  it('seeds a missing or behind disk copy after an unchanged merge', () => {
+    expect(
+      legacyShouldSeedDisk('unchanged', { status: 'missing' }, stored),
+    ).toBe(true);
+    expect(legacyShouldSeedDisk('unchanged', ok(legacyOf()), stored)).toBe(
+      true,
+    );
+    expect(legacyShouldSeedDisk('unchanged', ok(stored), stored)).toBe(false);
+  });
+
+  it('never overwrites the disk copy after a failed or rejected merge', () => {
+    const disk = ok(legacyOf(run('a', 'Completed'), run('b', 'Completed')));
+
+    expect(legacyShouldSeedDisk('unsaved', disk, stored)).toBe(false);
+    expect(legacyShouldSeedDisk('invalid', disk, stored)).toBe(false);
+    expect(legacyShouldSeedDisk('merged', disk, stored)).toBe(false);
+  });
+
+  it('never overwrites a disk copy it could not read, or one from a newer build', () => {
+    expect(
+      legacyShouldSeedDisk('unchanged', { status: 'unreadable' }, stored),
+    ).toBe(false);
+    expect(
+      legacyShouldSeedDisk(
+        'unchanged',
+        ok({ ...legacyOf(), version: 2 }),
+        stored,
+      ),
+    ).toBe(false);
+  });
+
+  it('has nothing to seed when no runs are stored', () => {
+    expect(
+      legacyShouldSeedDisk('unchanged', { status: 'missing' }, legacyOf()),
+    ).toBe(false);
   });
 });
