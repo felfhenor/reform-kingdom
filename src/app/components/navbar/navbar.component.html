@@ -209,6 +209,12 @@
         </li>
       }
 
+      @if (isFelDefeated()) {
+        <li class="action-button" appRequireSetup>
+          <app-button-run-end class="p-0 gap-0" [compact]="true" />
+        </li>
+      }
+
       <li class="action-button" appRequireSetup>
         <button
           class="btn btn-sm btn-neutral"

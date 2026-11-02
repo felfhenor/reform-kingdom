@@ -2,6 +2,7 @@ import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ButtonGlowComponent } from '@components/button-glow/button-glow.component';
 import { ButtonQuitComponent } from '@components/button-quit/button-quit.component';
+import { ButtonRunEndComponent } from '@components/button-run-end/button-run-end.component';
 import { ButtonSettingsComponent } from '@components/button-settings/button-settings.component';
 import { ButtonUpdateComponent } from '@components/button-update/button-update.component';
 import { IconComponent } from '@components/icon/icon.component';
@@ -40,6 +41,7 @@ import {
   trainerVisitOpen,
   worldCameraRecenter,
 } from '@helpers/engine/ui';
+import { isFelDefeated } from '@helpers/lore/outro';
 import { isSetup } from '@helpers/setup';
 import { saveGameState } from '@helpers/state-game';
 import { getOption, setOption } from '@helpers/state-options';
@@ -80,6 +82,7 @@ import {
     RequireNotSetupDirective,
     ModalComponent,
     ButtonQuitComponent,
+    ButtonRunEndComponent,
     ButtonSettingsComponent,
     ButtonGlowComponent,
     BarResourceComponent,
@@ -111,6 +114,7 @@ export class NavbarComponent {
   public leaveSwal = viewChild<SwalComponent>('leaveSwal');
 
   public isPaused = computed(() => getOption('gameloopPaused'));
+  public isFelDefeated = computed(() => isFelDefeated());
 
   public activeGamePlayView = computed(() => gamePlayView());
 

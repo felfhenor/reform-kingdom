@@ -1,0 +1,44 @@
+@let finished = isFinished();
+
+@if (compact()) {
+  <button
+    type="button"
+    class="btn btn-sm btn-neutral"
+    appButtonGlow
+    tp="Finish this run"
+    [disabled]="isBusy()"
+    [swal]="endSwal"
+    appSfx="ui-success"
+    [sfxTrigger]="['click', 'hover']"
+  >
+    <app-icon name="gameTrophyCup" size="nav"></app-icon>
+  </button>
+} @else {
+  <button
+    type="button"
+    class="btn"
+    [class.btn-primary]="finished"
+    [class.btn-error]="!finished"
+    [class.btn-outline]="!finished"
+    [disabled]="isBusy()"
+    [swal]="endSwal"
+    [appSfx]="finished ? 'ui-success' : 'ui-error'"
+    [sfxTrigger]="['click', 'hover']"
+  >
+    {{ finished ? 'Finish Run' : 'Abandon Run' }}
+  </button>
+}
+
+<swal
+  #endSwal
+  [title]="finished ? 'Finish this run?' : 'Abandon this run?'"
+  [text]="
+    finished
+      ? 'This run is added to your Legacy as completed, and your savefile is reset so you can start a new one.'
+      : 'This run is added to your Legacy as abandoned, and your savefile is reset. This cannot be undone.'
+  "
+  [icon]="finished ? 'question' : 'warning'"
+  [confirmButtonText]="finished ? 'Yes, finish run' : 'Yes, abandon run'"
+  cancelButtonText="No, keep playing"
+  (confirm)="endRun()"
+></swal>

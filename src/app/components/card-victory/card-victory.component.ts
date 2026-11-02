@@ -5,18 +5,24 @@ import {
   DestroyRef,
   ElementRef,
   inject,
+  signal,
   viewChild,
 } from '@angular/core';
+import { ButtonRunEndComponent } from '@components/button-run-end/button-run-end.component';
 import { ButtonSavefileExportComponent } from '@components/button-savefile-export/button-savefile-export.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { modalHasAnyOpen } from '@helpers/engine/modal-stack';
 import { victoryPopupDismiss } from '@helpers/lore/outro.ui';
 import { AnimationService } from '@services/animation.service';
 
+function inSwal(event: KeyboardEvent): boolean {
+  return !!(event.target as Element | null)?.closest?.('.swal2-container');
+}
+
 @Component({
   selector: 'app-card-victory',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ButtonSavefileExportComponent, SFXDirective],
+  imports: [ButtonRunEndComponent, ButtonSavefileExportComponent, SFXDirective],
   templateUrl: './card-victory.component.html',
   styleUrl: './card-victory.component.scss',
 })
@@ -26,7 +32,7 @@ export class CardVictoryComponent {
   private card = viewChild.required<ElementRef<HTMLElement>>('card');
   private continueButton =
     viewChild.required<ElementRef<HTMLButtonElement>>('continueButton');
-  private isDismissing = false;
+  public isDismissing = signal(false);
 
   constructor() {
     const host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
@@ -35,7 +41,8 @@ export class CardVictoryComponent {
 
     // Capture phase so navbar hotkeys (pause, view switches) can't act under the card; Esc and the pause menu stay usable.
     const onKeydown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' || modalHasAnyOpen()) return;
+      // Swal stops its own keys from propagating, so the navbar hotkeys never see them.
+      if (event.key === 'Escape' || modalHasAnyOpen() || inSwal(event)) return;
 
       event.stopImmediatePropagation();
       if (event.key === 'Tab' || host.contains(event.target as Node)) return;
@@ -50,9 +57,9 @@ export class CardVictoryComponent {
   }
 
   public dismiss(): void {
-    if (this.isDismissing) return;
+    if (this.isDismissing()) return;
 
-    this.isDismissing = true;
+    this.isDismissing.set(true);
     this.anim.dismissOverlay(this.backdrop().nativeElement);
     void this.anim
       .shatterIntoSmoke(this.card().nativeElement)

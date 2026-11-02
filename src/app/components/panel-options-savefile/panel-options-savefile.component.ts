@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ButtonRunEndComponent } from '@components/button-run-end/button-run-end.component';
 import { ButtonSavefileExportComponent } from '@components/button-savefile-export/button-savefile-export.component';
 import { ButtonSavefileImportComponent } from '@components/button-savefile-import/button-savefile-import.component';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
@@ -39,6 +40,7 @@ import {
   savefileRecover,
   savefileRestoreBackup,
 } from '@helpers/savefile/savefile-load.ui';
+import { isSetup } from '@helpers/setup';
 import { gamestate } from '@helpers/state-game';
 import type { SavefileBackup, SavefileBackupReason } from '@interfaces';
 import { NgSelectComponent } from '@ng-select/ng-select';
@@ -53,6 +55,7 @@ type AutosaveIntervalChoice = { label: string; value: number };
     SweetAlert2Module,
     DatePipe,
     DecimalPipe,
+    ButtonRunEndComponent,
     ButtonSavefileExportComponent,
     ButtonSavefileImportComponent,
     AnalyticsClickDirective,
@@ -104,6 +107,7 @@ export class PanelOptionsSavefileComponent
     return failure ? savefileFailureMessage(failure.reason) : '';
   });
 
+  public isSetup = computed(() => isSetup());
   public startedAt = computed(() => gamestate().meta.createdAt);
   public elapsedDurationText = computed(() =>
     this.durationText(timerTicksElapsed()),

@@ -24,24 +24,27 @@
           though!
         </p>
 
-        <p>This is a good time to back up your savefile, too.</p>
+        <p>When you're ready, finish this run to add it to your Legacy.</p>
 
         <p>Thank you for playing!</p>
       </div>
 
       <div class="card-actions justify-end">
-        <app-button-savefile-export />
-
         <button
           #continueButton
           type="button"
-          class="btn btn-primary"
+          class="btn btn-neutral"
           (click)="dismiss()"
-          appSfx="ui-success"
+          appSfx="ui-click"
           [sfxTrigger]="['click', 'hover']"
         >
-          Continue
+          Keep Playing
         </button>
+
+        <!-- A finish during the fade-out would land before the deferred "popup seen" write, leaking it into the new run. -->
+        @if (!isDismissing()) {
+          <app-button-run-end />
+        }
       </div>
     </div>
   </div>

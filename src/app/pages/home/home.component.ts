@@ -16,6 +16,7 @@ import {
 } from '@helpers/engine/discord';
 import { modalOpen } from '@helpers/engine/modal-stack';
 import { gameReset } from '@helpers/game-init';
+import { legacyHasUnfinishedBackup } from '@helpers/legacy/legacy.ui';
 import { savefileBackupsRead } from '@helpers/savefile/savefile-backup-storage';
 import {
   savefileFailureMessage,
@@ -65,12 +66,12 @@ export class HomeComponent implements OnInit {
       : '';
   });
 
-  private hasBackups = signal(false);
+  private hasUnfinishedBackup = signal(false);
 
   // A missing save with backups around is exactly what a silently lost save looks like.
   public showBackupsAvailable = computed(
     () =>
-      this.hasBackups() &&
+      this.hasUnfinishedBackup() &&
       !this.hasStartedGame() &&
       !this.savefileFailureText(),
   );
@@ -87,7 +88,7 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     void savefileBackupsRead().then(({ backups }) =>
-      this.hasBackups.set(backups.length > 0),
+      this.hasUnfinishedBackup.set(legacyHasUnfinishedBackup(backups)),
     );
 
     discordSetMainStatus('');

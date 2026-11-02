@@ -51,7 +51,7 @@ function errorMessage(e: unknown): string {
 }
 
 // A tick in flight reads its own snapshot and commits it at the end, which would clobber the migrated state.
-async function waitForGameloopIdle(): Promise<void> {
+export async function waitForGameloopIdle(): Promise<void> {
   while (gameloopIsProcessing()) {
     await delay(SAVEFILE_RETRY_DELAY_MS);
   }
