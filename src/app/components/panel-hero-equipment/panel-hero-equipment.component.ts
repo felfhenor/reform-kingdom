@@ -89,10 +89,10 @@ export class PanelHeroEquipmentComponent {
   public isAtKingdomCurrently = computed(() => isPlayerAtKingdom());
   public teachingsUnlocked = computed(() => isAnyTrainerDiscovered());
   public canPromote = computed(
-    () => worldPartyState()[0].id !== this.character().id,
+    () => worldPartyState().at(0)?.id !== this.character().id,
   );
   public canDemote = computed(
-    () => worldPartyState()[3].id !== this.character().id,
+    () => worldPartyState().at(-1)?.id !== this.character().id,
   );
 
   public character = input.required<Character>();

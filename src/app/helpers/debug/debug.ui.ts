@@ -5,6 +5,7 @@ import {
 } from '@helpers/combat/combat-create';
 import {
   CHARACTER_MAX_LEVEL,
+  PARTY_SIZE_MAX,
   TRADESKILL_MAX_LEVEL,
   WORKER_MAX_LEVEL,
 } from '@helpers/config';
@@ -22,6 +23,8 @@ import {
 import {
   characterRecalculateStats,
   characterXpForLevel,
+  createCharacter,
+  setParty,
 } from '@helpers/hero/party';
 import {
   characterSkillTreeCanLearn,
@@ -179,6 +182,18 @@ export function debugSetCharacterLevel(
     },
   }));
   void taskEventLevelReached(clampedLevel);
+}
+
+export function debugSetPartySize(size: number): void {
+  const party = worldPartyState();
+  if (party.length === 0 || !Number.isFinite(size)) return;
+
+  const target = clamp(Math.round(size), 1, PARTY_SIZE_MAX);
+  const added = Array.from(
+    { length: Math.max(0, target - party.length) },
+    (_, i) => createCharacter(`Hero ${party.length + i + 1}`, party[0].jobId),
+  );
+  setParty([...party.slice(0, target), ...added]);
 }
 
 function debugUpdateCharacter(

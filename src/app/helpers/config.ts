@@ -131,6 +131,7 @@ export const HEALING_MINIMUM_SECONDS = 10;
 export const HEALING_SECONDS_PER_LEVEL = 2;
 export const RECLASS_GOLD_PER_LEVEL = 100;
 export const CHARACTER_MAX_LEVEL = 99;
+export const PARTY_SIZE_MAX = 4;
 export const HERO_BURST_SKILL_SLOTS = 1;
 export const REGALIA_MAX_PER_JOB = 3;
 export const REGALIA_NAME_MAX_LENGTH = 20;

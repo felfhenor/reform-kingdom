@@ -12,6 +12,7 @@ import {
 import { Router } from '@angular/router';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { SFXDirective } from '@directives/sfx.directive';
+import { PARTY_SIZE_MAX } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import {
   discordSetMainStatus,
@@ -95,7 +96,7 @@ export class GameSetupWorldComponent implements OnInit {
   );
 
   private heroesModel = signal<HeroPick[]>(
-    sampleSize(STARTING_HERO_NAMES, 4).map((name) => ({
+    sampleSize(STARTING_HERO_NAMES, PARTY_SIZE_MAX).map((name) => ({
       name,
       jobId: '' as JobId,
     })),
@@ -141,7 +142,7 @@ export class GameSetupWorldComponent implements OnInit {
     const jobs = this.unlockedJobs();
     if (jobs.length === 0) return;
 
-    const names = sampleSize(STARTING_HERO_NAMES, 4);
+    const names = sampleSize(STARTING_HERO_NAMES, PARTY_SIZE_MAX);
 
     this.heroesModel.update((heroes) =>
       heroes.map((hero, i) => ({
