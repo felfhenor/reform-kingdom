@@ -1,6 +1,7 @@
 import {
   mergeGrantedSkills,
   skillEpCost,
+  skillFamilyEntry,
   skillIsUsableWithEquippedWeapons,
   skillTechniqueGeneratedElements,
   skillTechniqueStatScaling,
@@ -12,6 +13,7 @@ import {
   ensureSkill,
 } from '@helpers/content/ensure-skill';
 import { buildEquipmentSkill } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
 import type {
   EquipmentSkillContentTechnique,
   EquipmentSkillId,
@@ -236,5 +238,19 @@ describe('skillTechniqueGeneratedElements', () => {
     });
 
     expect(skillTechniqueGeneratedElements(skill)).toEqual([[]]);
+  });
+});
+
+describe('skillFamilyEntry', () => {
+  it('finds a skill in the family, or nothing', () => {
+    const cure = ensureSkill({
+      id: 'cure-2' as EquipmentSkillId,
+      name: 'Cure II',
+      family: 'Cure',
+    });
+    seedContent([cure]);
+
+    expect(skillFamilyEntry('Cure')).toBe(cure);
+    expect(skillFamilyEntry('Smite')).toBeUndefined();
   });
 });

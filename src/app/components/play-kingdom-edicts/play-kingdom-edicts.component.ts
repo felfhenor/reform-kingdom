@@ -1,9 +1,9 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
-import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import {
   edictScoreMultiplier,
@@ -61,9 +61,7 @@ import type { EdictKind } from '@interfaces';
             </div>
           </div>
         } @empty {
-          <app-blank-slate size="page">
-            This run has no edicts. It's the standard game.
-          </app-blank-slate>
+          <app-blank-slate size="page">This run has no edicts.</app-blank-slate>
         }
       </div>
     </app-card-page>

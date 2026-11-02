@@ -11,6 +11,7 @@ import type {
   SkillStatScaling,
 } from '@interfaces';
 import { SKILL_MAX_ALLY_TARGETS } from '@helpers/config';
+import { getEntriesByType } from '@helpers/content/content';
 import { ensureElementBlock } from '@helpers/content/ensure-helpers-stats';
 import { GameElementOrder, ROMAN_NUMERAL_TIERS, StatOrder } from '@interfaces';
 
@@ -187,4 +188,13 @@ export function mergeGrantedSkills(
   });
 
   return merged;
+}
+
+// Any skill in the family supplies the icon.
+export function skillFamilyEntry(
+  family: string,
+): EquipmentSkillContent | undefined {
+  return getEntriesByType<EquipmentSkillContent>('skill').find(
+    (skill) => skill.family === family,
+  );
 }

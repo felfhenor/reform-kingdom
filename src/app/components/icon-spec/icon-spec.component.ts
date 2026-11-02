@@ -32,7 +32,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   `,
 })
 export class IconSpecComponent {
-  public spec = input<SkillTreeNodeContent>();
+  public spec = input<Pick<SkillTreeNodeContent, 'name' | 'sprite'>>();
 
   public name = computed(() => {
     const node = this.spec();

@@ -5,6 +5,7 @@ import {
   recipeResultSpritesheet,
   recipeStylizedName,
 } from '@helpers/crafting/recipes';
+import { skillFamilyEntry } from '@helpers/hero/skill';
 import {
   equipmentItemDisplayName,
   equipmentItemMiscAffixDescriptions,
@@ -29,7 +30,6 @@ import {
   type EquipmentContent,
   type EquipmentId,
   type EquipmentItem,
-  type EquipmentSkillContent,
   type GatherYieldBonus,
   type ItemContent,
   type ItemId,
@@ -81,16 +81,12 @@ function gatherYieldBonusDisplay(
   return bonuses.length > 0 ? bonuses : undefined;
 }
 
-// Any skill in the family supplies the icon.
 export function resolveSkillStatBonusDisplay(
   bonuses: SkillStatBonus[],
 ): SkillStatBonusDisplay[] {
-  const skills = getEntriesByType<EquipmentSkillContent>('skill');
-
   return bonuses.map((bonus) => ({
     skillName: bonus.skillFamily,
-    skillSprite:
-      skills.find((skill) => skill.family === bonus.skillFamily)?.sprite ?? '',
+    skillSprite: skillFamilyEntry(bonus.skillFamily)?.sprite ?? '',
     stat: bonus.stat,
     value: bonus.value,
   }));

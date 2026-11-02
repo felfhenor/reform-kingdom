@@ -11,12 +11,15 @@ import { BarProgressComponent } from '@components/bar-progress/bar-progress.comp
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
+import { IconSpecComponent } from '@components/icon-spec/icon-spec.component';
+import { IconComponent } from '@components/icon/icon.component';
 import { RowEdictComponent } from '@components/row-edict/row-edict.component';
 import { FadeInDirective } from '@directives/fade-in.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
 import { edictEntry } from '@helpers/edict/edict';
 import { ticksToDurationParts } from '@helpers/engine/timer.ui';
+import { skillFamilyEntry } from '@helpers/hero/skill';
 import { legacyRunById } from '@helpers/legacy/legacy';
 import {
   legacyHeroMostUsedSkill,
@@ -31,6 +34,12 @@ import { isSetup } from '@helpers/setup';
 import type { GameId, JobContent } from '@interfaces';
 import { PluralizePipe } from '@pipes/pluralize.pipe';
 
+function withSkill<T extends { skillFamily: string }>(used: T | undefined) {
+  return used
+    ? { ...used, skill: skillFamilyEntry(used.skillFamily) }
+    : undefined;
+}
+
 @Component({
   selector: 'app-run-summary',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -41,10 +50,12 @@ import { PluralizePipe } from '@pipes/pluralize.pipe';
     DecimalPipe,
     IconItemPreviewComponent,
     IconJobComponent,
+    IconSpecComponent,
     NgTemplateOutlet,
     PluralizePipe,
     RowEdictComponent,
     SFXDirective,
+    IconComponent,
   ],
   hostDirectives: [FadeInDirective],
   host: { class: 'block' },
@@ -72,7 +83,10 @@ export class RunSummaryComponent {
       ...hero,
       job: getEntry<JobContent>(hero.jobId),
       statRows: hero.stats ? legacyHeroStatRows(hero.stats) : undefined,
-      mostUsed: hero.stats ? legacyHeroMostUsedSkill(hero.stats) : undefined,
+      biggestHit: withSkill(hero.stats?.biggestHit),
+      mostUsed: withSkill(
+        hero.stats ? legacyHeroMostUsedSkill(hero.stats) : undefined,
+      ),
       awards: this.awards()
         .filter((award) => award.heroIndex === index)
         .map((award) => award.label),

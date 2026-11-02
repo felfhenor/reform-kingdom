@@ -1,10 +1,9 @@
 @let summary = run();
+@let completed = summary?.outcome === 'Completed';
 
 <div class="flex flex-col h-[100vh] p-4 gap-4">
   <div class="flex flex-col gap-4 flex-1 min-h-0 overflow-y-auto">
     @if (summary) {
-      @let completed = summary.outcome === 'Completed';
-
       <div class="card bg-base-100 shrink-0">
         <div class="card-body flex-row flex-wrap items-center gap-4">
           <div class="flex flex-col gap-2 flex-1 min-w-0">
@@ -13,227 +12,226 @@
             </h1>
             <p class="type-muted">
               {{ summary.startedAt | date: 'medium' }} -
-              {{ summary.endedAt | date: 'medium' }}
+              {{ summary.endedAt | date: 'medium' }} &middot;
+              <span class="font-bold tabular-nums">
+                <ng-container
+                  [ngTemplateOutlet]="duration"
+                  [ngTemplateOutletContext]="{ $implicit: playTime() }"
+                />
+              </span>
             </p>
           </div>
 
-          <span
-            class="badge"
-            [class.badge-success]="completed"
-            [class.badge-warning]="!completed"
-          >
-            {{ summary.outcome }}
-          </span>
-
-          <div class="flex flex-col items-end">
-            <span class="type-meta">Play time</span>
-            <span class="font-bold tabular-nums">
-              <ng-container
-                [ngTemplateOutlet]="duration"
-                [ngTemplateOutletContext]="{ $implicit: playTime() }"
-              />
-            </span>
-          </div>
+          <div class="flex flex-col items-end"></div>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1">
-        <div class="card bg-base-100 lg:col-span-2">
+      <div class="flex flex-col gap-4 flex-1">
+        <div class="card bg-base-100">
           <div class="card-body gap-4">
             <h2 class="type-section-title">Party</h2>
 
-            @if (trackedPlayTime(); as trackedParts) {
-              <p class="type-muted">
-                This run began before stats were tracked, so combat stats only
-                cover the last
-                <ng-container
-                  [ngTemplateOutlet]="duration"
-                  [ngTemplateOutletContext]="{ $implicit: trackedParts }"
-                />
-                of play.
-              </p>
-            }
-
             <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
               @for (hero of party(); track $index) {
-                @let spec = hero.snapshot?.specialization;
                 <div class="flex flex-col gap-4 p-4 bg-base-200">
                   <div class="flex items-center gap-4">
                     <app-icon-job [job]="hero.job" />
-                    @if (spec) {
-                      <app-icon-item-preview
-                        [sprite]="spec.sprite"
-                        spritesheet="skilltreenode"
-                      />
-                    }
                     <div class="flex flex-col min-w-0">
                       <span class="type-entity-name">{{ hero.name }}</span>
-                      <span class="type-muted">
-                        Level {{ hero.level | number }}
+                      <span class="type-muted inline-flex items-center gap-2">
+                        Lv. {{ hero.level | number }}
                         {{ hero.job?.name ?? 'Unknown job' }}
-                        @if (spec) {
-                          · {{ spec.name }}
-                        }
+                        <app-icon-spec
+                          class="pb-1"
+                          [spec]="hero.snapshot?.specialization"
+                        />
                       </span>
                     </div>
                   </div>
 
-                  @if (hero.awards.length > 0) {
-                    <div class="flex flex-wrap gap-2">
-                      @for (award of hero.awards; track award) {
-                        <span class="badge badge-success">{{ award }}</span>
-                      }
-                    </div>
-                  }
+                  <div class="flex flex-wrap gap-2 min-h-[50px]">
+                    @for (award of hero.awards; track award) {
+                      <div>
+                        <span class="badge badge-success">
+                          <app-icon name="tablerAward"></app-icon>
+                          {{ award }}
+                        </span>
+                      </div>
+                    }
+                  </div>
 
-                  @if (hero.statRows; as rows) {
-                    <div class="grid grid-cols-3 gap-2">
+                  <div
+                    class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1 text-sm"
+                  >
+                    @if (hero.statRows; as rows) {
                       @for (row of rows; track row.label) {
-                        <div class="flex flex-col">
-                          <span class="type-meta">{{ row.label }}</span>
-                          <span class="font-bold tabular-nums">
+                        <div class="flex justify-between gap-2">
+                          <span class="text-lighter">{{ row.label }}</span>
+                          <span class="tabular-nums">
                             {{ row.value | number: '1.0-0' }}
                           </span>
                         </div>
                       }
-                    </div>
 
-                    <div class="flex flex-col gap-2 text-sm">
-                      @if (hero.stats?.biggestHit; as biggest) {
-                        <span>
-                          <span class="type-meta">Biggest hit:</span>
-                          {{ biggest.amount | number: '1.0-0' }}
-                          ({{ biggest.skillFamily }})
+                      <div class="flex justify-between gap-2 sm:col-span-2">
+                        <span class="text-lighter">Biggest hit</span>
+                        <span class="inline-flex items-center gap-2">
+                          @if (hero.biggestHit; as biggest) {
+                            <ng-container
+                              [ngTemplateOutlet]="skill"
+                              [ngTemplateOutletContext]="{ $implicit: biggest }"
+                            />
+                            <span class="tabular-nums">
+                              {{ biggest.amount | number: '1.0-0' }}
+                            </span>
+                          } @else {
+                            <span class="tabular-nums">0</span>
+                          }
                         </span>
-                      }
-                      @if (hero.mostUsed; as mostUsed) {
-                        <span>
-                          <span class="type-meta">Most used skill:</span>
-                          {{ mostUsed.skillFamily }} ×{{
-                            mostUsed.uses | number
-                          }}
-                        </span>
-                      }
-                    </div>
-                  } @else {
-                    <p class="type-muted">
-                      Combat stats weren't tracked for this run.
-                    </p>
-                  }
+                      </div>
 
-                  @if (hero.snapshot) {
-                    <div class="flex flex-col gap-2 text-sm">
-                      <span>
-                        <span class="type-meta">Jobs:</span>
-                        {{ hero.jobsUsedText }}
+                      <div class="flex justify-between gap-2 sm:col-span-2">
+                        <span class="text-lighter">Most used skill</span>
+                        <span class="inline-flex items-center gap-2">
+                          @if (hero.mostUsed; as mostUsed) {
+                            <ng-container
+                              [ngTemplateOutlet]="skill"
+                              [ngTemplateOutletContext]="{
+                                $implicit: mostUsed,
+                              }"
+                            />
+                            <span class="tabular-nums">
+                              x{{ mostUsed.uses | number }}
+                            </span>
+                          } @else {
+                            <span class="text-lighter">None</span>
+                          }
+                        </span>
+                      </div>
+                    } @else {
+                      <p class="type-muted sm:col-span-2">
+                        Combat stats weren't tracked for this run.
+                      </p>
+                    }
+
+                    @if (hero.snapshot) {
+                      <div class="flex justify-between gap-2 sm:col-span-2">
+                        <span class="text-lighter">Jobs</span>
+                        <span class="text-right">{{ hero.jobsUsedText }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div class="h-full flex flex-col gap-4">
+            <div class="card bg-base-100">
+              <div class="card-body gap-4">
+                <h2 class="type-section-title">Journey</h2>
+
+                @if (!hasRunTotals()) {
+                  <p class="type-muted">
+                    Gold, fights and crafting weren't tracked for this run.
+                  </p>
+                } @else if (trackedPlayTime(); as trackedParts) {
+                  <p class="type-muted">
+                    This run began before stats were tracked, so gold, fights
+                    and crafting only cover the last
+                    <ng-container
+                      [ngTemplateOutlet]="duration"
+                      [ngTemplateOutletContext]="{ $implicit: trackedParts }"
+                    />
+                    of play.
+                  </p>
+                }
+
+                <div
+                  class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1 text-sm"
+                >
+                  @for (stat of journeyStats(); track stat.label) {
+                    <div class="flex justify-between gap-2">
+                      <span class="text-lighter">{{ stat.label }}</span>
+                      <span class="tabular-nums">
+                        {{ stat.value | number }}
                       </span>
                     </div>
                   }
+
+                  @if (felDefeatedAt(); as felParts) {
+                    <div class="flex justify-between gap-2 sm:col-span-2">
+                      <span class="text-lighter">Fel defeated at</span>
+                      <span class="tabular-nums text-right">
+                        <ng-container
+                          [ngTemplateOutlet]="duration"
+                          [ngTemplateOutletContext]="{ $implicit: felParts }"
+                        />
+                      </span>
+                    </div>
+                  } @else if (isFelTickUntracked()) {
+                    <div class="flex justify-between gap-2 sm:col-span-2">
+                      <span class="text-lighter">Fel defeated at</span>
+                      <span class="text-lighter">Not tracked for this run</span>
+                    </div>
+                  }
                 </div>
-              }
-            </div>
-          </div>
-        </div>
-
-        <div class="card bg-base-100">
-          <div class="card-body gap-4">
-            <div class="flex justify-between items-center gap-4">
-              <h2 class="type-section-title">Edicts</h2>
-              <span class="badge badge-data tabular-nums">
-                {{ summary.fragments | number }} Fragments · score x{{
-                  summary.multiplier | number: '1.0-2'
-                }}
-              </span>
+              </div>
             </div>
 
-            @for (entry of edicts(); track entry.id) {
-              @if (entry.edict; as edict) {
-                <app-row-edict [edict]="edict" />
-              } @else {
-                <p class="type-muted">Unknown edict</p>
-              }
-            } @empty {
-              <app-blank-slate>
-                No edicts. This was the standard game.
-              </app-blank-slate>
-            }
-          </div>
-        </div>
-
-        <div class="card bg-base-100">
-          <div class="card-body gap-4">
-            <h2 class="type-section-title">Journey</h2>
-
-            @if (!hasRunTotals()) {
-              <p class="type-muted">
-                Gold, fights and crafting weren't tracked for this run.
-              </p>
-            } @else if (trackedPlayTime(); as trackedParts) {
-              <p class="type-muted">
-                This run began before stats were tracked, so gold, fights and
-                crafting only cover the last
-                <ng-container
-                  [ngTemplateOutlet]="duration"
-                  [ngTemplateOutletContext]="{ $implicit: trackedParts }"
-                />
-                of play.
-              </p>
-            }
-
-            <div class="grid grid-cols-2 gap-4">
-              @for (stat of journeyStats(); track stat.label) {
-                <div class="flex flex-col">
-                  <span class="type-meta">{{ stat.label }}</span>
+            <div class="card bg-base-100">
+              <div class="card-body gap-4">
+                @let overall = completionOverall();
+                <div class="flex justify-between items-center gap-4">
+                  <h2 class="type-section-title">Remembrance</h2>
                   <span class="text-2xl font-bold tabular-nums">
-                    {{ stat.value | number }}
+                    {{ overall.percent | number }}%
                   </span>
                 </div>
-              }
 
-              @if (felDefeatedAt(); as felParts) {
-                <div class="flex flex-col col-span-2">
-                  <span class="type-meta">Fel defeated at</span>
-                  <span class="font-bold tabular-nums">
-                    <ng-container
-                      [ngTemplateOutlet]="duration"
-                      [ngTemplateOutletContext]="{ $implicit: felParts }"
-                    />
-                  </span>
+                <div class="flex flex-col gap-2">
+                  @for (row of completionRows(); track row.name) {
+                    <div class="flex items-center gap-4">
+                      <span class="w-64 shrink-0">{{ row.name }}</span>
+                      <app-bar-progress
+                        class="flex-1"
+                        [color]="row.isComplete ? 'success' : 'primary'"
+                        [value]="row.current"
+                        [max]="row.max"
+                      >
+                        {{ row.current | number }}/{{ row.max | number }}
+                      </app-bar-progress>
+                    </div>
+                  }
                 </div>
-              } @else if (isFelTickUntracked()) {
-                <div class="flex flex-col col-span-2">
-                  <span class="type-meta">Fel defeated at</span>
-                  <span class="type-muted">Not tracked for this run</span>
-                </div>
-              }
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="card bg-base-100">
-          <div class="card-body gap-4">
-            @let overall = completionOverall();
-            <div class="flex justify-between items-center gap-4">
-              <h2 class="type-section-title">Remembrance</h2>
-              <span class="text-2xl font-bold tabular-nums">
-                {{ overall.percent | number }}%
-              </span>
-            </div>
-
-            <div class="flex flex-col gap-2">
-              @for (row of completionRows(); track row.name) {
-                <div class="flex items-center gap-4">
-                  <span class="w-64 shrink-0">{{ row.name }}</span>
-                  <app-bar-progress
-                    class="flex-1"
-                    [color]="row.isComplete ? 'success' : 'primary'"
-                    [value]="row.current"
-                    [max]="row.max"
-                  >
-                    {{ row.current | number }}/{{ row.max | number }}
-                  </app-bar-progress>
+          <div class="h-full">
+            <div class="h-full card bg-base-100">
+              <div class="card-body gap-4">
+                <div class="flex justify-between items-center gap-4">
+                  <h2 class="type-section-title">Edicts</h2>
+                  <span class="badge badge-data tabular-nums">
+                    {{ summary.fragments | number }} Fragments · score x{{
+                      summary.multiplier | number: '1.0-2'
+                    }}
+                  </span>
                 </div>
-              }
+
+                @for (entry of edicts(); track entry.id) {
+                  @if (entry.edict; as edict) {
+                    <app-row-edict [edict]="edict" />
+                  } @else {
+                    <p class="type-muted">Unknown edict</p>
+                  }
+                } @empty {
+                  <app-blank-slate>No edicts.</app-blank-slate>
+                }
+              </div>
             </div>
           </div>
         </div>
@@ -247,7 +245,7 @@
     }
   </div>
 
-  <div class="card bg-base-100 shrink-0">
+  <div class="card bg-base-100 shrink-0 flex flex-row justify-between gap-4">
     <div class="card-body flex-row justify-end gap-4 p-4">
       <button
         type="button"
@@ -279,4 +277,19 @@
     {{ part.value | number }}
     {{ part.unit | pluralize: part.value !== 1 }}{{ last ? '' : ',' }}
   }
+</ng-template>
+
+<ng-template #skill let-used>
+  <span class="inline-flex items-center gap-2">
+    @if (used.skill; as entry) {
+      <span class="relative inline-block overflow-hidden shrink-0 w-4 h-4">
+        <app-icon-item-preview
+          [sprite]="entry.sprite"
+          spritesheet="skill"
+          cssClass="zoom-inline"
+        />
+      </span>
+    }
+    {{ used.skillFamily }}
+  </span>
 </ng-template>

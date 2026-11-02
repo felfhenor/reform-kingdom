@@ -56,7 +56,9 @@ export function skillTreeIsLevelColumn(level: number): boolean {
 }
 
 // The display name without the '<Job>: ' uniqueness prefix.
-export function skillTreeNodeShortName(node: SkillTreeNodeContent): string {
+export function skillTreeNodeShortName(
+  node: Pick<SkillTreeNodeContent, 'name'>,
+): string {
   return node.name.slice(node.name.indexOf(':') + 1).trim();
 }
 

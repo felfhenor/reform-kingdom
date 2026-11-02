@@ -85,6 +85,7 @@ import {
 import {
   tablerArrowLeft,
   tablerArrowRight,
+  tablerAward,
   tablerCheck,
   tablerChecklist,
   tablerChevronLeft,
@@ -199,6 +200,7 @@ export const ALL_ICONS = {
   tablerList,
   tablerArrowLeft,
   tablerArrowRight,
+  tablerAward,
 };
 
 export const ICON_SIZE_VALUES: Record<IconSize, string> = {
