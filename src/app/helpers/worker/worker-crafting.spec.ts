@@ -27,6 +27,7 @@ import {
   tradeskillsState,
   updateGamestate,
   workersState,
+  runStatsState,
 } from '@helpers/state-game';
 import { taskRecordCraft } from '@helpers/task/task-progress';
 import {
@@ -253,6 +254,7 @@ describe('workerCraftingProcessTick', () => {
     tick();
     expect(ingots()).toBe(2);
     expect(current().status).toEqual(crafting());
+    expect(runStatsState().itemsCrafted).toBe(2);
   });
 
   it('finishes one unit per tick at a single tick per unit, never chaining', () => {
@@ -301,6 +303,7 @@ describe('workerCraftingProcessTick', () => {
 
     expect(ore()).toBe(0);
     expect(ingots()).toBe(0);
+    expect(runStatsState().itemsCrafted).toBe(0);
   });
 
   it('refunds the held unit and drops the assignment once the recipe stops qualifying', () => {

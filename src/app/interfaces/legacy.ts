@@ -1,6 +1,7 @@
 import type { EdictId } from '@interfaces/content-edict';
 import type { JobId } from '@interfaces/content-job';
 import type { RemembranceCategory } from '@interfaces/remembrance';
+import type { RunStatsTotals } from '@interfaces/run-stats';
 import type { GameId } from '@interfaces/state-game';
 
 export type RunOutcome = 'Completed' | 'Abandoned';
@@ -17,6 +18,8 @@ export type RunRecordStats = {
   mapsReached: number;
   townsVisited: number;
   completion: RemembranceCategory[];
+  // Missing on runs recorded before run stats were tracked.
+  run?: RunStatsTotals;
 };
 
 // Fragments and multiplier are kept as they were when the run ended, so rebalancing edicts never rewrites old runs.

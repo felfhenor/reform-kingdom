@@ -13,6 +13,7 @@ import {
   discoveredMapsState,
   gamestate,
   metaState,
+  runStatsState,
   worldPartyState,
   worldTownsState,
 } from '@helpers/state-game';
@@ -23,7 +24,9 @@ import type {
   RunRecord,
   RunRecordHero,
   RunRecordStats,
+  RunStatsTotals,
 } from '@interfaces';
+import { omit } from 'es-toolkit';
 import { sumBy } from 'es-toolkit/compat';
 
 export const LEGACY_STORAGE_KEY = 'legacy';
@@ -136,6 +139,10 @@ function legacyRunEdicts(): Pick<
   };
 }
 
+function legacyRunTotals(): RunStatsTotals {
+  return omit(runStatsState(), ['heroes']);
+}
+
 function legacyRunStats(): RunRecordStats {
   const bestiary = Object.values(bestiaryState());
   return {
@@ -146,6 +153,7 @@ function legacyRunStats(): RunRecordStats {
       (town) => town.firstVisitedAtTick !== undefined,
     ).length,
     completion: remembranceCategories(),
+    run: legacyRunTotals(),
   };
 }
 

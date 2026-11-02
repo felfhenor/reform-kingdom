@@ -28,11 +28,10 @@
           <div class="flex flex-col items-end">
             <span class="type-meta">Play time</span>
             <span class="font-bold tabular-nums">
-              @for (part of playTime(); track part.unit; let last = $last) {
-                {{ part.value | number }}
-                {{ part.unit | pluralize: part.value !== 1
-                }}{{ last ? '' : ',' }}
-              }
+              <ng-container
+                [ngTemplateOutlet]="duration"
+                [ngTemplateOutletContext]="{ $implicit: playTime() }"
+              />
             </span>
           </div>
         </div>
@@ -87,31 +86,48 @@
           <div class="card-body gap-4">
             <h2 class="type-section-title">Journey</h2>
 
+            @if (!hasRunTotals()) {
+              <p class="type-muted">
+                Gold, fights and crafting weren't tracked for this run.
+              </p>
+            } @else if (trackedPlayTime(); as trackedParts) {
+              <p class="type-muted">
+                This run began before stats were tracked, so gold, fights and
+                crafting only cover the last
+                <ng-container
+                  [ngTemplateOutlet]="duration"
+                  [ngTemplateOutletContext]="{ $implicit: trackedParts }"
+                />
+                of play.
+              </p>
+            }
+
             <div class="grid grid-cols-2 gap-4">
-              <div class="flex flex-col">
-                <span class="type-meta">Monsters defeated</span>
-                <span class="text-2xl font-bold tabular-nums">
-                  {{ summary.stats.kills | number }}
-                </span>
-              </div>
-              <div class="flex flex-col">
-                <span class="type-meta">Monster types defeated</span>
-                <span class="text-2xl font-bold tabular-nums">
-                  {{ summary.stats.monstersKilled | number }}
-                </span>
-              </div>
-              <div class="flex flex-col">
-                <span class="type-meta">Maps reached</span>
-                <span class="text-2xl font-bold tabular-nums">
-                  {{ summary.stats.mapsReached | number }}
-                </span>
-              </div>
-              <div class="flex flex-col">
-                <span class="type-meta">Towns visited</span>
-                <span class="text-2xl font-bold tabular-nums">
-                  {{ summary.stats.townsVisited | number }}
-                </span>
-              </div>
+              @for (stat of journeyStats(); track stat.label) {
+                <div class="flex flex-col">
+                  <span class="type-meta">{{ stat.label }}</span>
+                  <span class="text-2xl font-bold tabular-nums">
+                    {{ stat.value | number }}
+                  </span>
+                </div>
+              }
+
+              @if (felDefeatedAt(); as felParts) {
+                <div class="flex flex-col col-span-2">
+                  <span class="type-meta">Fel defeated at</span>
+                  <span class="font-bold tabular-nums">
+                    <ng-container
+                      [ngTemplateOutlet]="duration"
+                      [ngTemplateOutletContext]="{ $implicit: felParts }"
+                    />
+                  </span>
+                </div>
+              } @else if (isFelTickUntracked()) {
+                <div class="flex flex-col col-span-2">
+                  <span class="type-meta">Fel defeated at</span>
+                  <span class="type-muted">Not tracked for this run</span>
+                </div>
+              }
             </div>
           </div>
         </div>
@@ -179,3 +195,10 @@
     </div>
   </div>
 </div>
+
+<ng-template #duration let-parts>
+  @for (part of parts; track part.unit; let last = $last) {
+    {{ part.value | number }}
+    {{ part.unit | pluralize: part.value !== 1 }}{{ last ? '' : ',' }}
+  }
+</ng-template>

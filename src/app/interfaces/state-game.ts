@@ -12,6 +12,7 @@ import type { GlobalEffect } from '@interfaces/content-globaleffect';
 import type { ItemId } from '@interfaces/content-item';
 import type { MonsterId } from '@interfaces/content-monster';
 import type { RecipeId } from '@interfaces/content-recipe';
+import type { GameStateRunStats } from '@interfaces/run-stats';
 import type { TaskId } from '@interfaces/content-task';
 import type { TrainerId } from '@interfaces/content-trainer';
 import type { GameStateTradeskills } from '@interfaces/crafting';
@@ -178,6 +179,7 @@ export type GameState = {
   world: GameStateWorld;
   // Picked at world setup and fixed for the run.
   edicts: EdictId[];
+  runStats: GameStateRunStats;
   materials: GameStateMaterials;
   discoveredMaterials: GameStateDiscoveredMaterials;
   collectibles: GameStateCollectibles;

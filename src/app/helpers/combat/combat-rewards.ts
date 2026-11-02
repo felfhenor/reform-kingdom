@@ -16,7 +16,7 @@ import {
   isCollectibleDiscovered,
 } from '@helpers/item/collectibles';
 import { assertNeverReward } from '@helpers/item/loot';
-import { addMaterial, goldCoinId } from '@helpers/item/materials';
+import { addMaterialIncome, goldCoinId } from '@helpers/item/materials';
 import { armoryAddLootDrop } from '@helpers/kingdom/loot-filter';
 import {
   isWorkerRescued,
@@ -224,7 +224,7 @@ export function grantResolvedDrops(
       quantity = Math.round(quantity * goldGainMultiplier());
     }
 
-    addMaterial(itemId as ItemId, quantity);
+    addMaterialIncome(itemId as ItemId, quantity);
 
     const item = getEntry<ItemContent>(itemId);
     if (!item) return;

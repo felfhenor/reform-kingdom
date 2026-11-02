@@ -1,3 +1,4 @@
+import { runStatsRecordCraft } from '@helpers/run-stats/run-stats';
 import {
   categoryMessageLog,
   ITEM_ICON_TOKEN,
@@ -205,6 +206,8 @@ function completeCraftUnit(
     if (delivered > 0 && 'itemId' in recipe.result) {
       applyMaterialDelta(state, recipe.result.itemId, delivered);
     }
+    // A whiffed roll uses the unit up but crafts nothing, matching the kingdom queue.
+    if (delivered > 0) runStatsRecordCraft(state);
 
     const status = state.workers[workerId]?.status;
     if (status?.kind !== 'Crafting') return state;

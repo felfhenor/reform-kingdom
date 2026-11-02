@@ -5,7 +5,7 @@ import { rangeAtLevel } from '@helpers/engine/leveled-range';
 import { jobAbilityValue } from '@helpers/hero/job-ability';
 import { applyCollectibleGrant } from '@helpers/item/collectibles';
 import { newEquipmentItem } from '@helpers/item/equipment';
-import { applyMaterialDelta } from '@helpers/item/materials';
+import { applyMaterialIncome } from '@helpers/item/materials';
 import { addArmoryItems } from '@helpers/kingdom/armory';
 import { rngNumberRange } from '@helpers/rng';
 import { globalEffectSumsState } from '@helpers/state-game';
@@ -165,7 +165,7 @@ export function applyResolvedDropToState(
 ): boolean {
   switch (drop.kind) {
     case 'Item':
-      applyMaterialDelta(state, drop.itemId, drop.quantity);
+      applyMaterialIncome(state, drop.itemId, drop.quantity);
       return true;
     case 'Equipment':
       return applyEquipmentDrop(state, drop);

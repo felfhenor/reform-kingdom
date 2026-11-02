@@ -5,6 +5,7 @@ import {
 import { allEquipmentItemTypes } from '@helpers/item/equipment-types';
 import { rngUuid } from '@helpers/rng';
 import type {
+  GameStateRunStats,
   AutoModeState,
   CombatStatBlock,
   ElementBlock,
@@ -25,7 +26,7 @@ import type {
 } from '@interfaces';
 
 // 2: saves track gather-node visits from creation, so they skip the legacy gather-node backfill.
-export const GAMESTATE_VERSION = 2;
+export const GAMESTATE_VERSION = 3;
 
 export function defaultGameState(): GameState {
   return {
@@ -87,6 +88,18 @@ export function defaultGameState(): GameState {
     tutorials: {},
     regionIntros: {},
     tasks: {},
+    runStats: defaultRunStats(),
+  };
+}
+
+export function defaultRunStats(): GameStateRunStats {
+  return {
+    trackedFromTick: 0,
+    goldEarned: 0,
+    fightsWon: 0,
+    fightsLost: 0,
+    itemsCrafted: 0,
+    heroes: {},
   };
 }
 

@@ -454,6 +454,7 @@ describe('craftProcessTick', () => {
     expect(blacksmithing().xp.current).toBe(1);
     expect(blacksmithing().queue).toEqual([]);
     expect(taskRecordCraft).toHaveBeenCalledWith(recipeId);
+    expect(gamestate().runStats.itemsCrafted).toBe(1);
     expect(events).toContain('Kingdom:Craft:Complete:Material Copper Ingot');
     expect(lastLogIcons()).toEqual([
       { sprite: 'ingot-sprite', spritesheet: 'item' },

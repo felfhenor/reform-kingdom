@@ -4,7 +4,7 @@ import {
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { notifySuccess } from '@helpers/engine/notify';
-import { applyMaterialDelta } from '@helpers/item/materials';
+import { applyMaterialIncome } from '@helpers/item/materials';
 import { tradeGoodsLogPart, tradeLog } from '@helpers/item/trade';
 import { updateGamestate } from '@helpers/state-game';
 import type { TaskContent, TaskId } from '@interfaces';
@@ -42,7 +42,7 @@ export async function tasksClaim(taskIds: TaskId[]): Promise<void> {
       if (!task || !entry?.completedAt || entry.claimedAt) return;
 
       task.rewards.forEach((reward) =>
-        applyMaterialDelta(state, reward.itemId, reward.quantity),
+        applyMaterialIncome(state, reward.itemId, reward.quantity),
       );
       entry.claimedAt = Date.now();
       claimed.push(task);

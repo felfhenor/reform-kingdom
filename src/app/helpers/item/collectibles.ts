@@ -1,3 +1,4 @@
+import { runStatsRecordFelDefeat } from '@helpers/run-stats/run-stats';
 import { getEntry } from '@helpers/content/content';
 import {
   analyticsSafeSegment,
@@ -42,6 +43,13 @@ export function applyCollectibleGrant(
   recomputeGlobalEffectSums(state);
 }
 
+// Only clearing Forgetter's Fane awards it, so owning it means Fel has fallen at least once.
+const FINAL_COLLECTIBLE_NAME = 'Memory of the Forgetter';
+
+export function finalCollectibleId(): CollectibleId | undefined {
+  return getEntry<CollectibleContent>(FINAL_COLLECTIBLE_NAME)?.id;
+}
+
 export function collectiblesAdd(
   collectibleId: CollectibleId,
   quantity = 1,
@@ -52,6 +60,10 @@ export function collectiblesAdd(
 
   updateGamestate((state) => {
     applyCollectibleGrant(state, collectibleId, quantity);
+    // Only the first discovery is the defeat; refights grant it again.
+    if (!alreadyDiscovered && collectibleId === finalCollectibleId()) {
+      runStatsRecordFelDefeat(state);
+    }
     return state;
   });
   void taskEventCollectibleGained(collectibleId);

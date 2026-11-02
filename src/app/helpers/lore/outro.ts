@@ -1,15 +1,13 @@
-import { getEntry } from '@helpers/content/content';
-import { isCollectibleDiscovered } from '@helpers/item/collectibles';
+import {
+  finalCollectibleId,
+  isCollectibleDiscovered,
+} from '@helpers/item/collectibles';
 import { isTitleCrawlPending } from '@helpers/lore/title-crawl';
 import { metaState } from '@helpers/state-game';
-import type { CollectibleContent } from '@interfaces';
-
-// Only clearing Forgetter's Fane awards it, so owning it means Fel has fallen at least once.
-const FINAL_COLLECTIBLE_NAME = 'Memory of the Forgetter';
 
 export function isFelDefeated(): boolean {
-  const finalCollectible = getEntry<CollectibleContent>(FINAL_COLLECTIBLE_NAME);
-  return !!finalCollectible && isCollectibleDiscovered(finalCollectible.id);
+  const finalId = finalCollectibleId();
+  return !!finalId && isCollectibleDiscovered(finalId);
 }
 
 export function isOutroCrawlPending(): boolean {

@@ -1,3 +1,4 @@
+import { runStatsRecordFightEnd } from '@helpers/run-stats/run-stats';
 import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
 import {
   combatantMessageToken,
@@ -228,6 +229,7 @@ export function combatResolveAutoWin(
   isFinalFight: boolean,
 ): void {
   recordVictoryKills(combat);
+  runStatsRecordFightEnd(true);
   grantVictoryXp(combat, rollVictoryXp(combat));
   grantEncounterFightDrops(combat, rollMonsterDrops(combat), isFinalFight);
 
@@ -269,6 +271,7 @@ function handleCombatVictory(combat: Combat): boolean {
 
   syncPartyHpFromCombat(combat.heroes);
   recordVictoryKills(combat);
+  runStatsRecordFightEnd(true);
 
   // Only a cleared node counts as progress, so auto mode can't reset its failure counts on a node it never clears.
   const heldXp = [...(combat.heldXp ?? []), ...rollVictoryXp(combat)];
@@ -313,6 +316,7 @@ export function combatHandleDefeat(combat: Combat): void {
   playGameSFX('death');
 
   syncPartyHpFromCombat(combat.heroes);
+  runStatsRecordFightEnd(false);
   autoModeRecordClauseFailure();
   autoModeRecordNodeFailure(combat.locationName);
   travelBeginDeathsDoor();

@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe, DecimalPipe, NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -34,6 +34,7 @@ import { PluralizePipe } from '@pipes/pluralize.pipe';
     DatePipe,
     DecimalPipe,
     IconJobComponent,
+    NgTemplateOutlet,
     PluralizePipe,
     RowEdictComponent,
     SFXDirective,
@@ -64,6 +65,45 @@ export class RunSummaryComponent {
   public edicts = computed(() =>
     (this.run()?.edicts ?? []).map((id) => ({ id, edict: edictEntry(id) })),
   );
+
+  public journeyStats = computed(() => {
+    const stats = this.run()?.stats;
+    if (!stats) return [];
+
+    return [
+      { label: 'Monsters defeated', value: stats.kills },
+      { label: 'Monster types defeated', value: stats.monstersKilled },
+      { label: 'Maps reached', value: stats.mapsReached },
+      { label: 'Towns visited', value: stats.townsVisited },
+      ...(stats.run
+        ? [
+            { label: 'Gold earned', value: stats.run.goldEarned },
+            { label: 'Fights won', value: stats.run.fightsWon },
+            { label: 'Fights lost', value: stats.run.fightsLost },
+            { label: 'Items crafted', value: stats.run.itemsCrafted },
+          ]
+        : []),
+    ];
+  });
+  public hasRunTotals = computed(() => !!this.run()?.stats.run);
+  // Runs that began before tracking only count the play after it started.
+  public trackedPlayTime = computed(() => {
+    const run = this.run();
+    const from = run?.stats.run?.trackedFromTick ?? 0;
+    return run && from > 0 ? ticksToDurationParts(run.ticks - from) : undefined;
+  });
+  public isFelTickUntracked = computed(() => {
+    const run = this.run();
+    return (
+      run?.outcome === 'Completed' &&
+      !!run.stats.run &&
+      run.stats.run.felDefeatedTick === undefined
+    );
+  });
+  public felDefeatedAt = computed(() => {
+    const tick = this.run()?.stats.run?.felDefeatedTick;
+    return tick === undefined ? undefined : ticksToDurationParts(tick);
+  });
 
   public completionRows = computed(() =>
     (this.run()?.stats.completion ?? []).map(remembranceRow),

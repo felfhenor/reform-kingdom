@@ -45,6 +45,7 @@ import {
 } from '@helpers/kingdom/loot-filter';
 import { rngSucceedsChance, rngUuid } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
+import { runStatsRecordCraft } from '@helpers/run-stats/run-stats';
 import { taskRecordCraft } from '@helpers/task/task-progress';
 import type {
   CollectibleContent,
@@ -323,6 +324,10 @@ function grantCraftResult(tradeskill: Tradeskill, recipe: RecipeContent): void {
   }
 
   taskRecordCraft(recipe.id);
+  updateGamestate((state) => {
+    runStatsRecordCraft(state);
+    return state;
+  });
 
   if ('itemId' in recipe.result) {
     const { itemId } = recipe.result;

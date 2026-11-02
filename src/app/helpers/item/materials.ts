@@ -1,3 +1,4 @@
+import { runStatsAddGold } from '@helpers/run-stats/run-stats';
 import {
   GOLD_COIN_NAME,
   MEMORY_FLUX_NAME,
@@ -80,6 +81,29 @@ export function applyMaterialDelta(
   if (delta > 0) ledgerMark(state.discoveredMaterials, materialId);
 }
 
+// Only real income goes through here, so refunds, conversions and debug grants never count as gold earned.
+export function applyMaterialIncome(
+  state: GameState,
+  materialId: MaterialId,
+  quantity: number,
+): void {
+  applyMaterialDelta(state, materialId, quantity);
+  // Tolerates content without Gold Coin, since this runs for every income material.
+  if (materialId === getEntry<ItemContent>(GOLD_COIN_NAME)?.id) {
+    runStatsAddGold(state, quantity);
+  }
+}
+
+export function addMaterialIncome(
+  materialId: MaterialId,
+  quantity: number,
+): void {
+  updateGamestate((state) => {
+    applyMaterialIncome(state, materialId, quantity);
+    return state;
+  });
+}
+
 export function addMaterial(materialId: MaterialId, quantity: number): void {
   updateGamestate((state) => {
     applyMaterialDelta(state, materialId, quantity);
@@ -99,9 +123,9 @@ export function getGoldQuantity(): number {
   return getMaterialQuantity(goldCoinId());
 }
 
-// Mutates `state` directly - for use inside an existing `updateGamestate` callback.
+// Mutates `state` directly - for use inside an existing `updateGamestate` callback. Counts as gold earned.
 export function gainGold(state: GameState, amount: number): void {
-  applyMaterialDelta(state, goldCoinId(), amount);
+  applyMaterialIncome(state, goldCoinId(), amount);
 }
 
 export function spendGold(state: GameState, amount: number): void {
@@ -119,5 +143,5 @@ export function hasTraderTokens(amount: number): boolean {
 // Grants the new-game starting gold - only called once, when a fresh world
 // is created, so it never re-applies to an existing save.
 export function grantStartingGold(state: GameState): void {
-  gainGold(state, STARTING_GOLD_AMOUNT);
+  applyMaterialDelta(state, goldCoinId(), STARTING_GOLD_AMOUNT);
 }

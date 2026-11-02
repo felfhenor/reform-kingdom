@@ -11,7 +11,11 @@ vi.mock('@helpers/task/task-progress');
 vi.mock('@helpers/engine/sfx');
 
 import { combatantMessageToken, combatLog } from '@helpers/combat/combat-log';
-import { combatCheckIfOver, isCombatOver } from '@helpers/combat/combat-end';
+import {
+  combatCheckIfOver,
+  combatResolveAutoWin,
+  isCombatOver,
+} from '@helpers/combat/combat-end';
 import { monsterXpReward, xpForOverLevel } from '@helpers/combat/monster';
 import { commissionRecordMonsterKill } from '@helpers/commission/commission-kill-progress';
 import {
@@ -183,6 +187,16 @@ describe('combatCheckIfOver', () => {
       expect(commissionRecordMonsterKill).toHaveBeenCalledWith(goblinId);
       expect(events).toContain('Combat:Encounter:Win');
       expect(gamestate().world.combat).toBeUndefined();
+      expect(gamestate().runStats.fightsWon).toBe(1);
+    });
+
+    it('counts an auto-won fight as a win without fighting it', () => {
+      const combat = fight({ encounterId, fightIndex: 0 });
+      seedGamestate();
+
+      inTick(() => combatResolveAutoWin(combat, true));
+
+      expect(gamestate().runStats.fightsWon).toBe(1);
     });
 
     it('records summoned guardians in the bestiary without granting rewards for them', () => {
@@ -222,6 +236,8 @@ describe('combatCheckIfOver', () => {
       expect(gamestate().materials[oreId]?.quantity).toBe(3);
       expect(gamestate().world.combat).toEqual(combat);
       expect(taskRecordEncounterClear).not.toHaveBeenCalled();
+      // Each fight of a chained encounter counts on its own.
+      expect(gamestate().runStats.fightsWon).toBe(1);
     });
 
     it('whispers after a won fight and starts the next one after its delay', () => {
@@ -508,6 +524,10 @@ describe('combatCheckIfOver', () => {
       expect(gamestate().bestiary).toEqual({});
       expect(raidResolveDefeat).not.toHaveBeenCalled();
       expect(gamestate().world.combat).toBeUndefined();
+      expect(gamestate().runStats).toMatchObject({
+        fightsWon: 0,
+        fightsLost: 1,
+      });
     });
 
     it('also resolves the raid defeat for a raid loss', () => {

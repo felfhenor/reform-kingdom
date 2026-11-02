@@ -27,6 +27,7 @@ export * from './pixi';
 export * from './remembrance';
 export * from './rng';
 export * from './rumor';
+export * from './run-stats';
 export * from './savefile';
 export * from './setup';
 export * from './state-game';

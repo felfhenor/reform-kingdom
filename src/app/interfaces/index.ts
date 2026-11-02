@@ -83,6 +83,7 @@ export * from './remembrance.ui';
 export * from './roman-numerals';
 export * from './savefile';
 export * from './rumor.ui';
+export * from './run-stats';
 export * from './sfx';
 export * from './skill-preview.ui';
 export * from './sfx.ui';

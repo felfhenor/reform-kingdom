@@ -1,3 +1,4 @@
+import { runStatsBackfillTracking } from '@helpers/run-stats/run-stats';
 import { backfillDiscoveredTraders } from '@helpers/caravan/caravan';
 import { pruneInvalidCommissions } from '@helpers/commission/commission-tick';
 import {
@@ -160,6 +161,9 @@ export function migrateGameState() {
   stateRegaliaMigrate(newState);
 
   newState.edicts = pruneInvalidEdicts(newState.edicts);
+  newState.runStats.heroes = recordPrune(newState.runStats.heroes, (id) =>
+    newState.world.party.some((character) => character.id === id),
+  );
 
   newState.armory = pruneInvalidArmoryItems(newState.armory);
   newState.materials = recordPrune(newState.materials, contentExists);
@@ -211,6 +215,11 @@ export function migrateGameState() {
   newState.discoveredGatherNodes = backfillLegacyGatherNodeDiscoveries(
     newState.discoveredGatherNodes,
     newState.materials,
+    newState.meta.version,
+  );
+  newState.runStats = runStatsBackfillTracking(
+    newState.runStats,
+    newState.clock.numTicks,
     newState.meta.version,
   );
   newState.meta.version = GAMESTATE_VERSION;
