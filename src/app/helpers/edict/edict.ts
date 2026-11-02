@@ -16,7 +16,7 @@ const EDICT_KIND_ORDER: EdictKind[] = [
 ];
 
 // getEntry also resolves names, so require the id itself to match.
-function edictEntry(id: EdictId): EdictContent | undefined {
+export function edictEntry(id: EdictId): EdictContent | undefined {
   const entry = getEntry<EdictContent>(id);
   return entry?.__type === 'edict' && entry.id === id ? entry : undefined;
 }

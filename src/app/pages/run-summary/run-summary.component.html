@@ -1,0 +1,181 @@
+@let summary = run();
+
+<div class="flex flex-col page-size p-4 gap-4">
+  <div class="flex flex-col gap-4 flex-1 min-h-0 overflow-y-auto">
+    @if (summary) {
+      @let completed = summary.outcome === 'Completed';
+
+      <div class="card bg-base-100 shrink-0">
+        <div class="card-body flex-row flex-wrap items-center gap-4">
+          <div class="flex flex-col gap-2 flex-1 min-w-0">
+            <h1 class="type-page-title">
+              {{ completed ? 'Run Complete' : 'Run Abandoned' }}
+            </h1>
+            <p class="type-muted">
+              {{ summary.startedAt | date: 'medium' }} -
+              {{ summary.endedAt | date: 'medium' }}
+            </p>
+          </div>
+
+          <span
+            class="badge"
+            [class.badge-success]="completed"
+            [class.badge-warning]="!completed"
+          >
+            {{ summary.outcome }}
+          </span>
+
+          <div class="flex flex-col items-end">
+            <span class="type-meta">Play time</span>
+            <span class="font-bold tabular-nums">
+              @for (part of playTime(); track part.unit; let last = $last) {
+                {{ part.value | number }}
+                {{ part.unit | pluralize: part.value !== 1
+                }}{{ last ? '' : ',' }}
+              }
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="card bg-base-100">
+          <div class="card-body gap-4">
+            <h2 class="type-section-title">Party</h2>
+
+            @for (hero of party(); track $index) {
+              <div class="flex items-center gap-4">
+                <app-icon-job [job]="hero.job" />
+                <div class="flex flex-col">
+                  <span class="type-entity-name">{{ hero.name }}</span>
+                  <span class="type-muted">
+                    Level {{ hero.level | number }}
+                    {{ hero.job?.name ?? 'Unknown job' }}
+                  </span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="card bg-base-100">
+          <div class="card-body gap-4">
+            <div class="flex justify-between items-center gap-4">
+              <h2 class="type-section-title">Edicts</h2>
+              <span class="badge badge-data tabular-nums">
+                {{ summary.fragments | number }} Fragments · score x{{
+                  summary.multiplier | number: '1.0-2'
+                }}
+              </span>
+            </div>
+
+            @for (entry of edicts(); track entry.id) {
+              @if (entry.edict; as edict) {
+                <app-row-edict [edict]="edict" />
+              } @else {
+                <p class="type-muted">Unknown edict</p>
+              }
+            } @empty {
+              <app-blank-slate>
+                No edicts. This was the standard game.
+              </app-blank-slate>
+            }
+          </div>
+        </div>
+
+        <div class="card bg-base-100">
+          <div class="card-body gap-4">
+            <h2 class="type-section-title">Journey</h2>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div class="flex flex-col">
+                <span class="type-meta">Monsters defeated</span>
+                <span class="text-2xl font-bold tabular-nums">
+                  {{ summary.stats.kills | number }}
+                </span>
+              </div>
+              <div class="flex flex-col">
+                <span class="type-meta">Monster types defeated</span>
+                <span class="text-2xl font-bold tabular-nums">
+                  {{ summary.stats.monstersKilled | number }}
+                </span>
+              </div>
+              <div class="flex flex-col">
+                <span class="type-meta">Maps reached</span>
+                <span class="text-2xl font-bold tabular-nums">
+                  {{ summary.stats.mapsReached | number }}
+                </span>
+              </div>
+              <div class="flex flex-col">
+                <span class="type-meta">Towns visited</span>
+                <span class="text-2xl font-bold tabular-nums">
+                  {{ summary.stats.townsVisited | number }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card bg-base-100">
+          <div class="card-body gap-4">
+            @let overall = completionOverall();
+            <div class="flex justify-between items-center gap-4">
+              <h2 class="type-section-title">Remembrance</h2>
+              <span class="text-2xl font-bold tabular-nums">
+                {{ overall.percent | number }}%
+              </span>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              @for (row of completionRows(); track row.name) {
+                <div class="flex items-center gap-4">
+                  <span class="w-48 shrink-0">{{ row.name }}</span>
+                  <app-bar-progress
+                    class="flex-1"
+                    [color]="row.isComplete ? 'success' : 'primary'"
+                    [value]="row.current"
+                    [max]="row.max"
+                  >
+                    {{ row.current | number }}/{{ row.max | number }}
+                  </app-bar-progress>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <div class="card bg-base-100">
+        <div class="card-body">
+          <app-blank-slate>This run isn't in your Legacy.</app-blank-slate>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="card bg-base-100 shrink-0">
+    <div class="card-body flex-row justify-end gap-4 p-4">
+      <button
+        type="button"
+        class="btn btn-neutral"
+        (click)="goHome()"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        Main Menu
+      </button>
+
+      @if (canStartNewRun()) {
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="startNewRun()"
+          appSfx="ui-success"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Start a New Run
+        </button>
+      }
+    </div>
+  </div>
+</div>

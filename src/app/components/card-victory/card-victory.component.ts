@@ -9,7 +9,6 @@ import {
   viewChild,
 } from '@angular/core';
 import { ButtonRunEndComponent } from '@components/button-run-end/button-run-end.component';
-import { ButtonSavefileExportComponent } from '@components/button-savefile-export/button-savefile-export.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { modalHasAnyOpen } from '@helpers/engine/modal-stack';
 import { victoryPopupDismiss } from '@helpers/lore/outro.ui';
@@ -22,7 +21,7 @@ function inSwal(event: KeyboardEvent): boolean {
 @Component({
   selector: 'app-card-victory',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ButtonRunEndComponent, ButtonSavefileExportComponent, SFXDirective],
+  imports: [ButtonRunEndComponent, SFXDirective],
   templateUrl: './card-victory.component.html',
   styleUrl: './card-victory.component.scss',
 })

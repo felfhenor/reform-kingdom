@@ -38,6 +38,13 @@ export const routes: Routes = [
     canActivate: [requireSetupGuard],
   },
   {
+    path: 'summary/:runId',
+    loadComponent: () =>
+      import('@pages/run-summary/run-summary.component').then(
+        (m) => m.RunSummaryComponent,
+      ),
+  },
+  {
     path: '**',
     pathMatch: 'full',
     redirectTo: '',

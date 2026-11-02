@@ -3,7 +3,7 @@ import type { RemembranceCategory, RemembranceRow } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
 
 // Floored so a nearly-done category never reads 100% before it is.
-function remembranceRow(category: RemembranceCategory): RemembranceRow {
+export function remembranceRow(category: RemembranceCategory): RemembranceRow {
   const isComplete = category.current >= category.max;
   return {
     ...category,
