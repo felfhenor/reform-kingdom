@@ -48,6 +48,7 @@ export type KingdomIcon =
   | KingdomFeatureSubview
   | 'kingdom'
   | 'reclass'
+  | 'remembrance'
   | 'requesteddefenses'
   | 'rumor'
   | 'sethome'

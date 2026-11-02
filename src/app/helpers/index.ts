@@ -22,6 +22,7 @@ export * from './migrate';
 export * from './noise';
 export * from './pathfinding';
 export * from './pixi';
+export * from './remembrance';
 export * from './rng';
 export * from './rumor';
 export * from './savefile';

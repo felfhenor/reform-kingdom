@@ -5,6 +5,7 @@ import {
 } from '@helpers/engine/analytics';
 import { ledgerHas } from '@helpers/engine/ledger';
 import { bestiaryState, updateGamestate } from '@helpers/state-game';
+import { townGuardianMonsterIds } from '@helpers/town/town-guardian';
 import type {
   EncounterContent,
   EncounterRandomContent,
@@ -128,4 +129,17 @@ export function monsterEncounters(
 
 export function monsterSourceNodeNames(monsterId: MonsterId): string[] {
   return monsterEncounters(monsterId).map((encounter) => encounter.name);
+}
+
+// Guardians that also spawn as enemies can be killed, so only guardian-only monsters are left out.
+export function bestiaryMonsters(): MonsterContent[] {
+  const guardianOnlyMonsterIds = new Set(
+    townGuardianMonsterIds().filter(
+      (monsterId) => monsterEncounters(monsterId).length === 0,
+    ),
+  );
+
+  return getEntriesByType<MonsterContent>('monster').filter(
+    (monster) => !guardianOnlyMonsterIds.has(monster.id),
+  );
 }

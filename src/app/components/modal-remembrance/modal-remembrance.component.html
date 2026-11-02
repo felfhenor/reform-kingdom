@@ -1,0 +1,50 @@
+<app-modal
+  modalId="remembrance"
+  [showCloseButton]="true"
+  [allowEscToClose]="true"
+  [closeOnBackdropClick]="true"
+  widthClass="max-w-2xl"
+>
+  <span title>Remembrance</span>
+  <p subtitle>All that the kingdom has yet to remember.</p>
+
+  <div body class="flex flex-col gap-4">
+    @if (isUnlocked()) {
+      @let total = overall();
+      <div class="flex flex-col gap-2 p-3 bg-base-200">
+        <div class="flex items-center justify-between">
+          <span class="type-section-title">Overall</span>
+          <span class="text-2xl font-bold tabular-nums">
+            {{ total.percent | number }}%
+          </span>
+        </div>
+
+        <app-bar-progress
+          size="md"
+          [color]="total.isComplete ? 'success' : 'primary'"
+          [value]="total.current"
+          [max]="total.max"
+        />
+      </div>
+
+      <div class="flex flex-col gap-2">
+        @for (row of rows(); track row.name) {
+          <div class="flex items-center gap-4 p-3 bg-base-200">
+            <span class="w-52 shrink-0 type-entity-name">{{ row.name }}</span>
+
+            <app-bar-progress
+              class="flex-1"
+              [color]="row.isComplete ? 'success' : 'primary'"
+              [value]="row.current"
+              [max]="row.max"
+            >
+              {{ row.current | number }}/{{ row.max | number }} ({{
+                row.percent | number
+              }}%)
+            </app-bar-progress>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</app-modal>

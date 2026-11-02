@@ -93,4 +93,14 @@ describe('pruneInvalidWorldNodeDevelopmentLevels', () => {
 
     expect(result).toEqual({ "Founder's Shrine": { level: 1 } });
   });
+
+  // Older saves stored -1 for nodes that had no levels yet.
+  it('raises a negative stored level to 0', () => {
+    const result = pruneInvalidWorldNodeDevelopmentLevels(
+      { 'Oasis Wellspring': { level: -1 } },
+      () => buildDevelopable(),
+    );
+
+    expect(result).toEqual({ 'Oasis Wellspring': { level: 0 } });
+  });
 });

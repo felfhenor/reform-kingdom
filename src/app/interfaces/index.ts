@@ -76,6 +76,8 @@ export * from './museum.ui';
 export * from './noise';
 export * from './pixi-config';
 export * from './regalia';
+export * from './remembrance';
+export * from './remembrance.ui';
 export * from './roman-numerals';
 export * from './savefile';
 export * from './rumor.ui';

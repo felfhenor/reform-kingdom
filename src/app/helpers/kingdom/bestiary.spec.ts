@@ -7,7 +7,9 @@ import {
   ensureEncounterRandom,
 } from '@helpers/content/ensure-encounternode';
 import { ensureMonster } from '@helpers/content/ensure-monster';
+import { ensureTown } from '@helpers/content/ensure-town';
 import {
+  bestiaryMonsters,
   getMonsterFoundAtNodes,
   getMonsterKillCount,
   getMonsterLevelRangeFound,
@@ -23,6 +25,7 @@ import type {
   EncounterRandomId,
   GameStateBestiary,
   MonsterId,
+  TownId,
 } from '@interfaces';
 import { captureAnalyticsEvents } from '@/testing/analytics';
 import { seedContent } from '@/testing/content';
@@ -30,6 +33,7 @@ import { inTick, seedGamestate } from '@/testing/gamestate';
 
 const goblinId = 'goblin' as MonsterId;
 const staleId = 'stale' as MonsterId;
+const guardOnlyId = 'guard-only' as MonsterId;
 
 function entry(
   overrides: Partial<GameStateBestiary[MonsterId]> = {},
@@ -220,5 +224,42 @@ describe('monsterSourceNodeNames', () => {
     ]);
 
     expect(monsterSourceNodeNames(goblinId)).toEqual([]);
+  });
+});
+
+describe('bestiaryMonsters', () => {
+  it('leaves out guardian-only monsters but keeps guardians that also spawn', () => {
+    seedContent([
+      ensureMonster({ id: goblinId, name: 'Goblin' }),
+      ensureMonster({ id: staleId, name: 'Stale' }),
+      ensureMonster({ id: guardOnlyId, name: 'Town Guard' }),
+      ensureEncounter({
+        id: 'field-ruins' as EncounterId,
+        name: 'Field Ruins',
+        fights: [{ monsters: [{ monsterId: staleId }] }],
+      }),
+      ensureTown({
+        id: 'town' as TownId,
+        name: 'Town',
+        defense: {
+          guardian: {
+            reputationTiers: [
+              {
+                tier: 0,
+                guardians: [
+                  { monsterId: staleId, quantity: 1 },
+                  { monsterId: guardOnlyId, quantity: 1 },
+                ],
+              },
+            ],
+          },
+        },
+      }),
+    ]);
+
+    expect(bestiaryMonsters().map((monster) => monster.id)).toEqual([
+      goblinId,
+      staleId,
+    ]);
   });
 });

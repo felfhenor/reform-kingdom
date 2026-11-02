@@ -4,6 +4,7 @@ import type {
   GameStateWorldNodeLevels,
   WorldNodeDevelopable,
 } from '@interfaces';
+import { clamp } from 'es-toolkit/compat';
 
 export function worldNodeDevelopmentMaxLevel(
   content: WorldNodeDevelopable,
@@ -37,7 +38,7 @@ function pruneWorldNodeDevelopmentLevel(
   entry: GameStateWorldNodeLevel,
   content: WorldNodeDevelopable,
 ): GameStateWorldNodeLevel {
-  const level = Math.min(entry.level, worldNodeDevelopmentMaxLevel(content));
+  const level = clamp(entry.level, 0, worldNodeDevelopmentMaxLevel(content));
   const { developCompletesAtTick } = entry;
   return developCompletesAtTick !== undefined &&
     !worldNodeDevelopmentIsMaxLevel(content, level)

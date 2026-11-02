@@ -1,15 +1,14 @@
-import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { getEntry } from '@helpers/content/content';
 import { rangeLabelAtLevel } from '@helpers/engine/leveled-range';
 import { rewardDisplayOrder } from '@helpers/item/loot';
 import {
+  bestiaryMonsters,
   getMonsterFoundAtNodes,
   getMonsterKillCount,
   getMonsterLevelRangeFound,
   isMonsterDiscovered,
-  monsterEncounters,
   monsterSourceNodeNames,
 } from '@helpers/kingdom/bestiary';
-import { townGuardianMonsterIds } from '@helpers/town/town-guardian';
 import {
   isRewardDiscovered,
   rewardContentInfo,
@@ -91,18 +90,8 @@ export function bestiarySourceNodeNamesAtLevel(
 
 // Undiscovered monsters are still returned so the bestiary can render them as silhouettes instead of omitting them.
 export function getBestiaryEntries(): BestiaryEntry[] {
-  // Guardians that also spawn as enemies can be killed, so only guardian-only monsters are hidden.
-  const guardianOnlyMonsterIds = new Set(
-    townGuardianMonsterIds().filter(
-      (monsterId) => monsterEncounters(monsterId).length === 0,
-    ),
-  );
-  const monsters = getEntriesByType<MonsterContent>('monster').filter(
-    (monster) => !guardianOnlyMonsterIds.has(monster.id),
-  );
-
   return orderBy(
-    monsters.map(bestiaryEntry),
+    bestiaryMonsters().map(bestiaryEntry),
     [(entry) => (entry.discovered ? 1 : 0), (entry) => entry.monster.name],
     ['desc', 'asc'],
   );

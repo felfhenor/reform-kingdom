@@ -46,7 +46,7 @@ export const WORLD_NODE_DEVELOPMENT_ANALYTICS_SEGMENTS: Record<
   outpost: 'Outpost',
 };
 
-const WORLD_NODE_DEVELOPMENT_SELECTORS = {
+export const WORLD_NODE_DEVELOPMENT_SELECTORS = {
   gathering: gatherNodeLevelsState,
   shrine: shrinesState,
   outpost: outpostsState,

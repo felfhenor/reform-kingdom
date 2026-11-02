@@ -74,7 +74,12 @@
       <div class="card-body p-3 gap-2">
         <h2 class="type-section-title">Collections</h2>
 
-        <div class="grid grid-cols-2 gap-2">
+        @let showRemembrance = isRemembranceUnlocked();
+        <div
+          class="grid gap-2"
+          [class.grid-cols-2]="!showRemembrance"
+          [class.grid-cols-3]="showRemembrance"
+        >
           <button
             class="btn btn-neutral flex flex-col justify-center gap-2 h-36"
             (click)="openSubview('museum')"
@@ -128,6 +133,28 @@
               {{ discovered }}/{{ bestiaryList.length }} discovered
             </app-bar-progress>
           </button>
+
+          @if (showRemembrance) {
+            @let remembrance = remembranceTotal();
+            <button
+              class="btn btn-neutral flex flex-col justify-center gap-2 h-36"
+              (click)="openRemembranceModal()"
+              appSfx="ui-click"
+              [sfxOffset]="5"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              <app-icon-kingdom name="remembrance" class="zoom-tile" />
+              <span class="text-base font-bold">Remembrance</span>
+
+              <app-bar-progress
+                [color]="remembrance.isComplete ? 'success' : 'muted'"
+                [value]="remembrance.current"
+                [max]="remembrance.max"
+              >
+                {{ remembrance.percent | number }}% remembered
+              </app-bar-progress>
+            </button>
+          }
         </div>
       </div>
     </div>

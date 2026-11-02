@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { ModalPlayKingdomReclassComponent } from '@components/modal-play-kingdom-reclass/modal-play-kingdom-reclass.component';
 import { ModalRaidDefenseComponent } from '@components/modal-raid-defense/modal-raid-defense.component';
+import { ModalRemembranceComponent } from '@components/modal-remembrance/modal-remembrance.component';
 import { ModalRumorsComponent } from '@components/modal-rumors/modal-rumors.component';
 import { PageBlankComponent } from '@components/page-blank/page-blank.component';
 import { PanelKingdomNavComponent } from '@components/panel-kingdom-nav/panel-kingdom-nav.component';
@@ -40,6 +41,7 @@ import { kingdomSubview } from '@helpers/engine/ui';
     PlayKingdomWorkersComponent,
     ModalPlayKingdomReclassComponent,
     ModalRaidDefenseComponent,
+    ModalRemembranceComponent,
     ModalRumorsComponent,
     PageBlankComponent,
     PanelKingdomNavComponent,

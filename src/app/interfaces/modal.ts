@@ -7,6 +7,7 @@ export type ModalId =
   | 'outpost-teleport'
   | 'reclass-heroes'
   | 'raid-defense'
+  | 'remembrance'
   | 'rumors'
   | 'town-materials'
   | 'trainer-visit'

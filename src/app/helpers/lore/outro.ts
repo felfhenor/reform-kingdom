@@ -7,11 +7,13 @@ import type { CollectibleContent } from '@interfaces';
 // Only clearing Forgetter's Fane awards it, so owning it means Fel has fallen at least once.
 const FINAL_COLLECTIBLE_NAME = 'Memory of the Forgetter';
 
-export function isOutroCrawlPending(): boolean {
-  if (metaState().outroCrawlSeen) return false;
-
+export function isFelDefeated(): boolean {
   const finalCollectible = getEntry<CollectibleContent>(FINAL_COLLECTIBLE_NAME);
   return !!finalCollectible && isCollectibleDiscovered(finalCollectible.id);
+}
+
+export function isOutroCrawlPending(): boolean {
+  return !metaState().outroCrawlSeen && isFelDefeated();
 }
 
 export function isVictoryPopupPending(): boolean {

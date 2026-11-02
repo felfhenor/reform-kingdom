@@ -44,6 +44,11 @@ import {
 } from '@helpers/state-game';
 import { raidDefenseRowViewModels } from '@helpers/town/raid/town-raid-defense.ui';
 import { rumorsBought } from '@helpers/rumor/rumor.ui';
+import { isFelDefeated } from '@helpers/lore/outro';
+import {
+  remembranceOverall,
+  remembranceRows,
+} from '@helpers/remembrance/remembrance.ui';
 import { tasksClaimableIds } from '@helpers/task/task.ui';
 import { homeNodeResetToDuchy } from '@helpers/town/town-spawn.ui';
 import { workersLevelUpStatusEntries } from '@helpers/worker/worker-progression.ui';
@@ -110,6 +115,11 @@ export class PlayKingdomHomeComponent {
   public bestiaryEntries = computed(() => getBestiaryEntries());
   public bestiaryDiscoveredCount = computed(
     () => this.bestiaryEntries().filter((entry) => entry.discovered).length,
+  );
+
+  public isRemembranceUnlocked = computed(() => isFelDefeated());
+  public remembranceTotal = computed(() =>
+    remembranceOverall(remembranceRows()),
   );
 
   protected readonly nav = KINGDOM_FEATURE_NAV;
@@ -228,6 +238,10 @@ export class PlayKingdomHomeComponent {
 
   public openTasksModal(): void {
     modalOpen('tasks');
+  }
+
+  public openRemembranceModal(): void {
+    modalOpen('remembrance');
   }
 
   public openRumorsModal(): void {
