@@ -1,7 +1,11 @@
+import {
+  EDICT_FRAGMENT_MULTIPLIER_STEP,
+  EDICT_SCORE_MULTIPLIER_FLOOR,
+} from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { edictsState } from '@helpers/state-game';
 import type { EdictContent, EdictId, EdictKind } from '@interfaces';
-import { sortBy, uniq } from 'es-toolkit/compat';
+import { sortBy, sumBy, uniq } from 'es-toolkit/compat';
 
 const EDICT_KIND_ORDER: EdictKind[] = [
   'PartySize',
@@ -59,4 +63,15 @@ export function edictsSanitized(ids: EdictId[]): EdictId[] {
   });
 
   return kept.map((edict) => edict.id);
+}
+
+export function edictsFragmentTotal(edicts: EdictContent[]): number {
+  return sumBy(edicts, (edict) => edict.fragments);
+}
+
+export function edictScoreMultiplier(fragments: number): number {
+  return Math.max(
+    EDICT_SCORE_MULTIPLIER_FLOOR,
+    1 + EDICT_FRAGMENT_MULTIPLIER_STEP * fragments,
+  );
 }

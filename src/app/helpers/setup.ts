@@ -7,6 +7,8 @@ export function isSetup(): boolean {
 export function setupFinish(): Promise<void> {
   return updateGamestate((state) => {
     state.meta.isSetup = true;
+    // Reset stamps createdAt when the state is built, which can be long before the run starts.
+    state.meta.createdAt = Date.now();
     return state;
   });
 }

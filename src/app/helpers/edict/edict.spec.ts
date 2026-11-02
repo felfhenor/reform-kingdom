@@ -4,7 +4,9 @@ import { ensureEdict } from '@helpers/content/ensure-edict';
 import { ensureItem } from '@helpers/content/ensure-item';
 import {
   edictIsBlocked,
+  edictScoreMultiplier,
   edictsActive,
+  edictsFragmentTotal,
   edictsPickable,
   edictsSanitized,
   pruneInvalidEdicts,
@@ -122,5 +124,21 @@ describe('edictsSanitized', () => {
         gone,
       ]),
     ).toEqual([coin.id, frailty.id]);
+  });
+});
+
+describe('edict scoring', () => {
+  it('sums Fragments and scales the multiplier by them', () => {
+    const fragments = edictsFragmentTotal([
+      ensureEdict({ fragments: 3 }),
+      ensureEdict({ fragments: -1 }),
+    ]);
+
+    expect(fragments).toBe(2);
+    expect(edictScoreMultiplier(fragments)).toBeCloseTo(1.2);
+  });
+
+  it('never drops the multiplier below its floor', () => {
+    expect(edictScoreMultiplier(-50)).toBe(0.25);
   });
 });

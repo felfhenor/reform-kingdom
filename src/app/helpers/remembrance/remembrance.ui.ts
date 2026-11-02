@@ -1,12 +1,4 @@
-import {
-  remembranceBestiary,
-  remembranceCollectibles,
-  remembranceDevelopment,
-  remembranceEquipment,
-  remembranceMaterials,
-  remembranceTasks,
-  remembranceWorkers,
-} from '@helpers/remembrance/remembrance';
+import { remembranceCategories } from '@helpers/remembrance/remembrance';
 import type { RemembranceCategory, RemembranceRow } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
 
@@ -23,17 +15,7 @@ function remembranceRow(category: RemembranceCategory): RemembranceRow {
 }
 
 export function remembranceRows(): RemembranceRow[] {
-  return [
-    remembranceCollectibles(),
-    remembranceMaterials(),
-    remembranceEquipment(),
-    remembranceBestiary(),
-    remembranceWorkers(),
-    remembranceDevelopment('shrine'),
-    remembranceDevelopment('outpost'),
-    remembranceDevelopment('gathering'),
-    remembranceTasks(),
-  ].map(remembranceRow);
+  return remembranceCategories().map(remembranceRow);
 }
 
 export function remembranceOverall(rows: RemembranceRow[]): RemembranceRow {

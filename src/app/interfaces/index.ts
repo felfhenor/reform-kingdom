@@ -67,6 +67,7 @@ export * from './icon-size';
 export * from './identifiable';
 export * from './item-preview';
 export * from './ledger';
+export * from './legacy';
 export * from './level-range';
 export * from './loading';
 export * from './loot-filter';

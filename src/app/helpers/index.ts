@@ -17,6 +17,7 @@ export * from './gameloop-slow';
 export * from './hero';
 export * from './item';
 export * from './kingdom';
+export * from './legacy';
 export * from './lore';
 export * from './maps';
 export * from './migrate';

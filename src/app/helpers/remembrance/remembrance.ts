@@ -114,3 +114,17 @@ export function remembranceTasks(): RemembranceCategory {
     (task) => !!tasks[task.id]?.completedAt,
   );
 }
+
+export function remembranceCategories(): RemembranceCategory[] {
+  return [
+    remembranceCollectibles(),
+    remembranceMaterials(),
+    remembranceEquipment(),
+    remembranceBestiary(),
+    remembranceWorkers(),
+    remembranceDevelopment('shrine'),
+    remembranceDevelopment('outpost'),
+    remembranceDevelopment('gathering'),
+    remembranceTasks(),
+  ];
+}

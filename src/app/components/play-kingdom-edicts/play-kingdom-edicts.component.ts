@@ -5,12 +5,12 @@ import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/butt
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
-import { edictsActive } from '@helpers/edict/edict';
 import {
-  edictKindLabel,
   edictScoreMultiplier,
+  edictsActive,
   edictsFragmentTotal,
-} from '@helpers/edict/edict.ui';
+} from '@helpers/edict/edict';
+import { edictKindLabel } from '@helpers/edict/edict.ui';
 import type { EdictKind } from '@interfaces';
 
 @Component({

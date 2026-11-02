@@ -7,8 +7,7 @@ import {
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { IconKingdomComponent } from '@components/icon-kingdom/icon-kingdom.component';
-import { edictsActive } from '@helpers/edict/edict';
-import { edictsFragmentTotal } from '@helpers/edict/edict.ui';
+import { edictsActive, edictsFragmentTotal } from '@helpers/edict/edict';
 import { TippyDirective } from '@ngneat/helipopper';
 import { AnimationService } from '@services/animation.service';
 

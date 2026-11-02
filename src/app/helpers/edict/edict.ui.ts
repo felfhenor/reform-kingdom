@@ -1,15 +1,10 @@
 import {
-  EDICT_FRAGMENT_MULTIPLIER_STEP,
-  EDICT_SCORE_MULTIPLIER_FLOOR,
-} from '@helpers/config';
-import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { edictsActive, edictsSanitized } from '@helpers/edict/edict';
 import { updateGamestate } from '@helpers/state-game';
 import type { EdictContent, EdictId, EdictKind } from '@interfaces';
-import { sumBy } from 'es-toolkit/compat';
 
 const EDICT_KIND_LABELS: Record<EdictKind, string> = {
   PartySize: 'Party size',
@@ -43,17 +38,6 @@ export function edictsTrackRun(): void {
     analyticsSendDesignEvent(`Edict:Pick:${analyticsSafeSegment(edict.name)}`);
   });
   analyticsSendDesignEvent(`Edict:Run:Count:${edicts.length}`);
-}
-
-export function edictsFragmentTotal(edicts: EdictContent[]): number {
-  return sumBy(edicts, (edict) => edict.fragments);
-}
-
-export function edictScoreMultiplier(fragments: number): number {
-  return Math.max(
-    EDICT_SCORE_MULTIPLIER_FLOOR,
-    1 + EDICT_FRAGMENT_MULTIPLIER_STEP * fragments,
-  );
 }
 
 export function edictShortName(edict: EdictContent): string {

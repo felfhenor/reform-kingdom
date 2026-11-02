@@ -28,13 +28,13 @@ import { PARTY_SIZE_MAX } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import {
   edictIsBlocked,
+  edictScoreMultiplier,
+  edictsFragmentTotal,
   edictsPickable,
   edictsSanitized,
 } from '@helpers/edict/edict';
 import {
   edictKindGroupLabel,
-  edictScoreMultiplier,
-  edictsFragmentTotal,
   edictsSet,
   edictsTrackRun,
 } from '@helpers/edict/edict.ui';
