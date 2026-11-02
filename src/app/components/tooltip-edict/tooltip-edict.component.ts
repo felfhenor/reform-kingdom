@@ -35,7 +35,7 @@ import type { EdictContent } from '@interfaces';
 
           <p>{{ e.description }}</p>
           <p class="type-meta">
-            {{ kindLabel() }} · {{ cleared() ? 'Finished' : 'Incomplete' }}
+            {{ kindLabel() }} · {{ cleared() ? 'Completed' : 'Incomplete' }}
           </p>
 
           @if (blocked()) {

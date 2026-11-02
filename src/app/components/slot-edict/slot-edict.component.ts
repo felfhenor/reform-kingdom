@@ -34,10 +34,11 @@ import { TippyDirective } from '@ngneat/helipopper';
 
     <ng-template #tile>
       <span
-        class="h-[64px] w-[64px] flex justify-center items-center bg-gray-400 node-outline"
+        class="h-[64px] w-[64px] flex justify-center items-center bg-gray-400"
+        [class.node-outline]="!picked() && !cleared() && !blocked()"
         [class.ring-2]="picked()"
         [class.ring-primary]="picked()"
-        [class.node-cleared]="cleared()"
+        [class.node-cleared]="!picked() && cleared()"
         [class.node-excluded]="blocked()"
       >
         <app-atlas-image spritesheet="edict" [assetName]="e.sprite" />
