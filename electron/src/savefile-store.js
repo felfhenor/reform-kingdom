@@ -180,7 +180,7 @@ const exportWithLogs = async () => {
     const files = [
       ...(await readFolderFiles(savefileDir(), 'savefiles')),
       ...(await readFolderFiles(logsDir(), 'logs')),
-    ];
+    ].filter((f) => !f.name.endsWith('.tmp'));
     const stamp = new Date().toISOString().replaceAll(/[:.]/g, '-');
     const target = path.join(
       app.getPath('downloads'),
