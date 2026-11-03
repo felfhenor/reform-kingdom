@@ -5,13 +5,13 @@
 
   requirements:
     - itemId: Red Slime Core
-      quantity: 3
+      quantity: 1
 
     - itemId: Green Slime Core
-      quantity: 3
+      quantity: 1
 
     - itemId: Purple Slime Core
-      quantity: 3
+      quantity: 1
 
   tradeskillId: Artificing
   minTradeskillLevel: 5
