@@ -42,6 +42,7 @@ import {
 } from '@helpers/savefile/savefile-load.ui';
 import { isSetup } from '@helpers/setup';
 import { gamestate } from '@helpers/state-game';
+import { setOption } from '@helpers/state-options';
 import type { SavefileBackup, SavefileBackupReason } from '@interfaces';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
@@ -225,5 +226,8 @@ export class PanelOptionsSavefileComponent
     await this.router.navigate(['/']);
 
     gameReset();
+
+    setOption('gameloopPaused', false);
+    closeAllMenus();
   }
 }
