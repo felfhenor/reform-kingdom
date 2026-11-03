@@ -59,30 +59,9 @@
   kind: Boon
   fragments: -1
 
-- id: ffea9461-b341-4e11-939d-50837cf7e136
-  name: Edict of Guilds
-  sprite: '0007'
-  description: Recipes need fewer materials.
-  kind: Boon
-  fragments: -1
-
 - id: 7df5e003-4e99-4912-830f-66ca83aad694
   name: Edict of Blessings
-  sprite: '0008'
+  sprite: '0007'
   description: Shrine buffs never expire once prayed for.
   kind: Boon
   fragments: -2
-
-- id: bcdc86fc-c2e5-4500-84f8-f188c94c313f
-  name: Edict of Veterans
-  sprite: '0009'
-  description: Heroes start at level 10 with their starting gear.
-  kind: Boon
-  fragments: -4
-
-- id: 1d1c8bf8-9df1-44ee-ad9f-af6c78f7b8d7
-  name: Edict of Mercy
-  sprite: '0010'
-  description: 'A wipe costs nothing: no Deaths Door, just a short Healing.'
-  kind: Boon
-  fragments: -5

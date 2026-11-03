@@ -34,7 +34,7 @@
 - id: fc200585-8c6b-47b2-884d-6ba53d35098b
   name: Edict of the Wilds
   sprite: '0014'
-  description: Every monster gets one extra skill from its region's pool. Bestiary discoveries and kills count double, and monster-slaying affixes roll higher.
+  description: Every monster gets one extra skill from its region's pool.
   kind: Challenge
   fragments: 3
 
@@ -61,58 +61,21 @@
 
 - id: c03e5ab7-1e05-4e4d-a128-be17f5e58b2d
   name: Edict of Scarcity
-  sprite: '0018'
+  sprite: '0009'
   description: Recipes need more materials. Crafted gear always rolls one extra affix.
   kind: Challenge
   fragments: 2
 
 - id: d6631919-4f78-4b2e-973a-df63d710909b
   name: Edict of Curses
-  sprite: '0019'
+  sprite: '0010'
   description: Every dropped piece of equipment rolls a curse affix, and one extra good affix.
   kind: Challenge
   fragments: 2
 
-- id: eaa60c35-f0c9-463d-8da7-d341c3f56ce8
-  name: Edict of Sieges
-  sprite: '0020'
-  description: Raids come more often and hit harder. Defending successfully earns raid-only rewards and permanent town favor.
-  kind: Challenge
-  fragments: 3
-
-- id: 2f277fdc-eb42-4ad6-a980-8a9d325c0eae
-  name: Edict of Fickle Favor
-  sprite: '0021'
-  description: Town reputation slowly decays. Commissions pay more, and towns at max reputation unlock exclusive recipes.
-  kind: Challenge
-  fragments: 1
-
-- id: 0958d130-a453-47b2-a370-08579c00d88d
-  name: Edict of the Unknown
-  sprite: '0022'
-  description: Monster stats and weaknesses stay hidden until the bestiary has an entry. Completed bestiary entries grant slayer bonuses.
-  kind: Challenge
-  fragments: 2
-
-- id: b86e2e13-f7bd-44e3-bac7-730654d15578
-  name: Edict of Scars
-  sprite: '0023'
-  description: Each wipe gives every hero a lasting injury, removed by a trainer visit or time at a shrine.
-  kind: Challenge
-  fragments: 2
-  group: Death
-
-- id: 240c90bd-0b25-45cb-be0d-cd9ecb2251d4
-  name: Edict of the Fallen
-  sprite: '0024'
-  description: Each wipe kills one random hero, and a lower-level replacement is recruited at the kingdom. The fallen hero's job ability lives on as a weaker party-wide memorial.
-  kind: Challenge
-  fragments: 5
-  group: Death
-
 - id: fabe9a7d-6448-409e-9ed0-103cfa0a6974
   name: Edict of Iron
-  sprite: '0025'
+  sprite: '0008'
   description: A wipe ends the run.
   kind: Challenge
   fragments: 8
