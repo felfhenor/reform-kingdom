@@ -8,11 +8,11 @@ import { hostBinding } from 'ngxtension/host-binding';
 export class DisableOutsideElectronDirective {
   public disabled = hostBinding(
     'class.disabled',
-    computed(() => !isInElectron()),
+    computed(() => (isInElectron() ? undefined : true)),
   );
 
   public disabledAttr = hostBinding(
     'attr.disabled',
-    computed(() => !isInElectron()),
+    computed(() => (isInElectron() ? undefined : true)),
   );
 }
