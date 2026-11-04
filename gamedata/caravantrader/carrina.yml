@@ -105,6 +105,18 @@
       limit: 2
       weight: 2
 
+    - type: sell
+      value: 50
+      equipmentId: Cloak of Adventuring
+      limit: 2
+      weight: 1
+
+    - type: sell
+      value: 50
+      equipmentId: Hat of Adventuring
+      limit: 2
+      weight: 1
+
     # base game items
     - type: buy
       value: 10
