@@ -9,4 +9,5 @@ export type CollectibleSource =
   | { type: 'monster'; name: string; monsterId: MonsterId }
   | { type: 'crafting'; tradeskillId: TradeskillId; tradeskillLevel: number }
   | { type: 'trader'; traderId: CaravanTraderId; name: string }
-  | { type: 'raid'; townId: TownId; name: string };
+  | { type: 'raid'; townId: TownId; name: string }
+  | { type: 'town'; townId: TownId; name: string };

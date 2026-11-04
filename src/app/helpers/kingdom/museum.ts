@@ -1,12 +1,14 @@
 import { isTraderDiscovered } from '@helpers/caravan/caravan';
 import { getEntriesByType } from '@helpers/content/content';
 import { isMonsterDiscovered } from '@helpers/kingdom';
+import { townMaterialSaleConfig } from '@helpers/town';
 import { isTownVisited } from '@helpers/town/town-visit';
 import { isWorldNodeMapVisited } from '@helpers/world-node/world-nodes';
 import type {
   CaravanTraderContent,
   CollectibleSource,
   EncounterContent,
+  EncounterRandomContent,
   EquipmentId,
   ExchangeNodeContent,
   GatheringContent,
@@ -14,16 +16,53 @@ import type {
   MonsterContent,
   RecipeContent,
   RecipeId,
+  TownContent,
 } from '@interfaces';
 import { uniqBy } from 'es-toolkit/compat';
 
+function recipeCraftSources(
+  recipes: RecipeContent[],
+  towns: TownContent[],
+): CollectibleSource[] {
+  return recipes.flatMap((recipe): CollectibleSource[] => {
+    const owningTowns = towns.filter((town) =>
+      town.crafting.uniqueRecipeIds.includes(recipe.id),
+    );
+    if (owningTowns.length === 0) {
+      return [
+        {
+          type: 'crafting',
+          tradeskillId: recipe.tradeskillId,
+          tradeskillLevel: recipe.minTradeskillLevel,
+        },
+      ];
+    }
+
+    return owningTowns.map((town) => ({
+      type: 'town',
+      townId: town.id,
+      name: town.name,
+    }));
+  });
+}
+
+function sourceKey(source: CollectibleSource): string {
+  return source.type === 'crafting'
+    ? `crafting:${source.tradeskillId}:${source.tradeskillLevel}`
+    : `${source.type}:${source.name}`;
+}
+
 export function itemSources(itemId: ItemId): CollectibleSource[] {
   const gathers = getEntriesByType<GatheringContent>('gathering');
-  const encounters = getEntriesByType<EncounterContent>('encounter');
+  const encounters = [
+    ...getEntriesByType<EncounterContent>('encounter'),
+    ...getEntriesByType<EncounterRandomContent>('encounterrandom'),
+  ];
   const monsters = getEntriesByType<MonsterContent>('monster');
   const traders = getEntriesByType<CaravanTraderContent>('caravantrader');
   const recipes = getEntriesByType<RecipeContent>('recipe');
   const exchanges = getEntriesByType<ExchangeNodeContent>('exchangenode');
+  const towns = getEntriesByType<TownContent>('town');
 
   const exchangeSources: CollectibleSource[] = exchanges
     .filter((exchange) =>
@@ -53,21 +92,21 @@ export function itemSources(itemId: ItemId): CollectibleSource[] {
       monsterId: monster.id,
     }));
 
-  const dropEncounters = encounters.filter((encounter) =>
-    encounter.completionRewards.some(
-      (reward) => 'itemId' in reward && reward.itemId === itemId,
-    ),
-  );
+  const dropSources: CollectibleSource[] = encounters
+    .filter((encounter) =>
+      encounter.completionRewards.some(
+        (reward) => 'itemId' in reward && reward.itemId === itemId,
+      ),
+    )
+    .map((encounter) => ({ type: 'node', name: encounter.name }));
 
-  const dropSources: CollectibleSource[] = uniqBy(dropEncounters, 'name').map(
-    (encounter) => ({ type: 'node', name: encounter.name }),
-  );
-
+  // 'buy' trades are the trader buying from the party - not a source.
   const traderSources: CollectibleSource[] = traders
     .filter(
       (trader) =>
-        trader.trades.some((trade) => trade.itemId === itemId) ||
-        trader.tokenTrades.some((trade) => trade.itemId === itemId),
+        trader.trades.some(
+          (trade) => trade.type === 'sell' && trade.itemId === itemId,
+        ) || trader.tokenTrades.some((trade) => trade.itemId === itemId),
     )
     .map((trader) => ({
       type: 'trader',
@@ -75,34 +114,52 @@ export function itemSources(itemId: ItemId): CollectibleSource[] {
       name: trader.name,
     }));
 
-  const craftingSources: CollectibleSource[] = recipes
-    .filter(
+  const craftingSources = recipeCraftSources(
+    recipes.filter(
       (recipe) => 'itemId' in recipe.result && recipe.result.itemId === itemId,
-    )
-    .map((recipe) => ({
-      type: 'crafting',
-      tradeskillId: recipe.tradeskillId,
-      tradeskillLevel: recipe.minTradeskillLevel,
-    }));
+    ),
+    towns,
+  );
 
-  return [
-    ...gatherSources,
-    ...dropSources,
-    ...traderSources,
-    ...craftingSources,
-    ...exchangeSources,
-    ...monsterSources,
-  ];
+  const townSaleSources: CollectibleSource[] = towns
+    .filter((town) => !!townMaterialSaleConfig(town, itemId))
+    .map((town) => ({ type: 'town', townId: town.id, name: town.name }));
+
+  const raidSources: CollectibleSource[] = towns
+    .filter((town) =>
+      town.defense.rewards.some(
+        (reward) => 'itemId' in reward && reward.itemId === itemId,
+      ),
+    )
+    .map((town) => ({ type: 'raid', townId: town.id, name: town.name }));
+
+  return uniqBy(
+    [
+      ...gatherSources,
+      ...dropSources,
+      ...traderSources,
+      ...craftingSources,
+      ...townSaleSources,
+      ...raidSources,
+      ...exchangeSources,
+      ...monsterSources,
+    ],
+    sourceKey,
+  );
 }
 
 export function equipmentSources(
   equipmentId: EquipmentId,
 ): CollectibleSource[] {
-  const encounters = getEntriesByType<EncounterContent>('encounter');
+  const encounters = [
+    ...getEntriesByType<EncounterContent>('encounter'),
+    ...getEntriesByType<EncounterRandomContent>('encounterrandom'),
+  ];
   const monsters = getEntriesByType<MonsterContent>('monster');
   const traders = getEntriesByType<CaravanTraderContent>('caravantrader');
   const recipes = getEntriesByType<RecipeContent>('recipe');
   const exchanges = getEntriesByType<ExchangeNodeContent>('exchangenode');
+  const towns = getEntriesByType<TownContent>('town');
 
   const exchangeSources: CollectibleSource[] = exchanges
     .filter((exchange) =>
@@ -140,7 +197,9 @@ export function equipmentSources(
   const traderSources: CollectibleSource[] = traders
     .filter(
       (trader) =>
-        trader.trades.some((trade) => trade.equipmentId === equipmentId) ||
+        trader.trades.some(
+          (trade) => trade.type === 'sell' && trade.equipmentId === equipmentId,
+        ) ||
         trader.tokenTrades.some((trade) => trade.equipmentId === equipmentId),
     )
     .map((trader) => ({
@@ -149,17 +208,14 @@ export function equipmentSources(
       name: trader.name,
     }));
 
-  const craftingSources: CollectibleSource[] = recipes
-    .filter(
+  const craftingSources: CollectibleSource[] = recipeCraftSources(
+    recipes.filter(
       (recipe) =>
         'equipmentId' in recipe.result &&
         recipe.result.equipmentId === equipmentId,
-    )
-    .map((recipe) => ({
-      type: 'crafting',
-      tradeskillId: recipe.tradeskillId,
-      tradeskillLevel: recipe.minTradeskillLevel,
-    }));
+    ),
+    towns,
+  );
 
   return [
     ...dropSources,
@@ -206,6 +262,8 @@ export function isCollectibleSourceKnown(source: CollectibleSource): boolean {
     case 'trader':
       return isTraderDiscovered(source.traderId);
     case 'raid':
+      return isTownVisited(source.townId);
+    case 'town':
       return isTownVisited(source.townId);
     case 'crafting':
       return true;
