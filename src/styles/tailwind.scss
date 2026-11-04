@@ -175,6 +175,21 @@ body {
     url(/asset/texture-button.png),
     linear-gradient(to bottom, var(--here-bg), var(--here-bg)) !important;
   color: var(--color-base-content) !important;
+
+  &.here-animate {
+    animation: here-glow 1.5s ease-in-out infinite;
+  }
+}
+
+@keyframes here-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 2px 0 var(--color-primary);
+  }
+
+  50% {
+    box-shadow: 0 0 6px 4px var(--color-primary);
+  }
 }
 
 @utility btn-debug {
