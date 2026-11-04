@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/engine/logging');
 
+import { seedContent } from '@/testing/content';
 import { ensureCaravanTrader } from '@helpers/content/ensure-caravan';
 import {
   ensureEncounter,
@@ -22,7 +23,6 @@ import type {
   RecipeId,
   TownId,
 } from '@interfaces';
-import { seedContent } from '@/testing/content';
 
 const ruby = 'goblin-ruby' as CollectibleId;
 const flower = 'gobslime-flower' as CollectibleId;
@@ -83,7 +83,9 @@ describe('collectibleSourceMapBuild', () => {
     expect(Object.fromEntries(sources)).toEqual({
       [ruby]: [{ type: 'node', name: 'Field Ruins' }],
       [flower]: [{ type: 'node', name: 'Gobslime Shrine' }],
-      [effigy]: [{ type: 'crafting' }],
+      [effigy]: [
+        { type: 'crafting', tradeskillId: 'UNKNOWN', tradeskillLevel: 1 },
+      ],
       [card]: [{ type: 'trader', traderId: 'juke-itos', name: 'Juke Itos' }],
       [treasureMap]: [
         { type: 'trader', traderId: 'juke-itos', name: 'Juke Itos' },
