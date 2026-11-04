@@ -4,7 +4,10 @@ import type { EquipmentContent } from '@interfaces/content-equipment';
 import type { ItemContent } from '@interfaces/content-item';
 import type { RecipeContent } from '@interfaces/content-recipe';
 
-export type MuseumCanBeDiscovered = { discovered: boolean };
+export type MuseumCanBeDiscovered = {
+  discovered: boolean;
+  discoveredButNotMade: boolean;
+};
 
 export type MuseumDiscoverableSingleSource = MuseumCanBeDiscovered & {
   source?: CollectibleSource;

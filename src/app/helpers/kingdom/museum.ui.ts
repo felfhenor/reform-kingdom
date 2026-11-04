@@ -44,6 +44,7 @@ export function museumCollectibleEntry(
   return {
     collectible,
     discovered,
+    discoveredButNotMade: false,
     quantity: getCollectibleQuantity(collectible.id),
     source: museumCollectibleSource(collectible.id, discovered),
   };
@@ -180,6 +181,7 @@ export function getMuseumRecipeEntries(): MuseumRecipeEntry[] {
       discovered,
       sourceNodeNames: knownSourceNames(recipeSources(recipe.id), discovered),
       tokenUnlockCost: discovered ? undefined : recipe.tokenUnlockCost,
+      discoveredButNotMade: false,
     };
   });
 
@@ -193,11 +195,15 @@ export function getMuseumItemEntries(): MuseumItemEntry[] {
 
   const entries = items.map((item) => {
     const discovered = isMaterialDiscovered(item.id);
+    const sourceNodeNames = knownSourceNames(itemSources(item.id), discovered);
 
     return {
       item,
       discovered,
-      sourceNodeNames: knownSourceNames(itemSources(item.id), discovered),
+      sourceNodeNames,
+      discoveredButNotMade: !!sourceNodeNames.find((n) =>
+        n.includes('Crafting'),
+      ),
     };
   });
 
@@ -209,11 +215,18 @@ export function getMuseumEquipmentEntries(): MuseumEquipmentEntry[] {
 
   const entries = equipment.map((item) => {
     const discovered = isEquipmentDiscovered(item.id);
+    const sourceNodeNames = knownSourceNames(
+      equipmentSources(item.id),
+      discovered,
+    );
 
     return {
       equipment: item,
       discovered,
-      sourceNodeNames: knownSourceNames(equipmentSources(item.id), discovered),
+      sourceNodeNames,
+      discoveredButNotMade: !!sourceNodeNames.find((n) =>
+        n.includes('Crafting'),
+      ),
     };
   });
 

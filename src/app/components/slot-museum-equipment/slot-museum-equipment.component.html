@@ -11,7 +11,7 @@
       spritesheet="equipment"
     ></app-slot-rarity-outline>
   </div>
-} @else if (e.sourceNodeNames.find((n) => n.includes('Crafting'))) {
+} @else if (e.discoveredButNotMade) {
   <div
     class="relative w-[64px] h-[64px] cursor-default opacity-50"
     [tp]="tooltip"
