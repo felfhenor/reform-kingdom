@@ -296,3 +296,7 @@ body {
 @utility zoom-header {
   zoom: 150%;
 }
+
+.checkbox:checked {
+  --input-color: var(--color-primary);
+}
