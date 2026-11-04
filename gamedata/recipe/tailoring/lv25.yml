@@ -83,7 +83,7 @@
   minTradeskillLevel: 26
   maxTradeskillLevel: 27
   tradeskillXP: 37
-  craftTime: 20
+  craftTime: 10
 
 - id: 985e2314-cec8-429e-958e-4fca82fc926f
   name: 'Material: Steelthread'

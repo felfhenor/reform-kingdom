@@ -144,7 +144,7 @@
   minTradeskillLevel: 26
   maxTradeskillLevel: 27
   tradeskillXP: 37
-  craftTime: 20
+  craftTime: 6
 
 - id: f70bb8f8-e0a1-4cdf-bc53-90c85e32e89c
   name: 'Material: Fel Steel Ingot'
@@ -162,7 +162,7 @@
   minTradeskillLevel: 27
   maxTradeskillLevel: 28
   tradeskillXP: 39
-  craftTime: 20
+  craftTime: 8
 
 - id: 7d6d8c91-1679-4078-98b7-756f4b63b4db
   name: 'Offhand: Felforged Blocker'

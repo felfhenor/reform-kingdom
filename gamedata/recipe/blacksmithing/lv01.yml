@@ -12,7 +12,7 @@
   minTradeskillLevel: 1
   maxTradeskillLevel: 3
   tradeskillXP: 1
-  craftTime: 5
+  craftTime: 3
 
 - id: 56654f67-a1c0-4086-9f11-51e94fb74a69
   name: 'Weapon: Copper Dagger'

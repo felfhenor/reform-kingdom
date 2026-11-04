@@ -14,7 +14,7 @@
   minTradeskillLevel: 20
   maxTradeskillLevel: 23
   tradeskillXP: 24
-  craftTime: 10
+  craftTime: 7
 
 - id: db39ce09-e8fe-4198-90fd-5088648d5bc9
   name: 'Weapon: Crimwood Bow'

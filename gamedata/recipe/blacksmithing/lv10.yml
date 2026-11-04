@@ -32,7 +32,7 @@
   minTradeskillLevel: 10
   maxTradeskillLevel: 12
   tradeskillXP: 8
-  craftTime: 10
+  craftTime: 5
 
 - id: 8f19fe15-e6b5-45e3-85eb-fd824f5d6800
   name: 'Weapon: Miremetal Sword'
