@@ -13,7 +13,7 @@ import { modalHasAnyOpen, modalIsOpen } from '@helpers/engine/modal-stack';
 import { isGameloopPaused } from '@helpers/gameloop';
 import { setOption } from '@helpers/state-options';
 
-const SECONDS_PER_PARAGRAPH = 7;
+const SECONDS_PER_PARAGRAPH = 10;
 const SKIP_HOLD_MS = 1000;
 
 @Component({
