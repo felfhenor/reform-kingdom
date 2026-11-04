@@ -11,8 +11,19 @@
       spritesheet="equipment"
     ></app-slot-rarity-outline>
   </div>
+} @else if (e.sourceNodeNames.find((n) => n.includes('Crafting'))) {
+  <div
+    class="relative w-[64px] h-[64px] cursor-default opacity-50"
+    [tp]="tooltip"
+    [tpPlacement]="'top'"
+  >
+    <app-slot-rarity-outline
+      [entry]="e.equipment"
+      spritesheet="equipment"
+    ></app-slot-rarity-outline>
+  </div>
 } @else {
-  <div [tp]="tooltip" [tpPlacement]="'top'">
+  <div [tp]="tooltip" [tpPlacement]="'top'" class="opacity-50">
     <app-icon-unknown />
   </div>
 }
