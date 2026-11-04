@@ -69,6 +69,27 @@
       }
     </app-page-paged-grid>
   }
+
+  @case ('equipment') {
+    <app-page-paged-grid
+      #equipmentGrid
+      [entries]="equipmentEntries()"
+      [filterFn]="equipmentFilterFn"
+      searchPlaceholder="Search by name or location..."
+      emptyMessage="No equipment found."
+      [reflow]="true"
+    >
+      <span header>Museum</span>
+
+      <div before-toolbar role="tablist" class="tabs tabs-box">
+        <ng-container *ngTemplateOutlet="tabs"></ng-container>
+      </div>
+
+      @for (entry of equipmentGrid.pagedEntries(); track entry.equipment.id) {
+        <app-slot-museum-equipment [entry]="entry" />
+      }
+    </app-page-paged-grid>
+  }
 }
 
 <ng-template #tabs>
@@ -115,6 +136,21 @@
       Materials
       <span class="badge badge-sm badge-data tabular-nums">
         {{ itemDiscoveredCount() }}/{{ itemEntries().length }}
+      </span>
+    </button>
+
+    <button
+      type="button"
+      role="tab"
+      class="tab gap-2"
+      [class.tab-active]="tab === 'equipment'"
+      (click)="setTab('equipment')"
+      appSfx="ui-click"
+      [sfxTrigger]="['click', 'hover']"
+    >
+      Equipment
+      <span class="badge badge-sm badge-data tabular-nums">
+        {{ equipmentDiscoveredCount() }}/{{ equipmentEntries().length }}
       </span>
     </button>
   }

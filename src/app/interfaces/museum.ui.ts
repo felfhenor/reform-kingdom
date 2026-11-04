@@ -1,1 +1,1 @@
-export type MuseumTab = 'collectibles' | 'recipes' | 'items';
+export type MuseumTab = 'collectibles' | 'recipes' | 'items' | 'equipment';

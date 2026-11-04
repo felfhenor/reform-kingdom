@@ -9,7 +9,9 @@ import {
   getCollectibleQuantity,
   isCollectibleDiscovered,
 } from '@helpers/item/collectibles';
+import { isEquipmentDiscovered } from '@helpers/kingdom/armory';
 import {
+  equipmentSources,
   isCollectibleSourceKnown,
   itemSources,
   recipeSources,
@@ -19,8 +21,10 @@ import type {
   CollectibleContent,
   CollectibleId,
   CollectibleSource,
+  EquipmentContent,
   ItemContent,
   MuseumCollectibleEntry,
+  MuseumEquipmentEntry,
   MuseumItemEntry,
   MuseumRecipeEntry,
   RecipeContent,
@@ -153,6 +157,19 @@ export function itemSourceNames(
     );
 }
 
+export function equipmentSourceNames(
+  equipment: EquipmentContent,
+  discovered: boolean,
+): string[] {
+  return equipmentSources(equipment.id)
+    .filter((source) => discovered || isCollectibleSourceKnown(source))
+    .map((source) =>
+      source.type === 'node'
+        ? worldNodeDisplayName(source.name)
+        : collectibleSourceName(source),
+    );
+}
+
 export function recipeKnownSourceNames(recipe: RecipeContent): string[] {
   return recipeSourceNames(recipe, isRecipeDiscovered(recipe.id));
 }
@@ -203,6 +220,26 @@ export function getMuseumItemEntries(): MuseumItemEntry[] {
   );
 }
 
+export function getMuseumEquipmentEntries(): MuseumEquipmentEntry[] {
+  const equipment = getEntriesByType<EquipmentContent>('equipment');
+
+  const entries = equipment.map((item) => {
+    const discovered = isEquipmentDiscovered(item.id);
+
+    return {
+      equipment: item,
+      discovered,
+      sourceNodeNames: equipmentSourceNames(item, discovered),
+    };
+  });
+
+  return orderBy(
+    entries,
+    [(entry) => (entry.discovered ? 1 : 0), (entry) => entry.equipment.name],
+    ['desc', 'asc'],
+  );
+}
+
 export function filterMuseumRecipeEntries(
   entries: MuseumRecipeEntry[],
   searchText: string,
@@ -230,6 +267,24 @@ export function filterMuseumItemEntries(
 
   return entries.filter((entry) => {
     if (entry.discovered && entry.item.name.toLowerCase().includes(text)) {
+      return true;
+    }
+
+    return entry.sourceNodeNames.some((name) =>
+      name.toLowerCase().includes(text),
+    );
+  });
+}
+
+export function filterMuseumEquipmentEntries(
+  entries: MuseumEquipmentEntry[],
+  searchText: string,
+): MuseumEquipmentEntry[] {
+  const text = searchText.trim().toLowerCase();
+  if (text === '') return entries;
+
+  return entries.filter((entry) => {
+    if (entry.discovered && entry.equipment.name.toLowerCase().includes(text)) {
       return true;
     }
 

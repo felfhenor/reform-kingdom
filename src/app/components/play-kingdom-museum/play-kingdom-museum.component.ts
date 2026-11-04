@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { PagePagedGridComponent } from '@components/page-paged-grid/page-paged-grid.component';
 import { SlotMuseumCollectibleComponent } from '@components/slot-museum-collectible/slot-museum-collectible.component';
+import { SlotMuseumEquipmentComponent } from '@components/slot-museum-equipment/slot-museum-equipment.component';
 import { SlotMuseumItemComponent } from '@components/slot-museum-item/slot-museum-item.component';
 import { SlotMuseumRecipeComponent } from '@components/slot-museum-recipe/slot-museum-recipe.component';
 import { SFXDirective } from '@directives/sfx.directive';
@@ -16,15 +17,18 @@ import { recipeUnlockWithTokens } from '@helpers/crafting/recipes.ui';
 import { notifyError, notifySuccess } from '@helpers/engine/notify';
 import {
   filterMuseumCollectibleEntries,
+  filterMuseumEquipmentEntries,
   filterMuseumItemEntries,
   filterMuseumRecipeEntries,
   getMuseumCollectibleEntries,
+  getMuseumEquipmentEntries,
   getMuseumItemEntries,
   getMuseumRecipeEntries,
 } from '@helpers/kingdom/museum.ui';
 import { isFelDefeated } from '@helpers/lore';
 import {
   type MuseumCollectibleEntry,
+  type MuseumEquipmentEntry,
   type MuseumItemEntry,
   type MuseumRecipeEntry,
   type MuseumTab,
@@ -42,6 +46,7 @@ import {
     SFXDirective,
     NgTemplateOutlet,
     SlotMuseumItemComponent,
+    SlotMuseumEquipmentComponent,
   ],
   templateUrl: './play-kingdom-museum.component.html',
   styleUrl: './play-kingdom-museum.component.scss',
@@ -56,18 +61,24 @@ export class PlayKingdomMuseumComponent {
     );
   private recipesGrid =
     viewChild<PagePagedGridComponent<MuseumRecipeEntry>>('recipesGrid');
+
   private itemsGrid =
     viewChild<PagePagedGridComponent<MuseumItemEntry>>('itemsGrid');
+
+  private equipmentGrid =
+    viewChild<PagePagedGridComponent<MuseumEquipmentEntry>>('equipmentGrid');
 
   public activeTab = signal<MuseumTab>('collectibles');
 
   public collectibleEntries = computed(() => getMuseumCollectibleEntries());
   public recipeEntries = computed(() => getMuseumRecipeEntries());
   public itemEntries = computed(() => getMuseumItemEntries());
+  public equipmentEntries = computed(() => getMuseumEquipmentEntries());
 
   public collectibleFilterFn = filterMuseumCollectibleEntries;
   public recipeFilterFn = filterMuseumRecipeEntries;
   public itemFilterFn = filterMuseumItemEntries;
+  public equipmentFilterFn = filterMuseumEquipmentEntries;
 
   public collectibleDiscoveredCount = computed(
     () => this.collectibleEntries().filter((entry) => entry.discovered).length,
@@ -78,6 +89,9 @@ export class PlayKingdomMuseumComponent {
   public itemDiscoveredCount = computed(
     () => this.itemEntries().filter((entry) => entry.discovered).length,
   );
+  public equipmentDiscoveredCount = computed(
+    () => this.equipmentEntries().filter((entry) => entry.discovered).length,
+  );
 
   public shouldShowSpoilerTabs = computed(() => isFelDefeated());
 
@@ -86,6 +100,7 @@ export class PlayKingdomMuseumComponent {
     this.collectiblesGrid()?.resetPage();
     this.recipesGrid()?.resetPage();
     this.itemsGrid()?.resetPage();
+    this.equipmentGrid()?.resetPage();
   }
 
   public async unlockRecipe(recipeId: RecipeId): Promise<void> {

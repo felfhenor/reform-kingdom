@@ -1,5 +1,6 @@
 import type { CollectibleSource } from '@interfaces/collectible-source';
 import type { CollectibleContent } from '@interfaces/content-collectible';
+import type { EquipmentContent } from '@interfaces/content-equipment';
 import type { ItemContent } from '@interfaces/content-item';
 import type { RecipeContent } from '@interfaces/content-recipe';
 
@@ -28,4 +29,8 @@ export type MuseumRecipeEntry = MuseumDiscoverableMultipleSources & {
 
 export type MuseumItemEntry = MuseumDiscoverableMultipleSources & {
   item: ItemContent;
+};
+
+export type MuseumEquipmentEntry = MuseumDiscoverableMultipleSources & {
+  equipment: EquipmentContent;
 };
