@@ -31,7 +31,6 @@ import type {
   RecipeContent,
   TradeskillContent,
 } from '@interfaces';
-import { RARITY_PRIORITY } from '@interfaces';
 import { orderBy } from 'es-toolkit/compat';
 
 const CRAFTING_SOURCE_NAME = 'Crafting';
@@ -56,15 +55,7 @@ export function getMuseumCollectibleEntries(): MuseumCollectibleEntry[] {
     museumCollectibleEntry,
   );
 
-  return orderBy(
-    entries,
-    [
-      (entry) => (entry.discovered ? 1 : 0),
-      (entry) => RARITY_PRIORITY[entry.collectible.rarity],
-      (entry) => entry.collectible.name,
-    ],
-    ['desc', 'desc', 'asc'],
-  );
+  return orderBy(entries, [(entry) => entry.collectible.name], ['asc']);
 }
 
 // An undiscovered collectible's source stays unknown until its map is visited or its town visited; an unmet trader is hinted at without a name.
@@ -192,11 +183,7 @@ export function getMuseumRecipeEntries(): MuseumRecipeEntry[] {
     };
   });
 
-  return orderBy(
-    entries,
-    [(entry) => (entry.discovered ? 1 : 0), (entry) => entry.recipe.name],
-    ['desc', 'asc'],
-  );
+  return orderBy(entries, [(entry) => entry.recipe.name], ['asc']);
 }
 
 export function getMuseumItemEntries(): MuseumItemEntry[] {
@@ -214,11 +201,7 @@ export function getMuseumItemEntries(): MuseumItemEntry[] {
     };
   });
 
-  return orderBy(
-    entries,
-    [(entry) => (entry.discovered ? 1 : 0), (entry) => entry.item.name],
-    ['desc', 'asc'],
-  );
+  return orderBy(entries, [(entry) => entry.item.name], ['asc']);
 }
 
 export function getMuseumEquipmentEntries(): MuseumEquipmentEntry[] {
@@ -234,11 +217,7 @@ export function getMuseumEquipmentEntries(): MuseumEquipmentEntry[] {
     };
   });
 
-  return orderBy(
-    entries,
-    [(entry) => (entry.discovered ? 1 : 0), (entry) => entry.equipment.name],
-    ['desc', 'asc'],
-  );
+  return orderBy(entries, [(entry) => entry.equipment.name], ['asc']);
 }
 
 export function filterMuseumRecipeEntries(

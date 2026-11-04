@@ -15,9 +15,9 @@ import { IconComponent } from '@components/icon/icon.component';
 import { ListReflowDirective } from '@directives/list-reflow.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 
-const CELL_FOOTPRINT_PX = 72;
+const CELL_FOOTPRINT_PX = 80;
 // auto-fill columns lose the p-2 padding (16) but not the last cell's gap (-8); +1 covers clientWidth rounding up.
-const GRID_COLUMN_INSET_PX = 9;
+const GRID_COLUMN_INSET_PX = 17;
 
 @Component({
   selector: 'app-page-paged-grid',
