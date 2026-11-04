@@ -335,7 +335,7 @@ export const NODE_REVEAL_POP_MS = 450;
 export const NODE_REVEAL_OVERSHOOT = 1.70158;
 export const NODE_REVEAL_RING_RADIUS_TILES = 1.5;
 export const INDICATOR_PROGRESS_BAR_HEIGHT = 6;
-export const INDICATOR_PROGRESS_BAR_OFFSET_Y = -50;
+export const INDICATOR_PROGRESS_BAR_OFFSET_Y = -60;
 export const NODE_STATUS_ICON_RADIUS = 7;
 // Still fast enough for node timers and the 150ms status refresh to read as live.
 export const MAP_UNFOCUSED_MAX_FPS = 10;
