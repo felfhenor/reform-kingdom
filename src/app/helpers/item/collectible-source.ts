@@ -39,7 +39,11 @@ export function collectibleSourceMapBuild(): Map<
 
   getEntriesByType<RecipeContent>('recipe').forEach((recipe) => {
     if ('collectibleId' in recipe.result) {
-      addSource(recipe.result.collectibleId, { type: 'crafting' });
+      addSource(recipe.result.collectibleId, {
+        type: 'crafting',
+        tradeskillId: recipe.tradeskillId,
+        tradeskillLevel: recipe.minTradeskillLevel,
+      });
     }
   });
 

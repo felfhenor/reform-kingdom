@@ -1,97 +1,121 @@
 @let tab = activeTab();
 
-@if (tab === 'collectibles') {
-  <app-page-paged-grid
-    #collectiblesGrid
-    [entries]="collectibleEntries()"
-    [filterFn]="collectibleFilterFn"
-    searchPlaceholder="Search by name, description, or location..."
-    emptyMessage="No collectibles found."
-    [reflow]="true"
-  >
-    <span header>Museum</span>
+@switch (tab) {
+  @case ('collectibles') {
+    <app-page-paged-grid
+      #collectiblesGrid
+      [entries]="collectibleEntries()"
+      [filterFn]="collectibleFilterFn"
+      searchPlaceholder="Search by name, description, or location..."
+      emptyMessage="No collectibles found."
+      [reflow]="true"
+    >
+      <span header>Museum</span>
 
-    <div before-toolbar role="tablist" class="tabs tabs-box">
-      <button
-        type="button"
-        role="tab"
-        class="tab tab-active gap-2"
-        (click)="setTab('collectibles')"
-        appSfx="ui-click"
-        [sfxTrigger]="['click', 'hover']"
-      >
-        Collectibles
-        <span class="badge badge-sm badge-data tabular-nums">
-          {{ collectibleDiscoveredCount() }}/{{ collectibleEntries().length }}
-        </span>
-      </button>
-      <button
-        type="button"
-        role="tab"
-        class="tab gap-2"
-        (click)="setTab('recipes')"
-        appSfx="ui-click"
-        [sfxTrigger]="['click', 'hover']"
-      >
-        Recipes
-        <span class="badge badge-sm badge-data tabular-nums">
-          {{ recipeDiscoveredCount() }}/{{ recipeEntries().length }}
-        </span>
-      </button>
-    </div>
+      <div before-toolbar role="tablist" class="tabs tabs-box">
+        <ng-container *ngTemplateOutlet="tabs"></ng-container>
+      </div>
 
-    @for (
-      entry of collectiblesGrid.pagedEntries();
-      track entry.collectible.id
-    ) {
-      <app-slot-museum-collectible [entry]="entry" />
-    }
-  </app-page-paged-grid>
-} @else {
-  <app-page-paged-grid
-    #recipesGrid
-    [entries]="recipeEntries()"
-    [filterFn]="recipeFilterFn"
-    searchPlaceholder="Search by name or location..."
-    emptyMessage="No recipes found."
-    [reflow]="true"
-  >
-    <span header>Museum</span>
+      @for (
+        entry of collectiblesGrid.pagedEntries();
+        track entry.collectible.id
+      ) {
+        <app-slot-museum-collectible [entry]="entry" />
+      }
+    </app-page-paged-grid>
+  }
 
-    <div before-toolbar role="tablist" class="tabs tabs-box">
-      <button
-        type="button"
-        role="tab"
-        class="tab gap-2"
-        (click)="setTab('collectibles')"
-        appSfx="ui-click"
-        [sfxTrigger]="['click', 'hover']"
-      >
-        Collectibles
-        <span class="badge badge-sm badge-data tabular-nums">
-          {{ collectibleDiscoveredCount() }}/{{ collectibleEntries().length }}
-        </span>
-      </button>
-      <button
-        type="button"
-        role="tab"
-        class="tab tab-active gap-2"
-        (click)="setTab('recipes')"
-        appSfx="ui-click"
-        [sfxTrigger]="['click', 'hover']"
-      >
-        Recipes
-        <span class="badge badge-sm badge-data tabular-nums">
-          {{ recipeDiscoveredCount() }}/{{ recipeEntries().length }}
-        </span>
-      </button>
-    </div>
+  @case ('recipes') {
+    <app-page-paged-grid
+      #recipesGrid
+      [entries]="recipeEntries()"
+      [filterFn]="recipeFilterFn"
+      searchPlaceholder="Search by name or location..."
+      emptyMessage="No recipes found."
+      [reflow]="true"
+    >
+      <span header>Museum</span>
 
-    @for (entry of recipesGrid.pagedEntries(); track entry.recipe.id) {
-      <app-slot-museum-recipe
-        [entry]="entry"
-        (unlock)="unlockRecipe(entry.recipe.id)"
-      />
-    }
-  </app-page-paged-grid>
+      <div before-toolbar role="tablist" class="tabs tabs-box">
+        <ng-container *ngTemplateOutlet="tabs"></ng-container>
+      </div>
+
+      @for (entry of recipesGrid.pagedEntries(); track entry.recipe.id) {
+        <app-slot-museum-recipe
+          [entry]="entry"
+          (unlock)="unlockRecipe(entry.recipe.id)"
+        />
+      }
+    </app-page-paged-grid>
+  }
+
+  @case ('items') {
+    <app-page-paged-grid
+      #itemsGrid
+      [entries]="itemEntries()"
+      [filterFn]="itemFilterFn"
+      searchPlaceholder="Search by name or location..."
+      emptyMessage="No materials found."
+      [reflow]="true"
+    >
+      <span header>Museum</span>
+
+      <div before-toolbar role="tablist" class="tabs tabs-box">
+        <ng-container *ngTemplateOutlet="tabs"></ng-container>
+      </div>
+
+      @for (entry of itemsGrid.pagedEntries(); track entry.item.id) {
+        <app-slot-museum-item [entry]="entry" />
+      }
+    </app-page-paged-grid>
+  }
 }
+
+<ng-template #tabs>
+  <button
+    type="button"
+    role="tab"
+    class="tab gap-2"
+    [class.tab-active]="tab === 'collectibles'"
+    (click)="setTab('collectibles')"
+    appSfx="ui-click"
+    [sfxTrigger]="['click', 'hover']"
+  >
+    Collectibles
+    <span class="badge badge-sm badge-data tabular-nums">
+      {{ collectibleDiscoveredCount() }}/{{ collectibleEntries().length }}
+    </span>
+  </button>
+
+  <button
+    type="button"
+    role="tab"
+    class="tab gap-2"
+    [class.tab-active]="tab === 'recipes'"
+    (click)="setTab('recipes')"
+    appSfx="ui-click"
+    [sfxTrigger]="['click', 'hover']"
+  >
+    Recipes
+    <span class="badge badge-sm badge-data tabular-nums">
+      {{ recipeDiscoveredCount() }}/{{ recipeEntries().length }}
+    </span>
+  </button>
+
+  @if (shouldShowSpoilerTabs()) {
+    <button
+      type="button"
+      role="tab"
+      class="tab gap-2"
+      [class.tab-active]="tab === 'items'"
+      (click)="setTab('items')"
+      appSfx="ui-click"
+      [sfxTrigger]="['click', 'hover']"
+    >
+      Materials
+      <span class="badge badge-sm badge-data tabular-nums">
+        {{ itemDiscoveredCount() }}/{{ itemEntries().length }}
+      </span>
+    </button>
+  }
+</ng-template>

@@ -1,8 +1,9 @@
-import { getEntriesByType } from '@helpers/content/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
   isRecipeDiscovered,
   isRecipeDropGated,
 } from '@helpers/crafting/recipes';
+import { isMaterialDiscovered } from '@helpers/item';
 import { getCollectibleSource } from '@helpers/item/collectible-source';
 import {
   getCollectibleQuantity,
@@ -10,6 +11,7 @@ import {
 } from '@helpers/item/collectibles';
 import {
   isCollectibleSourceKnown,
+  itemSources,
   recipeSources,
 } from '@helpers/kingdom/museum';
 import { worldNodeDisplayName } from '@helpers/world-node/world-nodes';
@@ -17,9 +19,12 @@ import type {
   CollectibleContent,
   CollectibleId,
   CollectibleSource,
+  ItemContent,
   MuseumCollectibleEntry,
+  MuseumItemEntry,
   MuseumRecipeEntry,
   RecipeContent,
+  TradeskillContent,
 } from '@interfaces';
 import { RARITY_PRIORITY } from '@interfaces';
 import { orderBy } from 'es-toolkit/compat';
@@ -75,25 +80,20 @@ function museumCollectibleSource(
 }
 
 function collectibleSourceName(source: CollectibleSource): string {
-  return source.type === 'crafting' ? CRAFTING_SOURCE_NAME : source.name;
+  if (source.type === 'crafting') {
+    const tradeskillName =
+      getEntry<TradeskillContent>(source.tradeskillId)?.name ?? 'Unknown';
+
+    return `${CRAFTING_SOURCE_NAME} (${tradeskillName} Lv. ${source.tradeskillLevel})`;
+  }
+
+  return source.name;
 }
 
 export function museumCollectibleSourceLabel({
   source,
-  discovered,
 }: MuseumCollectibleEntry): string | undefined {
-  switch (source?.type) {
-    case 'crafting':
-      return `Source: ${CRAFTING_SOURCE_NAME}`;
-    case 'trader':
-      return `From: ${source.name}`;
-    case 'node':
-      return `${discovered ? 'Found in' : 'Discoverable in'}: ${source.name}`;
-    case 'raid':
-      return `From defending: ${source.name}`;
-    default:
-      return undefined;
-  }
+  return collectibleSourceName(source ?? { type: 'node', name: 'Unknown' });
 }
 
 export function filterMuseumCollectibleEntries(
@@ -140,6 +140,19 @@ export function recipeSourceNames(
     );
 }
 
+export function itemSourceNames(
+  item: ItemContent,
+  discovered: boolean,
+): string[] {
+  return itemSources(item.id)
+    .filter((source) => discovered || isCollectibleSourceKnown(source))
+    .map((source) =>
+      source.type === 'node'
+        ? worldNodeDisplayName(source.name)
+        : collectibleSourceName(source),
+    );
+}
+
 export function recipeKnownSourceNames(recipe: RecipeContent): string[] {
   return recipeSourceNames(recipe, isRecipeDiscovered(recipe.id));
 }
@@ -168,6 +181,28 @@ export function getMuseumRecipeEntries(): MuseumRecipeEntry[] {
   );
 }
 
+export function getMuseumItemEntries(): MuseumItemEntry[] {
+  const items = getEntriesByType<ItemContent>('item').filter(
+    (i) => !i.unobtainable,
+  );
+
+  const entries = items.map((item) => {
+    const discovered = isMaterialDiscovered(item.id);
+
+    return {
+      item,
+      discovered,
+      sourceNodeNames: itemSourceNames(item, discovered),
+    };
+  });
+
+  return orderBy(
+    entries,
+    [(entry) => (entry.discovered ? 1 : 0), (entry) => entry.item.name],
+    ['desc', 'asc'],
+  );
+}
+
 export function filterMuseumRecipeEntries(
   entries: MuseumRecipeEntry[],
   searchText: string,
@@ -177,6 +212,24 @@ export function filterMuseumRecipeEntries(
 
   return entries.filter((entry) => {
     if (entry.discovered && entry.recipe.name.toLowerCase().includes(text)) {
+      return true;
+    }
+
+    return entry.sourceNodeNames.some((name) =>
+      name.toLowerCase().includes(text),
+    );
+  });
+}
+
+export function filterMuseumItemEntries(
+  entries: MuseumItemEntry[],
+  searchText: string,
+): MuseumItemEntry[] {
+  const text = searchText.trim().toLowerCase();
+  if (text === '') return entries;
+
+  return entries.filter((entry) => {
+    if (entry.discovered && entry.item.name.toLowerCase().includes(text)) {
       return true;
     }
 

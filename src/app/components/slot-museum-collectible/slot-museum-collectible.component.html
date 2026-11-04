@@ -34,7 +34,7 @@
 
 <ng-template #sourceLine>
   @if (sourceLabel(); as label) {
-    <div class="text-xs">{{ label }}</div>
+    <div class="text-xs">Source: {{ label }}</div>
   } @else if (!e.discovered) {
     <div class="type-meta">Source unknown</div>
   }

@@ -45,7 +45,7 @@
       @if (showLocations()) {
         @if (e.sourceNodeNames.length > 0) {
           <span class="type-meta">
-            Discoverable in: {{ e.sourceNodeNames.join(', ') }}
+            Source: {{ e.sourceNodeNames.join(', ') }}
           </span>
         } @else {
           <span class="type-meta">Location unknown</span>

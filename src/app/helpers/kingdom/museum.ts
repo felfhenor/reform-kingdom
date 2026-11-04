@@ -6,9 +6,51 @@ import type {
   CaravanTraderContent,
   CollectibleSource,
   EncounterContent,
+  ItemId,
+  RecipeContent,
   RecipeId,
 } from '@interfaces';
 import { uniqBy } from 'es-toolkit/compat';
+
+export function itemSources(itemId: ItemId): CollectibleSource[] {
+  const encounters = getEntriesByType<EncounterContent>('encounter');
+  const traders = getEntriesByType<CaravanTraderContent>('caravantrader');
+  const recipes = getEntriesByType<RecipeContent>('recipe');
+
+  const dropEncounters = encounters.filter((encounter) =>
+    encounter.completionRewards.some(
+      (reward) => 'itemId' in reward && reward.itemId === itemId,
+    ),
+  );
+
+  const dropSources: CollectibleSource[] = uniqBy(dropEncounters, 'name').map(
+    (encounter) => ({ type: 'node', name: encounter.name }),
+  );
+
+  const traderSources: CollectibleSource[] = traders
+    .filter(
+      (trader) =>
+        trader.trades.some((trade) => trade.itemId === itemId) ||
+        trader.tokenTrades.some((trade) => trade.itemId === itemId),
+    )
+    .map((trader) => ({
+      type: 'trader',
+      traderId: trader.id,
+      name: trader.name,
+    }));
+
+  const craftingSources: CollectibleSource[] = recipes
+    .filter(
+      (recipe) => 'itemId' in recipe.result && recipe.result.itemId === itemId,
+    )
+    .map((recipe) => ({
+      type: 'crafting',
+      tradeskillId: recipe.tradeskillId,
+      tradeskillLevel: recipe.minTradeskillLevel,
+    }));
+
+  return [...dropSources, ...traderSources, ...craftingSources];
+}
 
 export function recipeSources(recipeId: RecipeId): CollectibleSource[] {
   const encounters = getEntriesByType<EncounterContent>('encounter');
