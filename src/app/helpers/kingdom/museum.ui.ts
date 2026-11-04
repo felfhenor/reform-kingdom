@@ -24,6 +24,7 @@ import type {
   EquipmentContent,
   ItemContent,
   MuseumCollectibleEntry,
+  MuseumDiscoverableMultipleSources,
   MuseumEquipmentEntry,
   MuseumItemEntry,
   MuseumRecipeEntry,
@@ -100,68 +101,65 @@ export function museumCollectibleSourceLabel({
   return collectibleSourceName(source ?? { type: 'node', name: 'Unknown' });
 }
 
+function textIncludes(value: string, text: string): boolean {
+  return value.toLowerCase().includes(text);
+}
+
+// Shared search-box behaviour: trims/lowercases the query and returns everything when it is empty.
+function filterMuseumEntries<T>(
+  entries: T[],
+  searchText: string,
+  matches: (entry: T, text: string) => boolean,
+): T[] {
+  const text = searchText.trim().toLowerCase();
+  if (text === '') return entries;
+
+  return entries.filter((entry) => matches(entry, text));
+}
+
+// Undiscovered entries only match on their sources, never their name.
+function filterByNameAndSources<T extends MuseumDiscoverableMultipleSources>(
+  entries: T[],
+  searchText: string,
+  name: (entry: T) => string,
+): T[] {
+  return filterMuseumEntries(
+    entries,
+    searchText,
+    (entry, text) =>
+      (entry.discovered && textIncludes(name(entry), text)) ||
+      entry.sourceNodeNames.some((sourceName) =>
+        textIncludes(sourceName, text),
+      ),
+  );
+}
+
 export function filterMuseumCollectibleEntries(
   entries: MuseumCollectibleEntry[],
   searchText: string,
 ): MuseumCollectibleEntry[] {
-  const text = searchText.trim().toLowerCase();
-  if (text === '') return entries;
-
-  return entries.filter((entry) => {
-    if (!entry.discovered) {
-      return (
-        !!entry.source &&
-        collectibleSourceName(entry.source).toLowerCase().includes(text)
-      );
-    }
-
-    if (entry.collectible.name.toLowerCase().includes(text)) return true;
-    if (entry.collectible.description.toLowerCase().includes(text)) {
-      return true;
-    }
+  return filterMuseumEntries(entries, searchText, (entry, text) => {
     if (
       entry.source &&
-      collectibleSourceName(entry.source).toLowerCase().includes(text)
+      textIncludes(collectibleSourceName(entry.source), text)
     ) {
       return true;
     }
+    if (!entry.discovered) return false;
 
-    return false;
+    return (
+      textIncludes(entry.collectible.name, text) ||
+      textIncludes(entry.collectible.description, text)
+    );
   });
 }
 
-// Undiscovered recipes only list sources the player has already found.
-export function recipeSourceNames(
-  recipe: RecipeContent,
+// Undiscovered entries only list sources the player has already found.
+function knownSourceNames(
+  sources: CollectibleSource[],
   discovered: boolean,
 ): string[] {
-  return recipeSources(recipe.id)
-    .filter((source) => discovered || isCollectibleSourceKnown(source))
-    .map((source) =>
-      source.type === 'node'
-        ? worldNodeDisplayName(source.name)
-        : collectibleSourceName(source),
-    );
-}
-
-export function itemSourceNames(
-  item: ItemContent,
-  discovered: boolean,
-): string[] {
-  return itemSources(item.id)
-    .filter((source) => discovered || isCollectibleSourceKnown(source))
-    .map((source) =>
-      source.type === 'node'
-        ? worldNodeDisplayName(source.name)
-        : collectibleSourceName(source),
-    );
-}
-
-export function equipmentSourceNames(
-  equipment: EquipmentContent,
-  discovered: boolean,
-): string[] {
-  return equipmentSources(equipment.id)
+  return sources
     .filter((source) => discovered || isCollectibleSourceKnown(source))
     .map((source) =>
       source.type === 'node'
@@ -171,7 +169,10 @@ export function equipmentSourceNames(
 }
 
 export function recipeKnownSourceNames(recipe: RecipeContent): string[] {
-  return recipeSourceNames(recipe, isRecipeDiscovered(recipe.id));
+  return knownSourceNames(
+    recipeSources(recipe.id),
+    isRecipeDiscovered(recipe.id),
+  );
 }
 
 // Only drop-gated recipes are shown - level-learned recipes have no discovery to track.
@@ -186,7 +187,7 @@ export function getMuseumRecipeEntries(): MuseumRecipeEntry[] {
     return {
       recipe,
       discovered,
-      sourceNodeNames: recipeSourceNames(recipe, discovered),
+      sourceNodeNames: knownSourceNames(recipeSources(recipe.id), discovered),
       tokenUnlockCost: discovered ? undefined : recipe.tokenUnlockCost,
     };
   });
@@ -209,7 +210,7 @@ export function getMuseumItemEntries(): MuseumItemEntry[] {
     return {
       item,
       discovered,
-      sourceNodeNames: itemSourceNames(item, discovered),
+      sourceNodeNames: knownSourceNames(itemSources(item.id), discovered),
     };
   });
 
@@ -229,7 +230,7 @@ export function getMuseumEquipmentEntries(): MuseumEquipmentEntry[] {
     return {
       equipment: item,
       discovered,
-      sourceNodeNames: equipmentSourceNames(item, discovered),
+      sourceNodeNames: knownSourceNames(equipmentSources(item.id), discovered),
     };
   });
 
@@ -244,52 +245,19 @@ export function filterMuseumRecipeEntries(
   entries: MuseumRecipeEntry[],
   searchText: string,
 ): MuseumRecipeEntry[] {
-  const text = searchText.trim().toLowerCase();
-  if (text === '') return entries;
-
-  return entries.filter((entry) => {
-    if (entry.discovered && entry.recipe.name.toLowerCase().includes(text)) {
-      return true;
-    }
-
-    return entry.sourceNodeNames.some((name) =>
-      name.toLowerCase().includes(text),
-    );
-  });
+  return filterByNameAndSources(entries, searchText, (e) => e.recipe.name);
 }
 
 export function filterMuseumItemEntries(
   entries: MuseumItemEntry[],
   searchText: string,
 ): MuseumItemEntry[] {
-  const text = searchText.trim().toLowerCase();
-  if (text === '') return entries;
-
-  return entries.filter((entry) => {
-    if (entry.discovered && entry.item.name.toLowerCase().includes(text)) {
-      return true;
-    }
-
-    return entry.sourceNodeNames.some((name) =>
-      name.toLowerCase().includes(text),
-    );
-  });
+  return filterByNameAndSources(entries, searchText, (e) => e.item.name);
 }
 
 export function filterMuseumEquipmentEntries(
   entries: MuseumEquipmentEntry[],
   searchText: string,
 ): MuseumEquipmentEntry[] {
-  const text = searchText.trim().toLowerCase();
-  if (text === '') return entries;
-
-  return entries.filter((entry) => {
-    if (entry.discovered && entry.equipment.name.toLowerCase().includes(text)) {
-      return true;
-    }
-
-    return entry.sourceNodeNames.some((name) =>
-      name.toLowerCase().includes(text),
-    );
-  });
+  return filterByNameAndSources(entries, searchText, (e) => e.equipment.name);
 }
