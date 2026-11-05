@@ -25,7 +25,7 @@
       value: 500
       itemId: Pumpkin Gem
       limit: 5
-      weight: 2
+      weight: 3
 
     # base game items
     - type: sell
@@ -92,6 +92,12 @@
       itemId: Duskhall Flux
       limit: 3
       weight: 2
+
+    - type: sell
+      value: 500
+      itemId: Pumpkin Gem
+      limit: 5
+      weight: 3
 
     - type: sell
       value: 500
