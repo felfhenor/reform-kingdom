@@ -86,6 +86,7 @@
           <input
             type="checkbox"
             [checked]="autoModeEnabled()"
+            (change)="toggleAutoMode()"
             class="checkbox checkbox-xs"
           />
 
@@ -96,6 +97,7 @@
           @let activeId = activeClauseId();
           <div class="flex flex-col gap-2 p-2 max-w-[400px]">
             <span class="font-semibold">Decree [5]</span>
+            <span class="my-2 type-hint">Right click to toggle auto-mode</span>
             @for (clause of enabledClauses(); track clause.id) {
               <span
                 class="text-xs"
