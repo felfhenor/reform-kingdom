@@ -133,8 +133,8 @@ export const ONE_YEAR_TICKS = 60 * 60 * 24 * 365;
 
 // Hero
 
-export const HEALING_MINIMUM_SECONDS = 10;
-export const HEALING_SECONDS_PER_LEVEL = 2;
+export const HEALING_MINIMUM_SECONDS = 1;
+export const HEALING_SECONDS_PER_LEVEL = 1;
 export const RECLASS_GOLD_PER_LEVEL = 100;
 export const CHARACTER_MAX_LEVEL = 99;
 export const PARTY_SIZE_MAX = 4;
@@ -148,8 +148,8 @@ export const TICKS_PER_STEP_ON_PATH = 1;
 export const TICKS_PER_STEP_OFF_PATH = 3;
 export const TICKS_PER_STEP_MIN_DIFF = 0.25;
 export const TRAVEL_UNITS_PER_TICK = 100;
-export const DEATHS_DOOR_SECONDS_PER_MAP = 10;
-export const DEATHS_DOOR_MINIMUM_SECONDS = 10;
+export const DEATHS_DOOR_SECONDS_PER_MAP = 3;
+export const DEATHS_DOOR_MINIMUM_SECONDS = 3;
 // Minimum ticks between two Intimidation auto-wins, so Intimidation can't instantly sweep a chain of weak nodes.
 export const INTIMIDATION_COOLDOWN_TICKS = 15;
 // Shared by every shrine, since a prayer anywhere replaces the last shrine's buff.
