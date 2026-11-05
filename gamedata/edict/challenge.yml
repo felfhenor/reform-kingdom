@@ -1,5 +1,5 @@
 - id: 8e5d5f1e-8a19-4b87-8c5c-e46426c89c8f
-  name: Edict of Frailty
+  name: Edict of Craven Frailty
   enabled: true
   sprite: '0011'
   description: Hero stats are reduced by 25%.
@@ -12,7 +12,7 @@
       percent: -25
 
 - id: d08f7c2f-05c0-43bc-bb14-7c8a5cc317b7
-  name: Edict of Fury
+  name: Edict of Nature's Wrath
   enabled: true
   sprite: '0012'
   description: Monster stats are increased by 25%.
@@ -25,56 +25,56 @@
       percent: 25
 
 - id: 3a267cfb-b42d-4b11-8fea-ae17e1041caa
-  name: Edict of Humility
+  name: Edict of Skillful Humility
   sprite: '0013'
   description: Specializations grant no bonus stats. Their skills and oath effects still work.
   kind: Challenge
   fragments: 2
 
 - id: fc200585-8c6b-47b2-884d-6ba53d35098b
-  name: Edict of the Wilds
+  name: Edict of the Magic Wilds
   sprite: '0014'
   description: Every monster gets one extra skill from its region's pool.
   kind: Challenge
   fragments: 3
 
 - id: bfc84b5e-c4fd-4fb0-8f6c-e4287aa66d15
-  name: Edict of the Tide
+  name: Edict of the Rising Tide
   sprite: '0015'
   description: Nodes rise to meet your party, so none are ever Trivial. Drops and gathering in old regions scale up with them.
   kind: Challenge
   fragments: 4
 
 - id: dbe3fe9d-6e30-4226-9168-88695fe136d6
-  name: Edict of Famine
+  name: Edict of Esurient Poverty
   sprite: '0016'
   description: Combat XP and gold are reduced by 40%. Commissions and town reputation pay much more.
   kind: Challenge
   fragments: 2
 
 - id: 513d5b7a-2a6e-47e0-883a-4891d6af6c40
-  name: Edict of Monopoly
+  name: Edict of Golden Monopoly
   sprite: '0017'
   description: Town shop prices are doubled. Exchange and caravan trader rates are better.
   kind: Challenge
   fragments: 1
 
 - id: c03e5ab7-1e05-4e4d-a128-be17f5e58b2d
-  name: Edict of Scarcity
+  name: Edict of True Scarcity
   sprite: '0009'
   description: Recipes need more materials. Crafted gear always rolls one extra affix.
   kind: Challenge
   fragments: 2
 
 - id: d6631919-4f78-4b2e-973a-df63d710909b
-  name: Edict of Curses
+  name: Edict of Fickle Curses
   sprite: '0010'
   description: Every dropped piece of equipment rolls a curse affix, and one extra good affix.
   kind: Challenge
   fragments: 2
 
 - id: fabe9a7d-6448-409e-9ed0-103cfa0a6974
-  name: Edict of Iron
+  name: Edict of Iron Blood
   sprite: '0008'
   description: A wipe ends the run.
   kind: Challenge

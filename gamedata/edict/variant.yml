@@ -1,54 +1,54 @@
 - id: 707f8b70-d85f-48de-b579-41591a7b7326
-  name: Edict of Mirrors
+  name: Edict of Reflective Mirrors
   sprite: '0028'
   description: Every hero must share one class. That job's abilities stack instead of only the highest counting.
   kind: Variant
   fragments: 0
 
 - id: dfca0a13-72ba-4c61-abc4-06f3677d5428
-  name: Edict of Homesteads
+  name: Edict of Plentiful Farmsteads
   sprite: '0027'
   description: Caravans are gone. Gather yield is increased by 25%.
   kind: Variant
   fragments: 0
 
 - id: e86047ab-7f77-4711-b50a-07d0cff1d65b
-  name: Edict of Pilgrims
+  name: Edict of Nomadic Departure
   sprite: '0026'
   description: Outposts are gone, so there is no Set Home or teleport, and Deaths Door walks all the way home. Shrines last much longer and are stronger.
   kind: Variant
   fragments: 0
 
 - id: 277dcf0b-f0a4-4ec9-9cdd-6b9b8f991f3e
-  name: Edict of Borders
+  name: Edict of Exogenous Support
   sprite: '0022'
   description: The Exchange is gone. Commissions grant double reputation, and towns offer more commission slots.
   kind: Variant
   fragments: 0
 
 - id: d9f1a5fc-a65a-43ae-a5c6-e0cfe363f961
-  name: Edict of the Forge
+  name: Edict of the Heated Forge
   sprite: '0020'
   description: Town shops no longer sell equipment. You get more worker slots and a deeper tradeskill queue.
   kind: Variant
   fragments: 0
 
 - id: 8847b540-dfa4-44d6-8258-8a4a314491b5
-  name: Edict of Coin
+  name: Edict of Cold Coins
   sprite: '0021'
   description: Player tradeskills are gone. Shops and caravans carry better goods, and commissions can be paid with gold.
   kind: Variant
   fragments: 0
 
 - id: 2fddab9f-257d-418c-8137-87616780e74b
-  name: Edict of the Stars
+  name: Edict of the Starry Sky
   sprite: '0018'
   description: Shrines are gone. Astral projector spells are stronger and last longer.
   kind: Variant
   fragments: 0
 
 - id: d105fead-7d45-45d1-ac4c-11ccb1ca6634
-  name: Edict of Devotion
+  name: Edict of True Devotion
   sprite: '0019'
   description: Reclassing is gone. Job abilities rank up faster, and heroes earn bonus skill points.
   kind: Variant
