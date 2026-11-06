@@ -21,6 +21,7 @@ import type {
   GlobalEffectEffectDeathPenaltyMultiplier,
   GlobalEffectEffectLevelStatMultiplier,
   GlobalEffectEffectShrineBuffsPermanent,
+  GlobalEffectEffectEnemyExtraSkills,
   GlobalEffectEffectTradeskillQueueSizeBoost,
   GlobalEffectEffectXPGainMultiplier,
   GlobalEffectId,
@@ -38,6 +39,7 @@ export function ensureGlobalEffectEffect(
     Partial<GlobalEffectEffectDeathPenaltyMultiplier> &
     Partial<GlobalEffectEffectLevelStatMultiplier> &
     Partial<GlobalEffectEffectShrineBuffsPermanent> &
+    Partial<GlobalEffectEffectEnemyExtraSkills> &
     Partial<GlobalEffectEffectGoldGainMultiplier> &
     Partial<GlobalEffectEffectDebuffResistance> &
     Partial<GlobalEffectEffectDebuffResistanceTag> &
@@ -109,6 +111,10 @@ export function ensureGlobalEffectEffect(
       effectType: 'GlobalShopPriceMultiplier',
       value: effect.value ?? 0,
     };
+  }
+
+  if (effect.effectType === 'EnemyExtraSkills') {
+    return { effectType: 'EnemyExtraSkills', value: effect.value ?? 0 };
   }
 
   if (effect.effectType === 'GlobalShrineBuffsPermanent') {

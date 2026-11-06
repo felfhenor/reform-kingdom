@@ -1,3 +1,5 @@
+import { ensureArray } from '@helpers/content/ensure-helpers-core';
+import { ensureMonsterSkill } from '@helpers/content/ensure-monster';
 import type { EncounterId, RegionContent, RegionId } from '@interfaces';
 
 export function ensureRegion(
@@ -13,5 +15,6 @@ export function ensureRegion(
       sealEncounterId: 'UNKNOWN' as EncounterId,
       parTicks: 1,
     },
+    skillPool: ensureArray(region.skillPool, ensureMonsterSkill),
   };
 }

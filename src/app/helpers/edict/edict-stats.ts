@@ -1,6 +1,19 @@
-import { monsterStatsAtLevel } from '@helpers/combat/monster';
-import { globalEffectSumsState } from '@helpers/state-game';
-import type { GameStat, MonsterContent, StatBlock } from '@interfaces';
+import {
+  monsterSkillsAtLevel,
+  monsterStatsAtLevel,
+} from '@helpers/combat/monster';
+import { regionForMap } from '@helpers/lore/region-intro';
+import { rngShuffle } from '@helpers/rng';
+import {
+  globalEffectSumsState,
+  worldCurrentLocationState,
+} from '@helpers/state-game';
+import type {
+  GameStat,
+  MonsterContent,
+  MonsterSkill,
+  StatBlock,
+} from '@interfaces';
 
 const PERCENT_ROUNDED_STATS: GameStat[] = ['Health', 'Energy'];
 
@@ -31,4 +44,25 @@ export function monsterStatsForRun(
     monsterStatsAtLevel(monster, level),
     globalEffectSumsState().enemyStatPercents,
   );
+}
+
+// Extra skills come from the region the party is fighting in, never one the monster already has.
+export function monsterSkillsForRun(
+  monster: MonsterContent,
+  level: number,
+): MonsterSkill[] {
+  const skills = monsterSkillsAtLevel(monster, level);
+  const extra = globalEffectSumsState().enemyExtraSkills;
+  if (extra <= 0) return skills;
+
+  const known = skills.map((skill) => skill.skillId);
+  const pool = (
+    regionForMap(worldCurrentLocationState().mapName)?.skillPool ?? []
+  ).filter(
+    (skill) =>
+      skill.minLevel <= level &&
+      skill.maxLevel >= level &&
+      !known.includes(skill.skillId),
+  );
+  return [...skills, ...rngShuffle(pool).slice(0, extra)];
 }

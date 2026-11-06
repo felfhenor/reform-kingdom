@@ -4,6 +4,25 @@
   seal:
     sealEncounterId: Spider Tower
     parTicks: 10800
+  skillPool:
+    - skillId: Double Strike I
+      weight: 2
+    - skillId: Sweep I
+      weight: 2
+    - skillId: Fortify I
+      weight: 2
+    - skillId: Snipe I
+      weight: 2
+    - skillId: Thunderbolt I
+      weight: 2
+    - skillId: Slow Web I
+      weight: 2
+    - skillId: Double Strike II
+      weight: 2
+      minLevel: 20
+    - skillId: Snipe II
+      weight: 2
+      minLevel: 20
   description: Home of the Founder, and the only place that remembers itself. Filled with flowery fields, mines ripe for the taking, and woods ready to be felled. The resources are plentiful, but so are the goblins. At least they're not all bad.
 
 - id: 8c8691c8-28d4-4fde-97c9-dd81ab18fe2b
@@ -12,6 +31,19 @@
   seal:
     sealEncounterId: Spirit Nexus
     parTicks: 28800
+  skillPool:
+    - skillId: Chilling Touch I
+      weight: 2
+    - skillId: Piercing Scream I
+      weight: 2
+    - skillId: Venom Spit I
+      weight: 2
+    - skillId: Venom Bite I
+      weight: 2
+    - skillId: Hex I
+      weight: 2
+    - skillId: Leech I
+      weight: 2
   description: A bog seated between the mountains, and a place where the dead come back to haunt the world. Home of the orcs, who pursue greater knowledge and a relationship with the dead. Such an act bears questionable fruit, but fruit all the same.
 
 - id: adda378a-5ffd-46b2-94d2-75caa0eb4819
@@ -20,6 +52,19 @@
   seal:
     sealEncounterId: Collapsed Temple
     parTicks: 39600
+  skillPool:
+    - skillId: Holy Smite II
+      weight: 2
+    - skillId: Cure II
+      weight: 2
+    - skillId: Starshine II
+      weight: 2
+    - skillId: Chilling Touch I
+      weight: 2
+    - skillId: Defensive Stance I
+      weight: 2
+    - skillId: Smashing Board II
+      weight: 2
   description: 'A ghostly cavern, a mystical shrine. Here, templars worship, research, and summon the spirits of the lost. Lost in many ways: lost in time, lost in space, and yet they find their way back somehow. They always do.'
 
 - id: 01e4b746-cbc1-4997-9514-abad030f2439
@@ -28,6 +73,19 @@
   seal:
     sealEncounterId: Ghostmirage Wreck
     parTicks: 54000
+  skillPool:
+    - skillId: Broil I
+      weight: 2
+    - skillId: Fireball II
+      weight: 2
+    - skillId: Earthshake II
+      weight: 2
+    - skillId: Zephyr I
+      weight: 2
+    - skillId: Pocket Sand
+      weight: 2
+    - skillId: Taunt I
+      weight: 2
   description: Once lush, the land has forgotten all but desolation. This is what the Larsian people call home. A home filled with dwindling water supplies, and the constant threat of being raided by the Akroki. What a life it is.
 
 - id: 6996ff96-7bda-4584-9c3a-96cc769a5132
@@ -36,6 +94,19 @@
   seal:
     sealEncounterId: "Demon's Den"
     parTicks: 72000
+  skillPool:
+    - skillId: Rake I
+      weight: 2
+    - skillId: Gnash I
+      weight: 2
+    - skillId: Venom Bite II
+      weight: 2
+    - skillId: Shadowburn I
+      weight: 2
+    - skillId: Sonic Screech I
+      weight: 2
+    - skillId: Nature Lance I
+      weight: 2
   description: A serene woodland, and home of the elves. Elfheim sits at the center, but demons lurk around every corner, waiting for their chance to disrupt the peace and corrupt more to their way of life. It's hard to escape when there's nowhere to go.
 
 - id: 5b8ae87a-5612-4ac0-ae1a-56d8ac12686d
@@ -44,6 +115,19 @@
   seal:
     sealEncounterId: Diurtar
     parTicks: 93600
+  skillPool:
+    - skillId: Double Strike III
+      weight: 2
+    - skillId: Sweep III
+      weight: 2
+    - skillId: Broil II
+      weight: 2
+    - skillId: Earthshake III
+      weight: 2
+    - skillId: Frostfire Bolt II
+      weight: 2
+    - skillId: Holy Smite III
+      weight: 2
   description: Frontline of the Fel, the demons who caused the Sundering. Here, they live ordinary lives. They cook, they hunt, they farm, and they live in harmony with their pets. It's a shame you can't coexist.
 
 - id: ebe78b04-20f9-4152-b40d-3121c83bc6f4
@@ -52,6 +136,19 @@
   seal:
     sealEncounterId: Frigid Graveyard
     parTicks: 118800
+  skillPool:
+    - skillId: Chilling Touch II
+      weight: 2
+    - skillId: Piercing Scream II
+      weight: 2
+    - skillId: Earthshake III
+      weight: 2
+    - skillId: Frostfire Bolt II
+      weight: 2
+    - skillId: Spellshield I
+      weight: 2
+    - skillId: Defensive Stance II
+      weight: 2
   description: A vast expanse of tundra broken up by myriad mountain ranges. Here, the Fel gather resources to prepare their most elite for war. The terrain is cruel, the winds harsh, and the snow nigh unnavigable. Yet, you must persist.
 
 - id: ccad90f2-9897-4c45-854f-d5cffff19bce
@@ -60,4 +157,17 @@
   seal:
     sealEncounterId: "Forgetter's Fane"
     parTicks: 144000
+  skillPool:
+    - skillId: Holy Smite IV
+      weight: 2
+    - skillId: Frostfire Bolt III
+      weight: 2
+    - skillId: Double Strike IV
+      weight: 2
+    - skillId: Thunderbolt IV
+      weight: 2
+    - skillId: Starshine IV
+      weight: 2
+    - skillId: Rapidfire III
+      weight: 2
   description: A place of no time and no space. A view from the top of the world. Here, there is everything. Here, there is nothing. Nothing except the Demon of Forgetting, Fel. Here, you'll remember everything. I hope.

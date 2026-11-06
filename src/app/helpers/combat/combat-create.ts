@@ -10,7 +10,10 @@ import {
 } from '@helpers/combat/monster';
 import { DEBUFF_POTENCY_PER_RANK } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
-import { monsterStatsForRun } from '@helpers/edict/edict-stats';
+import {
+  monsterSkillsForRun,
+  monsterStatsForRun,
+} from '@helpers/edict/edict-stats';
 import {
   defaultAffinities,
   defaultStats,
@@ -189,7 +192,9 @@ export function combatantFromMonster(
   const stats = isEnemy
     ? monsterStatsForRun(monster, level)
     : monsterStatsAtLevel(monster, level);
-  const skills = monsterSkillsAtLevel(monster, level);
+  const skills = isEnemy
+    ? monsterSkillsForRun(monster, level)
+    : monsterSkillsAtLevel(monster, level);
 
   return {
     id: rngUuid(),

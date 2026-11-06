@@ -34,17 +34,21 @@
   sprite: '0013'
   description: Heroes gain no stats from leveling, from their class or their specialization.
   kind: Challenge
-  fragments: 2
+  fragments: 5
   effects:
     - effectType: GlobalLevelStatMultiplier
       value: -1
 
 - id: fc200585-8c6b-47b2-884d-6ba53d35098b
-  name: Edict of the Magic Wilds
+  name: Edict of Magic Wilds
+  enabled: true
   sprite: '0014'
   description: Every monster gets one extra skill from its region's pool.
   kind: Challenge
   fragments: 3
+  effects:
+    - effectType: EnemyExtraSkills
+      value: 1
 
 - id: dbe3fe9d-6e30-4226-9168-88695fe136d6
   name: Edict of Esurient Poverty

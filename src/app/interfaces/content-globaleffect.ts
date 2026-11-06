@@ -126,6 +126,12 @@ export type GlobalEffectEffectEnemyStatPercent = {
   value: number;
 };
 
+// Each enemy rolls `value` extra skills from the current region's skillPool; guardians and summons never do.
+export type GlobalEffectEffectEnemyExtraSkills = {
+  effectType: 'EnemyExtraSkills';
+  value: number;
+};
+
 export type GlobalEffectEffect =
   | GlobalEffectEffectGainStats
   | GlobalEffectEffectGainStatPercent
@@ -137,6 +143,7 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectDeathPenaltyMultiplier
   | GlobalEffectEffectLevelStatMultiplier
   | GlobalEffectEffectShrineBuffsPermanent
+  | GlobalEffectEffectEnemyExtraSkills
   | GlobalEffectEffectDebuffResistance
   | GlobalEffectEffectDebuffResistanceTag
   | GlobalEffectEffectCombatItemDropRateBoost
