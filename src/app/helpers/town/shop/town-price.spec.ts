@@ -4,10 +4,11 @@ import { ensureEquipment } from '@helpers/content/ensure-item';
 import { ensureTown } from '@helpers/content/ensure-town';
 import { defaultStats } from '@helpers/defaults';
 import { equipmentSellValue } from '@helpers/kingdom/armory';
-import { townStockPrice } from '@helpers/town/shop/town-price';
+import { townShopPrice, townStockPrice } from '@helpers/town/shop/town-price';
 import type { EquipmentId, TownId } from '@interfaces';
 import { buildTownStockEntry } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 
 const sword = ensureEquipment({
   id: 'sword' as EquipmentId,
@@ -41,5 +42,23 @@ describe('townStockPrice', () => {
     expect(
       townStockPrice(townWithMarkup(0), buildTownStockEntry(sword.id)),
     ).toBeUndefined();
+  });
+});
+
+describe('townShopPrice', () => {
+  it('applies the shop price effect on top of the town markup', () => {
+    seedGamestate((state) => {
+      state.globalEffectSums.shopPriceMultiplierBonus = -0.25;
+    });
+
+    expect(townShopPrice(townWithMarkup(20), 100)).toBe(90);
+  });
+
+  it('never drops below 1 gold, even at a full discount', () => {
+    seedGamestate((state) => {
+      state.globalEffectSums.shopPriceMultiplierBonus = -1;
+    });
+
+    expect(townShopPrice(townWithMarkup(0), 100)).toBe(1);
   });
 });

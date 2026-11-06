@@ -17,6 +17,7 @@ import type {
   GlobalEffectEffectGoldGainMultiplier,
   GlobalEffectEffectOffPathTravelSpeedBoost,
   GlobalEffectEffectOnPathTravelSpeedBoost,
+  GlobalEffectEffectShopPriceMultiplier,
   GlobalEffectEffectTradeskillQueueSizeBoost,
   GlobalEffectEffectXPGainMultiplier,
   GlobalEffectId,
@@ -30,6 +31,7 @@ export function ensureGlobalEffectEffect(
     Partial<GlobalEffectEffectEnemyStatPercent> &
     Partial<GlobalEffectEffectGainCombatStat> &
     Partial<GlobalEffectEffectXPGainMultiplier> &
+    Partial<GlobalEffectEffectShopPriceMultiplier> &
     Partial<GlobalEffectEffectGoldGainMultiplier> &
     Partial<GlobalEffectEffectDebuffResistance> &
     Partial<GlobalEffectEffectDebuffResistanceTag> &
@@ -92,6 +94,13 @@ export function ensureGlobalEffectEffect(
   if (effect.effectType === 'GlobalGoldGainMultiplier') {
     return {
       effectType: 'GlobalGoldGainMultiplier',
+      value: effect.value ?? 0,
+    };
+  }
+
+  if (effect.effectType === 'GlobalShopPriceMultiplier') {
+    return {
+      effectType: 'GlobalShopPriceMultiplier',
       value: effect.value ?? 0,
     };
   }

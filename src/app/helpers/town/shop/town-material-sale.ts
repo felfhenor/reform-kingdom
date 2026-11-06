@@ -1,3 +1,4 @@
+import { townShopPrice } from '@helpers/town/shop/town-price';
 import { townMaterialQuantity } from '@helpers/town/town-materials';
 import type { ItemId, TownContent, TownMaterialThreshold } from '@interfaces';
 
@@ -11,13 +12,11 @@ export function townMaterialSaleConfig(
   );
 }
 
-// Premium price - same markup% and rounding convention as townStockPrice.
 export function townMaterialSalePrice(
   town: TownContent,
   threshold: TownMaterialThreshold,
 ): number {
-  const markup = town.traders.markupPercentages.sell;
-  return Math.max(1, Math.round(threshold.value * (1 + markup / 100)));
+  return townShopPrice(town, threshold.value);
 }
 
 // Only the coffer quantity above the sale's threshold counts as excess for sale.

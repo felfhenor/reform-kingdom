@@ -35,10 +35,17 @@
 
 - id: 26a02706-b73d-4009-b9fc-466374f9c8e7
   name: Edict of the Mercantile Winds
+  enabled: true
   sprite: '0003'
   description: Start with extra gold, and shop prices are reduced by 25%.
   kind: Boon
   fragments: -2
+  effects:
+    - effectType: GlobalShopPriceMultiplier
+      value: -0.25
+  startingItems:
+    - itemId: Gold Coin
+      quantity: 10000
 
 - id: 76096547-8e80-4964-ab36-f0a85947247e
   name: Edict of Cold Steel

@@ -14,6 +14,7 @@ import {
 } from '@helpers/item/materials';
 import { getArmoryEntries } from '@helpers/kingdom/armory';
 import { isRumorRevealed } from '@helpers/rumor/rumor';
+import { globalEffectSumsState } from '@helpers/state-game';
 import type { CaravanContent, CaravanTrade, GameState } from '@interfaces';
 
 // Collectibles, recipes and rumors sell once; undefined for trades with no such cap.
@@ -96,10 +97,16 @@ export function caravanTradePrice(
       : caravan.markupPercentages.buy;
 
   const affixPercent = partyCaravanAffixPercent(trade);
+  const shopPrice =
+    trade.type === 'sell'
+      ? 1 + globalEffectSumsState().shopPriceMultiplierBonus
+      : 1;
 
   return Math.max(
     1,
-    Math.round(trade.value * (1 + markup / 100) * (1 + affixPercent / 100)),
+    Math.round(
+      trade.value * (1 + markup / 100) * (1 + affixPercent / 100) * shopPrice,
+    ),
   );
 }
 

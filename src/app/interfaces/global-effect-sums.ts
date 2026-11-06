@@ -14,6 +14,7 @@ export type GlobalEffectSums = {
   debuffResistanceFlat: number;
   xpGainMultiplierBonus: number;
   goldGainMultiplierBonus: number;
+  shopPriceMultiplierBonus: number;
   combatItemDropRateBoost: number;
   gatheringItemDropRateBoost: number;
   armorySizeBoost: number;

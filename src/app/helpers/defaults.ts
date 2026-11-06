@@ -253,6 +253,7 @@ export function defaultGlobalEffectSums(): GlobalEffectSums {
     debuffResistanceFlat: 0,
     xpGainMultiplierBonus: 0,
     goldGainMultiplierBonus: 0,
+    shopPriceMultiplierBonus: 0,
     combatItemDropRateBoost: 0,
     gatheringItemDropRateBoost: 0,
     armorySizeBoost: 0,

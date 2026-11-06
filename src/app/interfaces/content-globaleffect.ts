@@ -30,6 +30,12 @@ export type GlobalEffectEffectGoldGainMultiplier = {
   value: number;
 };
 
+// Fraction (-0.25 = 25% cheaper) on what town shops and caravans charge, stacking additively.
+export type GlobalEffectEffectShopPriceMultiplier = {
+  effectType: 'GlobalShopPriceMultiplier';
+  value: number;
+};
+
 // Adds `value` (a flat percent) to every status effect tag's resistance,
 // unlike gear which targets specific tags.
 export type GlobalEffectEffectDebuffResistance = {
@@ -110,6 +116,7 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectGainCombatStat
   | GlobalEffectEffectXPGainMultiplier
   | GlobalEffectEffectGoldGainMultiplier
+  | GlobalEffectEffectShopPriceMultiplier
   | GlobalEffectEffectDebuffResistance
   | GlobalEffectEffectDebuffResistanceTag
   | GlobalEffectEffectCombatItemDropRateBoost

@@ -50,9 +50,11 @@ export function globalEffectEffectDescription(
       return `Hero ${CombatStatDimension.label[effect.combatStat]}: +${effect.value}${isPercent ? '%' : ''}`;
     }
     case 'GlobalXPGainMultiplier':
-      return `XP Gain: +${effect.value * 100}%`;
+      return `XP Gain: ${signedPercent(effect.value * 100)}`;
     case 'GlobalGoldGainMultiplier':
-      return `Gold Gain: +${effect.value * 100}%`;
+      return `Gold Gain: ${signedPercent(effect.value * 100)}`;
+    case 'GlobalShopPriceMultiplier':
+      return `Shop Prices: ${signedPercent(effect.value * 100)}`;
     case 'DebuffResistance':
       return `All Debuff Resist: +${effect.value}%`;
     case 'DebuffResistanceTag':
@@ -112,6 +114,9 @@ function accumulateGlobalEffectEffect(
       return;
     case 'GlobalGoldGainMultiplier':
       sums.goldGainMultiplierBonus += effect.value;
+      return;
+    case 'GlobalShopPriceMultiplier':
+      sums.shopPriceMultiplierBonus += effect.value;
       return;
     case 'DebuffResistance':
       sums.debuffResistanceFlat += effect.value;

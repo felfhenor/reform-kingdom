@@ -41,7 +41,7 @@
       <div class="flex items-center gap-2 flex-wrap">
         @if (!entry.soldOut) {
           <span
-            class="badge badge-sm"
+            class="badge badge-sm min-w-[50px]"
             [class.badge-success]="isPartyBuying()"
             [class.badge-warning]="!isPartyBuying()"
           >
@@ -58,7 +58,9 @@
         @let remaining = entry.remaining ?? 0;
 
         @if (remaining > 0) {
-          <span class="badge badge-sm badge-data">Stock: {{ remaining }}</span>
+          <span class="badge badge-sm badge-data">
+            {{ isPartyBuying() ? 'Stock' : 'Requested' }}: {{ remaining }}
+          </span>
         }
 
         @if (entry.soldOut) {
