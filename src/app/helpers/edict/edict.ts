@@ -3,8 +3,9 @@ import {
   EDICT_SCORE_MULTIPLIER_FLOOR,
 } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { applyMaterialDelta } from '@helpers/item/materials';
 import { edictsState } from '@helpers/state-game';
-import type { EdictContent, EdictId, EdictKind } from '@interfaces';
+import type { EdictContent, EdictId, EdictKind, GameState } from '@interfaces';
 import { sortBy, sumBy, uniq } from 'es-toolkit/compat';
 
 const EDICT_KIND_ORDER: EdictKind[] = [
@@ -74,4 +75,13 @@ export function edictScoreMultiplier(fragments: number): number {
     EDICT_SCORE_MULTIPLIER_FLOOR,
     1 + EDICT_FRAGMENT_MULTIPLIER_STEP * fragments,
   );
+}
+
+// Granted once, when the run's world is created, like the starting gold.
+export function applyEdictStartingItems(state: GameState): void {
+  state.edicts
+    .flatMap((id) => edictEntry(id)?.startingItems ?? [])
+    .forEach(({ itemId, quantity }) =>
+      applyMaterialDelta(state, itemId, quantity),
+    );
 }

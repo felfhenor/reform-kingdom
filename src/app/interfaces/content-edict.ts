@@ -1,6 +1,7 @@
 import type { HasSprite } from '@interfaces/artable';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { GlobalEffectEffect } from '@interfaces/content-globaleffect';
+import type { ItemQuantity } from '@interfaces/cost';
 import type { HasDescription } from '@interfaces/traits';
 
 export type EdictId = Branded<string, 'EdictId'>;
@@ -23,6 +24,9 @@ export type EdictContent = IsContentItem &
     group?: string;
 
     effects?: GlobalEffectEffect[];
+
+    // Added to the kingdom's stock once, when the run's world is created.
+    startingItems?: ItemQuantity[];
 
     // Temporary: only edicts whose effects are built can be picked; drop once all of them are.
     enabled?: boolean;

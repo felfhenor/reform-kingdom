@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { ensureEdict } from '@helpers/content/ensure-edict';
 import { ensureItem } from '@helpers/content/ensure-item';
 import {
+  applyEdictStartingItems,
   edictIsBlocked,
   edictScoreMultiplier,
   edictsActive,
@@ -13,7 +14,8 @@ import {
 } from '@helpers/edict/edict';
 import type { EdictContent, EdictId, ItemId } from '@interfaces';
 import { seedContent } from '@/testing/content';
-import { seedGamestate } from '@/testing/gamestate';
+import { inTick, seedGamestate } from '@/testing/gamestate';
+import { gamestate, updateGamestate } from '@helpers/state-game';
 
 const might = ensureEdict({ id: 'might' as EdictId, name: 'Edict of Might' });
 const famine = ensureEdict({
@@ -140,5 +142,34 @@ describe('edict scoring', () => {
 
   it('never drops the multiplier below its floor', () => {
     expect(edictScoreMultiplier(-50)).toBe(0.25);
+  });
+});
+
+describe('applyEdictStartingItems', () => {
+  it("adds each picked edict's starting items, stacking with existing stock", () => {
+    const frailty = ensureEdict({
+      id: 'frailty' as EdictId,
+      name: 'Edict of Frailty',
+      startingItems: [{ itemId: ore.id, quantity: 4 }],
+    });
+    const fury = ensureEdict({
+      id: 'fury' as EdictId,
+      name: 'Edict of Fury',
+      startingItems: [{ itemId: ore.id, quantity: 4 }],
+    });
+    seedContent([frailty, fury, might, ore]);
+    seedGamestate((state) => {
+      state.edicts = [frailty.id, fury.id, might.id];
+      state.materials[ore.id] = { quantity: 1, foundAt: 0 };
+    });
+
+    inTick(() =>
+      updateGamestate((state) => {
+        applyEdictStartingItems(state);
+        return state;
+      }),
+    );
+
+    expect(gamestate().materials[ore.id]?.quantity).toBe(9);
   });
 });

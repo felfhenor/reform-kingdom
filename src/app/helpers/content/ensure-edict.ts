@@ -1,5 +1,8 @@
 import { ensureGlobalEffectEffect } from '@helpers/content/ensure-globaleffect';
-import { ensureArray } from '@helpers/content/ensure-helpers-core';
+import {
+  ensureArray,
+  ensureItemQuantity,
+} from '@helpers/content/ensure-helpers-core';
 import type { EdictContent, EdictId } from '@interfaces';
 
 export function ensureEdict(
@@ -16,5 +19,6 @@ export function ensureEdict(
     group: edict.group ?? '',
     enabled: edict.enabled ?? false,
     effects: ensureArray(edict.effects, ensureGlobalEffectEffect),
+    startingItems: ensureArray(edict.startingItems, ensureItemQuantity),
   };
 }

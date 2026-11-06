@@ -1,4 +1,5 @@
 import { resetCombatLog } from '@helpers/combat/combat-log';
+import { applyEdictStartingItems } from '@helpers/edict/edict';
 import { ledgerMark } from '@helpers/engine/ledger';
 import {
   heroesSubviewClear,
@@ -24,6 +25,7 @@ export async function gameStart(): Promise<void> {
   setWorld(world);
   await updateGamestate((state) => {
     grantStartingGold(state);
+    applyEdictStartingItems(state);
     stateMarkPartyEquipmentDiscovered(state);
     ledgerMark(state.discoveredMaps, state.world.currentLocation.mapName);
     return state;
