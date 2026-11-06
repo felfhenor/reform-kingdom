@@ -37,7 +37,7 @@
   name: Edict of the Mercantile Winds
   enabled: true
   sprite: '0003'
-  description: Start with extra gold, and shop prices are reduced by 25%.
+  description: Start with extra gold, and caravan/town shop prices are reduced by 25%.
   kind: Boon
   fragments: -2
   effects:
@@ -63,7 +63,7 @@
   name: Edict of Cobblestone Roads
   enabled: true
   sprite: '0005'
-  description: Travel speed is increased by 50%, on and off paths.
+  description: Travel speed is increased by 50%, both on and off paths.
   kind: Boon
   fragments: -1
   effects:
@@ -87,7 +87,7 @@
   name: Edict of Eternal Blessings
   enabled: true
   sprite: '0007'
-  description: Shrine buffs never expire once prayed for.
+  description: Shrine buffs never expire.
   kind: Boon
   fragments: -2
   effects:

@@ -32,7 +32,7 @@
   name: Edict of Skillful Humility
   enabled: true
   sprite: '0013'
-  description: Heroes gain no stats from leveling, from their class or their specialization. Their skills and oath effects still work.
+  description: Heroes gain no stats from leveling, from their class or their specialization.
   kind: Challenge
   fragments: 2
   effects:
@@ -50,15 +50,15 @@
   name: Edict of Esurient Poverty
   enabled: true
   sprite: '0016'
-  description: XP and combat gold gains are reduced by 40%.
+  description: XP and combat gold gains are reduced by 50%.
   kind: Challenge
   fragments: 2
   group: XP
   effects:
     - effectType: GlobalXPGainMultiplier
-      value: -0.4
+      value: -0.5
     - effectType: GlobalGoldGainMultiplier
-      value: -0.4
+      value: -0.5
 
 - id: fabe9a7d-6448-409e-9ed0-103cfa0a6974
   name: Edict of Iron Blood
