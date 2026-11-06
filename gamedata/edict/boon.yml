@@ -38,17 +38,27 @@
 
 - id: 76096547-8e80-4964-ab36-f0a85947247e
   name: Edict of Cold Steel
+  enabled: true
   sprite: '0004'
-  description: Combat XP is increased by 50%.
+  description: XP gain is increased by 50%.
   kind: Boon
   fragments: -3
+  effects:
+    - effectType: GlobalXPGainMultiplier
+      value: 0.5
 
 - id: 024c9438-c014-4b73-aaa3-276ed4bcdb64
   name: Edict of Cobblestone Roads
+  enabled: true
   sprite: '0005'
   description: Travel speed is increased by 50%, on and off paths.
   kind: Boon
   fragments: -1
+  effects:
+    - effectType: GlobalOnPathTravelSpeedBoost
+      value: 0.5
+    - effectType: GlobalOffPathTravelSpeedBoost
+      value: 0.5
 
 - id: 1abaf8ae-7a55-4513-a0b7-d9a47f1d19e3
   name: Edict of Swift Mending
