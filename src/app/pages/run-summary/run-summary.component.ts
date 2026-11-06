@@ -186,4 +186,8 @@ export class RunSummaryComponent {
   public goHome(): void {
     void this.router.navigate(['/']);
   }
+
+  public openLegacy(): void {
+    void this.router.navigate(['/legacy']);
+  }
 }

@@ -362,6 +362,16 @@
         Main Menu
       </button>
 
+      <button
+        type="button"
+        class="btn btn-neutral"
+        (click)="openLegacy()"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        Legacy
+      </button>
+
       @if (canStartNewRun()) {
         <button
           type="button"

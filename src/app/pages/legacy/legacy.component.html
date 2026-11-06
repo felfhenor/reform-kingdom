@@ -1,0 +1,64 @@
+<div class="flex flex-col h-[100vh] p-4 gap-4">
+  <div class="card bg-base-100 flex-1 min-h-0">
+    <div class="card-body gap-4 min-h-0">
+      <h1 class="type-page-title grid grid-cols-[1fr_auto_1fr] gap-4 min-h-8">
+        <div class="justify-self-start">
+          <app-button-kingdom-back [onBack]="goHome" />
+        </div>
+
+        <div class="text-xl">Legacy</div>
+      </h1>
+
+      <div class="flex flex-col gap-2 overflow-y-auto">
+        @for (run of runs(); track run.id) {
+          <button
+            appListRow
+            class="p-2"
+            (click)="openRun(run.id)"
+            appSfx="ui-click"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            <span class="flex shrink-0">
+              @for (job of run.jobs; track $index) {
+                <app-icon-job class="zoom-row" [job]="job" />
+              }
+            </span>
+
+            <span class="flex flex-col min-w-0">
+              <span class="type-entity-name truncate">
+                {{ run.completed ? 'Run Complete' : 'Run Abandoned' }}
+              </span>
+              <span class="type-meta">
+                {{ run.endedAt | date: 'medium' }} &middot;
+                <ng-container
+                  [ngTemplateOutlet]="duration"
+                  [ngTemplateOutletContext]="{ $implicit: run.playTime }"
+                />
+                &middot;
+                @if (run.edictCount > 0) {
+                  {{ run.edictCount | number }}
+                  {{ 'edict' | pluralize: run.edictCount !== 1 }}
+                } @else {
+                  No edicts
+                }
+              </span>
+            </span>
+
+            <span class="badge badge-data tabular-nums ml-auto mr-2 shrink-0">
+              {{ run.score | number }}
+            </span>
+          </button>
+        } @empty {
+          <app-blank-slate>No runs in your Legacy yet.</app-blank-slate>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #duration let-parts>
+  @for (part of parts; track part.unit; let last = $last) {
+    {{ part.value | number }}
+    {{ part.unit | pluralize: part.value !== 1 }}{{ last ? '' : ',' }}
+  }
+</ng-template>

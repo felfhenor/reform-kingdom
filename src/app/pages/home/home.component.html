@@ -74,6 +74,18 @@
       New Game
     </button>
 
+    @if (hasLegacyRuns()) {
+      <button
+        class="btn btn-neutral btn-block"
+        (click)="openLegacy()"
+        appAnalyticsClick="Meta:Play:Legacy"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        Legacy
+      </button>
+    }
+
     <app-panel-debug-buttons></app-panel-debug-buttons>
 
     <app-button-settings></app-button-settings>

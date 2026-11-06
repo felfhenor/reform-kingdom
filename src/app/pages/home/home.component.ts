@@ -16,6 +16,7 @@ import {
 } from '@helpers/engine/discord';
 import { modalOpen } from '@helpers/engine/modal-stack';
 import { gameReset } from '@helpers/game-init';
+import { legacy } from '@helpers/legacy/legacy';
 import { legacyHasUnfinishedBackup } from '@helpers/legacy/legacy.ui';
 import { savefileBackupsRead } from '@helpers/savefile/savefile-backup-storage';
 import {
@@ -57,6 +58,7 @@ export class HomeComponent implements OnInit {
   );
 
   public hasStartedGame = computed(() => isSetup());
+  public hasLegacyRuns = computed(() => legacy().runs.length > 0);
 
   public analyticsEnabled = computed(() => getOption('analyticsEnabled'));
 
@@ -128,5 +130,9 @@ export class HomeComponent implements OnInit {
 
   resumeGame() {
     this.router.navigate(['/game']);
+  }
+
+  openLegacy() {
+    this.router.navigate(['/legacy']);
   }
 }

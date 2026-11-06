@@ -38,6 +38,11 @@ export const routes: Routes = [
     canActivate: [requireSetupGuard],
   },
   {
+    path: 'legacy',
+    loadComponent: () =>
+      import('@pages/legacy/legacy.component').then((m) => m.LegacyComponent),
+  },
+  {
     path: 'summary/:runId',
     loadComponent: () =>
       import('@pages/run-summary/run-summary.component').then(
