@@ -20,6 +20,7 @@ import {
   tradeskillIdForName,
   tradeskillXpForLevel,
 } from '@helpers/crafting/tradeskill';
+import { recomputeGlobalEffectSums } from '@helpers/hero/global-effect-state';
 import {
   characterRecalculateStats,
   characterXpForLevel,
@@ -74,6 +75,7 @@ import {
   type CharacterId,
   type CollectibleContent,
   type CollectibleId,
+  type EdictContent,
   type EquipmentContent,
   type EquipmentId,
   type ItemContent,
@@ -334,6 +336,23 @@ export function debugGiveCollectible(
   }
 
   collectiblesAdd(collectible.id, quantity);
+}
+
+// Skips the setup page's enabled, group and conflict rules, so unbuilt edicts can be tried too.
+export function debugToggleEdict(edictIdOrName: string): void {
+  const edict = getEntry<EdictContent>(edictIdOrName);
+  if (edict?.__type !== 'edict') {
+    console.warn(`Edict ${edictIdOrName} not found.`);
+    return;
+  }
+
+  updateGamestate((state) => {
+    state.edicts = state.edicts.includes(edict.id)
+      ? state.edicts.filter((id) => id !== edict.id)
+      : [...state.edicts, edict.id];
+    recomputeGlobalEffectSums(state);
+    return state;
+  });
 }
 
 export function debugDiscoverAllCollectibles(): void {
