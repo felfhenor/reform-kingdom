@@ -60,7 +60,7 @@
       value: 0.5
 
 - id: 024c9438-c014-4b73-aaa3-276ed4bcdb64
-  name: Edict of Cobblestone Roads
+  name: Edict of Fleet Feet
   enabled: true
   sprite: '0005'
   description: Travel speed is increased by 50%, both on and off paths.
