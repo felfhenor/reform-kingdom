@@ -12,6 +12,8 @@ import { applyMaterialDelta } from '@helpers/item/materials';
 import { workersState } from '@helpers/state-game';
 import {
   defaultWorkerState,
+  kingdomWorkerGatherMultiplier,
+  kingdomWorkerStatsForLevel,
   workerGainXp,
   workerIsReadyToLevelUp,
   workerXpIsFull,
@@ -181,5 +183,32 @@ describe('workerLevelInRange', () => {
         workerLevelInRange({ min: 5, max: 10 }, level),
       ),
     ).toEqual([false, true, true, false]);
+  });
+});
+
+describe('kingdomWorkerStatsForLevel', () => {
+  it('applies the worker craft and gather speed effects on top of level stats', () => {
+    seedGamestate((state) => {
+      state.globalEffectSums.workerCraftSpeedPercent = 50;
+      state.globalEffectSums.workerGatherSpeedPercent = 25;
+    });
+
+    expect(kingdomWorkerStatsForLevel(nell, 1)).toEqual({
+      capacity: 6,
+      gatherSpeed: 1.25,
+      craftSpeed: 0.75,
+      stamina: 30,
+    });
+    expect(kingdomWorkerGatherMultiplier()).toBe(1.25);
+  });
+
+  it('never drops below zero', () => {
+    seedGamestate((state) => {
+      state.globalEffectSums.workerCraftSpeedPercent = -200;
+      state.globalEffectSums.workerGatherSpeedPercent = -200;
+    });
+
+    expect(kingdomWorkerStatsForLevel(nell, 1).craftSpeed).toBe(0);
+    expect(kingdomWorkerGatherMultiplier()).toBe(0);
   });
 });

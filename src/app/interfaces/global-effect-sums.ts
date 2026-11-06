@@ -21,6 +21,9 @@ export type GlobalEffectSums = {
   shrineBuffsPermanent: boolean;
   enemyExtraSkills: number;
   wipeEndsRun: boolean;
+  workerCraftSpeedPercent: number;
+  workerGatherSpeedPercent: number;
+  townShopNoEquipment: boolean;
   combatItemDropRateBoost: number;
   gatheringItemDropRateBoost: number;
   armorySizeBoost: number;

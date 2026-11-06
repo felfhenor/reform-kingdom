@@ -143,6 +143,23 @@ export type GlobalEffectEffectWipeEndsRun = {
   effectType: 'GlobalWipeEndsRun';
 };
 
+// Whole percent on kingdom workers' craft speed, stacking additively.
+export type GlobalEffectEffectWorkerCraftSpeedPercent = {
+  effectType: 'WorkerCraftSpeedPercent';
+  value: number;
+};
+
+// Whole percent on kingdom workers' gather speed, stacking additively.
+export type GlobalEffectEffectWorkerGatherSpeedPercent = {
+  effectType: 'WorkerGatherSpeedPercent';
+  value: number;
+};
+
+// Town shops stop stocking equipment, and towns stop crafting it.
+export type GlobalEffectEffectTownShopNoEquipment = {
+  effectType: 'GlobalTownShopNoEquipment';
+};
+
 export type GlobalEffectEffect =
   | GlobalEffectEffectGainStats
   | GlobalEffectEffectGainStatPercent
@@ -157,6 +174,9 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectShrineBuffsPermanent
   | GlobalEffectEffectEnemyExtraSkills
   | GlobalEffectEffectWipeEndsRun
+  | GlobalEffectEffectWorkerCraftSpeedPercent
+  | GlobalEffectEffectWorkerGatherSpeedPercent
+  | GlobalEffectEffectTownShopNoEquipment
   | GlobalEffectEffectDebuffResistance
   | GlobalEffectEffectDebuffResistanceTag
   | GlobalEffectEffectCombatItemDropRateBoost

@@ -29,6 +29,7 @@ import { workerCraftRemainingTicks } from '@helpers/worker/worker-crafting.ui';
 import {
   workerIsReadyToLevelUp,
   workerLevelUpCost,
+  kingdomWorkerStatsForLevel,
   workerStatsForLevel,
 } from '@helpers/worker/worker-progression';
 import { workerLevelUp } from '@helpers/worker/worker-progression.ui';
@@ -119,7 +120,7 @@ export class PlayKingdomWorkersComponent {
   public selectedStats = computed(() => {
     const entry = this.selectedEntry();
     if (!entry) return undefined;
-    return workerStatsForLevel(entry.content, entry.state.level);
+    return kingdomWorkerStatsForLevel(entry.content, entry.state.level);
   });
 
   public capacityDisplay = computed(() =>

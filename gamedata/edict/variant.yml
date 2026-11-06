@@ -21,10 +21,30 @@
 
 - id: d9f1a5fc-a65a-43ae-a5c6-e0cfe363f961
   name: Edict of the Heated Forge
+  enabled: true
   sprite: '0020'
-  description: Town shops no longer sell equipment. You get more worker slots and a deeper tradeskill queue.
+  description: Town shops no longer sell equipment. Workers craft 50% faster, and every tradeskill queue holds 1 more craft.
   kind: Variant
   fragments: 0
+  effects:
+    - effectType: GlobalTownShopNoEquipment
+    - effectType: WorkerCraftSpeedPercent
+      value: 50
+    - effectType: GlobalTradeskillQueueSizeBoost
+      tradeskillId: Artificing
+      value: 1
+    - effectType: GlobalTradeskillQueueSizeBoost
+      tradeskillId: Blacksmithing
+      value: 1
+    - effectType: GlobalTradeskillQueueSizeBoost
+      tradeskillId: Jewelcrafting
+      value: 1
+    - effectType: GlobalTradeskillQueueSizeBoost
+      tradeskillId: Tailoring
+      value: 1
+    - effectType: GlobalTradeskillQueueSizeBoost
+      tradeskillId: Woodworking
+      value: 1
 
 - id: 8847b540-dfa4-44d6-8258-8a4a314491b5
   name: Edict of Cold Coins

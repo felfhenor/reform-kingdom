@@ -10,7 +10,7 @@ import {
   workerCraftTicksPerUnit,
   workerStartCrafting,
 } from '@helpers/worker/worker-crafting';
-import { workerStatsForLevel } from '@helpers/worker/worker-progression';
+import { kingdomWorkerStatsForLevel } from '@helpers/worker/worker-progression';
 import { workerTurnHome } from '@helpers/worker/worker-travel';
 import type {
   ItemContent,
@@ -80,7 +80,7 @@ export function workerCraftRemainingTicks(
   const recipe = getEntry<RecipeContent>(worker.status.recipeId);
   if (!content || !recipe) return undefined;
 
-  const { craftSpeed } = workerStatsForLevel(content, worker.level);
+  const { craftSpeed } = kingdomWorkerStatsForLevel(content, worker.level);
   if (craftSpeed <= 0) return undefined;
 
   return (

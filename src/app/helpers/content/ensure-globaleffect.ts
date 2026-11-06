@@ -122,6 +122,17 @@ export function ensureGlobalEffectEffect(
     };
   }
 
+  if (
+    effect.effectType === 'WorkerCraftSpeedPercent' ||
+    effect.effectType === 'WorkerGatherSpeedPercent'
+  ) {
+    return { effectType: effect.effectType, value: effect.value ?? 0 };
+  }
+
+  if (effect.effectType === 'GlobalTownShopNoEquipment') {
+    return { effectType: 'GlobalTownShopNoEquipment' };
+  }
+
   if (effect.effectType === 'GlobalWipeEndsRun') {
     return { effectType: 'GlobalWipeEndsRun' };
   }

@@ -1,5 +1,5 @@
 import { TOWN_RECIPE_OUTPUT_DUPLICATE_CAP } from '@helpers/config';
-import { worldTownsState } from '@helpers/state-game';
+import { globalEffectSumsState, worldTownsState } from '@helpers/state-game';
 import { townMaterialAtOrAboveThreshold } from '@helpers/town/town-resource-thresholds';
 import { townMaterialQuantity } from '@helpers/town/town-materials';
 import type {
@@ -66,6 +66,13 @@ export function isRecipeCraftableByTown(
 
   // TownStockEntry has no collectible variant to sell one as.
   if ('collectibleId' in recipe.result) return false;
+
+  // Gear that can never be stocked would hold the queue forever.
+  if (
+    'equipmentId' in recipe.result &&
+    globalEffectSumsState().townShopNoEquipment
+  )
+    return false;
 
   // Don't craft a material past its authored cap - mirrors the gather/commission threshold check.
   if (isRecipeResultAtOrAboveThreshold(recipe, town)) return false;

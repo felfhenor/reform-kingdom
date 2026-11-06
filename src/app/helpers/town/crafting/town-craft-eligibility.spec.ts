@@ -72,6 +72,15 @@ function queued(recipeId: RecipeId, count: number): TownCraftQueueEntry[] {
 }
 
 describe('isRecipeCraftableByTown', () => {
+  it('never crafts gear while town shops sell no equipment', () => {
+    seedGamestate((state) => {
+      state.world.towns[townId] = buildTownNodeState();
+      state.globalEffectSums.townShopNoEquipment = true;
+    });
+
+    expect(isRecipeCraftableByTown(swordRecipe, town())).toBe(false);
+  });
+
   it('needs enough of every item requirement, ignoring the recipe level', () => {
     seedTown({ materials: { [oreId]: 2 } });
     expect(

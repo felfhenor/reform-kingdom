@@ -6,7 +6,7 @@ import {
 } from '@helpers/config';
 import { roundToNearest10 } from '@helpers/engine/number';
 import { hasGold } from '@helpers/item/materials';
-import { updateGamestate } from '@helpers/state-game';
+import { globalEffectSumsState, updateGamestate } from '@helpers/state-game';
 import { kingdomNodeGet } from '@helpers/world-node/world-nodes';
 import type {
   CurrentLocation,
@@ -49,6 +49,28 @@ export function workerStatsForLevel(
   level: number,
 ): WorkerStatBlock {
   return statBlockForLevel(worker.baseStats, worker.statsPerLevel, level);
+}
+
+export function kingdomWorkerGatherMultiplier(): number {
+  return Math.max(
+    0,
+    1 + globalEffectSumsState().workerGatherSpeedPercent / 100,
+  );
+}
+
+// Town workers never get these bonuses, so only kingdom workers read this.
+export function kingdomWorkerStatsForLevel(
+  worker: WorkerContent,
+  level: number,
+): WorkerStatBlock {
+  const stats = workerStatsForLevel(worker, level);
+  const craftPercent = globalEffectSumsState().workerCraftSpeedPercent;
+
+  return {
+    ...stats,
+    gatherSpeed: stats.gatherSpeed * kingdomWorkerGatherMultiplier(),
+    craftSpeed: stats.craftSpeed * Math.max(0, 1 + craftPercent / 100),
+  };
 }
 
 // Lowest level whose stamina covers `requiredStamina`, or undefined if it never does by WORKER_MAX_LEVEL.

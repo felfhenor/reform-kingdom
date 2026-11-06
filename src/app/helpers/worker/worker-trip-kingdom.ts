@@ -14,6 +14,7 @@ import {
 } from '@helpers/worker/worker-assignment';
 import { workerStartCrafting } from '@helpers/worker/worker-crafting';
 import {
+  kingdomWorkerGatherMultiplier,
   workerGainXp,
   workerLevelInRange,
 } from '@helpers/worker/worker-progression';
@@ -146,7 +147,7 @@ export function kingdomWorkerTripHost(
         ? travelPathFrom(from, kingdom.nodeName, canUseTeleports)
         : undefined;
     },
-    gatherRateMultiplier: 1,
+    gatherRateMultiplier: kingdomWorkerGatherMultiplier(),
     onUnitGathered: (nodeName, _itemId, level) =>
       kingdomWorkerGainGatherXp(workerId, nodeName, level),
     onUnitBanked: kingdomWorkerGatherVfx,

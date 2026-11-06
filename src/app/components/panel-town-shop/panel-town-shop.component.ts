@@ -16,6 +16,7 @@ import { SFXDirective } from '@directives/sfx.directive';
 import { modalOpen } from '@helpers/engine/modal-stack';
 import { notifyError, notifySuccess } from '@helpers/engine/notify';
 import { getGoldQuantity, goldCoinId } from '@helpers/item/materials';
+import { globalEffectSumsState } from '@helpers/state-game';
 import { townStockPrice } from '@helpers/town/shop/town-price';
 import { townShopItemCap } from '@helpers/town/shop/town-shop-access';
 import { townStock, townStockDisplay } from '@helpers/town/shop/town-stock';
@@ -53,6 +54,9 @@ export class PanelTownShopComponent {
   public goldCoinItemId = goldCoinId();
 
   public stockCap = computed(() => townShopItemCap(this.town().id));
+  public sellsNoEquipment = computed(
+    () => globalEffectSumsState().townShopNoEquipment,
+  );
 
   public stockRows = computed<TownStockRow[]>(() => {
     const town = this.town();

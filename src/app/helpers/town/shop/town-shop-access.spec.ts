@@ -44,4 +44,19 @@ describe('townShopItemCap', () => {
     seedContent([]);
     expect(townShopItemCap(townId)).toBe(0);
   });
+
+  it('is 0 while town shops sell no equipment', () => {
+    seedContent([
+      ensureTown({
+        id: townId,
+        traders: { sellItemCount: [{ tier: 0, value: 5 }] },
+      }),
+    ]);
+    seedGamestate((state) => {
+      state.world.towns[townId] = buildTownNodeState();
+      state.globalEffectSums.townShopNoEquipment = true;
+    });
+
+    expect(townShopItemCap(townId)).toBe(0);
+  });
 });

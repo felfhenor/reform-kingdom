@@ -19,7 +19,7 @@ import { gamestate, updateGamestate } from '@helpers/state-game';
 import {
   workerGainXp,
   workerLevelInRange,
-  workerStatsForLevel,
+  kingdomWorkerStatsForLevel,
 } from '@helpers/worker/worker-progression';
 import type {
   GameState,
@@ -84,7 +84,7 @@ export function workerCraftAssignmentIsValid(
   const recipe = getEntry<RecipeContent>(assignment.recipeId);
   if (!content || !recipe) return false;
 
-  const { craftSpeed, stamina } = workerStatsForLevel(content, level);
+  const { craftSpeed, stamina } = kingdomWorkerStatsForLevel(content, level);
   return (
     craftSpeed > 0 &&
     stamina >= recipeWorkerStaminaCost(recipe) &&
@@ -262,7 +262,7 @@ export function workerCraftingProcessTick(workerId: WorkerId): void {
     return;
   }
 
-  const { craftSpeed } = workerStatsForLevel(content, worker.level);
+  const { craftSpeed } = kingdomWorkerStatsForLevel(content, worker.level);
   if (
     !advanceCraft(workerId, recipe, workerCraftTicksPerUnit(recipe, craftSpeed))
   )

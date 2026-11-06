@@ -61,6 +61,12 @@ export function globalEffectEffectDescription(
       return 'Shrine Buffs: Never expire';
     case 'GlobalWipeEndsRun':
       return 'A wipe ends the run';
+    case 'WorkerCraftSpeedPercent':
+      return `Worker Craft Speed: ${signedPercent(effect.value)}`;
+    case 'WorkerGatherSpeedPercent':
+      return `Worker Gather Speed: ${signedPercent(effect.value)}`;
+    case 'GlobalTownShopNoEquipment':
+      return 'Town shops sell no equipment';
     case 'EnemyExtraSkills':
       return `Enemy Skills: +${effect.value} from the region`;
     case 'GlobalLevelStatMultiplier':
@@ -147,6 +153,15 @@ function accumulateGlobalEffectEffect(
       return;
     case 'GlobalWipeEndsRun':
       sums.wipeEndsRun = true;
+      return;
+    case 'WorkerCraftSpeedPercent':
+      sums.workerCraftSpeedPercent += effect.value;
+      return;
+    case 'WorkerGatherSpeedPercent':
+      sums.workerGatherSpeedPercent += effect.value;
+      return;
+    case 'GlobalTownShopNoEquipment':
+      sums.townShopNoEquipment = true;
       return;
     case 'DebuffResistance':
       sums.debuffResistanceFlat += effect.value;
