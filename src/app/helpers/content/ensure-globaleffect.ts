@@ -9,7 +9,9 @@ import type {
   GlobalEffectEffectDebuffResistance,
   GlobalEffectEffectDebuffResistanceTag,
   GlobalEffectEffectDecreeClauseCapBoost,
+  GlobalEffectEffectEnemyStatPercent,
   GlobalEffectEffectGainCombatStat,
+  GlobalEffectEffectGainStatPercent,
   GlobalEffectEffectGainStats,
   GlobalEffectEffectGatheringItemDropRateBoost,
   GlobalEffectEffectGoldGainMultiplier,
@@ -24,6 +26,8 @@ import type {
 
 export function ensureGlobalEffectEffect(
   effect: Partial<GlobalEffectEffectGainStats> &
+    Partial<GlobalEffectEffectGainStatPercent> &
+    Partial<GlobalEffectEffectEnemyStatPercent> &
     Partial<GlobalEffectEffectGainCombatStat> &
     Partial<GlobalEffectEffectXPGainMultiplier> &
     Partial<GlobalEffectEffectGoldGainMultiplier> &
@@ -37,6 +41,17 @@ export function ensureGlobalEffectEffect(
     Partial<GlobalEffectEffectOnPathTravelSpeedBoost> &
     Partial<GlobalEffectEffectDecreeClauseCapBoost> = {},
 ): GlobalEffectEffect {
+  if (
+    effect.effectType === 'GainStatPercent' ||
+    effect.effectType === 'EnemyStatPercent'
+  ) {
+    return {
+      effectType: effect.effectType,
+      value: effect.value ?? 0,
+      ...(effect.stat === undefined ? {} : { stat: effect.stat as GameStat }),
+    };
+  }
+
   if (effect.effectType === 'GlobalXPGainMultiplier') {
     return { effectType: 'GlobalXPGainMultiplier', value: effect.value ?? 0 };
   }

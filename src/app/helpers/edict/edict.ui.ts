@@ -3,6 +3,7 @@ import {
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { edictsActive, edictsSanitized } from '@helpers/edict/edict';
+import { recomputeGlobalEffectSums } from '@helpers/hero/global-effect-state';
 import { updateGamestate } from '@helpers/state-game';
 import type { EdictContent, EdictId, EdictKind } from '@interfaces';
 
@@ -26,6 +27,7 @@ export async function edictsSet(ids: EdictId[]): Promise<void> {
   const sanitized = edictsSanitized(ids);
   await updateGamestate((state) => {
     state.edicts = sanitized;
+    recomputeGlobalEffectSums(state);
     return state;
   });
 }

@@ -12,6 +12,7 @@ import {
   buildMonsterCombatant,
   buildTestCombatant,
 } from '@/testing/builders';
+import { recomputeGlobalEffectSums } from '@helpers/hero/global-effect-state';
 import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -57,11 +58,12 @@ describe('combatSummonMonster', () => {
     const fury = ensureEdict({
       id: 'fury' as EdictId,
       name: 'Fury',
-      effects: [{ effectType: 'StatPercent', target: 'Enemy', percent: 25 }],
+      effects: [{ effectType: 'EnemyStatPercent', value: 25 }],
     });
     seedContent([wolf, fury]);
     seedGamestate((state) => {
       state.edicts = [fury.id];
+      recomputeGlobalEffectSums(state);
     });
     const hero = buildTestCombatant({ id: 'hero-1' });
     const enemy = buildMonsterCombatant(wolf, { id: 'enemy-1' });

@@ -7,10 +7,7 @@ import {
 } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { defaultEquipment, defaultStats } from '@helpers/defaults';
-import {
-  edictStatPercents,
-  statsScaledByPercent,
-} from '@helpers/edict/edict-stats';
+import { statsScaledByPercent } from '@helpers/edict/edict-stats';
 import { roundToNearest10 } from '@helpers/engine/number';
 import { characterNonGearEffects } from '@helpers/hero/hero-effect';
 import { characterSkillTreeSeeded } from '@helpers/hero/skill-tree-content';
@@ -27,7 +24,11 @@ import {
   STAT_BONUS,
 } from '@helpers/item/equipment-bonus';
 import { rngUuid } from '@helpers/rng';
-import { updateGamestate, worldPartyState } from '@helpers/state-game';
+import {
+  globalEffectSumsState,
+  updateGamestate,
+  worldPartyState,
+} from '@helpers/state-game';
 import {
   EquipmentTypeToSlot,
   type AffixEffect,
@@ -105,7 +106,11 @@ export function characterStatsForLevel(
   return stats;
 }
 
-export function characterStats(character: CharacterStatSource): StatBlock {
+// The default reads live state, so it's only for callers in a tick or the UI; migration passes its own sums.
+export function characterStats(
+  character: CharacterStatSource,
+  heroPercents = globalEffectSumsState().heroStatPercents,
+): StatBlock {
   return statsScaledByPercent(
     characterStatsForLevel(
       character.jobId,
@@ -113,13 +118,16 @@ export function characterStats(character: CharacterStatSource): StatBlock {
       character.equipment,
       characterNonGearEffects(character),
     ),
-    edictStatPercents('Hero'),
+    heroPercents,
   );
 }
 
 // Clamps current hp/ep to the recomputed max, since a change can shrink max Health/Energy.
-export function characterRecalculateStats(character: Character): Character {
-  const stats = characterStats(character);
+export function characterRecalculateStats(
+  character: Character,
+  heroPercents = globalEffectSumsState().heroStatPercents,
+): Character {
+  const stats = characterStats(character, heroPercents);
 
   return {
     ...character,
@@ -217,11 +225,17 @@ export function setParty(party: Character[]): void {
   });
 }
 
-export function pruneInvalidPartyEquipment(party: Character[]): Character[] {
+export function pruneInvalidPartyEquipment(
+  party: Character[],
+  heroPercents: StatBlock,
+): Character[] {
   return party.map((character) =>
-    characterRecalculateStats({
-      ...character,
-      equipment: pruneInvalidEquippedItems(character.equipment),
-    }),
+    characterRecalculateStats(
+      {
+        ...character,
+        equipment: pruneInvalidEquippedItems(character.equipment),
+      },
+      heroPercents,
+    ),
   );
 }

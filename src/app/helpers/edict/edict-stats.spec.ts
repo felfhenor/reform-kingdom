@@ -4,10 +4,10 @@ import { ensureEdict } from '@helpers/content/ensure-edict';
 import { ensureMonster } from '@helpers/content/ensure-monster';
 import { defaultStats } from '@helpers/defaults';
 import {
-  edictStatPercents,
   monsterStatsForRun,
   statsScaledByPercent,
 } from '@helpers/edict/edict-stats';
+import { recomputeGlobalEffectSums } from '@helpers/hero/global-effect-state';
 import type { EdictContent, EdictId, MonsterId } from '@interfaces';
 import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
@@ -15,51 +15,16 @@ import { seedGamestate } from '@/testing/gamestate';
 const edict = (id: string, effects: EdictContent['effects']) =>
   ensureEdict({ id: id as EdictId, name: id, effects });
 
-const might = edict('might', [
-  { effectType: 'StatPercent', target: 'Hero', percent: 25 },
-]);
-const frailty = edict('frailty', [
-  { effectType: 'StatPercent', target: 'Hero', percent: -25 },
-]);
-const hardy = edict('hardy', [
-  { effectType: 'StatPercent', target: 'Hero', percent: 50, stat: 'Health' },
-]);
-const fury = edict('fury', [
-  { effectType: 'StatPercent', target: 'Enemy', percent: 25 },
-]);
+const might = edict('might', [{ effectType: 'GainStatPercent', value: 25 }]);
+const fury = edict('fury', [{ effectType: 'EnemyStatPercent', value: 25 }]);
 
 function pick(...edicts: EdictContent[]): void {
-  seedContent([might, frailty, hardy, fury]);
+  seedContent([might, fury]);
   seedGamestate((state) => {
     state.edicts = edicts.map((e) => e.id);
+    recomputeGlobalEffectSums(state);
   });
 }
-
-describe('edictStatPercents', () => {
-  it('is zero for every stat with no edicts', () => {
-    pick();
-    expect(edictStatPercents('Hero')).toEqual(defaultStats());
-  });
-
-  it('adds stat-specific percents on top of all-stat ones', () => {
-    pick(might, hardy);
-    const percents = edictStatPercents('Hero');
-
-    expect(percents.Health).toBe(75);
-    expect(percents.Strength).toBe(25);
-  });
-
-  it('lets opposite edicts cancel', () => {
-    pick(might, frailty);
-    expect(edictStatPercents('Hero')).toEqual(defaultStats());
-  });
-
-  it('keeps hero and enemy percents apart', () => {
-    pick(fury);
-    expect(edictStatPercents('Hero')).toEqual(defaultStats());
-    expect(edictStatPercents('Enemy').Strength).toBe(25);
-  });
-});
 
 describe('statsScaledByPercent', () => {
   it('rounds scaled Health and Energy only, leaving zero stats at zero', () => {

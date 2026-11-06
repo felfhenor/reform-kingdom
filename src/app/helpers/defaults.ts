@@ -246,6 +246,8 @@ export function defaultTagResistances(): StatusEffectBlock {
 export function defaultGlobalEffectSums(): GlobalEffectSums {
   return {
     stats: defaultStats(),
+    heroStatPercents: defaultStats(),
+    enemyStatPercents: defaultStats(),
     combatStats: defaultCombatStats(),
     debuffResistanceTags: defaultTagResistances(),
     debuffResistanceFlat: 0,

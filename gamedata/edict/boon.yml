@@ -7,9 +7,8 @@
   fragments: -3
   group: HeroStats
   effects:
-    - effectType: StatPercent
-      target: Hero
-      percent: 25
+    - effectType: GainStatPercent
+      value: 25
 
 - id: a76ae14f-4c67-440f-b8d0-5e32c25eb933
   name: Edict of Calm Nature
@@ -20,9 +19,8 @@
   fragments: -3
   group: MonsterStats
   effects:
-    - effectType: StatPercent
-      target: Enemy
-      percent: -25
+    - effectType: EnemyStatPercent
+      value: -25
 
 - id: 1ccc343d-4575-40f9-85b4-ab51ca86ee34
   name: Edict of the Cornucopia

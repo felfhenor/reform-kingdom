@@ -39,6 +39,7 @@ import type {
   TrainerTeachingId,
 } from '@interfaces';
 import { buildCharacter, buildEquipmentItem } from '@/testing/builders';
+import { recomputeGlobalEffectSums } from '@helpers/hero/global-effect-state';
 import { seedContent } from '@/testing/content';
 import { buildEffectNode, heroLearning } from '@/testing/skill-tree';
 import { seedGamestate } from '@/testing/gamestate';
@@ -285,7 +286,7 @@ describe('characterStats with stat edicts', () => {
     ensureEdict({
       id: id as EdictId,
       name: id,
-      effects: [{ effectType: 'StatPercent', target: 'Hero', percent }],
+      effects: [{ effectType: 'GainStatPercent', value: percent }],
     });
   const might = heroEdict('might', 25);
   const frailty = heroEdict('frailty', -25);
@@ -294,6 +295,7 @@ describe('characterStats with stat edicts', () => {
     seedContent([...baseContent, might, frailty]);
     seedGamestate((state) => {
       state.edicts = edicts.map((e) => e.id);
+      recomputeGlobalEffectSums(state);
     });
     return characterStats(hero({ equipment: withGear({}) })).Strength;
   }
@@ -331,10 +333,10 @@ describe('pruneInvalidPartyEquipment', () => {
     });
     seedContent([job, cloak]);
 
-    const [prunedJala, prunedSpoorle] = pruneInvalidPartyEquipment([
-      jala,
-      spoorle,
-    ]);
+    const [prunedJala, prunedSpoorle] = pruneInvalidPartyEquipment(
+      [jala, spoorle],
+      defaultStats(),
+    );
 
     expect(prunedJala.equipment).toEqual(withGear({ Armor: armed.Armor }));
     expect(prunedJala.stats.Health).toBe(jala.stats.Health - 50);

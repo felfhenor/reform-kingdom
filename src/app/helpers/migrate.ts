@@ -19,7 +19,10 @@ import { ledgerMark } from '@helpers/engine/ledger';
 import { recordPrune } from '@helpers/engine/record';
 import { getMap } from '@helpers/maps';
 import { retrofitPartyXp } from '@helpers/hero/character-progress';
-import { recomputeGlobalEffectSums } from '@helpers/hero/global-effect-state';
+import {
+  globalEffectSumsFor,
+  recomputeGlobalEffectSums,
+} from '@helpers/hero/global-effect-state';
 import { pruneInvalidEdicts } from '@helpers/edict/edict';
 import { pruneInvalidPartyEquipment } from '@helpers/hero/party';
 import { grantFoundingStoneIfMissing } from '@helpers/item/collectibles';
@@ -267,7 +270,10 @@ export function migrateGameState() {
     ...craftQueueOrphanedEquipment(newState.tradeskills),
   ];
   newState.tradeskills = pruneInvalidCraftQueues(newState.tradeskills);
-  newState.world.party = pruneInvalidPartyEquipment(newState.world.party);
+  newState.world.party = pruneInvalidPartyEquipment(
+    newState.world.party,
+    globalEffectSumsFor(newState).heroStatPercents,
+  );
   newState.world.currentLocation = repairUnwalkableCurrentLocation(
     newState.world.currentLocation,
   );

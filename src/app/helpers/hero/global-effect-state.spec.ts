@@ -1,24 +1,30 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { ensureEdict } from '@helpers/content/ensure-edict';
 import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
 import { ensureCollectible } from '@helpers/content/ensure-item';
+import { ensureJob } from '@helpers/content/ensure-job';
 import { ensureTradeskill } from '@helpers/content/ensure-tradeskill';
-import { defaultGameState } from '@helpers/defaults';
+import { defaultGameState, defaultStats } from '@helpers/defaults';
 import {
   applyGlobalEffectAdd,
   applyGlobalEffectPush,
   applyGlobalEffectRemove,
   globalEffectEffectsDescription,
+  globalEffectSumsFor,
   recomputeGlobalEffectSums,
 } from '@helpers/hero/global-effect-state';
 import type {
   CollectibleId,
+  EdictId,
   GameState,
   GlobalEffect,
   GlobalEffectEffect,
   GlobalEffectId,
+  JobId,
   TradeskillId,
 } from '@interfaces';
+import { buildCharacter } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
 
@@ -45,15 +51,40 @@ function active(
   return { ...blessing, effects, startTick: 0, expiresAtTick };
 }
 
-// Recompute reads the live clock, but mutates whichever state it is handed.
+// Recompute reads the clock of the state it's handed, not the live one.
 function freshState(edit: (state: GameState) => void = () => undefined) {
   const state = defaultGameState();
+  state.clock.numTicks = now;
   edit(state);
   return state;
 }
 
+const might = ensureEdict({
+  id: 'might' as EdictId,
+  name: 'Might',
+  effects: [{ effectType: 'GainStatPercent', value: 25 }],
+});
+const frailty = ensureEdict({
+  id: 'frailty' as EdictId,
+  name: 'Frailty',
+  effects: [{ effectType: 'GainStatPercent', value: -25 }],
+});
+const fury = ensureEdict({
+  id: 'fury' as EdictId,
+  name: 'Fury',
+  effects: [
+    { effectType: 'EnemyStatPercent', value: 25 },
+    { effectType: 'GlobalXPGainMultiplier', value: 0.5 },
+  ],
+});
+const knight = ensureJob({
+  id: 'knight' as JobId,
+  name: 'Knight',
+  baseStats: { ...defaultStats(), Health: 100, Strength: 8 },
+});
+
 beforeEach(() => {
-  seedContent([jewelcrafting, satchel, blessing]);
+  seedContent([jewelcrafting, satchel, blessing, might, frailty, fury, knight]);
   seedGamestate((state) => (state.clock.numTicks = now));
 });
 
@@ -62,6 +93,8 @@ describe('globalEffectEffectsDescription', () => {
     expect(
       globalEffectEffectsDescription([
         { effectType: 'GainStats', stat: 'Strength', value: 5 },
+        { effectType: 'GainStatPercent', value: 25 },
+        { effectType: 'EnemyStatPercent', stat: 'Health', value: -10 },
         { effectType: 'GainCombatStat', combatStat: 'reviveChance', value: 2 },
         { effectType: 'GainCombatStat', combatStat: 'agroValue', value: 3 },
         { effectType: 'GlobalXPGainMultiplier', value: 0.1 },
@@ -88,6 +121,8 @@ describe('globalEffectEffectsDescription', () => {
     ).toBe(
       [
         'Hero Strength: +5',
+        'Hero stats: +25%',
+        'Enemy Health: -10%',
         'Hero Revive Chance: +2%',
         'Hero Aggro: +3',
         'XP Gain: +10%',
@@ -176,6 +211,86 @@ describe('recomputeGlobalEffectSums', () => {
     recomputeGlobalEffectSums(state);
 
     expect(state.globalEffectSums.armorySizeBoost).toBe(3 + 5);
+  });
+});
+
+describe('edicts as a source', () => {
+  it('adds the run edicts beside timed effects and collectibles', () => {
+    const sums = globalEffectSumsFor(
+      freshState((s) => {
+        s.edicts = [fury.id, 'gone' as EdictId];
+        s.globalEffects = [
+          active([{ effectType: 'GlobalXPGainMultiplier', value: 0.1 }]),
+        ];
+        s.collectibles = { [satchel.id]: { quantity: 1, foundAt: 0 } };
+      }),
+    );
+
+    expect(sums.xpGainMultiplierBonus).toBeCloseTo(0.6);
+    expect(sums.armorySizeBoost).toBe(5);
+    expect(sums.enemyStatPercents.Strength).toBe(25);
+    expect(sums.heroStatPercents).toEqual(defaultStats());
+  });
+
+  it('scales one stat on top of all-stat percents, and opposites cancel', () => {
+    const sums = globalEffectSumsFor(
+      freshState((s) => {
+        s.edicts = [might.id];
+        s.globalEffects = [
+          active([
+            { effectType: 'GainStatPercent', stat: 'Health', value: 50 },
+          ]),
+        ];
+      }),
+    );
+    expect(sums.heroStatPercents).toMatchObject({ Health: 75, Strength: 25 });
+
+    const cancelled = globalEffectSumsFor(
+      freshState((s) => (s.edicts = [might.id, frailty.id])),
+    );
+    expect(cancelled.heroStatPercents).toEqual(defaultStats());
+  });
+});
+
+describe('hero stat percents on the party', () => {
+  function partyState(edicts: EdictId[]): GameState {
+    const state = freshState((s) => {
+      s.world.party = [buildCharacter({ jobId: knight.id, level: 1, hp: 100 })];
+    });
+    recomputeGlobalEffectSums(state);
+    state.edicts = edicts;
+    return state;
+  }
+
+  it('recalculates the party when hero percents change', () => {
+    const state = partyState([might.id]);
+
+    recomputeGlobalEffectSums(state);
+
+    expect(state.world.party[0].stats).toMatchObject({
+      Health: 125,
+      Strength: 10,
+    });
+  });
+
+  it('leaves the party untouched when hero percents are unchanged', () => {
+    const state = partyState([fury.id]);
+    const party = state.world.party;
+
+    recomputeGlobalEffectSums(state);
+
+    expect(state.world.party).toBe(party);
+  });
+
+  it('clamps current HP to the new maximum when a percent ends', () => {
+    const state = partyState([might.id]);
+    recomputeGlobalEffectSums(state);
+    state.world.party[0] = { ...state.world.party[0], hp: 125 };
+
+    state.edicts = [];
+    recomputeGlobalEffectSums(state);
+
+    expect(state.world.party[0].hp).toBe(100);
   });
 });
 

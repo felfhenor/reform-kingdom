@@ -1,19 +1,37 @@
 import { getEntry } from '@helpers/content/content';
 import { defaultGlobalEffectSums } from '@helpers/defaults';
-import { timerTicksElapsed } from '@helpers/engine/timer';
+import { characterRecalculateStats } from '@helpers/hero/party';
 import {
   CombatStatDimension,
   StatusEffectTagDimension,
   type CollectibleContent,
   type CollectibleId,
+  type EdictContent,
+  type GameStat,
   type GameState,
   type GlobalEffect,
   type GlobalEffectContent,
   type GlobalEffectEffect,
   type GlobalEffectId,
   type GlobalEffectSums,
+  type StatBlock,
   type TradeskillContent,
 } from '@interfaces';
+import { isEqual } from 'es-toolkit';
+
+function signedPercent(value: number): string {
+  return `${value >= 0 ? '+' : ''}${value}%`;
+}
+
+function addStatPercent(
+  percents: StatBlock,
+  value: number,
+  stat?: GameStat,
+): void {
+  (stat ? [stat] : (Object.keys(percents) as GameStat[])).forEach((key) => {
+    percents[key] += value;
+  });
+}
 
 // Renders one effect as a short "Label: +N[%]" fragment.
 export function globalEffectEffectDescription(
@@ -22,6 +40,10 @@ export function globalEffectEffectDescription(
   switch (effect.effectType) {
     case 'GainStats':
       return `Hero ${effect.stat}: +${effect.value}`;
+    case 'GainStatPercent':
+      return `Hero ${effect.stat ?? 'stats'}: ${signedPercent(effect.value)}`;
+    case 'EnemyStatPercent':
+      return `Enemy ${effect.stat ?? 'stats'}: ${signedPercent(effect.value)}`;
     case 'GainCombatStat': {
       const isPercent =
         CombatStatDimension.isPercent?.[effect.combatStat] ?? true;
@@ -76,6 +98,12 @@ function accumulateGlobalEffectEffect(
     case 'GainStats':
       sums.stats[effect.stat] += effect.value;
       return;
+    case 'GainStatPercent':
+      addStatPercent(sums.heroStatPercents, effect.value, effect.stat);
+      return;
+    case 'EnemyStatPercent':
+      addStatPercent(sums.enemyStatPercents, effect.value, effect.stat);
+      return;
     case 'GainCombatStat':
       sums.combatStats[effect.combatStat] += effect.value;
       return;
@@ -119,26 +147,43 @@ function accumulateGlobalEffectEffect(
   }
 }
 
-// Rebuilds `state.globalEffectSums` from scratch. Called from the few
-// choke points that actually change either source: `applyGlobalEffectPush`,
-// `applyGlobalEffectRemove`, and `applyCollectibleGrant`.
-export function recomputeGlobalEffectSums(state: GameState): void {
-  const currentTick = timerTicksElapsed();
-
+// Totals of every timed effect, owned collectible and run edict, without writing them anywhere.
+export function globalEffectSumsFor(state: GameState): GlobalEffectSums {
   const activeEffectEntries = state.globalEffects
-    .filter((effect) => effect.expiresAtTick > currentTick)
+    .filter((effect) => effect.expiresAtTick > state.clock.numTicks)
     .flatMap((effect) => effect.effects);
 
   const collectibleEffectEntries = (
     Object.keys(state.collectibles) as CollectibleId[]
   ).flatMap((id) => getEntry<CollectibleContent>(id)?.effects ?? []);
 
-  const sums = defaultGlobalEffectSums();
-  [...activeEffectEntries, ...collectibleEffectEntries].forEach((effect) =>
-    accumulateGlobalEffectEffect(sums, effect),
+  const edictEffectEntries = state.edicts.flatMap(
+    (id) => getEntry<EdictContent>(id)?.effects ?? [],
   );
 
+  const sums = defaultGlobalEffectSums();
+  [
+    ...activeEffectEntries,
+    ...collectibleEffectEntries,
+    ...edictEffectEntries,
+  ].forEach((effect) => accumulateGlobalEffectEffect(sums, effect));
+  return sums;
+}
+
+export function recomputeGlobalEffectSums(state: GameState): void {
+  const sums = globalEffectSumsFor(state);
+  const heroPercentsChanged = !isEqual(
+    state.globalEffectSums?.heroStatPercents,
+    sums.heroStatPercents,
+  );
   state.globalEffectSums = sums;
+
+  // Hero stats are cached on each character, so a percent change has to be rolled into them.
+  if (heroPercentsChanged) {
+    state.world.party = state.world.party.map((hero) =>
+      characterRecalculateStats(hero, sums.heroStatPercents),
+    );
+  }
 }
 
 // Direct-state mutators for callers folding this into a larger `updateGamestate` commit.

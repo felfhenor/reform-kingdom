@@ -89,8 +89,24 @@ export type GlobalEffectEffectOnPathTravelSpeedBoost = {
   value: number;
 };
 
+// Whole percents, stacking additively; without a stat it scales every stat.
+export type GlobalEffectEffectGainStatPercent = {
+  effectType: 'GainStatPercent';
+  stat?: GameStat;
+  value: number;
+};
+
+// As GainStatPercent, for monsters fighting the party; guardians and hero summons are never touched.
+export type GlobalEffectEffectEnemyStatPercent = {
+  effectType: 'EnemyStatPercent';
+  stat?: GameStat;
+  value: number;
+};
+
 export type GlobalEffectEffect =
   | GlobalEffectEffectGainStats
+  | GlobalEffectEffectGainStatPercent
+  | GlobalEffectEffectEnemyStatPercent
   | GlobalEffectEffectGainCombatStat
   | GlobalEffectEffectXPGainMultiplier
   | GlobalEffectEffectGoldGainMultiplier

@@ -25,6 +25,7 @@ import {
 import { tradeskillXpForLevel } from '@helpers/crafting/tradeskill';
 import {
   defaultGameState,
+  defaultStats,
   defaultTradeskillBuilding,
   GAMESTATE_VERSION,
 } from '@helpers/defaults';
@@ -45,6 +46,7 @@ import type {
   GameOptions,
   GameState,
   GatheringId,
+  GlobalEffectSums,
   ItemId,
   JobId,
   MonsterId,
@@ -194,6 +196,31 @@ describe('migrateGameState', () => {
 
     expect(migrated.edicts).toEqual([]);
     expect(migrated.world.party).toHaveLength(1);
+  });
+
+  it('keeps an edict hero percent on a save whose sums predate it', () => {
+    const heroic = ensureEdict({
+      id: 'heroic' as EdictId,
+      name: 'Edict of Heroic Might',
+      effects: [{ effectType: 'GainStatPercent', value: 25 }],
+    });
+    const knight = ensureJob({
+      id: 'knight' as JobId,
+      name: 'Knight',
+      baseStats: { ...defaultStats(), Health: 100 },
+    });
+    seedContent([...content, heroic, knight]);
+
+    const migrated = migrate((save) => {
+      save.edicts = [heroic.id];
+      save.world.party = [buildCharacter({ jobId: knight.id, level: 1 })];
+      const sums = save.globalEffectSums as Partial<GlobalEffectSums>;
+      delete sums.heroStatPercents;
+      delete sums.enemyStatPercents;
+    });
+
+    expect(migrated.globalEffectSums.heroStatPercents.Health).toBe(25);
+    expect(migrated.world.party[0].stats.Health).toBe(125);
   });
 
   it('fills in whatever an older save is missing from the current defaults', () => {

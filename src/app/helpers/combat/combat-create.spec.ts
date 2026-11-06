@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { buildCharacter, buildEquipmentItem } from '@/testing/builders';
+import { recomputeGlobalEffectSums } from '@helpers/hero/global-effect-state';
 import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
 import { abilityJobContent, buildAbilityHero } from '@/testing/job-ability';
@@ -260,7 +261,7 @@ describe('combatantFromMonster', () => {
     const fury = ensureEdict({
       id: 'fury' as EdictId,
       name: 'Fury',
-      effects: [{ effectType: 'StatPercent', target: 'Enemy', percent: 25 }],
+      effects: [{ effectType: 'EnemyStatPercent', value: 25 }],
     });
     const brute = ensureMonster({
       id: 'brute' as MonsterId,
@@ -271,6 +272,7 @@ describe('combatantFromMonster', () => {
       seedContent([fury]);
       seedGamestate((state) => {
         state.edicts = active ? [fury.id] : [];
+        recomputeGlobalEffectSums(state);
       });
     }
 
@@ -330,7 +332,7 @@ describe('combatantsFromTownGuardians', () => {
     const fury = ensureEdict({
       id: 'fury' as EdictId,
       name: 'Fury',
-      effects: [{ effectType: 'StatPercent', target: 'Enemy', percent: 25 }],
+      effects: [{ effectType: 'EnemyStatPercent', value: 25 }],
     });
     const brute = ensureMonster({
       id: 'brute' as MonsterId,
@@ -340,6 +342,7 @@ describe('combatantsFromTownGuardians', () => {
     seedContent([brute, fury]);
     seedGamestate((state) => {
       state.edicts = [fury.id];
+      recomputeGlobalEffectSums(state);
     });
 
     const [guardian] = combatantsFromTownGuardians(

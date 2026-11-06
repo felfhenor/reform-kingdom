@@ -7,6 +7,8 @@ import type { StatBlock } from '@interfaces/stat';
 // see `recomputeGlobalEffectSums` for what keeps this in sync.
 export type GlobalEffectSums = {
   stats: StatBlock;
+  heroStatPercents: StatBlock;
+  enemyStatPercents: StatBlock;
   combatStats: CombatStatBlock;
   debuffResistanceTags: StatusEffectBlock;
   debuffResistanceFlat: number;
