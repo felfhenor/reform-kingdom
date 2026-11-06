@@ -41,7 +41,7 @@ import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation
 import { homeNodeGet } from '@helpers/town/town-spawn';
 import { currentLocationSet } from '@helpers/world';
 import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';
-import { outpostDeathPenaltyMultiplier } from '@helpers/world-node/world-node-outpost';
+import { deathPenaltyMultiplier } from '@helpers/world-node/world-node-outpost';
 import { isWorldNodeGateOpen } from '@helpers/world-node/world-node-gate';
 import {
   isWorldNodeCollectibleGateMet,
@@ -207,17 +207,14 @@ export function travelStart(
 // 10 seconds per teleport-hop to the home node's map, 10 second minimum so dying nearby still costs a beat; a developed home outpost shortens the total.
 function deathsDoorDurationTicks(): number {
   const home = homeNodeGet();
-  if (!home) return DEATHS_DOOR_MINIMUM_SECONDS;
-
-  const hops = mapHopsBetween(
-    worldCurrentLocationState().mapName,
-    home.mapName,
-  );
+  const hops = home
+    ? mapHopsBetween(worldCurrentLocationState().mapName, home.mapName)
+    : 0;
   const baseTicks = Math.max(
     DEATHS_DOOR_MINIMUM_SECONDS,
     hops * DEATHS_DOOR_SECONDS_PER_MAP,
   );
-  return Math.ceil(baseTicks * outpostDeathPenaltyMultiplier(home.nodeName));
+  return Math.ceil(baseTicks * deathPenaltyMultiplier(home?.nodeName));
 }
 
 // Deaths Door is purely a timer; on expiry the party teleports home.

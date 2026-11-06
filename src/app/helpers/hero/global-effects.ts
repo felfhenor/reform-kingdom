@@ -19,7 +19,7 @@ import {
 import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation-buff';
 import { homeNodeGet } from '@helpers/town/town-spawn';
 import { currentLocationSet } from '@helpers/world';
-import { outpostDeathPenaltyMultiplier } from '@helpers/world-node/world-node-outpost';
+import { deathPenaltyMultiplier } from '@helpers/world-node/world-node-outpost';
 import type {
   GlobalEffect,
   GlobalEffectContent,
@@ -76,10 +76,12 @@ function handleDeathsDoorExpiry(): void {
   }
 
   miscellaneousMessageLog('The party has been recalled home.');
-  const multiplier = home ? outpostDeathPenaltyMultiplier(home.nodeName) : 1;
   addGlobalEffect(
     'Healing' as GlobalEffectId,
-    Math.ceil(healingTicksForLevel(worldPartyState()) * multiplier),
+    Math.ceil(
+      healingTicksForLevel(worldPartyState()) *
+        deathPenaltyMultiplier(home?.nodeName),
+    ),
   );
 }
 

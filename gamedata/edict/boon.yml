@@ -74,10 +74,14 @@
 
 - id: 1abaf8ae-7a55-4513-a0b7-d9a47f1d19e3
   name: Edict of Swift Mending
+  enabled: true
   sprite: '0006'
   description: Deaths Door and Healing last half as long.
   kind: Boon
   fragments: -1
+  effects:
+    - effectType: GlobalDeathPenaltyMultiplier
+      value: -0.5
 
 - id: 7df5e003-4e99-4912-830f-66ca83aad694
   name: Edict of Eternal Blessings

@@ -254,6 +254,7 @@ export function defaultGlobalEffectSums(): GlobalEffectSums {
     xpGainMultiplierBonus: 0,
     goldGainMultiplierBonus: 0,
     shopPriceMultiplierBonus: 0,
+    deathPenaltyMultiplierBonus: 0,
     combatItemDropRateBoost: 0,
     gatheringItemDropRateBoost: 0,
     armorySizeBoost: 0,

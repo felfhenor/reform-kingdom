@@ -30,6 +30,12 @@ export type GlobalEffectEffectGoldGainMultiplier = {
   value: number;
 };
 
+// Fraction (-0.5 = half as long) on Deaths Door and Healing, stacking additively.
+export type GlobalEffectEffectDeathPenaltyMultiplier = {
+  effectType: 'GlobalDeathPenaltyMultiplier';
+  value: number;
+};
+
 // Fraction (-0.25 = 25% cheaper) on what town shops and caravans charge, stacking additively.
 export type GlobalEffectEffectShopPriceMultiplier = {
   effectType: 'GlobalShopPriceMultiplier';
@@ -117,6 +123,7 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectXPGainMultiplier
   | GlobalEffectEffectGoldGainMultiplier
   | GlobalEffectEffectShopPriceMultiplier
+  | GlobalEffectEffectDeathPenaltyMultiplier
   | GlobalEffectEffectDebuffResistance
   | GlobalEffectEffectDebuffResistanceTag
   | GlobalEffectEffectCombatItemDropRateBoost

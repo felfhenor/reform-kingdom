@@ -55,6 +55,8 @@ export function globalEffectEffectDescription(
       return `Gold Gain: ${signedPercent(effect.value * 100)}`;
     case 'GlobalShopPriceMultiplier':
       return `Shop Prices: ${signedPercent(effect.value * 100)}`;
+    case 'GlobalDeathPenaltyMultiplier':
+      return `Deaths Door & Healing Time: ${signedPercent(effect.value * 100)}`;
     case 'DebuffResistance':
       return `All Debuff Resist: +${effect.value}%`;
     case 'DebuffResistanceTag':
@@ -117,6 +119,9 @@ function accumulateGlobalEffectEffect(
       return;
     case 'GlobalShopPriceMultiplier':
       sums.shopPriceMultiplierBonus += effect.value;
+      return;
+    case 'GlobalDeathPenaltyMultiplier':
+      sums.deathPenaltyMultiplierBonus += effect.value;
       return;
     case 'DebuffResistance':
       sums.debuffResistanceFlat += effect.value;

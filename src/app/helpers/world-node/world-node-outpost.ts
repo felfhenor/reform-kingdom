@@ -3,7 +3,7 @@ import {
   OUTPOST_DEATH_PENALTY_REDUCTION_PER_LEVEL,
   OUTPOST_TELEPORT_LEVEL,
 } from '@helpers/config';
-import { outpostsState } from '@helpers/state-game';
+import { globalEffectSumsState, outpostsState } from '@helpers/state-game';
 import {
   isWorldNodeVisible,
   worldNodesOfType,
@@ -27,6 +27,15 @@ export function outpostDeathPenaltyMultiplier(nodeName: string): number {
   );
   const upgrades = Math.max(0, level - 1);
   return Math.max(0, 1 - upgrades * OUTPOST_DEATH_PENALTY_REDUCTION_PER_LEVEL);
+}
+
+// Scales Deaths Door and Healing: the home outpost's reduction times any global effect, never negative.
+export function deathPenaltyMultiplier(homeNodeName?: string): number {
+  const outpost = homeNodeName
+    ? outpostDeathPenaltyMultiplier(homeNodeName)
+    : 1;
+  const bonus = globalEffectSumsState().deathPenaltyMultiplierBonus;
+  return outpost * Math.max(0, 1 + bonus);
 }
 
 export function isOutpostTeleportUnlocked(nodeName: string): boolean {

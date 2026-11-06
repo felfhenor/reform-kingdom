@@ -7,6 +7,7 @@ import {
 } from '@helpers/config';
 import { ensureOutpost } from '@helpers/content/ensure-outpost';
 import {
+  deathPenaltyMultiplier,
   isOutpostBuilt,
   isOutpostTeleportListed,
   isOutpostTeleportUnlocked,
@@ -139,5 +140,23 @@ describe('teleport listings', () => {
     expect(
       outpostsWithTeleportUnlocked().map((entry) => entry.nodeName),
     ).toEqual(['Carrina Outpost']);
+  });
+});
+
+describe('deathPenaltyMultiplier', () => {
+  it('stacks the home outpost reduction with the global effect, never below 0', () => {
+    seedGamestate((state) => {
+      state.outposts[carrina] = { level: 2 };
+      state.globalEffectSums.deathPenaltyMultiplierBonus = -0.5;
+    });
+    expect(deathPenaltyMultiplier(carrina)).toBe(
+      (1 - OUTPOST_DEATH_PENALTY_REDUCTION_PER_LEVEL) * 0.5,
+    );
+    expect(deathPenaltyMultiplier()).toBe(0.5);
+
+    seedGamestate((state) => {
+      state.globalEffectSums.deathPenaltyMultiplierBonus = -2;
+    });
+    expect(deathPenaltyMultiplier()).toBe(0);
   });
 });
