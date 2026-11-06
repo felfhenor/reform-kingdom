@@ -42,40 +42,19 @@
   kind: Challenge
   fragments: 3
 
-- id: bfc84b5e-c4fd-4fb0-8f6c-e4287aa66d15
-  name: Edict of the Rising Tide
-  sprite: '0015'
-  description: Nodes rise to meet your party, so none are ever Trivial. Drops and gathering in old regions scale up with them.
-  kind: Challenge
-  fragments: 4
-
 - id: dbe3fe9d-6e30-4226-9168-88695fe136d6
   name: Edict of Esurient Poverty
+  enabled: true
   sprite: '0016'
-  description: Combat XP and gold are reduced by 40%. Commissions and town reputation pay much more.
+  description: XP and combat gold gains are reduced by 40%.
   kind: Challenge
   fragments: 2
-
-- id: 513d5b7a-2a6e-47e0-883a-4891d6af6c40
-  name: Edict of Golden Monopoly
-  sprite: '0017'
-  description: Town shop prices are doubled. Exchange and caravan trader rates are better.
-  kind: Challenge
-  fragments: 1
-
-- id: c03e5ab7-1e05-4e4d-a128-be17f5e58b2d
-  name: Edict of True Scarcity
-  sprite: '0009'
-  description: Recipes need more materials. Crafted gear always rolls one extra affix.
-  kind: Challenge
-  fragments: 2
-
-- id: d6631919-4f78-4b2e-973a-df63d710909b
-  name: Edict of Fickle Curses
-  sprite: '0010'
-  description: Every dropped piece of equipment rolls a curse affix, and one extra good affix.
-  kind: Challenge
-  fragments: 2
+  group: XP
+  effects:
+    - effectType: GlobalXPGainMultiplier
+      value: -0.4
+    - effectType: GlobalGoldGainMultiplier
+      value: -0.4
 
 - id: fabe9a7d-6448-409e-9ed0-103cfa0a6974
   name: Edict of Iron Blood

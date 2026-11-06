@@ -47,6 +47,7 @@
   description: XP gain is increased by 50%.
   kind: Boon
   fragments: -3
+  group: XP
   effects:
     - effectType: GlobalXPGainMultiplier
       value: 0.5
