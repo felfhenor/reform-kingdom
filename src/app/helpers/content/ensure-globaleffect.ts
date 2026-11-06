@@ -20,6 +20,7 @@ import type {
   GlobalEffectEffectShopPriceMultiplier,
   GlobalEffectEffectDeathPenaltyMultiplier,
   GlobalEffectEffectLevelStatMultiplier,
+  GlobalEffectEffectShrineBuffsPermanent,
   GlobalEffectEffectTradeskillQueueSizeBoost,
   GlobalEffectEffectXPGainMultiplier,
   GlobalEffectId,
@@ -36,6 +37,7 @@ export function ensureGlobalEffectEffect(
     Partial<GlobalEffectEffectShopPriceMultiplier> &
     Partial<GlobalEffectEffectDeathPenaltyMultiplier> &
     Partial<GlobalEffectEffectLevelStatMultiplier> &
+    Partial<GlobalEffectEffectShrineBuffsPermanent> &
     Partial<GlobalEffectEffectGoldGainMultiplier> &
     Partial<GlobalEffectEffectDebuffResistance> &
     Partial<GlobalEffectEffectDebuffResistanceTag> &
@@ -107,6 +109,10 @@ export function ensureGlobalEffectEffect(
       effectType: 'GlobalShopPriceMultiplier',
       value: effect.value ?? 0,
     };
+  }
+
+  if (effect.effectType === 'GlobalShrineBuffsPermanent') {
+    return { effectType: 'GlobalShrineBuffsPermanent' };
   }
 
   if (effect.effectType === 'GlobalLevelStatMultiplier') {

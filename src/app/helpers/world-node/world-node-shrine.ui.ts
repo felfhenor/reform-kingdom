@@ -5,10 +5,11 @@ import {
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { timerTicksElapsed } from '@helpers/engine/timer';
+import { ONE_YEAR_TICKS } from '@helpers/config';
 import { applyGlobalEffectAdd } from '@helpers/hero/global-effect-state';
 import { jobAbilityValue } from '@helpers/hero/job-ability';
 import { rumorWhisper } from '@helpers/rumor/rumor-whisper';
-import { updateGamestate } from '@helpers/state-game';
+import { globalEffectSumsState, updateGamestate } from '@helpers/state-game';
 import { isPartyAtNode } from '@helpers/world';
 import {
   shrinePrayerCooldownRemaining,
@@ -37,10 +38,14 @@ export async function shrinePray(nodeName: string): Promise<boolean> {
   if (!tier) return false;
 
   const currentTick = timerTicksElapsed();
+  const permanent = globalEffectSumsState().shrineBuffsPermanent;
   // Fixed at prayer time - a later party change doesn't stretch or shrink it.
-  const duration = Math.round(
-    tier.globalEffectDuration * (1 + jobAbilityValue('ShrineDurationBoost')),
-  );
+  const duration = permanent
+    ? ONE_YEAR_TICKS
+    : Math.round(
+        tier.globalEffectDuration *
+          (1 + jobAbilityValue('ShrineDurationBoost')),
+      );
 
   let prayed = false;
   await updateGamestate((state) => {
@@ -49,7 +54,13 @@ export async function shrinePray(nodeName: string): Promise<boolean> {
     state.globalEffects = state.globalEffects.filter(
       (effect) => !effect.isShrineBuff,
     );
-    applyGlobalEffectAdd(state, tier.globalEffectId, duration, currentTick);
+    applyGlobalEffectAdd(
+      state,
+      tier.globalEffectId,
+      duration,
+      currentTick,
+      permanent,
+    );
     state.world.prayerLastTick = currentTick;
     prayed = true;
     return state;

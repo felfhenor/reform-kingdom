@@ -85,7 +85,10 @@
 
 - id: 7df5e003-4e99-4912-830f-66ca83aad694
   name: Edict of Eternal Blessings
+  enabled: true
   sprite: '0007'
   description: Shrine buffs never expire once prayed for.
   kind: Boon
   fragments: -2
+  effects:
+    - effectType: GlobalShrineBuffsPermanent

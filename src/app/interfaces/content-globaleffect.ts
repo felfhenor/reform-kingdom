@@ -30,6 +30,11 @@ export type GlobalEffectEffectGoldGainMultiplier = {
   value: number;
 };
 
+// Shrine prayers last until the next prayer replaces them.
+export type GlobalEffectEffectShrineBuffsPermanent = {
+  effectType: 'GlobalShrineBuffsPermanent';
+};
+
 // Fraction (-1 = none) on every stat heroes gain per level, from job and skill tree alike, stacking additively.
 export type GlobalEffectEffectLevelStatMultiplier = {
   effectType: 'GlobalLevelStatMultiplier';
@@ -131,6 +136,7 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectShopPriceMultiplier
   | GlobalEffectEffectDeathPenaltyMultiplier
   | GlobalEffectEffectLevelStatMultiplier
+  | GlobalEffectEffectShrineBuffsPermanent
   | GlobalEffectEffectDebuffResistance
   | GlobalEffectEffectDebuffResistanceTag
   | GlobalEffectEffectCombatItemDropRateBoost

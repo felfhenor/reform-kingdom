@@ -256,6 +256,7 @@ export function defaultGlobalEffectSums(): GlobalEffectSums {
     shopPriceMultiplierBonus: 0,
     deathPenaltyMultiplierBonus: 0,
     levelStatMultiplierBonus: 0,
+    shrineBuffsPermanent: false,
     combatItemDropRateBoost: 0,
     gatheringItemDropRateBoost: 0,
     armorySizeBoost: 0,

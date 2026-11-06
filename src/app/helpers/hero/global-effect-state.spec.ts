@@ -82,6 +82,11 @@ const humility = ensureEdict({
   name: 'Humility',
   effects: [{ effectType: 'GlobalLevelStatMultiplier', value: -1 }],
 });
+const eternal = ensureEdict({
+  id: 'eternal' as EdictId,
+  name: 'Eternal',
+  effects: [{ effectType: 'GlobalShrineBuffsPermanent' }],
+});
 const knight = ensureJob({
   id: 'knight' as JobId,
   name: 'Knight',
@@ -97,6 +102,7 @@ beforeEach(() => {
     frailty,
     fury,
     humility,
+    eternal,
     knight,
   ]);
   seedGamestate((state) => (state.clock.numTicks = now));
@@ -334,6 +340,22 @@ describe('adding and removing effects', () => {
     applyGlobalEffectRemove(state, blessing.id);
     expect(state.globalEffects).toEqual([]);
     expect(state.globalEffectSums.stats.Strength).toBe(0);
+  });
+
+  it('marks shrine buffs permanent while an edict says so', () => {
+    expect(globalEffectSumsFor(freshState()).shrineBuffsPermanent).toBe(false);
+    expect(
+      globalEffectSumsFor(freshState((st) => (st.edicts = [eternal.id])))
+        .shrineBuffsPermanent,
+    ).toBe(true);
+  });
+
+  it('can hide the timer of an effect that normally shows it', () => {
+    const state = freshState();
+
+    applyGlobalEffectAdd(state, blessing.id, 30, now, true);
+
+    expect(state.globalEffects[0].hideDuration).toBe(true);
   });
 
   it('adds nothing for unknown content, and pushes ready-made effects as-is', () => {

@@ -55,6 +55,8 @@ export function globalEffectEffectDescription(
       return `Gold Gain: ${signedPercent(effect.value * 100)}`;
     case 'GlobalShopPriceMultiplier':
       return `Shop Prices: ${signedPercent(effect.value * 100)}`;
+    case 'GlobalShrineBuffsPermanent':
+      return 'Shrine Buffs: Never expire';
     case 'GlobalLevelStatMultiplier':
       return `Stats per Level: ${signedPercent(effect.value * 100)}`;
     case 'GlobalDeathPenaltyMultiplier':
@@ -127,6 +129,9 @@ function accumulateGlobalEffectEffect(
       return;
     case 'GlobalLevelStatMultiplier':
       sums.levelStatMultiplierBonus += effect.value;
+      return;
+    case 'GlobalShrineBuffsPermanent':
+      sums.shrineBuffsPermanent = true;
       return;
     case 'DebuffResistance':
       sums.debuffResistanceFlat += effect.value;
@@ -215,12 +220,14 @@ export function applyGlobalEffectAdd(
   globalEffectId: GlobalEffectId,
   durationTicks: number,
   currentTick: number,
+  hideDuration = false,
 ): void {
   const content = getEntry<GlobalEffectContent>(globalEffectId);
   if (!content) return;
 
   applyGlobalEffectPush(state, {
     ...content,
+    hideDuration: hideDuration || content.hideDuration,
     startTick: currentTick,
     expiresAtTick: currentTick + durationTicks,
   });
