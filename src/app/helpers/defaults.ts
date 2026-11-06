@@ -115,6 +115,7 @@ export function defaultRunStats(): GameStateRunStats {
     fightsWon: 0,
     fightsLost: 0,
     itemsCrafted: 0,
+    seals: {},
     heroes: {},
   };
 }

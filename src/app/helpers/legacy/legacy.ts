@@ -27,7 +27,7 @@ import type {
   RunRecordStats,
   RunStatsTotals,
 } from '@interfaces';
-import { omit } from 'es-toolkit';
+import { isPlainObject, omit } from 'es-toolkit';
 import { sumBy } from 'es-toolkit/compat';
 
 export const LEGACY_STORAGE_KEY = 'legacy';
@@ -50,6 +50,14 @@ function legacyHeroIsValid(hero: RunRecordHero | null): boolean {
   );
 }
 
+function legacySealsAreValid(seals: unknown): boolean {
+  return (
+    seals === undefined ||
+    (isPlainObject(seals) &&
+      Object.values(seals).every((tick) => typeof tick === 'number'))
+  );
+}
+
 function legacyRunIsValid(run: RunRecord | null): boolean {
   return (
     typeof run?.id === 'string' &&
@@ -57,7 +65,8 @@ function legacyRunIsValid(run: RunRecord | null): boolean {
     Array.isArray(run.party) &&
     run.party.every(legacyHeroIsValid) &&
     Array.isArray(run.edicts) &&
-    Array.isArray(run.stats?.completion)
+    Array.isArray(run.stats?.completion) &&
+    legacySealsAreValid(run.stats.run?.seals)
   );
 }
 

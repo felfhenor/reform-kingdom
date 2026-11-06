@@ -210,6 +210,14 @@ describe('migrateGameState', () => {
     expect(migrated.world.autoMode).toEqual(defaults.world.autoMode);
   });
 
+  it('gives a save from before seals an empty set, so its regions seal on their next clear', () => {
+    const migrated = migrate((save) => {
+      delete (save.runStats as Partial<GameState['runStats']>).seals;
+    });
+
+    expect(migrated.runStats.seals).toEqual({});
+  });
+
   it('grants the Founding Stone once, without touching one already owned', () => {
     seedContent([foundingStone]);
 

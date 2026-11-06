@@ -25,6 +25,7 @@ import {
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { ensureItem } from '@helpers/content/ensure-item';
 import { ensureMonster } from '@helpers/content/ensure-monster';
+import { ensureRegion } from '@helpers/content/ensure-region';
 import { ensureTown } from '@helpers/content/ensure-town';
 import {
   autoModeRecordClauseFailure,
@@ -59,6 +60,7 @@ import type {
   EncounterRandomId,
   ItemId,
   MonsterId,
+  RegionId,
   TownId,
 } from '@interfaces';
 import { captureAnalyticsEvents } from '@/testing/analytics';
@@ -313,6 +315,75 @@ describe('combatCheckIfOver', () => {
 
       expect(taskRecordEncounterClear).not.toHaveBeenCalled();
       expect(gamestate().world.combat).toBeUndefined();
+    });
+
+    describe('region seals', () => {
+      const carrinaId = 'carrina' as RegionId;
+      const carrina = (sealEncounterId: EncounterId) =>
+        ensureRegion({
+          id: carrinaId,
+          name: 'Carrina',
+          seal: { sealEncounterId, parTicks: 100 },
+        });
+
+      function clearAt(tick: number, sealedAt?: number): void {
+        const combat = fight({ encounterId, fightIndex: 0 });
+        seedGamestate((state) => {
+          state.clock.numTicks = tick;
+          state.world.combat = combat;
+          if (sealedAt !== undefined)
+            state.runStats.seals[carrinaId] = sealedAt;
+        });
+        inTick(() => combatCheckIfOver(combat));
+      }
+
+      it('seals the region on the first clear of its seal encounter', () => {
+        seedContent([goblin, encounter(), carrina(encounterId), ...items]);
+        const events = captureAnalyticsEvents();
+
+        clearAt(40);
+
+        expect(gamestate().runStats.seals[carrinaId]).toBe(40);
+        expect(logMessages()).toContain(
+          'The memory of Carrina is set in stone.',
+        );
+        expect(events).toContain('Progress:Seal:Carrina');
+      });
+
+      it('keeps the first tick on a refight, without logging again', () => {
+        seedContent([goblin, encounter(), carrina(encounterId), ...items]);
+
+        clearAt(90, 40);
+
+        expect(gamestate().runStats.seals[carrinaId]).toBe(40);
+        expect(logMessages()).not.toContain(
+          'The memory of Carrina is set in stone.',
+        );
+      });
+
+      it("ignores clears of encounters that aren't a seal", () => {
+        seedContent([
+          goblin,
+          encounter(),
+          carrina('elsewhere' as EncounterId),
+          ...items,
+        ]);
+
+        clearAt(40);
+
+        expect(gamestate().runStats.seals).toEqual({});
+      });
+
+      it('seals on an intimidation auto-win too', () => {
+        seedContent([goblin, encounter(), carrina(encounterId), ...items]);
+        seedGamestate((state) => (state.clock.numTicks = 25));
+
+        inTick(() =>
+          combatResolveAutoWin(fight({ encounterId, fightIndex: 0 }), true),
+        );
+
+        expect(gamestate().runStats.seals[carrinaId]).toBe(25);
+      });
     });
 
     it('hands a random encounter to its own victory handler, keeping combat when it continues', () => {

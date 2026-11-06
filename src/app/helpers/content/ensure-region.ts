@@ -1,4 +1,4 @@
-import type { RegionContent, RegionId } from '@interfaces';
+import type { EncounterId, RegionContent, RegionId } from '@interfaces';
 
 export function ensureRegion(
   region: Partial<RegionContent>,
@@ -9,5 +9,9 @@ export function ensureRegion(
     __type: 'region',
     description: region.description ?? '',
     mapName: region.mapName ?? 'UNKNOWN',
+    seal: region.seal ?? {
+      sealEncounterId: 'UNKNOWN' as EncounterId,
+      parTicks: 1,
+    },
   };
 }

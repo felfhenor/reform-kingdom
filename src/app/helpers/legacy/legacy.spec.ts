@@ -107,6 +107,20 @@ describe('legacyIsValid', () => {
       legacyIsValid({ version: 1, runs: [{ id: 'a', outcome: 'Completed' }] }),
     ).toBe(false);
   });
+
+  it('accepts runs without seals but rejects malformed ones', () => {
+    seedGamestate();
+    const withSeals = (seals: unknown) => {
+      const entry = run('a', 'Completed');
+      const stats = { ...entry.stats, run: { ...entry.stats.run, seals } };
+      return { version: 1, runs: [{ ...entry, stats }] };
+    };
+
+    expect(legacyIsValid(withSeals(undefined))).toBe(true);
+    expect(legacyIsValid(withSeals({ carrina: 500 }))).toBe(true);
+    expect(legacyIsValid(withSeals(['carrina']))).toBe(false);
+    expect(legacyIsValid(withSeals({ carrina: 'soon' }))).toBe(false);
+  });
 });
 
 describe('legacyRecordRun', () => {

@@ -1,6 +1,7 @@
 import {
   runStatsFightHeroIds,
   runStatsRecordFightEnd,
+  runStatsRecordSeal,
 } from '@helpers/run-stats/run-stats';
 import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
 import {
@@ -200,7 +201,16 @@ function currentEncounterFight(combat: Combat): EncounterFight | undefined {
 }
 
 function recordEncounterClear(combat: Combat): void {
-  if (!completedEncounter(combat)) return;
+  const encounter = completedEncounter(combat);
+  if (!encounter) return;
+
+  const sealed = runStatsRecordSeal(encounter.id);
+  if (sealed) {
+    combatMessageLog(combat, `The memory of ${sealed.name} is set in stone.`);
+    analyticsSendDesignEvent(
+      `Progress:Seal:${analyticsSafeSegment(sealed.name)}`,
+    );
+  }
 
   analyticsSendDesignEvent(
     `World:Node:Complete:${analyticsSafeSegment(combat.locationName)}`,
