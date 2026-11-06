@@ -68,6 +68,11 @@ function legacyRunIsValid(run: RunRecord | null): boolean {
     typeof run.fragments === 'number' &&
     typeof run.multiplier === 'number' &&
     Array.isArray(run.stats?.completion) &&
+    run.stats.completion.every(
+      (category) =>
+        typeof category?.current === 'number' &&
+        typeof category.max === 'number',
+    ) &&
     legacySealsAreValid(run.stats.run?.seals)
   );
 }

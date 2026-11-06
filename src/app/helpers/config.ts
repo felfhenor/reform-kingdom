@@ -67,6 +67,8 @@ export const EDICT_SCORE_MULTIPLIER_FLOOR = 0.25;
 export const SCORE_SEAL_POINTS = 1000;
 export const SCORE_SEAL_SPEED_POINTS = 1000;
 export const SCORE_COMPLETION_POINTS = 5000;
+// Each Remembrance category is worth this much at 100%, so big and small categories weigh the same.
+export const SCORE_REMEMBRANCE_POINTS = 1000;
 
 // Engine
 

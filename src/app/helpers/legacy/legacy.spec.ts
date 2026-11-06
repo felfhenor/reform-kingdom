@@ -122,6 +122,19 @@ describe('legacyIsValid', () => {
     expect(legacyIsValid(withSeals({ carrina: 'soon' }))).toBe(false);
   });
 
+  it('rejects runs with a malformed Remembrance entry', () => {
+    seedGamestate();
+    const entry = run('a', 'Completed');
+    const completion = [{ name: 'Tasks', current: 'lots', max: 10 }];
+
+    expect(
+      legacyIsValid({
+        version: 1,
+        runs: [{ ...entry, stats: { ...entry.stats, completion } }],
+      }),
+    ).toBe(false);
+  });
+
   it('rejects runs without a numeric multiplier or Fragments', () => {
     seedGamestate();
     const entry = run('a', 'Completed');

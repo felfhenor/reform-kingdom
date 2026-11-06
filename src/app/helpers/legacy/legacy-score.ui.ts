@@ -1,5 +1,6 @@
 import {
   SCORE_COMPLETION_POINTS,
+  SCORE_REMEMBRANCE_POINTS,
   SCORE_SEAL_POINTS,
   SCORE_SEAL_SPEED_POINTS,
 } from '@helpers/config';
@@ -8,6 +9,7 @@ import type {
   RegionContent,
   RunRecord,
   RunScore,
+  RunScoreRemembrance,
   RunScoreSeal,
 } from '@interfaces';
 import { clamp, sumBy } from 'es-toolkit/compat';
@@ -37,17 +39,30 @@ function legacyRunSeals(run: RunRecord): RunScoreSeal[] {
   });
 }
 
-// Worked out on render from current content, so a balance pass re-scores old runs; only the multiplier is kept as it was.
+function legacyRunRemembrance(run: RunRecord): RunScoreRemembrance[] {
+  return run.stats.completion.map(({ name, current, max }) => ({
+    name,
+    points:
+      max > 0
+        ? Math.floor(SCORE_REMEMBRANCE_POINTS * clamp(current / max, 0, 1))
+        : 0,
+  }));
+}
+
+// Seals use current content, so a balance pass re-scores old runs; the multiplier and Remembrance totals are kept as the run ended, so new content never lowers them.
 export function legacyRunScore(run: RunRecord): RunScore {
   const seals = legacyRunSeals(run);
-  const completion =
-    run.stats.run && run.outcome === 'Completed' ? SCORE_COMPLETION_POINTS : 0;
+  const remembrance = legacyRunRemembrance(run);
+  const completion = run.outcome === 'Completed' ? SCORE_COMPLETION_POINTS : 0;
   const base =
-    sumBy(seals, (seal) => seal.sealPoints + seal.speedPoints) + completion;
+    sumBy(seals, (seal) => seal.sealPoints + seal.speedPoints) +
+    sumBy(remembrance, (category) => category.points) +
+    completion;
 
   return {
     sealsTracked: run.stats.run?.seals !== undefined,
     seals,
+    remembrance,
     completion,
     base,
     multiplier: run.multiplier,

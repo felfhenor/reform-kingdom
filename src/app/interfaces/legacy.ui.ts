@@ -28,10 +28,16 @@ export type RunScoreSeal = {
   speedPoints: number;
 };
 
+export type RunScoreRemembrance = {
+  name: string;
+  points: number;
+};
+
 export type RunScore = {
   // False for runs recorded before seals were tracked.
   sealsTracked: boolean;
   seals: RunScoreSeal[];
+  remembrance: RunScoreRemembrance[];
   completion: number;
   base: number;
   multiplier: number;
