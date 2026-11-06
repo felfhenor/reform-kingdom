@@ -15,7 +15,7 @@ import {
   runStatsRecordFightEnd,
 } from '@helpers/run-stats/run-stats';
 import { gamestate, runStatsState, updateGamestate } from '@helpers/state-game';
-import type { CollectibleId, GameState, ItemId } from '@interfaces';
+import type { CollectibleId, GameState, ItemId, RegionId } from '@interfaces';
 import { seedContent } from '@/testing/content';
 import { inTick, seedGamestate } from '@/testing/gamestate';
 
@@ -111,5 +111,26 @@ describe('runStatsBackfillTracking', () => {
     expect(
       runStatsBackfillTracking(defaultRunStats(), 500, 3).trackedFromTick,
     ).toBe(0);
+  });
+
+  it('marks a save from before seals as sealing from now', () => {
+    expect(runStatsBackfillTracking(defaultRunStats(), 500, 3)).toMatchObject({
+      trackedFromTick: 0,
+      sealsTrackedFromTick: 500,
+    });
+    expect(
+      runStatsBackfillTracking(defaultRunStats(), 500, 4).sealsTrackedFromTick,
+    ).toBe(0);
+  });
+
+  it('leaves a version 3 save that already recorded seals tracked from the start', () => {
+    const sealed = {
+      ...defaultRunStats(),
+      seals: { ['carrina' as RegionId]: 40 },
+    };
+
+    expect(runStatsBackfillTracking(sealed, 500, 3).sealsTrackedFromTick).toBe(
+      0,
+    );
   });
 });

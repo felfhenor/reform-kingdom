@@ -27,7 +27,7 @@ import type {
 } from '@interfaces';
 
 // 2: saves track gather-node visits from creation, so they skip the legacy gather-node backfill.
-export const GAMESTATE_VERSION = 3;
+export const GAMESTATE_VERSION = 4;
 
 export function defaultGameState(): GameState {
   return {
@@ -116,6 +116,7 @@ export function defaultRunStats(): GameStateRunStats {
     fightsLost: 0,
     itemsCrafted: 0,
     seals: {},
+    sealsTrackedFromTick: 0,
     heroes: {},
   };
 }

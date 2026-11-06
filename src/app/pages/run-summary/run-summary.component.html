@@ -61,7 +61,7 @@
                   </div>
 
                   <div
-                    class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1 text-sm"
+                    class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-sm"
                   >
                     @if (hero.statRows; as rows) {
                       @for (row of rows; track row.label) {
@@ -150,7 +150,7 @@
                 }
 
                 <div
-                  class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1 text-sm"
+                  class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-sm"
                 >
                   @for (stat of journeyStats(); track stat.label) {
                     <div class="flex justify-between gap-2">
@@ -210,8 +210,8 @@
             </div>
           </div>
 
-          <div class="h-full">
-            <div class="h-full card bg-base-100">
+          <div class="h-full flex flex-col gap-4">
+            <div class="card bg-base-100">
               <div class="card-body gap-4">
                 <div class="flex justify-between items-center gap-4">
                   <h2 class="type-section-title">Edicts</h2>
@@ -233,6 +233,107 @@
                 }
               </div>
             </div>
+
+            @if (score(); as scored) {
+              <div class="card bg-base-100 flex-1">
+                <div class="card-body gap-4">
+                  <div class="flex justify-between items-center gap-4">
+                    <h2 class="type-section-title">Score</h2>
+                    <span class="text-2xl font-bold tabular-nums">
+                      {{ scored.total | number }}
+                    </span>
+                  </div>
+
+                  @if (!summary.stats.run) {
+                    <p class="type-muted">Score wasn't tracked for this run.</p>
+                  } @else if (!scored.sealsTracked) {
+                    <p class="type-muted">
+                      Seals weren't tracked for this run, so it only scores its
+                      completion.
+                    </p>
+                  } @else if (sealsTrackedPlayTime(); as trackedParts) {
+                    <p class="type-muted">
+                      This run began before seals were tracked, so only regions
+                      sealed in the last
+                      <ng-container
+                        [ngTemplateOutlet]="duration"
+                        [ngTemplateOutletContext]="{ $implicit: trackedParts }"
+                      />
+                      of play count.
+                    </p>
+                  }
+
+                  @if (summary.stats.run) {
+                    <div class="flex flex-col gap-2 text-sm">
+                      @for (seal of sealRows(); track seal.name) {
+                        <div class="flex justify-between gap-4">
+                          <span class="flex flex-col">
+                            <span>{{ seal.name }}</span>
+                            <span class="type-meta">
+                              Sealed at
+                              <ng-container
+                                [ngTemplateOutlet]="duration"
+                                [ngTemplateOutletContext]="{
+                                  $implicit: seal.sealedAt,
+                                }"
+                              />
+                              ·
+                              <ng-container
+                                [ngTemplateOutlet]="duration"
+                                [ngTemplateOutletContext]="{
+                                  $implicit: seal.parDelta,
+                                }"
+                              />
+                              {{ seal.isUnderPar ? 'under' : 'over' }} par
+                            </span>
+                          </span>
+                          <span class="tabular-nums">
+                            {{ seal.points | number }}
+                          </span>
+                        </div>
+                      }
+
+                      @for (region of unsealedRegions(); track region.id) {
+                        <div class="flex justify-between gap-4 text-lighter">
+                          <span>{{ region.name }}</span>
+                          <span>Not sealed</span>
+                        </div>
+                      }
+
+                      @if (scored.completion > 0) {
+                        <div class="flex justify-between gap-4">
+                          <span>Completion</span>
+                          <span class="tabular-nums">
+                            {{ scored.completion | number }}
+                          </span>
+                        </div>
+                      }
+
+                      <div class="divider my-0"></div>
+
+                      <div class="flex justify-between gap-4">
+                        <span class="text-lighter">Base score</span>
+                        <span class="tabular-nums">
+                          {{ scored.base | number }}
+                        </span>
+                      </div>
+                      <div class="flex justify-between gap-4">
+                        <span class="text-lighter">Edict multiplier</span>
+                        <span class="tabular-nums">
+                          x{{ scored.multiplier | number: '1.0-2' }}
+                        </span>
+                      </div>
+                      <div class="flex justify-between gap-4 font-semibold">
+                        <span>Final score</span>
+                        <span class="tabular-nums">
+                          {{ scored.total | number }}
+                        </span>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
           </div>
         </div>
       </div>

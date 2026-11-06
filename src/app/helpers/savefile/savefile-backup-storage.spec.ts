@@ -107,6 +107,8 @@ describe('savefile-backup-storage', () => {
           outcome: 'Completed',
           party: [],
           edicts: [],
+          fragments: 0,
+          multiplier: 1,
           stats: { completion: [] },
         },
       ],

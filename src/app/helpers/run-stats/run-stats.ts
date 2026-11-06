@@ -71,11 +71,25 @@ export function runStatsFightHeroIds(combat: Combat): CharacterId[] {
     .map((hero) => hero.id as CharacterId);
 }
 
-// Saves from before run stats (version 3) only count from this load, so the summary can say how much was missed.
+// A version 3 save that already has seals was started after sealing shipped, so it tracked them from the start.
+function runStatsPredatesSeals(
+  runStats: GameStateRunStats,
+  version: number,
+): boolean {
+  return version < 4 && Object.keys(runStats.seals).length === 0;
+}
+
+// Saves from before run stats (version 3) or seals (version 4) only count from this load, so the summary can say how much was missed.
 export function runStatsBackfillTracking(
   runStats: GameStateRunStats,
   numTicks: number,
   version: number,
 ): GameStateRunStats {
-  return version < 3 ? { ...runStats, trackedFromTick: numTicks } : runStats;
+  return {
+    ...runStats,
+    trackedFromTick: version < 3 ? numTicks : runStats.trackedFromTick,
+    sealsTrackedFromTick: runStatsPredatesSeals(runStats, version)
+      ? numTicks
+      : runStats.sealsTrackedFromTick,
+  };
 }

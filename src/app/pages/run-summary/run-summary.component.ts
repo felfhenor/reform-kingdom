@@ -22,6 +22,10 @@ import { ticksToDurationParts } from '@helpers/engine/timer.ui';
 import { skillFamilyEntry } from '@helpers/hero/skill';
 import { legacyRunById } from '@helpers/legacy/legacy';
 import {
+  legacyRunScore,
+  legacyUnsealedRegions,
+} from '@helpers/legacy/legacy-score.ui';
+import {
   legacyHeroMostUsedSkill,
   legacyHeroStatRows,
   legacyRunAwards,
@@ -137,6 +141,35 @@ export class RunSummaryComponent {
   public felDefeatedAt = computed(() => {
     const tick = this.run()?.stats.run?.felDefeatedTick;
     return tick === undefined ? undefined : ticksToDurationParts(tick);
+  });
+
+  public score = computed(() => {
+    const run = this.run();
+    return run ? legacyRunScore(run) : undefined;
+  });
+
+  public sealRows = computed(() =>
+    (this.score()?.seals ?? []).map((seal) => {
+      const parDelta = seal.region.seal.parTicks - seal.tick;
+      return {
+        name: seal.region.name,
+        sealedAt: ticksToDurationParts(seal.tick),
+        parDelta: ticksToDurationParts(Math.abs(parDelta)),
+        isUnderPar: parDelta >= 0,
+        points: seal.sealPoints + seal.speedPoints,
+      };
+    }),
+  );
+
+  public unsealedRegions = computed(() => {
+    const run = this.run();
+    return run ? legacyUnsealedRegions(run) : [];
+  });
+
+  public sealsTrackedPlayTime = computed(() => {
+    const run = this.run();
+    const from = run?.stats.run?.sealsTrackedFromTick ?? 0;
+    return run && from > 0 ? ticksToDurationParts(run.ticks - from) : undefined;
   });
 
   public completionRows = computed(() =>

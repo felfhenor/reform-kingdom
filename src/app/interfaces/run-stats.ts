@@ -32,10 +32,13 @@ export type RunStatsTotals = {
   felDefeatedTick?: number;
   // The tick each region was sealed on. Missing on runs recorded before seals were tracked.
   seals?: Partial<Record<RegionId, number>>;
+  // Above 0 when the run started before seals were tracked, so regions sealed earlier only count from their next clear.
+  sealsTrackedFromTick?: number;
 };
 
 export type GameStateRunStats = RunStatsTotals & {
   seals: Partial<Record<RegionId, number>>;
+  sealsTrackedFromTick: number;
   heroes: Partial<Record<CharacterId, HeroRunStats>>;
 };
 
