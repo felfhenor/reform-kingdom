@@ -22,3 +22,11 @@ export function debugResetVictoryCard(): void {
     return state;
   });
 }
+
+// Shows or clears the "run lost" card without needing a real wipe.
+export function debugSetRunLost(lost = true): void {
+  updateGamestate((state) => {
+    state.meta.runLost = lost;
+    return state;
+  });
+}

@@ -4,7 +4,9 @@
   <router-outlet></router-outlet>
 </div>
 
-@if (isTitleCrawlPending()) {
+@if (isRunLost()) {
+  <app-card-run-lost />
+} @else if (isTitleCrawlPending()) {
   <app-screen-title-crawl
     [paragraphs]="titleCrawlParagraphs"
     (finished)="titleCrawlFinish($event)"

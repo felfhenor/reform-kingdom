@@ -607,5 +607,20 @@ describe('combatCheckIfOver', () => {
       expect(travelBeginDeathsDoor).toHaveBeenCalled();
       expect(raidResolveDefeat).toHaveBeenCalledWith(larsiaId);
     });
+
+    it('ends the run instead of Deaths Door when a wipe ends the run', () => {
+      const events = captureAnalyticsEvents();
+      const combat = lost();
+      seedGamestate((state) => {
+        state.world.combat = combat;
+        state.globalEffectSums.wipeEndsRun = true;
+      });
+
+      inTick(() => combatCheckIfOver(combat));
+
+      expect(travelBeginDeathsDoor).not.toHaveBeenCalled();
+      expect(gamestate().meta.runLost).toBe(true);
+      expect(events).toContain('Combat:Encounter:RunLost');
+    });
   });
 });

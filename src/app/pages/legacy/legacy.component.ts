@@ -16,6 +16,7 @@ import { getEntry } from '@helpers/content/content';
 import { ticksToDurationParts } from '@helpers/engine/timer.ui';
 import { legacy } from '@helpers/legacy/legacy';
 import { legacyRunScore } from '@helpers/legacy/legacy-score.ui';
+import { legacyRunOutcomeTitle } from '@helpers/legacy/legacy.ui';
 import type { GameId, JobContent } from '@interfaces';
 import { PluralizePipe } from '@pipes/pluralize.pipe';
 import { sortBy } from 'es-toolkit/compat';
@@ -44,7 +45,7 @@ export class LegacyComponent {
   public runs = computed(() =>
     sortBy(legacy().runs, (run) => -run.endedAt).map((run) => ({
       id: run.id,
-      completed: run.outcome === 'Completed',
+      title: legacyRunOutcomeTitle(run.outcome),
       endedAt: run.endedAt,
       playTime: ticksToDurationParts(run.ticks),
       edictCount: run.edicts.length,

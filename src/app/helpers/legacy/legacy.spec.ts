@@ -84,9 +84,10 @@ describe('legacyAddRun', () => {
     expect(next.runs.map((entry) => entry.outcome)).toEqual(['Completed']);
   });
 
-  it('never downgrades a Completed run to Abandoned', () => {
+  it('never downgrades a Completed run to Abandoned or Lost', () => {
     const state = legacyAddRun(defaultLegacy(), run('a', 'Completed'));
     expect(legacyAddRun(state, run('a', 'Abandoned'))).toBe(state);
+    expect(legacyAddRun(state, run('a', 'Lost'))).toBe(state);
   });
 });
 

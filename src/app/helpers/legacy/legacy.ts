@@ -118,7 +118,7 @@ export const legacy = signal<LegacyState>(legacyLoad());
 
 export function legacyAddRun(state: LegacyState, run: RunRecord): LegacyState {
   const existing = state.runs.find((entry) => entry.id === run.id);
-  if (existing?.outcome === 'Completed' && run.outcome === 'Abandoned') {
+  if (existing?.outcome === 'Completed' && run.outcome !== 'Completed') {
     return state;
   }
 

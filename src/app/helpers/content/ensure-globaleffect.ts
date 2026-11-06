@@ -22,6 +22,7 @@ import type {
   GlobalEffectEffectLevelStatMultiplier,
   GlobalEffectEffectShrineBuffsPermanent,
   GlobalEffectEffectEnemyExtraSkills,
+  GlobalEffectEffectWipeEndsRun,
   GlobalEffectEffectTradeskillQueueSizeBoost,
   GlobalEffectEffectXPGainMultiplier,
   GlobalEffectId,
@@ -40,6 +41,7 @@ export function ensureGlobalEffectEffect(
     Partial<GlobalEffectEffectLevelStatMultiplier> &
     Partial<GlobalEffectEffectShrineBuffsPermanent> &
     Partial<GlobalEffectEffectEnemyExtraSkills> &
+    Partial<GlobalEffectEffectWipeEndsRun> &
     Partial<GlobalEffectEffectGoldGainMultiplier> &
     Partial<GlobalEffectEffectDebuffResistance> &
     Partial<GlobalEffectEffectDebuffResistanceTag> &
@@ -111,6 +113,10 @@ export function ensureGlobalEffectEffect(
       effectType: 'GlobalShopPriceMultiplier',
       value: effect.value ?? 0,
     };
+  }
+
+  if (effect.effectType === 'GlobalWipeEndsRun') {
+    return { effectType: 'GlobalWipeEndsRun' };
   }
 
   if (effect.effectType === 'EnemyExtraSkills') {

@@ -7,7 +7,7 @@ import {
   legacyRunById,
   legacyRunFromGame,
 } from '@helpers/legacy/legacy';
-import { isFelDefeated } from '@helpers/lore/outro';
+import { isFelDefeated, isRunLost } from '@helpers/lore/outro';
 import { waitForGameloopIdle } from '@helpers/savefile/savefile-load';
 import type {
   EdictId,
@@ -23,8 +23,15 @@ import type {
 } from '@interfaces';
 import { maxBy, uniq } from 'es-toolkit/compat';
 
+// Beating Fel counts even if a later wipe ended the run.
 export function legacyRunOutcome(): RunOutcome {
-  return isFelDefeated() ? 'Completed' : 'Abandoned';
+  if (isFelDefeated()) return 'Completed';
+  return isRunLost() ? 'Lost' : 'Abandoned';
+}
+
+export function legacyRunOutcomeTitle(outcome: RunOutcome): string {
+  if (outcome === 'Completed') return 'Run Complete';
+  return outcome === 'Lost' ? 'Run Lost' : 'Run Abandoned';
 }
 
 // The caller pauses first; a tick batch still in flight would otherwise commit over the reset that follows.

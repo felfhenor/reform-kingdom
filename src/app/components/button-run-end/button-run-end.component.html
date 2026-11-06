@@ -1,4 +1,5 @@
 @let finished = isFinished();
+@let lost = isLost();
 
 @if (compact()) {
   <button
@@ -12,6 +13,18 @@
     [sfxTrigger]="['click', 'hover']"
   >
     <app-icon name="gameTrophyCup" size="nav"></app-icon>
+  </button>
+} @else if (lost) {
+  <!-- A lost run has nothing left to play, so there's nothing to confirm. -->
+  <button
+    type="button"
+    class="btn btn-error"
+    [disabled]="isBusy()"
+    (click)="endRun()"
+    appSfx="ui-error"
+    [sfxTrigger]="['click', 'hover']"
+  >
+    End Run
   </button>
 } @else {
   <button

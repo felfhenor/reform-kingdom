@@ -57,6 +57,8 @@ export function globalEffectEffectDescription(
       return `Shop Prices: ${signedPercent(effect.value * 100)}`;
     case 'GlobalShrineBuffsPermanent':
       return 'Shrine Buffs: Never expire';
+    case 'GlobalWipeEndsRun':
+      return 'A wipe ends the run';
     case 'EnemyExtraSkills':
       return `Enemy Skills: +${effect.value} from the region`;
     case 'GlobalLevelStatMultiplier':
@@ -137,6 +139,9 @@ function accumulateGlobalEffectEffect(
       return;
     case 'EnemyExtraSkills':
       sums.enemyExtraSkills += effect.value;
+      return;
+    case 'GlobalWipeEndsRun':
+      sums.wipeEndsRun = true;
       return;
     case 'DebuffResistance':
       sums.debuffResistanceFlat += effect.value;

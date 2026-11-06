@@ -132,6 +132,11 @@ export type GlobalEffectEffectEnemyExtraSkills = {
   value: number;
 };
 
+// A party wipe ends the run instead of sending the party to Deaths Door.
+export type GlobalEffectEffectWipeEndsRun = {
+  effectType: 'GlobalWipeEndsRun';
+};
+
 export type GlobalEffectEffect =
   | GlobalEffectEffectGainStats
   | GlobalEffectEffectGainStatPercent
@@ -144,6 +149,7 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectLevelStatMultiplier
   | GlobalEffectEffectShrineBuffsPermanent
   | GlobalEffectEffectEnemyExtraSkills
+  | GlobalEffectEffectWipeEndsRun
   | GlobalEffectEffectDebuffResistance
   | GlobalEffectEffectDebuffResistanceTag
   | GlobalEffectEffectCombatItemDropRateBoost

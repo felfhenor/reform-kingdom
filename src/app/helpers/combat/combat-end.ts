@@ -10,7 +10,11 @@ import {
 } from '@helpers/combat/combat-log';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
 import { combatReset } from '@helpers/combat/combat-state';
-import { worldCombatState } from '@helpers/state-game';
+import {
+  globalEffectSumsState,
+  updateGamestate,
+  worldCombatState,
+} from '@helpers/state-game';
 import { taskRecordEncounterClear } from '@helpers/task/task-progress';
 import { monsterXpReward, xpForOverLevel } from '@helpers/combat/monster';
 import { commissionRecordMonsterKill } from '@helpers/commission/commission-kill-progress';
@@ -324,6 +328,14 @@ function handleCombatVictory(combat: Combat): boolean {
   return true;
 }
 
+function combatEndRunOnWipe(): void {
+  updateGamestate((state) => {
+    state.meta.runLost = true;
+    return state;
+  });
+  analyticsSendDesignEvent('Combat:Encounter:RunLost');
+}
+
 export function combatHandleDefeat(combat: Combat): void {
   combatMessageLog(combat, 'Heroes have lost the combat!');
   analyticsSendDesignEvent('Combat:Encounter:Loss');
@@ -333,9 +345,14 @@ export function combatHandleDefeat(combat: Combat): void {
   runStatsRecordFightEnd(false, runStatsFightHeroIds(combat));
   autoModeRecordClauseFailure();
   autoModeRecordNodeFailure(combat.locationName);
-  travelBeginDeathsDoor();
 
-  // A raid loss is still a real party wipe (Deaths Door above) plus its own town-scoped consequence.
+  if (globalEffectSumsState().wipeEndsRun) {
+    combatEndRunOnWipe();
+  } else {
+    travelBeginDeathsDoor();
+  }
+
+  // A raid loss is still a real party wipe (handled above) plus its own town-scoped consequence.
   if (combat.raidTownId) {
     raidResolveDefeat(combat.raidTownId as TownId);
   }

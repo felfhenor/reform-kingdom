@@ -1,5 +1,4 @@
 @let summary = run();
-@let completed = summary?.outcome === 'Completed';
 
 <div class="flex flex-col h-[100vh] p-4 gap-4">
   <div class="flex flex-col gap-4 flex-1 min-h-0 overflow-y-auto">
@@ -8,7 +7,7 @@
         <div class="card-body flex-row flex-wrap items-center gap-4">
           <div class="flex flex-col gap-2 flex-1 min-w-0">
             <h1 class="type-page-title">
-              {{ completed ? 'Run Complete' : 'Run Abandoned' }}
+              {{ outcomeTitle() }}
             </h1>
             <p class="type-muted">
               {{ summary.startedAt | date: 'medium' }} -

@@ -4,7 +4,7 @@ import type { RemembranceCategory } from '@interfaces/remembrance';
 import type { HeroRunStats, RunStatsTotals } from '@interfaces/run-stats';
 import type { GameId } from '@interfaces/state-game';
 
-export type RunOutcome = 'Completed' | 'Abandoned';
+export type RunOutcome = 'Completed' | 'Lost' | 'Abandoned';
 
 // Name and sprite are copied, not an id, so a renamed node can't break an old run.
 export type RunRecordArt = {

@@ -35,6 +35,7 @@ export class ButtonRunEndComponent {
   public compact = input(false);
 
   public isFinished = computed(() => legacyRunOutcome() === 'Completed');
+  public isLost = computed(() => legacyRunOutcome() === 'Lost');
   public isBusy = signal(false);
 
   public async endRun(): Promise<void> {

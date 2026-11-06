@@ -26,7 +26,7 @@
 
             <span class="flex flex-col min-w-0">
               <span class="type-entity-name truncate">
-                {{ run.completed ? 'Run Complete' : 'Run Abandoned' }}
+                {{ run.title }}
               </span>
               <span class="type-meta">
                 {{ run.endedAt | date: 'medium' }} &middot;

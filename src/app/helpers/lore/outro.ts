@@ -19,9 +19,16 @@ export function isVictoryPopupPending(): boolean {
   return meta.outroCrawlSeen && !meta.victoryPopupSeen;
 }
 
+export function isRunLost(): boolean {
+  return !!metaState().runLost;
+}
+
 // The world, tutorials and region intros all hold while one of these covers the game.
 export function isStoryScreenPending(): boolean {
   return (
-    isTitleCrawlPending() || isOutroCrawlPending() || isVictoryPopupPending()
+    isRunLost() ||
+    isTitleCrawlPending() ||
+    isOutroCrawlPending() ||
+    isVictoryPopupPending()
   );
 }

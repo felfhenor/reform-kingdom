@@ -66,8 +66,11 @@
 
 - id: fabe9a7d-6448-409e-9ed0-103cfa0a6974
   name: Edict of Iron Blood
+  enabled: true
   sprite: '0008'
   description: A wipe ends the run.
   kind: Challenge
   fragments: 8
   group: Death
+  effects:
+    - effectType: GlobalWipeEndsRun

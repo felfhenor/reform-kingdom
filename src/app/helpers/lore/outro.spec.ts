@@ -79,4 +79,9 @@ describe('isStoryScreenPending', () => {
     seedFelDefeated({ outroCrawlSeen: true, victoryPopupSeen: true });
     expect(isStoryScreenPending()).toBe(false);
   });
+
+  it('holds for good once the run is lost', () => {
+    seedGamestate((state) => (state.meta.runLost = true));
+    expect(isStoryScreenPending()).toBe(true);
+  });
 });

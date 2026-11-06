@@ -1,6 +1,7 @@
 import type { OnInit } from '@angular/core';
 import { Component, computed } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { CardRunLostComponent } from '@components/card-run-lost/card-run-lost.component';
 import { CardVictoryComponent } from '@components/card-victory/card-victory.component';
 import { NavbarComponent } from '@components/navbar/navbar.component';
 import { ScreenTitleCrawlComponent } from '@components/screen-title-crawl/screen-title-crawl.component';
@@ -8,6 +9,7 @@ import { FadeInDirective } from '@directives/fade-in.directive';
 import { discordUpdateStatus } from '@helpers/engine/discord';
 import {
   isOutroCrawlPending,
+  isRunLost,
   isVictoryPopupPending,
 } from '@helpers/lore/outro';
 import {
@@ -27,6 +29,7 @@ import {
     NavbarComponent,
     ScreenTitleCrawlComponent,
     CardVictoryComponent,
+    CardRunLostComponent,
   ],
   hostDirectives: [FadeInDirective],
   templateUrl: './game.component.html',
@@ -36,6 +39,7 @@ export class GameComponent implements OnInit {
   public isTitleCrawlPending = computed(() => isTitleCrawlPending());
   public isOutroCrawlPending = computed(() => isOutroCrawlPending());
   public isVictoryPopupPending = computed(() => isVictoryPopupPending());
+  public isRunLost = computed(() => isRunLost());
 
   public titleCrawlParagraphs = TITLE_CRAWL_PARAGRAPHS;
   public outroCrawlParagraphs = OUTRO_CRAWL_PARAGRAPHS;

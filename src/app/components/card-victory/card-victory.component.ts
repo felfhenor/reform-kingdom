@@ -10,13 +10,9 @@ import {
 } from '@angular/core';
 import { ButtonRunEndComponent } from '@components/button-run-end/button-run-end.component';
 import { SFXDirective } from '@directives/sfx.directive';
-import { modalHasAnyOpen } from '@helpers/engine/modal-stack';
+import { hotkeysBlockOutside } from '@helpers/engine/hotkeys.ui';
 import { victoryPopupDismiss } from '@helpers/lore/outro.ui';
 import { AnimationService } from '@services/animation.service';
-
-function inSwal(event: KeyboardEvent): boolean {
-  return !!(event.target as Element | null)?.closest?.('.swal2-container');
-}
 
 @Component({
   selector: 'app-card-victory',
@@ -38,19 +34,9 @@ export class CardVictoryComponent {
     const fadeIn = this.anim.fadeIn(host, 600);
     afterNextRender(() => this.continueButton().nativeElement.focus());
 
-    // Capture phase so navbar hotkeys (pause, view switches) can't act under the card; Esc and the pause menu stay usable.
-    const onKeydown = (event: KeyboardEvent) => {
-      // Swal stops its own keys from propagating, so the navbar hotkeys never see them.
-      if (event.key === 'Escape' || modalHasAnyOpen() || inSwal(event)) return;
-
-      event.stopImmediatePropagation();
-      if (event.key === 'Tab' || host.contains(event.target as Node)) return;
-      event.preventDefault();
-    };
-
-    window.addEventListener('keydown', onKeydown, { capture: true });
+    const unblock = hotkeysBlockOutside(host);
     inject(DestroyRef).onDestroy(() => {
-      window.removeEventListener('keydown', onKeydown, { capture: true });
+      unblock();
       fadeIn.pause();
     });
   }

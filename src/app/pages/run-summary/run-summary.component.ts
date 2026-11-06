@@ -29,6 +29,7 @@ import {
   legacyHeroMostUsedSkill,
   legacyHeroStatRows,
   legacyRunAwards,
+  legacyRunOutcomeTitle,
 } from '@helpers/legacy/legacy.ui';
 import {
   remembranceOverall,
@@ -71,6 +72,10 @@ export class RunSummaryComponent {
   public runId = input.required<string>();
 
   public run = computed(() => legacyRunById(this.runId() as GameId));
+  public outcomeTitle = computed(() => {
+    const run = this.run();
+    return run ? legacyRunOutcomeTitle(run.outcome) : '';
+  });
   public canStartNewRun = computed(() => !isSetup());
 
   public playTime = computed(() =>

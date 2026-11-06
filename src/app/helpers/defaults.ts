@@ -258,6 +258,7 @@ export function defaultGlobalEffectSums(): GlobalEffectSums {
     levelStatMultiplierBonus: 0,
     shrineBuffsPermanent: false,
     enemyExtraSkills: 0,
+    wipeEndsRun: false,
     combatItemDropRateBoost: 0,
     gatheringItemDropRateBoost: 0,
     armorySizeBoost: 0,
