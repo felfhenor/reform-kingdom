@@ -14,7 +14,7 @@
 
 - id: b636cdc4-ff65-4a5d-9c8c-d21549cd2dab
   name: Lone Wolf
-  sprite: '0031'
+  sprite: '0028'
   description: The last adventurer gets 50% more of every stat and 100% more Health.
   kind: SeatBoon
   fragments: 0

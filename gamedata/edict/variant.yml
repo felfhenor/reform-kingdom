@@ -1,14 +1,7 @@
 - id: 707f8b70-d85f-48de-b579-41591a7b7326
   name: Edict of Reflective Mirrors
-  sprite: '0028'
-  description: Every hero must share one class. That job's abilities stack instead of only the highest counting.
-  kind: Variant
-  fragments: 0
-
-- id: dfca0a13-72ba-4c61-abc4-06f3677d5428
-  name: Edict of Plentiful Farmsteads
   sprite: '0027'
-  description: Caravans are gone. Gather yield is increased by 25%.
+  description: Every hero must share one class. That job's abilities stack instead of only the highest counting.
   kind: Variant
   fragments: 0
 
