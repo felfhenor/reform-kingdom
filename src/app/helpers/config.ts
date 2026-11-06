@@ -63,6 +63,11 @@ export const LEVEL_UP_NODE_FAILURE_LIMIT = 5;
 export const EDICT_FRAGMENT_MULTIPLIER_STEP = 0.1;
 export const EDICT_SCORE_MULTIPLIER_FLOOR = 0.25;
 
+// First guesses, for the scoring balance pass. Speed points scale with how far under par a region was sealed.
+export const SCORE_SEAL_POINTS = 1000;
+export const SCORE_SEAL_SPEED_POINTS = 1000;
+export const SCORE_COMPLETION_POINTS = 5000;
+
 // Engine
 
 export const GAMELOOP_INTERVAL_MS = 1000;

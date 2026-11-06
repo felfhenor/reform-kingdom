@@ -121,6 +121,18 @@ describe('legacyIsValid', () => {
     expect(legacyIsValid(withSeals(['carrina']))).toBe(false);
     expect(legacyIsValid(withSeals({ carrina: 'soon' }))).toBe(false);
   });
+
+  it('rejects runs without a numeric multiplier or Fragments', () => {
+    seedGamestate();
+    const entry = run('a', 'Completed');
+
+    expect(
+      legacyIsValid({ version: 1, runs: [{ ...entry, multiplier: 'x' }] }),
+    ).toBe(false);
+    expect(
+      legacyIsValid({ version: 1, runs: [{ ...entry, fragments: undefined }] }),
+    ).toBe(false);
+  });
 });
 
 describe('legacyRecordRun', () => {

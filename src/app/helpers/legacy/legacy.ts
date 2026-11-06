@@ -65,6 +65,8 @@ function legacyRunIsValid(run: RunRecord | null): boolean {
     Array.isArray(run.party) &&
     run.party.every(legacyHeroIsValid) &&
     Array.isArray(run.edicts) &&
+    typeof run.fragments === 'number' &&
+    typeof run.multiplier === 'number' &&
     Array.isArray(run.stats?.completion) &&
     legacySealsAreValid(run.stats.run?.seals)
   );
