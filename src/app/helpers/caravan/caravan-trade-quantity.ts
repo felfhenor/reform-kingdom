@@ -97,15 +97,15 @@ export function caravanTradePrice(
       : caravan.markupPercentages.buy;
 
   const affixPercent = partyCaravanAffixPercent(trade);
-  const shopPrice =
+  const traderPrice =
     trade.type === 'sell'
-      ? 1 + globalEffectSumsState().shopPriceMultiplierBonus
+      ? 1 + globalEffectSumsState().traderPriceMultiplierBonus
       : 1;
 
   return Math.max(
     1,
     Math.round(
-      trade.value * (1 + markup / 100) * (1 + affixPercent / 100) * shopPrice,
+      trade.value * (1 + markup / 100) * (1 + affixPercent / 100) * traderPrice,
     ),
   );
 }

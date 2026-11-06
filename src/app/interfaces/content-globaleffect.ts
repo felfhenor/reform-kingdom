@@ -47,9 +47,15 @@ export type GlobalEffectEffectDeathPenaltyMultiplier = {
   value: number;
 };
 
-// Fraction (-0.25 = 25% cheaper) on what town shops and caravans charge, stacking additively.
+// Fraction (-0.25 = 25% cheaper) on what town shops charge, stacking additively.
 export type GlobalEffectEffectShopPriceMultiplier = {
   effectType: 'GlobalShopPriceMultiplier';
+  value: number;
+};
+
+// Fraction (-0.25 = 25% cheaper) on what caravans charge, stacking additively.
+export type GlobalEffectEffectTraderPriceMultiplier = {
+  effectType: 'GlobalTraderPriceMultiplier';
   value: number;
 };
 
@@ -145,6 +151,7 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectXPGainMultiplier
   | GlobalEffectEffectGoldGainMultiplier
   | GlobalEffectEffectShopPriceMultiplier
+  | GlobalEffectEffectTraderPriceMultiplier
   | GlobalEffectEffectDeathPenaltyMultiplier
   | GlobalEffectEffectLevelStatMultiplier
   | GlobalEffectEffectShrineBuffsPermanent

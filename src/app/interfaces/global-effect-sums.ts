@@ -15,6 +15,7 @@ export type GlobalEffectSums = {
   xpGainMultiplierBonus: number;
   goldGainMultiplierBonus: number;
   shopPriceMultiplierBonus: number;
+  traderPriceMultiplierBonus: number;
   deathPenaltyMultiplierBonus: number;
   levelStatMultiplierBonus: number;
   shrineBuffsPermanent: boolean;

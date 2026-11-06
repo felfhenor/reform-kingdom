@@ -63,10 +63,16 @@
 
 - id: 513d5b7a-2a6e-47e0-883a-4891d6af6c40
   name: Edict of Golden Monopoly
+  enabled: true
   sprite: '0017'
-  description: Town shop prices are doubled. Exchange and caravan trader rates are better.
+  description: Town shop prices are doubled. Caravan prices are reduced by 75%.
   kind: Variant
   fragments: 0
+  effects:
+    - effectType: GlobalShopPriceMultiplier
+      value: 1
+    - effectType: GlobalTraderPriceMultiplier
+      value: -0.75
 
 - id: c03e5ab7-1e05-4e4d-a128-be17f5e58b2d
   name: Edict of True Scarcity

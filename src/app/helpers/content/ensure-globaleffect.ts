@@ -115,6 +115,13 @@ export function ensureGlobalEffectEffect(
     };
   }
 
+  if (effect.effectType === 'GlobalTraderPriceMultiplier') {
+    return {
+      effectType: 'GlobalTraderPriceMultiplier',
+      value: effect.value ?? 0,
+    };
+  }
+
   if (effect.effectType === 'GlobalWipeEndsRun') {
     return { effectType: 'GlobalWipeEndsRun' };
   }

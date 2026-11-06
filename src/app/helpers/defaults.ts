@@ -254,6 +254,7 @@ export function defaultGlobalEffectSums(): GlobalEffectSums {
     xpGainMultiplierBonus: 0,
     goldGainMultiplierBonus: 0,
     shopPriceMultiplierBonus: 0,
+    traderPriceMultiplierBonus: 0,
     deathPenaltyMultiplierBonus: 0,
     levelStatMultiplierBonus: 0,
     shrineBuffsPermanent: false,

@@ -43,6 +43,8 @@
   effects:
     - effectType: GlobalShopPriceMultiplier
       value: -0.25
+    - effectType: GlobalTraderPriceMultiplier
+      value: -0.25
   startingItems:
     - itemId: Gold Coin
       quantity: 10000

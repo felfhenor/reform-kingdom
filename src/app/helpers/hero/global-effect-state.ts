@@ -55,6 +55,8 @@ export function globalEffectEffectDescription(
       return `Gold Gain: ${signedPercent(effect.value * 100)}`;
     case 'GlobalShopPriceMultiplier':
       return `Shop Prices: ${signedPercent(effect.value * 100)}`;
+    case 'GlobalTraderPriceMultiplier':
+      return `Trader Prices: ${signedPercent(effect.value * 100)}`;
     case 'GlobalShrineBuffsPermanent':
       return 'Shrine Buffs: Never expire';
     case 'GlobalWipeEndsRun':
@@ -127,6 +129,9 @@ function accumulateGlobalEffectEffect(
       return;
     case 'GlobalShopPriceMultiplier':
       sums.shopPriceMultiplierBonus += effect.value;
+      return;
+    case 'GlobalTraderPriceMultiplier':
+      sums.traderPriceMultiplierBonus += effect.value;
       return;
     case 'GlobalDeathPenaltyMultiplier':
       sums.deathPenaltyMultiplierBonus += effect.value;

@@ -96,9 +96,9 @@ describe('caravanTradePrice', () => {
     expect(caravanTradePrice(caravan(0, 0), trade({ type: 'buy' }))).toBe(110);
   });
 
-  it('applies the shop price effect to what the caravan charges only', () => {
+  it('applies the trader price effect to what the caravan charges only', () => {
     seedGamestate((state) => {
-      state.globalEffectSums.shopPriceMultiplierBonus = -0.25;
+      state.globalEffectSums.traderPriceMultiplierBonus = -0.25;
     });
 
     expect(caravanTradePrice(caravan(0, 0), trade({ type: 'sell' }))).toBe(75);

@@ -13,6 +13,7 @@ import type {
   EncounterId,
   RecipeId,
   TownId,
+  TradeskillId,
 } from '@interfaces';
 import { buildTownNodeState } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
@@ -70,7 +71,13 @@ describe('isCollectibleSourceKnown', () => {
     expect(
       isCollectibleSourceKnown({ type: 'raid', townId, name: 'Larsia' }),
     ).toBe(false);
-    expect(isCollectibleSourceKnown({ type: 'crafting' })).toBe(true);
+    expect(
+      isCollectibleSourceKnown({
+        type: 'crafting',
+        tradeskillId: 'smithing' as TradeskillId,
+        tradeskillLevel: 1,
+      }),
+    ).toBe(true);
   });
 
   it('reveals traders and towns once met or visited', () => {
