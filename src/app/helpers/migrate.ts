@@ -272,7 +272,7 @@ export function migrateGameState() {
   newState.tradeskills = pruneInvalidCraftQueues(newState.tradeskills);
   newState.world.party = pruneInvalidPartyEquipment(
     newState.world.party,
-    globalEffectSumsFor(newState).heroStatPercents,
+    globalEffectSumsFor(newState),
   );
   newState.world.currentLocation = repairUnwalkableCurrentLocation(
     newState.world.currentLocation,

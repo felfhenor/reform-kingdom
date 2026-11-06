@@ -30,10 +30,14 @@
 
 - id: 3a267cfb-b42d-4b11-8fea-ae17e1041caa
   name: Edict of Skillful Humility
+  enabled: true
   sprite: '0013'
-  description: Specializations grant no bonus stats. Their skills and oath effects still work.
+  description: Heroes gain no stats from leveling, from their class or their specialization. Their skills and oath effects still work.
   kind: Challenge
   fragments: 2
+  effects:
+    - effectType: GlobalLevelStatMultiplier
+      value: -1
 
 - id: fc200585-8c6b-47b2-884d-6ba53d35098b
   name: Edict of the Magic Wilds

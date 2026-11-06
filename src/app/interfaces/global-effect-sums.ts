@@ -16,6 +16,7 @@ export type GlobalEffectSums = {
   goldGainMultiplierBonus: number;
   shopPriceMultiplierBonus: number;
   deathPenaltyMultiplierBonus: number;
+  levelStatMultiplierBonus: number;
   combatItemDropRateBoost: number;
   gatheringItemDropRateBoost: number;
   armorySizeBoost: number;

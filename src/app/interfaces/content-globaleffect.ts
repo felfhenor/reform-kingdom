@@ -30,6 +30,12 @@ export type GlobalEffectEffectGoldGainMultiplier = {
   value: number;
 };
 
+// Fraction (-1 = none) on every stat heroes gain per level, from job and skill tree alike, stacking additively.
+export type GlobalEffectEffectLevelStatMultiplier = {
+  effectType: 'GlobalLevelStatMultiplier';
+  value: number;
+};
+
 // Fraction (-0.5 = half as long) on Deaths Door and Healing, stacking additively.
 export type GlobalEffectEffectDeathPenaltyMultiplier = {
   effectType: 'GlobalDeathPenaltyMultiplier';
@@ -124,6 +130,7 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectGoldGainMultiplier
   | GlobalEffectEffectShopPriceMultiplier
   | GlobalEffectEffectDeathPenaltyMultiplier
+  | GlobalEffectEffectLevelStatMultiplier
   | GlobalEffectEffectDebuffResistance
   | GlobalEffectEffectDebuffResistanceTag
   | GlobalEffectEffectCombatItemDropRateBoost

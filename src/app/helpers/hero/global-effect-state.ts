@@ -55,6 +55,8 @@ export function globalEffectEffectDescription(
       return `Gold Gain: ${signedPercent(effect.value * 100)}`;
     case 'GlobalShopPriceMultiplier':
       return `Shop Prices: ${signedPercent(effect.value * 100)}`;
+    case 'GlobalLevelStatMultiplier':
+      return `Stats per Level: ${signedPercent(effect.value * 100)}`;
     case 'GlobalDeathPenaltyMultiplier':
       return `Deaths Door & Healing Time: ${signedPercent(effect.value * 100)}`;
     case 'DebuffResistance':
@@ -123,6 +125,9 @@ function accumulateGlobalEffectEffect(
     case 'GlobalDeathPenaltyMultiplier':
       sums.deathPenaltyMultiplierBonus += effect.value;
       return;
+    case 'GlobalLevelStatMultiplier':
+      sums.levelStatMultiplierBonus += effect.value;
+      return;
     case 'DebuffResistance':
       sums.debuffResistanceFlat += effect.value;
       return;
@@ -182,16 +187,16 @@ export function globalEffectSumsFor(state: GameState): GlobalEffectSums {
 
 export function recomputeGlobalEffectSums(state: GameState): void {
   const sums = globalEffectSumsFor(state);
-  const heroPercentsChanged = !isEqual(
-    state.globalEffectSums?.heroStatPercents,
-    sums.heroStatPercents,
-  );
+  const previous = state.globalEffectSums;
+  const heroStatsChanged =
+    !isEqual(previous?.heroStatPercents, sums.heroStatPercents) ||
+    previous?.levelStatMultiplierBonus !== sums.levelStatMultiplierBonus;
   state.globalEffectSums = sums;
 
-  // Hero stats are cached on each character, so a percent change has to be rolled into them.
-  if (heroPercentsChanged) {
+  // Hero stats are cached on each character, so a change to what scales them has to be rolled in.
+  if (heroStatsChanged) {
     state.world.party = state.world.party.map((hero) =>
-      characterRecalculateStats(hero, sums.heroStatPercents),
+      characterRecalculateStats(hero, sums),
     );
   }
 }

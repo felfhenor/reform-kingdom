@@ -11,7 +11,11 @@ import { ensureEquipment } from '@helpers/content/ensure-item';
 import { ensureJob } from '@helpers/content/ensure-job';
 import { ensureSkillTreeNode } from '@helpers/content/ensure-skilltreenode';
 import { ensureTrainerTeaching } from '@helpers/content/ensure-trainer';
-import { defaultEquipment, defaultStats } from '@helpers/defaults';
+import {
+  defaultEquipment,
+  defaultGlobalEffectSums,
+  defaultStats,
+} from '@helpers/defaults';
 import {
   affixEffectsStatsPerLevel,
   characterRecalculateStats,
@@ -192,6 +196,20 @@ describe('characterStatsForLevel', () => {
     ).toBe(5 + (0.5 + 0.25) * 4);
   });
 
+  it('scales job growth and StatPerLevel alike by the level scale', () => {
+    const effects = [
+      { kind: 'StatPerLevel', stat: 'Strength', value: 0.25 } as const,
+    ];
+
+    expect(
+      characterStatsForLevel(jobId, 5, defaultEquipment(), effects, 0).Strength,
+    ).toBe(5);
+    expect(
+      characterStatsForLevel(jobId, 5, defaultEquipment(), effects, 0.5)
+        .Strength,
+    ).toBe(5 + (0.5 + 0.25) * 4 * 0.5);
+  });
+
   it('includes learned node effects in characterStats', () => {
     const grant = buildEffectNode('grant', [
       { kind: 'StatPerLevel', stat: 'Strength', value: 1 },
@@ -335,7 +353,7 @@ describe('pruneInvalidPartyEquipment', () => {
 
     const [prunedJala, prunedSpoorle] = pruneInvalidPartyEquipment(
       [jala, spoorle],
-      defaultStats(),
+      defaultGlobalEffectSums(),
     );
 
     expect(prunedJala.equipment).toEqual(withGear({ Armor: armed.Armor }));

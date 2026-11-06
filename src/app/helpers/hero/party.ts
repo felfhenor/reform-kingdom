@@ -38,6 +38,7 @@ import {
   type EquipmentBlock,
   type EquipmentContent,
   type GatherYieldBonus,
+  type GlobalEffectSums,
   type HeroEffect,
   type JobContent,
   type JobId,
@@ -72,6 +73,7 @@ function jobStatsAtLevel(
   jobId: JobId,
   level: number,
   effects: HeroEffect[],
+  levelScale: number,
 ): StatBlock {
   const job = getEntry<JobContent>(jobId);
   const stats = { ...(job?.baseStats ?? defaultStats()) };
@@ -79,7 +81,8 @@ function jobStatsAtLevel(
   const bonusPerLevel = affixEffectsStatsPerLevel(effects);
 
   (Object.keys(stats) as Array<keyof StatBlock>).forEach((stat) => {
-    stats[stat] += (perLevel[stat] + bonusPerLevel[stat]) * (level - 1);
+    stats[stat] +=
+      (perLevel[stat] + bonusPerLevel[stat]) * (level - 1) * levelScale;
   });
 
   return stats;
@@ -90,8 +93,9 @@ export function characterStatsForLevel(
   level: number,
   equipment: EquipmentBlock,
   effects: HeroEffect[],
+  levelScale = 1,
 ): StatBlock {
-  const stats = jobStatsAtLevel(jobId, level, effects);
+  const stats = jobStatsAtLevel(jobId, level, effects, levelScale);
   const equipmentStats = affixEffectsAddToBlock(
     equipmentStatTotals(equipment),
     effects,
@@ -109,7 +113,7 @@ export function characterStatsForLevel(
 // The default reads live state, so it's only for callers in a tick or the UI; migration passes its own sums.
 export function characterStats(
   character: CharacterStatSource,
-  heroPercents = globalEffectSumsState().heroStatPercents,
+  sums: GlobalEffectSums = globalEffectSumsState(),
 ): StatBlock {
   return statsScaledByPercent(
     characterStatsForLevel(
@@ -117,17 +121,18 @@ export function characterStats(
       character.level,
       character.equipment,
       characterNonGearEffects(character),
+      Math.max(0, 1 + sums.levelStatMultiplierBonus),
     ),
-    heroPercents,
+    sums.heroStatPercents,
   );
 }
 
 // Clamps current hp/ep to the recomputed max, since a change can shrink max Health/Energy.
 export function characterRecalculateStats(
   character: Character,
-  heroPercents = globalEffectSumsState().heroStatPercents,
+  sums: GlobalEffectSums = globalEffectSumsState(),
 ): Character {
-  const stats = characterStats(character, heroPercents);
+  const stats = characterStats(character, sums);
 
   return {
     ...character,
@@ -227,7 +232,7 @@ export function setParty(party: Character[]): void {
 
 export function pruneInvalidPartyEquipment(
   party: Character[],
-  heroPercents: StatBlock,
+  sums: GlobalEffectSums,
 ): Character[] {
   return party.map((character) =>
     characterRecalculateStats(
@@ -235,7 +240,7 @@ export function pruneInvalidPartyEquipment(
         ...character,
         equipment: pruneInvalidEquippedItems(character.equipment),
       },
-      heroPercents,
+      sums,
     ),
   );
 }

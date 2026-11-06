@@ -77,6 +77,11 @@ const fury = ensureEdict({
     { effectType: 'GlobalXPGainMultiplier', value: 0.5 },
   ],
 });
+const humility = ensureEdict({
+  id: 'humility' as EdictId,
+  name: 'Humility',
+  effects: [{ effectType: 'GlobalLevelStatMultiplier', value: -1 }],
+});
 const knight = ensureJob({
   id: 'knight' as JobId,
   name: 'Knight',
@@ -84,7 +89,16 @@ const knight = ensureJob({
 });
 
 beforeEach(() => {
-  seedContent([jewelcrafting, satchel, blessing, might, frailty, fury, knight]);
+  seedContent([
+    jewelcrafting,
+    satchel,
+    blessing,
+    might,
+    frailty,
+    fury,
+    humility,
+    knight,
+  ]);
   seedGamestate((state) => (state.clock.numTicks = now));
 });
 
@@ -271,6 +285,15 @@ describe('hero stat percents on the party', () => {
       Health: 125,
       Strength: 10,
     });
+  });
+
+  it('recalculates the party when the level stat scale changes', () => {
+    const state = partyState([humility.id]);
+    const party = state.world.party;
+
+    recomputeGlobalEffectSums(state);
+
+    expect(state.world.party).not.toBe(party);
   });
 
   it('leaves the party untouched when hero percents are unchanged', () => {
