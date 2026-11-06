@@ -23,7 +23,7 @@
       value: -25
 
 - id: 1ccc343d-4575-40f9-85b4-ab51ca86ee34
-  name: Edict of the Cornucopia
+  name: Edict of the Blessed Cornucopia
   enabled: true
   sprite: '0002'
   description: Item drop chance is increased by 25%.
