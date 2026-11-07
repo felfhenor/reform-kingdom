@@ -34,7 +34,7 @@ vi.mock('@helpers/worker/worker-tick');
 import { caravanProcessTick } from '@helpers/caravan/caravan-tick';
 import { combatDoCombatIteration } from '@helpers/combat/combat';
 import { commissionProcessTick } from '@helpers/commission/commission-tick';
-import { TICKS_PER_YIELD } from '@helpers/config';
+import { GAMELOOP_YIELD_BUDGET_MS, TICKS_PER_YIELD } from '@helpers/config';
 import { craftProcessTick } from '@helpers/crafting/crafting-queue';
 import { autoModeProcessTick } from '@helpers/decree/auto-mode';
 import { encounterRandomProcessTick } from '@helpers/encounter/encounter-random-tick';
@@ -224,10 +224,27 @@ describe('gameloop', () => {
     [TICKS_PER_YIELD + 1, 1],
     [3600, 3600 / TICKS_PER_YIELD],
   ])('over %i ticks, yields to the browser %i times', async (ticks, yields) => {
+    // Frozen clock, so a slow run can't add time-budget yields.
+    const now = vi.spyOn(performance, 'now').mockReturnValue(0);
+    onTestFinished(() => now.mockRestore());
+
     await gameloop(ticks);
 
     expect(numTicks()).toBe(ticks);
     expect(schedulerYield).toHaveBeenCalledTimes(yields);
+  });
+
+  it('yields after any tick that overruns the time budget, except the last', async () => {
+    let elapsed = 0;
+    const now = vi
+      .spyOn(performance, 'now')
+      .mockImplementation(() => (elapsed += GAMELOOP_YIELD_BUDGET_MS));
+    onTestFinished(() => now.mockRestore());
+
+    await gameloop(3);
+
+    expect(numTicks()).toBe(3);
+    expect(schedulerYield).toHaveBeenCalledTimes(2);
   });
 
   it('saves once the save interval has passed, and not before', async () => {
