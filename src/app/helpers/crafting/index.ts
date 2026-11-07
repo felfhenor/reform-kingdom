@@ -4,6 +4,7 @@ export * from './crafting-queue.ui';
 export * from './crafting-reserved-equipment';
 export * from './crafting.ui';
 export * from './recipe-filter.ui';
+export * from './recipe-requirements';
 export * from './recipe-result';
 export * from './recipes';
 export * from './recipes.ui';

@@ -1,3 +1,4 @@
+import { recipeKingdomRequirements } from '@helpers/crafting/recipe-requirements';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
   craftMaxCraftableQuantity,
@@ -99,7 +100,7 @@ function recipeRequirementEntries(
   recipe: RecipeContent,
 ): CraftRequirementEntry[] {
   const sorted = orderBy(
-    recipe.requirements.map((requirement) => ({
+    recipeKingdomRequirements(recipe).map((requirement) => ({
       entry: buildRequirementEntry(requirement),
       discovered: isRequirementDiscovered(requirement),
     })),

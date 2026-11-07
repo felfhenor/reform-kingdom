@@ -1,3 +1,4 @@
+import { recipeKingdomRequirements } from '@helpers/crafting/recipe-requirements';
 import { runStatsRecordCraft } from '@helpers/run-stats/run-stats';
 import {
   categoryMessageLog,
@@ -55,7 +56,7 @@ export function workerCraftTicksPerUnit(
 function recipeItemRequirements(
   recipe: RecipeContent,
 ): RecipeRequirementItem[] {
-  return recipe.requirements.filter(
+  return recipeKingdomRequirements(recipe).filter(
     (requirement): requirement is RecipeRequirementItem =>
       'itemId' in requirement,
   );

@@ -19,8 +19,12 @@ import {
 } from '@interfaces';
 import { isEqual } from 'es-toolkit';
 
+function signedNumber(value: number): string {
+  return `${value >= 0 ? '+' : ''}${value}`;
+}
+
 function signedPercent(value: number): string {
-  return `${value >= 0 ? '+' : ''}${value}%`;
+  return `${signedNumber(value)}%`;
 }
 
 function addStatPercent(
@@ -71,6 +75,10 @@ export function globalEffectEffectDescription(
       return 'Dropped gear is cursed';
     case 'GlobalDropExtraAffixes':
       return `Dropped Gear Affixes: +${effect.value}`;
+    case 'GlobalCraftedExtraAffixes':
+      return `Crafted Gear Affixes: +${effect.value}`;
+    case 'GlobalRecipeMaterialBoost':
+      return `Recipe Materials: ${signedNumber(effect.value)} each`;
     case 'EnemyExtraSkills':
       return `Enemy Skills: +${effect.value} from the region`;
     case 'GlobalLevelStatMultiplier':
@@ -172,6 +180,12 @@ function accumulateGlobalEffectEffect(
       return;
     case 'GlobalDropExtraAffixes':
       sums.dropExtraAffixes += effect.value;
+      return;
+    case 'GlobalCraftedExtraAffixes':
+      sums.craftedExtraAffixes += effect.value;
+      return;
+    case 'GlobalRecipeMaterialBoost':
+      sums.recipeMaterialBoost += effect.value;
       return;
     case 'DebuffResistance':
       sums.debuffResistanceFlat += effect.value;

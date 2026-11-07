@@ -1,3 +1,4 @@
+import { recipeKingdomRequirements } from '@helpers/crafting/recipe-requirements';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import type {
@@ -92,7 +93,7 @@ export function refundQueueEntry(
   const remaining = entry.quantityTotal - entry.quantityCompleted;
   if (!recipe || remaining <= 0) return;
 
-  recipe.requirements.forEach((requirement) => {
+  recipeKingdomRequirements(recipe).forEach((requirement) => {
     if (!('itemId' in requirement)) return;
     applyMaterialDelta(
       state,

@@ -1,3 +1,4 @@
+import { recipeKingdomRequirements } from '@helpers/crafting/recipe-requirements';
 import {
   categoryMessageLog,
   collectibleDropHtml,
@@ -117,14 +118,15 @@ export function craftMaxCraftableQuantity(
   recipe: RecipeContent,
   tradeskill: Tradeskill,
 ): number {
-  const collectibleGateUnmet = recipe.requirements.some(
+  const requirements = recipeKingdomRequirements(recipe);
+  const collectibleGateUnmet = requirements.some(
     (requirement) =>
       'collectibleId' in requirement &&
       !isCollectibleDiscovered(requirement.collectibleId),
   );
   if (collectibleGateUnmet) return 0;
 
-  const consumedRequirements = recipe.requirements
+  const consumedRequirements = requirements
     .filter(isConsumedRequirement)
     .filter((requirement) => requirementNeeded(requirement) > 0);
 
@@ -270,7 +272,7 @@ export function craftQueueStart(
   if (clampedQuantity <= 0) return false;
 
   updateGamestate((state) => {
-    const reserved = recipe.requirements.flatMap((requirement) =>
+    const reserved = recipeKingdomRequirements(recipe).flatMap((requirement) =>
       consumeRequirement(state, requirement, clampedQuantity),
     );
 

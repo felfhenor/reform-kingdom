@@ -89,10 +89,16 @@
 
 - id: c03e5ab7-1e05-4e4d-a128-be17f5e58b2d
   name: Edict of True Scarcity
+  enabled: true
   sprite: '0009'
-  description: Recipes need more materials. Crafted gear always rolls one extra affix.
+  description: Recipes need 1 more of every material. Crafted gear always rolls one extra affix.
   kind: Variant
   fragments: 0
+  effects:
+    - effectType: GlobalRecipeMaterialBoost
+      value: 1
+    - effectType: GlobalCraftedExtraAffixes
+      value: 1
 
 - id: d6631919-4f78-4b2e-973a-df63d710909b
   name: Edict of Fickle Curses

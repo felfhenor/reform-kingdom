@@ -137,6 +137,25 @@ describe('armoryAddLootDrop', () => {
     expect(armoryState()[0].affixIds).toEqual([might.id]);
   });
 
+  it('rolls crafted extra affixes only on crafted gear', () => {
+    const might = ensureAffix({
+      id: 'might' as AffixId,
+      name: 'Mighty',
+      family: 'Might',
+    });
+    seedContent([sword, might]);
+    const craftedState = (state: GameState) => {
+      state.globalEffectSums.craftedExtraAffixes = 1;
+    };
+
+    drop(craftedState);
+    expect(armoryState()[0].affixIds).toEqual([]);
+
+    seedGamestate(craftedState);
+    inTick(() => armoryAddLootDrop(sword.id, 'Crafting'));
+    expect(armoryState()[0].affixIds).toEqual([might.id]);
+  });
+
   it('keeps a drop the filter accepts in the armory', () => {
     expect(drop()).toEqual({ kind: 'Kept', content: sword });
 

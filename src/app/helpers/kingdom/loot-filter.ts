@@ -61,12 +61,12 @@ export function armoryAddLootDrop(
       return state;
     }
 
-    const { cursedDrops, dropExtraAffixes } = globalEffectSumsState();
+    const sums = globalEffectSumsState();
     const item = newEquipmentItem(
       equipmentId,
       source === 'Combat'
-        ? rollDropAffixIds(content, cursedDrops, dropExtraAffixes)
-        : undefined,
+        ? rollDropAffixIds(content, sums.cursedDrops, sums.dropExtraAffixes)
+        : rollDropAffixIds(content, false, sums.craftedExtraAffixes),
     );
 
     if (!equipmentPassesLootFilter(content, state.lootFilters, source)) {

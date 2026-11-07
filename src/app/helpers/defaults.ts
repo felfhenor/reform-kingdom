@@ -265,6 +265,8 @@ export function defaultGlobalEffectSums(): GlobalEffectSums {
     townShopNoEquipment: false,
     cursedDrops: false,
     dropExtraAffixes: 0,
+    craftedExtraAffixes: 0,
+    recipeMaterialBoost: 0,
     combatItemDropRateBoost: 0,
     gatheringItemDropRateBoost: 0,
     armorySizeBoost: 0,

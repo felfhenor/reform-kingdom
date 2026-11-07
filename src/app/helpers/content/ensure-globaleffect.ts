@@ -23,6 +23,8 @@ import type {
   GlobalEffectEffectShrineBuffsPermanent,
   GlobalEffectEffectEnemyExtraSkills,
   GlobalEffectEffectDropExtraAffixes,
+  GlobalEffectEffectCraftedExtraAffixes,
+  GlobalEffectEffectRecipeMaterialBoost,
   GlobalEffectEffectWipeEndsRun,
   GlobalEffectEffectTradeskillQueueSizeBoost,
   GlobalEffectEffectXPGainMultiplier,
@@ -43,6 +45,8 @@ export function ensureGlobalEffectEffect(
     Partial<GlobalEffectEffectShrineBuffsPermanent> &
     Partial<GlobalEffectEffectEnemyExtraSkills> &
     Partial<GlobalEffectEffectDropExtraAffixes> &
+    Partial<GlobalEffectEffectCraftedExtraAffixes> &
+    Partial<GlobalEffectEffectRecipeMaterialBoost> &
     Partial<GlobalEffectEffectWipeEndsRun> &
     Partial<GlobalEffectEffectGoldGainMultiplier> &
     Partial<GlobalEffectEffectDebuffResistance> &
@@ -145,7 +149,9 @@ export function ensureGlobalEffectEffect(
 
   if (
     effect.effectType === 'EnemyExtraSkills' ||
-    effect.effectType === 'GlobalDropExtraAffixes'
+    effect.effectType === 'GlobalDropExtraAffixes' ||
+    effect.effectType === 'GlobalCraftedExtraAffixes' ||
+    effect.effectType === 'GlobalRecipeMaterialBoost'
   ) {
     return { effectType: effect.effectType, value: effect.value ?? 0 };
   }

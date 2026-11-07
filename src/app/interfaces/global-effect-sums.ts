@@ -26,6 +26,8 @@ export type GlobalEffectSums = {
   townShopNoEquipment: boolean;
   cursedDrops: boolean;
   dropExtraAffixes: number;
+  craftedExtraAffixes: number;
+  recipeMaterialBoost: number;
   combatItemDropRateBoost: number;
   gatheringItemDropRateBoost: number;
   armorySizeBoost: number;

@@ -171,6 +171,18 @@ export type GlobalEffectEffectDropExtraAffixes = {
   value: number;
 };
 
+// Kingdom-crafted gear rolls `value` more normal affixes than its rarity gives.
+export type GlobalEffectEffectCraftedExtraAffixes = {
+  effectType: 'GlobalCraftedExtraAffixes';
+  value: number;
+};
+
+// Every material a kingdom recipe needs changes by `value` (whole units), never below 1.
+export type GlobalEffectEffectRecipeMaterialBoost = {
+  effectType: 'GlobalRecipeMaterialBoost';
+  value: number;
+};
+
 export type GlobalEffectEffect =
   | GlobalEffectEffectGainStats
   | GlobalEffectEffectGainStatPercent
@@ -190,6 +202,8 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectTownShopNoEquipment
   | GlobalEffectEffectCursedDrops
   | GlobalEffectEffectDropExtraAffixes
+  | GlobalEffectEffectCraftedExtraAffixes
+  | GlobalEffectEffectRecipeMaterialBoost
   | GlobalEffectEffectDebuffResistance
   | GlobalEffectEffectDebuffResistanceTag
   | GlobalEffectEffectCombatItemDropRateBoost
