@@ -19,14 +19,12 @@
     - StarryNomadic
   enabled: true
   sprite: '0025'
-  description: Outposts are permanently forgotten. Shrine buffs last 2x as long and are 50% stronger.
+  description: Outposts are permanently forgotten. Shrine buffs are 50% stronger.
   kind: Variant
   fragments: 0
   effects:
     - effectType: GlobalWorldNodeTypeRemoved
       nodeType: Outpost
-    - effectType: GlobalShrineBuffDuration
-      value: 1
     - effectType: GlobalShrineBuffStrength
       value: 0.5
 

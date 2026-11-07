@@ -88,6 +88,8 @@
   description: Deaths Door and Healing timers are reduced by 50%.
   kind: Boon
   fragments: -1
+  groups:
+    - Death
   effects:
     - effectType: GlobalDeathPenaltyMultiplier
       value: -0.5
