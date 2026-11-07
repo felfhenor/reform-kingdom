@@ -222,11 +222,18 @@ export function worldNodeCollectibleGateIds(
   );
 }
 
-// Nodes with no gate are always met; gated nodes need every listed collectible found. Outposts removed for the run never are.
+export function isWorldNodeTypeRemoved(type: string): boolean {
+  return !!globalEffectSumsState().removedWorldNodeTypes[type as WorldNodeType];
+}
+
+export function isWorldNodeNameRemoved(nodeName: string): boolean {
+  const entry = worldNodeByName(nodeName);
+  return !!entry && isWorldNodeTypeRemoved(entry.nodeData.type);
+}
+
+// Nodes with no gate are always met; gated nodes need every listed collectible found. A node type removed for the run never is.
 export function isWorldNodeCollectibleGateMet(entry: WorldNodeEntry): boolean {
-  if (globalEffectSumsState().outpostsDisabled && worldNodeOutpost(entry)) {
-    return false;
-  }
+  if (isWorldNodeTypeRemoved(entry.nodeData.type)) return false;
 
   return worldNodeCollectibleGateIds(entry).every((collectibleId) =>
     isCollectibleDiscovered(collectibleId),

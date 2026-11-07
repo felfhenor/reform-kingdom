@@ -6,6 +6,7 @@ import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { ensureTown } from '@helpers/content/ensure-town';
 import {
   isCollectibleSourceKnown,
+  isFoundOnlyAtRemovedNodes,
   recipeSources,
 } from '@helpers/kingdom/museum';
 import type {
@@ -18,6 +19,7 @@ import type {
 import { buildTownNodeState } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 
 const cloakRecipe = 'equipment-bone-hewn-cloak' as RecipeId;
 const ingotRecipe = 'material-copper-ingot' as RecipeId;
@@ -54,6 +56,30 @@ describe('recipeSources', () => {
     expect(recipeSources(ingotRecipe)).toEqual([alekia]);
     expect(recipeSources(mapRecipe)).toEqual([alekia]);
     expect(recipeSources('unsourced' as RecipeId)).toEqual([]);
+  });
+});
+
+describe('sources at removed nodes', () => {
+  it('drops a removed node from the sources, and says when nothing else is left', () => {
+    seedContent([
+      ensureEncounter({
+        id: 'field-ruins' as EncounterId,
+        name: 'Field Ruins',
+        completionRewards: [ensureDroppedReward({ recipeId: cloakRecipe })],
+      }),
+    ]);
+    seedWorldNodes([{ name: 'Field Ruins', type: 'ExploreNode' }]);
+
+    seedGamestate();
+    expect(recipeSources(cloakRecipe)).toHaveLength(1);
+    expect(isFoundOnlyAtRemovedNodes({ recipeId: cloakRecipe })).toBe(false);
+
+    seedGamestate((state) => {
+      state.globalEffectSums.removedWorldNodeTypes.ExploreNode = true;
+    });
+    expect(recipeSources(cloakRecipe)).toEqual([]);
+    expect(isFoundOnlyAtRemovedNodes({ recipeId: cloakRecipe })).toBe(true);
+    expect(isFoundOnlyAtRemovedNodes({ recipeId: ingotRecipe })).toBe(false);
   });
 });
 

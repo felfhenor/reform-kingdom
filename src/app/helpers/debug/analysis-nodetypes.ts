@@ -15,25 +15,17 @@ import type {
   MapNodeCheckRef,
   WorldNodeType,
 } from '@interfaces';
-import { WORLD_NODE_TYPES } from '@interfaces';
-
-// nodeoverride is left out on purpose: it backs Kingdom and TeleportNode alike.
-const NODE_TYPE_BY_CONTENT_TYPE: Partial<Record<ContentType, WorldNodeType>> = {
-  encounter: 'ExploreNode',
-  encounterrandom: 'ExploreRandomNode',
-  gathering: 'GatherNode',
-  caravan: 'CaravanNode',
-  shrine: 'Shrine',
-  outpost: 'Outpost',
-  trainer: 'Trainer',
-  exchangenode: 'ExchangeNode',
-  town: 'NonPlayerKingdom',
-  collectiblegate: 'CollectibleGate',
-};
+import { WORLD_NODE_TYPE_BY_CONTENT_TYPE, WORLD_NODE_TYPES } from '@interfaces';
 
 function expectedNodeType(nodeName: string): WorldNodeType | undefined {
   const content = getEntry<IsContentItem>(nodeName);
-  return content ? NODE_TYPE_BY_CONTENT_TYPE[content.__type] : undefined;
+  return content
+    ? (
+        WORLD_NODE_TYPE_BY_CONTENT_TYPE as Partial<
+          Record<ContentType, WorldNodeType>
+        >
+      )[content.__type]
+    : undefined;
 }
 
 // Content match first; otherwise a valid type that contains (or is contained by) the typo, e.g. "Teleport".

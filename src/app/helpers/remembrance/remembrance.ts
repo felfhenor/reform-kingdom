@@ -6,10 +6,18 @@ import {
   bestiaryMonsters,
   isMonsterDiscovered,
 } from '@helpers/kingdom/bestiary';
-import { tasksState } from '@helpers/state-game';
+import { isFoundOnlyAtRemovedNodes } from '@helpers/kingdom/museum';
+import { globalEffectSumsState, tasksState } from '@helpers/state-game';
 import { isWorkerRescued } from '@helpers/worker/worker-discovery';
 import { worldNodeDevelopmentMaxLevel } from '@helpers/world-node/world-node-development';
-import { WORLD_NODE_DEVELOPMENT_SELECTORS } from '@helpers/world-node/world-node-development-state';
+import {
+  WORLD_NODE_DEVELOPABLE_TYPES,
+  WORLD_NODE_DEVELOPMENT_SELECTORS,
+} from '@helpers/world-node/world-node-development-state';
+import {
+  isWorldNodeNameRemoved,
+  isWorldNodeTypeRemoved,
+} from '@helpers/world-node/world-nodes';
 import type {
   CollectibleContent,
   EquipmentContent,
@@ -20,7 +28,11 @@ import type {
   WorkerContent,
   WorldNodeDevelopableContent,
   WorldNodeDevelopableType,
+  EquipmentId,
+  ItemId,
+  SourceTarget,
 } from '@interfaces';
+import { WORLD_NODE_TYPE_BY_CONTENT_TYPE } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
 
 const REMEMBRANCE_DEVELOPMENT_NAMES: Record<WorldNodeDevelopableType, string> =
@@ -29,6 +41,25 @@ const REMEMBRANCE_DEVELOPMENT_NAMES: Record<WorldNodeDevelopableType, string> =
     outpost: 'Outpost Development',
     gathering: 'Gather Node Development',
   };
+
+// Source lookups scan all content, so they're skipped in the usual run with nothing removed.
+function findable<T extends { id: string; unobtainable?: boolean }>(
+  entries: T[],
+  target: (id: string) => SourceTarget,
+): T[] {
+  const anyRemoved =
+    Object.keys(globalEffectSumsState().removedWorldNodeTypes).length > 0;
+  return obtainable(entries).filter(
+    (entry) => !anyRemoved || !isFoundOnlyAtRemovedNodes(target(entry.id)),
+  );
+}
+
+function isTaskOnRemovedNode(task: TaskContent): boolean {
+  return (
+    'nodeName' in task.requirement &&
+    isWorldNodeNameRemoved(task.requirement.nodeName)
+  );
+}
 
 function remembranceCount<T>(
   name: string,
@@ -53,7 +84,9 @@ export function remembranceCollectibles(): RemembranceCategory {
 export function remembranceMaterials(): RemembranceCategory {
   return remembranceCount(
     'Materials',
-    obtainable(getEntriesByType<ItemContent>('item')),
+    findable(getEntriesByType<ItemContent>('item'), (id) => ({
+      itemId: id as ItemId,
+    })),
     (item) => isMaterialDiscovered(item.id),
   );
 }
@@ -61,7 +94,9 @@ export function remembranceMaterials(): RemembranceCategory {
 export function remembranceEquipment(): RemembranceCategory {
   return remembranceCount(
     'Equipment',
-    obtainable(getEntriesByType<EquipmentContent>('equipment')),
+    findable(getEntriesByType<EquipmentContent>('equipment'), (id) => ({
+      equipmentId: id as EquipmentId,
+    })),
     (equipment) => isEquipmentDiscovered(equipment.id),
   );
 }
@@ -110,7 +145,9 @@ export function remembranceTasks(): RemembranceCategory {
   const tasks = tasksState();
   return remembranceCount(
     'Tasks',
-    getEntriesByType<TaskContent>('task'),
+    getEntriesByType<TaskContent>('task').filter(
+      (task) => !isTaskOnRemovedNode(task),
+    ),
     (task) => !!tasks[task.id]?.completedAt,
   );
 }
@@ -122,9 +159,9 @@ export function remembranceCategories(): RemembranceCategory[] {
     remembranceEquipment(),
     remembranceBestiary(),
     remembranceWorkers(),
-    remembranceDevelopment('shrine'),
-    remembranceDevelopment('outpost'),
-    remembranceDevelopment('gathering'),
+    ...WORLD_NODE_DEVELOPABLE_TYPES.filter(
+      (type) => !isWorldNodeTypeRemoved(WORLD_NODE_TYPE_BY_CONTENT_TYPE[type]),
+    ).map(remembranceDevelopment),
     remembranceTasks(),
   ];
 }

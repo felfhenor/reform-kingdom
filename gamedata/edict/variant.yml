@@ -2,7 +2,7 @@
   name: Edict of Reflective Mirrors
   enabled: true
   sprite: '0027'
-  description: Every hero must share one class, and reclassing must change the whole party. Most party job abilities will stack together.
+  description: Every hero must share one job, and reclassing must change the whole party. Most party job abilities will stack together.
   kind: Variant
   fragments: 0
   effects:
@@ -13,11 +13,12 @@
   name: Edict of Nomadic Departure
   enabled: true
   sprite: '0026'
-  description: Outposts are gone. Shrine buffs last 2x as long and are 50% stronger.
+  description: Outposts are permanently forgotten. Shrine buffs last 2x as long and are 50% stronger.
   kind: Variant
   fragments: 0
   effects:
-    - effectType: GlobalOutpostsDisabled
+    - effectType: GlobalWorldNodeTypeRemoved
+      nodeType: Outpost
     - effectType: GlobalShrineBuffDuration
       value: 1
     - effectType: GlobalShrineBuffStrength
@@ -25,10 +26,18 @@
 
 - id: 277dcf0b-f0a4-4ec9-9cdd-6b9b8f991f3e
   name: Edict of Exogenous Support
+  enabled: true
   sprite: '0022'
-  description: The Exchange is gone. Commissions grant double reputation, and towns offer more commission slots.
+  description: Exchanges are permanently forgotten. Town commissions grant 2x reputation, and towns offer 2 more commission slots.
   kind: Variant
   fragments: 0
+  effects:
+    - effectType: GlobalWorldNodeTypeRemoved
+      nodeType: ExchangeNode
+    - effectType: GlobalCommissionReputationBoost
+      value: 1
+    - effectType: GlobalTownCommissionSlotBoost
+      value: 2
 
 - id: d9f1a5fc-a65a-43ae-a5c6-e0cfe363f961
   name: Edict of the Heated Forge

@@ -2,6 +2,7 @@ import type { CombatStatBlock } from '@interfaces/combat';
 import type { StatusEffectBlock } from '@interfaces/content-statuseffect';
 import type { TradeskillId } from '@interfaces/content-tradeskill';
 import type { StatBlock } from '@interfaces/stat';
+import type { WorldNodeType } from '@interfaces/tiled-map';
 
 // Precomputed totals across every active global effect + owned collectible -
 // see `recomputeGlobalEffectSums` for what keeps this in sync.
@@ -32,7 +33,10 @@ export type GlobalEffectSums = {
   reclassDisabled: boolean;
   partySharesClass: boolean;
   jobAbilitiesStack: boolean;
-  outpostsDisabled: boolean;
+  // Sparse - only removed node types have an entry.
+  removedWorldNodeTypes: Partial<Record<WorldNodeType, boolean>>;
+  commissionReputationBonus: number;
+  townCommissionSlotBoost: number;
   shrineBuffDurationBonus: number;
   shrineBuffStrengthBonus: number;
   combatItemDropRateBoost: number;

@@ -4,6 +4,7 @@ import type { StatusEffectTag } from '@interfaces/content-statuseffect';
 import type { TradeskillId } from '@interfaces/content-tradeskill';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { GameStat } from '@interfaces/stat';
+import type { WorldNodeType } from '@interfaces/tiled-map';
 
 export type GlobalEffectId = Branded<string, 'GlobalEffectId'>;
 
@@ -197,9 +198,22 @@ export type GlobalEffectEffectJobAbilitiesStack = {
   effectType: 'GlobalJobAbilitiesStack';
 };
 
-// Outpost nodes are removed from the map for the run.
-export type GlobalEffectEffectOutpostsDisabled = {
-  effectType: 'GlobalOutpostsDisabled';
+// Every node of `nodeType` is removed from the map for the run, and remembrance stops counting what only it gives.
+export type GlobalEffectEffectWorldNodeTypeRemoved = {
+  effectType: 'GlobalWorldNodeTypeRemoved';
+  nodeType: WorldNodeType;
+};
+
+// Fraction (1 = double) on the reputation town commissions grant, stacking additively.
+export type GlobalEffectEffectCommissionReputationBoost = {
+  effectType: 'GlobalCommissionReputationBoost';
+  value: number;
+};
+
+// Whole extra commission slots in every town.
+export type GlobalEffectEffectTownCommissionSlotBoost = {
+  effectType: 'GlobalTownCommissionSlotBoost';
+  value: number;
 };
 
 // Fraction (1 = twice as long) on shrine buff duration, stacking additively.
@@ -245,7 +259,9 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectReclassDisabled
   | GlobalEffectEffectPartySharesClass
   | GlobalEffectEffectJobAbilitiesStack
-  | GlobalEffectEffectOutpostsDisabled
+  | GlobalEffectEffectWorldNodeTypeRemoved
+  | GlobalEffectEffectCommissionReputationBoost
+  | GlobalEffectEffectTownCommissionSlotBoost
   | GlobalEffectEffectShrineBuffDuration
   | GlobalEffectEffectShrineBuffStrength
   | GlobalEffectEffectDebuffResistance

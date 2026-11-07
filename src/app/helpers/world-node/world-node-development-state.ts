@@ -37,15 +37,6 @@ export const WORLD_NODE_DEVELOPMENT_SLICES: Record<
   outpost: 'outposts',
 };
 
-export const WORLD_NODE_DEVELOPMENT_ANALYTICS_SEGMENTS: Record<
-  WorldNodeDevelopableType,
-  string
-> = {
-  gathering: 'GatherNode',
-  shrine: 'Shrine',
-  outpost: 'Outpost',
-};
-
 export const WORLD_NODE_DEVELOPMENT_SELECTORS = {
   gathering: gatherNodeLevelsState,
   shrine: shrinesState,

@@ -5,7 +5,7 @@ import {
 } from '@helpers/commission/commission-requirement';
 import { getEntry } from '@helpers/content/content';
 import { jobAbilityValue } from '@helpers/hero/job-ability';
-import { worldTownsState } from '@helpers/state-game';
+import { globalEffectSumsState, worldTownsState } from '@helpers/state-game';
 import type {
   CommissionOfferContent,
   CommissionRequirementEntry,
@@ -54,7 +54,15 @@ export function townCommissionReputationReward(
   if (!offer) return 0;
 
   const base = commissionOfferReputationReward(offer, townId, state);
-  return Math.round(base * (1 + jobAbilityValue('CommissionReputationBoost')));
+  const { commissionReputationBonus } = state
+    ? state.globalEffectSums
+    : globalEffectSumsState();
+  return Math.round(
+    base *
+      (1 +
+        jobAbilityValue('CommissionReputationBoost') +
+        commissionReputationBonus),
+  );
 }
 
 export function townCommissionCanFulfill(

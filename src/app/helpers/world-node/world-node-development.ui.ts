@@ -6,10 +6,10 @@ import {
 import { updateGamestate } from '@helpers/state-game';
 import { isPartyAtNode } from '@helpers/world';
 import {
-  WORLD_NODE_DEVELOPMENT_ANALYTICS_SEGMENTS,
   worldNodeDevelopable,
   worldNodeDevelopmentBegin,
 } from '@helpers/world-node/world-node-development-state';
+import { WORLD_NODE_TYPE_BY_CONTENT_TYPE } from '@interfaces';
 
 // Re-validated inside the callback so a double-click can't pay twice.
 export async function worldNodeDevelopStart(
@@ -31,7 +31,7 @@ export async function worldNodeDevelopStart(
       : `The party has begun developing **${content.name}** to +${targetLevel}.`,
   );
   analyticsSendDesignEvent(
-    `World:${WORLD_NODE_DEVELOPMENT_ANALYTICS_SEGMENTS[content.__type]}:LevelUp:${analyticsSafeSegment(nodeName)}`,
+    `World:${WORLD_NODE_TYPE_BY_CONTENT_TYPE[content.__type]}:LevelUp:${analyticsSafeSegment(nodeName)}`,
   );
   return true;
 }

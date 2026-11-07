@@ -5,7 +5,12 @@ import {
   ensureEquipment,
   ensureItem,
 } from '@helpers/content/ensure-item';
+import {
+  ensureExchangeNode,
+  ensureExchangeNodeExchange,
+} from '@helpers/content/ensure-exchangenode';
 import { ensureGathering } from '@helpers/content/ensure-gathernode';
+import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { ensureMonster } from '@helpers/content/ensure-monster';
 import { ensureOutpost } from '@helpers/content/ensure-outpost';
 import { ensureWorldNodeDevelopmentLevel } from '@helpers/content/ensure-helpers-core';
@@ -19,6 +24,7 @@ import { ensureWorker } from '@helpers/content/ensure-worker';
 import { ledgerMark } from '@helpers/engine/ledger';
 import {
   remembranceBestiary,
+  remembranceCategories,
   remembranceCollectibles,
   remembranceDevelopment,
   remembranceEquipment,
@@ -29,6 +35,7 @@ import {
 import type {
   CollectibleId,
   EquipmentId,
+  ExchangeNodeId,
   GatheringId,
   ItemId,
   MonsterId,
@@ -37,9 +44,11 @@ import type {
   TaskId,
   TownId,
   WorkerId,
+  WorldNodeType,
 } from '@interfaces';
 import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 
 const relicId = 'relic' as CollectibleId;
 const swordId = 'sword' as EquipmentId;
@@ -49,6 +58,8 @@ const goblinId = 'goblin' as MonsterId;
 const rescuedId = 'rescued' as WorkerId;
 const townWorkerId = 'town-worker' as WorkerId;
 const taskId = 'task' as TaskId;
+const crownId = 'crown' as EquipmentId;
+const essenceId = 'essence' as ItemId;
 const developmentLevel = ensureWorldNodeDevelopmentLevel({});
 
 beforeEach(() => {
@@ -169,5 +180,80 @@ describe('remembranceDevelopment', () => {
       current: 0,
       max: 1,
     });
+  });
+});
+
+describe('with a node type removed', () => {
+  const removing = (type: WorldNodeType) =>
+    seedGamestate((state) => {
+      state.globalEffectSums.removedWorldNodeTypes[type] = true;
+    });
+
+  it('stops counting what only a removed node gives, keeping anything with another source', () => {
+    seedContent([
+      ensureEquipment({ id: swordId, name: 'Sword' }),
+      ensureEquipment({ id: crownId, name: 'Crown' }),
+      ensureItem({ id: oreId, name: 'Ore' }),
+      ensureItem({ id: essenceId, name: 'Essence' }),
+      ensureExchangeNode({
+        id: 'exchange' as ExchangeNodeId,
+        name: 'Exchange',
+        exchanges: [
+          ensureExchangeNodeExchange({
+            kind: 'Equipment',
+            inputEquipmentId: swordId,
+            outputEquipmentId: crownId,
+          }),
+          {
+            kind: 'Item',
+            input: { itemId: oreId, required: 1 },
+            output: { itemId: essenceId, quantity: 1 },
+            costs: [],
+          },
+        ],
+      }),
+      ensureMonster({
+        id: goblinId,
+        name: 'Goblin',
+        drops: [ensureDroppedReward({ itemId: essenceId })],
+      }),
+    ]);
+    seedWorldNodes([{ name: 'Exchange', type: 'ExchangeNode' }]);
+
+    seedGamestate();
+    expect(remembranceEquipment().max).toBe(2);
+
+    removing('ExchangeNode');
+    expect(remembranceEquipment().max).toBe(1);
+    expect(remembranceMaterials().max).toBe(2);
+  });
+
+  it('drops the development category of a removed node type', () => {
+    removing('Outpost');
+
+    expect(remembranceCategories().map((category) => category.name)).toEqual(
+      expect.not.arrayContaining(['Outpost Development']),
+    );
+    expect(remembranceCategories().map((category) => category.name)).toEqual(
+      expect.arrayContaining(['Shrine Development']),
+    );
+  });
+
+  it('drops tasks set at a removed node', () => {
+    seedContent([
+      ensureTask({ id: taskId, name: 'Task' }),
+      ensureTask({
+        id: 'pray' as TaskId,
+        name: 'Pray',
+        requirement: { kind: 'ShrineLevel', nodeName: 'Shrine A', level: 1 },
+      }),
+    ]);
+    seedWorldNodes([{ name: 'Shrine A', type: 'Shrine' }]);
+
+    seedGamestate();
+    expect(remembranceTasks().max).toBe(2);
+
+    removing('Shrine');
+    expect(remembranceTasks().max).toBe(1);
   });
 });

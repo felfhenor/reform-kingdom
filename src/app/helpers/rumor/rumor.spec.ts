@@ -93,6 +93,15 @@ describe('isRumorSubjectFound', () => {
     expect(isRumorSubjectFound(gladeRumor.subject)).toBe(true);
   });
 
+  it('counts a node of a removed type as found, so its rumor is spent', () => {
+    seedWorld();
+    seedGamestate((state) => {
+      state.globalEffectSums.removedWorldNodeTypes.GatherNode = true;
+    });
+
+    expect(isRumorSubjectFound(gladeRumor.subject)).toBe(true);
+  });
+
   it('finds a gated node once its collectible is owned', () => {
     seedWorld();
     seedGamestate();
@@ -200,6 +209,14 @@ describe('rumor purchases', () => {
     seedWorld([gladeRumor, groveRumor, relicRumor, trader]);
     expect(rumorTraders(gladeRumor.id)).toEqual([trader]);
     expect(rumorsSold()).toEqual([gladeRumor]);
+  });
+
+  it('does not count a rumor about a removed node as sold', () => {
+    seedWorld([gladeRumor, trader]);
+    seedGamestate((state) => {
+      state.globalEffectSums.removedWorldNodeTypes.GatherNode = true;
+    });
+    expect(rumorsSold()).toEqual([]);
   });
 
   it('does not count a rumor no caravan sells as sold', () => {

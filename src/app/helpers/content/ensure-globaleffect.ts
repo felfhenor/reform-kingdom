@@ -32,6 +32,8 @@ import type {
   GlobalEffectId,
   StatusEffectTag,
   TradeskillId,
+  WorldNodeType,
+  GlobalEffectEffectWorldNodeTypeRemoved,
 } from '@interfaces';
 
 export function ensureGlobalEffectEffect(
@@ -59,7 +61,8 @@ export function ensureGlobalEffectEffect(
     Partial<GlobalEffectEffectTradeskillQueueSizeBoost> &
     Partial<GlobalEffectEffectOffPathTravelSpeedBoost> &
     Partial<GlobalEffectEffectOnPathTravelSpeedBoost> &
-    Partial<GlobalEffectEffectDecreeClauseCapBoost> = {},
+    Partial<GlobalEffectEffectDecreeClauseCapBoost> &
+    Partial<GlobalEffectEffectWorldNodeTypeRemoved> = {},
 ): GlobalEffectEffect {
   if (
     effect.effectType === 'GainStatPercent' ||
@@ -144,10 +147,16 @@ export function ensureGlobalEffectEffect(
   if (
     effect.effectType === 'GlobalReclassDisabled' ||
     effect.effectType === 'GlobalPartySharesClass' ||
-    effect.effectType === 'GlobalJobAbilitiesStack' ||
-    effect.effectType === 'GlobalOutpostsDisabled'
+    effect.effectType === 'GlobalJobAbilitiesStack'
   ) {
     return { effectType: effect.effectType };
+  }
+
+  if (effect.effectType === 'GlobalWorldNodeTypeRemoved') {
+    return {
+      effectType: 'GlobalWorldNodeTypeRemoved',
+      nodeType: effect.nodeType ?? ('UNKNOWN' as WorldNodeType),
+    };
   }
 
   if (effect.effectType === 'GlobalTownShopNoEquipment') {
@@ -164,6 +173,8 @@ export function ensureGlobalEffectEffect(
     effect.effectType === 'GlobalCraftedExtraAffixes' ||
     effect.effectType === 'GlobalRecipeMaterialBoost' ||
     effect.effectType === 'GlobalSkillPointsPerLevel' ||
+    effect.effectType === 'GlobalCommissionReputationBoost' ||
+    effect.effectType === 'GlobalTownCommissionSlotBoost' ||
     effect.effectType === 'GlobalShrineBuffDuration' ||
     effect.effectType === 'GlobalShrineBuffStrength'
   ) {

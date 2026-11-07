@@ -6,7 +6,7 @@ import { TOWN_COMMISSION_TICK_INTERVAL } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { rngChoiceWeighted, rngUuid } from '@helpers/rng';
-import { updateGamestate } from '@helpers/state-game';
+import { globalEffectSumsState, updateGamestate } from '@helpers/state-game';
 import { townSpecialtyPriority } from '@helpers/town/crafting/town-craft-priority-state';
 import {
   townCommissionPriorityWeightFromMap,
@@ -43,7 +43,9 @@ const TOWN_COMMISSION_SLOT_COUNTS: Record<number, number> = {
 
 export function townCommissionSlotCount(town: TownContent): number {
   const tier = townReputationTier(town.id);
-  return townReputationTierMultiplier(tier, TOWN_COMMISSION_SLOT_COUNTS) ?? 1;
+  const base =
+    townReputationTierMultiplier(tier, TOWN_COMMISSION_SLOT_COUNTS) ?? 1;
+  return Math.max(1, base + globalEffectSumsState().townCommissionSlotBoost);
 }
 
 function addCommissionSlot(

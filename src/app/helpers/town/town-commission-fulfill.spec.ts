@@ -103,6 +103,14 @@ describe('townCommissionReputationReward', () => {
 
     expect(townCommissionReputationReward(townId, slotId)).toBe(28);
   });
+
+  it('adds a global reputation boost alongside the healer one', () => {
+    seedSlot((state) => {
+      state.globalEffectSums.commissionReputationBonus = 1;
+    });
+
+    expect(townCommissionReputationReward(townId, slotId)).toBe(50);
+  });
 });
 
 describe('townCommissionCanFulfill', () => {

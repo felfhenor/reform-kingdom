@@ -2,14 +2,13 @@ import { isTraderDiscovered } from '@helpers/caravan/caravan';
 import { getEntriesByType } from '@helpers/content/content';
 import { isMonsterDiscovered } from '@helpers/kingdom';
 import { isTownVisited } from '@helpers/town/town-visit';
-import { isWorldNodeMapVisited } from '@helpers/world-node/world-nodes';
+import {
+  isWorldNodeMapVisited,
+  isWorldNodeNameRemoved,
+} from '@helpers/world-node/world-nodes';
 import type {
   CaravanTraderContent,
   CollectibleSource,
-  DropCollectible,
-  DropEquipment,
-  DropItem,
-  DropRecipe,
   EncounterContent,
   EncounterRandomContent,
   EquipmentId,
@@ -20,6 +19,7 @@ import type {
   MonsterContent,
   RecipeContent,
   RecipeId,
+  SourceTarget,
   TownContent,
 } from '@interfaces';
 import { uniqBy } from 'es-toolkit/compat';
@@ -33,9 +33,6 @@ const SOURCE_KEYS = [
 ] as const;
 type SourceKey = (typeof SOURCE_KEYS)[number];
 type SourceFields = Partial<Record<SourceKey, string>>;
-
-export type SourceTarget =
-  DropItem | DropEquipment | DropRecipe | DropCollectible;
 
 // Takes `object` rather than SourceFields: a worker drop shares none of these keys, which TS would reject as a weak-type mismatch.
 function matchesTarget(output: object, target: SourceTarget): boolean {
@@ -103,7 +100,24 @@ const nodeSource = (entry: { name: string }): CollectibleSource => ({
   name: entry.name,
 });
 
+function isCollectibleSourceRemoved(source: CollectibleSource): boolean {
+  return source.type === 'node' && isWorldNodeNameRemoved(source.name);
+}
+
+// Has sources, and every one is a node removed this run.
+export function isFoundOnlyAtRemovedNodes(target: SourceTarget): boolean {
+  const sources = everyContentSource(target);
+  return sources.length > 0 && sources.every(isCollectibleSourceRemoved);
+}
+
+// Leaves out nodes removed this run.
 export function contentSources(target: SourceTarget): CollectibleSource[] {
+  return everyContentSource(target).filter(
+    (source) => !isCollectibleSourceRemoved(source),
+  );
+}
+
+function everyContentSource(target: SourceTarget): CollectibleSource[] {
   const towns = getEntriesByType<TownContent>('town');
   const encounters = [
     ...getEntriesByType<EncounterContent>('encounter'),

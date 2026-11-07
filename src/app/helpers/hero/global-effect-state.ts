@@ -16,9 +16,25 @@ import {
   type GlobalEffectSums,
   type StatBlock,
   type TradeskillContent,
+  type WorldNodeType,
 } from '@interfaces';
 import { isEqual } from 'es-toolkit';
 import { round } from 'es-toolkit/compat';
+
+const WORLD_NODE_TYPE_LABELS: Record<WorldNodeType, string> = {
+  Kingdom: 'Duchies',
+  NonPlayerKingdom: 'Towns',
+  CaravanNode: 'Caravans',
+  ExploreNode: 'Encounters',
+  ExploreRandomNode: 'Mystical locations',
+  GatherNode: 'Gather nodes',
+  Shrine: 'Shrines',
+  Outpost: 'Outposts',
+  Trainer: 'Trainers',
+  ExchangeNode: 'Exchanges',
+  TeleportNode: 'Teleports',
+  CollectibleGate: 'Gates',
+};
 
 // Rounded so scaled fractions (0.15 * 100) don't print float noise.
 function signedNumber(value: number): string {
@@ -91,8 +107,12 @@ export function globalEffectEffectDescription(
       return 'Every hero shares one class';
     case 'GlobalJobAbilitiesStack':
       return 'Party job abilities stack';
-    case 'GlobalOutpostsDisabled':
-      return 'There are no outposts';
+    case 'GlobalWorldNodeTypeRemoved':
+      return `${WORLD_NODE_TYPE_LABELS[effect.nodeType]} are gone`;
+    case 'GlobalCommissionReputationBoost':
+      return `Commission Reputation: ${signedPercent(effect.value * 100)}`;
+    case 'GlobalTownCommissionSlotBoost':
+      return `Town Commission Slots: ${signedNumber(effect.value)}`;
     case 'GlobalShrineBuffDuration':
       return `Shrine Buff Duration: ${signedPercent(effect.value * 100)}`;
     case 'GlobalShrineBuffStrength':
@@ -223,8 +243,14 @@ function accumulateGlobalEffectEffect(
     case 'GlobalJobAbilitiesStack':
       sums.jobAbilitiesStack = true;
       return;
-    case 'GlobalOutpostsDisabled':
-      sums.outpostsDisabled = true;
+    case 'GlobalWorldNodeTypeRemoved':
+      sums.removedWorldNodeTypes[effect.nodeType] = true;
+      return;
+    case 'GlobalCommissionReputationBoost':
+      sums.commissionReputationBonus += effect.value;
+      return;
+    case 'GlobalTownCommissionSlotBoost':
+      sums.townCommissionSlotBoost += effect.value;
       return;
     case 'GlobalShrineBuffDuration':
       sums.shrineBuffDurationBonus += effect.value;

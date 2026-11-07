@@ -93,12 +93,14 @@ function slot(
 function seedSlots(
   commissionSlots: TownCommissionSlotState[] = [],
   reputationTier = 0,
+  slotBoost = 0,
 ): void {
   seedGamestate((state) => {
     state.world.towns[townId] = buildTownNodeState({
       commissionSlots,
       reputation: TOWN_REPUTATION_THRESHOLDS[reputationTier],
     });
+    state.globalEffectSums.townCommissionSlotBoost = slotBoost;
   });
 }
 
@@ -139,6 +141,17 @@ describe('townCommissionSlotCount', () => {
     counts.slice(1).forEach((count, i) => {
       expect(count).toBeGreaterThan(counts[i]);
     });
+  });
+
+  it('adds the slot boost, never dropping below one slot', () => {
+    seedSlots([], 0);
+    const base = townCommissionSlotCount(town([]));
+
+    seedSlots([], 0, 2);
+    expect(townCommissionSlotCount(town([]))).toBe(base + 2);
+
+    seedSlots([], 0, -10);
+    expect(townCommissionSlotCount(town([]))).toBe(1);
   });
 });
 

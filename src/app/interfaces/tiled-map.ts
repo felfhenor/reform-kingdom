@@ -1,3 +1,5 @@
+import type { ContentType } from '@interfaces/identifiable';
+
 export type GameMap = {
   name: string;
   data: unknown;
@@ -47,6 +49,20 @@ export const WORLD_NODE_TYPES = [
 ] as const;
 
 export type WorldNodeType = (typeof WORLD_NODE_TYPES)[number];
+
+// nodeoverride is left out on purpose: it backs Kingdom and TeleportNode alike.
+export const WORLD_NODE_TYPE_BY_CONTENT_TYPE = {
+  encounter: 'ExploreNode',
+  encounterrandom: 'ExploreRandomNode',
+  gathering: 'GatherNode',
+  caravan: 'CaravanNode',
+  shrine: 'Shrine',
+  outpost: 'Outpost',
+  trainer: 'Trainer',
+  exchangenode: 'ExchangeNode',
+  town: 'NonPlayerKingdom',
+  collectiblegate: 'CollectibleGate',
+} as const satisfies Partial<Record<ContentType, WorldNodeType>>;
 
 export type KingdomObject = TiledObject & { type: 'Kingdom' };
 export type NonPlayerKingdomObject = TiledObject & {

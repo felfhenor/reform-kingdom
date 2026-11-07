@@ -283,21 +283,23 @@ describe('encounter-backed node accessors', () => {
   });
 
   describe('isWorldNodeCollectibleGateMet', () => {
-    it('is false for an outpost while outposts are disabled, and only for outposts', () => {
-      const disableOutposts = () =>
-        seedGamestate((state) => {
-          state.globalEffectSums.outpostsDisabled = true;
-        });
-
+    it('is false for every node of a removed type, and only that type', () => {
       seedContent([
-        ensureOutpost({ id: 'outpost' as OutpostId, name: 'Forest Ruins' }),
+        ensureOutpost({ id: 'outpost' as OutpostId, name: 'Old Camp' }),
+        buildEncounter(),
       ]);
-      expect(isWorldNodeCollectibleGateMet(buildEntry())).toBe(true);
-      disableOutposts();
-      expect(isWorldNodeCollectibleGateMet(buildEntry())).toBe(false);
+      const nodes = seedWorldNodes([
+        { name: 'Old Camp', type: 'Outpost' },
+        { name: 'Forest Ruins', type: 'ExploreNode' },
+      ]);
 
-      seedContent([buildEncounter()]);
-      expect(isWorldNodeCollectibleGateMet(buildEntry())).toBe(true);
+      expect(isWorldNodeCollectibleGateMet(nodes['Old Camp'])).toBe(true);
+
+      seedGamestate((state) => {
+        state.globalEffectSums.removedWorldNodeTypes.Outpost = true;
+      });
+      expect(isWorldNodeCollectibleGateMet(nodes['Old Camp'])).toBe(false);
+      expect(isWorldNodeCollectibleGateMet(nodes['Forest Ruins'])).toBe(true);
     });
 
     it('is vacuously true for a node with no gate', () => {

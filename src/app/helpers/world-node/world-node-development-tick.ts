@@ -8,11 +8,11 @@ import { timerTicksElapsed } from '@helpers/engine/timer';
 import { updateGamestate } from '@helpers/state-game';
 import { taskEventShrineLevel } from '@helpers/task/task-events';
 import {
-  WORLD_NODE_DEVELOPMENT_ANALYTICS_SEGMENTS,
   WORLD_NODE_DEVELOPMENT_SLICES,
   worldNodeDevelopmentsDue,
 } from '@helpers/world-node/world-node-development-state';
 import type { WorldNodeDevelopmentDue } from '@interfaces';
+import { WORLD_NODE_TYPE_BY_CONTENT_TYPE } from '@interfaces';
 
 function worldNodeDevelopmentCompleteText(
   { content, level }: WorldNodeDevelopmentDue,
@@ -35,7 +35,7 @@ function worldNodeDevelopmentAnnounce(due: WorldNodeDevelopmentDue): void {
   }
 
   analyticsSendDesignEvent(
-    `World:${WORLD_NODE_DEVELOPMENT_ANALYTICS_SEGMENTS[content.__type]}:LevelUpComplete:${analyticsSafeSegment(nodeName)}`,
+    `World:${WORLD_NODE_TYPE_BY_CONTENT_TYPE[content.__type]}:LevelUpComplete:${analyticsSafeSegment(nodeName)}`,
   );
 }
 

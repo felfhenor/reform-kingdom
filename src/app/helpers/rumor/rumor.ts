@@ -7,6 +7,8 @@ import { characterAllTeachingIds } from '@helpers/trainer/trainer-teaching';
 import { isWorldMapVisited } from '@helpers/world-node/world-map-discovery';
 import { isWorldNodeDiscovered } from '@helpers/world-node/world-node-discovery';
 import {
+  isWorldNodeNameRemoved,
+  isWorldNodeTypeRemoved,
   isWorldNodeVisible,
   worldNodeByName,
 } from '@helpers/world-node/world-nodes';
@@ -28,8 +30,12 @@ export function rumorSprite(): string | undefined {
 export function isRumorSubjectFound(subject: RumorSubject): boolean {
   switch (subject.kind) {
     case 'Node': {
+      // A node removed this run can't be found, so its rumor is spent like a missing one.
       const entry = worldNodeByName(subject.nodeName);
-      return entry ? isWorldNodeVisible(entry) : false;
+      return entry
+        ? isWorldNodeVisible(entry) ||
+            isWorldNodeTypeRemoved(entry.nodeData.type)
+        : false;
     }
     case 'Collectible':
       return isCollectibleDiscovered(subject.collectibleId);
@@ -72,10 +78,16 @@ export function rumorTraders(rumorId: RumorId): CaravanTraderContent[] {
   );
 }
 
+// A rumor about a node removed this run isn't on offer.
 export function rumorsSold(): RumorContent[] {
-  return getEntriesByType<RumorContent>('rumor').filter(
-    (rumor) => !!rumorNodeName(rumor) && rumorTraders(rumor.id).length > 0,
-  );
+  return getEntriesByType<RumorContent>('rumor').filter((rumor) => {
+    const nodeName = rumorNodeName(rumor);
+    return (
+      !!nodeName &&
+      !isWorldNodeNameRemoved(nodeName) &&
+      rumorTraders(rumor.id).length > 0
+    );
+  });
 }
 
 // Inferred from the reveal ledger, so a node found by clicking first also counts.
