@@ -5,8 +5,6 @@ import {
 import { allEquipmentItemTypes } from '@helpers/item/equipment-types';
 import { rngUuid } from '@helpers/rng';
 import type {
-  GameStateRunStats,
-  HeroRunStats,
   AutoModeState,
   CombatStatBlock,
   ElementBlock,
@@ -14,9 +12,11 @@ import type {
   EquipmentItemType,
   GameId,
   GameState,
+  GameStateRunStats,
   GameStateTradeskills,
   GatheringState,
   GlobalEffectSums,
+  HeroRunStats,
   LootFilterSettings,
   MonsterType,
   StatBlock,
@@ -49,8 +49,8 @@ export function defaultGameState(): GameState {
       party: [],
       currentLocation: {
         mapName: 'Carrina',
-        x: 26,
-        y: 24,
+        x: 29,
+        y: 27,
       },
       travel: defaultTravelState(),
       gathering: defaultGatheringState(),
