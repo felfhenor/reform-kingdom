@@ -304,6 +304,20 @@ describe('charactersReclass (batch)', () => {
     expect(events).toEqual([]);
     expect(taskEventLevelReached).not.toHaveBeenCalled();
   });
+
+  it('changes nothing while reclassing is disabled', async () => {
+    seedGamestate((state) => {
+      state.world.party = [hero('Jala')];
+      applyMaterialDelta(state, goldId, 100_000);
+      state.globalEffectSums.reclassDisabled = true;
+    });
+
+    await charactersReclass([
+      { characterId: 'Jala' as CharacterId, jobId: warriorId },
+    ]);
+
+    expect(reclassed().jobId).toBe(explorerId);
+  });
 });
 
 describe('auto-optimizing the new loadout', () => {

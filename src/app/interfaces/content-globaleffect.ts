@@ -177,6 +177,17 @@ export type GlobalEffectEffectCraftedExtraAffixes = {
   value: number;
 };
 
+// Heroes earn `value` extra skill points (floored) per job level past 1; nodes over budget are pruned on load, so keep sources permanent.
+export type GlobalEffectEffectSkillPointsPerLevel = {
+  effectType: 'GlobalSkillPointsPerLevel';
+  value: number;
+};
+
+// Heroes can't change class.
+export type GlobalEffectEffectReclassDisabled = {
+  effectType: 'GlobalReclassDisabled';
+};
+
 // Every material a kingdom recipe needs changes by `value` (whole units), never below 1.
 export type GlobalEffectEffectRecipeMaterialBoost = {
   effectType: 'GlobalRecipeMaterialBoost';
@@ -204,6 +215,8 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectDropExtraAffixes
   | GlobalEffectEffectCraftedExtraAffixes
   | GlobalEffectEffectRecipeMaterialBoost
+  | GlobalEffectEffectSkillPointsPerLevel
+  | GlobalEffectEffectReclassDisabled
   | GlobalEffectEffectDebuffResistance
   | GlobalEffectEffectDebuffResistanceTag
   | GlobalEffectEffectCombatItemDropRateBoost

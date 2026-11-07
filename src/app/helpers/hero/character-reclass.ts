@@ -148,6 +148,8 @@ function reclassCharactersInState(
   state: GameState,
   picks: CharacterReclassPick[],
 ): CharacterReclassPick[] {
+  if (state.globalEffectSums.reclassDisabled) return [];
+
   const started = picks.filter((pick) =>
     reclassCharacterStart(state, pick.characterId, pick.jobId),
   );

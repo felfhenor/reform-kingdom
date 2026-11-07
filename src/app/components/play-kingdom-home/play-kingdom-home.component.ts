@@ -38,6 +38,7 @@ import {
   getMuseumRecipeEntries,
 } from '@helpers/kingdom/museum.ui';
 import {
+  globalEffectSumsState,
   materialsState,
   workersState,
   worldHomeNodeNameState,
@@ -85,6 +86,7 @@ import { clamp, sortBy } from 'es-toolkit/compat';
 })
 export class PlayKingdomHomeComponent {
   public isAtKingdomCurrently = computed(() => isPlayerAtKingdom());
+  public canReclass = computed(() => !globalEffectSumsState().reclassDisabled);
 
   public materialCount = computed(() => Object.keys(materialsState()).length);
 

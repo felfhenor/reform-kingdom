@@ -1,20 +1,19 @@
-import {
-  SKILL_TREE_MAX_COLUMN_LEVEL,
-  SKILL_TREE_SP_LEVEL_INTERVAL,
-  SKILL_TREE_STARTING_SP,
-} from '@helpers/config';
+import { SKILL_TREE_MAX_COLUMN_LEVEL } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { characterJobLevel } from '@helpers/hero/job';
 import {
   characterSkillTreeSeeded,
   characterSkillTreeStale,
+  skillTreeBaseSp,
   skillTreeIsOath,
   skillTreeIsSpecOption,
   skillTreeJobNodes,
+  skillTreeLevelsGained,
   skillTreeNodeLevel,
   skillTreeOptionOath,
 } from '@helpers/hero/skill-tree-content';
 import { skillTreeNodeKind } from '@helpers/hero/skill-tree-node';
+import { globalEffectSumsState } from '@helpers/state-game';
 import type {
   Character,
   JobContent,
@@ -23,13 +22,13 @@ import type {
   SkillTreeNodeContent,
   SkillTreeNodeId,
 } from '@interfaces';
-import { clamp, partition, sortBy, takeWhile, uniq } from 'es-toolkit/compat';
+import { partition, sortBy, takeWhile, uniq } from 'es-toolkit/compat';
 
+// Migration reads the save's own sums here, where a pre-bonus save has no key.
 export function skillTreeEarnedSp(level: number): number {
-  const counted = clamp(level, 1, SKILL_TREE_MAX_COLUMN_LEVEL);
+  const bonus = globalEffectSumsState().skillPointsPerLevel ?? 0;
   return (
-    SKILL_TREE_STARTING_SP +
-    Math.floor((counted - 1) / SKILL_TREE_SP_LEVEL_INTERVAL)
+    skillTreeBaseSp(level) + Math.floor(skillTreeLevelsGained(level) * bonus)
   );
 }
 

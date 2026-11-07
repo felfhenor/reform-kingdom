@@ -62,10 +62,15 @@
 
 - id: d105fead-7d45-45d1-ac4c-11ccb1ca6634
   name: Edict of True Devotion
+  enabled: true
   sprite: '0019'
-  description: Reclassing is gone. Job abilities rank up faster, and heroes earn bonus skill points.
+  description: Reclassing is gone. Heroes earn 1 extra skill point every 2 levels.
   kind: Variant
   fragments: 0
+  effects:
+    - effectType: GlobalReclassDisabled
+    - effectType: GlobalSkillPointsPerLevel
+      value: 0.5
 
 - id: bfc84b5e-c4fd-4fb0-8f6c-e4287aa66d15
   name: Edict of the Rising Tide
@@ -88,7 +93,7 @@
       value: -0.75
 
 - id: c03e5ab7-1e05-4e4d-a128-be17f5e58b2d
-  name: Edict of True Scarcity
+  name: Edict of Artificial Scarcity
   enabled: true
   sprite: '0009'
   description: Recipes need 1 more of every material. Crafted gear always rolls one extra affix.

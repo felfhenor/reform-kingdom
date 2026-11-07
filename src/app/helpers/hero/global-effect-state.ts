@@ -79,6 +79,12 @@ export function globalEffectEffectDescription(
       return `Crafted Gear Affixes: +${effect.value}`;
     case 'GlobalRecipeMaterialBoost':
       return `Recipe Materials: ${signedNumber(effect.value)} each`;
+    case 'GlobalSkillPointsPerLevel':
+      return Math.abs(effect.value) >= 1
+        ? `Skill Points: ${signedNumber(effect.value)} per level`
+        : `Skill Points: ${signedNumber(Math.sign(effect.value))} every ${Math.round(1 / Math.abs(effect.value))} levels`;
+    case 'GlobalReclassDisabled':
+      return 'Heroes cannot reclass';
     case 'EnemyExtraSkills':
       return `Enemy Skills: +${effect.value} from the region`;
     case 'GlobalLevelStatMultiplier':
@@ -186,6 +192,12 @@ function accumulateGlobalEffectEffect(
       return;
     case 'GlobalRecipeMaterialBoost':
       sums.recipeMaterialBoost += effect.value;
+      return;
+    case 'GlobalSkillPointsPerLevel':
+      sums.skillPointsPerLevel += effect.value;
+      return;
+    case 'GlobalReclassDisabled':
+      sums.reclassDisabled = true;
       return;
     case 'DebuffResistance':
       sums.debuffResistanceFlat += effect.value;

@@ -352,22 +352,24 @@
             </button>
           }
 
-          <app-slot-button-container
-            [disabled]="!isAtKingdomCurrently()"
-            [helpText]="'Reclass heroes. This must be done at the Duchy.'"
-          >
-            <button
-              class="btn btn-neutral btn-sm"
+          @if (canReclass()) {
+            <app-slot-button-container
               [disabled]="!isAtKingdomCurrently()"
-              (click)="openReclassModal()"
-              appSfx="ui-click"
-              [sfxOffset]="1"
-              [sfxTrigger]="['click', 'hover']"
+              [helpText]="'Reclass heroes. This must be done at the Duchy.'"
             >
-              <app-icon-kingdom name="reclass" class="zoom-inline" />
-              Reclass Heroes
-            </button>
-          </app-slot-button-container>
+              <button
+                class="btn btn-neutral btn-sm"
+                [disabled]="!isAtKingdomCurrently()"
+                (click)="openReclassModal()"
+                appSfx="ui-click"
+                [sfxOffset]="1"
+                [sfxTrigger]="['click', 'hover']"
+              >
+                <app-icon-kingdom name="reclass" class="zoom-inline" />
+                Reclass Heroes
+              </button>
+            </app-slot-button-container>
+          }
 
           @if (!isKingdomHome()) {
             <app-slot-button-container

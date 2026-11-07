@@ -28,6 +28,8 @@ export type GlobalEffectSums = {
   dropExtraAffixes: number;
   craftedExtraAffixes: number;
   recipeMaterialBoost: number;
+  skillPointsPerLevel: number;
+  reclassDisabled: boolean;
   combatItemDropRateBoost: number;
   gatheringItemDropRateBoost: number;
   armorySizeBoost: number;

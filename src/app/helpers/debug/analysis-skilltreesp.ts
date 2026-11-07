@@ -2,7 +2,6 @@
 
 import { SKILL_TREE_MAX_COLUMN_LEVEL } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
-import { skillTreeEarnedSp } from '@helpers/hero/skill-tree';
 import {
   skillTreeIsOath,
   skillTreeIsSpecOption,
@@ -11,6 +10,7 @@ import {
   skillTreeNodeLevel,
   skillTreeNodeShortName,
   skillTreeOptionOath,
+  skillTreeBaseSp,
 } from '@helpers/hero/skill-tree-content';
 import { skillTreeNodeKind } from '@helpers/hero/skill-tree-node';
 import type {
@@ -150,7 +150,7 @@ function jobNodeTable(job: JobContent): AnalysisTable {
 
 export function runSkillTreeSpAnalysis(): AnalysisRunResult {
   const jobs = sortBy(getEntriesByType<JobContent>('job'), 'name');
-  const earnedSp = skillTreeEarnedSp(SKILL_TREE_MAX_COLUMN_LEVEL);
+  const earnedSp = skillTreeBaseSp(SKILL_TREE_MAX_COLUMN_LEVEL);
   const builds = buildSpTable(jobs, earnedSp);
 
   return {

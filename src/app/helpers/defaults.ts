@@ -267,6 +267,8 @@ export function defaultGlobalEffectSums(): GlobalEffectSums {
     dropExtraAffixes: 0,
     craftedExtraAffixes: 0,
     recipeMaterialBoost: 0,
+    skillPointsPerLevel: 0,
+    reclassDisabled: false,
     combatItemDropRateBoost: 0,
     gatheringItemDropRateBoost: 0,
     armorySizeBoost: 0,

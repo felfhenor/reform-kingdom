@@ -1,9 +1,11 @@
 import {
   SKILL_TREE_COLUMN_INTERVAL,
   SKILL_TREE_MAX_COLUMN_LEVEL,
+  SKILL_TREE_SP_LEVEL_INTERVAL,
+  SKILL_TREE_STARTING_SP,
 } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
-import { sortBy } from 'es-toolkit/compat';
+import { clamp, sortBy } from 'es-toolkit/compat';
 import type {
   Character,
   JobContent,
@@ -13,6 +15,18 @@ import type {
   SkillTreeNodeId,
   SkillTreeSkillGrant,
 } from '@interfaces';
+
+export function skillTreeLevelsGained(level: number): number {
+  return clamp(level, 1, SKILL_TREE_MAX_COLUMN_LEVEL) - 1;
+}
+
+// Content-only budget, before any run effects.
+export function skillTreeBaseSp(level: number): number {
+  return (
+    SKILL_TREE_STARTING_SP +
+    Math.floor(skillTreeLevelsGained(level) / SKILL_TREE_SP_LEVEL_INTERVAL)
+  );
+}
 
 export function skillTreeJobNodes(jobId: JobId): SkillTreeNodeContent[] {
   return getEntriesByType<SkillTreeNodeContent>('skilltreenode').filter(

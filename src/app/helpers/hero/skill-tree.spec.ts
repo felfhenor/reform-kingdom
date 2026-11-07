@@ -24,6 +24,7 @@ import type {
 } from '@interfaces';
 import { buildCharacter } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 import { buildRegalia } from '@/testing/regalia';
 
 const jobId = 'tree-job' as JobId;
@@ -98,6 +99,17 @@ describe('skillTreeEarnedSp', () => {
     expect(skillTreeEarnedSp(3)).toBe(3);
     expect(skillTreeEarnedSp(50)).toBe(26);
     expect(skillTreeEarnedSp(99)).toBe(26);
+  });
+
+  it('adds the per-level bonus for every level past 1, rounded down', () => {
+    seedGamestate((state) => {
+      state.globalEffectSums.skillPointsPerLevel = 0.5;
+    });
+
+    expect(skillTreeEarnedSp(1)).toBe(2);
+    expect(skillTreeEarnedSp(2)).toBe(2);
+    expect(skillTreeEarnedSp(3)).toBe(4);
+    expect(skillTreeEarnedSp(50)).toBe(50);
   });
 });
 
@@ -256,6 +268,17 @@ describe('skillTreePrune', () => {
     expect(
       skillTreePrune(jobId, ids('strike', 'aura', 'strike2', 'left'), 3),
     ).toEqual(ids('strike', 'aura'));
+  });
+
+  it('counts the per-level SP bonus in the budget', () => {
+    seedTree([...tree, node('extra1'), node('extra2')]);
+    const learned = ids('strike', 'aura', 'extra1', 'extra2');
+    expect(skillTreePrune(jobId, learned, 3)).toHaveLength(3);
+
+    seedGamestate((state) => {
+      state.globalEffectSums.skillPointsPerLevel = 0.5;
+    });
+    expect(skillTreePrune(jobId, learned, 3)).toHaveLength(4);
   });
 });
 

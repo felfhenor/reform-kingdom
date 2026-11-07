@@ -25,6 +25,7 @@ import type {
   GlobalEffectEffectDropExtraAffixes,
   GlobalEffectEffectCraftedExtraAffixes,
   GlobalEffectEffectRecipeMaterialBoost,
+  GlobalEffectEffectSkillPointsPerLevel,
   GlobalEffectEffectWipeEndsRun,
   GlobalEffectEffectTradeskillQueueSizeBoost,
   GlobalEffectEffectXPGainMultiplier,
@@ -47,6 +48,7 @@ export function ensureGlobalEffectEffect(
     Partial<GlobalEffectEffectDropExtraAffixes> &
     Partial<GlobalEffectEffectCraftedExtraAffixes> &
     Partial<GlobalEffectEffectRecipeMaterialBoost> &
+    Partial<GlobalEffectEffectSkillPointsPerLevel> &
     Partial<GlobalEffectEffectWipeEndsRun> &
     Partial<GlobalEffectEffectGoldGainMultiplier> &
     Partial<GlobalEffectEffectDebuffResistance> &
@@ -139,6 +141,10 @@ export function ensureGlobalEffectEffect(
     return { effectType: 'GlobalCursedDrops' };
   }
 
+  if (effect.effectType === 'GlobalReclassDisabled') {
+    return { effectType: 'GlobalReclassDisabled' };
+  }
+
   if (effect.effectType === 'GlobalTownShopNoEquipment') {
     return { effectType: 'GlobalTownShopNoEquipment' };
   }
@@ -151,7 +157,8 @@ export function ensureGlobalEffectEffect(
     effect.effectType === 'EnemyExtraSkills' ||
     effect.effectType === 'GlobalDropExtraAffixes' ||
     effect.effectType === 'GlobalCraftedExtraAffixes' ||
-    effect.effectType === 'GlobalRecipeMaterialBoost'
+    effect.effectType === 'GlobalRecipeMaterialBoost' ||
+    effect.effectType === 'GlobalSkillPointsPerLevel'
   ) {
     return { effectType: effect.effectType, value: effect.value ?? 0 };
   }
