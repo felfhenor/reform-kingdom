@@ -163,3 +163,13 @@
   startingItems:
     - itemId: Duskhall Flux
       quantity: 8
+
+- id: 90ce65bb-e56f-46e2-b911-0beb9a6ba485
+  name: Edict of Impeccable Foresight
+  enabled: true
+  sprite: '0031'
+  description: Every game feature is revealed at level 1, rather than over time.
+  kind: Variant
+  fragments: 0
+  effects:
+    - effectType: GlobalFeaturesRevealed

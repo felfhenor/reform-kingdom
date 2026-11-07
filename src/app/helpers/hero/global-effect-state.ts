@@ -89,6 +89,8 @@ export function globalEffectEffectDescription(
       return `Worker Gather Speed: ${signedPercent(effect.value)}`;
     case 'GlobalTownShopNoEquipment':
       return 'Town shops sell no equipment';
+    case 'GlobalFeaturesRevealed':
+      return 'Every feature is revealed from the start';
     case 'GlobalCursedDrops':
       return 'Dropped gear is cursed';
     case 'GlobalDropExtraAffixes':
@@ -226,6 +228,9 @@ function accumulateGlobalEffectEffect(
       return;
     case 'GlobalTownShopNoEquipment':
       sums.townShopNoEquipment = true;
+      return;
+    case 'GlobalFeaturesRevealed':
+      sums.featuresRevealed = true;
       return;
     case 'GlobalCursedDrops':
       sums.cursedDrops = true;

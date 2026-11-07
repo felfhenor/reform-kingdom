@@ -160,6 +160,11 @@ export type GlobalEffectEffectTownShopNoEquipment = {
   effectType: 'GlobalTownShopNoEquipment';
 };
 
+// Level-gated UI shows from the start instead of waiting on party level.
+export type GlobalEffectEffectFeaturesRevealed = {
+  effectType: 'GlobalFeaturesRevealed';
+};
+
 // Combat-dropped gear rolls one curse affix on top of its normal affixes.
 export type GlobalEffectEffectCursedDrops = {
   effectType: 'GlobalCursedDrops';
@@ -276,6 +281,7 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectWorkerCraftSpeedPercent
   | GlobalEffectEffectWorkerGatherSpeedPercent
   | GlobalEffectEffectTownShopNoEquipment
+  | GlobalEffectEffectFeaturesRevealed
   | GlobalEffectEffectCursedDrops
   | GlobalEffectEffectDropExtraAffixes
   | GlobalEffectEffectCraftedExtraAffixes

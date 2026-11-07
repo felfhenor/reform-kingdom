@@ -175,6 +175,10 @@ export function ensureGlobalEffectEffect(
     return { effectType: 'GlobalTownShopNoEquipment' };
   }
 
+  if (effect.effectType === 'GlobalFeaturesRevealed') {
+    return { effectType: 'GlobalFeaturesRevealed' };
+  }
+
   if (effect.effectType === 'GlobalWipeEndsRun') {
     return { effectType: 'GlobalWipeEndsRun' };
   }

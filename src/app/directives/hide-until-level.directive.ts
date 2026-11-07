@@ -1,6 +1,7 @@
 import { computed, Directive, input } from '@angular/core';
 import { hostBinding } from 'ngxtension/host-binding';
 import { partyMaxLevel } from '@helpers/item/gathering';
+import { globalEffectSumsState } from '@helpers/state-game';
 
 @Directive({
   selector: '[appHideUntilLevel]',
@@ -10,6 +11,10 @@ export class HideUntilLevelDirective {
 
   public hidden = hostBinding(
     'class.hidden',
-    computed(() => partyMaxLevel() < this.appHideUntilLevel()),
+    computed(
+      () =>
+        !globalEffectSumsState().featuresRevealed &&
+        partyMaxLevel() < this.appHideUntilLevel(),
+    ),
   );
 }

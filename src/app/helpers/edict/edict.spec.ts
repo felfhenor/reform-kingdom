@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { EDICT_SCORE_MULTIPLIER_FLOOR } from '@helpers/config';
 import { ensureEdict } from '@helpers/content/ensure-edict';
 import { ensureItem } from '@helpers/content/ensure-item';
 import {
@@ -154,7 +155,7 @@ describe('edict scoring', () => {
   });
 
   it('never drops the multiplier below its floor', () => {
-    expect(edictScoreMultiplier(-50)).toBe(0.25);
+    expect(edictScoreMultiplier(-50)).toBe(EDICT_SCORE_MULTIPLIER_FLOOR);
   });
 });
 
