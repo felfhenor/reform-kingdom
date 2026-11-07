@@ -2,7 +2,7 @@ import { computed } from '@angular/core';
 import { getEntry } from '@helpers/content/content';
 import { characterNonGearEffects } from '@helpers/hero/hero-effect';
 import { affixEffectsOfKind } from '@helpers/item/affix';
-import { worldPartyState } from '@helpers/state-game';
+import { globalEffectSumsState, worldPartyState } from '@helpers/state-game';
 import type {
   Character,
   GameStat,
@@ -124,19 +124,35 @@ const partyJobAbilityEntries = computed(() => {
   return byType;
 });
 
+function partyJobAbilityValue(
+  rule: JobAbilityRule,
+  entries: JobAbilityPartyEntry[],
+  stacks: boolean,
+): number {
+  // Summed types floor once at the end, so two 1.5s make 3 rather than 2.
+  if (rule.stacking === 'Sum') return Math.floor(sumBy(entries, 'amount'));
+  // Level offsets are negative, so summing them would shrink the party's reach.
+  if (!stacks || rule.amount === 'LevelOffset') {
+    return Math.max(...entries.map((entry) => entry.amount));
+  }
+
+  return sumBy(entries, 'amount');
+}
+
 const partyJobAbilityValues = computed(() => {
   const entriesByType = partyJobAbilityEntries();
+  const stacks = globalEffectSumsState().jobAbilitiesStack;
   const values: Partial<Record<JobAbilityType, number>> = {};
 
   (Object.keys(entriesByType) as JobAbilityType[]).forEach((type) => {
     const entries = entriesByType[type] ?? [];
     if (entries.length === 0) return;
 
-    // Summed types floor once at the end, so two 1.5s make 3 rather than 2.
-    values[type] =
-      JOB_ABILITY_RULES[type].stacking === 'Sum'
-        ? Math.floor(sumBy(entries, (entry) => entry.amount))
-        : Math.max(...entries.map((entry) => entry.amount));
+    values[type] = partyJobAbilityValue(
+      JOB_ABILITY_RULES[type],
+      entries,
+      stacks,
+    );
   });
 
   return values;
@@ -157,10 +173,12 @@ export function jobAbilityEntries(
   }));
 }
 
-// The single best contributor and their computed amount, for log lines that name the hero.
+// The best contributor, named in log lines, with the party's value for `type`.
 export function jobAbilityHighest(
   type: JobAbilityType,
 ): { character: Character; amount: number } | undefined {
   const best = maxBy(partyJobAbilityEntries()[type] ?? [], 'amount');
-  return best ? { character: best.character, amount: best.amount } : undefined;
+  return best
+    ? { character: best.character, amount: jobAbilityValue(type) }
+    : undefined;
 }

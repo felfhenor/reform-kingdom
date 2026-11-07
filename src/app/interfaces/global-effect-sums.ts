@@ -30,6 +30,8 @@ export type GlobalEffectSums = {
   recipeMaterialBoost: number;
   skillPointsPerLevel: number;
   reclassDisabled: boolean;
+  partySharesClass: boolean;
+  jobAbilitiesStack: boolean;
   combatItemDropRateBoost: number;
   gatheringItemDropRateBoost: number;
   armorySizeBoost: number;

@@ -48,7 +48,8 @@ import {
 } from '@helpers/engine/discord';
 import { gameReset, gameStart } from '@helpers/game-init';
 import { titleCrawlQueue } from '@helpers/lore/title-crawl.ui';
-import { getUnlockedJobs } from '@helpers/hero/job';
+import { globalEffectSumsOf } from '@helpers/hero/global-effect-state';
+import { getUnlockedJobs, jobIdsShared } from '@helpers/hero/job';
 import { createCharacter, setParty } from '@helpers/hero/party';
 import { rngChoiceIdentifiable } from '@helpers/rng';
 import { isSetup } from '@helpers/setup';
@@ -166,6 +167,18 @@ export class GameSetupWorldComponent implements OnInit {
     edictScoreMultiplier(this.fragmentTotal()),
   );
 
+  private partySharesClass = computed(
+    () =>
+      globalEffectSumsOf(
+        this.pickedEdicts().flatMap((edict) => edict.effects ?? []),
+      ).partySharesClass,
+  );
+  public partyBreaksSharedClass = computed(
+    () =>
+      this.partySharesClass() &&
+      !jobIdsShared(this.heroesModel().map((hero) => hero.jobId)),
+  );
+
   public partyForm = form(this.heroesModel, (heroes) => {
     applyEach(heroes, heroPickSchema);
   });
@@ -240,18 +253,21 @@ export class GameSetupWorldComponent implements OnInit {
     if (jobs.length === 0) return;
 
     const names = sampleSize(STARTING_HERO_NAMES, PARTY_SIZE_MAX);
+    const sharedJob = rngChoiceIdentifiable(jobs);
 
     this.heroesModel.update((heroes) =>
       heroes.map((hero, i) => ({
         ...hero,
         name: names[i],
-        jobId: (rngChoiceIdentifiable(jobs) ?? hero.jobId) as JobId,
+        jobId: ((this.partySharesClass()
+          ? sharedJob
+          : rngChoiceIdentifiable(jobs)) ?? hero.jobId) as JobId,
       })),
     );
   }
 
   public async createWorld() {
-    if (this.partyForm().invalid()) return;
+    if (this.partyForm().invalid() || this.partyBreaksSharedClass()) return;
 
     // Starting a game without answering the consent prompt counts as declining it.
     setOption('analyticsOptInDismissed', true);

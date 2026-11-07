@@ -188,6 +188,16 @@ export type GlobalEffectEffectReclassDisabled = {
   effectType: 'GlobalReclassDisabled';
 };
 
+// Every hero must have the same job; reclassing moves the whole party at once.
+export type GlobalEffectEffectPartySharesClass = {
+  effectType: 'GlobalPartySharesClass';
+};
+
+// Party job abilities that normally keep only the best hero's value add up instead.
+export type GlobalEffectEffectJobAbilitiesStack = {
+  effectType: 'GlobalJobAbilitiesStack';
+};
+
 // Every material a kingdom recipe needs changes by `value` (whole units), never below 1.
 export type GlobalEffectEffectRecipeMaterialBoost = {
   effectType: 'GlobalRecipeMaterialBoost';
@@ -217,6 +227,8 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectRecipeMaterialBoost
   | GlobalEffectEffectSkillPointsPerLevel
   | GlobalEffectEffectReclassDisabled
+  | GlobalEffectEffectPartySharesClass
+  | GlobalEffectEffectJobAbilitiesStack
   | GlobalEffectEffectDebuffResistance
   | GlobalEffectEffectDebuffResistanceTag
   | GlobalEffectEffectCombatItemDropRateBoost

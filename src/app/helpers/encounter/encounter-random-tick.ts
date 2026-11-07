@@ -1,3 +1,4 @@
+import { ENCOUNTER_RESET_REDUCTION_MAX } from '@helpers/config';
 import { encounterRandomResetTime } from '@helpers/encounter/encounter-random';
 import { generateEncounterRandomFights } from '@helpers/encounter/encounter-random-generate';
 import { timerTicksElapsed } from '@helpers/engine/timer';
@@ -11,6 +12,7 @@ import {
   worldNodeEncounterRandom,
   worldNodesOfType,
 } from '@helpers/world-node/world-nodes';
+import { clamp } from 'es-toolkit/compat';
 import type {
   EncounterRandomContent,
   EncounterRandomNodeState,
@@ -33,7 +35,13 @@ function regenerateEncounterRandomNode(
 ): void {
   // EncounterResetReduction only counts if present right now, at the reset - it fixes the length of the cycle that starts here.
   const resetTime = Math.round(
-    content.resetTime * (1 - jobAbilityValue('EncounterResetReduction')),
+    content.resetTime *
+      (1 -
+        clamp(
+          jobAbilityValue('EncounterResetReduction'),
+          0,
+          ENCOUNTER_RESET_REDUCTION_MAX,
+        )),
   );
 
   updateGamestate((state) => {

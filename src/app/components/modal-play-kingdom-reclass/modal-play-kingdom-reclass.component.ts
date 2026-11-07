@@ -25,12 +25,20 @@ import {
   characterReclassCost,
   charactersReclass,
 } from '@helpers/hero/character-reclass';
-import { characterJobLevel, getUnlockedJobs } from '@helpers/hero/job';
+import {
+  characterJobLevel,
+  getUnlockedJobs,
+  jobIdsShared,
+} from '@helpers/hero/job';
 import {
   characterCurrentRegalia,
   regaliaMatchesCharacter,
 } from '@helpers/hero/regalia';
-import { regaliasState, worldPartyState } from '@helpers/state-game';
+import {
+  globalEffectSumsState,
+  regaliasState,
+  worldPartyState,
+} from '@helpers/state-game';
 import { goldCoinId, hasGold } from '@helpers/item/materials';
 import type {
   Character,
@@ -125,6 +133,12 @@ export class ModalPlayKingdomReclassComponent {
   );
 
   public canAffordReclass = computed(() => hasGold(this.totalReclassCost()));
+
+  public breaksSharedClass = computed(
+    () =>
+      globalEffectSumsState().partySharesClass &&
+      !jobIdsShared(this.picksModel().map((pick) => pick.jobId)),
+  );
 
   constructor() {
     // Reseed the pickers from the live party each time the modal is opened.

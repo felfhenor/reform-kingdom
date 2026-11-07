@@ -28,6 +28,10 @@ export function getUnlockedJobs(): JobContent[] {
   return getEntriesByType<JobContent>('job');
 }
 
+export function jobIdsShared(jobIds: JobId[]): boolean {
+  return uniq(jobIds).length <= 1;
+}
+
 // Level the hero would resume a job at: their current level if it's the active job, else their saved progress, else 1 for a job never held.
 export function characterJobLevel(
   character: Pick<Character, 'jobId' | 'level' | 'jobProgress'>,

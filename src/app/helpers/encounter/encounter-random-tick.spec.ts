@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { ENCOUNTER_RESET_REDUCTION_MAX } from '@helpers/config';
+
 vi.mock('@helpers/encounter/encounter-random-generate');
 
 import { ensureEncounterRandom } from '@helpers/content/ensure-encounternode';
@@ -115,6 +117,18 @@ describe('encounterRandomProcessTick', () => {
       tick();
 
       expect(shrineState()?.resetTime).toBe(75);
+    });
+
+    it('caps a stacked reduction so the cycle never collapses', () => {
+      seedShrine(undefined, (state) => {
+        state.world.party = [magician, magician, magician, magician];
+        state.globalEffectSums.jobAbilitiesStack = true;
+      });
+      tick();
+
+      expect(shrineState()?.resetTime).toBe(
+        shrine.resetTime * (1 - ENCOUNTER_RESET_REDUCTION_MAX),
+      );
     });
 
     it('keeps the shortened cycle after the Magician leaves mid-cycle', () => {

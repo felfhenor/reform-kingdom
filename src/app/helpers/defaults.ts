@@ -269,6 +269,8 @@ export function defaultGlobalEffectSums(): GlobalEffectSums {
     recipeMaterialBoost: 0,
     skillPointsPerLevel: 0,
     reclassDisabled: false,
+    partySharesClass: false,
+    jobAbilitiesStack: false,
     combatItemDropRateBoost: 0,
     gatheringItemDropRateBoost: 0,
     armorySizeBoost: 0,

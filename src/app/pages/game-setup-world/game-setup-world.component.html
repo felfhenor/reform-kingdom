@@ -71,6 +71,17 @@
         </div>
       </div>
 
+      @if (partyBreaksSharedClass()) {
+        <div
+          role="alert"
+          class="alert alert-warning shrink-0"
+          (animate.enter)="onFadeEnter($event)"
+          (animate.leave)="onFadeLeave($event)"
+        >
+          Your edicts require every hero to share one class.
+        </div>
+      }
+
       @if (showFirstRunWarning()) {
         <div
           role="alert"
@@ -147,7 +158,7 @@
 
       <button
         class="btn btn-primary"
-        [disabled]="partyForm().invalid()"
+        [disabled]="partyForm().invalid() || partyBreaksSharedClass()"
         (click)="createWorld()"
         appSfx="ui-click"
         [sfxTrigger]="['click', 'hover']"

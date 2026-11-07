@@ -1,9 +1,13 @@
 - id: 707f8b70-d85f-48de-b579-41591a7b7326
   name: Edict of Reflective Mirrors
+  enabled: true
   sprite: '0027'
-  description: Every hero must share one class. That job's abilities stack instead of only the highest counting.
+  description: Every hero must share one class, and reclassing must change the whole party. Most party job abilities will stack together.
   kind: Variant
   fragments: 0
+  effects:
+    - effectType: GlobalPartySharesClass
+    - effectType: GlobalJobAbilitiesStack
 
 - id: e86047ab-7f77-4711-b50a-07d0cff1d65b
   name: Edict of Nomadic Departure

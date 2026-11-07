@@ -57,6 +57,10 @@
   </div>
 
   <div actions class="flex gap-4 items-center">
+    @if (breaksSharedClass()) {
+      <div class="badge badge-warning">Every hero must share one class.</div>
+    }
+
     @if (hasChanges()) {
       <div class="flex items-center justify-end gap-2 text-sm">
         <span>Cost:</span>
@@ -66,7 +70,7 @@
 
     <button
       class="btn btn-primary"
-      [disabled]="!hasChanges() || !canAffordReclass()"
+      [disabled]="!hasChanges() || !canAffordReclass() || breaksSharedClass()"
       (click)="$event.shiftKey || reclassAllSwal.fire()"
       (click.shift)="applyReclassAll()"
       appSfx="ui-click"

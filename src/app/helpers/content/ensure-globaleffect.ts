@@ -141,8 +141,12 @@ export function ensureGlobalEffectEffect(
     return { effectType: 'GlobalCursedDrops' };
   }
 
-  if (effect.effectType === 'GlobalReclassDisabled') {
-    return { effectType: 'GlobalReclassDisabled' };
+  if (
+    effect.effectType === 'GlobalReclassDisabled' ||
+    effect.effectType === 'GlobalPartySharesClass' ||
+    effect.effectType === 'GlobalJobAbilitiesStack'
+  ) {
+    return { effectType: effect.effectType };
   }
 
   if (effect.effectType === 'GlobalTownShopNoEquipment') {

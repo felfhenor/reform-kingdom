@@ -30,9 +30,10 @@ const warrior = abilityJobContent('Warrior', [
 const plain = abilityJobContent('Plain', []);
 const onPathId = 'OnPathTravelSpeed-id' as JobAbilityId;
 
-function seedParty(party: Character[]): void {
+function seedParty(party: Character[], stack = false): void {
   seedGamestate((state) => {
     state.world.party = party;
+    state.globalEffectSums.jobAbilitiesStack = stack;
   });
 }
 
@@ -187,6 +188,28 @@ describe('jobAbilityValue', () => {
   });
 });
 
+describe('jobAbilityValue with stacking', () => {
+  it('adds up best-only abilities across the party', () => {
+    seedContent(warrior);
+    seedParty(
+      [buildAbilityHero('Warrior', 10), buildAbilityHero('Warrior', 25)],
+      true,
+    );
+
+    expect(jobAbilityValue('OnPathTravelSpeed')).toBeCloseTo(0.3);
+  });
+
+  it('keeps Intimidation best-only, since its offsets are negative', () => {
+    seedContent(warrior);
+    seedParty(
+      [buildAbilityHero('Warrior', 20), buildAbilityHero('Warrior', 30)],
+      true,
+    );
+
+    expect(jobAbilityValue('Intimidation')).toBe(18);
+  });
+});
+
 describe('jobAbilityEntries', () => {
   it('lists every hero with the ability at their own rank', () => {
     seedContent([...warrior, ...plain]);
@@ -217,6 +240,17 @@ describe('jobAbilityHighest', () => {
       character: expect.objectContaining({ name: 'High' }),
       amount: 18,
     });
+  });
+
+  it('reports the stacked party value under the best hero', () => {
+    seedContent(warrior);
+    const low = buildAbilityHero('Warrior', 10, {}, { name: 'Low' });
+    const high = buildAbilityHero('Warrior', 25, {}, { name: 'High' });
+    seedParty([low, high], true);
+
+    const best = jobAbilityHighest('OnPathTravelSpeed');
+    expect(best?.character.name).toBe('High');
+    expect(best?.amount).toBeCloseTo(0.3);
   });
 
   it('is undefined when nobody has the ability', () => {

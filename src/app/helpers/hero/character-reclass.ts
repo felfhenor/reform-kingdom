@@ -5,7 +5,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { characterJobLevel } from '@helpers/hero/job';
+import { characterJobLevel, jobIdsShared } from '@helpers/hero/job';
 import { characterSkillTreeSeeded } from '@helpers/hero/skill-tree-content';
 import { characterStats, characterXpForLevel } from '@helpers/hero/party';
 import { characterCurrentRegalia } from '@helpers/hero/regalia';
@@ -34,7 +34,7 @@ import type {
 import { EquipmentTypeToSlot } from '@interfaces';
 import { partyMaxLevel } from '@helpers/item/gathering';
 import { taskEventLevelReached } from '@helpers/task/task-events';
-import { partition } from 'es-toolkit/compat';
+import { partition, sumBy } from 'es-toolkit/compat';
 
 // Priced by the level the hero lands on, not the one they're leaving - reclassing back into a high-level job costs more than reclassing out of one.
 export function characterReclassCost(
@@ -143,12 +143,39 @@ function reclassCharacterFinish(
   Object.assign(character, { stats, hp: stats.Health, ep: stats.Energy });
 }
 
+// A shared-class party reclasses together, so every pick must be affordable up front or none would land.
+function reclassKeepsSharedClass(
+  state: GameState,
+  picks: CharacterReclassPick[],
+): boolean {
+  const pickFor = (character: Character) =>
+    picks.find((pick) => pick.characterId === character.id);
+  const cost = sumBy(state.world.party, (character) => {
+    const pick = pickFor(character);
+    return pick ? characterReclassCost(character, pick.jobId) : 0;
+  });
+
+  return (
+    jobIdsShared(
+      state.world.party.map(
+        (character) => pickFor(character)?.jobId ?? character.jobId,
+      ),
+    ) && (state.materials[goldCoinId()]?.quantity ?? 0) >= cost
+  );
+}
+
 // Every hero is unequipped before any loads, and regalia heroes load before the rest optimize, so batch order can't steal gear.
 function reclassCharactersInState(
   state: GameState,
   picks: CharacterReclassPick[],
 ): CharacterReclassPick[] {
   if (state.globalEffectSums.reclassDisabled) return [];
+  if (
+    state.globalEffectSums.partySharesClass &&
+    !reclassKeepsSharedClass(state, picks)
+  ) {
+    return [];
+  }
 
   const started = picks.filter((pick) =>
     reclassCharacterStart(state, pick.characterId, pick.jobId),

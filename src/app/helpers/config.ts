@@ -159,6 +159,8 @@ export const DEATHS_DOOR_SECONDS_PER_MAP = 3;
 export const DEATHS_DOOR_MINIMUM_SECONDS = 3;
 // Minimum ticks between two Intimidation auto-wins, so Intimidation can't instantly sweep a chain of weak nodes.
 export const INTIMIDATION_COOLDOWN_TICKS = 15;
+// Stacked party abilities can sum past 1, which would reset random encounters instantly.
+export const ENCOUNTER_RESET_REDUCTION_MAX = 0.75;
 // Shared by every shrine, since a prayer anywhere replaces the last shrine's buff.
 export const SHRINE_PRAYER_COOLDOWN_TICKS = 300;
 // Per home-outpost level past the build (+1), applied to both Deaths Door and Healing.

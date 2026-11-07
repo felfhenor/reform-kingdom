@@ -318,6 +318,58 @@ describe('charactersReclass (batch)', () => {
 
     expect(reclassed().jobId).toBe(explorerId);
   });
+
+  describe('with a shared class', () => {
+    const party = () => [hero('Jala'), hero('Spoorle')];
+    const bothToWarrior = [
+      { characterId: 'Jala' as CharacterId, jobId: warriorId },
+      { characterId: 'Spoorle' as CharacterId, jobId: warriorId },
+    ];
+
+    function seedShared(gold = 100_000): void {
+      seedGamestate((state) => {
+        state.world.party = party();
+        applyMaterialDelta(state, goldId, gold);
+        state.globalEffectSums.partySharesClass = true;
+      });
+    }
+
+    it('reclasses the whole party together', async () => {
+      seedShared();
+
+      await charactersReclass(bothToWarrior);
+
+      expect(worldPartyState().map((c) => c.jobId)).toEqual([
+        warriorId,
+        warriorId,
+      ]);
+    });
+
+    it('rejects a batch that would split the class', async () => {
+      seedShared();
+
+      await charactersReclass(bothToWarrior.slice(0, 1));
+
+      expect(worldPartyState().map((c) => c.jobId)).toEqual([
+        explorerId,
+        explorerId,
+      ]);
+    });
+
+    it('rejects the whole batch when only part of it is affordable', async () => {
+      seedShared(RECLASS_GOLD_PER_LEVEL);
+
+      await charactersReclass(bothToWarrior);
+
+      expect(worldPartyState().map((c) => c.jobId)).toEqual([
+        explorerId,
+        explorerId,
+      ]);
+      expect(gamestate().materials[goldId]?.quantity).toBe(
+        RECLASS_GOLD_PER_LEVEL,
+      );
+    });
+  });
 });
 
 describe('auto-optimizing the new loadout', () => {

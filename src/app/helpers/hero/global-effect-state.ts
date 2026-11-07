@@ -85,6 +85,10 @@ export function globalEffectEffectDescription(
         : `Skill Points: ${signedNumber(Math.sign(effect.value))} every ${Math.round(1 / Math.abs(effect.value))} levels`;
     case 'GlobalReclassDisabled':
       return 'Heroes cannot reclass';
+    case 'GlobalPartySharesClass':
+      return 'Every hero shares one class';
+    case 'GlobalJobAbilitiesStack':
+      return 'Party job abilities stack';
     case 'EnemyExtraSkills':
       return `Enemy Skills: +${effect.value} from the region`;
     case 'GlobalLevelStatMultiplier':
@@ -199,6 +203,12 @@ function accumulateGlobalEffectEffect(
     case 'GlobalReclassDisabled':
       sums.reclassDisabled = true;
       return;
+    case 'GlobalPartySharesClass':
+      sums.partySharesClass = true;
+      return;
+    case 'GlobalJobAbilitiesStack':
+      sums.jobAbilitiesStack = true;
+      return;
     case 'DebuffResistance':
       sums.debuffResistanceFlat += effect.value;
       return;
@@ -233,6 +243,14 @@ function accumulateGlobalEffectEffect(
   }
 }
 
+export function globalEffectSumsOf(
+  effects: GlobalEffectEffect[],
+): GlobalEffectSums {
+  const sums = defaultGlobalEffectSums();
+  effects.forEach((effect) => accumulateGlobalEffectEffect(sums, effect));
+  return sums;
+}
+
 // Totals of every timed effect, owned collectible and run edict, without writing them anywhere.
 export function globalEffectSumsFor(state: GameState): GlobalEffectSums {
   const activeEffectEntries = state.globalEffects
@@ -247,13 +265,11 @@ export function globalEffectSumsFor(state: GameState): GlobalEffectSums {
     (id) => getEntry<EdictContent>(id)?.effects ?? [],
   );
 
-  const sums = defaultGlobalEffectSums();
-  [
+  return globalEffectSumsOf([
     ...activeEffectEntries,
     ...collectibleEffectEntries,
     ...edictEffectEntries,
-  ].forEach((effect) => accumulateGlobalEffectEffect(sums, effect));
-  return sums;
+  ]);
 }
 
 export function recomputeGlobalEffectSums(state: GameState): void {
