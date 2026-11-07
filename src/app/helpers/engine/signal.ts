@@ -20,10 +20,42 @@ function localStorageDeserialize<T>(raw: string): T {
     : (JSON.parse(raw) as T);
 }
 
+// Persists a value that changes often (e.g. many times a tick) at most once per delay; pending writes flush when the page is hidden or unloaded.
+function deferredLocalStorageWriter<T>(
+  localStorageKey: string,
+  delayMs: number,
+  read: () => T,
+): () => void {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+
+  const flush = () => {
+    if (timer === undefined) return;
+    clearTimeout(timer);
+    timer = undefined;
+    localStorage.setItem(localStorageKey, localStorageSerialize(read()));
+  };
+
+  if (typeof window !== 'undefined' && window.addEventListener) {
+    window.addEventListener('pagehide', flush);
+    window.addEventListener('beforeunload', flush);
+  }
+  if (typeof document !== 'undefined' && document.addEventListener) {
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) flush();
+    });
+  }
+
+  return () => {
+    if (timer !== undefined) return;
+    timer = setTimeout(flush, delayMs);
+  };
+}
+
 export function localStorageSignal<T>(
   localStorageKey: string,
   initialValue: T,
   onLoad?: (value: T) => void,
+  options?: { persistDelayMs?: number },
 ): WritableSignal<T> {
   const storedValueRaw = localStorage.getItem(localStorageKey);
   if (storedValueRaw !== null) {
@@ -42,17 +74,31 @@ export function localStorageSignal<T>(
   }
 
   const writableSignal = signal(initialValue);
-
   const originalSet = writableSignal.set;
+
+  const persistDelayMs = options?.persistDelayMs ?? 0;
+  const schedulePersist =
+    persistDelayMs > 0
+      ? deferredLocalStorageWriter(
+          localStorageKey,
+          persistDelayMs,
+          writableSignal,
+        )
+      : undefined;
+
   writableSignal.set = (value: T) => {
+    if (schedulePersist) {
+      originalSet(value);
+      schedulePersist();
+      return;
+    }
+
     localStorage.setItem(localStorageKey, localStorageSerialize(value));
     originalSet(value);
   };
 
   writableSignal.update = (updateFn: (value: T) => T) => {
-    const value = updateFn(writableSignal());
-    localStorage.setItem(localStorageKey, localStorageSerialize(value));
-    originalSet(value);
+    writableSignal.set(updateFn(writableSignal()));
   };
 
   return writableSignal;

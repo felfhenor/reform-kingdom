@@ -1,4 +1,4 @@
-import { rngSeeded, rngSucceedsChance, rngUuid } from '@helpers/rng';
+import { rngDefault, rngSucceedsChance } from '@helpers/rng';
 import type { PRNG } from 'seedrandom';
 
 // Shared LUK curve used by every luck-driven mechanic (crit, dodge, status
@@ -6,7 +6,7 @@ import type { PRNG } from 'seedrandom';
 // to stay well under 100.
 export function luckRollSucceeds(
   luck: number,
-  rng: PRNG = rngSeeded(rngUuid()),
+  rng: PRNG = rngDefault(),
 ): boolean {
   return rngSucceedsChance(luck, rng);
 }

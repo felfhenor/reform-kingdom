@@ -22,13 +22,30 @@ export function setAllContentById(state: Map<string, IsContentItem>): void {
   _allContentById.set(new Map(state));
 }
 
+// Keyed on the map itself: content is only ever replaced wholesale, so a new map means a stale index.
+const entriesByTypeCache = new WeakMap<
+  Map<string, IsContentItem>,
+  Map<ContentType, IsContentItem[]>
+>();
+
+function entriesByTypeIndex(): Map<ContentType, IsContentItem[]> {
+  const all = allContentById();
+  let index = entriesByTypeCache.get(all);
+  if (index) return index;
+
+  index = new Map();
+  all.forEach((entry) => {
+    const list = index!.get(entry.__type);
+    if (list) list.push(entry);
+    else index!.set(entry.__type, [entry]);
+  });
+  entriesByTypeCache.set(all, index);
+  return index;
+}
+
+// Called many times per tick, so it reads an index instead of scanning all content. Copied so callers can't mutate the index.
 export function getEntriesByType<T>(type: ContentType): T[] {
-  return (
-    [...allContentById()]
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      .filter(([_, entry]) => entry.__type === type)
-      .map((e) => e[1]) as T[]
-  );
+  return [...(entriesByTypeIndex().get(type) ?? [])] as T[];
 }
 
 export function unfurlContent(

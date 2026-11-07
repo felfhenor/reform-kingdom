@@ -1,5 +1,6 @@
 import { pluralize } from '@boringnode/pluralize';
 import { recipeStylizedName } from '@helpers/crafting/recipes';
+import { COMBAT_LOG_PERSIST_DELAY_MS } from '@helpers/config';
 import { localStorageSignal } from '@helpers/engine/signal';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { rngUuid } from '@helpers/rng';
@@ -20,7 +21,12 @@ import { startCase } from 'es-toolkit';
 import { parseInline } from 'marked';
 import mustache from 'mustache';
 
-export const combatLog = localStorageSignal<CombatLog[]>('combatLog', []);
+export const combatLog = localStorageSignal<CombatLog[]>(
+  'combatLog',
+  [],
+  undefined,
+  { persistDelayMs: COMBAT_LOG_PERSIST_DELAY_MS },
+);
 
 export function resetCombatLog() {
   combatLog.set([]);

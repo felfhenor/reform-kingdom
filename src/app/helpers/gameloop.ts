@@ -4,7 +4,7 @@ import { computed } from '@angular/core';
 import { caravanProcessTick } from '@helpers/caravan/caravan-tick';
 import { combatDoCombatIteration } from '@helpers/combat/combat';
 import { commissionProcessTick } from '@helpers/commission/commission-tick';
-import { TICKS_PER_YIELD } from '@helpers/config';
+import { GAMELOOP_YIELD_BUDGET_MS, TICKS_PER_YIELD } from '@helpers/config';
 import { craftProcessTick } from '@helpers/crafting/crafting-queue';
 import { autoModeProcessTick } from '@helpers/decree/auto-mode';
 import { discordUpdateStatus } from '@helpers/engine/discord';
@@ -83,6 +83,8 @@ export async function gameloop(totalTicks: number): Promise<void> {
     const startedAt = performance.now();
     let yieldedMs = 0;
     let ticksRun = 0;
+    let ticksSinceYield = 0;
+    let sliceStartedAt = startedAt;
 
     // Tick one at a time (not one bulk +=) so tick-driven systems see an accurate timerTicksElapsed() each iteration.
     for (let i = 0; i < numTicks; i++) {
@@ -121,10 +123,18 @@ export async function gameloop(totalTicks: number): Promise<void> {
       if (isStoryScreenPending()) break;
 
       // Yield time is excluded from the slow-tick check; a backgrounded tab can stall it for a second.
-      if ((i + 1) % TICKS_PER_YIELD === 0) {
+      ticksSinceYield++;
+      const isLastTick = i === numTicks - 1;
+      if (
+        ticksSinceYield >= TICKS_PER_YIELD ||
+        (!isLastTick &&
+          performance.now() - sliceStartedAt >= GAMELOOP_YIELD_BUDGET_MS)
+      ) {
         const yieldStartedAt = performance.now();
         await schedulerYield();
-        yieldedMs += performance.now() - yieldStartedAt;
+        sliceStartedAt = performance.now();
+        yieldedMs += sliceStartedAt - yieldStartedAt;
+        ticksSinceYield = 0;
       }
     }
 

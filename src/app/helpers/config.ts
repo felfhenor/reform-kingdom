@@ -125,6 +125,10 @@ export const HIGH_RISK_LEVELS_ABOVE_PARTY = 7;
 
 // Caps how many ticks run before yielding to the browser during a long catch-up (e.g. after the tab was backgrounded), so it doesn't block the main thread for seconds at a time.
 export const TICKS_PER_YIELD = 100;
+// Also yields once a batch has held the main thread this long, so slow ticks can't stack up into a visible freeze.
+export const GAMELOOP_YIELD_BUDGET_MS = 12;
+// The adventure log is written to localStorage at most this often, not on every message - serializing 500 entries per line was a large share of tick time.
+export const COMBAT_LOG_PERSIST_DELAY_MS = 2000;
 
 export const ADVENTURE_LOG_OVERLAY_MAX_LINES = 15;
 // Ticks, not wall-clock time, so lines don't expire while the game is paused.

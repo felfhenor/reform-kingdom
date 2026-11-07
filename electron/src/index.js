@@ -79,6 +79,8 @@ const createWindow = () => {
     webPreferences: {
       nodeIntegration: true,
       autoplayPolicy: 'no-user-gesture-required',
+      // Chromium otherwise throttles timers in a minimized/occluded window, stalling the gameloop even with "Run in Background" on.
+      backgroundThrottling: false,
       preload: path.join(__dirname, 'preload.js'),
     },
   });

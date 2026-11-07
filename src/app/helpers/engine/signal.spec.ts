@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // test-setup.ts mocks this module globally; this spec tests the real one.
 vi.unmock('@helpers/engine/signal');
@@ -189,5 +189,39 @@ describe('localStorageSignal', () => {
     localStorageSignal('key', { a: 1 }).set({ a: 2 });
 
     expect(localStorageSignal('key', { a: 1 })()).toEqual({ a: 2 });
+  });
+
+  describe('with a persist delay', () => {
+    beforeEach(() => vi.useFakeTimers());
+    afterEach(() => vi.useRealTimers());
+
+    it('updates the value at once but writes only the latest value once the delay passes', () => {
+      const value = localStorageSignal('key', 0, undefined, {
+        persistDelayMs: 100,
+      });
+      vi.mocked(localStorage.setItem).mockClear();
+
+      value.set(1);
+      value.update((n) => n + 1);
+
+      expect(value()).toBe(2);
+      expect(localStorage.setItem).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(100);
+
+      expect(localStorage.setItem).toHaveBeenCalledTimes(1);
+      expect(localStorage.getItem('key')).toBe('2');
+    });
+
+    it('writes a pending value as soon as the page is hidden', () => {
+      const value = localStorageSignal('key', 0, undefined, {
+        persistDelayMs: 100,
+      });
+      value.set(5);
+
+      window.dispatchEvent(new Event('pagehide'));
+
+      expect(localStorage.getItem('key')).toBe('5');
+    });
   });
 });

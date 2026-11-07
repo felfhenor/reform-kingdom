@@ -89,7 +89,13 @@ export class GamestateService {
   // Minimizing or switching away may be the last chance to save, so don't wait for the next autosave.
   private saveWhenHidden() {
     const onVisibilityChange = () => {
-      if (!isPageVisible() && isGameStateReady()) saveGameState();
+      // Hidden-tab loop runs skip the repaint (see doGameloop), so catch the UI up the moment it can be seen again.
+      if (isPageVisible()) {
+        this.applicationRef.tick();
+        return;
+      }
+
+      if (isGameStateReady()) saveGameState();
     };
 
     document.addEventListener('visibilitychange', onVisibilityChange);
@@ -129,7 +135,9 @@ export class GamestateService {
       } finally {
         isRunning = false;
       }
-      applicationRef.tick();
+
+      // Nothing can see a hidden page, so skip the full-app change detection pass; becoming visible forces one.
+      if (isPageVisible()) applicationRef.tick();
     }
 
     void runLoop(1);

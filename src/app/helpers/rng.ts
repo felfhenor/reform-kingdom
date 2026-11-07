@@ -15,20 +15,28 @@ export function rngSeeded(seed = rngUuid()): PRNG {
   return seedrandom(seed);
 }
 
-export function rngChoice<T>(choices: T[], rng = rngSeeded(rngUuid())): T {
+// Seeding a fresh PRNG costs a uuid plus a full key schedule, which dominated combat rolls; unseeded rolls share one stream instead.
+let defaultRng: PRNG | undefined;
+
+export function rngDefault(): PRNG {
+  defaultRng ??= rngSeeded(rngUuid());
+  return defaultRng;
+}
+
+export function rngChoice<T>(choices: T[], rng = rngDefault()): T {
   return choices[Math.floor(rng() * choices.length)];
 }
 
 export function rngChoiceOther<T>(
   choices: T[],
   current: T,
-  rng = rngSeeded(rngUuid()),
+  rng = rngDefault(),
 ): T {
   const others = choices.filter((choice) => choice !== current);
   return rngChoice(others.length > 0 ? others : choices, rng);
 }
 
-export function rngShuffle<T>(choices: T[], rng = rngSeeded(rngUuid())): T[] {
+export function rngShuffle<T>(choices: T[], rng = rngDefault()): T[] {
   const baseArray = choices.slice();
 
   const shuffled = [];
@@ -44,18 +52,18 @@ export function rngShuffle<T>(choices: T[], rng = rngSeeded(rngUuid())): T[] {
 
 export function rngChoiceIdentifiable<T extends Identifiable>(
   choices: T[],
-  rng = rngSeeded(rngUuid()),
+  rng = rngDefault(),
 ): string | undefined {
   if (choices.length === 0) return undefined;
 
   return choices[Math.floor(rng() * choices.length)].id;
 }
 
-export function rngNumber(max: number, rng = rngSeeded(rngUuid())): number {
+export function rngNumber(max: number, rng = rngDefault()): number {
   return Math.floor(rng() * max);
 }
 
-export function rngUniform(rng = rngSeeded(rngUuid())): number {
+export function rngUniform(rng = rngDefault()): number {
   return rng();
 }
 
@@ -63,7 +71,7 @@ export function rngUniform(rng = rngSeeded(rngUuid())): number {
 export function rngNumberRange(
   min: number,
   max: number,
-  rng = rngSeeded(rngUuid()),
+  rng = rngDefault(),
 ): number {
   const low = Math.ceil(min);
   const high = Math.floor(max);
@@ -75,7 +83,7 @@ export function rngNumberRange(
 
 export function rngSucceedsChance(
   max: number,
-  rng = rngSeeded(rngUuid()),
+  rng = rngDefault(),
 ): boolean {
   return rng() * 100 <= max;
 }
@@ -83,7 +91,7 @@ export function rngSucceedsChance(
 export function rngChoiceWeighted<T>(
   items: T[],
   weightFn: (item: T) => number,
-  rng = rngSeeded(rngUuid()),
+  rng = rngDefault(),
 ): T | undefined {
   if (items.length === 0) return undefined;
 
