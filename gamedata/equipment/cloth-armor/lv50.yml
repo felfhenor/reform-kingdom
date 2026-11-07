@@ -35,8 +35,8 @@
     Accuracy: 10
 
 - id: 7f0104ad-0f13-45af-b4a4-7b3d44f47cad
-  name: Shroud of the Templars
-  description: A memoriam shroud, reforged by the Founder's technique against the forgetting. It remembers the templars from before they hid, when they kept the kingdom's dead.
+  name: Shroud of Lalal
+  description: A memoriam shroud, reforged by the Founder's technique against the forgetting. It remembers Lalal, the creator and inventor lost from the frost.
   levelRequirement: 58
   rarity: Mystical
   type: Cloth Armor

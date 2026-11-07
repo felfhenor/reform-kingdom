@@ -19,7 +19,7 @@
 
     - kind: Equipment
       inputEquipmentId: Frostweave Coat
-      outputEquipmentId: Shroud of the Templars
+      outputEquipmentId: Shroud of Lalal
       costs:
         - itemId: Memory Flux
           required: 2
