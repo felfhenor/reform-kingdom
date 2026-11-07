@@ -323,6 +323,9 @@ export class GamePlayWorldComponent implements OnDestroy {
   private isShowingAtLocationIndicator = false;
   // Indexed by party slot (0 = leader); persists across map transitions like other loaded textures.
   private partyTokenTexturesByIndex: Texture[][] = [];
+  // Party job ids the cached textures were built from; a mismatch triggers a reload.
+  private partyTokenJobKey: string | undefined;
+  private isReloadingPartyTextures = false;
   private isTransitioningMap = false;
   private wasPartyDead = false;
 
@@ -634,10 +637,8 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.encounterProgressBar.container,
     );
 
-    if (this.partyTokenTexturesByIndex.length === 0) {
-      this.partyTokenTexturesByIndex = await Promise.all(
-        worldPartyState().map((_, index) => this.loadPartyTokenTextures(index)),
-      );
+    if (this.partyTokenJobKey !== this.currentPartyJobKey()) {
+      await this.reloadPartyTokenTextures();
     }
 
     this.isShowingAtLocationIndicator = isPlayerAtLocation();
@@ -646,6 +647,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.visualPositionTicker = () => {
       this.checkForMapChange(worldCurrentLocationState().mapName);
       this.checkForDeathsDoorRecall();
+      this.checkForPartyJobChange();
       this.updateVisualPosition();
       // Ahead of updatePlayerIndicatorIfNeeded() so a fresh arrival's catch-up state exists the same frame the indicator-swap check reads it.
       this.advancePartyFollowerPositions();
@@ -874,6 +876,36 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.viewportTiles.heightTiles,
       this.cameraBounds,
     );
+  }
+
+  // One entry per party slot, so a class change or roster change both invalidate the cached textures.
+  private currentPartyJobKey(): string {
+    return worldPartyState()
+      .map((hero) => hero.jobId)
+      .join('|');
+  }
+
+  private async reloadPartyTokenTextures(): Promise<void> {
+    const jobKey = this.currentPartyJobKey();
+    const textures = await Promise.all(
+      worldPartyState().map((_, index) => this.loadPartyTokenTextures(index)),
+    );
+    this.partyTokenTexturesByIndex = textures;
+    this.partyTokenJobKey = jobKey;
+  }
+
+  // Polled from the Pixi ticker (like map changes) since zoneless CD isn't guaranteed to wake for state changes.
+  private checkForPartyJobChange(): void {
+    // transitionToMap() does its own reload, so leave it alone mid-transition.
+    if (this.isReloadingPartyTextures || this.isTransitioningMap) return;
+    if (this.partyTokenJobKey === this.currentPartyJobKey()) return;
+
+    this.isReloadingPartyTextures = true;
+    void this.reloadPartyTokenTextures()
+      .then(() => this.setupPlayerIndicator())
+      .finally(() => {
+        this.isReloadingPartyTextures = false;
+      });
   }
 
   private async loadPartyTokenTextures(heroIndex: number): Promise<Texture[]> {
