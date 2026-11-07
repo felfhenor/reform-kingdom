@@ -6,7 +6,7 @@ import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import { edictsState } from '@helpers/state-game';
 import type { EdictContent, EdictId, EdictKind, GameState } from '@interfaces';
-import { sortBy, sumBy, uniq } from 'es-toolkit/compat';
+import { intersection, sortBy, sumBy, uniq } from 'es-toolkit/compat';
 
 const EDICT_KIND_ORDER: EdictKind[] = [
   'PartySize',
@@ -48,9 +48,10 @@ export function edictIsBlocked(
   edict: EdictContent,
   picked: EdictContent[],
 ): boolean {
-  if (!edict.group) return false;
   return picked.some(
-    (other) => other.id !== edict.id && other.group === edict.group,
+    (other) =>
+      other.id !== edict.id &&
+      intersection(other.groups, edict.groups).length > 0,
   );
 }
 

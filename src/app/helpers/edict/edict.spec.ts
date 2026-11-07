@@ -78,8 +78,12 @@ const pickable = (
 ): EdictContent =>
   ensureEdict({ id: id as EdictId, name: id, enabled: true, ...overrides });
 
-const frailty = pickable('frailty', { kind: 'Challenge', group: 'HeroStats' });
-const strength = pickable('strength', { kind: 'Boon', group: 'HeroStats' });
+const frailty = pickable('frailty', {
+  kind: 'Challenge',
+  groups: ['HeroStats'],
+});
+const strength = pickable('strength', { kind: 'Boon', groups: ['HeroStats'] });
+const sky = pickable('sky', { kind: 'Variant', groups: ['Sky', 'Coin'] });
 const coin = pickable('coin', { kind: 'Variant' });
 const triad = pickable('triad', { kind: 'PartySize' });
 const loneWolf = pickable('lone-wolf', { kind: 'SeatBoon' });
@@ -108,6 +112,15 @@ describe('edictIsBlocked', () => {
     expect(edictIsBlocked(strength, [strength])).toBe(false);
     expect(edictIsBlocked(coin, [frailty, strength])).toBe(false);
     expect(edictIsBlocked(coin, [triad])).toBe(false);
+  });
+
+  it('blocks on any shared group, so a multi-group edict can block edicts that allow each other', () => {
+    const skyOnly = pickable('sky-only', { groups: ['Sky'] });
+    const coinOnly = pickable('coin-only', { groups: ['Coin'] });
+
+    expect(edictIsBlocked(sky, [skyOnly])).toBe(true);
+    expect(edictIsBlocked(coinOnly, [sky])).toBe(true);
+    expect(edictIsBlocked(skyOnly, [coinOnly])).toBe(false);
   });
 });
 

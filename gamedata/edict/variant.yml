@@ -11,7 +11,8 @@
 
 - id: e86047ab-7f77-4711-b50a-07d0cff1d65b
   name: Edict of Nomadic Departure
-  group: Shrines
+  groups:
+    - StarryNomadic
   enabled: true
   sprite: '0026'
   description: Outposts are permanently forgotten. Shrine buffs last 2x as long and are 50% stronger.
@@ -69,7 +70,9 @@
 
 - id: 2fddab9f-257d-418c-8137-87616780e74b
   name: Edict of the Starry Sky
-  group: Shrines
+  groups:
+    - StarryNomadic
+    - StarryEternal
   enabled: true
   sprite: '0018'
   description: Shrines are permanently forgotten. Astral projector spells last 2x as long and are 2x as strong.

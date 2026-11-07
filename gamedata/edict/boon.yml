@@ -5,7 +5,8 @@
   description: Hero stats are increased by 25%.
   kind: Boon
   fragments: -3
-  group: HeroStats
+  groups:
+    - HeroStats
   effects:
     - effectType: GainStatPercent
       value: 25
@@ -17,7 +18,8 @@
   description: Monster stats are reduced by 25%.
   kind: Boon
   fragments: -3
-  group: MonsterStats
+  groups:
+    - MonsterStats
   effects:
     - effectType: EnemyStatPercent
       value: -25
@@ -58,7 +60,8 @@
   description: XP gain is increased by 50%.
   kind: Boon
   fragments: -3
-  group: XP
+  groups:
+    - XP
   effects:
     - effectType: GlobalXPGainMultiplier
       value: 0.5
@@ -89,7 +92,8 @@
 
 - id: 7df5e003-4e99-4912-830f-66ca83aad694
   name: Edict of Eternal Blessings
-  group: Shrines
+  groups:
+    - StarryEternal
   enabled: true
   sprite: '0007'
   description: Shrine buffs never expire.

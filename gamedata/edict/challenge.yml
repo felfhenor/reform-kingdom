@@ -5,7 +5,8 @@
   description: Hero stats are reduced by 25%.
   kind: Challenge
   fragments: 3
-  group: HeroStats
+  groups:
+    - HeroStats
   effects:
     - effectType: GainStatPercent
       value: -25
@@ -20,7 +21,8 @@
   description: Monster stats are increased by 25%.
   kind: Challenge
   fragments: 3
-  group: MonsterStats
+  groups:
+    - MonsterStats
   effects:
     - effectType: EnemyStatPercent
       value: 25
@@ -57,7 +59,8 @@
   description: XP and combat gold gains are reduced by 50%.
   kind: Challenge
   fragments: 2
-  group: XP
+  groups:
+    - XP
   effects:
     - effectType: GlobalXPGainMultiplier
       value: -0.5
@@ -71,6 +74,7 @@
   description: A wipe ends the run.
   kind: Challenge
   fragments: 8
-  group: Death
+  groups:
+    - Death
   effects:
     - effectType: GlobalWipeEndsRun

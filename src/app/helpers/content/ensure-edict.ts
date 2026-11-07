@@ -16,7 +16,7 @@ export function ensureEdict(
     sprite: edict.sprite ?? '',
     kind: edict.kind ?? 'Challenge',
     fragments: edict.fragments ?? 0,
-    group: edict.group ?? '',
+    groups: edict.groups ?? [],
     enabled: edict.enabled ?? false,
     effects: ensureArray(edict.effects, ensureGlobalEffectEffect),
     startingItems: ensureArray(edict.startingItems, ensureItemQuantity),

@@ -20,8 +20,8 @@ export type EdictContent = IsContentItem &
     // Summed across a run's edicts to set its score multiplier; negative for boons.
     fragments: number;
 
-    // Edicts sharing a non-empty group can't be picked together.
-    group?: string;
+    // Edicts sharing any group can't be picked together.
+    groups?: string[];
 
     effects?: GlobalEffectEffect[];
 
