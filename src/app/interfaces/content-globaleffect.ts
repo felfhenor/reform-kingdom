@@ -204,6 +204,13 @@ export type GlobalEffectEffectWorldNodeTypeRemoved = {
   nodeType: WorldNodeType;
 };
 
+// Every developable node of `nodeType` begins the run at this level (capped at its max), stacking additively.
+export type GlobalEffectEffectWorldNodeStartingLevel = {
+  effectType: 'GlobalWorldNodeStartingLevel';
+  nodeType: WorldNodeType;
+  value: number;
+};
+
 // Fraction (1 = double) on the reputation town commissions grant, stacking additively.
 export type GlobalEffectEffectCommissionReputationBoost = {
   effectType: 'GlobalCommissionReputationBoost';
@@ -279,6 +286,7 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectPartySharesClass
   | GlobalEffectEffectJobAbilitiesStack
   | GlobalEffectEffectWorldNodeTypeRemoved
+  | GlobalEffectEffectWorldNodeStartingLevel
   | GlobalEffectEffectCommissionReputationBoost
   | GlobalEffectEffectTownCommissionSlotBoost
   | GlobalEffectEffectShrineBuffDuration

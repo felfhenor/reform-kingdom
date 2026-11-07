@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { OUTPOST_TELEPORT_LEVEL } from '@helpers/config';
 import { ensureOutpost } from '@helpers/content/ensure-outpost';
+import { ledgerMark } from '@helpers/engine/ledger';
 import { outpostCanTeleport } from '@helpers/world-node/world-node-outpost-teleport';
 import type { GameState, OutpostId, WorldNodeEntry } from '@interfaces';
 import { buildCombat } from '@/testing/builders';
@@ -17,6 +18,7 @@ let hidden: WorldNodeEntry;
 function seedTeleports(edit?: (state: GameState) => void): void {
   seedGamestate((state) => {
     state.world.currentLocation = locationOf(carrina);
+    ledgerMark(state.discoveredMaps, carrina.mapName);
     names.forEach(
       (name) => (state.outposts[name] = { level: OUTPOST_TELEPORT_LEVEL }),
     );

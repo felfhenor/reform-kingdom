@@ -44,6 +44,8 @@
   description: Start with extra gold, and caravan/town shop prices are reduced by 25%.
   kind: Boon
   fragments: -2
+  groups:
+    - TownCaravanGold
   effects:
     - effectType: GlobalShopPriceMultiplier
       value: -0.25
@@ -112,3 +114,18 @@
   effects:
     - effectType: GlobalCraftTimeMultiplier
       value: -0.5
+
+- id: 6580e020-2ee1-4629-b655-3d5da9637a0d
+  name: Edict of Storied Development
+  enabled: true
+  sprite: '0030'
+  description: Every outpost and gather node starts at +1.
+  kind: Boon
+  fragments: -4
+  effects:
+    - effectType: GlobalWorldNodeStartingLevel
+      nodeType: Outpost
+      value: 1
+    - effectType: GlobalWorldNodeStartingLevel
+      nodeType: GatherNode
+      value: 1

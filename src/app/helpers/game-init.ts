@@ -14,6 +14,7 @@ import { setupFinish } from '@helpers/setup';
 import { resetGameState, updateGamestate } from '@helpers/state-game';
 import { setOption } from '@helpers/state-options';
 import { setWorld } from '@helpers/world';
+import { worldNodeDevelopmentApplyStartingLevels } from '@helpers/world-node/world-node-development-state';
 import { worldgenGenerateWorld } from '@helpers/worldgen';
 
 export async function gameStart(): Promise<void> {
@@ -26,6 +27,7 @@ export async function gameStart(): Promise<void> {
   await updateGamestate((state) => {
     grantStartingGold(state);
     applyEdictStartingItems(state);
+    worldNodeDevelopmentApplyStartingLevels(state);
     stateMarkPartyEquipmentDiscovered(state);
     ledgerMark(state.discoveredMaps, state.world.currentLocation.mapName);
     return state;

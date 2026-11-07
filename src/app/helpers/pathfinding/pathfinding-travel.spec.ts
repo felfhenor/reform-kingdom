@@ -5,6 +5,7 @@ vi.mock('@helpers/hero/travel-cost');
 import { OUTPOST_TELEPORT_LEVEL } from '@helpers/config';
 import { ensureCollectibleGate } from '@helpers/content/ensure-collectiblegate';
 import { ensureNodeOverride } from '@helpers/content/ensure-nodeoverride';
+import { ledgerMark } from '@helpers/engine/ledger';
 import {
   travelPathTotalTicks,
   travelStepTicksCost,
@@ -472,6 +473,9 @@ describe('travelPathFrom via teleport-level outposts', () => {
     seedGamestate((state) => {
       state.outposts = Object.fromEntries(
         Object.entries(levels).map(([name, level]) => [name, { level }]),
+      );
+      ['Carrina', 'CraggledMire'].forEach((mapName) =>
+        ledgerMark(state.discoveredMaps, mapName),
       );
     });
   }

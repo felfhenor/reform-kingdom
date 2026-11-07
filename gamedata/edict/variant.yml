@@ -105,6 +105,8 @@
   description: Town shop prices are doubled. Caravan prices are reduced by 75%.
   kind: Variant
   fragments: 0
+  groups:
+    - TownCaravanGold
   effects:
     - effectType: GlobalShopPriceMultiplier
       value: 1

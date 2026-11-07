@@ -36,6 +36,8 @@ export type GlobalEffectSums = {
   jobAbilitiesStack: boolean;
   // Sparse - only removed node types have an entry.
   removedWorldNodeTypes: Partial<Record<WorldNodeType, boolean>>;
+  // Sparse - only node types with a starting level have an entry.
+  worldNodeStartingLevels: Partial<Record<WorldNodeType, number>>;
   commissionReputationBonus: number;
   townCommissionSlotBoost: number;
   shrineBuffDurationBonus: number;

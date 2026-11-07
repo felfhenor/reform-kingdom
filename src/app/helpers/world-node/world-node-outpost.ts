@@ -5,6 +5,7 @@ import {
 } from '@helpers/config';
 import { globalEffectSumsState, outpostsState } from '@helpers/state-game';
 import {
+  isWorldNodeMapVisited,
   isWorldNodeVisible,
   worldNodesOfType,
 } from '@helpers/world-node/world-nodes';
@@ -42,9 +43,13 @@ export function isOutpostTeleportUnlocked(nodeName: string): boolean {
   return worldNodeOutpostLevel(nodeName) >= OUTPOST_TELEPORT_LEVEL;
 }
 
-// Building one requires standing there, so built doubles as "visited" and keeps unexplored outposts off the list.
+// Edicts can build outposts at world start, so being built alone doesn't prove the party has been there.
 export function isOutpostTeleportListed(entry: WorldNodeEntry): boolean {
-  return isWorldNodeVisible(entry) && isOutpostBuilt(entry.nodeName);
+  return (
+    isWorldNodeVisible(entry) &&
+    isWorldNodeMapVisited(entry.nodeName) &&
+    isOutpostBuilt(entry.nodeName)
+  );
 }
 
 export function outpostsWithTeleportUnlocked(): WorldNodeEntry[] {

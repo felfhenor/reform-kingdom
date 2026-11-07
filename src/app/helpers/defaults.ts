@@ -273,6 +273,7 @@ export function defaultGlobalEffectSums(): GlobalEffectSums {
     partySharesClass: false,
     jobAbilitiesStack: false,
     removedWorldNodeTypes: {},
+    worldNodeStartingLevels: {},
     commissionReputationBonus: 0,
     townCommissionSlotBoost: 0,
     shrineBuffDurationBonus: 0,

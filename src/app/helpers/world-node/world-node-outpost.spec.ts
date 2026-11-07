@@ -6,6 +6,7 @@ import {
   OUTPOST_TELEPORT_LEVEL,
 } from '@helpers/config';
 import { ensureOutpost } from '@helpers/content/ensure-outpost';
+import { ledgerMark } from '@helpers/engine/ledger';
 import {
   deathPenaltyMultiplier,
   isOutpostBuilt,
@@ -22,8 +23,9 @@ import { seedWorldNodes } from '@/testing/world';
 
 const carrina = 'Carrina Outpost';
 
-function atLevels(levels: Record<string, number>): void {
+function atLevels(levels: Record<string, number>, visited = true): void {
   seedGamestate((state) => {
+    if (visited) ledgerMark<string>(state.discoveredMaps, 'TestMap');
     Object.entries(levels).forEach(
       ([nodeName, level]) => (state.outposts[nodeName] = { level }),
     );
@@ -105,7 +107,7 @@ describe('teleport listings', () => {
     'Hidden Outpost',
   ];
 
-  function seedOutposts(levels: Record<string, number>) {
+  function seedOutposts(levels: Record<string, number>, visited = true) {
     seedContent(
       outposts.map((name) =>
         ensureOutpost({
@@ -118,7 +120,7 @@ describe('teleport listings', () => {
     const nodes = seedWorldNodes(
       outposts.map((name) => ({ name, type: 'Outpost' })),
     );
-    atLevels(levels);
+    atLevels(levels, visited);
     return nodes;
   }
 
@@ -128,6 +130,12 @@ describe('teleport listings', () => {
     expect(isOutpostTeleportListed(nodes['Carrina Outpost'])).toBe(true);
     expect(isOutpostTeleportListed(nodes['Larsian Outpost'])).toBe(false);
     expect(isOutpostTeleportListed(nodes['Hidden Outpost'])).toBe(false);
+  });
+
+  it('skip built outposts on a map the party has never visited', () => {
+    const nodes = seedOutposts({ 'Carrina Outpost': 1 }, false);
+
+    expect(isOutpostTeleportListed(nodes['Carrina Outpost'])).toBe(false);
   });
 
   it('offer only listed outposts with the teleport unlocked', () => {

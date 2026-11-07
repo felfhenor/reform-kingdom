@@ -66,6 +66,7 @@ import {
   WORLD_NODE_DEVELOPABLE_TYPES,
   WORLD_NODE_DEVELOPMENT_SLICES,
   worldNodeDevelopable,
+  worldNodesDevelopedPastStart,
 } from '@helpers/world-node/world-node-development-state';
 import {
   worldNodeByName,
@@ -117,11 +118,12 @@ function backfillLegacyGatherNodeDiscoveries(
 
 // Pre-ledger saves: every node the party stood at, fought at, or developed proves its map was visited.
 function visitedNodeMapNames(state: GameState): string[] {
+  const sums = globalEffectSumsFor(state);
   const nodeNames = [
     ...Object.keys(state.discoveredGatherNodes),
     ...Object.keys(state.worldDiscoveries),
-    ...Object.keys(state.shrines),
-    ...Object.keys(state.outposts),
+    ...worldNodesDevelopedPastStart(state, sums, 'shrine'),
+    ...worldNodesDevelopedPastStart(state, sums, 'outpost'),
     ...Object.values(state.bestiary).flatMap((entry) => entry.foundAtNodes),
     ...(state.world.homeNodeName ? [state.world.homeNodeName] : []),
   ];

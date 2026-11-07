@@ -35,6 +35,7 @@ import type {
   TradeskillId,
   WorldNodeType,
   GlobalEffectEffectWorldNodeTypeRemoved,
+  GlobalEffectEffectWorldNodeStartingLevel,
 } from '@interfaces';
 
 export function ensureGlobalEffectEffect(
@@ -64,7 +65,8 @@ export function ensureGlobalEffectEffect(
     Partial<GlobalEffectEffectOffPathTravelSpeedBoost> &
     Partial<GlobalEffectEffectOnPathTravelSpeedBoost> &
     Partial<GlobalEffectEffectDecreeClauseCapBoost> &
-    Partial<GlobalEffectEffectWorldNodeTypeRemoved> = {},
+    Partial<GlobalEffectEffectWorldNodeTypeRemoved> &
+    Partial<GlobalEffectEffectWorldNodeStartingLevel> = {},
 ): GlobalEffectEffect {
   if (
     effect.effectType === 'GainStatPercent' ||
@@ -158,6 +160,14 @@ export function ensureGlobalEffectEffect(
     return {
       effectType: 'GlobalWorldNodeTypeRemoved',
       nodeType: effect.nodeType ?? ('UNKNOWN' as WorldNodeType),
+    };
+  }
+
+  if (effect.effectType === 'GlobalWorldNodeStartingLevel') {
+    return {
+      effectType: 'GlobalWorldNodeStartingLevel',
+      nodeType: effect.nodeType ?? ('UNKNOWN' as WorldNodeType),
+      value: effect.value ?? 0,
     };
   }
 

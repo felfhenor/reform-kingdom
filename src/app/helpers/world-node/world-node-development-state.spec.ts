@@ -1,9 +1,14 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { ensureGathering } from '@helpers/content/ensure-gathernode';
 import { ensureOutpost } from '@helpers/content/ensure-outpost';
 import { applyMaterialDelta } from '@helpers/item/materials';
-import { worldNodeDevelopmentBegin } from '@helpers/world-node/world-node-development-state';
-import type { GameState, ItemId, OutpostId } from '@interfaces';
+import {
+  worldNodeDevelopmentApplyStartingLevels,
+  worldNodeDevelopmentBegin,
+  worldNodesDevelopedPastStart,
+} from '@helpers/world-node/world-node-development-state';
+import type { GameState, GatheringId, ItemId, OutpostId } from '@interfaces';
 import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
 import { seedWorldNodes } from '@/testing/world';
@@ -65,5 +70,88 @@ describe('worldNodeDevelopmentBegin', () => {
         }),
       ),
     ).toBe(0);
+  });
+});
+
+describe('worldNodeDevelopmentApplyStartingLevels', () => {
+  const glade = ensureGathering({
+    id: 'glade' as GatheringId,
+    name: 'Wergen Woods',
+    levels: [{ costs: [], developTime: 1 }],
+  });
+
+  function seedWith(
+    edit: (sums: GameState['globalEffectSums']) => void,
+    levels: GameState['outposts'] = {},
+  ) {
+    seedContent([outpost, glade]);
+    seedWorldNodes([
+      { name: outpost.name, type: 'Outpost', x: 1 },
+      { name: glade.name, type: 'GatherNode', x: 2 },
+    ]);
+    return structuredClone(
+      seedGamestate((state) => {
+        edit(state.globalEffectSums);
+        state.outposts = levels;
+      }),
+    );
+  }
+
+  function applyWith(
+    levels: GameState['globalEffectSums']['worldNodeStartingLevels'],
+  ) {
+    const draft = seedWith((sums) => (sums.worldNodeStartingLevels = levels));
+    worldNodeDevelopmentApplyStartingLevels(draft);
+    return draft;
+  }
+
+  it('levels only the node types with a starting level', () => {
+    const draft = applyWith({ Outpost: 1 });
+
+    expect(draft.outposts[outpost.name]).toEqual({ level: 1 });
+    expect(draft.gatherNodeLevels[glade.name]).toBeUndefined();
+  });
+
+  it('caps each node at its max level', () => {
+    const draft = applyWith({ Outpost: 5, GatherNode: 5 });
+
+    expect(draft.outposts[outpost.name]).toEqual({ level: 2 });
+    expect(draft.gatherNodeLevels[glade.name]).toEqual({ level: 1 });
+  });
+
+  it('skips node types removed for the run', () => {
+    const draft = seedWith((sums) => {
+      sums.worldNodeStartingLevels = { Outpost: 1 };
+      sums.removedWorldNodeTypes = { Outpost: true };
+    });
+    worldNodeDevelopmentApplyStartingLevels(draft);
+
+    expect(draft.outposts[outpost.name]).toBeUndefined();
+  });
+
+  it('counts only development past the starting level as progress', () => {
+    const atStart = seedWith(
+      (sums) => (sums.worldNodeStartingLevels = { Outpost: 1 }),
+      { [outpost.name]: { level: 1 } },
+    );
+    const pending = seedWith(
+      (sums) => (sums.worldNodeStartingLevels = { Outpost: 1 }),
+      { [outpost.name]: { level: 1, developCompletesAtTick: 10 } },
+    );
+
+    expect(
+      worldNodesDevelopedPastStart(
+        atStart,
+        atStart.globalEffectSums,
+        'outpost',
+      ),
+    ).toEqual([]);
+    expect(
+      worldNodesDevelopedPastStart(
+        pending,
+        pending.globalEffectSums,
+        'outpost',
+      ),
+    ).toEqual([outpost.name]);
   });
 });

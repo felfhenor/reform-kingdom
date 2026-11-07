@@ -111,6 +111,8 @@ export function globalEffectEffectDescription(
       return 'Party job abilities stack';
     case 'GlobalWorldNodeTypeRemoved':
       return `${WORLD_NODE_TYPE_LABELS[effect.nodeType]} are gone`;
+    case 'GlobalWorldNodeStartingLevel':
+      return `${WORLD_NODE_TYPE_LABELS[effect.nodeType]} start at +${effect.value}`;
     case 'GlobalCommissionReputationBoost':
       return `Commission Reputation: ${signedPercent(effect.value * 100)}`;
     case 'GlobalTownCommissionSlotBoost':
@@ -254,6 +256,10 @@ function accumulateGlobalEffectEffect(
       return;
     case 'GlobalWorldNodeTypeRemoved':
       sums.removedWorldNodeTypes[effect.nodeType] = true;
+      return;
+    case 'GlobalWorldNodeStartingLevel':
+      sums.worldNodeStartingLevels[effect.nodeType] =
+        (sums.worldNodeStartingLevels[effect.nodeType] ?? 0) + effect.value;
       return;
     case 'GlobalCommissionReputationBoost':
       sums.commissionReputationBonus += effect.value;

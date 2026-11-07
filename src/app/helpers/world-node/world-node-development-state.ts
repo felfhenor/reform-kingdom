@@ -1,4 +1,5 @@
 import { formatDuration, timerTicksElapsed } from '@helpers/engine/timer';
+import { clamp } from 'es-toolkit/compat';
 import {
   gatherNodeLevelsState,
   outpostsState,
@@ -18,15 +19,18 @@ import {
   worldNodeGathering,
   worldNodeOutpost,
   worldNodeShrine,
+  worldNodesOfType,
 } from '@helpers/world-node/world-nodes';
 import type {
   GameState,
   GameStateWorldNodeDevelopmentSlice,
   GameStateWorldNodeLevel,
+  GlobalEffectSums,
   WorldNodeDevelopableContent,
   WorldNodeDevelopableType,
   WorldNodeDevelopmentDue,
 } from '@interfaces';
+import { WORLD_NODE_TYPE_BY_CONTENT_TYPE } from '@interfaces';
 
 export const WORLD_NODE_DEVELOPMENT_SLICES: Record<
   WorldNodeDevelopableType,
@@ -138,4 +142,48 @@ export function worldNodeDevelopmentsDue(
   return WORLD_NODE_DEVELOPABLE_TYPES.flatMap((type) =>
     worldNodeDevelopmentsDueOfType(type, nowTick),
   );
+}
+
+function worldNodeStartingLevel(
+  sums: GlobalEffectSums,
+  content: WorldNodeDevelopableContent,
+): number {
+  const nodeType = WORLD_NODE_TYPE_BY_CONTENT_TYPE[content.__type];
+  if (sums.removedWorldNodeTypes?.[nodeType]) return 0;
+
+  const start = sums.worldNodeStartingLevels?.[nodeType] ?? 0;
+  return clamp(start, 0, content.levels.length);
+}
+
+// Mutates `state`; only meant for a freshly created world.
+export function worldNodeDevelopmentApplyStartingLevels(
+  state: GameState,
+): void {
+  WORLD_NODE_DEVELOPABLE_TYPES.forEach((type) => {
+    worldNodesOfType(WORLD_NODE_TYPE_BY_CONTENT_TYPE[type]).forEach(
+      ({ nodeName }) => {
+        const content = worldNodeDevelopable(nodeName);
+        if (content?.__type !== type) return;
+
+        const level = worldNodeStartingLevel(state.globalEffectSums, content);
+        if (level > 0)
+          state[WORLD_NODE_DEVELOPMENT_SLICES[type]][nodeName] = { level };
+      },
+    );
+  });
+}
+
+// Starting levels are free, so only progress past them proves the party stood at the node.
+export function worldNodesDevelopedPastStart(
+  state: GameState,
+  sums: GlobalEffectSums,
+  type: WorldNodeDevelopableType,
+): string[] {
+  const levels = state[WORLD_NODE_DEVELOPMENT_SLICES[type]] ?? {};
+  return Object.keys(levels).filter((nodeName) => {
+    const { level, developCompletesAtTick } = levels[nodeName];
+    const content = worldNodeDevelopable(nodeName);
+    const start = content ? worldNodeStartingLevel(sums, content) : 0;
+    return developCompletesAtTick !== undefined || level > start;
+  });
 }
