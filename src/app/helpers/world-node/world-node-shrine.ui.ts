@@ -1,11 +1,11 @@
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
+import { ONE_YEAR_TICKS, SHRINE_PRAYER_COOLDOWN_TICKS } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { timerTicksElapsed } from '@helpers/engine/timer';
-import { ONE_YEAR_TICKS } from '@helpers/config';
 import { applyGlobalEffectAdd } from '@helpers/hero/global-effect-state';
 import { jobAbilityValue } from '@helpers/hero/job-ability';
 import { rumorWhisper } from '@helpers/rumor/rumor-whisper';
@@ -22,6 +22,7 @@ import {
 } from '@helpers/world-node/world-nodes';
 import type {
   GlobalEffectContent,
+  GlobalEffectId,
   ShrineContent,
   ShrineLevel,
 } from '@interfaces';
@@ -54,8 +55,18 @@ export async function shrinePray(nodeName: string): Promise<boolean> {
   await updateGamestate((state) => {
     if (shrinePrayerCooldownRemaining() > 0) return state;
 
+    const cooldownId = getEntry<GlobalEffectContent>(
+      'Trepidation' as GlobalEffectId,
+    )?.id;
     state.globalEffects = state.globalEffects.filter(
-      (effect) => !effect.isShrineBuff,
+      (effect) => !effect.isShrineBuff && effect.id !== cooldownId,
+    );
+    // Purely informational - the cooldown itself is enforced via prayerLastTick.
+    applyGlobalEffectAdd(
+      state,
+      'Trepidation' as GlobalEffectId,
+      SHRINE_PRAYER_COOLDOWN_TICKS,
+      currentTick,
     );
     applyGlobalEffectAdd(
       state,

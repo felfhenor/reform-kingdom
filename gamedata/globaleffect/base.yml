@@ -21,3 +21,8 @@
   description: The party is following standing orders.
 
   hideDuration: true
+
+- id: 6c71e633-8ef2-4b91-bcab-5ea7cabcae12
+  name: Trepidation
+  sprite: '0020'
+  description: The party cannot pray at shrines.
