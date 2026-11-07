@@ -30,6 +30,7 @@ import {
   findStackableEntryIndex,
 } from '@helpers/crafting/crafting-queue';
 import { craftQueueRemove } from '@helpers/crafting/crafting-queue.ui';
+import { recipeCraftTime } from '@helpers/crafting/recipe-craft-time';
 import { filterCraftRecipeEntries } from '@helpers/crafting/recipe-filter.ui';
 import {
   recipeResultContent,
@@ -94,6 +95,7 @@ export class PanelPlayKingdomTradeskillComponent {
   public tradeskill = input.required<Tradeskill>();
 
   public formatDuration = formatDuration;
+  public recipeCraftTime = recipeCraftTime;
 
   public building = computed(() => tradeskillBuilding(this.tradeskill()));
 
@@ -165,7 +167,7 @@ export class PanelPlayKingdomTradeskillComponent {
           ? recipeResultSpritesheet(recipe)
           : ('item' as const),
         remaining: recipe
-          ? formatDuration(recipe.craftTime - entry.ticksIntoCraft)
+          ? formatDuration(recipeCraftTime(recipe) - entry.ticksIntoCraft)
           : '',
       };
     });

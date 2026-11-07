@@ -1,5 +1,6 @@
 import { getEntry } from '@helpers/content/content';
 import { craftQueueTicksRemaining } from '@helpers/crafting/crafting';
+import { recipeCraftTime } from '@helpers/crafting/recipe-craft-time';
 import {
   recipeResultContent,
   recipeResultSpritesheet,
@@ -22,7 +23,7 @@ export function craftQueueTotalTicks(tradeskill: Tradeskill): number {
     const recipe = getEntry<RecipeContent>(entry.recipeId);
     if (!recipe) return 0;
 
-    return recipe.craftTime * entry.quantityTotal;
+    return recipeCraftTime(recipe) * entry.quantityTotal;
   });
 }
 

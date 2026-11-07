@@ -267,6 +267,7 @@ export function defaultGlobalEffectSums(): GlobalEffectSums {
     dropExtraAffixes: 0,
     craftedExtraAffixes: 0,
     recipeMaterialBoost: 0,
+    craftTimeMultiplierBonus: 0,
     skillPointsPerLevel: 0,
     reclassDisabled: false,
     partySharesClass: false,

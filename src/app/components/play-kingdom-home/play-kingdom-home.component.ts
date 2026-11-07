@@ -12,6 +12,7 @@ import { isCaravanDiscovered } from '@helpers/caravan/caravan';
 import { commissionCanFulfill } from '@helpers/commission/commission-fulfill';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { craftQueueTicksRemaining } from '@helpers/crafting/crafting';
+import { recipeCraftTime } from '@helpers/crafting/recipe-craft-time';
 import {
   craftQueueTotalTicks,
   craftQueueUnitsRemaining,
@@ -185,10 +186,11 @@ export class PlayKingdomHomeComponent {
             )
           : 0;
       const activePercent =
-        activeEntry && activeRecipe && activeRecipe.craftTime > 0
+        activeEntry && activeRecipe
           ? clamp(
               Math.round(
-                (activeEntry.ticksIntoCraft / activeRecipe.craftTime) * 100,
+                (activeEntry.ticksIntoCraft / recipeCraftTime(activeRecipe)) *
+                  100,
               ),
               0,
               100,

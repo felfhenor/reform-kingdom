@@ -246,6 +246,12 @@ export type GlobalEffectEffectRecipeMaterialBoost = {
   value: number;
 };
 
+// Fraction (-0.5 = half as long) on every craft's time - kingdom, workers and towns - stacking additively.
+export type GlobalEffectEffectCraftTimeMultiplier = {
+  effectType: 'GlobalCraftTimeMultiplier';
+  value: number;
+};
+
 export type GlobalEffectEffect =
   | GlobalEffectEffectGainStats
   | GlobalEffectEffectGainStatPercent
@@ -267,6 +273,7 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectDropExtraAffixes
   | GlobalEffectEffectCraftedExtraAffixes
   | GlobalEffectEffectRecipeMaterialBoost
+  | GlobalEffectEffectCraftTimeMultiplier
   | GlobalEffectEffectSkillPointsPerLevel
   | GlobalEffectEffectReclassDisabled
   | GlobalEffectEffectPartySharesClass

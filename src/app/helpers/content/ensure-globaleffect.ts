@@ -25,6 +25,7 @@ import type {
   GlobalEffectEffectDropExtraAffixes,
   GlobalEffectEffectCraftedExtraAffixes,
   GlobalEffectEffectRecipeMaterialBoost,
+  GlobalEffectEffectCraftTimeMultiplier,
   GlobalEffectEffectSkillPointsPerLevel,
   GlobalEffectEffectWipeEndsRun,
   GlobalEffectEffectTradeskillQueueSizeBoost,
@@ -50,6 +51,7 @@ export function ensureGlobalEffectEffect(
     Partial<GlobalEffectEffectDropExtraAffixes> &
     Partial<GlobalEffectEffectCraftedExtraAffixes> &
     Partial<GlobalEffectEffectRecipeMaterialBoost> &
+    Partial<GlobalEffectEffectCraftTimeMultiplier> &
     Partial<GlobalEffectEffectSkillPointsPerLevel> &
     Partial<GlobalEffectEffectWipeEndsRun> &
     Partial<GlobalEffectEffectGoldGainMultiplier> &
@@ -197,6 +199,13 @@ export function ensureGlobalEffectEffect(
   if (effect.effectType === 'GlobalDeathPenaltyMultiplier') {
     return {
       effectType: 'GlobalDeathPenaltyMultiplier',
+      value: effect.value ?? 0,
+    };
+  }
+
+  if (effect.effectType === 'GlobalCraftTimeMultiplier') {
+    return {
+      effectType: 'GlobalCraftTimeMultiplier',
       value: effect.value ?? 0,
     };
   }

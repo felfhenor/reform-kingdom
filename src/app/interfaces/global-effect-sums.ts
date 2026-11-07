@@ -29,6 +29,7 @@ export type GlobalEffectSums = {
   dropExtraAffixes: number;
   craftedExtraAffixes: number;
   recipeMaterialBoost: number;
+  craftTimeMultiplierBonus: number;
   skillPointsPerLevel: number;
   reclassDisabled: boolean;
   partySharesClass: boolean;

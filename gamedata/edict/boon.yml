@@ -83,7 +83,7 @@
   name: Edict of Swift Mending
   enabled: true
   sprite: '0006'
-  description: Deaths Door and Healing last half as long.
+  description: Deaths Door and Healing timers are reduced by 50%.
   kind: Boon
   fragments: -1
   effects:
@@ -101,3 +101,14 @@
   fragments: -2
   effects:
     - effectType: GlobalShrineBuffsPermanent
+
+- id: afeb283e-97fd-4bbb-a5e9-905e6c766304
+  name: Edict of Hasty Hammers
+  enabled: true
+  sprite: '0029'
+  description: Crafting timers are reduced by 50%.
+  kind: Boon
+  fragments: -1
+  effects:
+    - effectType: GlobalCraftTimeMultiplier
+      value: -0.5

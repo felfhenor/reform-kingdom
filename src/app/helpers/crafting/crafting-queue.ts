@@ -1,3 +1,4 @@
+import { recipeCraftTime } from '@helpers/crafting/recipe-craft-time';
 import { recipeKingdomRequirements } from '@helpers/crafting/recipe-requirements';
 import {
   categoryMessageLog,
@@ -447,12 +448,10 @@ export function craftProcessTick(): void {
     if (!tradeskillId) return;
 
     // Clamped, not just incremented - so a held craft reads exactly 0 ticks remaining instead of counting past it.
-    const ticksIntoCraft = Math.min(entry.ticksIntoCraft + 1, recipe.craftTime);
+    const craftTime = recipeCraftTime(recipe);
+    const ticksIntoCraft = Math.min(entry.ticksIntoCraft + 1, craftTime);
 
-    if (
-      ticksIntoCraft < recipe.craftTime ||
-      craftResultBlockedByArmory(recipe)
-    ) {
+    if (ticksIntoCraft < craftTime || craftResultBlockedByArmory(recipe)) {
       updateGamestate((state) => {
         const building = tradeskillBuildingIn(state, tradeskillId);
         const index = building.queue.findIndex(

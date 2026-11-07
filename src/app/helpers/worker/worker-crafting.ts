@@ -1,3 +1,4 @@
+import { recipeCraftTime } from '@helpers/crafting/recipe-craft-time';
 import { recipeKingdomRequirements } from '@helpers/crafting/recipe-requirements';
 import { runStatsRecordCraft } from '@helpers/run-stats/run-stats';
 import {
@@ -50,7 +51,7 @@ export function workerCraftTicksPerUnit(
   recipe: RecipeContent,
   craftSpeed: number,
 ): number {
-  return Math.max(1, Math.ceil(recipe.craftTime / craftSpeed));
+  return Math.max(1, Math.ceil(recipeCraftTime(recipe) / craftSpeed));
 }
 
 function recipeItemRequirements(

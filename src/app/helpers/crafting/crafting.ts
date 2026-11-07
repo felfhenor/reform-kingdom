@@ -1,3 +1,4 @@
+import { recipeCraftTime } from '@helpers/crafting/recipe-craft-time';
 import { recipeKingdomRequirements } from '@helpers/crafting/recipe-requirements';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
@@ -177,9 +178,10 @@ export function craftQueueTicksRemaining(tradeskill: Tradeskill): number {
     if (!recipe) return 0;
 
     const remainingUnits = entry.quantityTotal - entry.quantityCompleted;
-    const remainingTicksThisUnit = recipe.craftTime - entry.ticksIntoCraft;
+    const craftTime = recipeCraftTime(recipe);
+    const remainingTicksThisUnit = craftTime - entry.ticksIntoCraft;
 
-    return remainingTicksThisUnit + (remainingUnits - 1) * recipe.craftTime;
+    return remainingTicksThisUnit + (remainingUnits - 1) * craftTime;
   });
 }
 

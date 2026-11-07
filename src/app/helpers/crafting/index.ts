@@ -3,6 +3,7 @@ export * from './crafting-queue';
 export * from './crafting-queue.ui';
 export * from './crafting-reserved-equipment';
 export * from './crafting.ui';
+export * from './recipe-craft-time';
 export * from './recipe-filter.ui';
 export * from './recipe-requirements';
 export * from './recipe-result';

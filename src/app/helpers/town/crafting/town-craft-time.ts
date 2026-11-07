@@ -1,4 +1,5 @@
 import { TRADESKILL_MAX_LEVEL } from '@helpers/config';
+import { recipeCraftTime } from '@helpers/crafting/recipe-craft-time';
 import { clamp } from 'es-toolkit/compat';
 import type { RecipeContent, TownContent } from '@interfaces';
 
@@ -11,7 +12,7 @@ export function townCraftTimeFor(
 ): number {
   const effectiveLevel = clamp(level, 1, TRADESKILL_MAX_LEVEL);
   const baseTime =
-    recipe.craftTime *
+    recipeCraftTime(recipe) *
     town.crafting.craftingDurationMultiplier *
     debuffMultiplier;
 

@@ -97,6 +97,8 @@ export function globalEffectEffectDescription(
       return `Crafted Gear Affixes: +${effect.value}`;
     case 'GlobalRecipeMaterialBoost':
       return `Recipe Materials: ${signedNumber(effect.value)} each`;
+    case 'GlobalCraftTimeMultiplier':
+      return `Craft Time: ${signedPercent(effect.value * 100)}`;
     case 'GlobalSkillPointsPerLevel':
       return Math.abs(effect.value) >= 1
         ? `Skill Points: ${signedNumber(effect.value)} per level`
@@ -234,6 +236,9 @@ function accumulateGlobalEffectEffect(
       return;
     case 'GlobalRecipeMaterialBoost':
       sums.recipeMaterialBoost += effect.value;
+      return;
+    case 'GlobalCraftTimeMultiplier':
+      sums.craftTimeMultiplierBonus += effect.value;
       return;
     case 'GlobalSkillPointsPerLevel':
       sums.skillPointsPerLevel += effect.value;
