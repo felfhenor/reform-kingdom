@@ -40,6 +40,11 @@
   effects:
     - effectType: GlobalLevelStatMultiplier
       value: -1
+  startingItems:
+    - itemId: Duskhall Flux
+      quantity: 4
+    - itemId: Memory Flux
+      quantity: 4
 
 - id: fc200585-8c6b-47b2-884d-6ba53d35098b
   name: Edict of Magic Wilds

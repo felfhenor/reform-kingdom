@@ -9,6 +9,10 @@
     - effectType: GlobalPartySharesClass
     - effectType: GlobalJobAbilitiesStack
 
+  startingItems:
+    - itemId: Memory Flux
+      quantity: 4
+
 - id: e86047ab-7f77-4711-b50a-07d0cff1d65b
   name: Edict of Nomadic Departure
   groups:
@@ -67,6 +71,15 @@
     - effectType: GlobalTradeskillQueueSizeBoost
       tradeskillId: Woodworking
       value: 1
+  startingItems:
+    - itemId: Copper Ore
+      quantity: 25
+    - itemId: Flax Flower
+      quantity: 25
+    - itemId: Wergen Wood
+      quantity: 25
+    - itemId: Malachite
+      quantity: 10
 
 - id: 2fddab9f-257d-418c-8137-87616780e74b
   name: Edict of the Starry Sky
@@ -97,6 +110,9 @@
     - effectType: GlobalReclassDisabled
     - effectType: GlobalSkillPointsPerLevel
       value: 0.5
+  startingItems:
+    - itemId: Memory Flux
+      quantity: 4
 
 - id: 513d5b7a-2a6e-47e0-883a-4891d6af6c40
   name: Edict of Golden Monopoly
@@ -125,6 +141,15 @@
       value: 1
     - effectType: GlobalCraftedExtraAffixes
       value: 1
+  startingItems:
+    - itemId: Copper Ore
+      quantity: 10
+    - itemId: Flax Flower
+      quantity: 10
+    - itemId: Wergen Wood
+      quantity: 10
+    - itemId: Malachite
+      quantity: 5
 
 - id: d6631919-4f78-4b2e-973a-df63d710909b
   name: Edict of Fickle Curses
@@ -137,3 +162,6 @@
     - effectType: GlobalCursedDrops
     - effectType: GlobalDropExtraAffixes
       value: 1
+  startingItems:
+    - itemId: Duskhall Flux
+      quantity: 8
