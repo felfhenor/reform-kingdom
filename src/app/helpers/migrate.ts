@@ -5,6 +5,7 @@ import {
   craftQueueOrphanedEquipment,
   pruneInvalidCraftQueues,
 } from '@helpers/crafting/crafting';
+import { combatOrdersWithJobDefaults } from '@helpers/combat/combat-order';
 import { contentExists } from '@helpers/content/content';
 import {
   migrateTradeskillStateKeys,
@@ -153,7 +154,10 @@ export function migrateGameState() {
   newState.world.party = newState.world.party.map((character) => ({
     ...character,
     equipment: backfillEquipmentBlock(character.equipment),
-    combatOrders: character.combatOrders ?? {},
+    combatOrders: combatOrdersWithJobDefaults(
+      character.combatOrders ?? {},
+      character.jobId,
+    ),
     teachings: pruneInvalidCharacterTeachings(character.teachings),
     burstSkills: pruneInvalidBurstSkills(character.burstSkills),
     ...characterSkillTreesMigrate(character),

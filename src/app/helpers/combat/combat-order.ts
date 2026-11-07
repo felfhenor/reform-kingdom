@@ -2,6 +2,7 @@ import { getEntry } from '@helpers/content/content';
 import { rngUuid } from '@helpers/rng';
 import { worldPartyState } from '@helpers/state-game';
 import type {
+  Character,
   CharacterId,
   CombatOrderClause,
   CombatOrderClauseId,
@@ -34,6 +35,16 @@ export function combatOrdersFromJobDefaults(jobId: JobId): CombatOrderClause[] {
     condition: cloneDeep(order.condition),
     action: cloneDeep(order.action),
   }));
+}
+
+// A job never held before starts with its defaults; an existing (even emptied) list is the player's own.
+export function combatOrdersWithJobDefaults(
+  combatOrders: Character['combatOrders'],
+  jobId: JobId,
+): Character['combatOrders'] {
+  return combatOrders[jobId]
+    ? combatOrders
+    : { ...combatOrders, [jobId]: combatOrdersFromJobDefaults(jobId) };
 }
 
 // A clause casting a family the hero no longer knows; switched off rather than deleted so re-learning it is one click.

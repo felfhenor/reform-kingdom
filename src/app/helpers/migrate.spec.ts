@@ -511,14 +511,15 @@ describe('migrateGameState', () => {
     expect(migrated.tradeskills[blacksmithing.id].level).toBe(7);
   });
 
-  it('gives heroes from older saves an empty set of combat orders', () => {
+  it("gives heroes from older saves their current job's default combat orders", () => {
     const migrated = migrate((save) => {
       const hero: Partial<Character> = buildCharacter();
       delete hero.combatOrders;
       save.world.party = [hero as Character];
     });
 
-    expect(migrated.world.party[0].combatOrders).toEqual({});
+    const hero = migrated.world.party[0];
+    expect(hero.combatOrders).toEqual({ [hero.jobId]: [] });
   });
 
   it('backfills burst skills, maps legacy family names to ids, and drops non-special or unknown entries', () => {

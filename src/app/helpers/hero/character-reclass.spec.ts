@@ -242,6 +242,28 @@ describe('characterReclass', () => {
     expect(reclassed().skillTreeVersions[warriorId]).toBe(1);
   });
 
+  it("seeds a never-held job's default orders, keeping orders already set for a held job", async () => {
+    seedJobs({
+      defaultCombatOrders: [
+        { condition: { type: 'Always' }, action: { type: 'RandomSkill' } },
+      ],
+    });
+    seedWorld([
+      hero('Jala'),
+      hero('Spoorle', { combatOrders: { [warriorId]: [] } }),
+    ]);
+
+    await charactersReclass([
+      { characterId: 'Jala' as CharacterId, jobId: warriorId },
+      { characterId: 'Spoorle' as CharacterId, jobId: warriorId },
+    ]);
+
+    expect(reclassed(0).combatOrders[warriorId]).toEqual([
+      expect.objectContaining({ action: { type: 'RandomSkill' } }),
+    ]);
+    expect(reclassed(1).combatOrders[warriorId]).toEqual([]);
+  });
+
   it('leaves other party members alone', async () => {
     const spoorle = hero('Spoorle');
     seedWorld([hero('Jala'), spoorle]);

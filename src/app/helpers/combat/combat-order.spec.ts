@@ -4,6 +4,7 @@ import {
   combatOrderClauseUsesUnknownFamily,
   combatOrderClauses,
   combatOrdersFromJobDefaults,
+  combatOrdersWithJobDefaults,
 } from '@helpers/combat/combat-order';
 import { ensureJob } from '@helpers/content/ensure-job';
 import type {
@@ -65,6 +66,27 @@ describe('combatOrdersFromJobDefaults', () => {
     seedContent([]);
 
     expect(combatOrdersFromJobDefaults(ranger)).toEqual([]);
+  });
+});
+
+describe('combatOrdersWithJobDefaults', () => {
+  const order: JobDefaultCombatOrder = {
+    condition: { type: 'Always' },
+    action: { type: 'RandomSkill' },
+  };
+
+  it('seeds a job with no orders yet, leaving set (even emptied) jobs alone', () => {
+    seedContent([
+      ensureJob({ id: warrior, name: 'Warrior', defaultCombatOrders: [order] }),
+      ensureJob({ id: ranger, name: 'Ranger', defaultCombatOrders: [order] }),
+    ]);
+    const orders = { [ranger]: [] };
+
+    expect(combatOrdersWithJobDefaults(orders, warrior)).toEqual({
+      [ranger]: [],
+      [warrior]: [{ ...order, id: expect.any(String), enabled: true }],
+    });
+    expect(combatOrdersWithJobDefaults(orders, ranger)).toBe(orders);
   });
 });
 

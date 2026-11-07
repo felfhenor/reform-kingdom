@@ -1,3 +1,4 @@
+import { combatOrdersWithJobDefaults } from '@helpers/combat/combat-order';
 import { RECLASS_GOLD_PER_LEVEL } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { defaultEquipment } from '@helpers/defaults';
@@ -111,6 +112,10 @@ function reclassCharacterStart(
   const seeded = characterSkillTreeSeeded(character, jobId);
   character.skillTreeNodes[jobId] = seeded.skillTreeNodes[jobId];
   character.skillTreeVersions[jobId] = seeded.skillTreeVersions[jobId];
+  character.combatOrders = combatOrdersWithJobDefaults(
+    character.combatOrders,
+    jobId,
+  );
   return true;
 }
 
