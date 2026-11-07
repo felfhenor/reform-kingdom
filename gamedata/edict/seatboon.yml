@@ -1,20 +1,20 @@
 - id: b7025b7c-515b-4bf3-bfed-519061a650c5
   name: Deep Study
-  sprite: '0029'
+  sprite: '0028'
   description: Each hero gains 1 extra skill point per level for every empty party seat.
   kind: SeatBoon
   fragments: 0
 
 - id: 4aa9f306-d47b-4cbc-8d87-57af5c186e8d
   name: Quiet Camp
-  sprite: '0027'
+  sprite: '0026'
   description: Out-of-combat Health and Energy restore as if the party had 4 heroes.
   kind: SeatBoon
   fragments: 0
 
 - id: b636cdc4-ff65-4a5d-9c8c-d21549cd2dab
   name: Lone Wolf
-  sprite: '0028'
+  sprite: '0027'
   description: The last adventurer gets 50% more of every stat and 100% more Health.
   kind: SeatBoon
   fragments: 0

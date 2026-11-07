@@ -1,7 +1,7 @@
 - id: 707f8b70-d85f-48de-b579-41591a7b7326
   name: Edict of Reflective Mirrors
   enabled: true
-  sprite: '0021'
+  sprite: '0020'
   description: Every hero must share one job, and reclassing must change the whole party. Most party job abilities will stack together.
   kind: Variant
   fragments: 0
@@ -14,7 +14,7 @@
   groups:
     - StarryNomadic
   enabled: true
-  sprite: '0026'
+  sprite: '0025'
   description: Outposts are permanently forgotten. Shrine buffs last 2x as long and are 50% stronger.
   kind: Variant
   fragments: 0
@@ -29,7 +29,7 @@
 - id: 277dcf0b-f0a4-4ec9-9cdd-6b9b8f991f3e
   name: Edict of Exogenous Support
   enabled: true
-  sprite: '0022'
+  sprite: '0021'
   description: Exchanges are permanently forgotten. Town commissions grant 2x reputation, and towns offer 2 more commission slots.
   kind: Variant
   fragments: 0
@@ -44,7 +44,7 @@
 - id: d9f1a5fc-a65a-43ae-a5c6-e0cfe363f961
   name: Edict of the Heated Forge
   enabled: true
-  sprite: '0020'
+  sprite: '0019'
   description: Town shops no longer sell equipment. Workers craft 50% faster, and every tradeskill queue holds 1 more craft.
   kind: Variant
   fragments: 0
@@ -74,7 +74,7 @@
     - StarryNomadic
     - StarryEternal
   enabled: true
-  sprite: '0018'
+  sprite: '0017'
   description: Shrines are permanently forgotten. Astral projector spells last 2x as long and are 2x as strong.
   kind: Variant
   fragments: 0
@@ -89,7 +89,7 @@
 - id: d105fead-7d45-45d1-ac4c-11ccb1ca6634
   name: Edict of True Devotion
   enabled: true
-  sprite: '0019'
+  sprite: '0018'
   description: Reclassing is gone. Heroes earn 1 extra skill point every 2 levels.
   kind: Variant
   fragments: 0
@@ -98,17 +98,10 @@
     - effectType: GlobalSkillPointsPerLevel
       value: 0.5
 
-- id: bfc84b5e-c4fd-4fb0-8f6c-e4287aa66d15
-  name: Edict of the Rising Tide
-  sprite: '0015'
-  description: Nodes rise to meet your party, so none are ever Trivial. Drops and gathering in old regions scale up with them.
-  kind: Variant
-  fragments: 0
-
 - id: 513d5b7a-2a6e-47e0-883a-4891d6af6c40
   name: Edict of Golden Monopoly
   enabled: true
-  sprite: '0017'
+  sprite: '0016'
   description: Town shop prices are doubled. Caravan prices are reduced by 75%.
   kind: Variant
   fragments: 0

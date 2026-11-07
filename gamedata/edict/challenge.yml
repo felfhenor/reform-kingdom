@@ -55,7 +55,7 @@
 - id: dbe3fe9d-6e30-4226-9168-88695fe136d6
   name: Edict of Esurient Poverty
   enabled: true
-  sprite: '0016'
+  sprite: '0015'
   description: XP and combat gold gains are reduced by 50%.
   kind: Challenge
   fragments: 2
