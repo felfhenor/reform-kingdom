@@ -64,6 +64,18 @@
             }
           </span>
           <div class="flex gap-2">
+            @if (view.tutorial.trigger.kind === 'losing-streak') {
+              <button
+                type="button"
+                class="btn btn-xs btn-neutral"
+                (click)="ignore()"
+                appSfx="ui-error"
+                [sfxTrigger]="['click', 'hover']"
+              >
+                Ignore This
+              </button>
+            }
+
             @if (view.totalSteps !== 1) {
               <button
                 type="button"

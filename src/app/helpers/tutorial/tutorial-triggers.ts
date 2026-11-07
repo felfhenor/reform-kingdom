@@ -11,7 +11,7 @@ import {
   worldPartyState,
   worldTownsState,
 } from '@helpers/state-game';
-import type { TutorialTrigger } from '@interfaces';
+import type { GameOption, TutorialTrigger } from '@interfaces';
 import { sum } from 'es-toolkit';
 
 export function tutorialTriggerSatisfied(trigger: TutorialTrigger): boolean {
@@ -44,6 +44,14 @@ export function tutorialTriggerSatisfied(trigger: TutorialTrigger): boolean {
         recentLossCount() >= trigger.losses
       );
   }
+}
+
+export function tutorialTriggerSkipOption(
+  trigger: TutorialTrigger,
+): GameOption {
+  return trigger.kind === 'losing-streak'
+    ? 'skipLosingStreakTutorial'
+    : 'skipFeatureTutorials';
 }
 
 // Node failure counts clear on a win there or on level-up, so this is losses since the party last made progress.

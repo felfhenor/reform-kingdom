@@ -3,7 +3,10 @@ import { describe, expect, it } from 'vitest';
 import { ensureJob } from '@helpers/content/ensure-job';
 import { ensureSkill } from '@helpers/content/ensure-skill';
 import { ensureSkillTreeNode } from '@helpers/content/ensure-skilltreenode';
-import { tutorialTriggerSatisfied } from '@helpers/tutorial/tutorial-triggers';
+import {
+  tutorialTriggerSatisfied,
+  tutorialTriggerSkipOption,
+} from '@helpers/tutorial/tutorial-triggers';
 import { buildCharacter } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
@@ -103,5 +106,25 @@ describe('tutorialTriggerSatisfied first-skill-point', () => {
   it('waits while every point is spent', () => {
     seedHero(1);
     expect(tutorialTriggerSatisfied({ kind: 'first-skill-point' })).toBe(false);
+  });
+});
+
+describe('tutorialTriggerSkipOption', () => {
+  it('gives the losing streak its own option', () => {
+    expect(tutorialTriggerSkipOption(losingStreak)).toBe(
+      'skipLosingStreakTutorial',
+    );
+  });
+
+  it('groups every other trigger under feature tutorials', () => {
+    expect(tutorialTriggerSkipOption({ kind: 'party-level', level: 5 })).toBe(
+      'skipFeatureTutorials',
+    );
+    expect(tutorialTriggerSkipOption({ kind: 'first-worker' })).toBe(
+      'skipFeatureTutorials',
+    );
+    expect(tutorialTriggerSkipOption({ kind: 'game-start' })).toBe(
+      'skipFeatureTutorials',
+    );
   });
 });

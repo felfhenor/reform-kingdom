@@ -17,7 +17,9 @@ export type GameOption =
   | 'colorblindMode'
   | 'runInBackground'
   | 'muteWhenUnfocused'
-  | 'lowerFrameRateWhenUnfocused';
+  | 'lowerFrameRateWhenUnfocused'
+  | 'skipFeatureTutorials'
+  | 'skipLosingStreakTutorial';
 
 export type UiScale = 'auto' | number;
 

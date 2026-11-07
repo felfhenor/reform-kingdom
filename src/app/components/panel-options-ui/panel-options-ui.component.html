@@ -77,6 +77,58 @@
 
         <div class="form-control">
           <label class="label cursor-pointer label-option">
+            <span class="label-text">
+              Skip Feature Tutorials
+              <app-icon
+                name="gameHelp"
+                size="inline"
+                class="text-lighter ml-1"
+                [tp]="'Stops the opening tutorial and the tutorials that appear when you unlock a new feature.'"
+                [tpPlacement]="'top'"
+              />
+            </span>
+            <input
+              type="checkbox"
+              [checked]="getOption('skipFeatureTutorials')"
+              class="checkbox"
+              (click)="
+                setOption(
+                  'skipFeatureTutorials',
+                  !getOption('skipFeatureTutorials')
+                )
+              "
+            />
+          </label>
+        </div>
+
+        <div class="form-control">
+          <label class="label cursor-pointer label-option">
+            <span class="label-text">
+              Skip Struggling Reminder
+              <app-icon
+                name="gameHelp"
+                size="inline"
+                class="text-lighter ml-1"
+                [tp]="'Stops the reminder that appears after your party loses several fights in a row.'"
+                [tpPlacement]="'top'"
+              />
+            </span>
+            <input
+              type="checkbox"
+              [checked]="getOption('skipLosingStreakTutorial')"
+              class="checkbox"
+              (click)="
+                setOption(
+                  'skipLosingStreakTutorial',
+                  !getOption('skipLosingStreakTutorial')
+                )
+              "
+            />
+          </label>
+        </div>
+
+        <div class="form-control">
+          <label class="label cursor-pointer label-option">
             <span class="label-text">Adventure Log Overlay</span>
             <input
               type="checkbox"

@@ -11,7 +11,11 @@ import { stateMarkPartyEquipmentDiscovered } from '@helpers/kingdom/armory';
 import { migrateGameState } from '@helpers/migrate';
 import { savefileMarkFresh } from '@helpers/savefile/savefile-load';
 import { setupFinish } from '@helpers/setup';
-import { resetGameState, updateGamestate } from '@helpers/state-game';
+import {
+  globalEffectSumsState,
+  resetGameState,
+  updateGamestate,
+} from '@helpers/state-game';
 import { setOption } from '@helpers/state-options';
 import { setWorld } from '@helpers/world';
 import { worldNodeDevelopmentApplyStartingLevels } from '@helpers/world-node/world-node-development-state';
@@ -32,6 +36,10 @@ export async function gameStart(): Promise<void> {
     ledgerMark(state.discoveredMaps, state.world.currentLocation.mapName);
     return state;
   });
+
+  // A default, not a lock: the player can turn feature tutorials back on mid-run.
+  if (globalEffectSumsState().featuresRevealed)
+    setOption('skipFeatureTutorials', true);
 
   await setupFinish();
 }

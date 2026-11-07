@@ -11,6 +11,7 @@ import {
 import { gameloopShouldRun } from '@helpers/gameloop';
 import { regionIntroPending } from '@helpers/lore/region-intro';
 import { isStoryScreenPending } from '@helpers/lore/outro';
+import { getOption, setOption } from '@helpers/state-options';
 import {
   isGameStateReady,
   worldCurrentLocationState,
@@ -20,7 +21,10 @@ import {
   isTutorialSeen,
   tutorialMarkSeen,
 } from '@helpers/tutorial/tutorial-seen';
-import { tutorialTriggerSatisfied } from '@helpers/tutorial/tutorial-triggers';
+import {
+  tutorialTriggerSatisfied,
+  tutorialTriggerSkipOption,
+} from '@helpers/tutorial/tutorial-triggers';
 import type {
   GamePlayView,
   KingdomSubview,
@@ -41,7 +45,10 @@ const tutorialTargetRegistryVersion = signal(0);
 export function tutorialsPending(): TutorialDefinition[] {
   if (!isGameStateReady()) return [];
 
-  const unseen = TUTORIAL_CATALOG.filter((t) => !isTutorialSeen(t.id));
+  const unseen = TUTORIAL_CATALOG.filter(
+    (t) =>
+      !isTutorialSeen(t.id) && !getOption(tutorialTriggerSkipOption(t.trigger)),
+  );
   if (unseen.length === 0) return [];
 
   return unseen.filter((t) => tutorialTriggerSatisfied(t.trigger));
@@ -124,6 +131,14 @@ export async function tutorialSkip(): Promise<void> {
   const active = activeTutorial();
   if (!active) return;
   await tutorialFinish(active.tutorialId);
+}
+
+// Turns off every future showing of the active tutorial's kind, then closes it.
+export async function tutorialIgnoreActive(): Promise<void> {
+  const active = activeTutorialStepView();
+  if (!active) return;
+  setOption(tutorialTriggerSkipOption(active.tutorial.trigger), true);
+  await tutorialSkip();
 }
 
 export async function tutorialTargetClicked(key: string): Promise<void> {

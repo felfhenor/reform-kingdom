@@ -42,6 +42,9 @@ export function defaultOptions(): GameOptions {
     partyViewAlwaysExpand: true,
     craftingViewAlwaysExpand: false,
 
+    skipFeatureTutorials: false,
+    skipLosingStreakTutorial: false,
+
     adventureLogOverlay: true,
     adventureLogOverlayKinds: {
       Combat: false,

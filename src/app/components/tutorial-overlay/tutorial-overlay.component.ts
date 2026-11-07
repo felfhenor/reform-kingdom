@@ -15,6 +15,7 @@ import {
   activeTutorialStepView,
   tutorialAdvance,
   tutorialCheckAutoTrigger,
+  tutorialIgnoreActive,
   tutorialSkip,
   tutorialRestoreActiveTarget,
   tutorialTargetRect,
@@ -166,5 +167,9 @@ export class TutorialOverlayComponent {
 
   public skip(): void {
     void tutorialSkip();
+  }
+
+  public ignore(): void {
+    void tutorialIgnoreActive();
   }
 }
