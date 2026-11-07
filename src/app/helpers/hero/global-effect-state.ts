@@ -117,6 +117,10 @@ export function globalEffectEffectDescription(
       return `Shrine Buff Duration: ${signedPercent(effect.value * 100)}`;
     case 'GlobalShrineBuffStrength':
       return `Shrine Buff Strength: ${signedPercent(effect.value * 100)}`;
+    case 'GlobalAstralSpellDuration':
+      return `Astral Spell Duration: ${signedPercent(effect.value * 100)}`;
+    case 'GlobalAstralSpellStrength':
+      return `Astral Spell Strength: ${signedPercent(effect.value * 100)}`;
     case 'EnemyExtraSkills':
       return `Enemy Skills: +${effect.value} from the region`;
     case 'GlobalLevelStatMultiplier':
@@ -257,6 +261,12 @@ function accumulateGlobalEffectEffect(
       return;
     case 'GlobalShrineBuffStrength':
       sums.shrineBuffStrengthBonus += effect.value;
+      return;
+    case 'GlobalAstralSpellDuration':
+      sums.astralSpellDurationBonus += effect.value;
+      return;
+    case 'GlobalAstralSpellStrength':
+      sums.astralSpellStrengthBonus += effect.value;
       return;
     case 'DebuffResistance':
       sums.debuffResistanceFlat += effect.value;

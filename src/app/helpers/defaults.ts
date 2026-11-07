@@ -276,6 +276,8 @@ export function defaultGlobalEffectSums(): GlobalEffectSums {
     townCommissionSlotBoost: 0,
     shrineBuffDurationBonus: 0,
     shrineBuffStrengthBonus: 0,
+    astralSpellDurationBonus: 0,
+    astralSpellStrengthBonus: 0,
     combatItemDropRateBoost: 0,
     gatheringItemDropRateBoost: 0,
     armorySizeBoost: 0,

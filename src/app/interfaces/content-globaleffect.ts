@@ -228,6 +228,18 @@ export type GlobalEffectEffectShrineBuffStrength = {
   value: number;
 };
 
+// Fraction (1 = twice as long) on astral spell duration, stacking additively.
+export type GlobalEffectEffectAstralSpellDuration = {
+  effectType: 'GlobalAstralSpellDuration';
+  value: number;
+};
+
+// Fraction (1 = twice as strong) on every value of an astral spell, fixed when cast.
+export type GlobalEffectEffectAstralSpellStrength = {
+  effectType: 'GlobalAstralSpellStrength';
+  value: number;
+};
+
 // Every material a kingdom recipe needs changes by `value` (whole units), never below 1.
 export type GlobalEffectEffectRecipeMaterialBoost = {
   effectType: 'GlobalRecipeMaterialBoost';
@@ -264,6 +276,8 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectTownCommissionSlotBoost
   | GlobalEffectEffectShrineBuffDuration
   | GlobalEffectEffectShrineBuffStrength
+  | GlobalEffectEffectAstralSpellDuration
+  | GlobalEffectEffectAstralSpellStrength
   | GlobalEffectEffectDebuffResistance
   | GlobalEffectEffectDebuffResistanceTag
   | GlobalEffectEffectCombatItemDropRateBoost

@@ -8,6 +8,7 @@ import { applyMaterialDelta } from '@helpers/item/materials';
 import {
   astralProjectorDuration,
   astralProjectorProcessTick,
+  astralProjectorStrength,
   astralProjectorSpellToBeOverwritten,
   isAstralProjectorCastable,
   pruneInvalidActiveAstralProjectorSpells,
@@ -78,6 +79,24 @@ describe('astralProjectorDuration', () => {
 
     seed((state) => (state.world.party = [buildAbilityHero('Magician', 1)]));
     expect(astralProjectorDuration(lasting)).toBe(125);
+  });
+
+  it('adds a global duration bonus alongside Astral Resonance', () => {
+    const lasting = ensureAstralProjector({ ...starfall, duration: 100 });
+    seedContent([lasting]);
+
+    seed((state) => (state.globalEffectSums.astralSpellDurationBonus = 1));
+    expect(astralProjectorDuration(lasting)).toBe(200);
+  });
+});
+
+describe('astralProjectorStrength', () => {
+  it('is 1 plus the global strength bonus', () => {
+    seed();
+    expect(astralProjectorStrength()).toBe(1);
+
+    seed((state) => (state.globalEffectSums.astralSpellStrengthBonus = 1));
+    expect(astralProjectorStrength()).toBe(2);
   });
 });
 

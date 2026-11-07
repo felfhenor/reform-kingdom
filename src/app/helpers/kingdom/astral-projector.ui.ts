@@ -13,6 +13,7 @@ import {
 import {
   astralProjectorDuration,
   astralProjectorEntries,
+  astralProjectorStrength,
   astralProjectorSpellToBeOverwritten,
   isAstralProjectorCastable,
   isAstralProjectorCollectiblesMet,
@@ -65,7 +66,14 @@ export function astralProjectorCast(id: AstralProjectorId): void {
     }
 
     applyGlobalEffectRemove(state, content.globalEffectId);
-    applyGlobalEffectAdd(state, content.globalEffectId, duration, currentTick);
+    applyGlobalEffectAdd(
+      state,
+      content.globalEffectId,
+      duration,
+      currentTick,
+      false,
+      astralProjectorStrength(),
+    );
 
     const isActive = state.activeAstralProjectorSpells.some(
       (spell) => spell.astralProjectorId === id,

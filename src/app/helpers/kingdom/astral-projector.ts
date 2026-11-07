@@ -10,6 +10,7 @@ import { getMaterialQuantity } from '@helpers/item/materials';
 import {
   activeAstralProjectorSpellsState,
   gamestate,
+  globalEffectSumsState,
   updateGamestate,
 } from '@helpers/state-game';
 import type {
@@ -37,8 +38,15 @@ export function astralProjectorDuration(
   content: AstralProjectorContent,
 ): number {
   return Math.round(
-    content.duration * (1 + jobAbilityValue('AstralDurationBoost')),
+    content.duration *
+      (1 +
+        jobAbilityValue('AstralDurationBoost') +
+        globalEffectSumsState().astralSpellDurationBonus),
   );
+}
+
+export function astralProjectorStrength(): number {
+  return 1 + globalEffectSumsState().astralSpellStrengthBonus;
 }
 
 export function isAstralProjectorCastable(

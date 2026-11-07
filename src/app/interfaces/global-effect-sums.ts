@@ -39,6 +39,8 @@ export type GlobalEffectSums = {
   townCommissionSlotBoost: number;
   shrineBuffDurationBonus: number;
   shrineBuffStrengthBonus: number;
+  astralSpellDurationBonus: number;
+  astralSpellStrengthBonus: number;
   combatItemDropRateBoost: number;
   gatheringItemDropRateBoost: number;
   armorySizeBoost: number;

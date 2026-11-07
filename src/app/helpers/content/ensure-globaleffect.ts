@@ -175,6 +175,8 @@ export function ensureGlobalEffectEffect(
     effect.effectType === 'GlobalSkillPointsPerLevel' ||
     effect.effectType === 'GlobalCommissionReputationBoost' ||
     effect.effectType === 'GlobalTownCommissionSlotBoost' ||
+    effect.effectType === 'GlobalAstralSpellDuration' ||
+    effect.effectType === 'GlobalAstralSpellStrength' ||
     effect.effectType === 'GlobalShrineBuffDuration' ||
     effect.effectType === 'GlobalShrineBuffStrength'
   ) {

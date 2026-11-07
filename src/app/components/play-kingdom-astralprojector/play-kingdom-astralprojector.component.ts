@@ -15,12 +15,16 @@ import { CardPageComponent } from '@components/card-page/card-page.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
-import { globalEffectDescription } from '@helpers/hero/global-effect-state';
+import {
+  globalEffectDescription,
+  globalEffectEffectsScaled,
+} from '@helpers/hero/global-effect-state';
 import { notifySuccess } from '@helpers/engine/notify';
 import { formatDuration } from '@helpers/engine/timer';
 import {
   astralProjectorDuration,
   astralProjectorSpellToBeOverwritten,
+  astralProjectorStrength,
   isAstralProjectorCastable,
 } from '@helpers/kingdom/astral-projector';
 import {
@@ -71,7 +75,15 @@ export class PlayKingdomAstralProjectorComponent {
       return {
         content,
         effect: { rarity: content.rarity, sprite: '', ...(effect ?? {}) },
-        description: effect ? globalEffectDescription(effect) : '',
+        description: effect
+          ? globalEffectDescription({
+              description: effect.description,
+              effects: globalEffectEffectsScaled(
+                effect.effects,
+                astralProjectorStrength(),
+              ),
+            })
+          : '',
         materialEntries: astralProjectorMaterialEntries(content),
         castable: isAstralProjectorCastable(content),
         durationLabel: formatDuration(astralProjectorDuration(content)),
