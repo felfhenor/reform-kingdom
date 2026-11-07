@@ -5,6 +5,7 @@ import {
   characterJobAbilityValue,
   jobAbilityEntries,
   jobAbilityHighest,
+  jobAbilityStacks,
   jobAbilityValue,
 } from '@helpers/hero/job-ability';
 import type { Character, JobAbilityId } from '@interfaces';
@@ -207,6 +208,21 @@ describe('jobAbilityValue with stacking', () => {
     );
 
     expect(jobAbilityValue('Intimidation')).toBe(18);
+  });
+});
+
+describe('jobAbilityStacks', () => {
+  it.each([
+    ['RestoreHealthOOC', false, true],
+    ['RestoreHealthOOC', true, true],
+    ['OnPathTravelSpeed', false, false],
+    ['OnPathTravelSpeed', true, true],
+    ['Intimidation', true, false],
+    ['Ambush', true, undefined],
+  ] as const)('%s with edict stacking %s is %s', (type, stack, expected) => {
+    seedParty([], stack);
+
+    expect(jobAbilityStacks(type)).toBe(expected);
   });
 });
 

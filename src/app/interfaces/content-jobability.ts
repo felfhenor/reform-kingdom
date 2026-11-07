@@ -22,6 +22,8 @@ export type JobAbilityType =
   | 'CoverThreshold'
   | 'DebuffPotency';
 
+export type JobAbilityStacking = 'Sum' | 'Highest' | 'PerHero';
+
 export type JobAbilityContent = IsContentItem &
   HasDescription &
   HasSprite & {

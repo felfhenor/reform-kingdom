@@ -14,7 +14,10 @@ import {
   SKILL_TREE_TRACK_MIN_WIDTH,
 } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
-import { jobAbilityValueLabel } from '@helpers/hero/job-ability.ui';
+import {
+  jobAbilityDescription,
+  jobAbilityValueLabel,
+} from '@helpers/hero/job-ability.ui';
 import { affixEffectsStatsPerLevel } from '@helpers/hero/party';
 import { characterCurrentRegalia } from '@helpers/hero/regalia';
 import { skillTreeNodeModifiers } from '@helpers/hero/skill-modifier';
@@ -271,11 +274,11 @@ export function skillTreeNodeArt(
 }
 
 export function skillTreeNodeEffectText(node: SkillTreeNodeContent): string {
+  const ability = skillTreeNodeAbility(node);
   return (
     node.description ||
     skillTreeNodeSkill(node)?.description ||
-    skillTreeNodeAbility(node)?.description ||
-    ''
+    (ability ? jobAbilityDescription(ability) : '')
   );
 }
 

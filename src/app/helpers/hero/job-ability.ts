@@ -8,14 +8,16 @@ import type {
   GameStat,
   JobAbilityContent,
   JobAbilityId,
+  JobAbilityStacking,
   JobAbilityType,
 } from '@interfaces';
 import { maxBy, sumBy } from 'es-toolkit/compat';
 import { current, isDraft } from 'immer';
 
+// PerHero: each hero's own rank works alone, so there's no party value to stack.
 type JobAbilityRule =
-  | { stacking: 'Sum' | 'Highest'; amount: 'Value' | 'LevelOffset' }
-  | { stacking: 'Sum' | 'Highest'; amount: 'Stat'; stat: GameStat };
+  | { stacking: JobAbilityStacking; amount: 'Value' | 'LevelOffset' }
+  | { stacking: JobAbilityStacking; amount: 'Stat'; stat: GameStat };
 
 // The one place that knows how each ability type stacks, so no hook has to.
 const JOB_ABILITY_RULES: Record<JobAbilityType, JobAbilityRule> = {
@@ -29,13 +31,12 @@ const JOB_ABILITY_RULES: Record<JobAbilityType, JobAbilityRule> = {
   EncounterResetReduction: { stacking: 'Highest', amount: 'Value' },
   OnPathTravelSpeed: { stacking: 'Highest', amount: 'Value' },
   OffPathTravelSpeed: { stacking: 'Highest', amount: 'Value' },
-  Ambush: { stacking: 'Highest', amount: 'Value' },
+  Ambush: { stacking: 'PerHero', amount: 'Value' },
   EquipmentDropRateBoost: { stacking: 'Highest', amount: 'Value' },
   ItemDropRateBoost: { stacking: 'Highest', amount: 'Value' },
-  // Per-hero: combat reads the owner's own rank, never the party value.
-  SkillRepeatChance: { stacking: 'Highest', amount: 'Value' },
-  CoverThreshold: { stacking: 'Highest', amount: 'Value' },
-  DebuffPotency: { stacking: 'Highest', amount: 'Value' },
+  SkillRepeatChance: { stacking: 'PerHero', amount: 'Value' },
+  CoverThreshold: { stacking: 'PerHero', amount: 'Value' },
+  DebuffPotency: { stacking: 'PerHero', amount: 'Value' },
 };
 
 type JobAbilityPartyEntry = {
@@ -124,19 +125,35 @@ const partyJobAbilityEntries = computed(() => {
   return byType;
 });
 
+function jobAbilityRuleStacks(
+  rule: JobAbilityRule,
+  edictStacks: boolean,
+): boolean | undefined {
+  if (rule.stacking === 'PerHero') return undefined;
+  if (rule.stacking === 'Sum') return true;
+  // Level offsets are negative, so summing them would shrink the party's reach.
+  return edictStacks && rule.amount !== 'LevelOffset';
+}
+
+// Whether party members' ranks of `type` add up this run; undefined when each hero's rank works alone.
+export function jobAbilityStacks(type: JobAbilityType): boolean | undefined {
+  return jobAbilityRuleStacks(
+    JOB_ABILITY_RULES[type],
+    globalEffectSumsState().jobAbilitiesStack,
+  );
+}
+
 function partyJobAbilityValue(
   rule: JobAbilityRule,
   entries: JobAbilityPartyEntry[],
-  stacks: boolean,
+  edictStacks: boolean,
 ): number {
   // Summed types floor once at the end, so two 1.5s make 3 rather than 2.
   if (rule.stacking === 'Sum') return Math.floor(sumBy(entries, 'amount'));
-  // Level offsets are negative, so summing them would shrink the party's reach.
-  if (!stacks || rule.amount === 'LevelOffset') {
-    return Math.max(...entries.map((entry) => entry.amount));
-  }
 
-  return sumBy(entries, 'amount');
+  return jobAbilityRuleStacks(rule, edictStacks)
+    ? sumBy(entries, 'amount')
+    : Math.max(...entries.map((entry) => entry.amount));
 }
 
 const partyJobAbilityValues = computed(() => {

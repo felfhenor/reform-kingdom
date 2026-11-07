@@ -7,7 +7,10 @@ import {
   viewChild,
 } from '@angular/core';
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
-import { jobAbilityValueLabel } from '@helpers/hero/job-ability.ui';
+import {
+  jobAbilityDescription,
+  jobAbilityValueLabel,
+} from '@helpers/hero/job-ability.ui';
 import type { JobAbilityRow } from '@interfaces';
 
 // Headless, like app-tooltip-skill-preview: callers hand `template()` to `[tp]`.
@@ -24,4 +27,5 @@ export class TooltipJobAbilityComponent {
   public template = viewChild.required<TemplateRef<unknown>>('tooltipContent');
 
   public jobAbilityValueLabel = jobAbilityValueLabel;
+  public jobAbilityDescription = jobAbilityDescription;
 }

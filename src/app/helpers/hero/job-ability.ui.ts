@@ -1,6 +1,9 @@
 import { DEBUFF_POTENCY_PER_RANK } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
-import { characterJobAbilities } from '@helpers/hero/job-ability';
+import {
+  characterJobAbilities,
+  jobAbilityStacks,
+} from '@helpers/hero/job-ability';
 import {
   skillTreeJobNodes,
   skillTreeNodeLevel,
@@ -55,6 +58,14 @@ export function jobAbilityValueLabel(
   value: number,
 ): string {
   return JOB_ABILITY_VALUE_LABELS[ability.type]?.(value) ?? `${value}`;
+}
+
+// The stacking line follows the run's edicts, so it isn't written into the content.
+export function jobAbilityDescription(ability: JobAbilityContent): string {
+  const stacks = jobAbilityStacks(ability.type);
+  if (stacks === undefined) return ability.description;
+
+  return `${ability.description} ${stacks ? 'Stacks.' : 'Does not stack.'}`;
 }
 
 function jobAbilityRow(
