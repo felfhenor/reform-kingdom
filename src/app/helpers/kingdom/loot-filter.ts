@@ -1,10 +1,15 @@
 import { LOOT_FILTER_AUTO_SELL_PERCENT } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { ledgerMark } from '@helpers/engine/ledger';
+import { rollDropAffixIds } from '@helpers/item/affix';
 import { newEquipmentItem } from '@helpers/item/equipment';
 import { gainGold } from '@helpers/item/materials';
 import { addArmoryItems, equipmentSellValue } from '@helpers/kingdom/armory';
-import { lootFiltersState, updateGamestate } from '@helpers/state-game';
+import {
+  globalEffectSumsState,
+  lootFiltersState,
+  updateGamestate,
+} from '@helpers/state-game';
 import type {
   EquipmentContent,
   EquipmentId,
@@ -56,7 +61,13 @@ export function armoryAddLootDrop(
       return state;
     }
 
-    const item = newEquipmentItem(equipmentId);
+    const { cursedDrops, dropExtraAffixes } = globalEffectSumsState();
+    const item = newEquipmentItem(
+      equipmentId,
+      source === 'Combat'
+        ? rollDropAffixIds(content, cursedDrops, dropExtraAffixes)
+        : undefined,
+    );
 
     if (!equipmentPassesLootFilter(content, state.lootFilters, source)) {
       ledgerMark(state.discoveredEquipment, equipmentId);

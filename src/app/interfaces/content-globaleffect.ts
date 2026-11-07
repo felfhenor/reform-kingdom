@@ -160,6 +160,17 @@ export type GlobalEffectEffectTownShopNoEquipment = {
   effectType: 'GlobalTownShopNoEquipment';
 };
 
+// Combat-dropped gear rolls one curse affix on top of its normal affixes.
+export type GlobalEffectEffectCursedDrops = {
+  effectType: 'GlobalCursedDrops';
+};
+
+// Combat-dropped gear rolls `value` more normal affixes than its rarity gives.
+export type GlobalEffectEffectDropExtraAffixes = {
+  effectType: 'GlobalDropExtraAffixes';
+  value: number;
+};
+
 export type GlobalEffectEffect =
   | GlobalEffectEffectGainStats
   | GlobalEffectEffectGainStatPercent
@@ -177,6 +188,8 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectWorkerCraftSpeedPercent
   | GlobalEffectEffectWorkerGatherSpeedPercent
   | GlobalEffectEffectTownShopNoEquipment
+  | GlobalEffectEffectCursedDrops
+  | GlobalEffectEffectDropExtraAffixes
   | GlobalEffectEffectDebuffResistance
   | GlobalEffectEffectDebuffResistanceTag
   | GlobalEffectEffectCombatItemDropRateBoost

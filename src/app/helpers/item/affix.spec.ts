@@ -17,6 +17,7 @@ import {
   equipmentItemDisplayName,
   equipmentItemMiscAffixDescriptions,
   rollAffixIds,
+  rollDropAffixIds,
 } from '@helpers/item/affix';
 import { rngChoiceWeighted } from '@helpers/rng';
 import type {
@@ -92,6 +93,60 @@ function gear(
 ) {
   return ensureEquipment({ rarity, levelRequirement, type });
 }
+
+describe('rollDropAffixIds', () => {
+  const curseAffix = ensureAffix({
+    id: 'affix-curse' as AffixId,
+    name: 'Dulling',
+    levelRequirement: 1,
+    rarity: 'Common',
+    family: 'Curse',
+    position: 'Prefix',
+    effects: [{ kind: 'Stat', stat: 'Intelligence', value: -2 }],
+  });
+
+  beforeEach(() => {
+    vi.mocked(rngChoiceWeighted).mockReset();
+    seedContent([curseAffix, strengthAffix, agilityPrefixAffix]);
+  });
+
+  it('rolls a curse on top of the extra normal affixes, never a second curse', () => {
+    vi.mocked(rngChoiceWeighted)
+      .mockReturnValueOnce(curseAffix)
+      .mockReturnValueOnce(strengthAffix)
+      .mockReturnValueOnce(agilityPrefixAffix);
+
+    expect(rollDropAffixIds(gear('Uncommon', 5), true, 1)).toEqual([
+      curseAffix.id,
+      strengthAffix.id,
+      agilityPrefixAffix.id,
+    ]);
+    expect(vi.mocked(rngChoiceWeighted).mock.calls[0][0]).toEqual([curseAffix]);
+    expect(vi.mocked(rngChoiceWeighted).mock.calls[1][0]).not.toContain(
+      curseAffix,
+    );
+  });
+
+  it('still rolls the extra normal affix when no curse fits the gear', () => {
+    seedContent([strengthAffix]);
+    vi.mocked(rngChoiceWeighted)
+      .mockReturnValueOnce(undefined)
+      .mockReturnValueOnce(strengthAffix);
+
+    expect(rollDropAffixIds(gear('Common', 5), true, 1)).toEqual([
+      strengthAffix.id,
+    ]);
+  });
+
+  it('rolls extra normal affixes without a curse', () => {
+    vi.mocked(rngChoiceWeighted).mockReturnValueOnce(strengthAffix);
+
+    expect(rollDropAffixIds(gear('Common', 5), false, 1)).toEqual([
+      strengthAffix.id,
+    ]);
+    expect(rngChoiceWeighted).toHaveBeenCalledTimes(1);
+  });
+});
 
 describe('rollAffixIds', () => {
   beforeEach(() => {

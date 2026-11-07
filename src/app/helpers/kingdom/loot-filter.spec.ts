@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { LOOT_FILTER_AUTO_SELL_PERCENT } from '@helpers/config';
+import { ensureAffix } from '@helpers/content/ensure-affix';
 import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
 import { defaultLootFilterSettings, defaultStats } from '@helpers/defaults';
 import { getGoldQuantity } from '@helpers/item/materials';
@@ -18,6 +19,7 @@ import {
 } from '@helpers/kingdom/loot-filter';
 import { armoryState, gamestate } from '@helpers/state-game';
 import type {
+  AffixId,
   EquipmentId,
   GameState,
   ItemId,
@@ -101,6 +103,40 @@ describe('equipmentPassesLootFilter', () => {
 });
 
 describe('armoryAddLootDrop', () => {
+  it('curses combat drops only while cursed drops are on', () => {
+    const curse = ensureAffix({
+      id: 'curse' as AffixId,
+      name: 'Dulling',
+      family: 'Curse',
+      position: 'Prefix',
+    });
+    seedContent([sword, curse]);
+    const cursedState = (state: GameState) => {
+      state.globalEffectSums.cursedDrops = true;
+    };
+
+    drop(cursedState);
+    expect(armoryState()[0].affixIds).toEqual([curse.id]);
+
+    seedGamestate(cursedState);
+    inTick(() => armoryAddLootDrop(sword.id, 'Crafting'));
+    expect(armoryState()[0].affixIds).toEqual([]);
+  });
+
+  it('rolls extra affixes on combat drops', () => {
+    const might = ensureAffix({
+      id: 'might' as AffixId,
+      name: 'Mighty',
+      family: 'Might',
+    });
+    seedContent([sword, might]);
+
+    drop((state) => {
+      state.globalEffectSums.dropExtraAffixes = 1;
+    });
+    expect(armoryState()[0].affixIds).toEqual([might.id]);
+  });
+
   it('keeps a drop the filter accepts in the armory', () => {
     expect(drop()).toEqual({ kind: 'Kept', content: sword });
 

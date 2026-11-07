@@ -96,7 +96,12 @@
 
 - id: d6631919-4f78-4b2e-973a-df63d710909b
   name: Edict of Fickle Curses
+  enabled: true
   sprite: '0010'
   description: Every dropped piece of equipment rolls a curse affix, and one extra good affix.
   kind: Variant
   fragments: 0
+  effects:
+    - effectType: GlobalCursedDrops
+    - effectType: GlobalDropExtraAffixes
+      value: 1

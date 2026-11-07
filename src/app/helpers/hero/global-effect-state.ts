@@ -67,6 +67,10 @@ export function globalEffectEffectDescription(
       return `Worker Gather Speed: ${signedPercent(effect.value)}`;
     case 'GlobalTownShopNoEquipment':
       return 'Town shops sell no equipment';
+    case 'GlobalCursedDrops':
+      return 'Dropped gear is cursed';
+    case 'GlobalDropExtraAffixes':
+      return `Dropped Gear Affixes: +${effect.value}`;
     case 'EnemyExtraSkills':
       return `Enemy Skills: +${effect.value} from the region`;
     case 'GlobalLevelStatMultiplier':
@@ -162,6 +166,12 @@ function accumulateGlobalEffectEffect(
       return;
     case 'GlobalTownShopNoEquipment':
       sums.townShopNoEquipment = true;
+      return;
+    case 'GlobalCursedDrops':
+      sums.cursedDrops = true;
+      return;
+    case 'GlobalDropExtraAffixes':
+      sums.dropExtraAffixes += effect.value;
       return;
     case 'DebuffResistance':
       sums.debuffResistanceFlat += effect.value;

@@ -22,6 +22,7 @@ import type {
   GlobalEffectEffectLevelStatMultiplier,
   GlobalEffectEffectShrineBuffsPermanent,
   GlobalEffectEffectEnemyExtraSkills,
+  GlobalEffectEffectDropExtraAffixes,
   GlobalEffectEffectWipeEndsRun,
   GlobalEffectEffectTradeskillQueueSizeBoost,
   GlobalEffectEffectXPGainMultiplier,
@@ -41,6 +42,7 @@ export function ensureGlobalEffectEffect(
     Partial<GlobalEffectEffectLevelStatMultiplier> &
     Partial<GlobalEffectEffectShrineBuffsPermanent> &
     Partial<GlobalEffectEffectEnemyExtraSkills> &
+    Partial<GlobalEffectEffectDropExtraAffixes> &
     Partial<GlobalEffectEffectWipeEndsRun> &
     Partial<GlobalEffectEffectGoldGainMultiplier> &
     Partial<GlobalEffectEffectDebuffResistance> &
@@ -129,6 +131,10 @@ export function ensureGlobalEffectEffect(
     return { effectType: effect.effectType, value: effect.value ?? 0 };
   }
 
+  if (effect.effectType === 'GlobalCursedDrops') {
+    return { effectType: 'GlobalCursedDrops' };
+  }
+
   if (effect.effectType === 'GlobalTownShopNoEquipment') {
     return { effectType: 'GlobalTownShopNoEquipment' };
   }
@@ -137,8 +143,11 @@ export function ensureGlobalEffectEffect(
     return { effectType: 'GlobalWipeEndsRun' };
   }
 
-  if (effect.effectType === 'EnemyExtraSkills') {
-    return { effectType: 'EnemyExtraSkills', value: effect.value ?? 0 };
+  if (
+    effect.effectType === 'EnemyExtraSkills' ||
+    effect.effectType === 'GlobalDropExtraAffixes'
+  ) {
+    return { effectType: effect.effectType, value: effect.value ?? 0 };
   }
 
   if (effect.effectType === 'GlobalShrineBuffsPermanent') {

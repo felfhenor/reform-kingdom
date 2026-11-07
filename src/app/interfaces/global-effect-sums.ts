@@ -24,6 +24,8 @@ export type GlobalEffectSums = {
   workerCraftSpeedPercent: number;
   workerGatherSpeedPercent: number;
   townShopNoEquipment: boolean;
+  cursedDrops: boolean;
+  dropExtraAffixes: number;
   combatItemDropRateBoost: number;
   gatheringItemDropRateBoost: number;
   armorySizeBoost: number;

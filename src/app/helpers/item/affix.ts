@@ -12,6 +12,8 @@ import type {
 import { AffixCountByRarity, EquipmentTypeToSlot } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
 
+const CURSE_AFFIX_FAMILY = 'Curse';
+
 export const AFFIX_ROLL_WEIGHT_BY_RARITY: Record<DropRarity, number> = {
   Common: 25,
   Uncommon: 15,
@@ -65,20 +67,67 @@ export function affixRollWeight(
     : AFFIX_ROLL_WEIGHT_BY_RARITY[affix.rarity];
 }
 
+function rollableAffixes(
+  content: EquipmentContent,
+  isReforge: boolean,
+): AffixContent[] {
+  return getEntriesByType<AffixContent>('affix').filter((affix) =>
+    affixCanRollOn(affix, content, isReforge),
+  );
+}
+
+function rollCurseAffix(content: EquipmentContent): AffixContent | undefined {
+  return rngChoiceWeighted(
+    rollableAffixes(content, false).filter(
+      (affix) => affix.family === CURSE_AFFIX_FAMILY,
+    ),
+    (affix) => affixRollWeight(affix, false),
+  );
+}
+
+// The curse sits on top of the normal rolls, and its family keeps them curse-free.
+export function rollDropAffixIds(
+  content: EquipmentContent,
+  cursed: boolean,
+  extraAffixes: number,
+): AffixId[] {
+  const curse = cursed ? rollCurseAffix(content) : undefined;
+
+  return rollAffixIdsOnto(
+    content,
+    false,
+    AffixCountByRarity[content.rarity] + extraAffixes,
+    curse ? [curse] : [],
+  );
+}
+
 // Item rarity controls how many affixes roll; each roll is independently weighted by the affix's own rarity, so a Common item can still land a rarer affix - it just gets fewer rolls overall.
 // At most one Suffix-position affix total; Prefix affixes are otherwise uncapped.
 export function rollAffixIds(
   content: EquipmentContent,
   isReforge = false,
 ): AffixId[] {
-  const pool = getEntriesByType<AffixContent>('affix').filter((affix) =>
-    affixCanRollOn(affix, content, isReforge),
+  return rollAffixIdsOnto(
+    content,
+    isReforge,
+    AffixCountByRarity[content.rarity],
+    [],
   );
-  const rolledFamilies = new Set<string>();
-  const rolledIds: AffixId[] = [];
-  let hasRolledSuffix = false;
+}
 
-  for (let i = 0; i < AffixCountByRarity[content.rarity]; i++) {
+// Rolls `count` more affixes after `seed`, honoring the seed's families and suffix.
+function rollAffixIdsOnto(
+  content: EquipmentContent,
+  isReforge: boolean,
+  count: number,
+  seed: AffixContent[],
+): AffixId[] {
+  const pool = rollableAffixes(content, isReforge);
+  const rolledFamilies = new Set(seed.map((affix) => affix.family));
+  const rolledIds = seed.map((affix) => affix.id);
+  let hasRolledSuffix = seed.some((affix) => affix.position === 'Suffix');
+
+  for (let i = 0; i < count; i++) {
     const eligible = pool.filter(
       (affix) =>
         !rolledFamilies.has(affix.family) &&
