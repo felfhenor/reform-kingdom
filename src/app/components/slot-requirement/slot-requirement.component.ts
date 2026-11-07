@@ -42,6 +42,12 @@ export class SlotRequirementComponent {
   public tooltip = input.required<string>();
   public detailed = input(false);
 
+  public quantityDisplay = computed(() => {
+    const qty = this.quantity();
+    if (qty >= 1000) return `${Math.floor(qty / 1000)}k`;
+    return qty.toString();
+  });
+
   // Collectibles keep the plain tooltip, which carries their "(not consumed)" note.
   public hasDetail = computed(
     () =>

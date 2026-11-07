@@ -6,9 +6,9 @@
   @if (content(); as entry) {
     <app-slot-rarity-outline [entry]="entry" [spritesheet]="spritesheet()">
       @if (owned() >= quantity()) {
-        <span badge-br>{{ quantity() }}</span>
+        <span badge-br>{{ quantityDisplay() }}</span>
       } @else {
-        <span badge-br-unmet>{{ quantity() }}</span>
+        <span badge-br-unmet>{{ quantityDisplay() }}</span>
       }
     </app-slot-rarity-outline>
   } @else {
