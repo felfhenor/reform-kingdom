@@ -8,6 +8,8 @@ vi.mock('@helpers/engine/logging');
 
 import {
   gamestate,
+  gamestateFreezeSubtree,
+  gamestateSetAutoFreeze,
   activeAstralProjectorSpellsState,
   bestiaryState,
   collectiblesState,
@@ -46,6 +48,7 @@ import {
 } from '@helpers/state-game';
 import { defaultWorkerState } from '@helpers/worker/worker-progression';
 import type { GameState, WorkerId } from '@interfaces';
+import { buildCombat } from '@/testing/builders';
 import { seedGamestate, storedSave } from '@/testing/gamestate';
 
 const WORKER_ID = 'weaver-nell' as WorkerId;
@@ -456,5 +459,38 @@ describe('updateGamestate with Immer drafts', () => {
 
     expect(gamestate().workers[WORKER_ID].level).toBe(1);
     expect(workersState()).toBe(state.workers);
+  });
+});
+
+describe('gamestateFreezeSubtree', () => {
+  afterEach(() => gamestateSetAutoFreeze(true));
+
+  it('freezes the whole subtree while Immer auto-freezes', () => {
+    const subtree = gamestateFreezeSubtree({ inner: { hp: 1 } });
+
+    expect(Object.isFrozen(subtree)).toBe(true);
+    expect(Object.isFrozen(subtree.inner)).toBe(true);
+  });
+
+  it('freezes only the root once auto-freeze is off', () => {
+    gamestateSetAutoFreeze(false);
+    const subtree = gamestateFreezeSubtree({ inner: { hp: 1 } });
+
+    expect(Object.isFrozen(subtree)).toBe(true);
+    expect(Object.isFrozen(subtree.inner)).toBe(false);
+  });
+
+  it('commits a frozen subtree through updateGamestate', () => {
+    gamestateSetAutoFreeze(false);
+    const combat = gamestateFreezeSubtree(buildCombat());
+
+    gamestateTickStart();
+    updateGamestate((state) => {
+      state.world.combat = combat;
+      return state;
+    });
+    gamestateTickEnd();
+
+    expect(worldCombatState()).toBe(combat);
   });
 });

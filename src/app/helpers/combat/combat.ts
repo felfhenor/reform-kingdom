@@ -35,7 +35,11 @@ import {
   runStatsCombatFlush,
   runStatsRecordSkillUse,
 } from '@helpers/run-stats/run-stats-combat';
-import { updateGamestate, worldCombatState } from '@helpers/state-game';
+import {
+  gamestateFreezeSubtree,
+  updateGamestate,
+  worldCombatState,
+} from '@helpers/state-game';
 
 import { clamp, sortBy } from 'es-toolkit/compat';
 
@@ -231,6 +235,7 @@ export function combatDoCombatIteration(): void {
     combatDoRound(combat);
   }
 
+  gamestateFreezeSubtree(combat);
   updateGamestate((state) => {
     state.world.combat = combat;
     runStatsCombatFlush(state);

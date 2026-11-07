@@ -3,10 +3,10 @@ import { appConfig } from '@/app/app.config';
 import { enableProfiling, isDevMode } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { error } from '@helpers/engine/logging';
-import { setAutoFreeze } from 'immer';
+import { gamestateSetAutoFreeze } from '@helpers/state-game';
 
 // Dev-only: a frozen state makes a stray in-place write throw instead of silently skipping slice consumers.
-setAutoFreeze(isDevMode());
+gamestateSetAutoFreeze(isDevMode());
 
 enableProfiling();
 bootstrapApplication(AppComponent, appConfig).catch((err) =>

@@ -12,12 +12,25 @@ import {
 } from '@helpers/savefile/savefile-disk';
 import { savefileIsWorthKeeping } from '@helpers/savefile/savefile-validate';
 import { type GameState } from '@interfaces';
-import { produce } from 'immer';
+import { freeze, produce, setAutoFreeze } from 'immer';
 
 export const isGameStateReady = signal<boolean>(false);
 export const hasGameStateLoaded = signal<boolean>(false);
 
 let tickGamestate: GameState | undefined = undefined;
+
+// Immer's own default.
+let isAutoFreezing = true;
+
+export function gamestateSetAutoFreeze(enabled: boolean): void {
+  isAutoFreezing = enabled;
+  setAutoFreeze(enabled);
+}
+
+// Immer rescans a large fresh subtree assigned into a draft for nested drafts unless it's already frozen.
+export function gamestateFreezeSubtree<T>(value: T): T {
+  return freeze(value, isAutoFreezing);
+}
 
 // The Immer draft of the callback currently running, so reads inside it see the callback's own earlier writes.
 let activeDraft: GameState | undefined = undefined;
