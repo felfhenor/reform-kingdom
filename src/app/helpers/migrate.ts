@@ -1,12 +1,11 @@
-import { runStatsBackfillTracking } from '@helpers/run-stats/run-stats';
 import { backfillDiscoveredTraders } from '@helpers/caravan/caravan';
+import { combatOrdersWithJobDefaults } from '@helpers/combat/combat-order';
 import { pruneInvalidCommissions } from '@helpers/commission/commission-tick';
+import { contentExists } from '@helpers/content/content';
 import {
   craftQueueOrphanedEquipment,
   pruneInvalidCraftQueues,
 } from '@helpers/crafting/crafting';
-import { combatOrdersWithJobDefaults } from '@helpers/combat/combat-order';
-import { contentExists } from '@helpers/content/content';
 import {
   migrateTradeskillStateKeys,
   retrofitTradeskillXp,
@@ -16,16 +15,18 @@ import {
   pruneInvalidDecreeGatherClauses,
 } from '@helpers/decree/decree';
 import { defaultGameState, GAMESTATE_VERSION } from '@helpers/defaults';
+import { pruneInvalidEdicts } from '@helpers/edict/edict';
 import { ledgerMark } from '@helpers/engine/ledger';
 import { recordPrune } from '@helpers/engine/record';
-import { getMap } from '@helpers/maps';
+import { pruneInvalidBurstSkills } from '@helpers/hero/burst-skill';
 import { retrofitPartyXp } from '@helpers/hero/character-progress';
 import {
   globalEffectSumsFor,
   recomputeGlobalEffectSums,
 } from '@helpers/hero/global-effect-state';
-import { pruneInvalidEdicts } from '@helpers/edict/edict';
 import { pruneInvalidPartyEquipment } from '@helpers/hero/party';
+import { stateRegaliaMigrate } from '@helpers/hero/regalia-state';
+import { characterSkillTreesMigrate } from '@helpers/hero/skill-tree';
 import { grantFoundingStoneIfMissing } from '@helpers/item/collectibles';
 import {
   backfillEquipmentBlock,
@@ -37,15 +38,9 @@ import { applyMaterialDelta } from '@helpers/item/materials';
 import { pruneInvalidArmoryItems } from '@helpers/kingdom/armory';
 import { pruneInvalidActiveAstralProjectorSpells } from '@helpers/kingdom/astral-projector';
 import { repairInvalidBestiaryLevels } from '@helpers/kingdom/bestiary';
+import { getMap } from '@helpers/maps';
 import { repairUnwalkableCurrentLocation } from '@helpers/pathfinding/pathfinding';
-import { pruneInvalidHomeNode } from '@helpers/town/town-spawn';
-import { pruneInvalidTowns } from '@helpers/town/town-prune';
-import { pruneInvalidBurstSkills } from '@helpers/hero/burst-skill';
-import { stateRegaliaMigrate } from '@helpers/hero/regalia-state';
-import { pruneInvalidCharacterTeachings } from '@helpers/trainer/trainer';
-import { characterSkillTreesMigrate } from '@helpers/hero/skill-tree';
-import { retrofitTasks } from '@helpers/task/task-migrate';
-import { TUTORIAL_CATALOG } from '@helpers/tutorial/tutorial-catalog';
+import { runStatsBackfillTracking } from '@helpers/run-stats/run-stats';
 import {
   gamestate,
   gamestateTickEnd,
@@ -54,14 +49,18 @@ import {
   setGameState,
 } from '@helpers/state-game';
 import { defaultOptions, options, setOptions } from '@helpers/state-options';
+import { retrofitTasks } from '@helpers/task/task-migrate';
+import { pruneInvalidTowns } from '@helpers/town/town-prune';
+import { pruneInvalidHomeNode } from '@helpers/town/town-spawn';
+import { pruneInvalidCharacterTeachings } from '@helpers/trainer/trainer';
+import { TUTORIAL_CATALOG } from '@helpers/tutorial/tutorial-catalog';
+import { workerAssignmentIsValid } from '@helpers/worker/worker-assignment';
+import { workerCraftOrphanedMaterials } from '@helpers/worker/worker-crafting';
 import {
   isWorkerContentKnown,
   pruneInvalidWorkerStates,
 } from '@helpers/worker/worker-discovery';
-import { workerCraftOrphanedMaterials } from '@helpers/worker/worker-crafting';
-import { workerAssignmentIsValid } from '@helpers/worker/worker-assignment';
 import { backfillDiscoveredMaps } from '@helpers/world-node/world-map-discovery';
-import { allGatherableMaterialIds } from '@helpers/world-node/world-node-gathering';
 import { pruneInvalidWorldNodeDevelopmentLevels } from '@helpers/world-node/world-node-development';
 import {
   WORLD_NODE_DEVELOPABLE_TYPES,
@@ -69,6 +68,7 @@ import {
   worldNodeDevelopable,
   worldNodesDevelopedPastStart,
 } from '@helpers/world-node/world-node-development-state';
+import { allGatherableMaterialIds } from '@helpers/world-node/world-node-gathering';
 import {
   worldNodeByName,
   worldNodesOfType,
@@ -142,6 +142,12 @@ export function migrateGameState() {
     tradeskills: migrateTradeskillStateKeys(state.tradeskills ?? {}),
   };
   const newState = merge(defaultGameState(), remappedState);
+
+  // Validators below read the live state, whose sums may predate fields they need (e.g. removedWorldNodeTypes).
+  setGameState(
+    { ...state, globalEffectSums: globalEffectSumsFor(newState) },
+    false,
+  );
 
   // Pre-per-clause-risk saves stored this on `world.autoMode` directly; the field no longer exists on `AutoModeState`.
   const legacyAutoMode = newState.world.autoMode as AutoModeState & {
