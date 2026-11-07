@@ -100,9 +100,11 @@ export type PixiNodeLabelResolver = (
   object: TiledObject,
 ) => WorldNodeLabelInfo | undefined;
 
+export type WorldNodeStatusBadge = 'Beaten' | 'NotBeaten' | 'Developed';
+
 export type WorldNodeStatusInfo = {
-  // Whether the node is currently "cleared" for the badge indicator (e.g. an ExploreRandomNode's completedThisCycle).
-  beaten: boolean;
+  // Undefined when the node can badge but currently shouldn't (e.g. a developable node short of max level).
+  badge?: WorldNodeStatusBadge;
 };
 
 export type PixiNodeStatusResolver = (

@@ -195,7 +195,7 @@ function pixiTiledObjectRender(
     statusIcon.x = object.width - NODE_STATUS_ICON_RADIUS;
     statusIcon.y = -NODE_STATUS_ICON_RADIUS;
     statusIcon.visible = false;
-    pixiIndicatorNodeStatusUpdate(statusIcon, statusInfo.beaten);
+    pixiIndicatorNodeStatusUpdate(statusIcon, statusInfo.badge);
     wrapper.addChild(statusIcon);
   }
 

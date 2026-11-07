@@ -80,7 +80,7 @@ export function pixiWorldContainersCreate(app: Application): {
   app.stage.addChild(gatherProgressContainer);
   app.stage.addChild(encounterProgressContainer);
   app.stage.addChild(nodeSelectionContainer);
-  // Node labels stay parented in the map for positioning but draw here, above the party/worker tokens.
+  // Node labels and status badges stay parented in the map for positioning but draw here, above the tokens and outlines.
   app.stage.addChild(nodeLabelLayer);
   // Added last so gather/reward popups render above every other map overlay.
   app.stage.addChild(floatingTextContainer);

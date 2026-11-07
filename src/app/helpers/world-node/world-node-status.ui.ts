@@ -9,7 +9,9 @@ import { worldNodeCaravanTimerText } from '@helpers/world-node/world-node-carava
 import { worldNodeCaravanVisitedTraderName } from '@helpers/world-node/world-node-caravan.ui';
 import { worldNodeExploreRandomTimerText } from '@helpers/world-node/world-node-encounter';
 import { worldNodeExploreRandomIsCompleted } from '@helpers/world-node/world-node-encounter.ui';
+import { worldNodeDevelopmentIsMaxLevel } from '@helpers/world-node/world-node-development';
 import {
+  worldNodeDevelopable,
   worldNodeDevelopmentLevel,
   worldNodeDevelopmentTimerText,
 } from '@helpers/world-node/world-node-development-state';
@@ -116,11 +118,23 @@ export function worldNodeFarmOption(
   };
 }
 
-// Only ExploreRandomNode has a per-cycle beaten/not-beaten state worth badging on the map.
+// ExploreRandomNodes badge their per-cycle state; developable nodes badge only once maxed out.
 export function worldNodeStatusInfo(
   entry: WorldNodeEntry,
 ): WorldNodeStatusInfo | undefined {
-  if (worldNodeInteractionKind(entry) !== 'ExploreRandom') return undefined;
+  if (worldNodeInteractionKind(entry) === 'ExploreRandom') {
+    return {
+      badge: worldNodeExploreRandomIsCompleted(entry) ? 'Beaten' : 'NotBeaten',
+    };
+  }
 
-  return { beaten: worldNodeExploreRandomIsCompleted(entry) };
+  const content = worldNodeDevelopable(entry.nodeName);
+  if (!content) return undefined;
+
+  const level = worldNodeDevelopmentLevel(entry.nodeName);
+  return {
+    badge: worldNodeDevelopmentIsMaxLevel(content, level)
+      ? 'Developed'
+      : undefined,
+  };
 }

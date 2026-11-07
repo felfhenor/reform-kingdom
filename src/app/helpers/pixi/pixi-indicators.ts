@@ -11,6 +11,7 @@ import type {
   WorldNodeInteractionKind,
   WorldNodeLabelInfo,
   WorldNodeProgressKind,
+  WorldNodeStatusBadge,
 } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 import type { ColorSource, Texture } from 'pixi.js';
@@ -171,24 +172,39 @@ function pixiDifficultyColor(tier: DifficultyTier): string {
   return cssColorVar(`--difficulty-${tier.toLowerCase()}`);
 }
 
-// Small beaten/not-beaten badge for the bottom-right corner of a node's sprite. Position is set
+// Small status badge for the bottom-right corner of a node's sprite. Position is set
 // by the caller (depends on the node's own object width/height, not a fixed tile size).
 export function pixiIndicatorNodeStatusCreate(): Graphics {
   const graphics = new Graphics();
   graphics.cullable = true;
-  pixiIndicatorNodeStatusUpdate(graphics, false);
   return graphics;
 }
 
 export function pixiIndicatorNodeStatusUpdate(
   graphics: Graphics,
-  beaten: boolean,
+  badge?: WorldNodeStatusBadge,
 ): void {
+  graphics.clear();
+  if (badge === 'Developed') {
+    pixiDrawStatusStar(graphics);
+    return;
+  }
+
+  if (badge) pixiDrawStatusCircle(graphics, badge === 'Beaten');
+}
+
+function pixiDrawStatusStar(graphics: Graphics): void {
+  graphics
+    .star(0, 0, 5, NODE_STATUS_ICON_RADIUS)
+    .fill(cssColorVar('--node-status-developed'))
+    .stroke({ width: 1.5, color: 0x000000 });
+}
+
+function pixiDrawStatusCircle(graphics: Graphics, beaten: boolean): void {
   const radius = NODE_STATUS_ICON_RADIUS;
   const mark = radius * 0.45;
 
   graphics
-    .clear()
     .circle(0, 0, radius)
     .fill(
       cssColorVar(beaten ? '--node-status-beaten' : '--node-status-not-beaten'),

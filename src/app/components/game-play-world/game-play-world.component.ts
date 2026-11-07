@@ -597,7 +597,10 @@ export class GamePlayWorldComponent implements OnDestroy {
     );
     this.mapContainer.addChild(renderedMap.container);
     this.nodeLabels = renderedMap.nodeLabels;
-    containers.nodeLabelLayer.attach(...renderedMap.nodeLabels.values());
+    containers.nodeLabelLayer.attach(
+      ...renderedMap.nodeLabels.values(),
+      ...renderedMap.nodeStatusIcons.values(),
+    );
     this.nodeWrappers = renderedMap.nodeWrappers;
     this.nodeStatusIcons = renderedMap.nodeStatusIcons;
 
@@ -759,7 +762,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       if (!visible) return;
 
       const info = worldNodeStatusInfo(entry);
-      if (info) pixiIndicatorNodeStatusUpdate(icon, info.beaten);
+      if (info) pixiIndicatorNodeStatusUpdate(icon, info.badge);
     });
   }
 
