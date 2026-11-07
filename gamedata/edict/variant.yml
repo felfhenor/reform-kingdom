@@ -1,7 +1,7 @@
 - id: 707f8b70-d85f-48de-b579-41591a7b7326
   name: Edict of Reflective Mirrors
   enabled: true
-  sprite: '0027'
+  sprite: '0021'
   description: Every hero must share one job, and reclassing must change the whole party. Most party job abilities will stack together.
   kind: Variant
   fragments: 0
@@ -65,13 +65,6 @@
     - effectType: GlobalTradeskillQueueSizeBoost
       tradeskillId: Woodworking
       value: 1
-
-- id: 8847b540-dfa4-44d6-8258-8a4a314491b5
-  name: Edict of Cold Coins
-  sprite: '0021'
-  description: Player tradeskills are gone. Shops and caravans carry better goods, and commissions can be paid with gold.
-  kind: Variant
-  fragments: 0
 
 - id: 2fddab9f-257d-418c-8137-87616780e74b
   name: Edict of the Starry Sky

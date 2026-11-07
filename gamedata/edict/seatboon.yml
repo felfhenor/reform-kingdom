@@ -7,7 +7,7 @@
 
 - id: 4aa9f306-d47b-4cbc-8d87-57af5c186e8d
   name: Quiet Camp
-  sprite: '0030'
+  sprite: '0027'
   description: Out-of-combat Health and Energy restore as if the party had 4 heroes.
   kind: SeatBoon
   fragments: 0
