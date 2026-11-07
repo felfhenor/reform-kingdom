@@ -101,7 +101,7 @@
               [disabled]="!draftMaterialId()"
               placeholder="Location"
               [ngModel]="draftNodeName()"
-              (change)="setDraftGatherNodeName($event)"
+              (change)="setDraftScopedNodeName($event)"
             >
               <ng-template ng-option-tmp let-item="item">
                 <app-option-world-node [option]="item" [showLevel]="true" />
@@ -154,7 +154,48 @@
             </ng-select>
           }
 
-          @if (draftType() === 'FarmNode') {
+          @if (draftFormType() === 'FarmMaterial') {
+            <ng-select
+              class="w-64"
+              [items]="rewardOptions()"
+              bindLabel="name"
+              bindValue="key"
+              [clearable]="false"
+              placeholder="Reward"
+              [ngModel]="draftRewardKey()"
+              (change)="setDraftReward($event)"
+            >
+              <ng-template ng-option-tmp let-item="item">
+                <app-option-reward [reward]="item" />
+              </ng-template>
+
+              <ng-template ng-label-tmp let-item="item">
+                <app-option-reward [reward]="item" />
+              </ng-template>
+            </ng-select>
+
+            <ng-select
+              class="w-64"
+              [items]="exploreNodeOptions()"
+              bindLabel="nodeName"
+              bindValue="nodeName"
+              [clearable]="false"
+              [disabled]="!draftRewardKey()"
+              placeholder="Explore Node"
+              [ngModel]="draftNodeName()"
+              (change)="setDraftScopedNodeName($event)"
+            >
+              <ng-template ng-option-tmp let-item="item">
+                <app-option-world-node [option]="item" [showLevel]="true" />
+              </ng-template>
+
+              <ng-template ng-label-tmp let-item="item">
+                <app-option-world-node [option]="item" />
+              </ng-template>
+            </ng-select>
+          }
+
+          @if (draftFormType() === 'FarmNode') {
             <ng-select
               class="w-64"
               [items]="exploreNodeOptions()"

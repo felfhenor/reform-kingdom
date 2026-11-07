@@ -36,6 +36,8 @@ import {
 } from '@helpers/decree/decree';
 import {
   exploreNodeFarmOptions,
+  exploreNodeFarmOptionsFor,
+  farmableRewardOptions,
   farmNodeActiveWarning,
   farmNodeRewardOptions,
 } from '@helpers/decree/decree-farm-node.ui';
@@ -79,8 +81,15 @@ import { TippyDirective } from '@ngneat/helipopper';
 import { AnimationService } from '@services/animation.service';
 import { sortBy } from 'es-toolkit/compat';
 
-// GatherFromNode is a node-first form for the same GatherMaterial clause; GatherMaterial picks the material first.
-type ClauseFormType = DecreeClauseAction['type'] | 'GatherFromNode';
+// Alternate pick orders for existing clauses: GatherFromNode is node-first GatherMaterial, FarmMaterial is reward-first FarmNode.
+type ClauseFormType =
+  DecreeClauseAction['type'] | 'GatherFromNode' | 'FarmMaterial';
+
+function clauseTypeOf(formType: ClauseFormType): DecreeClauseAction['type'] {
+  if (formType === 'GatherFromNode') return 'GatherMaterial';
+  if (formType === 'FarmMaterial') return 'FarmNode';
+  return formType;
+}
 
 const CLAUSE_TYPE_OPTIONS: {
   value: ClauseFormType;
@@ -90,6 +99,7 @@ const CLAUSE_TYPE_OPTIONS: {
     { value: 'GatherMaterial', label: 'Gather Material' },
     { value: 'GatherFromNode', label: 'Gather from Node' },
     { value: 'FarmNode', label: 'Farm Node' },
+    { value: 'FarmMaterial', label: 'Farm Material' },
     { value: 'FinishUnfinishedAreas', label: 'Finish Unfinished Areas' },
     { value: 'LevelUpParty', label: 'Level Up Party' },
     { value: 'DefendTowns', label: 'Defend Towns' },
@@ -211,7 +221,11 @@ export class GamePlayDecreeComponent {
     return materialOptionsFor(scopedIds);
   });
 
-  public exploreNodeOptions = computed(() => exploreNodeFarmOptions());
+  public exploreNodeOptions = computed(() => {
+    if (!this.isFarmByReward()) return exploreNodeFarmOptions();
+    const key = this.draftRewardKey();
+    return key ? exploreNodeFarmOptionsFor(key) : [];
+  });
   public draftFarmNodeWarning = computed(() => {
     const nodeName = this.draftNodeName();
     return this.draftType() === 'FarmNode' && nodeName
@@ -225,12 +239,12 @@ export class GamePlayDecreeComponent {
   });
 
   public draftFormType = signal<ClauseFormType>('GatherMaterial');
-  public draftType = computed<DecreeClauseAction['type']>(() => {
-    const formType = this.draftFormType();
-    return formType === 'GatherFromNode' ? 'GatherMaterial' : formType;
-  });
+  public draftType = computed(() => clauseTypeOf(this.draftFormType()));
   public isGatherByMaterial = computed(
     () => this.draftFormType() === 'GatherMaterial',
+  );
+  public isFarmByReward = computed(
+    () => this.draftFormType() === 'FarmMaterial',
   );
   public draftMaterialId = signal<MaterialId | undefined>(undefined);
   public draftNodeName = signal<string | undefined>(undefined);
@@ -244,9 +258,8 @@ export class GamePlayDecreeComponent {
     sortBy(visitedTowns(), (town) => town.name),
   );
 
-  // Scoped to the currently-selected node - a FarmNode reward only ever
-  // makes sense in the context of the node it's farmed from.
   public rewardOptions = computed<FarmNodeRewardOption[]>(() => {
+    if (this.isFarmByReward()) return farmableRewardOptions();
     const nodeName = this.draftNodeName();
     return nodeName ? sortBy(farmNodeRewardOptions(nodeName), 'name') : [];
   });
@@ -367,8 +380,8 @@ export class GamePlayDecreeComponent {
     );
   }
 
-  // Keeps the material - it was picked first and scopes these nodes.
-  public setDraftGatherNodeName(option: { nodeName: string } | null): void {
+  // Keeps the material/reward - it was picked first and scopes these nodes.
+  public setDraftScopedNodeName(option: { nodeName: string } | null): void {
     this.draftNodeName.set(option ? option.nodeName : undefined);
   }
 
@@ -380,6 +393,12 @@ export class GamePlayDecreeComponent {
 
   public setDraftReward(option: FarmNodeRewardOption | null): void {
     this.draftRewardKey.set(option ? option.key : undefined);
+    if (!this.isFarmByReward()) return;
+
+    const nodeOptions = this.exploreNodeOptions();
+    this.draftNodeName.set(
+      nodeOptions.length === 1 ? nodeOptions[0].nodeName : undefined,
+    );
   }
 
   public setDraftTownName(option: TownContent | null): void {

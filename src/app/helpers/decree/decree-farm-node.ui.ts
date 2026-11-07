@@ -24,7 +24,7 @@ import {
   type RewardIdentity,
   type WorldNodeEntry,
 } from '@interfaces';
-import { sortBy } from 'es-toolkit/compat';
+import { sortBy, uniqBy } from 'es-toolkit/compat';
 
 export function farmNodeActiveWarning(nodeName: string): string | undefined {
   const entry = worldNodeByName(nodeName);
@@ -129,4 +129,19 @@ export function farmNodeRewardOptions(
       return { ...content, key, reward: identity };
     })
     .filter((option): option is FarmNodeRewardOption => !!option);
+}
+
+export function farmableRewardOptions(): FarmNodeRewardOption[] {
+  const options = farmableExploreNodes().flatMap((entry) =>
+    farmNodeRewardOptions(entry.nodeName),
+  );
+  return sortBy(uniqBy(options, 'key'), 'name');
+}
+
+export function exploreNodeFarmOptionsFor(
+  key: string,
+): ExploreNodeFarmOption[] {
+  return exploreNodeFarmOptions().filter((option) =>
+    farmNodeRewardOptions(option.nodeName).some((reward) => reward.key === key),
+  );
 }
