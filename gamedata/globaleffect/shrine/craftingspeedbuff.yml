@@ -1,0 +1,39 @@
+- id: dbcd5cd3-f20d-41c0-9d2d-90bbf81f4cbc
+  name: Ingenuity of the Artificer I
+  sprite: '0021'
+  isShrineBuff: true
+  effects:
+    - effectType: GlobalCraftTimeMultiplier
+      value: -0.1
+
+- id: 0d32ce20-c228-49ca-8997-6c7240498911
+  name: Ingenuity of the Artificer II
+  sprite: '0021'
+  isShrineBuff: true
+  effects:
+    - effectType: GlobalCraftTimeMultiplier
+      value: -0.2
+
+- id: fc6f23a7-dbed-409c-8980-23fbb0112193
+  name: Ingenuity of the Artificer III
+  sprite: '0021'
+  isShrineBuff: true
+  effects:
+    - effectType: GlobalCraftTimeMultiplier
+      value: -0.3
+
+- id: 6b8e88f2-58bc-4ab7-a025-ecc5134819d7
+  name: Ingenuity of the Artificer IV
+  sprite: '0021'
+  isShrineBuff: true
+  effects:
+    - effectType: GlobalCraftTimeMultiplier
+      value: -0.4
+
+- id: c9a2ef3e-4426-4146-ac19-b34b3df8bcb1
+  name: Ingenuity of the Artificer V
+  sprite: '0021'
+  isShrineBuff: true
+  effects:
+    - effectType: GlobalCraftTimeMultiplier
+      value: -0.5

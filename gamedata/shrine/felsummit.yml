@@ -1,0 +1,92 @@
+- id: 339f5f05-643f-4bfb-a860-fe55154de226
+  name: Shrine of Lalal
+  description: A shrine dedicated to Lalal, the artificer. She was known for her ingenuitive and creative mind.
+  legendName: Legend of the Artificer
+
+  levels:
+    - developTime: 300
+      costs:
+        - itemId: Felfrost
+          required: 100
+
+        - itemId: Frostwood
+          required: 100
+
+        - itemId: Frozen Felrock
+          required: 100
+
+      globalEffectId: Ingenuity of the Artificer I
+      globalEffectDuration: 1800
+      legend: Lalal was a creator adored by those around her. She was known for tinkering with all manner of creation at a young age, and her curiosity and creativity blossomed into a lifetime of invention.
+
+    - developTime: 600
+      costs:
+        - itemId: Gold Coin
+          required: 100000
+
+        - itemId: Frostneedle
+          required: 25
+
+        - itemId: Fel Iron Ingot
+          required: 25
+
+        - itemId: Diamond
+          required: 25
+
+      globalEffectId: Ingenuity of the Artificer II
+      globalEffectDuration: 3600
+      legend: Lalal was a tinkerer at heart, often lost in her own thoughts for days at a time. She was reclusive, and it's not known how long it was before she was determined to be lost.
+
+    - developTime: 900
+      costs:
+        - itemId: Gold Coin
+          required: 150000
+
+        - itemId: Fel Steel Ingot
+          required: 25
+
+        - itemId: Spellthread
+          required: 25
+
+        - itemId: Frostcore
+          required: 25
+
+      globalEffectId: Ingenuity of the Artificer III
+      globalEffectDuration: 7200
+      legend: The Founder met Lalal on his travels, and saw many strange and wondrous devices. Lalal's creative genius was unmatched, and the Founder was grateful to have met her.
+
+    - developTime: 1200
+      costs:
+        - itemId: Gold Coin
+          required: 200000
+
+        - itemId: Steelthread
+          required: 25
+
+        - itemId: Frostskin
+          required: 25
+
+        - itemId: Frostsoul
+          required: 25
+
+      globalEffectId: Ingenuity of the Artificer IV
+      globalEffectDuration: 14400
+      legend: Lalal was lost to the Sundering like all of the Founder's companions. Her ingenuity was on full display anywhere she'd been, having left behind a stash of strange devices and creations.
+
+    - developTime: 1500
+      costs:
+        - itemId: Gold Coin
+          required: 250000
+
+        - itemId: Fel Flux
+          required: 25
+
+        - itemId: Crystalfrost Scales
+          required: 25
+
+        - itemId: Deathchill Cloth
+          required: 25
+
+      globalEffectId: Ingenuity of the Artificer V
+      globalEffectDuration: 31536000
+      legend: All who pray to Lalal seek even a shred of her ingenuity. Oftentimes, they seek to leave behind a legacy as strong as hers.
