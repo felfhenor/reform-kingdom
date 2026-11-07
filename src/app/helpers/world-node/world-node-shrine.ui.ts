@@ -38,13 +38,16 @@ export async function shrinePray(nodeName: string): Promise<boolean> {
   if (!tier) return false;
 
   const currentTick = timerTicksElapsed();
-  const permanent = globalEffectSumsState().shrineBuffsPermanent;
+  const sums = globalEffectSumsState();
+  const permanent = sums.shrineBuffsPermanent;
   // Fixed at prayer time - a later party change doesn't stretch or shrink it.
   const duration = permanent
     ? ONE_YEAR_TICKS
     : Math.round(
         tier.globalEffectDuration *
-          (1 + jobAbilityValue('ShrineDurationBoost')),
+          (1 +
+            jobAbilityValue('ShrineDurationBoost') +
+            sums.shrineBuffDurationBonus),
       );
 
   let prayed = false;
@@ -60,6 +63,7 @@ export async function shrinePray(nodeName: string): Promise<boolean> {
       duration,
       currentTick,
       permanent,
+      1 + sums.shrineBuffStrengthBonus,
     );
     state.world.prayerLastTick = currentTick;
     prayed = true;

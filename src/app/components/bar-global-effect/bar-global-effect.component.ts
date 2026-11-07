@@ -86,9 +86,8 @@ export class BarGlobalEffectComponent {
   public durationLabel = globalEffectDurationLabel;
 
   // Auto Mode's description is live status text, computed at render time rather than stored in gamestate since it changes often.
-  public effectDescription(effect: GlobalEffect): string {
-    if (effect.name !== 'Auto Mode') return effect.description;
-    return autoModeStatusLabel() ?? effect.description;
+  public effectDescription(effect: GlobalEffect): string | undefined {
+    return effect.name === 'Auto Mode' ? autoModeStatusLabel() : undefined;
   }
 
   public onEnter(event: AnimationCallbackEvent): void {

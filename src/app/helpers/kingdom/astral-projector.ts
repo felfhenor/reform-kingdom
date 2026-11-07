@@ -4,6 +4,7 @@ import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
 import { notifySuccess } from '@helpers/engine/notify';
 import { timerTicksElapsed } from '@helpers/engine/timer';
+import { jobAbilityValue } from '@helpers/hero/job-ability';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import {
@@ -28,6 +29,15 @@ export function isAstralProjectorCollectiblesMet(
 ): boolean {
   return content.requiredCollectibles.every((requirement) =>
     isCollectibleDiscovered(requirement.collectibleId),
+  );
+}
+
+// Read at cast time and fixed for the spell, so a later party change doesn't stretch or shrink it.
+export function astralProjectorDuration(
+  content: AstralProjectorContent,
+): number {
+  return Math.round(
+    content.duration * (1 + jobAbilityValue('AstralDurationBoost')),
   );
 }
 

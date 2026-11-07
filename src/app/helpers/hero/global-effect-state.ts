@@ -18,9 +18,11 @@ import {
   type TradeskillContent,
 } from '@interfaces';
 import { isEqual } from 'es-toolkit';
+import { round } from 'es-toolkit/compat';
 
+// Rounded so scaled fractions (0.15 * 100) don't print float noise.
 function signedNumber(value: number): string {
-  return `${value >= 0 ? '+' : ''}${value}`;
+  return `${value >= 0 ? '+' : ''}${round(value, 2)}`;
 }
 
 function signedPercent(value: number): string {
@@ -43,7 +45,7 @@ export function globalEffectEffectDescription(
 ): string {
   switch (effect.effectType) {
     case 'GainStats':
-      return `Hero ${effect.stat}: +${effect.value}`;
+      return `Hero ${effect.stat}: ${signedNumber(effect.value)}`;
     case 'GainStatPercent':
       return `Hero ${effect.stat ?? 'stats'}: ${signedPercent(effect.value)}`;
     case 'EnemyStatPercent':
@@ -89,6 +91,12 @@ export function globalEffectEffectDescription(
       return 'Every hero shares one class';
     case 'GlobalJobAbilitiesStack':
       return 'Party job abilities stack';
+    case 'GlobalOutpostsDisabled':
+      return 'There are no outposts';
+    case 'GlobalShrineBuffDuration':
+      return `Shrine Buff Duration: ${signedPercent(effect.value * 100)}`;
+    case 'GlobalShrineBuffStrength':
+      return `Shrine Buff Strength: ${signedPercent(effect.value * 100)}`;
     case 'EnemyExtraSkills':
       return `Enemy Skills: +${effect.value} from the region`;
     case 'GlobalLevelStatMultiplier':
@@ -100,9 +108,9 @@ export function globalEffectEffectDescription(
     case 'DebuffResistanceTag':
       return `${StatusEffectTagDimension.label[effect.tag]}: +${effect.value}%`;
     case 'GlobalCombatItemDropRateBoost':
-      return `Item Drop Chance: +${effect.value}%`;
+      return `Item Drop Chance: ${signedPercent(effect.value)}`;
     case 'GlobalGatheringItemDropRateBoost':
-      return `Extra Gather Item Chance: +${effect.value}%`;
+      return `Extra Gather Item Chance: ${signedPercent(effect.value)}`;
     case 'GlobalArmorySizeBoost':
       return `Armory Size: +${effect.value}`;
     case 'GlobalTradeskillQueueSizeBoost': {
@@ -112,9 +120,9 @@ export function globalEffectEffectDescription(
       return `${tradeskillName} Queue Size: +${effect.value}`;
     }
     case 'GlobalOffPathTravelSpeedBoost':
-      return `Off-Path Travel Speed: +${effect.value * 100}%`;
+      return `Off-Path Travel Speed: ${signedPercent(effect.value * 100)}`;
     case 'GlobalOnPathTravelSpeedBoost':
-      return `On-Path Travel Speed: +${effect.value * 100}%`;
+      return `On-Path Travel Speed: ${signedPercent(effect.value * 100)}`;
     case 'GlobalDecreeClauseCapBoost':
       return `Decree Clause Cap: +${effect.value}`;
   }
@@ -126,6 +134,12 @@ export function globalEffectEffectsDescription(
   effects: GlobalEffectEffect[],
 ): string {
   return effects.map(globalEffectEffectDescription).join(', ');
+}
+
+export function globalEffectDescription(
+  effect: Pick<GlobalEffectContent, 'description' | 'effects'>,
+): string {
+  return effect.description || globalEffectEffectsDescription(effect.effects);
 }
 
 function assertNeverGlobalEffectEffect(value: never): never {
@@ -208,6 +222,15 @@ function accumulateGlobalEffectEffect(
       return;
     case 'GlobalJobAbilitiesStack':
       sums.jobAbilitiesStack = true;
+      return;
+    case 'GlobalOutpostsDisabled':
+      sums.outpostsDisabled = true;
+      return;
+    case 'GlobalShrineBuffDuration':
+      sums.shrineBuffDurationBonus += effect.value;
+      return;
+    case 'GlobalShrineBuffStrength':
+      sums.shrineBuffStrengthBonus += effect.value;
       return;
     case 'DebuffResistance':
       sums.debuffResistanceFlat += effect.value;
@@ -297,18 +320,32 @@ export function applyGlobalEffectPush(
   recomputeGlobalEffectSums(state);
 }
 
+// Flag effects have no value to scale, so they pass through unchanged.
+export function globalEffectEffectsScaled(
+  effects: GlobalEffectEffect[],
+  multiplier: number,
+): GlobalEffectEffect[] {
+  return effects.map((effect) =>
+    'value' in effect
+      ? { ...effect, value: effect.value * multiplier }
+      : effect,
+  );
+}
+
 export function applyGlobalEffectAdd(
   state: GameState,
   globalEffectId: GlobalEffectId,
   durationTicks: number,
   currentTick: number,
   hideDuration = false,
+  valueMultiplier = 1,
 ): void {
   const content = getEntry<GlobalEffectContent>(globalEffectId);
   if (!content) return;
 
   applyGlobalEffectPush(state, {
     ...content,
+    effects: globalEffectEffectsScaled(content.effects, valueMultiplier),
     hideDuration: hideDuration || content.hideDuration,
     startTick: currentTick,
     expiresAtTick: currentTick + durationTicks,

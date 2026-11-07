@@ -11,10 +11,17 @@
 
 - id: e86047ab-7f77-4711-b50a-07d0cff1d65b
   name: Edict of Nomadic Departure
+  enabled: true
   sprite: '0026'
-  description: Outposts are gone, so there is no Set Home or teleport, and Deaths Door walks all the way home. Shrines last much longer and are stronger.
+  description: Outposts are gone. Shrine buffs last 2x as long and are 50% stronger.
   kind: Variant
   fragments: 0
+  effects:
+    - effectType: GlobalOutpostsDisabled
+    - effectType: GlobalShrineBuffDuration
+      value: 1
+    - effectType: GlobalShrineBuffStrength
+      value: 0.5
 
 - id: 277dcf0b-f0a4-4ec9-9cdd-6b9b8f991f3e
   name: Edict of Exogenous Support

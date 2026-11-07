@@ -16,12 +16,14 @@ import type {
   CollectibleId,
   EncounterId,
   TownContentInput,
+  OutpostId,
 } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 
 import { ensureCaravan } from '@helpers/content/ensure-caravan';
 import { ensureEncounter } from '@helpers/content/ensure-encounternode';
 import { ensureNodeOverride } from '@helpers/content/ensure-nodeoverride';
+import { ensureOutpost } from '@helpers/content/ensure-outpost';
 import { ensureTown } from '@helpers/content/ensure-town';
 import { ensureTrainer } from '@helpers/content/ensure-trainer';
 import { seedContent } from '@/testing/content';
@@ -281,6 +283,23 @@ describe('encounter-backed node accessors', () => {
   });
 
   describe('isWorldNodeCollectibleGateMet', () => {
+    it('is false for an outpost while outposts are disabled, and only for outposts', () => {
+      const disableOutposts = () =>
+        seedGamestate((state) => {
+          state.globalEffectSums.outpostsDisabled = true;
+        });
+
+      seedContent([
+        ensureOutpost({ id: 'outpost' as OutpostId, name: 'Forest Ruins' }),
+      ]);
+      expect(isWorldNodeCollectibleGateMet(buildEntry())).toBe(true);
+      disableOutposts();
+      expect(isWorldNodeCollectibleGateMet(buildEntry())).toBe(false);
+
+      seedContent([buildEncounter()]);
+      expect(isWorldNodeCollectibleGateMet(buildEntry())).toBe(true);
+    });
+
     it('is vacuously true for a node with no gate', () => {
       seedContent([buildEncounter()]);
 

@@ -5,6 +5,7 @@ import {
   input,
   viewChild,
 } from '@angular/core';
+import { globalEffectDescription } from '@helpers/hero/global-effect-state';
 import type { GlobalEffect, GlobalEffectContent } from '@interfaces';
 
 @Component({
@@ -17,7 +18,7 @@ import type { GlobalEffect, GlobalEffectContent } from '@interfaces';
       <div class="p-2 max-w-[400px]">
         <div class="type-entity-name mb-2">{{ e.name }}</div>
 
-        <p>{{ description() ?? e.description }}</p>
+        <p>{{ description() ?? globalEffectDescription(e) }}</p>
 
         @if (e.extendedDescription; as extended) {
           <p class="type-meta mt-2">{{ extended }}</p>
@@ -34,4 +35,6 @@ export class TooltipGlobalEffectComponent {
   public description = input<string>();
 
   public template = viewChild.required<TemplateRef<unknown>>('tooltipContent');
+
+  public globalEffectDescription = globalEffectDescription;
 }

@@ -4,7 +4,6 @@ import type { StatusEffectTag } from '@interfaces/content-statuseffect';
 import type { TradeskillId } from '@interfaces/content-tradeskill';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { GameStat } from '@interfaces/stat';
-import type { HasDescription } from '@interfaces/traits';
 
 export type GlobalEffectId = Branded<string, 'GlobalEffectId'>;
 
@@ -198,6 +197,23 @@ export type GlobalEffectEffectJobAbilitiesStack = {
   effectType: 'GlobalJobAbilitiesStack';
 };
 
+// Outpost nodes are removed from the map for the run.
+export type GlobalEffectEffectOutpostsDisabled = {
+  effectType: 'GlobalOutpostsDisabled';
+};
+
+// Fraction (1 = twice as long) on shrine buff duration, stacking additively.
+export type GlobalEffectEffectShrineBuffDuration = {
+  effectType: 'GlobalShrineBuffDuration';
+  value: number;
+};
+
+// Fraction (0.5 = 50% stronger) on every value of a shrine buff, fixed when prayed.
+export type GlobalEffectEffectShrineBuffStrength = {
+  effectType: 'GlobalShrineBuffStrength';
+  value: number;
+};
+
 // Every material a kingdom recipe needs changes by `value` (whole units), never below 1.
 export type GlobalEffectEffectRecipeMaterialBoost = {
   effectType: 'GlobalRecipeMaterialBoost';
@@ -229,6 +245,9 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectReclassDisabled
   | GlobalEffectEffectPartySharesClass
   | GlobalEffectEffectJobAbilitiesStack
+  | GlobalEffectEffectOutpostsDisabled
+  | GlobalEffectEffectShrineBuffDuration
+  | GlobalEffectEffectShrineBuffStrength
   | GlobalEffectEffectDebuffResistance
   | GlobalEffectEffectDebuffResistanceTag
   | GlobalEffectEffectCombatItemDropRateBoost
@@ -240,9 +259,10 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectDecreeClauseCapBoost;
 
 export type GlobalEffectContent = IsContentItem &
-  HasDescription &
   HasSprite & {
     id: GlobalEffectId;
+    // Left out, the text is generated from `effects`, so scaled values stay accurate.
+    description?: string;
     __type: 'globaleffect';
     effects: GlobalEffectEffect[];
     hideDuration?: boolean;

@@ -32,6 +32,9 @@ export type GlobalEffectSums = {
   reclassDisabled: boolean;
   partySharesClass: boolean;
   jobAbilitiesStack: boolean;
+  outpostsDisabled: boolean;
+  shrineBuffDurationBonus: number;
+  shrineBuffStrengthBonus: number;
   combatItemDropRateBoost: number;
   gatheringItemDropRateBoost: number;
   armorySizeBoost: number;

@@ -3,6 +3,7 @@ import { getEntry } from '@helpers/content/content';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { allMaps } from '@helpers/maps';
 import { tiledMapGetLayer } from '@helpers/pixi/tiled-map';
+import { globalEffectSumsState } from '@helpers/state-game';
 import { isWorldNodeDiscovered } from '@helpers/world-node/world-node-discovery';
 import { isWorldMapVisited } from '@helpers/world-node/world-map-discovery';
 import type {
@@ -221,8 +222,12 @@ export function worldNodeCollectibleGateIds(
   );
 }
 
-// Nodes with no gate are always met; gated nodes need every listed collectible found.
+// Nodes with no gate are always met; gated nodes need every listed collectible found. Outposts removed for the run never are.
 export function isWorldNodeCollectibleGateMet(entry: WorldNodeEntry): boolean {
+  if (globalEffectSumsState().outpostsDisabled && worldNodeOutpost(entry)) {
+    return false;
+  }
+
   return worldNodeCollectibleGateIds(entry).every((collectibleId) =>
     isCollectibleDiscovered(collectibleId),
   );

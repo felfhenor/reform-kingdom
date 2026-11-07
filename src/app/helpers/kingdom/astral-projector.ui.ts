@@ -5,13 +5,13 @@ import {
   applyGlobalEffectAdd,
   applyGlobalEffectRemove,
 } from '@helpers/hero/global-effect-state';
-import { jobAbilityValue } from '@helpers/hero/job-ability';
 import {
   applyMaterialDelta,
   getMaterialQuantity,
   isMaterialDiscovered,
 } from '@helpers/item/materials';
 import {
+  astralProjectorDuration,
   astralProjectorEntries,
   astralProjectorSpellToBeOverwritten,
   isAstralProjectorCastable,
@@ -49,9 +49,7 @@ export function astralProjectorCast(id: AstralProjectorId): void {
   const evicted = astralProjectorSpellToBeOverwritten(id);
   const currentTick = timerTicksElapsed();
   // One value for both the effect and the spell's expiry, so their bookkeeping can't drift.
-  const duration = Math.round(
-    content.duration * (1 + jobAbilityValue('AstralDurationBoost')),
-  );
+  const duration = astralProjectorDuration(content);
 
   updateGamestate((state) => {
     content.requiredMaterials.forEach((requirement) => {

@@ -15,9 +15,11 @@ import { CardPageComponent } from '@components/card-page/card-page.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
+import { globalEffectDescription } from '@helpers/hero/global-effect-state';
 import { notifySuccess } from '@helpers/engine/notify';
 import { formatDuration } from '@helpers/engine/timer';
 import {
+  astralProjectorDuration,
   astralProjectorSpellToBeOverwritten,
   isAstralProjectorCastable,
 } from '@helpers/kingdom/astral-projector';
@@ -40,6 +42,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 type AstralProjectorRowViewModel = {
   content: AstralProjectorContent;
   effect: Partial<GlobalEffectContent> & HasSprite & HasRarity;
+  description: string;
   materialEntries: AstralProjectorMaterialEntry[];
   castable: boolean;
   durationLabel: string;
@@ -63,17 +66,17 @@ export class PlayKingdomAstralProjectorComponent {
   private locale = inject(LOCALE_ID);
 
   public rows = computed<AstralProjectorRowViewModel[]>(() =>
-    unlockedAstralProjectorEntries().map((content) => ({
-      content,
-      effect: {
-        rarity: content.rarity,
-        sprite: '',
-        ...(getEntry<GlobalEffectContent>(content.globalEffectId) ?? {}),
-      },
-      materialEntries: astralProjectorMaterialEntries(content),
-      castable: isAstralProjectorCastable(content),
-      durationLabel: formatDuration(content.duration),
-    })),
+    unlockedAstralProjectorEntries().map((content) => {
+      const effect = getEntry<GlobalEffectContent>(content.globalEffectId);
+      return {
+        content,
+        effect: { rarity: content.rarity, sprite: '', ...(effect ?? {}) },
+        description: effect ? globalEffectDescription(effect) : '',
+        materialEntries: astralProjectorMaterialEntries(content),
+        castable: isAstralProjectorCastable(content),
+        durationLabel: formatDuration(astralProjectorDuration(content)),
+      };
+    }),
   );
 
   private overwriteSwal = viewChild<SwalComponent>('overwriteSwal');

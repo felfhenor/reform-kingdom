@@ -1,7 +1,6 @@
 - id: f80cdc93-31fe-41e3-bb00-b2ba6ec79e5c
   name: Strength of the Duchy I
   sprite: '0004'
-  description: +5 STR/VIT for all heroes.
 
   effects:
     - effectType: GainStats
@@ -14,7 +13,6 @@
 - id: 3ce69c39-7d04-42f3-8ca2-e0842ffebad9
   name: Strength of the Duchy II
   sprite: '0004'
-  description: +10 STR/VIT for all heroes.
 
   effects:
     - effectType: GainStats
@@ -27,7 +25,6 @@
 - id: 20ba9568-7c0c-4104-8f0b-822eaea3bab9
   name: Strength of the Duchy III
   sprite: '0004'
-  description: +15 STR/VIT for all heroes.
 
   effects:
     - effectType: GainStats
@@ -40,7 +37,6 @@
 - id: c29d0b5f-8fba-42a4-8fb8-0645aa0ce9e5
   name: Magic of the Cimmerians I
   sprite: '0005'
-  description: +5 INT/RES for all heroes.
 
   effects:
     - effectType: GainStats
@@ -53,7 +49,6 @@
 - id: c1090324-b2cd-4134-a5ce-8a04acc8192a
   name: Magic of the Cimmerians II
   sprite: '0005'
-  description: +10 INT/RES for all heroes.
 
   effects:
     - effectType: GainStats
@@ -66,7 +61,6 @@
 - id: b6fdd638-cc76-410c-b7e5-85e561356a1e
   name: Magic of the Cimmerians III
   sprite: '0005'
-  description: +15 INT/RES for all heroes.
 
   effects:
     - effectType: GainStats
@@ -79,7 +73,6 @@
 - id: 5c0e119f-04d8-4daa-8d91-20e91a8e0ae2
   name: Luck of the Elvish I
   sprite: '0006'
-  description: +5 LUK for all heroes.
 
   effects:
     - effectType: GainStats
@@ -89,7 +82,6 @@
 - id: 0f71e6ac-9cb7-480d-a002-28cb5c946d94
   name: Luck of the Elvish II
   sprite: '0006'
-  description: +10 LUK for all heroes.
 
   effects:
     - effectType: GainStats
@@ -99,7 +91,6 @@
 - id: ca3c7d2b-2706-4a3b-8de8-58188f9b1570
   name: Luck of the Elvish III
   sprite: '0006'
-  description: +15 LUK for all heroes.
 
   effects:
     - effectType: GainStats
@@ -109,7 +100,6 @@
 - id: 512154e2-b4f3-4e87-a246-cb6551b79b7d
   name: Invigoration of the Zelks I
   sprite: '0007'
-  description: +25 HP/EP for all heroes.
 
   effects:
     - effectType: GainStats
@@ -122,7 +112,6 @@
 - id: d57ff2f2-9ec9-40b1-a79f-925d0abdc014
   name: Invigoration of the Zelks II
   sprite: '0007'
-  description: +50 HP/EP for all heroes.
 
   effects:
     - effectType: GainStats
@@ -135,7 +124,6 @@
 - id: fab474ff-73ac-4703-b5b1-6947ed179feb
   name: Invigoration of the Zelks III
   sprite: '0007'
-  description: +75 HP/EP for all heroes.
 
   effects:
     - effectType: GainStats
@@ -148,7 +136,6 @@
 - id: 1a6f4a0e-2c53-4e2c-8e5f-5f2f2e4c8a19
   name: Fortitude of the Warden I
   sprite: '0009'
-  description: +10% resistance to all debuffs for all heroes.
 
   effects:
     - effectType: DebuffResistance
@@ -157,7 +144,6 @@
 - id: 79725552-77cd-4277-81b1-2e0d06af88cc
   name: Fortitude of the Warden II
   sprite: '0009'
-  description: +20% resistance to all debuffs for all heroes.
 
   effects:
     - effectType: DebuffResistance
@@ -166,7 +152,6 @@
 - id: afdcf5f0-bf2b-4f29-a6bb-c4a7fa908b67
   name: Fortitude of the Warden III
   sprite: '0009'
-  description: +30% resistance to all debuffs for all heroes.
 
   effects:
     - effectType: DebuffResistance

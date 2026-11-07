@@ -11,6 +11,8 @@ import { TooltipGlobalEffectComponent } from '@components/tooltip-global-effect/
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
 import { formatDuration } from '@helpers/engine/timer';
+import { globalEffectEffectsScaled } from '@helpers/hero/global-effect-state';
+import { globalEffectSumsState } from '@helpers/state-game';
 import { isPartyAtNode } from '@helpers/world';
 import {
   shrinePrayerCooldownRemaining,
@@ -59,7 +61,14 @@ export class PanelMapNodeActionsShrineComponent {
     const tier = worldNodeShrineCurrentTier(shrine, this.entry().nodeName);
     if (!tier) return undefined;
 
-    return getEntry<GlobalEffectContent>(tier.globalEffectId);
+    const content = getEntry<GlobalEffectContent>(tier.globalEffectId);
+    if (!content) return undefined;
+
+    const strength = 1 + globalEffectSumsState().shrineBuffStrengthBonus;
+    return {
+      ...content,
+      effects: globalEffectEffectsScaled(content.effects, strength),
+    };
   });
 
   doPray() {

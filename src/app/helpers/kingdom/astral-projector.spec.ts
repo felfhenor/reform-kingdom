@@ -6,6 +6,7 @@ import { ensureAstralProjector } from '@helpers/content/ensure-astralprojector';
 import { applyCollectibleGrant } from '@helpers/item/collectibles';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import {
+  astralProjectorDuration,
   astralProjectorProcessTick,
   astralProjectorSpellToBeOverwritten,
   isAstralProjectorCastable,
@@ -21,6 +22,7 @@ import type {
 } from '@interfaces';
 import { seedContent } from '@/testing/content';
 import { inTick, seedGamestate } from '@/testing/gamestate';
+import { abilityJobContent, buildAbilityHero } from '@/testing/job-ability';
 import { captureNotifications } from '@/testing/notify';
 
 const orbId = 'star-orb' as CollectibleId;
@@ -61,6 +63,22 @@ function logMessages(): string[] {
 
 beforeEach(() => {
   seedContent([starfall, moonrise]);
+});
+
+describe('astralProjectorDuration', () => {
+  it('stretches the duration by the party Astral Resonance', () => {
+    const lasting = ensureAstralProjector({ ...starfall, duration: 100 });
+    seedContent([
+      lasting,
+      ...abilityJobContent('Magician', [['AstralDurationBoost', 1, 0.25]]),
+    ]);
+
+    seed();
+    expect(astralProjectorDuration(lasting)).toBe(100);
+
+    seed((state) => (state.world.party = [buildAbilityHero('Magician', 1)]));
+    expect(astralProjectorDuration(lasting)).toBe(125);
+  });
 });
 
 describe('isAstralProjectorCastable', () => {

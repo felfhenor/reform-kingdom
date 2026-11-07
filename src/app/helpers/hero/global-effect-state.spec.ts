@@ -8,6 +8,8 @@ import { ensureTradeskill } from '@helpers/content/ensure-tradeskill';
 import { defaultGameState, defaultStats } from '@helpers/defaults';
 import {
   applyGlobalEffectAdd,
+  globalEffectDescription,
+  globalEffectEffectsScaled,
   applyGlobalEffectPush,
   applyGlobalEffectRemove,
   globalEffectEffectsDescription,
@@ -158,6 +160,30 @@ describe('globalEffectEffectsDescription', () => {
         'On-Path Travel Speed: +5%',
         'Decree Clause Cap: +1',
       ].join(', '),
+    );
+  });
+
+  it('rounds scaled values instead of printing float noise', () => {
+    expect(
+      globalEffectEffectsDescription([
+        { effectType: 'GlobalXPGainMultiplier', value: 0.15 * 1.5 },
+        { effectType: 'GlobalOffPathTravelSpeedBoost', value: 0.3 * 1.5 },
+      ]),
+    ).toBe('XP Gain: +22.5%, Off-Path Travel Speed: +45%');
+  });
+});
+
+describe('globalEffectDescription', () => {
+  it('prefers written text, else generates it from the effects', () => {
+    const effects: GlobalEffectEffect[] = [
+      { effectType: 'GlobalXPGainMultiplier', value: 0.1 },
+    ];
+
+    expect(globalEffectDescription({ description: 'Blessed', effects })).toBe(
+      'Blessed',
+    );
+    expect(globalEffectDescription({ description: '', effects })).toBe(
+      'XP Gain: +10%',
     );
   });
 });
@@ -348,6 +374,26 @@ describe('adding and removing effects', () => {
       globalEffectSumsFor(freshState((st) => (st.edicts = [eternal.id])))
         .shrineBuffsPermanent,
     ).toBe(true);
+  });
+
+  it('scales every value of an effect, leaving flags alone', () => {
+    const state = freshState();
+
+    applyGlobalEffectAdd(state, blessing.id, 30, now, false, 1.5);
+    expect(state.globalEffectSums.stats.Strength).toBe(7.5);
+
+    expect(
+      globalEffectEffectsScaled(
+        [
+          { effectType: 'GlobalXPGainMultiplier', value: 0.2 },
+          { effectType: 'GlobalCursedDrops' },
+        ],
+        2,
+      ),
+    ).toEqual([
+      { effectType: 'GlobalXPGainMultiplier', value: 0.4 },
+      { effectType: 'GlobalCursedDrops' },
+    ]);
   });
 
   it('can hide the timer of an effect that normally shows it', () => {

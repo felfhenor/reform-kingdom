@@ -144,7 +144,8 @@ export function ensureGlobalEffectEffect(
   if (
     effect.effectType === 'GlobalReclassDisabled' ||
     effect.effectType === 'GlobalPartySharesClass' ||
-    effect.effectType === 'GlobalJobAbilitiesStack'
+    effect.effectType === 'GlobalJobAbilitiesStack' ||
+    effect.effectType === 'GlobalOutpostsDisabled'
   ) {
     return { effectType: effect.effectType };
   }
@@ -162,7 +163,9 @@ export function ensureGlobalEffectEffect(
     effect.effectType === 'GlobalDropExtraAffixes' ||
     effect.effectType === 'GlobalCraftedExtraAffixes' ||
     effect.effectType === 'GlobalRecipeMaterialBoost' ||
-    effect.effectType === 'GlobalSkillPointsPerLevel'
+    effect.effectType === 'GlobalSkillPointsPerLevel' ||
+    effect.effectType === 'GlobalShrineBuffDuration' ||
+    effect.effectType === 'GlobalShrineBuffStrength'
   ) {
     return { effectType: effect.effectType, value: effect.value ?? 0 };
   }
@@ -234,7 +237,7 @@ export function ensureGlobalEffect(
     name: effect.name ?? 'UNKNOWN',
     __type: 'globaleffect',
     sprite: effect.sprite ?? 'UNKNOWN',
-    description: effect.description ?? 'UNKNOWN',
+    description: effect.description ?? '',
     effects: ensureArray(effect.effects, ensureGlobalEffectEffect),
     hideDuration: effect.hideDuration ?? false,
     isShrineBuff: effect.isShrineBuff ?? false,
