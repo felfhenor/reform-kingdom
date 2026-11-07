@@ -15,9 +15,8 @@ import { IconComponent } from '@components/icon/icon.component';
 import { ListReflowDirective } from '@directives/list-reflow.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 
+// 64px cell + 16px gap; p-2 padding (16) cancels the missing trailing gap.
 const CELL_FOOTPRINT_PX = 80;
-// auto-fill columns lose the p-2 padding (16) but not the last cell's gap (-8); +1 covers clientWidth rounding up.
-const GRID_COLUMN_INSET_PX = 17;
 
 @Component({
   selector: 'app-page-paged-grid',
@@ -97,9 +96,10 @@ export class PagePagedGridComponent<T> implements OnDestroy {
     if (!el) return;
 
     const updateItemsPerPage = () => {
+      // Read the auto-fill track count the browser resolved rather than re-deriving it.
       const columns = Math.max(
         1,
-        Math.floor((el.clientWidth - GRID_COLUMN_INSET_PX) / CELL_FOOTPRINT_PX),
+        getComputedStyle(el).gridTemplateColumns.split(' ').length,
       );
       const rows = Math.max(1, Math.floor(el.clientHeight / CELL_FOOTPRINT_PX));
       this.itemsPerPage.set(columns * rows);
