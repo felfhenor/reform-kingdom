@@ -95,13 +95,21 @@
                     [maxDecimals]="1"
                   />
 
-                  <app-row-gather-yield-bonuses
-                    [bonuses]="materialGatherYieldBonuses(entry.item)"
-                  />
+                  @let gatherBonuses = materialGatherYieldBonuses(entry.item);
+                  @if (gatherBonuses.length > 0) {
+                    <app-row-gather-yield-bonuses
+                      class="my-2"
+                      [bonuses]="gatherBonuses"
+                    />
+                  }
 
-                  <app-row-skill-stat-bonuses
-                    [bonuses]="materialSkillStatBonuses(entry.item)"
-                  />
+                  @let skillBonuses = materialSkillStatBonuses(entry.item);
+                  @if (skillBonuses.length > 0) {
+                    <app-row-skill-stat-bonuses
+                      class="my-2"
+                      [bonuses]="skillBonuses"
+                    />
+                  }
                 </div>
               </div>
 

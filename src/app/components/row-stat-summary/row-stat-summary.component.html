@@ -11,8 +11,7 @@
 
 @if (hasAnyResistances()) {
   <app-row-labeled-values
-    class="block text-xs"
-    [class.mt-2]="layout() === 'column'"
+    class="text-xs"
     [dimension]="resistanceDimension"
     [values]="resistances()"
     [bonusValues]="bonusResistances()"
@@ -23,8 +22,7 @@
 
 @if (hasAnyCombatStats()) {
   <app-row-labeled-values
-    class="block text-xs"
-    [class.mt-2]="layout() === 'column'"
+    class="text-xs"
     [dimension]="combatStatDimension"
     [values]="combatStats()"
     [bonusValues]="bonusCombatStats()"
@@ -35,8 +33,7 @@
 
 @if (hasAnyMonsterTypeDamage()) {
   <app-row-labeled-values
-    class="block text-xs"
-    [class.mt-2]="layout() === 'column'"
+    class="text-xs"
     [dimension]="monsterTypeDamageDimension"
     [values]="monsterTypeDamage()"
     [bonusValues]="bonusMonsterTypeDamage()"
@@ -47,8 +44,7 @@
 
 @if (hasAnyElementalResistances()) {
   <app-row-labeled-values
-    class="block text-xs"
-    [class.mt-2]="layout() === 'column'"
+    class="text-xs"
     [dimension]="elementalResistanceDimension"
     [values]="elementalResistances()"
     [bonusValues]="bonusElementalResistances()"
@@ -59,8 +55,7 @@
 
 @if (hasAnyElementalBoons()) {
   <app-row-labeled-values
-    class="block text-xs"
-    [class.mt-2]="layout() === 'column'"
+    class="text-xs"
     [dimension]="elementalBoonDimension"
     [values]="elementalBoons()"
     [bonusValues]="bonusElementalBoons()"

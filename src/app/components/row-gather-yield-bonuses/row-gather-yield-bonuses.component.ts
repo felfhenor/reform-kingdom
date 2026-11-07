@@ -6,6 +6,7 @@ import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-bl
 // Shared by the equipment tooltip and the infusion screen - anywhere a GatherYield bonus (base, infusion, or affix) needs the same icon+text row.
 @Component({
   selector: 'app-row-gather-yield-bonuses',
+  host: { class: 'flex flex-col gap-2' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [SlotIconBlankComponent, AtlasImageComponent, DecimalPipe],
   templateUrl: './row-gather-yield-bonuses.component.html',
@@ -13,5 +14,7 @@ import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-bl
 })
 export class RowGatherYieldBonusesComponent {
   public bonuses =
-    input<{ tradeskillName: string; tradeskillSprite: string; value: number }[]>();
+    input<
+      { tradeskillName: string; tradeskillSprite: string; value: number }[]
+    >();
 }

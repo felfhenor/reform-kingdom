@@ -30,6 +30,7 @@ function hasAnyNonzero(
 
 @Component({
   selector: 'app-row-stat-summary',
+  host: { class: 'flex flex-col gap-2' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RowItemStatsComponent, RowLabeledValuesComponent],
   templateUrl: './row-stat-summary.component.html',

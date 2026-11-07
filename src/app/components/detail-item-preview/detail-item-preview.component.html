@@ -76,9 +76,19 @@
       </div>
     }
 
-    <app-row-gather-yield-bonuses [bonuses]="item.gatherYieldBonuses" />
+    @if (item.gatherYieldBonuses?.length) {
+      <app-row-gather-yield-bonuses
+        class="my-2"
+        [bonuses]="item.gatherYieldBonuses"
+      />
+    }
 
-    <app-row-skill-stat-bonuses [bonuses]="item.skillStatBonuses" />
+    @if (item.skillStatBonuses?.length) {
+      <app-row-skill-stat-bonuses
+        class="my-2"
+        [bonuses]="item.skillStatBonuses"
+      />
+    }
 
     @for (skill of item.skills; track skill.id) {
       <div class="type-meta my-2 flex items-center gap-2">

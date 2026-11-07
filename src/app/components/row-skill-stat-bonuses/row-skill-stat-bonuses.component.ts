@@ -8,6 +8,7 @@ import { StatShorthand } from '@interfaces';
 // Shared by the equipment tooltip and the infusion screen.
 @Component({
   selector: 'app-row-skill-stat-bonuses',
+  host: { class: 'flex flex-col gap-2' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [SlotIconBlankComponent, AtlasImageComponent, DecimalPipe],
   templateUrl: './row-skill-stat-bonuses.component.html',

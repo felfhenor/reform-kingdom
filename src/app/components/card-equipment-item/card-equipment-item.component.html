@@ -1,7 +1,7 @@
 @let content = equipment();
 
 <button
-  class="pl-2 items-start"
+  class="pl-2 pb-2 items-start"
   appListRow
   [disabled]="disabled()"
   [tp]="tooltip"
@@ -40,6 +40,18 @@
       [elementalBoons]="item.elementalBoons"
       [bonusElementalBoons]="item.bonusElementalBoons"
     />
+
+    @if (item.gatherYieldBonuses?.length) {
+      <app-row-gather-yield-bonuses [bonuses]="item.gatherYieldBonuses" />
+    }
+
+    @if (item.skillStatBonuses?.length) {
+      <app-row-skill-stat-bonuses [bonuses]="item.skillStatBonuses" />
+    }
+
+    @for (desc of item.miscAffixDescriptions; track $index) {
+      <span class="text-xs text-value-positive">{{ desc }}</span>
+    }
   </span>
 </button>
 

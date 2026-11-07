@@ -9,7 +9,9 @@ import {
 } from '@angular/core';
 import { DetailItemPreviewComponent } from '@components/detail-item-preview/detail-item-preview.component';
 import { RowEquipmentSellValueComponent } from '@components/row-equipment-sell-value/row-equipment-sell-value.component';
+import { RowGatherYieldBonusesComponent } from '@components/row-gather-yield-bonuses/row-gather-yield-bonuses.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
+import { RowSkillStatBonusesComponent } from '@components/row-skill-stat-bonuses/row-skill-stat-bonuses.component';
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { ListRowDirective } from '@directives/list-row.directive';
@@ -39,6 +41,8 @@ import { TippyDirective } from '@ngneat/helipopper';
     RowEquipmentSellValueComponent,
     RowInfusedMaterialsComponent,
     RowStatSummaryComponent,
+    RowGatherYieldBonusesComponent,
+    RowSkillStatBonusesComponent,
     DetailItemPreviewComponent,
     TippyDirective,
     ListRowDirective,
