@@ -11,6 +11,7 @@ import { DetailMaterialSourcesComponent } from '@components/detail-material-sour
 import { FloatDeltaDirective } from '@directives/float-delta.directive';
 import { getEntry } from '@helpers/content/content';
 import { itemPreviewDisplay } from '@helpers/item/item-preview';
+import { getMaterialQuantity } from '@helpers/item/materials';
 import type { ItemContent, ItemId } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { injectTweenedNumber } from '@services/animation.service';
@@ -45,6 +46,7 @@ import { injectTweenedNumber } from '@services/animation.service';
       @if (short()) {
         <span
           class="inline-block text-right tabular-nums relative"
+          [class.text-error]="isMissing()"
           [style.min-width]="minWidth()"
           [appFloatDelta]="amount()"
           [appFloatDeltaEnabled]="animate()"
@@ -58,6 +60,11 @@ import { injectTweenedNumber } from '@services/animation.service';
 
     <ng-template #detailedTooltip>
       <app-detail-item-preview [display]="previewDisplay()">
+        @if (showOwned()) {
+          <div class="type-meta mt-2" [class.text-error]="isMissing()">
+            Owned: {{ owned() | number }} / {{ amount() | number }}
+          </div>
+        }
         <app-detail-material-sources [itemId]="type()" />
       </app-detail-item-preview>
     </ng-template>
@@ -73,12 +80,19 @@ export class CurrencyNameComponent {
   public numberFormat = input('1.0-0');
   public animate = input(false);
   public detailed = input(false);
+  public showOwned = input(false);
 
   public itemData = computed(() => getEntry<ItemContent>(this.type())!);
   public icon = computed(() => this.itemData().sprite);
   public label = computed(() => this.itemData().name);
   public previewDisplay = computed(() =>
     itemPreviewDisplay('item', this.itemData()),
+  );
+  public owned = computed(() =>
+    this.showOwned() ? getMaterialQuantity(this.type()) : 0,
+  );
+  public isMissing = computed(
+    () => this.showOwned() && this.owned() < this.amount(),
   );
   public displayAmount = injectTweenedNumber(
     () => this.amount(),

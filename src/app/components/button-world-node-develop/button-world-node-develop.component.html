@@ -14,7 +14,7 @@
     Currently developing ({{ remaining }})
   } @else {
     Develop for
-    <app-row-currency-cost [costs]="cost()" />
+    <app-row-currency-cost [costs]="cost()" [showOwned]="true" />
     ({{ developTimeText() }})
   }
 </button>

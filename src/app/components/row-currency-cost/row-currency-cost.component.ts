@@ -13,6 +13,7 @@ import type { CostItem } from '@interfaces';
           [type]="cost.itemId"
           [amount]="cost.required"
           [detailed]="true"
+          [showOwned]="showOwned()"
         />
       }
     </div>
@@ -20,4 +21,5 @@ import type { CostItem } from '@interfaces';
 })
 export class RowCurrencyCostComponent {
   public costs = input.required<CostItem[]>();
+  public showOwned = input(false);
 }

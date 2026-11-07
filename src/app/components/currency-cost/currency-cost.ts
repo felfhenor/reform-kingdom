@@ -14,6 +14,7 @@ import type { ItemId } from '@interfaces';
       [numberFormat]="numberFormat()"
       [animate]="animate()"
       [detailed]="detailed()"
+      [showOwned]="showOwned()"
     />
   `,
   host: {
@@ -28,4 +29,5 @@ export class CurrencyCostComponent {
   public numberFormat = input('1.0-0');
   public animate = input(false);
   public detailed = input(false);
+  public showOwned = input(false);
 }
