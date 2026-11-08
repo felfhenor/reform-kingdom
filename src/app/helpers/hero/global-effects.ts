@@ -16,7 +16,7 @@ import {
   worldPartyState,
   worldCurrentLocationState,
 } from '@helpers/state-game';
-import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation-buff';
+import { regionBuffsSync } from '@helpers/hero/region-buffs';
 import { homeNodeGet } from '@helpers/town/town-spawn';
 import { currentLocationSet } from '@helpers/world';
 import { deathPenaltyMultiplier } from '@helpers/world-node/world-node-outpost';
@@ -72,7 +72,7 @@ function handleDeathsDoorExpiry(): void {
       x: home.x,
       y: home.y,
     });
-    townReputationBuffSync(previousMapName, home.mapName);
+    regionBuffsSync(previousMapName, home.mapName);
   }
 
   miscellaneousMessageLog('The party has been recalled home.');

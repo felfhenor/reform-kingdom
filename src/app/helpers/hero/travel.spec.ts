@@ -7,7 +7,7 @@ vi.mock('@helpers/encounter/encounter-random-combat');
 vi.mock('@helpers/engine/ui');
 vi.mock('@helpers/item/gathering');
 vi.mock('@helpers/pathfinding/pathfinding-travel');
-vi.mock('@helpers/town/reputation/town-reputation-buff');
+vi.mock('@helpers/hero/region-buffs');
 vi.mock('@helpers/world-node/world-node-encounter');
 vi.mock('@helpers/pathfinding/pathfinding', async (importOriginal) => ({
   ...(await importOriginal<typeof PathfindingHelper>()),
@@ -52,7 +52,7 @@ import {
   worldCurrentLocationState,
   worldTravelState,
 } from '@helpers/state-game';
-import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation-buff';
+import { regionBuffsSync } from '@helpers/hero/region-buffs';
 import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';
 import { outpostDeathPenaltyMultiplier } from '@helpers/world-node/world-node-outpost';
 import type {
@@ -392,10 +392,7 @@ describe('travelRelocateTo', () => {
       ticksIntoStep: 0,
     });
     expect(gatheringStop).toHaveBeenCalled();
-    expect(townReputationBuffSync).toHaveBeenCalledWith(
-      'Carrina',
-      'LarsianDesert',
-    );
+    expect(regionBuffsSync).toHaveBeenCalledWith('Carrina', 'LarsianDesert');
   });
 });
 
@@ -499,7 +496,7 @@ describe('travelProcessTick', () => {
       path: [move(2)],
       ticksIntoStep: 0,
     });
-    expect(townReputationBuffSync).toHaveBeenCalledWith('Carrina', 'Carrina');
+    expect(regionBuffsSync).toHaveBeenCalledWith('Carrina', 'Carrina');
   });
 
   it('completes an on-path step at the cheaper on-path cost', () => {
@@ -575,10 +572,7 @@ describe('travelProcessTick', () => {
 
     expect(worldCurrentLocationState()).toEqual(at(0, 'CraggledMire'));
     expect(worldTravelState().status).toBe('Idle');
-    expect(townReputationBuffSync).toHaveBeenLastCalledWith(
-      'Carrina',
-      'CraggledMire',
-    );
+    expect(regionBuffsSync).toHaveBeenLastCalledWith('Carrina', 'CraggledMire');
 
     seedTravel({ destinationNodeName: 'Gateway', path: [teleport('Larsia')] });
     tick();

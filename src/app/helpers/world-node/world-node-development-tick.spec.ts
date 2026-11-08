@@ -2,18 +2,25 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { combatLog } from '@helpers/combat/combat-log';
 import { ensureGathering } from '@helpers/content/ensure-gathernode';
+import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
 import { ensureOutpost } from '@helpers/content/ensure-outpost';
 import {
   ensureShrine,
   ensureShrineLevel,
 } from '@helpers/content/ensure-shrine';
-import { gamestate } from '@helpers/state-game';
+import { gamestate, globalEffectsState } from '@helpers/state-game';
 import {
   worldNodeDevelopmentTicksRemaining,
   worldNodeDevelopmentTimerText,
 } from '@helpers/world-node/world-node-development-state';
 import { worldNodeDevelopmentProcessTick } from '@helpers/world-node/world-node-development-tick';
-import type { GameState, GatheringId, OutpostId, ShrineId } from '@interfaces';
+import type {
+  GameState,
+  GatheringId,
+  GlobalEffectId,
+  OutpostId,
+  ShrineId,
+} from '@interfaces';
 import { seedContent } from '@/testing/content';
 import { inTick, seedGamestate } from '@/testing/gamestate';
 import { captureNotifications } from '@/testing/notify';
@@ -37,6 +44,10 @@ const outpost = ensureOutpost({
   name: 'Carrina Outpost',
   levels: [level, level],
 });
+const outpostBuff = ensureGlobalEffect({
+  id: 'regional-outpost' as GlobalEffectId,
+  name: 'Regional Outpost',
+});
 
 function seed(edit: (state: GameState) => void): void {
   seedGamestate((state) => {
@@ -48,7 +59,7 @@ function seed(edit: (state: GameState) => void): void {
 const tick = () => inTick(worldNodeDevelopmentProcessTick);
 
 beforeEach(() => {
-  seedContent([woods, shrine, outpost]);
+  seedContent([woods, shrine, outpost, outpostBuff]);
   seedWorldNodes([
     { name: woods.name, type: 'GatherNode', x: 1 },
     { name: shrine.name, type: 'Shrine', x: 2 },
@@ -110,6 +121,19 @@ describe('worldNodeDevelopmentProcessTick', () => {
     expect(combatLog().map((entry) => entry.message)).toContain(
       '**Carrina Outpost** has been built.',
     );
+  });
+
+  it('refreshes the outpost buff when an outpost on the current map levels', () => {
+    seed((state) => {
+      state.world.currentLocation.mapName = 'TestMap';
+      state.outposts[outpost.name] = { level: 0, developCompletesAtTick: now };
+    });
+
+    tick();
+
+    expect(globalEffectsState()).toEqual([
+      expect.objectContaining({ name: outpostBuff.name }),
+    ]);
   });
 
   it('does nothing when no development is pending', () => {

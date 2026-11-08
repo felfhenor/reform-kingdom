@@ -174,6 +174,8 @@ export const OUTPOST_DEATH_PENALTY_MAX_LEVEL = 4;
 // Build (+1), three death-penalty upgrades, then the teleport unlock; enforced on content by validate:outposts.
 export const OUTPOST_MAX_LEVEL = 5;
 export const OUTPOST_TELEPORT_LEVEL = 5;
+// Per outpost level (build included), on and off path, while the party is on the outpost's map.
+export const OUTPOST_TRAVEL_SPEED_BONUS_PER_LEVEL = 0.05;
 
 // Shared exponent for the house XP-curve shape (start + (end - start) * progress^EASE) used by character,
 // tradeskill, and worker leveling - see patterns.md's "shared XP-curve shape" note.

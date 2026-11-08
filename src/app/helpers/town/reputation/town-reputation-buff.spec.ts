@@ -12,7 +12,6 @@ import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputa
 import {
   townReputationBuffEffects,
   townReputationBuffRefresh,
-  townReputationBuffSync,
 } from '@helpers/town/reputation/town-reputation-buff';
 import type {
   GameState,
@@ -76,8 +75,8 @@ function activeBuffs() {
   return globalEffectsState().filter(({ id }) => id === buff.id);
 }
 
-const sync = (from: string, to: string) =>
-  inTick(() => townReputationBuffSync(from, to));
+const refresh = (mapName: string) =>
+  inTick(() => townReputationBuffRefresh(mapName));
 
 describe('townReputationBuffEffects', () => {
   it('lists only the non-zero stats, combat stats and resistances', () => {
@@ -97,11 +96,11 @@ describe('townReputationBuffEffects', () => {
   });
 });
 
-describe('townReputationBuffSync', () => {
-  it('grants the town’s buff for its tier on entering its map, described from the tier', () => {
+describe('townReputationBuffRefresh', () => {
+  it('grants the town’s buff for its tier on its map, described from the tier', () => {
     seedTown(1);
 
-    sync('Carrina', desert);
+    refresh(desert);
 
     expect(activeBuffs()).toEqual([
       expect.objectContaining({
@@ -113,37 +112,32 @@ describe('townReputationBuffSync', () => {
     ]);
   });
 
-  it('drops the buff on leaving the map, and changes nothing without a map change', () => {
+  it('drops the buff off its map', () => {
     seedTown(1, true);
-    sync(desert, desert);
-    expect(activeBuffs()).toEqual([expect.objectContaining({ startTick: 0 })]);
-
-    sync(desert, 'Carrina');
+    refresh('Carrina');
     expect(activeBuffs()).toEqual([]);
   });
 
   it('grants nothing at a tier without a buff, or once the buff or node is gone', () => {
     seedTown(0);
-    sync('Carrina', desert);
+    refresh(desert);
     expect(activeBuffs()).toEqual([]);
 
     seedTown(1);
     seedContent([larsia]);
-    sync('Carrina', desert);
+    refresh(desert);
     expect(globalEffectsState()).toEqual([]);
 
     seedTown(1);
     seedWorldNodes([]);
-    sync('Carrina', desert);
+    refresh(desert);
     expect(activeBuffs()).toEqual([]);
   });
-});
 
-describe('townReputationBuffRefresh', () => {
   it('re-derives the buff in place, replacing the old one', () => {
     seedTown(1, true);
 
-    inTick(() => townReputationBuffRefresh(desert));
+    refresh(desert);
 
     expect(activeBuffs()).toEqual([
       expect.objectContaining({ startTick: now, effects: [expect.anything()] }),

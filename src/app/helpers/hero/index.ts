@@ -17,6 +17,7 @@ export * from './position-swapping';
 export * from './regalia';
 export * from './regalia-state';
 export * from './regalia.ui';
+export * from './region-buffs';
 export * from './resting';
 export * from './resting.ui';
 export * from './skill';

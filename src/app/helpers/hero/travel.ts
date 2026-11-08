@@ -37,7 +37,7 @@ import {
   worldCurrentLocationState,
   worldTravelState,
 } from '@helpers/state-game';
-import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation-buff';
+import { regionBuffsSync } from '@helpers/hero/region-buffs';
 import { homeNodeGet } from '@helpers/town/town-spawn';
 import { currentLocationSet } from '@helpers/world';
 import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';
@@ -133,7 +133,7 @@ export function travelRelocateTo(destination: CurrentLocation): void {
     y: destination.y,
   });
 
-  townReputationBuffSync(previousMapName, destination.mapName);
+  regionBuffsSync(previousMapName, destination.mapName);
 
   updateGamestate((state) => {
     state.world.travel = { status: 'Idle', path: [], ticksIntoStep: 0 };
@@ -284,7 +284,7 @@ function travelCompleteStep(
     x: completedStep.x,
     y: completedStep.y,
   });
-  townReputationBuffSync(previousLocation.mapName, completedStep.mapName);
+  regionBuffsSync(previousLocation.mapName, completedStep.mapName);
 
   if (remainingPath.length === 0) {
     updateGamestate((state) => {

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@helpers/town/reputation/town-reputation-buff');
+vi.mock('@helpers/hero/region-buffs');
 
 import { combatLog } from '@helpers/combat/combat-log';
 import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
@@ -20,7 +20,7 @@ import {
   worldCurrentLocationState,
   worldPartyState,
 } from '@helpers/state-game';
-import { townReputationBuffSync } from '@helpers/town/reputation/town-reputation-buff';
+import { regionBuffsSync } from '@helpers/hero/region-buffs';
 import { outpostDeathPenaltyMultiplier } from '@helpers/world-node/world-node-outpost';
 import type {
   GameState,
@@ -181,10 +181,7 @@ describe('globalEffectsProcessTick', () => {
       tick();
 
       expect(worldCurrentLocationState()).toEqual(locationOf(Duchy));
-      expect(townReputationBuffSync).toHaveBeenCalledWith(
-        'CraggledMire',
-        'Carrina',
-      );
+      expect(regionBuffsSync).toHaveBeenCalledWith('CraggledMire', 'Carrina');
       expect(effectIds()).toEqual([healing.id]);
       expect(grantedHealingTicks()).toBe(
         healingTicksForLevel(worldPartyState()),
@@ -220,7 +217,7 @@ describe('globalEffectsProcessTick', () => {
       tick();
 
       expect(worldCurrentLocationState().mapName).toBe('CraggledMire');
-      expect(townReputationBuffSync).not.toHaveBeenCalled();
+      expect(regionBuffsSync).not.toHaveBeenCalled();
       expect(grantedHealingTicks()).toBe(
         healingTicksForLevel(worldPartyState()),
       );

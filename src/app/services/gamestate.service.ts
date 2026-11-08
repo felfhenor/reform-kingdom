@@ -22,7 +22,7 @@ import {
   saveGameState,
 } from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
-import { townReputationBuffReconcile } from '@helpers/town/reputation/town-reputation-buff.ui';
+import { regionBuffsRefresh } from '@helpers/hero/region-buffs';
 import { ContentService } from '@services/content.service';
 import { LoggerService } from '@services/logger.service';
 import { interval } from 'rxjs';
@@ -72,8 +72,8 @@ export class GamestateService {
     void savefileLegacySync();
     migrateOptionsState();
 
-    // The normal sync hook never runs on load, so town-region buffs need re-deriving here.
-    townReputationBuffReconcile(gamestate().world.currentLocation.mapName);
+    // The normal sync hook never runs on load, so regional buffs need re-deriving here.
+    regionBuffsRefresh(gamestate().world.currentLocation.mapName);
 
     this.logger.info('GameState', 'Gamestate loaded.');
     this.hasLoaded.set(true);

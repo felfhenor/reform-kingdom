@@ -19,6 +19,7 @@ import {
 import { setOption } from '@helpers/state-options';
 import { setWorld } from '@helpers/world';
 import { worldNodeDevelopmentApplyStartingLevels } from '@helpers/world-node/world-node-development-state';
+import { applyOutpostBuffRefresh } from '@helpers/world-node/world-node-outpost-buff';
 import { worldgenGenerateWorld } from '@helpers/worldgen';
 
 export async function gameStart(): Promise<void> {
@@ -32,6 +33,7 @@ export async function gameStart(): Promise<void> {
     grantStartingGold(state);
     applyEdictStartingItems(state);
     worldNodeDevelopmentApplyStartingLevels(state);
+    applyOutpostBuffRefresh(state, state.world.currentLocation.mapName);
     stateMarkPartyEquipmentDiscovered(state);
     ledgerMark(state.discoveredMaps, state.world.currentLocation.mapName);
     return state;

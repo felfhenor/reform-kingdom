@@ -19,6 +19,7 @@ export * from './world-node-gathering-discovery.ui';
 export * from './world-node-gathering.ui';
 export * from './world-node-level';
 export * from './world-node-outpost';
+export * from './world-node-outpost-buff';
 export * from './world-node-outpost-teleport';
 export * from './world-node-outpost.ui';
 export * from './world-node-rewards';

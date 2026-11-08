@@ -1,0 +1,6 @@
+- id: 3a2279e0-2327-4c1f-9471-1ac1ff19fb9e
+  name: Regional Outpost
+  sprite: '0022'
+  description: The outpost of this region helps the party travel throughout the region.
+
+  hideDuration: true

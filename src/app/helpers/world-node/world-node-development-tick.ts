@@ -11,6 +11,7 @@ import {
   WORLD_NODE_DEVELOPMENT_SLICES,
   worldNodeDevelopmentsDue,
 } from '@helpers/world-node/world-node-development-state';
+import { applyOutpostBuffRefresh } from '@helpers/world-node/world-node-outpost-buff';
 import type { WorldNodeDevelopmentDue } from '@interfaces';
 import { WORLD_NODE_TYPE_BY_CONTENT_TYPE } from '@interfaces';
 
@@ -49,6 +50,8 @@ export function worldNodeDevelopmentProcessTick(): void {
         level,
       };
     });
+    if (due.some(({ content }) => content.__type === 'outpost'))
+      applyOutpostBuffRefresh(state, state.world.currentLocation.mapName);
     return state;
   });
 

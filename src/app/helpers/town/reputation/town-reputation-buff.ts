@@ -107,13 +107,3 @@ export async function townReputationBuffRefresh(
     return state;
   });
 }
-
-// Regional, not per-tile: a town's buff is active while the party is anywhere on the
-// same map its node sits on.
-export function townReputationBuffSync(
-  previousMapName: string,
-  currentMapName: string,
-): void {
-  if (previousMapName === currentMapName) return;
-  townReputationBuffRefresh(currentMapName);
-}
