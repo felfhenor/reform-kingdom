@@ -66,7 +66,6 @@
       <div class="flex-1 flex flex-col gap-2 overflow-y-auto min-h-0">
         @if (selectedEntry(); as entry) {
           @let displayInfo = entryStatusDisplay(entry);
-          @let stats = selectedStats();
 
           <div class="flex items-center gap-4">
             <div class="shrink-0">
@@ -96,6 +95,11 @@
                 /{{ entry.state.xp.maximum | number }} XP
               </app-bar-progress>
 
+              <span class="flex items-center gap-2 text-sm">
+                <app-icon name="gameHeartBeats" size="row" />
+                {{ stamina() | number: '1.0-1' }} stamina
+              </span>
+
               <div class="flex flex-row gap-2 items-center">
                 @if (displayInfo.locationEntry) {
                   <app-sprite-node
@@ -120,44 +124,21 @@
             </button>
           </div>
 
-          @if (stats) {
-            <div class="flex flex-wrap gap-x-6 gap-y-2 text-sm mt-4">
-              <div class="flex items-center gap-2">
-                <span class="type-label">Gathering</span>
-                <span class="flex items-center gap-2">
-                  <app-icon name="gameSwapBag" size="row" />
-                  {{ capacityDisplay() | number }} capacity
-                </span>
-                <span class="flex items-center gap-2">
-                  <app-icon name="gameClockwork" size="row" />
-                  {{ stats.gatherSpeed | number: '1.0-1' }} speed
-                </span>
-              </div>
-
-              <div class="flex items-center gap-2">
-                <span class="type-label">Crafting</span>
-                <span class="flex items-center gap-2">
-                  <app-icon name="gameClockwork" size="row" />
-                  {{ stats.craftSpeed | number: '1.0-2' }} speed
-                </span>
-              </div>
-
-              <span class="flex items-center gap-2">
-                <app-icon name="gameHeartBeats" size="row" />
-                {{ stats.stamina | number: '1.0-1' }} stamina
-              </span>
-            </div>
-          }
-
           <p class="type-flavor min-h-[60px]">
             {{ entry.content.description }}
           </p>
 
           <div class="divider my-1"></div>
 
-          <div class="flex flex-col gap-4">
-            <app-panel-kingdom-workers-assignment-gather
+          <div class="flex flex-col gap-12">
+            <app-panel-kingdom-workers-assignment-node
               [workerId]="entry.id"
+              mode="Gather"
+            />
+
+            <app-panel-kingdom-workers-assignment-node
+              [workerId]="entry.id"
+              mode="Combat"
             />
 
             <app-panel-kingdom-workers-assignment-craft [workerId]="entry.id" />
@@ -165,7 +146,7 @@
             @if (canRecall()) {
               <button
                 class="btn btn-sm btn-error btn-outline w-fit"
-                [tp]="'Cancel this workers current order. If they are currently gathering, they will return to the Duchy. If they are currently crafting, they will cease immediately.'"
+                [tp]="'Cancel this workers current order. If they are currently gathering or fighting, they will return to the Duchy. If they are currently crafting, they will cease immediately.'"
                 (click)="recall()"
                 appSfx="ui-error"
                 [sfxOffset]="0"

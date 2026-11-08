@@ -68,8 +68,22 @@ function tripCost(): number {
 
 function staminaFor(cost: number): Partial<WorkerContent> {
   return {
-    baseStats: { capacity: 5, gatherSpeed: 1, craftSpeed: 0, stamina: cost },
-    statsPerLevel: { capacity: 0, gatherSpeed: 0, craftSpeed: 0, stamina: 0 },
+    baseStats: {
+      capacity: 5,
+      gatherSpeed: 1,
+      craftSpeed: 0,
+      stamina: cost,
+      combatPower: 0,
+      combatSpeed: 0,
+    },
+    statsPerLevel: {
+      capacity: 0,
+      gatherSpeed: 0,
+      craftSpeed: 0,
+      stamina: 0,
+      combatPower: 0,
+      combatSpeed: 0,
+    },
   };
 }
 

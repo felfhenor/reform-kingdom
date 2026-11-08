@@ -18,6 +18,7 @@ export * from './world-node-gathering-discovery';
 export * from './world-node-gathering-discovery.ui';
 export * from './world-node-gathering.ui';
 export * from './world-node-level';
+export * from './world-node-monster-drops';
 export * from './world-node-outpost';
 export * from './world-node-outpost-buff';
 export * from './world-node-outpost-teleport';

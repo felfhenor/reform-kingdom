@@ -1,5 +1,6 @@
 import { runStatsAddGold } from '@helpers/run-stats/run-stats';
 import {
+  CRIMSON_LUCRE_NAME,
   GOLD_COIN_NAME,
   MEMORY_FLUX_NAME,
   REFORGE_REAGENT_NAME,
@@ -17,6 +18,10 @@ import type { GameState, ItemContent, ItemId, MaterialId } from '@interfaces';
 
 export function goldCoinId(): ItemId {
   return getEntry<ItemContent>(GOLD_COIN_NAME)!.id;
+}
+
+export function crimsonLucreId(): ItemId {
+  return getEntry<ItemContent>(CRIMSON_LUCRE_NAME)!.id;
 }
 
 export function traderTokenId(): ItemId {

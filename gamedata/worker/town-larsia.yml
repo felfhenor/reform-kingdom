@@ -9,12 +9,16 @@
     gatherSpeed: 0.5
     craftSpeed: 0
     stamina: 100
+    combatPower: 0
+    combatSpeed: 0
 
   statsPerLevel:
     capacity: 0.5
     gatherSpeed: 0.1
     craftSpeed: 0
     stamina: 1
+    combatPower: 0
+    combatSpeed: 0
 
   canUseTeleports: false
 
@@ -29,12 +33,16 @@
     gatherSpeed: 0.5
     craftSpeed: 0
     stamina: 100
+    combatPower: 0
+    combatSpeed: 0
 
   statsPerLevel:
     capacity: 0.5
     gatherSpeed: 0.1
     craftSpeed: 0
     stamina: 1
+    combatPower: 0
+    combatSpeed: 0
 
   canUseTeleports: false
 
@@ -49,11 +57,15 @@
     gatherSpeed: 0.5
     craftSpeed: 0
     stamina: 100
+    combatPower: 0
+    combatSpeed: 0
 
   statsPerLevel:
     capacity: 0.5
     gatherSpeed: 0.1
     craftSpeed: 0
     stamina: 1
+    combatPower: 0
+    combatSpeed: 0
 
   canUseTeleports: false

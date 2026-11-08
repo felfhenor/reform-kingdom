@@ -1,9 +1,14 @@
 import type { WorkerId } from '@interfaces/content-worker';
+import type { DifficultyTier } from '@interfaces/difficulty-tier';
 import type { ItemId } from '@interfaces/content-item';
 import type { RecipeId } from '@interfaces/content-recipe';
 import type { Ledger } from '@interfaces/ledger';
 import type { CurrentLocation } from '@interfaces/state-game';
 import type { TravelStep } from '@interfaces/travel';
+import type {
+  RewardContentInfo,
+  WorldNodeEntry,
+} from '@interfaces/world-nodes';
 
 export type WorkerGatherAssignment = {
   nodeName: string;
@@ -13,6 +18,8 @@ export type WorkerGatherAssignment = {
 export type WorkerCraftAssignment = {
   recipeId: RecipeId;
 };
+
+export type WorkerAssignmentKind = 'Gather' | 'Combat' | 'Craft';
 
 // Told apart structurally ('recipeId' in a) so pre-crafting saves load unchanged.
 export type WorkerAssignment = WorkerGatherAssignment | WorkerCraftAssignment;
@@ -108,4 +115,22 @@ export type WorkerCraftSlot = {
   sprite: string;
   waiting: boolean;
   tooltip: string;
+};
+
+export type WorkerAssignmentMode = Exclude<WorkerAssignmentKind, 'Craft'>;
+
+export type WorkerAssignmentNodeOption = {
+  nodeName: string;
+  entry: WorldNodeEntry;
+  staminaCost?: number;
+  levelRangeLabel?: string;
+  requiredPower?: number;
+  difficulty?: DifficultyTier;
+  noXp: boolean;
+  disabled: boolean;
+};
+
+export type WorkerAssignmentItemOption = RewardContentInfo & {
+  id: ItemId;
+  owned: number;
 };

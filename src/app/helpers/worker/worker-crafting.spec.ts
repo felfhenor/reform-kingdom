@@ -85,8 +85,22 @@ function worker(overrides: Partial<WorkerContent> = {}): WorkerContent {
   return ensureWorker({
     id: workerId,
     name: 'Weaver Nell',
-    baseStats: { capacity: 1, gatherSpeed: 1, craftSpeed: 2, stamina: 100 },
-    statsPerLevel: { capacity: 0, gatherSpeed: 0, craftSpeed: 0, stamina: 0 },
+    baseStats: {
+      capacity: 1,
+      gatherSpeed: 1,
+      craftSpeed: 2,
+      stamina: 100,
+      combatPower: 0,
+      combatSpeed: 0,
+    },
+    statsPerLevel: {
+      capacity: 0,
+      gatherSpeed: 0,
+      craftSpeed: 0,
+      stamina: 0,
+      combatPower: 0,
+      combatSpeed: 0,
+    },
     ...overrides,
   });
 }
@@ -207,7 +221,16 @@ describe('workerCraftAssignmentIsValid', () => {
     const withStats = (craftSpeed: number, stamina: number) => {
       seed(
         { minTradeskillLevel: 3 },
-        { baseStats: { capacity: 1, gatherSpeed: 1, craftSpeed, stamina } },
+        {
+          baseStats: {
+            capacity: 1,
+            gatherSpeed: 1,
+            craftSpeed,
+            stamina,
+            combatPower: 0,
+            combatSpeed: 0,
+          },
+        },
       );
       return workerCraftAssignmentIsValid(workerId, 1, { recipeId });
     };
@@ -266,6 +289,8 @@ describe('workerCraftingProcessTick', () => {
           gatherSpeed: 1,
           craftSpeed: 99,
           stamina: 100,
+          combatPower: 0,
+          combatSpeed: 0,
         },
       },
     );

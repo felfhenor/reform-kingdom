@@ -1,10 +1,49 @@
 <div class="flex flex-col gap-2">
-  <span class="flex items-center gap-2 type-label">
-    Gathering
-    @if (isActive()) {
-      <span class="badge badge-sm badge-success">Active</span>
+  @let modeStats = stats();
+
+  <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
+    <span class="flex items-center gap-2 type-label min-w-[120px]">
+      {{ mode() === 'Gather' ? 'Gathering' : 'Combat' }}
+    </span>
+
+    <span
+      class="badge badge-sm badge-success min-w-[80px]"
+      [class.invisible]="!isActive()"
+    >
+      Active
+    </span>
+
+    @if (modeStats) {
+      <span class="flex items-center gap-4 text-sm">
+        @if (mode() === 'Combat') {
+          <span class="flex items-center gap-2 min-w-[120px]">
+            <app-icon name="gameClockwork" size="row" />
+            {{ modeStats.combatSpeed | number: '1.0-2' }} speed
+          </span>
+
+          <span class="flex items-center gap-2 min-w-[120px]">
+            <app-icon name="gameSwapBag" size="row" />
+            {{ capacity() | number }} capacity
+          </span>
+
+          <span class="flex items-center gap-2 min-w-[120px]">
+            <app-icon name="gameCrossedSwords" size="row" />
+            {{ combatPower() | number }} power
+          </span>
+        } @else {
+          <span class="flex items-center gap-2 min-w-[120px]">
+            <app-icon name="gameClockwork" size="row" />
+            {{ modeStats.gatherSpeed | number: '1.0-1' }} speed
+          </span>
+
+          <span class="flex items-center gap-2 min-w-[120px]">
+            <app-icon name="gameSwapBag" size="row" />
+            {{ capacity() | number }} capacity
+          </span>
+        }
+      </span>
     }
-  </span>
+  </div>
 
   <div class="flex flex-row gap-2">
     <ng-select
@@ -12,7 +51,11 @@
       [items]="nodeOptions()"
       bindLabel="nodeName"
       bindValue="nodeName"
-      placeholder="Select a gather node..."
+      [placeholder]="
+        mode() === 'Gather'
+          ? 'Select a gather node...'
+          : 'Select a combat node...'
+      "
       [clearable]="false"
       [ngModel]="displayedNodeName()"
       (change)="setDraftNodeName($event.nodeName)"
@@ -29,7 +72,11 @@
 
               <div class="type-meta">
                 <span class="text-difficulty-{{ item.difficulty }}">
-                  Lv. {{ item.levelRangeLabel }}
+                  @if (item.requiredPower !== undefined) {
+                    Power Lv. {{ item.requiredPower | number }}
+                  } @else {
+                    Lv. {{ item.levelRangeLabel }}
+                  }
                 </span>
                 @if (item.staminaCost !== undefined) {
                   · {{ item.staminaCost | number }} stamina
@@ -41,7 +88,7 @@
           </div>
 
           <div>
-            @if (level() > item.maxLevel) {
+            @if (item.noXp) {
               <span class="badge badge-warning text-sm">No XP</span>
             }
           </div>
@@ -54,12 +101,16 @@
             <app-sprite-node class="zoom-row" [entry]="item.entry" />
             {{ item.nodeName }}
             <span class="text-difficulty-{{ item.difficulty }}">
-              Lv. {{ item.levelRangeLabel }}
+              @if (item.requiredPower !== undefined) {
+                Power Lv. {{ item.requiredPower | number }}
+              } @else {
+                Lv. {{ item.levelRangeLabel }}
+              }
             </span>
           </div>
 
           <div>
-            @if (level() > item.maxLevel) {
+            @if (item.noXp) {
               <span class="badge badge-warning text-sm">No XP</span>
             }
           </div>

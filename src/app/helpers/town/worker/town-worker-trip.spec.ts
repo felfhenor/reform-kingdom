@@ -41,7 +41,14 @@ import { seedWorldNodes } from '@/testing/world';
 const darwin = ensureWorker({
   id: 'darwin' as WorkerId,
   name: 'Darwin',
-  baseStats: { capacity: 2, gatherSpeed: 1, craftSpeed: 0, stamina: 20 },
+  baseStats: {
+    capacity: 2,
+    gatherSpeed: 1,
+    craftSpeed: 0,
+    stamina: 20,
+    combatPower: 0,
+    combatSpeed: 0,
+  },
 });
 const ore = ensureItem({ id: 'copper-ore' as ItemId, name: 'Copper Ore' });
 const gold = ensureItem({ id: 'gold' as ItemId, name: 'Gold Coin' });

@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
+import { IconComponent } from '@components/icon/icon.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { recipeResultOwnedQuantity } from '@helpers/crafting/recipes';
@@ -21,7 +22,10 @@ import {
   recipeWorkerStaminaCost,
 } from '@helpers/worker/worker-crafting';
 import { workerAssignCraft } from '@helpers/worker/worker-crafting.ui';
-import { workerStatsForLevel } from '@helpers/worker/worker-progression';
+import {
+  kingdomWorkerStatsForLevel,
+  workerStatsForLevel,
+} from '@helpers/worker/worker-progression';
 import type {
   DifficultyTier,
   ItemContent,
@@ -56,6 +60,7 @@ type RecipeOption = {
   imports: [
     AtlasImageComponent,
     DecimalPipe,
+    IconComponent,
     FormsModule,
     NgSelectComponent,
     NgOptionTemplateDirective,
@@ -71,6 +76,13 @@ export class PanelKingdomWorkersAssignmentCraftComponent {
   public worker = computed(() => workersState()[this.workerId()]);
   public content = computed(() => getEntry<WorkerContent>(this.workerId()));
   public level = computed(() => this.worker()?.level ?? 1);
+
+  public craftSpeed = computed(() => {
+    const content = this.content();
+    return content
+      ? kingdomWorkerStatsForLevel(content, this.level()).craftSpeed
+      : 0;
+  });
 
   public assignedRecipeId = computed(() => {
     const assignment = this.worker()?.assignment;
@@ -90,12 +102,12 @@ export class PanelKingdomWorkersAssignmentCraftComponent {
 
   public isActive = computed(() => !!this.assignedRecipeId());
 
-  // Assigned while out gathering - it starts once the worker is home.
+  // Assigned while out on a trip - it starts once the worker is home.
   public isPending = computed(
     () => this.isActive() && this.worker()?.status.kind !== 'Crafting',
   );
 
-  // Keeps the last recipe on screen after the worker switches to gathering.
+  // Keeps the last recipe on screen after the worker switches to a trip.
   public shownRecipeId = linkedSignal<
     { workerId: WorkerId; recipeId?: RecipeId },
     RecipeId | undefined

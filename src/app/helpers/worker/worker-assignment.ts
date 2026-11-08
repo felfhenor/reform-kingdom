@@ -2,6 +2,14 @@ import { getEntry } from '@helpers/content/content';
 import { travelPathBaseTotalTicks } from '@helpers/hero/travel-cost-base';
 import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
+import { isMaterialDiscovered } from '@helpers/item/materials';
+import {
+  isWorkerCombatNode,
+  isWorkerCombatNodeUnlocked,
+  workerCombatNodeLevel,
+  workerCombatPower,
+  workerCombatUnitTicks,
+} from '@helpers/worker/worker-combat';
 import { workerCraftAssignmentIsValid } from '@helpers/worker/worker-crafting';
 import { workerStatsForLevel } from '@helpers/worker/worker-progression';
 import { workerGatherNodeHasItem } from '@helpers/worker/worker-shared';
@@ -48,6 +56,26 @@ export function workerAssignmentIsValid(
     : workerGatherAssignmentIsValid(workerId, level, assignment);
 }
 
+function workerCombatAssignmentIsValid(
+  content: WorkerContent,
+  level: number,
+  assignment: WorkerGatherAssignment,
+): boolean {
+  const { nodeName, itemId } = assignment;
+  const stats = workerStatsForLevel(content, level);
+  const nodeLevel = workerCombatNodeLevel(nodeName);
+
+  return (
+    isWorkerCombatNodeUnlocked(nodeName) &&
+    isMaterialDiscovered(itemId) &&
+    nodeLevel !== undefined &&
+    workerCombatPower(content, level) >= nodeLevel &&
+    workerCombatUnitTicks(content, level, nodeName, itemId) !== undefined &&
+    canWorkerReachNode(nodeName, stats.stamina, content.canUseTeleports)
+  );
+}
+
+// Combat jobs share the gather shape; the node's type tells them apart.
 export function workerGatherAssignmentIsValid(
   workerId: WorkerId,
   level: number,
@@ -55,6 +83,10 @@ export function workerGatherAssignmentIsValid(
 ): boolean {
   const content = getEntry<WorkerContent>(workerId);
   if (!content) return false;
+
+  if (isWorkerCombatNode(assignment.nodeName)) {
+    return workerCombatAssignmentIsValid(content, level, assignment);
+  }
 
   const stamina = workerStatsForLevel(content, level).stamina;
 

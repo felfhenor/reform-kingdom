@@ -1,4 +1,6 @@
 export * from './worker-assignment';
+export * from './worker-assignment.ui';
+export * from './worker-combat';
 export * from './worker-crafting';
 export * from './worker-crafting.ui';
 export * from './worker-discovery';

@@ -496,6 +496,12 @@ export const WORKER_XP_START = 10;
 export const WORKER_XP_END = 10000;
 // Stamina a worker needs per tradeskill level of a recipe's minimum, to be assigned to craft it.
 export const WORKER_CRAFT_STAMINA_PER_TRADESKILL_LEVEL = 5;
+// Ticks per combat unit at combatSpeed 1 for a 100% drop; rarer drops take proportionally longer.
+export const WORKER_COMBAT_BASE_TICKS = 10;
+// Drops rarer than this are timed as if they were this common, so 1% drops aren't 100x slower.
+export const WORKER_COMBAT_MIN_DROP_CHANCE = 10;
+// A node grants combat XP while its level is within this many points below the worker's combat power.
+export const WORKER_COMBAT_XP_POWER_WINDOW = 10;
 
 // Common desktop sizes at or above the Electron window's 1280x720 minimum.
 export const WINDOW_SIZE_PRESETS: ReadonlyArray<{

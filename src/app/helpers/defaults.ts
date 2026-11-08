@@ -203,6 +203,8 @@ export function defaultWorkerStats(): WorkerStatBlock {
     gatherSpeed: 0,
     craftSpeed: 0,
     stamina: 0,
+    combatPower: 0,
+    combatSpeed: 0,
   };
 }
 

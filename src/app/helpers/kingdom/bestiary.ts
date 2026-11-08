@@ -20,6 +20,12 @@ export function isMonsterDiscovered(monsterId: MonsterId): boolean {
   return ledgerHas(bestiaryState(), monsterId);
 }
 
+export function isWorldNodeFought(nodeName: string): boolean {
+  return Object.values(bestiaryState()).some((entry) =>
+    entry.foundAtNodes.includes(nodeName),
+  );
+}
+
 export function getMonsterKillCount(monsterId: MonsterId): number {
   return bestiaryState()[monsterId]?.kills ?? 0;
 }

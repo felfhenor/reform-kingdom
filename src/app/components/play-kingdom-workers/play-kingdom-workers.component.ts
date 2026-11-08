@@ -13,7 +13,7 @@ import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/butt
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { PanelKingdomWorkersAssignmentCraftComponent } from '@components/panel-kingdom-workers-assignment-craft/panel-kingdom-workers-assignment-craft.component';
-import { PanelKingdomWorkersAssignmentGatherComponent } from '@components/panel-kingdom-workers-assignment-gather/panel-kingdom-workers-assignment-gather.component';
+import { PanelKingdomWorkersAssignmentNodeComponent } from '@components/panel-kingdom-workers-assignment-node/panel-kingdom-workers-assignment-node.component';
 import { RowCurrencyCostComponent } from '@components/row-currency-cost/row-currency-cost.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
@@ -25,6 +25,7 @@ import { getEntry } from '@helpers/content/content';
 import { formatDuration } from '@helpers/engine/timer';
 import { goldCoinId } from '@helpers/item/materials';
 import { discoveredWorkersState, workersState } from '@helpers/state-game';
+import { isWorkerCombatNode } from '@helpers/worker/worker-combat';
 import { workerCraftRemainingTicks } from '@helpers/worker/worker-crafting.ui';
 import {
   workerIsReadyToLevelUp,
@@ -82,7 +83,7 @@ type EntryStatusDisplay = {
     SFXDirective,
     TutorialTargetDirective,
     RowCurrencyCostComponent,
-    PanelKingdomWorkersAssignmentGatherComponent,
+    PanelKingdomWorkersAssignmentNodeComponent,
     PanelKingdomWorkersAssignmentCraftComponent,
   ],
   templateUrl: './play-kingdom-workers.component.html',
@@ -126,6 +127,8 @@ export class PlayKingdomWorkersComponent {
   public capacityDisplay = computed(() =>
     Math.floor(this.selectedStats()?.capacity ?? 0),
   );
+
+  public stamina = computed(() => this.selectedStats()?.stamina ?? 0);
 
   public statusLabel = computed(() => {
     const entry = this.selectedEntry();
@@ -187,8 +190,11 @@ export class PlayKingdomWorkersComponent {
           entry.content,
           entry.state.level,
         ).capacity;
+        const verb = isWorkerCombatNode(status.nodeName)
+          ? 'Fighting'
+          : 'Gathering';
         return {
-          label: `Gathering... (${status.itemsGathered}/${Math.floor(capacity)})`,
+          label: `${verb}... (${status.itemsGathered}/${Math.floor(capacity)})`,
           locationEntry: worldNodeByName(status.nodeName),
         };
       }

@@ -40,6 +40,8 @@ export function statBlockForLevel(
     gatherSpeed: base.gatherSpeed + perLevel.gatherSpeed * (level - 1),
     craftSpeed: base.craftSpeed + perLevel.craftSpeed * (level - 1),
     stamina: base.stamina + perLevel.stamina * (level - 1),
+    combatPower: base.combatPower + perLevel.combatPower * (level - 1),
+    combatSpeed: base.combatSpeed + perLevel.combatSpeed * (level - 1),
   };
 }
 

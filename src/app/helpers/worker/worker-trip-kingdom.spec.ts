@@ -5,11 +5,15 @@ vi.mock('@helpers/pathfinding/pathfinding-travel');
 vi.mock('@helpers/worker/worker-assignment');
 
 import { combatLog } from '@helpers/combat/combat-log';
+import { WORKER_COMBAT_XP_POWER_WINDOW } from '@helpers/config';
+import { ensureEncounter } from '@helpers/content/ensure-encounternode';
+import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import {
   ensureGatherResult,
   ensureGathering,
 } from '@helpers/content/ensure-gathernode';
 import { ensureItem } from '@helpers/content/ensure-item';
+import { ensureMonster } from '@helpers/content/ensure-monster';
 import { ensureWorker } from '@helpers/content/ensure-worker';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { getMaterialQuantity } from '@helpers/item/materials';
@@ -29,10 +33,12 @@ import {
 } from '@helpers/worker/worker-trip';
 import { kingdomWorkerTripHost } from '@helpers/worker/worker-trip-kingdom';
 import type {
+  EncounterId,
   GameState,
   GatheringContent,
   GatheringId,
   ItemId,
+  MonsterId,
   RecipeId,
   TravelStep,
   WorkerId,
@@ -48,7 +54,14 @@ import { seedWorldNodes } from '@/testing/world';
 const nell = ensureWorker({
   id: 'weaver-nell' as WorkerId,
   name: 'Weaver Nell',
-  baseStats: { capacity: 3, gatherSpeed: 2, craftSpeed: 0, stamina: 30 },
+  baseStats: {
+    capacity: 3,
+    gatherSpeed: 2,
+    craftSpeed: 0,
+    stamina: 30,
+    combatPower: 0,
+    combatSpeed: 0,
+  },
 });
 const copper = ensureItem({
   id: 'copper-ore' as ItemId,
@@ -188,6 +201,46 @@ describe('kingdom worker gathering', () => {
     });
 
     expect(ticksForOneUnit()).toBeLessThan(base);
+  });
+
+  it('earns combat xp only while the node is near the worker power', () => {
+    const den = 'Goblin Den';
+    const goblinId = 'goblin' as MonsterId;
+    const xpAfterOneUnit = (combatPower: number) => {
+      seedContent([
+        ensureWorker({
+          ...nell,
+          baseStats: { ...nell.baseStats, combatPower, combatSpeed: 1 },
+        }),
+        copper,
+        ...['Gold Coin', 'Crimson Lucre', 'Trader Scrip', 'Duskhall Flux'].map(
+          (name) => ensureItem({ id: name as ItemId, name }),
+        ),
+        ensureMonster({
+          id: goblinId,
+          name: 'Goblin',
+          drops: [ensureDroppedReward({ itemId: copper.id, chance: 100 })],
+        }),
+        ensureEncounter({
+          id: 'den' as EncounterId,
+          name: den,
+          levelRange: { min: 1, max: 5 },
+          fights: [{ monsters: [{ monsterId: goblinId }] }],
+        }),
+      ]);
+      seedWorldNodes([
+        { name: 'The Duchy', type: 'Kingdom' },
+        { name: den, type: 'ExploreNode' },
+      ]);
+      seedWorker(gathering({ nodeName: den }), {
+        assignment: { nodeName: den, itemId: copper.id },
+      });
+      ticksForOneUnit();
+      return worker().xp.current;
+    };
+
+    expect(xpAfterOneUnit(5 + WORKER_COMBAT_XP_POWER_WINDOW)).toBe(1);
+    expect(xpAfterOneUnit(6 + WORKER_COMBAT_XP_POWER_WINDOW)).toBe(0);
   });
 
   it('earns no xp outside the node’s worker level range', () => {

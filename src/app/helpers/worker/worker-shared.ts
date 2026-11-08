@@ -62,11 +62,10 @@ export function workerGatherRate(
 
 export function workerGatherTickOutcome(
   status: WorkerStatusGathering,
-  rate: number,
-  gatherTime: number,
+  unitTicks: number,
 ): WorkerGatherTickOutcome {
   const ticksIntoGather = status.ticksIntoGather + 1;
-  if (ticksIntoGather < gatherTime / rate) {
+  if (ticksIntoGather < unitTicks) {
     return { kind: 'Progress', ticksIntoGather };
   }
 

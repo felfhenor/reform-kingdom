@@ -4,7 +4,11 @@ import {
   ensureGatherResult,
   ensureGathering,
 } from '@helpers/content/ensure-gathernode';
+import { WORKER_COMBAT_BASE_TICKS } from '@helpers/config';
+import { ensureEncounter } from '@helpers/content/ensure-encounternode';
+import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { ensureItem } from '@helpers/content/ensure-item';
+import { ensureMonster } from '@helpers/content/ensure-monster';
 import { ensureWorker } from '@helpers/content/ensure-worker';
 import { workersState } from '@helpers/state-game';
 import {
@@ -18,12 +22,15 @@ import {
   workerTripTravelTick,
 } from '@helpers/worker/worker-trip';
 import type {
+  EncounterId,
   GatheringId,
   ItemId,
+  MonsterId,
   TravelStep,
   WorkerId,
   WorkerState,
   WorkerStatus,
+  WorkerStatusGathering,
   WorkerTripHost,
 } from '@interfaces';
 import { seedContent } from '@/testing/content';
@@ -33,7 +40,14 @@ import { seedWorldNodes } from '@/testing/world';
 const nell = ensureWorker({
   id: 'weaver-nell' as WorkerId,
   name: 'Weaver Nell',
-  baseStats: { capacity: 3, gatherSpeed: 2, craftSpeed: 0, stamina: 30 },
+  baseStats: {
+    capacity: 3,
+    gatherSpeed: 2,
+    craftSpeed: 0,
+    stamina: 30,
+    combatPower: 0,
+    combatSpeed: 0,
+  },
 });
 const copper = ensureItem({ id: 'copper-ore' as ItemId, name: 'Copper Ore' });
 const nodeName = 'Wergen Woods';
@@ -101,7 +115,7 @@ function tickWhile(still: () => boolean, tick: () => void): number {
   return ticks;
 }
 
-const gathering = (itemsGathered = 0): WorkerStatus => ({
+const gathering = (itemsGathered = 0): WorkerStatusGathering => ({
   kind: 'Gathering',
   ...assignment,
   itemsGathered,
@@ -204,6 +218,54 @@ describe('workerTripGatheringTick', () => {
       assignment: null,
     });
     expect(calls).toEqual([]);
+  });
+
+  it('abandons once the node can no longer yield the item, even if still called valid', () => {
+    const { host, calls } = stubHost();
+    seedWorker({ ...gathering(), itemId: 'gone' as ItemId });
+
+    inTick(() => workerTripGatheringTick(host));
+
+    expect(worker()).toMatchObject({
+      status: { kind: 'AtDuchy' },
+      assignment: null,
+    });
+    expect(calls).toEqual([]);
+  });
+
+  it('times a combat node unit by the drop chance and combat speed', () => {
+    const den = 'Goblin Den';
+    const goblinId = 'goblin' as MonsterId;
+    seedContent([
+      ensureWorker({
+        ...nell,
+        baseStats: { ...nell.baseStats, combatSpeed: 1 },
+      }),
+      copper,
+      ...['Gold Coin', 'Crimson Lucre', 'Trader Scrip', 'Duskhall Flux'].map(
+        (name) => ensureItem({ id: name as ItemId, name }),
+      ),
+      ensureMonster({
+        id: goblinId,
+        name: 'Goblin',
+        drops: [ensureDroppedReward({ itemId: copper.id, chance: 50 })],
+      }),
+      ensureEncounter({
+        id: 'den' as EncounterId,
+        name: den,
+        fights: [{ monsters: [{ monsterId: goblinId }] }],
+      }),
+    ]);
+    seedWorldNodes([{ name: den, type: 'ExploreNode' }]);
+    const { host } = stubHost();
+    seedWorker({ ...gathering(), nodeName: den });
+
+    const ticks = tickWhile(
+      () => itemsGathered() === 0,
+      () => inTick(() => workerTripGatheringTick(host)),
+    );
+
+    expect(ticks).toBe(WORKER_COMBAT_BASE_TICKS * 2);
   });
 });
 

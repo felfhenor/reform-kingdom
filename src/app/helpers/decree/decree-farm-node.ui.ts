@@ -1,4 +1,3 @@
-import { getEntry } from '@helpers/content/content';
 import { farmableExploreNodes } from '@helpers/decree/decree-farm-node';
 import { assertNeverReward } from '@helpers/item/loot';
 import {
@@ -8,19 +7,16 @@ import {
   rewardKey,
   worldNodeCompletionRewards,
 } from '@helpers/world-node/world-node-rewards';
-import { worldNodeLevelRange } from '@helpers/world-node/world-node-status';
+import { worldNodeMonsterDropTable } from '@helpers/world-node/world-node-monster-drops';
 import { worldNodeFarmOption } from '@helpers/world-node/world-node-status.ui';
 import {
   worldNodeByName,
-  worldNodeEncounter,
   worldNodeEncounterRandom,
 } from '@helpers/world-node/world-nodes';
 import {
   type DroppedReward,
   type ExploreNodeFarmOption,
   type FarmNodeRewardOption,
-  type MonsterContent,
-  type MonsterId,
   type RewardIdentity,
   type WorldNodeEntry,
 } from '@interfaces';
@@ -57,47 +53,14 @@ function toRewardIdentity(reward: DroppedReward): RewardIdentity {
   }
 }
 
-function worldNodeMonsterIds(entry: WorldNodeEntry): MonsterId[] {
-  const encounter = worldNodeEncounter(entry);
-  if (encounter) {
-    return encounter.fights.flatMap((fight) =>
-      fight.monsters.map((monster) => monster.monsterId),
-    );
-  }
-
-  const encounterRandom = worldNodeEncounterRandom(entry);
-  return encounterRandom?.creaturePool.map((pool) => pool.monsterId) ?? [];
-}
-
 // Discovered kill drops from every monster fought at `entry`, de-duplicated; excludes undiscovered drops and Gold Coin.
 function worldNodeMonsterDrops(entry: WorldNodeEntry): DroppedReward[] {
-  const levelRange = worldNodeLevelRange(entry);
-  if (!levelRange) return [];
-
-  const monsterIds = new Set(worldNodeMonsterIds(entry));
-
-  const seen = new Set<string>();
-  const drops: DroppedReward[] = [];
-
-  monsterIds.forEach((monsterId) => {
-    const monster = getEntry<MonsterContent>(monsterId);
-    monster?.drops.forEach((reward) => {
-      if (isGoldCoinReward(reward)) return;
-      if (!isRewardDiscovered(reward)) return;
-
-      const canDropFromNode =
-        levelRange.max >= reward.minLevel && levelRange.min <= reward.maxLevel;
-      if (!canDropFromNode) return;
-
-      const key = rewardKey(reward);
-      if (seen.has(key)) return;
-
-      seen.add(key);
-      drops.push(reward);
-    });
-  });
-
-  return drops;
+  return uniqBy(
+    worldNodeMonsterDropTable(entry).filter(
+      (reward) => !isGoldCoinReward(reward) && isRewardDiscovered(reward),
+    ),
+    (reward) => rewardKey(reward),
+  );
 }
 
 export function farmNodeRewardOptions(

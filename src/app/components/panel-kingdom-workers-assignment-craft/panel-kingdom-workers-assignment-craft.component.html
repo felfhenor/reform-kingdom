@@ -1,12 +1,30 @@
 <div class="flex flex-col gap-2">
-  <span class="flex items-center gap-2 type-label">
-    Crafting
-    @if (isPending()) {
-      <span class="badge badge-sm badge-attention">Starts on return</span>
-    } @else if (isActive()) {
-      <span class="badge badge-sm badge-success">Active</span>
-    }
-  </span>
+  <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
+    <span class="flex items-center gap-2 type-label min-w-[120px]">
+      Crafting
+    </span>
+
+    <div class="min-w-[80px]">
+      <span
+        class="badge badge-sm badge-attention"
+        [class.hidden]="!isPending()"
+      >
+        On Return
+      </span>
+
+      <span
+        class="badge badge-sm badge-success"
+        [class.hidden]="!isActive() || isPending()"
+      >
+        Active
+      </span>
+    </div>
+
+    <span class="flex items-center gap-2 text-sm min-w-[120px]">
+      <app-icon name="gameClockwork" size="row" />
+      {{ craftSpeed() | number: '1.0-2' }} speed
+    </span>
+  </div>
 
   <div class="flex flex-row gap-2">
     <ng-select

@@ -6,7 +6,12 @@ import type { HasDescription } from '@interfaces/traits';
 export type WorkerId = Branded<string, 'WorkerId'>;
 
 export type WorkerStatBlock = Record<
-  'capacity' | 'gatherSpeed' | 'craftSpeed' | 'stamina',
+  | 'capacity'
+  | 'gatherSpeed'
+  | 'craftSpeed'
+  | 'stamina'
+  | 'combatPower'
+  | 'combatSpeed',
   number
 >;
 

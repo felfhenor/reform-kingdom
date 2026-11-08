@@ -32,12 +32,21 @@ const goldId = 'gold' as ItemId;
 const nell = ensureWorker({
   id: 'weaver-nell' as WorkerId,
   name: 'Weaver Nell',
-  baseStats: { capacity: 6, gatherSpeed: 1, craftSpeed: 0.5, stamina: 30 },
+  baseStats: {
+    capacity: 6,
+    gatherSpeed: 1,
+    craftSpeed: 0.5,
+    stamina: 30,
+    combatPower: 2,
+    combatSpeed: 1,
+  },
   statsPerLevel: {
     capacity: 0.5,
     gatherSpeed: 0.1,
     craftSpeed: 0.05,
     stamina: 2,
+    combatPower: 0.5,
+    combatSpeed: 0.1,
   },
 });
 
@@ -69,6 +78,8 @@ describe('workerStatsForLevel', () => {
       gatherSpeed: 1 + 0.1 * 4,
       craftSpeed: 0.5 + 0.05 * 4,
       stamina: 30 + 2 * 4,
+      combatPower: 2 + 0.5 * 4,
+      combatSpeed: 1 + 0.1 * 4,
     });
   });
 });
@@ -198,6 +209,8 @@ describe('kingdomWorkerStatsForLevel', () => {
       gatherSpeed: 1.25,
       craftSpeed: 0.75,
       stamina: 30,
+      combatPower: 2,
+      combatSpeed: 1,
     });
     expect(kingdomWorkerGatherMultiplier()).toBe(1.25);
   });

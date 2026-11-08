@@ -41,8 +41,22 @@ const workerContent: WorkerContent = ensureWorker({
   description: 'test',
   sprite: '0000',
   frames: 4,
-  baseStats: { capacity: 6, gatherSpeed: 2, craftSpeed: 0, stamina: 30 },
-  statsPerLevel: { capacity: 0.5, gatherSpeed: 0.1, craftSpeed: 0, stamina: 2 },
+  baseStats: {
+    capacity: 6,
+    gatherSpeed: 2,
+    craftSpeed: 0,
+    stamina: 30,
+    combatPower: 0,
+    combatSpeed: 0,
+  },
+  statsPerLevel: {
+    capacity: 0.5,
+    gatherSpeed: 0.1,
+    craftSpeed: 0,
+    stamina: 2,
+    combatPower: 0,
+    combatSpeed: 0,
+  },
   canUseTeleports: true,
 });
 
@@ -160,19 +174,18 @@ describe('workerGatherNodeHasItem', () => {
 
 describe('workerGatherTickOutcome', () => {
   it('advances progress while under the per-unit tick count', () => {
-    // gatherTime 10 at rate 2 = 5 ticks per unit.
     expect(
-      workerGatherTickOutcome(gatheringStatus({ ticksIntoGather: 3 }), 2, 10),
+      workerGatherTickOutcome(gatheringStatus({ ticksIntoGather: 3 }), 5),
     ).toEqual({ kind: 'Progress', ticksIntoGather: 4 });
   });
 
   it('keeps gathering through a fractional tick count until it is passed', () => {
-    // gatherTime 25 at rate 4 = 6.25 ticks per unit: tick 6 is still short, tick 7 lands.
+    // Tick 6 is still short of 6.25, tick 7 lands.
     expect(
-      workerGatherTickOutcome(gatheringStatus({ ticksIntoGather: 5 }), 4, 25),
+      workerGatherTickOutcome(gatheringStatus({ ticksIntoGather: 5 }), 6.25),
     ).toEqual({ kind: 'Progress', ticksIntoGather: 6 });
     expect(
-      workerGatherTickOutcome(gatheringStatus({ ticksIntoGather: 6 }), 4, 25),
+      workerGatherTickOutcome(gatheringStatus({ ticksIntoGather: 6 }), 6.25),
     ).toEqual({ kind: 'UnitGathered', itemsGathered: 1 });
   });
 
@@ -180,8 +193,7 @@ describe('workerGatherTickOutcome', () => {
     expect(
       workerGatherTickOutcome(
         gatheringStatus({ ticksIntoGather: 4, itemsGathered: 2 }),
-        2,
-        10,
+        5,
       ),
     ).toEqual({ kind: 'UnitGathered', itemsGathered: 3 });
   });

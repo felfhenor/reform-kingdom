@@ -12,6 +12,10 @@ import {
   workerAssignmentIsValid,
   workerGatherAssignmentIsValid,
 } from '@helpers/worker/worker-assignment';
+import {
+  isWorkerCombatNode,
+  workerCombatGrantsXp,
+} from '@helpers/worker/worker-combat';
 import { workerStartCrafting } from '@helpers/worker/worker-crafting';
 import {
   kingdomWorkerGatherMultiplier,
@@ -32,13 +36,26 @@ import type {
   WorkerTripHost,
 } from '@interfaces';
 
-function kingdomWorkerGainGatherXp(
+function kingdomWorkerUnitGrantsXp(
+  workerId: WorkerId,
+  nodeName: string,
+  level: number,
+): boolean {
+  if (isWorkerCombatNode(nodeName)) {
+    const content = getEntry<WorkerContent>(workerId);
+    return !!content && workerCombatGrantsXp(content, level, nodeName);
+  }
+
+  const gathering = workerGatherNodeContent(nodeName);
+  return !!gathering && workerLevelInRange(gathering.workerLevelRange, level);
+}
+
+function kingdomWorkerGainUnitXp(
   workerId: WorkerId,
   nodeName: string,
   level: number,
 ): void {
-  const gathering = workerGatherNodeContent(nodeName);
-  if (gathering && workerLevelInRange(gathering.workerLevelRange, level)) {
+  if (kingdomWorkerUnitGrantsXp(workerId, nodeName, level)) {
     workerGainXp(workerId, 1);
   }
 }
@@ -149,7 +166,7 @@ export function kingdomWorkerTripHost(
     },
     gatherRateMultiplier: kingdomWorkerGatherMultiplier(),
     onUnitGathered: (nodeName, _itemId, level) =>
-      kingdomWorkerGainGatherXp(workerId, nodeName, level),
+      kingdomWorkerGainUnitXp(workerId, nodeName, level),
     onUnitBanked: kingdomWorkerGatherVfx,
     onArrivedHome: (cargo, pending, level) =>
       kingdomWorkerArrivedHome(workerId, cargo, pending, level),

@@ -1,6 +1,10 @@
 import { getEntry } from '@helpers/content/content';
 import { travelPathAdvanceTick } from '@helpers/hero/travel-progress';
 import { updateGamestate } from '@helpers/state-game';
+import {
+  isWorkerCombatNode,
+  workerCombatUnitTicks,
+} from '@helpers/worker/worker-combat';
 import { workerStatsForLevel } from '@helpers/worker/worker-progression';
 import {
   applyWorkerGatherProgress,
@@ -132,6 +136,30 @@ function workerTripCompleteGatherUnit<W extends WorkerTripWorker>(
   });
 }
 
+// Undefined when this node can no longer yield the item (content changed, or the rate fell to 0).
+function workerTripUnitTicks<W extends WorkerTripWorker>(
+  host: WorkerTripHost<W>,
+  content: WorkerContent,
+  level: number,
+  nodeName: string,
+  itemId: ItemId,
+): number | undefined {
+  if (isWorkerCombatNode(nodeName)) {
+    return workerCombatUnitTicks(content, level, nodeName, itemId);
+  }
+
+  const gathering = workerGatherNodeContent(nodeName);
+  if (!gathering) return undefined;
+
+  const nodeLevel = worldNodeLevel(nodeName);
+  const rate =
+    workerGatherRate(content, level, gathering, itemId, nodeLevel) *
+    host.gatherRateMultiplier;
+  if (rate <= 0) return undefined;
+
+  return gatheringEffectiveGatherTime(gathering, nodeLevel) / rate;
+}
+
 export function workerTripGatheringTick<W extends WorkerTripWorker>(
   host: WorkerTripHost<W>,
 ): void {
@@ -140,26 +168,20 @@ export function workerTripGatheringTick<W extends WorkerTripWorker>(
   if (!worker || !status || status.kind !== 'Gathering') return;
 
   const { nodeName, itemId } = status;
-  if (!host.assignmentIsValid(worker.level, { nodeName, itemId })) {
+  const content = getEntry<WorkerContent>(host.workerId);
+  const unitTicks = content
+    ? workerTripUnitTicks(host, content, worker.level, nodeName, itemId)
+    : undefined;
+  if (
+    !content ||
+    unitTicks === undefined ||
+    !host.assignmentIsValid(worker.level, { nodeName, itemId })
+  ) {
     workerTripAbandonGather(host);
     return;
   }
 
-  const content = getEntry<WorkerContent>(host.workerId);
-  const gathering = workerGatherNodeContent(nodeName);
-  if (!content || !gathering) return;
-
-  const nodeLevel = worldNodeLevel(nodeName);
-  const rate =
-    workerGatherRate(content, worker.level, gathering, itemId, nodeLevel) *
-    host.gatherRateMultiplier;
-  if (rate <= 0) return;
-
-  const outcome = workerGatherTickOutcome(
-    status,
-    rate,
-    gatheringEffectiveGatherTime(gathering, nodeLevel),
-  );
+  const outcome = workerGatherTickOutcome(status, unitTicks);
   if (outcome.kind === 'Progress') {
     updateGamestate((state) => {
       const target = host.draft(state);
