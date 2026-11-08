@@ -55,7 +55,7 @@ export function isOutpostTeleportListed(entry: WorldNodeEntry): boolean {
 export function outpostsWithTeleportUnlocked(): WorldNodeEntry[] {
   return worldNodesOfType('Outpost').filter(
     (entry) =>
-      isOutpostTeleportListed(entry) &&
-      isOutpostTeleportUnlocked(entry.nodeName),
+      isOutpostTeleportUnlocked(entry.nodeName) &&
+      isOutpostTeleportListed(entry),
   );
 }

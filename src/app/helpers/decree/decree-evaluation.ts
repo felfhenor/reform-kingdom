@@ -20,7 +20,7 @@ import { homeNodeGet, isPlayerAtHome } from '@helpers/town/town-spawn';
 import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';
 import { isWorldNodeGateOpen } from '@helpers/world-node/world-node-gate';
 import { discoveredGatherNodesFor } from '@helpers/world-node/world-node-gathering-discovery';
-import { worldNodeObtainableMissingRewards } from '@helpers/world-node/world-node-rewards';
+import { worldNodeHasObtainableMissingReward } from '@helpers/world-node/world-node-rewards';
 import {
   isWorldNodeVisible,
   worldNodeByName,
@@ -123,7 +123,7 @@ function isUnfinishedArea(entry: WorldNodeEntry): boolean {
     return false;
   }
 
-  return worldNodeObtainableMissingRewards(entry).length > 0;
+  return worldNodeHasObtainableMissingReward(entry);
 }
 
 export function nearestUnfinishedExploreNode(
@@ -133,11 +133,11 @@ export function nearestUnfinishedExploreNode(
     ...worldNodesOfType('ExploreNode'),
     ...worldNodesOfType('ExploreRandomNode'),
   ]
-    .filter(isWorldNodeVisible)
-    .filter(isUnfinishedArea)
     .filter((entry) =>
       riskLevelSatisfies(riskLevelOfExploreNode(entry), riskTolerance),
-    );
+    )
+    .filter(isWorldNodeVisible)
+    .filter(isUnfinishedArea);
 
   return nearestReachableNode(candidates, riskTolerance);
 }

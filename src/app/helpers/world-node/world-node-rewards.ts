@@ -97,19 +97,22 @@ export function isGoldCoinReward(reward: DroppedReward): boolean {
   return reward.itemId === getEntry<ItemContent>(GOLD_COIN_NAME)?.id;
 }
 
+function worldNodeAllCompletionRewards(entry: WorldNodeEntry): DroppedReward[] {
+  return (
+    worldNodeEncounter(entry)?.completionRewards ??
+    worldNodeEncounterRandom(entry)?.completionRewards ??
+    []
+  );
+}
+
 // Distinct completion rewards, excluding Gold Coin and de-duplicated by identity.
 export function worldNodeCompletionRewards(
   entry: WorldNodeEntry,
 ): DroppedReward[] {
-  const completionRewards =
-    worldNodeEncounter(entry)?.completionRewards ??
-    worldNodeEncounterRandom(entry)?.completionRewards;
-  if (!completionRewards) return [];
-
   const seen = new Set<string>();
   const rewards: DroppedReward[] = [];
 
-  completionRewards.forEach((reward) => {
+  worldNodeAllCompletionRewards(entry).forEach((reward) => {
     if (isGoldCoinReward(reward)) return;
 
     const key = rewardKey(reward);
@@ -151,11 +154,14 @@ export function worldNodeCompletionRewardProgress(
   };
 }
 
-// Excludes rewards that can never roll (e.g. town-exclusive recipes), so a node isn't chased for nothing.
-export function worldNodeObtainableMissingRewards(
+// Ignores rewards that can never roll (e.g. town-exclusive recipes), so a node isn't chased for nothing.
+export function worldNodeHasObtainableMissingReward(
   entry: WorldNodeEntry,
-): DroppedReward[] {
-  return worldNodeCompletionRewards(entry).filter(
-    (reward) => !isRewardDiscovered(reward) && isRecipeUsable(reward),
+): boolean {
+  return worldNodeAllCompletionRewards(entry).some(
+    (reward) =>
+      !isRewardDiscovered(reward) &&
+      !isGoldCoinReward(reward) &&
+      isRecipeUsable(reward),
   );
 }

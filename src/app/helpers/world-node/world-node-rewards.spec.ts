@@ -5,6 +5,7 @@ import type {
   EquipmentId,
   ItemId,
   RecipeId,
+  TownId,
   TradeskillId,
   WorldNodeEntry,
 } from '@interfaces';
@@ -18,6 +19,7 @@ import {
   ensureItem,
 } from '@helpers/content/ensure-item';
 import { ensureRecipe } from '@helpers/content/ensure-recipe';
+import { ensureTown } from '@helpers/content/ensure-town';
 import { ensureTradeskill } from '@helpers/content/ensure-tradeskill';
 import { recipeStylizedName } from '@helpers/crafting/recipes';
 import { defaultTradeskillBuilding } from '@helpers/defaults';
@@ -25,7 +27,7 @@ import {
   rewardContentInfo,
   worldNodeCompletionRewardProgress,
   worldNodeCompletionRewards,
-  worldNodeObtainableMissingRewards,
+  worldNodeHasObtainableMissingReward,
 } from '@helpers/world-node/world-node-rewards';
 import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
@@ -151,18 +153,14 @@ describe('worldNodeCompletionRewardProgress', () => {
   });
 });
 
-describe('worldNodeObtainableMissingRewards', () => {
-  const clamReward = ensureDroppedReward({
-    collectibleId: clam.id,
-    chance: 10,
-  });
-
+describe('worldNodeHasObtainableMissingReward', () => {
   function withTailoringLevel(level: number, recipeFound = false): void {
     seedGamestate((state) => {
       state.tradeskills[tradeskillId] = {
         ...defaultTradeskillBuilding(),
         level,
       };
+      state.collectibles[clam.id] = { quantity: 1, foundAt: 1 };
       if (recipeFound) state.discoveredRecipes[cloakRecipe.id] = { foundAt: 1 };
     });
   }
@@ -171,22 +169,52 @@ describe('worldNodeObtainableMissingRewards', () => {
     seedEncounterWith(
       [
         ensureDroppedReward({ recipeId: cloakRecipe.id, chance: 10 }),
-        clamReward,
+        ensureDroppedReward({ collectibleId: clam.id, chance: 10 }),
       ],
       [cloakRecipe, clam],
     );
   });
 
-  it('includes a recipe even below its tradeskill level', () => {
+  it('counts a recipe even below its tradeskill level', () => {
     withTailoringLevel(cloakRecipe.minTradeskillLevel - 1);
 
-    expect(worldNodeObtainableMissingRewards(node())).toHaveLength(2);
+    expect(worldNodeHasObtainableMissingReward(node())).toBe(true);
   });
 
-  it('skips rewards already discovered', () => {
+  it('is false once every reward is discovered', () => {
     withTailoringLevel(cloakRecipe.minTradeskillLevel, true);
 
-    expect(worldNodeObtainableMissingRewards(node())).toEqual([clamReward]);
+    expect(worldNodeHasObtainableMissingReward(node())).toBe(false);
+  });
+
+  it('ignores a town-exclusive recipe', () => {
+    withTailoringLevel(cloakRecipe.minTradeskillLevel);
+    seedEncounterWith(
+      [ensureDroppedReward({ recipeId: cloakRecipe.id, chance: 10 })],
+      [
+        cloakRecipe,
+        ensureTown({
+          id: 'larsia' as TownId,
+          name: 'Larsia',
+          crafting: { uniqueRecipeIds: [cloakRecipe.id] },
+        }),
+      ],
+    );
+
+    expect(worldNodeHasObtainableMissingReward(node())).toBe(false);
+  });
+
+  it('ignores an undiscovered Gold Coin', () => {
+    const goldCoin = ensureItem({
+      id: 'gold-coin' as ItemId,
+      name: 'Gold Coin',
+    });
+    seedEncounterWith(
+      [ensureDroppedReward({ itemId: goldCoin.id, chance: 100 })],
+      [goldCoin],
+    );
+
+    expect(worldNodeHasObtainableMissingReward(node())).toBe(false);
   });
 });
 
