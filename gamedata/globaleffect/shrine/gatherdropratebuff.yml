@@ -3,37 +3,57 @@
   sprite: '0014'
   isShrineBuff: true
   effects:
+    - effectType: GlobalGatheringItemFlatBoost
+      value: 1
     - effectType: GlobalGatheringItemDropRateBoost
       value: 10
+    - effectType: GlobalGatheringItemDropAmountBoost
+      value: 2
 
 - id: 72e55b35-6cab-4862-ba0d-c832fd5deb7f
   name: Grovetender's Bounty II
   sprite: '0014'
   isShrineBuff: true
   effects:
+    - effectType: GlobalGatheringItemFlatBoost
+      value: 2
     - effectType: GlobalGatheringItemDropRateBoost
       value: 20
+    - effectType: GlobalGatheringItemDropAmountBoost
+      value: 2
 
 - id: a5df1339-0c22-4fa7-83e6-60ed0455a9a9
   name: Grovetender's Bounty III
   sprite: '0014'
   isShrineBuff: true
   effects:
+    - effectType: GlobalGatheringItemFlatBoost
+      value: 2
     - effectType: GlobalGatheringItemDropRateBoost
       value: 30
+    - effectType: GlobalGatheringItemDropAmountBoost
+      value: 3
 
 - id: 294fc0b5-3bea-41cc-981c-133cee8cbcd5
   name: Grovetender's Bounty IV
   sprite: '0014'
   isShrineBuff: true
   effects:
+    - effectType: GlobalGatheringItemFlatBoost
+      value: 3
     - effectType: GlobalGatheringItemDropRateBoost
       value: 40
+    - effectType: GlobalGatheringItemDropAmountBoost
+      value: 3
 
 - id: 71c8f5d9-24d0-4441-9f96-fe2857e1e97f
   name: Grovetender's Bounty V
   sprite: '0014'
   isShrineBuff: true
   effects:
+    - effectType: GlobalGatheringItemFlatBoost
+      value: 3
     - effectType: GlobalGatheringItemDropRateBoost
       value: 50
+    - effectType: GlobalGatheringItemDropAmountBoost
+      value: 4

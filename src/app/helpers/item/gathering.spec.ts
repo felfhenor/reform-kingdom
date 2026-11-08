@@ -27,7 +27,7 @@ import { partyGatherYieldBonuses } from '@helpers/hero/party';
 import {
   canEnterGatherNode,
   currentGatheringContent,
-  gatheringItemDropRateBoost,
+  gatheringBonusItems,
   gatheringProcessTick,
   gatheringProgressFraction,
   gatheringRollResult,
@@ -453,7 +453,7 @@ describe('gatheringProcessTick', () => {
     expect(worldGatheringState().ticksIntoGather).toBe(0);
   });
 
-  it('grants +1 of the first item line on a successful drop-rate boost roll', () => {
+  it('adds the guaranteed and rolled bonus items to the first item line only', () => {
     seedGathering({
       gatherResults: [
         result([
@@ -463,15 +463,51 @@ describe('gatheringProcessTick', () => {
       ],
     });
     seedGatheringAt(4, (state) => {
+      state.globalEffectSums.gatheringItemFlatBoost = 1;
       state.globalEffectSums.gatheringItemDropRateBoost = 20;
+      state.globalEffectSums.gatheringItemDropAmountBoost = 2;
     });
     vi.mocked(rngSucceedsChance).mockReturnValue(true);
 
     inTick(gatheringProcessTick);
 
-    expect(gatheringItemDropRateBoost()).toBe(20);
     expect(rngSucceedsChance).toHaveBeenCalledWith(20);
-    expect(material(woodId)).toBe(3);
+    expect(material(woodId)).toBe(5);
     expect(material(stickId)).toBe(1);
+  });
+});
+
+describe('gatheringBonusItems', () => {
+  const seedBonus = (flat: number, chance: number, amount: number) =>
+    seedGamestate((state) => {
+      state.globalEffectSums.gatheringItemFlatBoost = flat;
+      state.globalEffectSums.gatheringItemDropRateBoost = chance;
+      state.globalEffectSums.gatheringItemDropAmountBoost = amount;
+    });
+
+  it('grants only the guaranteed bonus when the roll fails', () => {
+    seedBonus(1, 50, 4);
+    vi.mocked(rngSucceedsChance).mockReturnValue(false);
+
+    expect(gatheringBonusItems()).toBe(1);
+  });
+
+  it('stacks the rolled amount on top of the guaranteed bonus', () => {
+    seedBonus(1, 50, 4);
+    vi.mocked(rngSucceedsChance).mockReturnValue(true);
+
+    expect(gatheringBonusItems()).toBe(5);
+  });
+
+  it('rolls a strength-scaled fractional remainder as a chance of one more', () => {
+    seedBonus(1.5, 15, 3);
+    vi.mocked(rngSucceedsChance).mockReturnValueOnce(true);
+    vi.mocked(rngSucceedsChance).mockReturnValueOnce(false);
+
+    expect(gatheringBonusItems()).toBe(4);
+    expect(rngSucceedsChance).toHaveBeenLastCalledWith(50);
+
+    vi.mocked(rngSucceedsChance).mockReturnValue(true);
+    expect(gatheringBonusItems()).toBe(5);
   });
 });

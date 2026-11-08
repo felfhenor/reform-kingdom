@@ -47,6 +47,8 @@ export type GlobalEffectSums = {
   astralSpellStrengthBonus: number;
   combatItemDropRateBoost: number;
   gatheringItemDropRateBoost: number;
+  gatheringItemDropAmountBoost: number;
+  gatheringItemFlatBoost: number;
   armorySizeBoost: number;
   // Sparse - only tradeskills with an active boost have an entry.
   tradeskillQueueSizeBoosts: Partial<Record<TradeskillId, number>>;

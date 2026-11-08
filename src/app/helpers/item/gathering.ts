@@ -149,9 +149,18 @@ function partyGatherYieldBonus(tradeskillIds: TradeskillId[]): number {
   );
 }
 
-// Gather yields are whole numbers, so a percent boost can't scale a quantity directly - it's rolled instead as a chance of +1.
-export function gatheringItemDropRateBoost(): number {
-  return globalEffectSumsState().gatheringItemDropRateBoost;
+// Shrine buff strength can scale the counts into fractions, so the remainder is rolled as a chance of one more.
+export function gatheringBonusItems(): number {
+  const sums = globalEffectSumsState();
+  const rolled = rngSucceedsChance(sums.gatheringItemDropRateBoost)
+    ? sums.gatheringItemDropAmountBoost
+    : 0;
+  const total = sums.gatheringItemFlatBoost + rolled;
+  const whole = Math.floor(total);
+  const remainder = total - whole;
+  return remainder > 0 && rngSucceedsChance(remainder * 100)
+    ? whole + 1
+    : whole;
 }
 
 function grantGatherItems(
@@ -160,14 +169,15 @@ function grantGatherItems(
   yieldMultiplier: number,
 ): void {
   const yieldBonus = partyGatherYieldBonus(result.tradeskillIds);
-  const bonusItem = rngSucceedsChance(gatheringItemDropRateBoost()) ? 1 : 0;
+  const bonusItems = gatheringBonusItems();
 
   const grants = result.items
     .filter(({ quantity }) => quantity > 0)
     .map(({ itemId, quantity }, index) => {
       // Bonus is flat per gather cycle, not per item line - only the first line gets it.
       const grantedQuantity =
-        quantity * yieldMultiplier + (index === 0 ? yieldBonus + bonusItem : 0);
+        quantity * yieldMultiplier +
+        (index === 0 ? yieldBonus + bonusItems : 0);
       addMaterial(itemId, grantedQuantity);
       taskRecordGather(nodeName, itemId, grantedQuantity);
 

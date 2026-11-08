@@ -79,9 +79,21 @@ export type GlobalEffectEffectCombatItemDropRateBoost = {
   value: number;
 };
 
-// `value` (a flat percent) is the chance of +1 extra item on a gather cycle
+// `value` (a flat percent) is the chance of a gather cycle granting the GlobalGatheringItemDropAmountBoost extra items.
 export type GlobalEffectEffectGatheringItemDropRateBoost = {
   effectType: 'GlobalGatheringItemDropRateBoost';
+  value: number;
+};
+
+// Adds `value` (a flat count) to the extra items granted when the GlobalGatheringItemDropRateBoost roll succeeds.
+export type GlobalEffectEffectGatheringItemDropAmountBoost = {
+  effectType: 'GlobalGatheringItemDropAmountBoost';
+  value: number;
+};
+
+// Adds `value` (a flat count) to every gather cycle, no roll needed.
+export type GlobalEffectEffectGatheringItemFlatBoost = {
+  effectType: 'GlobalGatheringItemFlatBoost';
   value: number;
 };
 
@@ -303,6 +315,8 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectDebuffResistanceTag
   | GlobalEffectEffectCombatItemDropRateBoost
   | GlobalEffectEffectGatheringItemDropRateBoost
+  | GlobalEffectEffectGatheringItemDropAmountBoost
+  | GlobalEffectEffectGatheringItemFlatBoost
   | GlobalEffectEffectArmorySizeBoost
   | GlobalEffectEffectTradeskillQueueSizeBoost
   | GlobalEffectEffectOffPathTravelSpeedBoost

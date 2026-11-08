@@ -13,7 +13,9 @@ import type {
   GlobalEffectEffectGainCombatStat,
   GlobalEffectEffectGainStatPercent,
   GlobalEffectEffectGainStats,
+  GlobalEffectEffectGatheringItemDropAmountBoost,
   GlobalEffectEffectGatheringItemDropRateBoost,
+  GlobalEffectEffectGatheringItemFlatBoost,
   GlobalEffectEffectGoldGainMultiplier,
   GlobalEffectEffectOffPathTravelSpeedBoost,
   GlobalEffectEffectOnPathTravelSpeedBoost,
@@ -60,6 +62,8 @@ export function ensureGlobalEffectEffect(
     Partial<GlobalEffectEffectDebuffResistanceTag> &
     Partial<GlobalEffectEffectCombatItemDropRateBoost> &
     Partial<GlobalEffectEffectGatheringItemDropRateBoost> &
+    Partial<GlobalEffectEffectGatheringItemDropAmountBoost> &
+    Partial<GlobalEffectEffectGatheringItemFlatBoost> &
     Partial<GlobalEffectEffectArmorySizeBoost> &
     Partial<GlobalEffectEffectTradeskillQueueSizeBoost> &
     Partial<GlobalEffectEffectOffPathTravelSpeedBoost> &
@@ -231,11 +235,12 @@ export function ensureGlobalEffectEffect(
     };
   }
 
-  if (effect.effectType === 'GlobalGatheringItemDropRateBoost') {
-    return {
-      effectType: 'GlobalGatheringItemDropRateBoost',
-      value: effect.value ?? 0,
-    };
+  if (
+    effect.effectType === 'GlobalGatheringItemDropRateBoost' ||
+    effect.effectType === 'GlobalGatheringItemDropAmountBoost' ||
+    effect.effectType === 'GlobalGatheringItemFlatBoost'
+  ) {
+    return { effectType: effect.effectType, value: effect.value ?? 0 };
   }
 
   if (effect.effectType === 'DebuffResistance') {

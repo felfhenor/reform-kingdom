@@ -140,7 +140,11 @@ export function globalEffectEffectDescription(
     case 'GlobalCombatItemDropRateBoost':
       return `Item Drop Chance: ${signedPercent(effect.value)}`;
     case 'GlobalGatheringItemDropRateBoost':
-      return `Extra Gather Item Chance: ${signedPercent(effect.value)}`;
+      return `Lucky Gather Item Chance: ${signedPercent(effect.value)}`;
+    case 'GlobalGatheringItemDropAmountBoost':
+      return `Lucky Gather Items on Success: ${signedNumber(effect.value)}`;
+    case 'GlobalGatheringItemFlatBoost':
+      return `Guaranteed Gather Items: ${signedNumber(effect.value)}`;
     case 'GlobalArmorySizeBoost':
       return `Armory Size: +${effect.value}`;
     case 'GlobalTradeskillQueueSizeBoost': {
@@ -295,6 +299,12 @@ function accumulateGlobalEffectEffect(
       return;
     case 'GlobalGatheringItemDropRateBoost':
       sums.gatheringItemDropRateBoost += effect.value;
+      return;
+    case 'GlobalGatheringItemDropAmountBoost':
+      sums.gatheringItemDropAmountBoost += effect.value;
+      return;
+    case 'GlobalGatheringItemFlatBoost':
+      sums.gatheringItemFlatBoost += effect.value;
       return;
     case 'GlobalArmorySizeBoost':
       sums.armorySizeBoost += effect.value;

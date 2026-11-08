@@ -283,6 +283,8 @@ export function defaultGlobalEffectSums(): GlobalEffectSums {
     astralSpellStrengthBonus: 0,
     combatItemDropRateBoost: 0,
     gatheringItemDropRateBoost: 0,
+    gatheringItemDropAmountBoost: 0,
+    gatheringItemFlatBoost: 0,
     armorySizeBoost: 0,
     tradeskillQueueSizeBoosts: {},
     offPathTravelSpeedBonus: 0,
