@@ -127,7 +127,7 @@
 
 - id: 04646d29-e5d6-4f31-a724-c1a1c87411ed
   name: Rescue Dekar Anten
-  description: Clear the Mystical Gobslime Shrine to rescue Dekar Anten.
+  description: Clear the Gobslime Temple to rescue Dekar Anten.
   order: 320
   requireMapVisit: Carrina
   whisper: Some would say he got lost in the ruins. I say the ruins lost him.
