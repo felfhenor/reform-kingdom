@@ -1,5 +1,5 @@
 import { LOOT_FILTER_AUTO_SELL_PERCENT } from '@helpers/config';
-import { getEntry } from '@helpers/content/content';
+import { contentExists, getEntry } from '@helpers/content/content';
 import { ledgerMark } from '@helpers/engine/ledger';
 import { rollDropAffixIds } from '@helpers/item/affix';
 import { newEquipmentItem } from '@helpers/item/equipment';
@@ -24,6 +24,7 @@ export function equipmentPassesLootFilter(
   source: LootSource,
 ): boolean {
   if (!filters.sellFromSources[source]) return true;
+  if (filters.exceptEquipment.includes(content.id)) return true;
   if (!filters.keepRarities[content.rarity]) return false;
   if (content.levelRequirement < filters.minimumItemLevel) return false;
   if (!filters.keepEquipmentTypes[content.type]) return false;
@@ -87,4 +88,13 @@ export function armoryAddLootDrop(
   });
 
   return outcome;
+}
+
+export function pruneInvalidLootFilters(
+  filters: LootFilterSettings,
+): LootFilterSettings {
+  return {
+    ...filters,
+    exceptEquipment: filters.exceptEquipment.filter(contentExists),
+  };
 }

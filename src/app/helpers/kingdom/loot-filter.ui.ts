@@ -1,11 +1,16 @@
 import { LOOT_FILTER_DEFAULT_MIN_ITEM_LEVEL } from '@helpers/config';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { isEquipmentDiscovered } from '@helpers/kingdom/armory';
 import { lootFiltersState, updateGamestate } from '@helpers/state-game';
 import type {
   DropRarity,
+  EquipmentContent,
+  EquipmentId,
   EquipmentItemType,
   LootFilterSettings,
   LootSource,
 } from '@interfaces';
+import { sortBy } from 'es-toolkit/compat';
 
 export function lootFilterSettings(): LootFilterSettings {
   return lootFiltersState();
@@ -57,7 +62,51 @@ export function lootFilterSummary(filters: LootFilterSettings): string {
       .map(([source]) => source.toLowerCase()),
   );
 
-  return `From ${sources}, ${rules} will be automatically sold.`;
+  return `From ${sources}, ${rules} will be automatically sold${lootFilterExceptSuffix(filters)}.`;
+}
+
+function lootFilterExceptSuffix(filters: LootFilterSettings): string {
+  const count = filters.exceptEquipment.length;
+  if (count === 0) return '';
+
+  return `, except ${count.toLocaleString()} ${count === 1 ? 'item' : 'items'}`;
+}
+
+export function lootFilterExceptionOptions(
+  filters: LootFilterSettings,
+): EquipmentContent[] {
+  const options = getEntriesByType<EquipmentContent>('equipment').filter(
+    (content) =>
+      isEquipmentDiscovered(content.id) &&
+      !filters.exceptEquipment.includes(content.id),
+  );
+
+  return sortBy(options, (content) => content.name);
+}
+
+export function lootFilterExceptions(
+  filters: LootFilterSettings,
+): EquipmentContent[] {
+  return filters.exceptEquipment
+    .map((id) => getEntry<EquipmentContent>(id))
+    .filter((content): content is EquipmentContent => !!content);
+}
+
+export function lootFilterAddException(equipmentId: EquipmentId): void {
+  updateGamestate((state) => {
+    if (state.lootFilters.exceptEquipment.includes(equipmentId)) return state;
+
+    state.lootFilters.exceptEquipment.push(equipmentId);
+    return state;
+  });
+}
+
+export function lootFilterRemoveException(equipmentId: EquipmentId): void {
+  updateGamestate((state) => {
+    state.lootFilters.exceptEquipment =
+      state.lootFilters.exceptEquipment.filter((id) => id !== equipmentId);
+    return state;
+  });
 }
 
 export function lootFilterSetSourceSells(

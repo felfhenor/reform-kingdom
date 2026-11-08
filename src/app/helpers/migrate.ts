@@ -38,6 +38,7 @@ import { applyMaterialDelta } from '@helpers/item/materials';
 import { pruneInvalidArmoryItems } from '@helpers/kingdom/armory';
 import { pruneInvalidActiveAstralProjectorSpells } from '@helpers/kingdom/astral-projector';
 import { repairInvalidBestiaryLevels } from '@helpers/kingdom/bestiary';
+import { pruneInvalidLootFilters } from '@helpers/kingdom/loot-filter';
 import { getMap } from '@helpers/maps';
 import { repairUnwalkableCurrentLocation } from '@helpers/pathfinding/pathfinding';
 import { runStatsBackfillTracking } from '@helpers/run-stats/run-stats';
@@ -190,6 +191,7 @@ export function migrateGameState() {
     newState.discoveredMaterials,
     newState.materials,
   );
+  newState.lootFilters = pruneInvalidLootFilters(newState.lootFilters);
   newState.discoveredEquipment = recordPrune(
     newState.discoveredEquipment,
     contentExists,

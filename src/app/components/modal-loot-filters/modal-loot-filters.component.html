@@ -89,6 +89,90 @@
         }
       </div>
     </div>
+
+    <div class="flex flex-col gap-2">
+      <div class="type-label">Never Auto-Sell</div>
+
+      <div class="flex items-center gap-2">
+        <ng-select
+          class="flex-1"
+          [items]="exceptionOptions()"
+          bindLabel="name"
+          bindValue="id"
+          placeholder="Select discovered equipment..."
+          [ngModel]="selectedExceptionId()"
+          (ngModelChange)="selectedExceptionId.set($event)"
+        >
+          <ng-template ng-option-tmp let-item="item">
+            <div class="flex items-center gap-2">
+              <app-atlas-image
+                class="zoom-row"
+                spritesheet="equipment"
+                [assetName]="item.sprite"
+              />
+              {{ item.name }}
+            </div>
+          </ng-template>
+
+          <ng-template ng-label-tmp let-item="item">
+            <div class="flex items-center gap-2">
+              <app-atlas-image
+                class="zoom-row"
+                spritesheet="equipment"
+                [assetName]="item.sprite"
+              />
+              {{ item.name }}
+            </div>
+          </ng-template>
+        </ng-select>
+
+        <button
+          type="button"
+          class="btn btn-sm btn-primary"
+          [disabled]="!selectedExceptionId()"
+          (click)="addException()"
+          appSfx="ui-click"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Add
+        </button>
+      </div>
+
+      @if (exceptions().length > 0) {
+        <div
+          class="flex flex-wrap gap-2"
+          appListReflow
+          (animate.enter)="onEnter($event)"
+          (animate.leave)="onLeave($event)"
+        >
+          @for (entry of exceptions(); track entry.content.id) {
+            <button
+              type="button"
+              class="zoom-row cursor-pointer"
+              [tp]="tooltip"
+              [tpPlacement]="'top'"
+              (click)="removeException(entry.content.id)"
+              (animate.leave)="onLeave($event)"
+              appSfx="ui-click"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              <app-slot-rarity-outline
+                [entry]="entry.content"
+                spritesheet="equipment"
+              />
+            </button>
+
+            <ng-template #tooltip>
+              <div class="max-w-[400px]">
+                <app-detail-item-preview [display]="entry.display">
+                  <div class="text-xs mt-2 text-lighter">Click to remove.</div>
+                </app-detail-item-preview>
+              </div>
+            </ng-template>
+          }
+        </div>
+      }
+    </div>
   </div>
 
   <div actions>

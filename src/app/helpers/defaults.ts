@@ -168,6 +168,7 @@ export function defaultLootFilterSettings(): LootFilterSettings {
     keepEquipmentTypes: Object.fromEntries(
       allEquipmentItemTypes().map((type) => [type, true]),
     ) as Record<EquipmentItemType, boolean>,
+    exceptEquipment: [],
   };
 }
 

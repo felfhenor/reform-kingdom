@@ -16,6 +16,7 @@ import {
 import {
   armoryAddLootDrop,
   equipmentPassesLootFilter,
+  pruneInvalidLootFilters,
 } from '@helpers/kingdom/loot-filter';
 import { armoryState, gamestate } from '@helpers/state-game';
 import type {
@@ -99,6 +100,18 @@ describe('equipmentPassesLootFilter', () => {
 
     expect(equipmentPassesLootFilter(sword, filters, 'Crafting')).toBe(true);
     expect(equipmentPassesLootFilter(sword, filters, 'Combat')).toBe(false);
+  });
+
+  it('always keeps an excepted item, whatever the other rules say', () => {
+    const filters = filtersWith((f) => {
+      f.keepRarities.Common = false;
+      f.keepEquipmentTypes.Sword = false;
+      f.minimumItemLevel = sword.levelRequirement + 1;
+      f.exceptEquipment = [sword.id];
+    });
+
+    expect(equipmentPassesLootFilter(sword, filters, 'Combat')).toBe(true);
+    expect(equipmentPassesLootFilter(sword, filters, 'Crafting')).toBe(true);
   });
 });
 
@@ -221,5 +234,17 @@ describe('armoryAddLootDrop', () => {
     expect(armoryState().map((item) => item.equipmentId)).toEqual([gone]);
 
     expect(drop(fillArmory, gone)).toEqual({ kind: 'NoRoom' });
+  });
+});
+
+describe('pruneInvalidLootFilters', () => {
+  it('drops exceptions whose equipment no longer exists, keeping order', () => {
+    const filters = filtersWith((f) => {
+      f.exceptEquipment = ['gone' as EquipmentId, sword.id];
+    });
+
+    expect(pruneInvalidLootFilters(filters).exceptEquipment).toEqual([
+      sword.id,
+    ]);
   });
 });
