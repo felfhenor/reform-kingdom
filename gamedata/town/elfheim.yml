@@ -184,6 +184,7 @@
 
   gathering:
     gatherRateMultiplier: 6
+    combatRateMultiplier: 4
     goldGatheredPerMaterial: 2
 
     workers:

@@ -36,6 +36,7 @@ export type WorkerTripHost<W extends WorkerTripWorker> = {
     canUseTeleports: boolean,
   ) => TravelStep[] | undefined;
   gatherRateMultiplier: number;
+  combatRateMultiplier: number;
   onUnitGathered?: (nodeName: string, itemId: ItemId, level: number) => void;
   onUnitBanked?: (nodeName: string, itemId: ItemId) => void;
   onArrivedHome: (

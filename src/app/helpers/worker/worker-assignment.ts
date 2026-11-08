@@ -6,9 +6,7 @@ import { isMaterialDiscovered } from '@helpers/item/materials';
 import {
   isWorkerCombatNode,
   isWorkerCombatNodeUnlocked,
-  workerCombatNodeLevel,
-  workerCombatPower,
-  workerCombatUnitTicks,
+  workerCanFightFor,
 } from '@helpers/worker/worker-combat';
 import { workerCraftAssignmentIsValid } from '@helpers/worker/worker-crafting';
 import { workerStatsForLevel } from '@helpers/worker/worker-progression';
@@ -62,16 +60,13 @@ function workerCombatAssignmentIsValid(
   assignment: WorkerGatherAssignment,
 ): boolean {
   const { nodeName, itemId } = assignment;
-  const stats = workerStatsForLevel(content, level);
-  const nodeLevel = workerCombatNodeLevel(nodeName);
+  const stamina = workerStatsForLevel(content, level).stamina;
 
   return (
     isWorkerCombatNodeUnlocked(nodeName) &&
     isMaterialDiscovered(itemId) &&
-    nodeLevel !== undefined &&
-    workerCombatPower(content, level) >= nodeLevel &&
-    workerCombatUnitTicks(content, level, nodeName, itemId) !== undefined &&
-    canWorkerReachNode(nodeName, stats.stamina, content.canUseTeleports)
+    workerCanFightFor(content, level, nodeName, itemId) &&
+    canWorkerReachNode(nodeName, stamina, content.canUseTeleports)
   );
 }
 

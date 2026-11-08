@@ -2,6 +2,7 @@ import { getEntry } from '@helpers/content/content';
 import { formatDuration } from '@helpers/engine/timer';
 import { travelTicksRemaining } from '@helpers/hero/travel-progress';
 import { worldTownsState } from '@helpers/state-game';
+import { isWorkerCombatNode } from '@helpers/worker/worker-combat';
 import { worldNodeByName } from '@helpers/world-node/world-nodes';
 import type {
   CurrentLocation,
@@ -60,7 +61,7 @@ export function townWorkerStatusDisplay(
     }
     case 'Gathering':
       return {
-        label: `Gathering at ${status.nodeName}`,
+        label: `${isWorkerCombatNode(status.nodeName) ? 'Fighting' : 'Gathering'} at ${status.nodeName}`,
         locationEntry: worldNodeByName(status.nodeName),
       };
     case 'Resting':

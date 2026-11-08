@@ -1,6 +1,10 @@
 import { getEntry } from '@helpers/content/content';
 import { travelPathBaseTotalTicks } from '@helpers/hero/travel-cost-base';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
+import {
+  isWorkerCombatNode,
+  workerCanFightFor,
+} from '@helpers/worker/worker-combat';
 import { workerStatsForLevel } from '@helpers/worker/worker-progression';
 import { workerGatherNodeHasItem } from '@helpers/worker/worker-shared';
 import { worldNodeByName } from '@helpers/world-node/world-nodes';
@@ -42,7 +46,22 @@ export function townWorkerStaminaCostToNode(
   return path ? travelPathBaseTotalTicks(path, townNode) : undefined;
 }
 
-// No discovery check - town workers are NPC-run, not player exploration.
+export function townWorkerCanReach(
+  town: TownContent,
+  content: WorkerContent,
+  level: number,
+  nodeName: string,
+): boolean {
+  const stamina = workerStatsForLevel(content, level).stamina;
+  const cost = townWorkerStaminaCostToNode(
+    town,
+    nodeName,
+    content.canUseTeleports,
+  );
+  return cost !== undefined && cost <= stamina;
+}
+
+// No discovery or cleared check - town workers are NPC-run, not player exploration.
 export function townWorkerAssignmentIsValid(
   town: TownContent,
   workerId: WorkerId,
@@ -52,16 +71,10 @@ export function townWorkerAssignmentIsValid(
   const content = getEntry<WorkerContent>(workerId);
   if (!content) return false;
 
-  const stamina = workerStatsForLevel(content, level).stamina;
-  const cost = townWorkerStaminaCostToNode(
-    town,
-    assignment.nodeName,
-    content.canUseTeleports,
-  );
+  const { nodeName, itemId } = assignment;
+  const canDoJob = isWorkerCombatNode(nodeName)
+    ? workerCanFightFor(content, level, nodeName, itemId)
+    : workerGatherNodeHasItem(nodeName, itemId);
 
-  return (
-    workerGatherNodeHasItem(assignment.nodeName, assignment.itemId) &&
-    cost !== undefined &&
-    cost <= stamina
-  );
+  return canDoJob && townWorkerCanReach(town, content, level, nodeName);
 }

@@ -80,6 +80,7 @@ export type TownMaterialThresholdHash = Partial<Record<ItemId, number>>;
 
 export type TownGatheringConfig = {
   gatherRateMultiplier: number;
+  combatRateMultiplier: number;
   // Hidden gold accrual rate: gold += goldGatheredPerMaterial per material gathered, capped via materialThresholds.
   goldGatheredPerMaterial: number;
   workers: TownGatheringWorker[];

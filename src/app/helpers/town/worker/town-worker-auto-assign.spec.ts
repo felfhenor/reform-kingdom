@@ -16,8 +16,13 @@ import {
   ensureGatherResult,
   ensureGathering,
 } from '@helpers/content/ensure-gathernode';
+import { ensureEncounter } from '@helpers/content/ensure-encounternode';
+import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
+import { ensureItem } from '@helpers/content/ensure-item';
+import { ensureMonster } from '@helpers/content/ensure-monster';
 import { ensureRecipe } from '@helpers/content/ensure-recipe';
 import { ensureTown } from '@helpers/content/ensure-town';
+import { ensureWorker } from '@helpers/content/ensure-worker';
 import { rngChoiceWeighted } from '@helpers/rng';
 import {
   townPickGatherAssignment,
@@ -25,12 +30,17 @@ import {
 } from '@helpers/town/worker/town-worker-auto-assign';
 import { worldTownsState } from '@helpers/state-game';
 import { defaultTownWorkerState } from '@helpers/town/worker/town-worker-progression';
-import { townWorkerAssignmentIsValid } from '@helpers/town/worker/town-worker-travel';
+import {
+  townWorkerAssignmentIsValid,
+  townWorkerCanReach,
+} from '@helpers/town/worker/town-worker-travel';
 import { workerTripBeginOutbound } from '@helpers/worker/worker-trip';
 import type {
+  EncounterId,
   GameState,
   GatheringId,
   ItemId,
+  MonsterId,
   RecipeId,
   TownId,
   TownNodeState,
@@ -89,6 +99,7 @@ function seedWorld(
     { name: woods.name, type: 'GatherNode' },
     { name: farMine.name, type: 'GatherNode' },
     { name: 'Field', type: 'GatherNode' },
+    { name: 'Goblin Den', type: 'ExploreNode' },
   ]);
   seedGamestate((state) => {
     state.world.towns[townId] = buildTownNodeState(townState);
@@ -113,6 +124,7 @@ beforeEach(() => {
     (_town, _worker, _level, assignment) =>
       assignment.nodeName !== farMine.name,
   );
+  vi.mocked(townWorkerCanReach).mockReturnValue(true);
   seedContent([town, mine, woods, farMine, oreRecipe]);
 });
 
@@ -167,6 +179,61 @@ describe('townPickGatherAssignment', () => {
       },
       { nodeName: woods.name, itemId: wood, weight: 3 },
     ]);
+  });
+
+  it('fights only for monster drops the town caps and still needs', () => {
+    const teeth = 'goblin-teeth' as ItemId;
+    seedContent([
+      town,
+      mine,
+      woods,
+      farMine,
+      oreRecipe,
+      ensureWorker({
+        id: workerId,
+        baseStats: {
+          capacity: 5,
+          gatherSpeed: 1,
+          craftSpeed: 0,
+          stamina: 100,
+          combatPower: 1,
+          combatSpeed: 1,
+        },
+      }),
+      ...[
+        'Gold Coin',
+        'Crimson Lucre',
+        'Trader Scrip',
+        'Duskhall Flux',
+        'Memory Flux',
+      ].map((name) => ensureItem({ id: name as ItemId, name })),
+      ensureMonster({
+        id: 'goblin' as MonsterId,
+        name: 'Goblin',
+        drops: [
+          ensureDroppedReward({ itemId: wood, chance: 40 }),
+          ensureDroppedReward({ itemId: teeth, chance: 90 }),
+        ],
+      }),
+      ensureEncounter({
+        id: 'den' as EncounterId,
+        name: 'Goblin Den',
+        fights: [{ monsters: [{ monsterId: 'goblin' as MonsterId }] }],
+      }),
+    ]);
+    seedWorld();
+
+    townPickGatherAssignment(town, workerId, 1);
+    expect(offered()).toContainEqual({
+      nodeName: 'Goblin Den',
+      itemId: wood,
+      weight: 0.4,
+    });
+    expect(offered().map((c) => c.itemId)).not.toContain(teeth);
+
+    seedWorld({ materials: { [wood]: 10 } });
+    townPickGatherAssignment(town, workerId, 1);
+    expect(offered().map((c) => c.nodeName)).not.toContain('Goblin Den');
   });
 
   it('is undefined when nothing is worth gathering', () => {

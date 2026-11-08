@@ -10,6 +10,9 @@ import type { WorldNodeEntry } from '@interfaces/world-nodes';
 // Town workers only gather, so a craft assignment can't reach one.
 export type TownWorkerAssignment = WorkerGatherAssignment;
 
+// One weighted option for a town worker's next trip.
+export type TownWorkerCandidate = TownWorkerAssignment & { weight: number };
+
 export type TownWorkerStatusAtTown = {
   kind: 'AtTown';
 };

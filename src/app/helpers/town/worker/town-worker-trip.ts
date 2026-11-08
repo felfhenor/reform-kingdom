@@ -45,7 +45,7 @@ function townWorkerArrivedHome(
   });
 }
 
-// Trips start from and return to the town's own node, scaled by the town's gather rate.
+// Trips start from and return to the town's own node, scaled by the town's gather and combat rates.
 export function townWorkerTripHost(
   town: TownContent,
   workerId: WorkerId,
@@ -71,6 +71,7 @@ export function townWorkerTripHost(
     pathHome: (from, canUseTeleports) =>
       townWorkerTravelPath(from, town.name, canUseTeleports),
     gatherRateMultiplier: town.gathering.gatherRateMultiplier,
+    combatRateMultiplier: town.gathering.combatRateMultiplier,
     onArrivedHome: (cargo) => townWorkerArrivedHome(town, workerId, cargo),
   };
 }

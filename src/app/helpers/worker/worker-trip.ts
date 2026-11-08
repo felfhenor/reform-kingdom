@@ -145,7 +145,10 @@ function workerTripUnitTicks<W extends WorkerTripWorker>(
   itemId: ItemId,
 ): number | undefined {
   if (isWorkerCombatNode(nodeName)) {
-    return workerCombatUnitTicks(content, level, nodeName, itemId);
+    const ticks = workerCombatUnitTicks(content, level, nodeName, itemId);
+    return ticks !== undefined && host.combatRateMultiplier > 0
+      ? ticks / host.combatRateMultiplier
+      : undefined;
   }
 
   const gathering = workerGatherNodeContent(nodeName);

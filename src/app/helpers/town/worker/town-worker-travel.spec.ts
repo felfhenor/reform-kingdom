@@ -7,6 +7,10 @@ import {
   ensureGatherResult,
   ensureGathering,
 } from '@helpers/content/ensure-gathernode';
+import { ensureEncounter } from '@helpers/content/ensure-encounternode';
+import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
+import { ensureItem } from '@helpers/content/ensure-item';
+import { ensureMonster } from '@helpers/content/ensure-monster';
 import { ensureTown } from '@helpers/content/ensure-town';
 import { ensureWorker } from '@helpers/content/ensure-worker';
 import { travelPathBaseTotalTicks } from '@helpers/hero/travel-cost-base';
@@ -23,8 +27,10 @@ import {
 } from '@helpers/worker/worker-trip';
 import { defaultTownWorkerState } from '@helpers/town/worker/town-worker-progression';
 import type {
+  EncounterId,
   GatheringId,
   ItemId,
+  MonsterId,
   TownId,
   TownWorkerState,
   TravelStep,
@@ -183,6 +189,62 @@ describe('townWorkerAssignmentIsValid', () => {
     expect(vi.mocked(travelPathFrom).mock.calls[0].slice(2)).toEqual(
       noOutpostRoute(false),
     );
+  });
+});
+
+describe('townWorkerAssignmentIsValid (combat node)', () => {
+  const den = 'Goblin Den';
+  const fighter = (combatPower: number) =>
+    ensureWorker({
+      ...worker,
+      baseStats: { ...worker.baseStats, combatPower, combatSpeed: 1 },
+    });
+  const seedDen = (combatPower: number) => {
+    seedContent([
+      town,
+      fighter(combatPower),
+      ...[
+        'Gold Coin',
+        'Crimson Lucre',
+        'Trader Scrip',
+        'Duskhall Flux',
+        'Memory Flux',
+      ].map((name) => ensureItem({ id: name as ItemId, name })),
+      ensureMonster({
+        id: 'goblin' as MonsterId,
+        name: 'Goblin',
+        drops: [ensureDroppedReward({ itemId: ore, chance: 50 })],
+      }),
+      ensureEncounter({
+        id: 'den' as EncounterId,
+        name: den,
+        levelRange: { min: 15, max: 20 },
+        fights: [{ monsters: [{ monsterId: 'goblin' as MonsterId }] }],
+      }),
+    ]);
+    seedWorldNodes([
+      { name: town.name, type: 'NonPlayerKingdom' },
+      { name: den, type: 'ExploreNode' },
+    ]);
+    seedGamestate();
+  };
+  const valid = () =>
+    townWorkerAssignmentIsValid(town, worker.id, 1, {
+      nodeName: den,
+      itemId: ore,
+    });
+
+  it('needs no player progress, only power at the node level and stamina', () => {
+    routesCost(20);
+    seedDen(20);
+    expect(valid()).toBe(true);
+
+    seedDen(19);
+    expect(valid()).toBe(false);
+
+    seedDen(20);
+    routesCost(21);
+    expect(valid()).toBe(false);
   });
 });
 

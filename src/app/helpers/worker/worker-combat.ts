@@ -18,11 +18,7 @@ import {
   worldNodeByName,
   worldNodeEncounter,
 } from '@helpers/world-node/world-nodes';
-import type {
-  DroppedItemReward,
-  ItemId,
-  WorkerContent,
-} from '@interfaces';
+import type { DroppedItemReward, ItemId, WorkerContent } from '@interfaces';
 import { clamp, maxBy } from 'es-toolkit/compat';
 
 function workerCombatExcludedItemIds(): Set<ItemId | undefined> {
@@ -65,11 +61,13 @@ export function workerCombatItemDrops(nodeName: string): DroppedItemReward[] {
   const entry = worldNodeByName(nodeName);
   if (!entry || !isWorkerCombatNode(nodeName)) return [];
 
-  const excluded = workerCombatExcludedItemIds();
-  return worldNodeMonsterDropTable(entry).filter(
-    (reward): reward is DroppedItemReward =>
-      reward.kind === 'Item' && !excluded.has(reward.itemId),
+  const itemDrops = worldNodeMonsterDropTable(entry).filter(
+    (reward): reward is DroppedItemReward => reward.kind === 'Item',
   );
+  if (itemDrops.length === 0) return [];
+
+  const excluded = workerCombatExcludedItemIds();
+  return itemDrops.filter((reward) => !excluded.has(reward.itemId));
 }
 
 export function workerCombatBestDropChance(
@@ -94,6 +92,21 @@ export function workerCombatUnitTicks(
 
   const effectiveChance = clamp(chance, WORKER_COMBAT_MIN_DROP_CHANCE, 100);
   return WORKER_COMBAT_BASE_TICKS / (speed * (effectiveChance / 100));
+}
+
+// The power and rate checks every fighter shares, kingdom or town.
+export function workerCanFightFor(
+  worker: WorkerContent,
+  level: number,
+  nodeName: string,
+  itemId: ItemId,
+): boolean {
+  const nodeLevel = workerCombatNodeLevel(nodeName);
+  return (
+    nodeLevel !== undefined &&
+    workerCombatPower(worker, level) >= nodeLevel &&
+    workerCombatUnitTicks(worker, level, nodeName, itemId) !== undefined
+  );
 }
 
 export function workerCombatGrantsXp(

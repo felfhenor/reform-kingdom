@@ -114,6 +114,7 @@ function ensureTownGathering(
 ): TownGatheringConfig {
   return {
     gatherRateMultiplier: gathering.gatherRateMultiplier ?? 1,
+    combatRateMultiplier: gathering.combatRateMultiplier ?? 1,
     goldGatheredPerMaterial: gathering.goldGatheredPerMaterial ?? 0,
     workers: ensureArray(gathering.workers, ensureTownGatheringWorker),
   };

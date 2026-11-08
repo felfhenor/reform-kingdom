@@ -77,6 +77,7 @@ function stubHost(overrides: Partial<WorkerTripHost<WorkerState>> = {}) {
     pathTo: () => path,
     pathHome: () => path,
     gatherRateMultiplier: 1,
+    combatRateMultiplier: 1,
     onUnitGathered: () => calls.push(`gathered while ${statusNow()}`),
     onUnitBanked: () => calls.push(`banked while ${statusNow()}`),
     onArrivedHome: (cargo, pending, level) =>
@@ -266,6 +267,14 @@ describe('workerTripGatheringTick', () => {
     );
 
     expect(ticks).toBe(WORKER_COMBAT_BASE_TICKS * 2);
+
+    const { host: fastHost } = stubHost({ combatRateMultiplier: 4 });
+    seedWorker({ ...gathering(), nodeName: den });
+    const fastTicks = tickWhile(
+      () => itemsGathered() === 0,
+      () => inTick(() => workerTripGatheringTick(fastHost)),
+    );
+    expect(fastTicks).toBe(WORKER_COMBAT_BASE_TICKS / 2);
   });
 });
 
