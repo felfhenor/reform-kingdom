@@ -44,6 +44,20 @@ describe('autoModeToggle', () => {
     expect(autoModeIsEnabled()).toBe(false);
     expect(worldAutoModeState().activeClauseId).toBeUndefined();
   });
+
+  it('drops an auto-farm clause when turned off, and only then', () => {
+    const autoFarm = decreeClause({
+      type: 'AutoFarmNode',
+      nodeName: 'Forest Ruins',
+    });
+    seedAutoMode({ enabled: false, clauses: [autoFarm, clauseA] });
+
+    inTick(() => autoModeToggle(true));
+    expect(worldAutoModeState().clauses).toEqual([autoFarm, clauseA]);
+
+    inTick(() => autoModeToggle(false));
+    expect(worldAutoModeState().clauses).toEqual([clauseA]);
+  });
 });
 
 describe('autoModeSetActiveClause', () => {

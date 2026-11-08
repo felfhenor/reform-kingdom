@@ -49,14 +49,16 @@
   />
 }
 
-<label class="label cursor-pointer label-checkbox">
-  <input
-    type="checkbox"
-    [checked]="clause().enabled"
-    class="checkbox checkbox-sm"
-    (click)="toggleEnabled.emit()"
-  />
-</label>
+@if (clause().type !== 'AutoFarmNode') {
+  <label class="label cursor-pointer label-checkbox">
+    <input
+      type="checkbox"
+      [checked]="clause().enabled"
+      class="checkbox checkbox-sm"
+      (click)="toggleEnabled.emit()"
+    />
+  </label>
+}
 
 @if (isEditable()) {
   <button

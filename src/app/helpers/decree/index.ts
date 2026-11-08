@@ -2,6 +2,7 @@ export * from './auto-mode';
 export * from './auto-mode-state';
 export * from './auto-mode.ui';
 export * from './decree';
+export * from './decree-auto-farm.ui';
 export * from './decree-evaluation';
 export * from './decree-farm-node';
 export * from './decree-farm-node.ui';

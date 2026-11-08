@@ -63,6 +63,10 @@ const finish = decreeClause({
 });
 const levelUp = decreeClause({ type: 'LevelUpParty', riskTolerance: 'High' });
 const goHome = decreeClause({ type: 'ReturnToKingdom' });
+const autoFarm = decreeClause({
+  type: 'AutoFarmNode',
+  nodeName: 'Forest Ruins',
+});
 const farm = (nodeName = 'Forest Ruins') =>
   decreeClause({
     type: 'FarmNode',
@@ -661,6 +665,7 @@ describe('isClauseSatisfiable', () => {
     finish,
     levelUp,
     farm(),
+    autoFarm,
     decreeClause({ type: 'DefendTowns', riskTolerance: 'High' }),
   ];
 
@@ -688,6 +693,14 @@ describe('isClauseSatisfiable', () => {
 
     seedDecreeWorld(ruinsPlaces, stocked(bone, 5));
     expect(isClauseSatisfiable(farm())).toBe(false);
+  });
+
+  it('auto-farms its node with no stock limit', () => {
+    seedDecreeWorld(ruinsPlaces, stocked(bone, 5));
+    expect(isClauseSatisfiable(autoFarm)).toBe(true);
+
+    seedDecreeWorld(grovePlaces);
+    expect(isClauseSatisfiable(autoFarm)).toBe(false);
   });
 
   it('levels the party until the weakest hero hits the level cap', () => {

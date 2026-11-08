@@ -19,12 +19,14 @@ function isExploreRandomNodeCleared(entry: WorldNodeEntry): boolean {
   );
 }
 
-// ExploreNodes with at least one completion reward looted - the closest proxy to "already beaten" this game has.
+// At least one completion reward looted - the closest proxy to "already beaten" this game has.
+export function isExploreNodeCleared(entry: WorldNodeEntry): boolean {
+  return worldNodeCompletionRewardProgress(entry).obtained > 0;
+}
+
 export function farmableExploreNodes(): WorldNodeEntry[] {
   return [
-    ...worldNodesOfType('ExploreNode').filter(
-      (entry) => worldNodeCompletionRewardProgress(entry).obtained > 0,
-    ),
+    ...worldNodesOfType('ExploreNode').filter(isExploreNodeCleared),
     ...worldNodesOfType('ExploreRandomNode').filter(isExploreRandomNodeCleared),
   ];
 }

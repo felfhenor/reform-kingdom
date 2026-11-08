@@ -14,11 +14,27 @@
           <div class="flex items-center gap-2">
             <app-sprite-node [entry]="entry" />
 
-            <div class="flex flex-col">
+            <div class="flex flex-col gap-2">
               <h2 class="type-page-title">{{ displayName() }}</h2>
 
               @if (caravanTraderName(); as traderName) {
                 <span class="type-muted">{{ traderName }}</span>
+              }
+
+              @if (canAutoFarm()) {
+                <label
+                  class="label cursor-pointer label-checkbox text-sm"
+                  [tp]="'Continuously farm this node until your party leaves.'"
+                >
+                  <input
+                    type="checkbox"
+                    class="checkbox checkbox-sm"
+                    [checked]="isAutoFarming()"
+                    (click)="toggleAutoFarm()"
+                  />
+
+                  <span class="ml-1">Auto Farm</span>
+                </label>
               }
             </div>
           </div>

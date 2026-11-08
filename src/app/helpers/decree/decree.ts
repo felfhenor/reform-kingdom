@@ -23,6 +23,30 @@ export function decreeClauseCap(): number {
   return DECREE_CLAUSE_CAP + globalEffectSumsState().decreeClauseCapBoost;
 }
 
+export function isAutoFarmClause<T extends DecreeClauseAction>(
+  clause: T,
+): clause is Extract<T, { type: 'AutoFarmNode' }> {
+  return clause.type === 'AutoFarmNode';
+}
+
+export function decreePinnedClauseCount(clauses: DecreeClause[]): number {
+  return clauses.filter(isAutoFarmClause).length;
+}
+
+export function decreeCappedClauseCount(): number {
+  const clauses = decreeClauses();
+  return clauses.length - decreePinnedClauseCount(clauses);
+}
+
+export function decreeClauseCreate(action: DecreeClauseAction): DecreeClause {
+  return {
+    ...action,
+    id: rngUuid() as DecreeClauseId,
+    enabled: true,
+    failureCount: 0,
+  };
+}
+
 // Drops clauses whose material no GatherNode produces anymore (post-rebalance) - unlike an
 // undiscovered/unreachable node, exploring more can never fix this, so it's safe to prune.
 export function pruneInvalidDecreeGatherClauses(
@@ -76,18 +100,14 @@ export function decreeClauseConflicts(
 }
 
 export function decreeClauseAdd(action: DecreeClauseAction): boolean {
-  if (decreeClauses().length >= decreeClauseCap()) return false;
+  if (decreeCappedClauseCount() >= decreeClauseCap()) return false;
   if (decreeClauseConflicts(action, decreeClauses())) return false;
 
-  const clause: DecreeClause = {
-    ...action,
-    id: rngUuid() as DecreeClauseId,
-    enabled: true,
-    failureCount: 0,
-  };
+  const clause = decreeClauseCreate(action);
 
   updateGamestate((state) => {
-    state.world.autoMode.clauses.unshift(clause);
+    const clauses = state.world.autoMode.clauses;
+    clauses.splice(decreePinnedClauseCount(clauses), 0, clause);
     return state;
   });
 
@@ -115,10 +135,13 @@ export function decreeClauseReorder(
 ): void {
   updateGamestate((state) => {
     const clauses = state.world.autoMode.clauses;
+    const pinnedCount = decreePinnedClauseCount(clauses);
+    if (previousIndex < pinnedCount) return state;
+
     const [moved] = clauses.splice(previousIndex, 1);
     if (!moved) return state;
 
-    clauses.splice(newIndex, 0, moved);
+    clauses.splice(Math.max(newIndex, pinnedCount), 0, moved);
     return state;
   });
 }

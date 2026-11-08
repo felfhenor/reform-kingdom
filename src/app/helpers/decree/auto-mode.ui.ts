@@ -32,6 +32,8 @@ function clauseStatusLabel(clause: DecreeClause): string {
       return clause.townName
         ? `Defending ${clause.townName}...`
         : 'Seeking a town to defend...';
+    case 'AutoFarmNode':
+      return `Farming ${clause.nodeName}...`;
   }
 }
 

@@ -25,14 +25,17 @@ import {
   autoModeToggle,
 } from '@helpers/decree/auto-mode-state';
 import {
+  decreeCappedClauseCount,
   decreeClauseAdd,
   decreeClauseCap,
   decreeClauseConflicts,
   decreeClauseReorder,
   decreeClauses,
   decreeClauseSetEnabled,
+  decreePinnedClauseCount,
   decreeWaitForFullEnergyBeforeCombat,
   decreeWaitForFullHealthBeforeCombat,
+  isAutoFarmClause,
 } from '@helpers/decree/decree';
 import {
   exploreNodeFarmOptions,
@@ -82,10 +85,11 @@ import { AnimationService } from '@services/animation.service';
 import { sortBy } from 'es-toolkit/compat';
 
 // Alternate pick orders for existing clauses: GatherFromNode is node-first GatherMaterial, FarmMaterial is reward-first FarmNode.
-type ClauseFormType =
-  DecreeClauseAction['type'] | 'GatherFromNode' | 'FarmMaterial';
+// AutoFarmNode is node-panel only, never drafted here.
+type ClauseDraftType = Exclude<DecreeClauseAction['type'], 'AutoFarmNode'>;
+type ClauseFormType = ClauseDraftType | 'GatherFromNode' | 'FarmMaterial';
 
-function clauseTypeOf(formType: ClauseFormType): DecreeClauseAction['type'] {
+function clauseTypeOf(formType: ClauseFormType): ClauseDraftType {
   if (formType === 'GatherFromNode') return 'GatherMaterial';
   if (formType === 'FarmMaterial') return 'FarmNode';
   return formType;
@@ -190,9 +194,13 @@ export class GamePlayDecreeComponent {
     decreeWaitForFullEnergyBeforeCombat(),
   );
   public clauses = computed(() => decreeClauses());
+  public cappedClauseCount = computed(() => decreeCappedClauseCount());
   public clauseCap = computed(() => decreeClauseCap());
   public isClauseCapReached = computed(
-    () => this.clauses().length >= this.clauseCap(),
+    () => this.cappedClauseCount() >= this.clauseCap(),
+  );
+  public pinnedClauseCount = computed(() =>
+    decreePinnedClauseCount(this.clauses()),
   );
   public activeClauseId = computed(() => decreeActiveClauseId());
 
@@ -413,6 +421,11 @@ export class GamePlayDecreeComponent {
     if (this.editingClauseId() === clauseId) this.cancelEditClause();
     decreeClauseRemove(clauseId);
   }
+
+  public isAutoFarmClause = isAutoFarmClause;
+
+  public canDropAt = (index: number): boolean =>
+    index >= this.pinnedClauseCount();
 
   public onDrop(event: CdkDragDrop<DecreeClause[]>): void {
     decreeClauseReorder(event.previousIndex, event.currentIndex);

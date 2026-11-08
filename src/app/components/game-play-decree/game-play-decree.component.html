@@ -340,7 +340,7 @@
             [class.badge-data]="!isClauseCapReached()"
             [class.badge-warning]="isClauseCapReached()"
           >
-            {{ clauses().length | number }}/{{ clauseCap() | number }}
+            {{ cappedClauseCount() | number }}/{{ clauseCap() | number }}
           </span>
         </div>
 
@@ -348,13 +348,16 @@
           cdkDropList
           class="flex flex-col gap-2 flex-1 min-h-0 overflow-y-auto py-1"
           appListReflow
+          [cdkDropListSortPredicate]="canDropAt"
           (cdkDropListDropped)="onDrop($event)"
         >
           @for (clause of clauses(); track clause.id) {
             @let isActiveClause = clause.id === activeClauseId();
+            @let isPinned = isAutoFarmClause(clause);
 
             <li
               cdkDrag
+              [cdkDragDisabled]="isPinned"
               [cdkDragScale]="uiScale()"
               appListReflowDrag
               class="flex flex-row items-center gap-2 p-2 mx-1 bg-base-200"
@@ -367,12 +370,22 @@
               "
               (animate.leave)="onClauseLeave($event)"
             >
-              <app-icon
-                cdkDragHandle
-                name="tablerGripVertical"
-                size="row"
-                class="cursor-move text-lighter shrink-0"
-              />
+              @if (isPinned) {
+                <app-icon
+                  name="tablerPinned"
+                  size="row"
+                  class="text-lighter shrink-0"
+                  [tp]="'Pinned to the top until the party leaves.'"
+                  [tpPlacement]="'top'"
+                />
+              } @else {
+                <app-icon
+                  cdkDragHandle
+                  name="tablerGripVertical"
+                  size="row"
+                  class="cursor-move text-lighter shrink-0"
+                />
+              }
 
               <app-row-decree-clause
                 [clause]="clause"

@@ -22,6 +22,12 @@ import { SlotGatherMaterialComponent } from '@components/slot-gather-material/sl
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { caravanBrandName } from '@helpers/caravan/caravan';
+import {
+  decreeAutoFarmAvailable,
+  decreeAutoFarmIsActive,
+  decreeAutoFarmStart,
+  decreeAutoFarmStop,
+} from '@helpers/decree/decree-auto-farm.ui';
 import { encounterStartFight } from '@helpers/encounter/encounter';
 import { encounterRandomStartFight } from '@helpers/encounter/encounter-random-combat';
 import { rangeLabel } from '@helpers/engine/leveled-range';
@@ -79,12 +85,14 @@ import {
   worldNodeTown,
   worldNodeTrainer,
 } from '@helpers/world-node/world-nodes';
+import { TippyDirective } from '@ngneat/helipopper';
 import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-panel-map-node',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TippyDirective,
     BarTownReputationComponent,
     ButtonCloseComponent,
     SlotCompletionRewardComponent,
@@ -194,6 +202,28 @@ export class PanelMapNodeComponent {
       ? worldNodeCaravanVisitedTraderName(entry)
       : undefined;
   });
+
+  public canAutoFarm = computed(() => {
+    const entry = this.node();
+    return !!entry && decreeAutoFarmAvailable(entry);
+  });
+
+  public isAutoFarming = computed(() => {
+    const entry = this.node();
+    return !!entry && decreeAutoFarmIsActive(entry.nodeName);
+  });
+
+  public toggleAutoFarm(): void {
+    const entry = this.node();
+    if (!entry) return;
+
+    if (this.isAutoFarming()) {
+      decreeAutoFarmStop(entry.nodeName);
+      return;
+    }
+
+    decreeAutoFarmStart(entry.nodeName);
+  }
 
   public isGatherNode = computed(() => {
     const entry = this.node();

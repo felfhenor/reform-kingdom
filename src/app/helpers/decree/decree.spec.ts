@@ -41,6 +41,11 @@ function seedDecree(
 
 const clauseIds = () => decreeClauses().map((clause) => clause.id);
 
+const autoFarm = withId('auto-farm', {
+  type: 'AutoFarmNode',
+  nodeName: 'Forest Ruins',
+});
+
 // Clauses that never conflict with each other, to fill the decree up to its cap.
 const distinctClauses = (count: number) =>
   Array.from({ length: count }, (_, i) =>
@@ -128,6 +133,16 @@ describe('decreeClauseAdd', () => {
     expect(inTick(() => decreeClauseAdd({ type: 'ReturnToKingdom' }))).toBe(
       true,
     );
+  });
+
+  it('slots in under a pinned auto-farm, which does not count toward the cap', () => {
+    seedDecree([autoFarm, ...distinctClauses(DECREE_CLAUSE_CAP - 1)]);
+
+    expect(inTick(() => decreeClauseAdd({ type: 'ReturnToKingdom' }))).toBe(
+      true,
+    );
+    expect(clauseIds()[0]).toBe('auto-farm');
+    expect(decreeClauses()[1].type).toBe('ReturnToKingdom');
   });
 });
 
@@ -386,6 +401,15 @@ describe('decreeClauseReorder', () => {
     inTick(() => decreeClauseReorder(0, 2));
 
     expect(clauseIds()).toEqual(['clause-1', 'clause-2', 'clause-0']);
+  });
+
+  it('keeps a pinned auto-farm on top', () => {
+    seedDecree([autoFarm, ...distinctClauses(2)]);
+
+    inTick(() => decreeClauseReorder(0, 2));
+    inTick(() => decreeClauseReorder(2, 0));
+
+    expect(clauseIds()).toEqual(['auto-farm', 'clause-1', 'clause-0']);
   });
 
   it('ignores a move from a position with no clause', () => {

@@ -276,6 +276,7 @@ export function clauseTargetNode(
         ? reachableVisibleNode(clause.nodeName, 'High')
         : nearestGatherNodeFor(clause.materialId);
     case 'FarmNode':
+    case 'AutoFarmNode':
       return farmNodeTarget(clause.nodeName);
     case 'FinishUnfinishedAreas':
       return nearestUnfinishedExploreNode(clause.riskTolerance);
@@ -332,6 +333,7 @@ export function isClauseSatisfiable(clause: DecreeClause): boolean {
         !!clauseTargetNode(clause)
       );
     case 'FinishUnfinishedAreas':
+    case 'AutoFarmNode':
       return !blockedByHealth() && !!clauseTargetNode(clause);
     case 'LevelUpParty':
       return (
@@ -357,6 +359,7 @@ export function isClauseBlockedOnlyByHealth(clause: DecreeClause): boolean {
         !!clauseTargetNode(clause)
       );
     case 'FinishUnfinishedAreas':
+    case 'AutoFarmNode':
       return !!clauseTargetNode(clause);
     case 'LevelUpParty':
       return (

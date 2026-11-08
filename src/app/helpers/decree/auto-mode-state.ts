@@ -1,3 +1,4 @@
+import { isAutoFarmClause } from '@helpers/decree/decree';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { updateGamestate, worldAutoModeState } from '@helpers/state-game';
 import type { DecreeClauseId } from '@interfaces';
@@ -6,10 +7,19 @@ export function autoModeIsEnabled(): boolean {
   return worldAutoModeState().enabled;
 }
 
+// Every manual move turns Auto Mode off, so this is also where "farm until I leave" ends.
 export function autoModeToggle(enabled: boolean): void {
   updateGamestate((state) => {
-    state.world.autoMode.enabled = enabled;
-    if (!enabled) state.world.autoMode.activeClauseId = undefined;
+    const autoMode = state.world.autoMode;
+    autoMode.enabled = enabled;
+    if (enabled) return state;
+
+    autoMode.activeClauseId = undefined;
+    if (autoMode.clauses.some(isAutoFarmClause)) {
+      autoMode.clauses = autoMode.clauses.filter(
+        (clause) => !isAutoFarmClause(clause),
+      );
+    }
     return state;
   });
 }

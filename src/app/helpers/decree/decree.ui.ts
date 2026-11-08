@@ -98,5 +98,7 @@ export function decreeClauseSummary(clause: DecreeClause): string {
       return clause.townName
         ? `Defend ${clause.townName} from raids (${clause.riskTolerance} risk)`
         : `Defend towns from raids (${clause.riskTolerance} risk)`;
+    case 'AutoFarmNode':
+      return `Farm ${clause.nodeName} until the party leaves`;
   }
 }

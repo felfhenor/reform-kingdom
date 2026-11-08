@@ -25,7 +25,9 @@ export type DecreeClauseAction =
   | { type: 'FinishUnfinishedAreas'; riskTolerance: DecreeRiskLevel }
   | { type: 'LevelUpParty'; riskTolerance: DecreeRiskLevel }
   | { type: 'ReturnToKingdom' }
-  | { type: 'DefendTowns'; riskTolerance: DecreeRiskLevel; townName?: string };
+  | { type: 'DefendTowns'; riskTolerance: DecreeRiskLevel; townName?: string }
+  // Added from the node panel only; pinned on top, exempt from the cap, dropped when Auto Mode turns off.
+  | { type: 'AutoFarmNode'; nodeName: string };
 
 // `hop` is the target itself, or the node it's walled in behind that must be visited first.
 export type DecreeRoute = {
