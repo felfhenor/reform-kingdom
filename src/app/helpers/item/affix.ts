@@ -106,12 +106,14 @@ export function rollDropAffixIds(
 export function rollAffixIds(
   content: EquipmentContent,
   isReforge = false,
+  allowCurses = true,
 ): AffixId[] {
   return rollAffixIdsOnto(
     content,
     isReforge,
     AffixCountByRarity[content.rarity],
     [],
+    allowCurses ? [] : [CURSE_AFFIX_FAMILY],
   );
 }
 
@@ -121,9 +123,13 @@ function rollAffixIdsOnto(
   isReforge: boolean,
   count: number,
   seed: AffixContent[],
+  excludedFamilies: string[] = [],
 ): AffixId[] {
   const pool = rollableAffixes(content, isReforge);
-  const rolledFamilies = new Set(seed.map((affix) => affix.family));
+  const rolledFamilies = new Set([
+    ...excludedFamilies,
+    ...seed.map((affix) => affix.family),
+  ]);
   const rolledIds = seed.map((affix) => affix.id);
   let hasRolledSuffix = seed.some((affix) => affix.position === 'Suffix');
 

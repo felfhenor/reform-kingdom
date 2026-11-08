@@ -64,6 +64,17 @@ export function newEquipmentItem(
   };
 }
 
+// Merchant stock - nobody would knowingly buy cursed gear.
+export function newCurseFreeEquipmentItem(
+  equipmentId: EquipmentId,
+): EquipmentItem {
+  const content = getEntry<EquipmentContent>(equipmentId);
+  return newEquipmentItem(
+    equipmentId,
+    content ? rollAffixIds(content, false, false) : [],
+  );
+}
+
 // A two-handed item occupies multiple paperdoll slots but is still one physical item (same instance id) - dedupe by instance id.
 export function equippedItems(equipment: EquipmentBlock): EquipmentItem[] {
   const seen = new Set<EquipmentItemId>();

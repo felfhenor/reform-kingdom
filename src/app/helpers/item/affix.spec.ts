@@ -159,6 +159,23 @@ describe('rollAffixIds', () => {
     expect(rngChoiceWeighted).not.toHaveBeenCalled();
   });
 
+  it('keeps Curse-family affixes out of the pool when curses are disallowed', () => {
+    const curseAffix = ensureAffix({
+      id: 'affix-curse' as AffixId,
+      levelRequirement: 1,
+      family: 'Curse',
+    });
+    seedContent([curseAffix, strengthAffix]);
+    vi.mocked(rngChoiceWeighted).mockReturnValueOnce(strengthAffix);
+
+    expect(rollAffixIds(gear('Uncommon', 1), false, false)).toEqual([
+      strengthAffix.id,
+    ]);
+    expect(vi.mocked(rngChoiceWeighted).mock.calls[0][0]).toEqual([
+      strengthAffix,
+    ]);
+  });
+
   it('rolls one affix for Uncommon rarity', () => {
     vi.mocked(rngChoiceWeighted).mockReturnValueOnce(strengthAffix);
 

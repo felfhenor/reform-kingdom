@@ -11,7 +11,7 @@ import {
 } from '@helpers/engine/analytics';
 import { ledgerMark } from '@helpers/engine/ledger';
 import { applyCollectibleGrant } from '@helpers/item/collectibles';
-import { newEquipmentItem } from '@helpers/item/equipment';
+import { newCurseFreeEquipmentItem } from '@helpers/item/equipment';
 import {
   applyMaterialDelta,
   gainGold,
@@ -85,9 +85,9 @@ function grantCaravanReward(
 
   if (trade.equipmentId) {
     const items: EquipmentItem[] = [
-      previewedEquipment ?? newEquipmentItem(trade.equipmentId),
+      previewedEquipment ?? newCurseFreeEquipmentItem(trade.equipmentId),
       ...Array.from({ length: quantity - 1 }, () =>
-        newEquipmentItem(trade.equipmentId!),
+        newCurseFreeEquipmentItem(trade.equipmentId!),
       ),
     ];
     addArmoryItems(state, trade.equipmentId, items);
@@ -187,7 +187,7 @@ function caravanTradeApply(
     grantCaravanReward(state, trade, quantity, previewed);
     if (trade.equipmentId) {
       nodeState.rolledEquipment ??= {};
-      nodeState.rolledEquipment[tradeIndex] = newEquipmentItem(
+      nodeState.rolledEquipment[tradeIndex] = newCurseFreeEquipmentItem(
         trade.equipmentId,
       );
     }

@@ -5,7 +5,7 @@ import {
 import { caravanTradeUnlockOwned } from '@helpers/caravan/caravan-trade-quantity';
 import { ACTIVE_TRADE_COUNT } from '@helpers/config';
 import { timerTicksElapsed } from '@helpers/engine/timer';
-import { newEquipmentItem } from '@helpers/item/equipment';
+import { newCurseFreeEquipmentItem } from '@helpers/item/equipment';
 import { updateGamestate, worldCaravansState } from '@helpers/state-game';
 import {
   worldNodeCaravan,
@@ -93,7 +93,7 @@ function rollEquipmentForActiveTrades(
   activeTradeIndices.forEach((index) => {
     const trade = trader.trades[index];
     if (trade?.type === 'sell' && trade.equipmentId) {
-      rolled[index] = newEquipmentItem(trade.equipmentId);
+      rolled[index] = newCurseFreeEquipmentItem(trade.equipmentId);
     }
   });
 
