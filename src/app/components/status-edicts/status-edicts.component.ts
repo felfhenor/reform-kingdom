@@ -41,7 +41,7 @@ import { AnimationService } from '@services/animation.service';
       </ng-template>
 
       <div
-        class="w-16 h-16 m-2 flex items-center justify-center border border-current"
+        class="w-16 h-16 ms-2 mt-2 flex items-center justify-center border border-current"
         [tp]="edictsTooltip"
         [tpPlacement]="'bottom'"
         [attr.aria-label]="'Edicts'"

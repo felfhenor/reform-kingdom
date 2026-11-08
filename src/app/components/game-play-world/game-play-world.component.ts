@@ -182,6 +182,7 @@ const NODE_STATUS_UPDATE_INTERVAL_MS = 150;
             class="pointer-events-auto cursor-pointer"
             (click)="viewEdicts()"
           ></app-status-edicts>
+
           <app-bar-global-effect
             class="pointer-events-auto"
           ></app-bar-global-effect>

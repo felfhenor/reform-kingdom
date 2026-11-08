@@ -64,7 +64,7 @@ import { AnimationService } from '@services/animation.service';
       align-items: center;
       justify-content: center;
       border: 1px solid currentColor;
-      border-radius: 0.25rem;
+      border-radius: 0;
       opacity: 0.85;
       background: transparent;
       contain: content;
