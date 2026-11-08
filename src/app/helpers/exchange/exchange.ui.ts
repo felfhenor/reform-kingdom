@@ -16,16 +16,21 @@ import {
 } from '@helpers/exchange/exchange';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
 import { equippedItems } from '@helpers/item/equipment';
+import { isMaterialDiscovered } from '@helpers/item/materials';
+import { isEquipmentDiscovered } from '@helpers/kingdom/armory';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import type {
   EquipmentContent,
   EquipmentItem,
   EquipmentItemId,
+  ExchangeInputHint,
   ExchangeNodeContent,
+  ExchangeNodeExchange,
   ExchangeResult,
   ExchangeRow,
   ItemContent,
 } from '@interfaces';
+import { uniqBy } from 'es-toolkit/compat';
 
 const EXCHANGE_ERRORS: Record<Exclude<ExchangeResult, 'ok'>, string> = {
   missing: 'You no longer have what that exchange requires.',
@@ -101,6 +106,29 @@ export function exchangeHasOnlyEquippedInputs(
       equippedIds.has(exchange.inputEquipmentId) &&
       !exchangeHasInput(state, exchange),
   );
+}
+
+function exchangeInputHint(exchange: ExchangeNodeExchange): ExchangeInputHint {
+  const isEquipment = exchange.kind === 'Equipment';
+  const id = isEquipment ? exchange.inputEquipmentId : exchange.input.itemId;
+  const content = getEntry<EquipmentContent | ItemContent>(id);
+
+  return {
+    id,
+    discovered: isEquipment
+      ? isEquipmentDiscovered(exchange.inputEquipmentId)
+      : isMaterialDiscovered(exchange.input.itemId),
+    name: content?.name ?? 'UNKNOWN',
+    spritesheet: isEquipment ? 'equipment' : 'item',
+    sprite: content?.sprite ?? '',
+  };
+}
+
+// Each distinct input the node accepts, so an empty exchange still hints at what to bring.
+export function exchangeInputHints(
+  node: ExchangeNodeContent,
+): ExchangeInputHint[] {
+  return uniqBy(node.exchanges.map(exchangeInputHint), 'id');
 }
 
 function exchangeVerb(nodeName: string): string {

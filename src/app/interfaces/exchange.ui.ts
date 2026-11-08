@@ -1,3 +1,4 @@
+import type { AtlasedImage } from '@interfaces/artable';
 import type { EquipmentContent } from '@interfaces/content-equipment';
 import type { ExchangeNodeItemExchange } from '@interfaces/content-exchangenode';
 import type { CostItem } from '@interfaces/cost';
@@ -27,3 +28,12 @@ export type ExchangeItemRow = {
 };
 
 export type ExchangeRow = ExchangeEquipmentRow | ExchangeItemRow;
+
+// One accepted input, shown when the player has nothing to exchange; masked until discovered.
+export type ExchangeInputHint = {
+  id: string;
+  discovered: boolean;
+  name: string;
+  spritesheet: AtlasedImage;
+  sprite: string;
+};

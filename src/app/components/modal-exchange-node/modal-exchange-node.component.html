@@ -49,7 +49,11 @@
               }
             </div>
           } @else {
-            <app-row-currency-cost class="flex-1" [costs]="itemInput(row)" />
+            <app-row-currency-cost
+              class="flex-1"
+              [costs]="itemInput(row)"
+              [showOwned]="true"
+            />
 
             <span class="type-muted">
               <app-icon name="tablerArrowRight"></app-icon>
@@ -73,11 +77,35 @@
               [costs]="
                 row.kind === 'Equipment' ? row.costs : row.exchange.costs
               "
+              [showOwned]="true"
             />
           </button>
         </div>
       } @empty {
-        <app-blank-slate>{{ nodeContent.emptyText }}</app-blank-slate>
+        <app-blank-slate>
+          {{ nodeContent.emptyText }}
+          <span
+            class="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1"
+          >
+            Accepts:
+            @for (hint of inputHints(); track hint.id) {
+              @if (hint.discovered) {
+                <span class="inline-flex items-center gap-1">
+                  <span class="min-h-[16px] min-w-[16px]">
+                    <app-atlas-image
+                      class="zoom-inline"
+                      [spritesheet]="hint.spritesheet"
+                      [assetName]="hint.sprite"
+                    />
+                  </span>
+                  {{ hint.name }}
+                </span>
+              } @else {
+                <span class="type-unknown">???</span>
+              }
+            }
+          </span>
+        </app-blank-slate>
       }
 
       @if (showUnequipHint()) {

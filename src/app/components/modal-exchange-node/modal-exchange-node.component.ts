@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { ModalComponent } from '@components/modal/modal.component';
@@ -8,6 +9,7 @@ import { SFXDirective } from '@directives/sfx.directive';
 import { activeExchangeNode } from '@helpers/engine/ui';
 import {
   exchangeHasOnlyEquippedInputs,
+  exchangeInputHints,
   exchangePerformEquipment,
   exchangePerformItem,
   exchangeRows,
@@ -20,6 +22,7 @@ import type { CostItem, ExchangeItemRow, ExchangeRow } from '@interfaces';
   selector: 'app-modal-exchange-node',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    AtlasImageComponent,
     BlankSlateComponent,
     ModalComponent,
     RowCurrencyCostComponent,
@@ -43,6 +46,11 @@ export class ModalExchangeNodeComponent {
   public rows = computed<ExchangeRow[]>(() => {
     const node = this.node();
     return node ? exchangeRows(node) : [];
+  });
+
+  public inputHints = computed(() => {
+    const node = this.node();
+    return node ? exchangeInputHints(node) : [];
   });
 
   public showUnequipHint = computed(() => {
