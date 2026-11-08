@@ -10,7 +10,7 @@
           required: 500
 
       globalEffectId: Mobility of the Pioneer I
-      globalEffectDuration: 1800
+      globalEffectDuration: 3600
       legend: Culcula walked places no one else could. Others tried to follow, but none were able. Not even the Founder knew where Culcula went, but Culcula always came back with a map and a story.
 
     - developTime: 600
@@ -28,7 +28,7 @@
           required: 25
 
       globalEffectId: Mobility of the Pioneer II
-      globalEffectDuration: 3600
+      globalEffectDuration: 7200
       legend: No person was simultaneously lost and found as often as Culcula. Some speculated that, where there was no path, Culcula simply made one.
 
     - developTime: 900
@@ -46,7 +46,7 @@
           required: 25
 
       globalEffectId: Mobility of the Pioneer III
-      globalEffectDuration: 7200
+      globalEffectDuration: 10800
       legend: Everyone needed Culcula's maps. They were carried by Parcilyte's tacticians, Izchak's merchants, and even the Founder.
 
     - developTime: 1200

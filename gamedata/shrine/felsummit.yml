@@ -16,7 +16,7 @@
           required: 100
 
       globalEffectId: Ingenuity of the Artificer I
-      globalEffectDuration: 1800
+      globalEffectDuration: 3600
       legend: Lalal was a creator adored by those around her. She was known for tinkering with all manner of creation at a young age, and her curiosity and creativity blossomed into a lifetime of invention.
 
     - developTime: 600
@@ -34,7 +34,7 @@
           required: 25
 
       globalEffectId: Ingenuity of the Artificer II
-      globalEffectDuration: 3600
+      globalEffectDuration: 7200
       legend: Lalal was a tinkerer at heart, often lost in her own thoughts for days at a time. She was reclusive, and it's not known how long it was before she was determined to be lost.
 
     - developTime: 900
@@ -52,7 +52,7 @@
           required: 25
 
       globalEffectId: Ingenuity of the Artificer III
-      globalEffectDuration: 7200
+      globalEffectDuration: 10800
       legend: The Founder met Lalal on his travels, and saw many strange and wondrous devices. Lalal's creative genius was unmatched, and the Founder was grateful to have met her.
 
     - developTime: 1200

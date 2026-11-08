@@ -16,7 +16,7 @@
           required: 100
 
       globalEffectId: Champion's Harvest I
-      globalEffectDuration: 1800
+      globalEffectDuration: 3600
       legend: Parcilyte led the Founder's army to expand the kingdom's territories. Every battle won was another land to remember.
 
     - developTime: 600
@@ -31,7 +31,7 @@
           required: 50
 
       globalEffectId: Champion's Harvest II
-      globalEffectDuration: 3600
+      globalEffectDuration: 7200
       legend: She never lost a battle that mattered. Her name was sung in every hall, her victories celebrated everywhere. A win for her was a win for the kingdom.
 
     - developTime: 900
@@ -43,7 +43,7 @@
           required: 150
 
       globalEffectId: Champion's Harvest III
-      globalEffectDuration: 7200
+      globalEffectDuration: 10800
       legend: The spoils of war were vast, and Parcilyte made sure her troops were well-provisioned. She was a champion, a fair general, and a role model to all who followed her.
 
     - developTime: 1200

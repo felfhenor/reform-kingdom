@@ -11,7 +11,7 @@
           required: 500
 
       globalEffectId: Wisdom of the Founder I
-      globalEffectDuration: 1800
+      globalEffectDuration: 3600
       legend: Before the kingdom, there wasn't anything worth naming. The Founder saw a different world, a different way.
 
     - developTime: 600
@@ -29,7 +29,7 @@
           required: 25
 
       globalEffectId: Wisdom of the Founder II
-      globalEffectDuration: 3600
+      globalEffectDuration: 7200
       legend: With the light of the Founding Stone, the second sun, the Founder saw the world as it could be. The world remembered; the Founder could rest easier.
 
     - developTime: 900
@@ -47,7 +47,7 @@
           required: 25
 
       globalEffectId: Wisdom of the Founder III
-      globalEffectDuration: 7200
+      globalEffectDuration: 10800
       legend: The Founder brought in those who could help the lands grow. Under their combined leadership, the lands prospered. Their shrines still stand, their wisdom burning bright.
 
     - developTime: 1200
@@ -101,7 +101,7 @@
           required: 500
 
       globalEffectId: Triumph of the Magnate I
-      globalEffectDuration: 1800
+      globalEffectDuration: 3600
       legend: Izchak was the most trusted merchant in the kingdom. He knew how to value anything with coin - even a promise from the Founder.
 
     - developTime: 600
@@ -110,7 +110,7 @@
           required: 25000
 
       globalEffectId: Triumph of the Magnate II
-      globalEffectDuration: 3600
+      globalEffectDuration: 7200
       legend: Building the kingdom was no easy task. Izchak made sure the funds were there. No one knows how.
 
     - developTime: 900
@@ -119,7 +119,7 @@
           required: 100000
 
       globalEffectId: Triumph of the Magnate III
-      globalEffectDuration: 7200
+      globalEffectDuration: 10800
       legend: Folk tales say that Izchak tried to teach economics to the goblins. They just took the coins. Now, every creature in the land has coin.
 
     - developTime: 1200
