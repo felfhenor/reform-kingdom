@@ -28,7 +28,7 @@ const WORLD_NODE_TYPE_LABELS: Record<WorldNodeType, string> = {
   CaravanNode: 'Caravans',
   ExploreNode: 'Encounters',
   ExploreRandomNode: 'Mystical locations',
-  GatherNode: 'Gather nodes',
+  GatherNode: 'Gather locations',
   Shrine: 'Shrines',
   Outpost: 'Outposts',
   Trainer: 'Trainers',

@@ -121,7 +121,7 @@
   name: Edict of Storied Development
   enabled: true
   sprite: '0030'
-  description: Every outpost and gather node starts at +1.
+  description: Every outpost and gather location starts at +1.
   kind: Boon
   fragments: -4
   effects:

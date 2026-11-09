@@ -54,7 +54,7 @@ function taskLocate(task: TaskContent): TaskRowViewModel['locate'] {
   const disabledReason =
     node.mapName === worldCurrentLocationState().mapName
       ? ''
-      : `You must be in ${mapName} to locate this node.`;
+      : `You must be in ${mapName} to locate this location.`;
   return { node, disabledReason };
 }
 

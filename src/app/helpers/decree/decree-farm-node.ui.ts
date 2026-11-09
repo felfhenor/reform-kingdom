@@ -1,5 +1,6 @@
 import { farmableExploreNodes } from '@helpers/decree/decree-farm-node';
 import { assertNeverReward } from '@helpers/item/loot';
+import { worldNodeMonsterDropTable } from '@helpers/world-node/world-node-monster-drops';
 import {
   isGoldCoinReward,
   isRewardDiscovered,
@@ -7,7 +8,6 @@ import {
   rewardKey,
   worldNodeCompletionRewards,
 } from '@helpers/world-node/world-node-rewards';
-import { worldNodeMonsterDropTable } from '@helpers/world-node/world-node-monster-drops';
 import { worldNodeFarmOption } from '@helpers/world-node/world-node-status.ui';
 import {
   worldNodeByName,
@@ -26,7 +26,7 @@ export function farmNodeActiveWarning(nodeName: string): string | undefined {
   const entry = worldNodeByName(nodeName);
   if (!entry || !worldNodeEncounterRandom(entry)) return undefined;
 
-  return 'This is a mystical node, it will only be visited while it is active.';
+  return 'This is a mystical location, it will only be visited while it is active.';
 }
 
 export function exploreNodeFarmOptions(): ExploreNodeFarmOption[] {

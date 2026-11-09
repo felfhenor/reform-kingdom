@@ -14,7 +14,7 @@ export const TUTORIAL_CATALOG: TutorialDefinition[] = [
         targetKey: 'nav-world',
         view: 'world',
         title: 'World',
-        body: 'Your party explores the map here - travel between nodes, gather materials, and fight encounters.',
+        body: 'Your party explores the map here - travel between locations, gather materials, and fight encounters.',
       },
       {
         targetKey: 'nav-kingdom',

@@ -101,8 +101,8 @@ const CLAUSE_TYPE_OPTIONS: {
 }[] = sortBy(
   [
     { value: 'GatherMaterial', label: 'Gather Material' },
-    { value: 'GatherFromNode', label: 'Gather from Node' },
-    { value: 'FarmNode', label: 'Farm Node' },
+    { value: 'GatherFromNode', label: 'Gather from Location' },
+    { value: 'FarmNode', label: 'Farm Location' },
     { value: 'FarmMaterial', label: 'Farm Material' },
     { value: 'FinishUnfinishedAreas', label: 'Finish Unfinished Areas' },
     { value: 'LevelUpParty', label: 'Level Up Party' },
@@ -128,14 +128,14 @@ const RISK_TOLERANCE_OPTIONS: RiskToleranceOption[] = [
     label: 'Low',
     difficulty: RISK_BAND_DIFFICULTY.Low,
     description:
-      "Only target nodes with a max level at or below the party's level.",
+      "Only target locations with a max level at or below the party's level.",
   },
   {
     value: 'Medium',
     label: 'Medium',
     difficulty: RISK_BAND_DIFFICULTY.Medium,
     description:
-      "Target nodes with at least a minimum level of the party's level.",
+      "Target locations with at least a minimum level of the party's level.",
   },
   {
     value: 'High',

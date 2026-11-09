@@ -22,16 +22,16 @@ import {
 import type {
   CollectibleContent,
   EquipmentContent,
+  EquipmentId,
   ItemContent,
+  ItemId,
   RemembranceCategory,
+  SourceTarget,
   TaskContent,
   TownContent,
   WorkerContent,
   WorldNodeDevelopableContent,
   WorldNodeDevelopableType,
-  EquipmentId,
-  ItemId,
-  SourceTarget,
 } from '@interfaces';
 import { WORLD_NODE_TYPE_BY_CONTENT_TYPE } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
@@ -40,7 +40,7 @@ const REMEMBRANCE_DEVELOPMENT_NAMES: Record<WorldNodeDevelopableType, string> =
   {
     shrine: 'Shrine Development',
     outpost: 'Outpost Development',
-    gathering: 'Gather Node Development',
+    gathering: 'Gather Location Development',
   };
 
 // Source lookups scan all content, so they're skipped in the usual run with nothing removed.

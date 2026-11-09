@@ -181,7 +181,7 @@
               bindValue="nodeName"
               [clearable]="false"
               [disabled]="!draftRewardKey()"
-              placeholder="Explore Node"
+              placeholder="Explore Location"
               [ngModel]="draftNodeName()"
               (change)="setDraftScopedNodeName($event)"
             >
@@ -202,7 +202,7 @@
               bindLabel="nodeName"
               bindValue="nodeName"
               [clearable]="false"
-              placeholder="Explore Node"
+              placeholder="Explore Location"
               [ngModel]="draftNodeName()"
               (change)="setDraftNodeName($event)"
             >
@@ -312,7 +312,7 @@
               name="gameHelp"
               size="inline"
               class="text-lighter"
-              [tp]="'Your party will explore nodes that match the specified difficulty. If they fail enough times, they will go to an easier node. They will do this until they get to the easiest node that still gives them XP. If there are none, this clause will be skipped.'"
+              [tp]="'Your party will explore locations that match the specified difficulty. If they fail enough times, they will go to an easier location. They will do this until they get to the easiest location that still gives them XP. If there are none, this clause will be skipped.'"
             />
           }
         </div>
