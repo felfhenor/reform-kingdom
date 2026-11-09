@@ -497,6 +497,7 @@
   level: 10
   row: Spellweaving
   track: 1
+  maxRank: 3
   effects:
     - kind: Stat
       stat: Energy
@@ -534,6 +535,7 @@
   level: 45
   row: Arcanist
   requiredSkillTreeNodeIds: ['Magician: Arcanist']
+  maxRank: 3
   effects:
     - kind: Stat
       stat: Energy
@@ -571,6 +573,7 @@
   level: 5
   row: Arcanist
   track: 1
+  maxRank: 3
   effects:
     - kind: Stat
       stat: Intelligence
@@ -594,6 +597,7 @@
   sprite: '0037'
   level: 1
   row: Celestar
+  maxRank: 3
   effects:
     - kind: Stat
       stat: Resistance
@@ -606,6 +610,7 @@
   level: 5
   row: Celestar
   track: 1
+  maxRank: 3
   effects:
     - kind: Stat
       stat: Spirit
@@ -618,7 +623,21 @@
   level: 10
   row: Celestar
   track: 2
+  maxRank: 3
   effects:
     - kind: Stat
       stat: Luck
       value: 2
+
+- id: 931891c4-9160-4a64-a525-4dd7e5359d45
+  name: 'Magician: Stout'
+  jobId: Magician
+  sprite: '0025'
+  level: 5
+  row: Evocation
+  track: 1
+  maxRank: 3
+  effects:
+    - kind: Stat
+      stat: Vitality
+      value: 5

@@ -1,4 +1,4 @@
-import { NgTemplateOutlet } from '@angular/common';
+import { DecimalPipe, NgTemplateOutlet } from '@angular/common';
 import {
   afterNextRender,
   afterRenderEffect,
@@ -40,6 +40,7 @@ import type {
   SkillTreeLayoutBox,
   SkillTreeNodeContent,
   SkillTreeNodeId,
+  SkillTreeNodeRank,
   SkillTreeNodeState,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -48,6 +49,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-panel-heroes-skill-tree-grid',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    DecimalPipe,
     IconItemPreviewComponent,
     NgTemplateOutlet,
     SFXDirective,
@@ -60,6 +62,7 @@ export class PanelHeroesSkillTreeGridComponent {
   public job = input.required<JobContent>();
   public heroLevel = input.required<number>();
   public states = input.required<Map<SkillTreeNodeId, SkillTreeNodeState>>();
+  public ranks = input.required<Map<SkillTreeNodeId, SkillTreeNodeRank>>();
   public selectedId = input<SkillTreeNodeId>();
   public selected = output<SkillTreeNodeId>();
   public learnRequested = output<SkillTreeNodeId>();

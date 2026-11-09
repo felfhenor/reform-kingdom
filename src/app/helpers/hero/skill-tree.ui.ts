@@ -10,7 +10,10 @@ import {
 import {
   characterSkillTreeAvailableSp,
   characterSkillTreeNodeIds,
+  skillTreeIdsWithout,
+  skillTreeIdsWithoutPresent,
   skillTreeNodeIsLearnable,
+  skillTreeNodeRank,
   skillTreePrune,
 } from '@helpers/hero/skill-tree';
 import {
@@ -29,8 +32,10 @@ import type {
   Regalia,
   SkillTreeNodeContent,
   SkillTreeNodeId,
+  SkillTreeNodeRank,
   SkillTreeNodeState,
   SkillTreeOathChoice,
+  SkillTreeStageContext,
 } from '@interfaces';
 import { isEqual, sortBy } from 'es-toolkit/compat';
 
@@ -91,24 +96,50 @@ function skillTreeExcludedIds(
   return excluded;
 }
 
+// The current job's tree with `staged` added on top of the confirmed tree; chosen repeats an id once per rank.
+function skillTreeStageContext(
+  character: Pick<
+    Character,
+    'jobId' | 'level' | 'jobProgress' | 'skillTreeNodes'
+  >,
+  staged: SkillTreeNodeId[],
+): SkillTreeStageContext {
+  const nodes = skillTreeJobNodes(character.jobId);
+  const learned = characterSkillTreeNodeIds(character, character.jobId);
+  const chosen = [...learned, ...staged];
+  return {
+    nodes,
+    learned,
+    staged,
+    chosen,
+    excluded: skillTreeExcludedIds(nodes, new Set(chosen)),
+    freeSp:
+      characterSkillTreeAvailableSp(character, character.jobId) - staged.length,
+    level: character.level,
+  };
+}
+
+// Whether one more rank of the node could be staged right now.
+function skillTreeNodeCanStage(
+  node: SkillTreeNodeContent,
+  context: SkillTreeStageContext,
+): boolean {
+  return (
+    context.freeSp > 0 &&
+    !context.excluded.has(node.id) &&
+    skillTreeNodeIsLearnable(context.nodes, context.chosen, node, context.level)
+  );
+}
+
+// A node with any staged rank reads as pending, even over ranks already learned.
 function skillTreeNodeStateOf(
   node: SkillTreeNodeContent,
-  nodes: SkillTreeNodeContent[],
-  context: {
-    learned: Set<SkillTreeNodeId>;
-    chosen: Set<SkillTreeNodeId>;
-    excluded: Set<SkillTreeNodeId>;
-    freeSp: number;
-    level: number;
-  },
+  context: SkillTreeStageContext,
 ): SkillTreeNodeState {
-  if (context.learned.has(node.id)) return 'learned';
-  if (context.chosen.has(node.id)) return 'pending';
+  if (context.staged.includes(node.id)) return 'pending';
+  if (context.learned.includes(node.id)) return 'learned';
   if (context.excluded.has(node.id)) return 'excluded';
-  return context.freeSp > 0 &&
-    skillTreeNodeIsLearnable(nodes, context.chosen, node, context.level)
-    ? 'available'
-    : 'locked';
+  return skillTreeNodeCanStage(node, context) ? 'available' : 'locked';
 }
 
 // How each node of the current job's tree reads with `staged` added on top of the confirmed tree.
@@ -119,22 +150,31 @@ export function characterSkillTreeNodeStates(
   >,
   staged: SkillTreeNodeId[],
 ): Map<SkillTreeNodeId, SkillTreeNodeState> {
-  const nodes = skillTreeJobNodes(character.jobId);
-  const learned = new Set(
-    characterSkillTreeNodeIds(character, character.jobId),
-  );
-  const chosen = new Set([...learned, ...staged]);
-  const context = {
-    learned,
-    chosen,
-    excluded: skillTreeExcludedIds(nodes, chosen),
-    freeSp:
-      characterSkillTreeAvailableSp(character, character.jobId) - staged.length,
-    level: character.level,
-  };
-
+  const context = skillTreeStageContext(character, staged);
   return new Map(
-    nodes.map((node) => [node.id, skillTreeNodeStateOf(node, nodes, context)]),
+    context.nodes.map((node) => [node.id, skillTreeNodeStateOf(node, context)]),
+  );
+}
+
+// Each node's rank with `staged` counted, and whether another rank can be staged on top.
+export function characterSkillTreeNodeRanks(
+  character: Pick<
+    Character,
+    'jobId' | 'level' | 'jobProgress' | 'skillTreeNodes'
+  >,
+  staged: SkillTreeNodeId[],
+): Map<SkillTreeNodeId, SkillTreeNodeRank> {
+  const context = skillTreeStageContext(character, staged);
+  return new Map(
+    context.nodes.map((node) => [
+      node.id,
+      {
+        rank: skillTreeNodeRank(context.chosen, node.id),
+        learnedRank: skillTreeNodeRank(context.learned, node.id),
+        maxRank: node.maxRank,
+        canLearn: skillTreeNodeCanStage(node, context),
+      },
+    ]),
   );
 }
 
@@ -154,7 +194,7 @@ export function skillTreeOathChoice(
     : undefined;
 }
 
-// Unstaging a node also unstages anything staged that depended on it.
+// Unstages one rank of a node; dropping its last rank also unstages anything staged that depended on it.
 export function characterSkillTreeStagedWithout(
   character: Pick<
     Character,
@@ -164,11 +204,13 @@ export function characterSkillTreeStagedWithout(
   nodeId: SkillTreeNodeId,
 ): SkillTreeNodeId[] {
   const learned = characterSkillTreeNodeIds(character, character.jobId);
-  return skillTreePrune(
+  const remaining = skillTreeIdsWithoutPresent(staged, [nodeId]);
+  const pruned = skillTreePrune(
     character.jobId,
-    [...learned, ...staged.filter((id) => id !== nodeId)],
+    [...learned, ...remaining],
     character.level,
-  ).filter((id) => !learned.includes(id));
+  );
+  return skillTreeIdsWithoutPresent(pruned, learned);
 }
 
 function sameTree(a: SkillTreeNodeId[], b: SkillTreeNodeId[]): boolean {
@@ -182,7 +224,7 @@ export function regaliaEquipLosesLiveTree(
   regalia: Regalia,
 ): boolean {
   const live = characterSkillTreeNodeIds(character, regalia.jobId);
-  if (regalia.skillTreeNodeIds.every((id) => live.includes(id))) return false;
+  if (skillTreeIdsWithout(live, regalia.skillTreeNodeIds)) return false;
 
   return !regalias.some(
     (entry) =>

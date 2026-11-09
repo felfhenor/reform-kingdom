@@ -5,6 +5,7 @@
   @let state = stateOf(node.id);
   @let nodeArt = art(node);
   @let isSelected = node.id === selectedId();
+  @let nodeRank = ranks().get(node.id);
 
   <button
     #box
@@ -31,6 +32,14 @@
       [spritesheet]="nodeArt.spritesheet"
       cssClass="zoom-tile"
     />
+
+    @if (nodeRank && nodeRank.maxRank > 1) {
+      <span
+        class="absolute bottom-0 right-0 px-0.5 text-xs leading-none font-bold tabular-nums bg-base-100/80 pointer-events-none"
+      >
+        {{ nodeRank.rank | number }}/{{ nodeRank.maxRank | number }}
+      </span>
+    }
   </button>
 </ng-template>
 

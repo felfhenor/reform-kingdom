@@ -21,7 +21,7 @@ import type {
   SkillTreeNodeEffect,
   SkillTreeNodeKind,
 } from '@interfaces';
-import { countBy, sortBy } from 'es-toolkit/compat';
+import { countBy, groupBy, sortBy, sumBy } from 'es-toolkit/compat';
 
 const NODE_KINDS: SkillTreeNodeKind[] = [
   'Skill',
@@ -82,6 +82,17 @@ function kindCounts(
   return Object.fromEntries(kinds.map((kind) => [kind, counts[kind] ?? 0]));
 }
 
+// Every rank of a node costs its own SP.
+function kindSp(
+  nodes: SkillTreeNodeContent[],
+  kinds: string[],
+): Record<string, number> {
+  const byKind = groupBy(nodes, nodeType);
+  return Object.fromEntries(
+    kinds.map((kind) => [kind, sumBy(byKind[kind] ?? [], 'maxRank')]),
+  );
+}
+
 function nodeCountTable(jobs: JobContent[]): AnalysisTable {
   return {
     title: 'Nodes by type',
@@ -107,9 +118,9 @@ function buildSpTable(jobs: JobContent[], earnedSp: number): AnalysisTable {
         const build = skillTreeBuildNodes(nodes, spec);
         return {
           Build: `${job.name} / ${skillTreeNodeShortName(spec)}`,
-          ...kindCounts(build, NODE_KINDS),
-          'Total SP': build.length,
-          Slack: earnedSp - build.length,
+          ...kindSp(build, NODE_KINDS),
+          'Total SP': sumBy(build, 'maxRank'),
+          Slack: earnedSp - sumBy(build, 'maxRank'),
         };
       });
     }),

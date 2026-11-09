@@ -533,6 +533,7 @@
   level: 5
   row: Divine Might
   track: 1
+  maxRank: 3
   effects:
     - kind: Stat
       stat: Energy
@@ -607,6 +608,7 @@
   level: 10
   row: Lifegiver
   track: 2
+  maxRank: 3
   effects:
     - kind: Stat
       stat: Luck
@@ -619,6 +621,7 @@
   level: 5
   row: Templar
   track: 1
+  maxRank: 3
   effects:
     - kind: Stat
       stat: Intelligence
@@ -626,3 +629,42 @@
     - kind: Stat
       stat: Strength
       value: 5
+
+- id: 95b2af21-5753-4371-b211-f1b6bbd6e20d
+  name: 'Healer: Stout'
+  jobId: Healer
+  sprite: '0025'
+  level: 1
+  row: Templar
+  track: 0
+  maxRank: 3
+  effects:
+    - kind: Stat
+      stat: Vitality
+      value: 5
+
+- id: 34237cb1-1adb-4558-abf5-8e65bcde169d
+  name: 'Healer: Serene'
+  jobId: Healer
+  sprite: '0038'
+  level: 5
+  row: Lifegiver
+  track: 1
+  maxRank: 3
+  effects:
+    - kind: Stat
+      stat: Spirit
+      value: 3
+
+- id: 43ec9cf0-8206-445c-8e3f-4cc7d4f5e663
+  name: 'Healer: Steadfast'
+  jobId: Healer
+  sprite: '0041'
+  level: 10
+  row: Templar
+  track: 2
+  maxRank: 3
+  effects:
+    - kind: Stat
+      stat: Constitution
+      value: 3

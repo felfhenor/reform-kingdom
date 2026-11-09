@@ -79,6 +79,25 @@ export type SkillModifierLine = {
   entries: SkillModifierLineEntry[];
 };
 
+// A node's rank with staged picks counted, and whether one more can be staged.
+export type SkillTreeNodeRank = {
+  rank: number;
+  learnedRank: number;
+  maxRank: number;
+  canLearn: boolean;
+};
+
+// The current job's tree with staged picks on top; chosen repeats an id once per rank.
+export type SkillTreeStageContext = {
+  nodes: SkillTreeNodeContent[];
+  learned: SkillTreeNodeId[];
+  staged: SkillTreeNodeId[];
+  chosen: SkillTreeNodeId[];
+  excluded: Set<SkillTreeNodeId>;
+  freeSp: number;
+  level: number;
+};
+
 // The option picked for an oath, confirmed or only staged.
 export type SkillTreeOathChoice = { name: string; state: SkillTreeNodeState };
 

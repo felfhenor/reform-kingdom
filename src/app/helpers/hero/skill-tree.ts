@@ -22,7 +22,7 @@ import type {
   SkillTreeNodeContent,
   SkillTreeNodeId,
 } from '@interfaces';
-import { partition, sortBy, takeWhile, uniq } from 'es-toolkit/compat';
+import { partition, sortBy, takeWhile } from 'es-toolkit/compat';
 
 // Migration reads the save's own sums here, where a pre-bonus save has no key.
 export function skillTreeEarnedSp(level: number): number {
@@ -64,30 +64,67 @@ export function characterSkillTreeAvailableSp(
   );
 }
 
-// Requiring an oath is satisfied by either of its options.
+// A tree holds one copy of a node's id per rank learned, so its length is always the SP it cost.
+export function skillTreeNodeRank(
+  nodeIds: SkillTreeNodeId[],
+  nodeId: SkillTreeNodeId,
+): number {
+  return nodeIds.filter((id) => id === nodeId).length;
+}
+
+// Takes out one copy per entry of `removed`; undefined if `nodeIds` doesn't hold them all.
+export function skillTreeIdsWithout(
+  nodeIds: SkillTreeNodeId[],
+  removed: SkillTreeNodeId[],
+): SkillTreeNodeId[] | undefined {
+  const remaining = [...nodeIds];
+  const allFound = removed.every((id) => {
+    const index = remaining.indexOf(id);
+    if (index >= 0) remaining.splice(index, 1);
+    return index >= 0;
+  });
+  return allFound ? remaining : undefined;
+}
+
+// Takes out one copy per entry of `removed`, skipping any that aren't there.
+export function skillTreeIdsWithoutPresent(
+  nodeIds: SkillTreeNodeId[],
+  removed: SkillTreeNodeId[],
+): SkillTreeNodeId[] {
+  return removed.reduce(
+    (remaining, id) => skillTreeIdsWithout(remaining, [id]) ?? remaining,
+    nodeIds,
+  );
+}
+
+// Requiring an oath is satisfied by either of its options; any rank of a node satisfies it.
 function skillTreeRequirementMet(
   nodes: SkillTreeNodeContent[],
-  learned: Set<SkillTreeNodeId>,
+  learned: SkillTreeNodeId[],
   requiredId: SkillTreeNodeId,
 ): boolean {
   const required = nodes.find((node) => node.id === requiredId);
   return required && skillTreeIsOath(required)
-    ? required.optionSkillTreeNodeIds.some((id) => learned.has(id))
-    : learned.has(requiredId);
+    ? required.optionSkillTreeNodeIds.some((id) => learned.includes(id))
+    : learned.includes(requiredId);
 }
 
-// Ignores SP; an oath option takes its oath's requirements and is locked out once its sibling is learned.
+// Whether one more rank can be learned, ignoring SP; an oath option takes its oath's requirements and is locked out once its sibling is learned.
 export function skillTreeNodeIsLearnable(
   nodes: SkillTreeNodeContent[],
-  learned: Set<SkillTreeNodeId>,
+  learned: SkillTreeNodeId[],
   node: SkillTreeNodeContent,
   level: number,
 ): boolean {
-  if (learned.has(node.id) || skillTreeIsOath(node)) return false;
+  if (skillTreeIsOath(node)) return false;
+  if (skillTreeNodeRank(learned, node.id) >= node.maxRank) return false;
   if (skillTreeNodeLevel(nodes, node) > level) return false;
 
   const oath = skillTreeOptionOath(nodes, node.id);
-  if (oath?.optionSkillTreeNodeIds.some((id) => learned.has(id))) return false;
+  const siblingLearned = oath?.optionSkillTreeNodeIds.some(
+    (id) => id !== node.id && learned.includes(id),
+  );
+  if (siblingLearned) return false;
 
   return (oath ?? node).requiredSkillTreeNodeIds.every((requiredId) =>
     skillTreeRequirementMet(nodes, learned, requiredId),
@@ -104,9 +141,7 @@ export function characterSkillTreeCanLearn(
 ): boolean {
   const nodes = skillTreeJobNodes(character.jobId);
   const node = nodes.find((candidate) => candidate.id === nodeId);
-  const learned = new Set(
-    characterSkillTreeNodeIds(character, character.jobId),
-  );
+  const learned = characterSkillTreeNodeIds(character, character.jobId);
 
   return (
     !!node &&
@@ -122,12 +157,25 @@ function skillTreeAdditionsLearnable(
   added: SkillTreeNodeContent[],
   level: number,
 ): boolean {
-  const learned = new Set(current);
+  const learned = [...current];
   return added.every((node) => {
     const learnable = skillTreeNodeIsLearnable(nodes, learned, node, level);
-    learned.add(node.id);
+    learned.push(node.id);
     return learnable;
   });
+}
+
+// Each id as its node (repeats kept), in level order; undefined if any id is unknown.
+function skillTreeNodesInLevelOrder(
+  nodes: SkillTreeNodeContent[],
+  nodeIds: SkillTreeNodeId[],
+): SkillTreeNodeContent[] | undefined {
+  const found = nodeIds.map((id) => nodes.find((node) => node.id === id));
+  if (found.some((node) => !node)) return undefined;
+
+  return sortBy(found as SkillTreeNodeContent[], (node) =>
+    skillTreeNodeLevel(nodes, node),
+  );
 }
 
 // Confirm only ever adds: undefined if anything learned would be dropped, an id is unknown, or the additions aren't learnable within the free SP.
@@ -140,34 +188,34 @@ export function characterSkillTreeWithAdditions(
 ): SkillTreeNodeId[] | undefined {
   const current = characterSkillTreeNodeIds(character, character.jobId);
   const nodes = skillTreeJobNodes(character.jobId);
-  const added = sortBy(
-    nodes.filter(
-      (node) => nodeIds.includes(node.id) && !current.includes(node.id),
-    ),
-    (node) => skillTreeNodeLevel(nodes, node),
-  );
+  const addedIds = skillTreeIdsWithout(nodeIds, current);
+  const added = addedIds
+    ? skillTreeNodesInLevelOrder(nodes, addedIds)
+    : undefined;
 
   const valid =
-    current.every((id) => nodeIds.includes(id)) &&
-    current.length + added.length === uniq(nodeIds).length &&
+    !!added &&
     added.length <= characterSkillTreeAvailableSp(character, character.jobId) &&
     skillTreeAdditionsLearnable(nodes, current, added, character.level);
 
   return valid ? [...current, ...added.map((node) => node.id)] : undefined;
 }
 
-// Everything a hands-off player will eventually buy, in order: lowest level first, an oath's first option, perks only after all else.
+// Everything a hands-off player will eventually buy, in order: lowest level first, an oath's first option, perks (every rank) only after all else.
 function skillTreeAutoPickPlan(
   nodes: SkillTreeNodeContent[],
-  learned: Set<SkillTreeNodeId>,
+  learned: SkillTreeNodeId[],
 ): SkillTreeNodeContent[] {
-  const planned = new Set(learned);
+  const planned = [...learned];
   const [perks, others] = partition(
     sortBy(nodes, (node) => skillTreeNodeLevel(nodes, node)),
     (node) => skillTreeNodeKind(node) === 'Perk',
   );
+  const ranks = [...others, ...perks].flatMap((node) =>
+    Array<SkillTreeNodeContent>(node.maxRank).fill(node),
+  );
 
-  return [...others, ...perks].filter((node) => {
+  return ranks.filter((node) => {
     if (
       !skillTreeNodeIsLearnable(
         nodes,
@@ -178,7 +226,7 @@ function skillTreeAutoPickPlan(
     )
       return false;
 
-    planned.add(node.id);
+    planned.push(node.id);
     return true;
   });
 }
@@ -196,7 +244,7 @@ export function characterSkillTreeAutoPicks(
   const nodes = skillTreeJobNodes(character.jobId);
   const plan = skillTreeAutoPickPlan(
     nodes,
-    new Set(characterSkillTreeNodeIds(character, character.jobId)),
+    characterSkillTreeNodeIds(character, character.jobId),
   );
 
   return takeWhile(
@@ -207,22 +255,22 @@ export function characterSkillTreeAutoPicks(
     .map((node) => node.id);
 }
 
-// Parents always sit at a lower level, so rebuilding in level order drops unknown, too-high, orphaned and duplicate oath picks in one pass.
+// Parents always sit at a lower level, so rebuilding in level order drops unknown, too-high, orphaned, over-ranked and duplicate oath picks in one pass.
 export function skillTreePrune(
   jobId: JobId,
   nodeIds: SkillTreeNodeId[],
   level: number,
 ): SkillTreeNodeId[] {
   const nodes = skillTreeJobNodes(jobId);
-  const known = nodes.filter((node) => nodeIds.includes(node.id));
-  const kept = new Set<SkillTreeNodeId>();
+  const known = nodeIds.filter((id) => nodes.some((node) => node.id === id));
+  const kept: SkillTreeNodeId[] = [];
 
-  sortBy(known, (node) => skillTreeNodeLevel(nodes, node)).forEach((node) => {
-    if (skillTreeNodeIsLearnable(nodes, kept, node, level)) kept.add(node.id);
+  skillTreeNodesInLevelOrder(nodes, known)?.forEach((node) => {
+    if (skillTreeNodeIsLearnable(nodes, kept, node, level)) kept.push(node.id);
   });
 
   // Over budget (e.g. the SP rate changed): refund from the top, which never orphans a kept node.
-  return [...kept].slice(0, skillTreeEarnedSp(level));
+  return kept.slice(0, skillTreeEarnedSp(level));
 }
 
 // Seeds unseen or stale trees, then prunes each held job's tree against its own level; trees of removed jobs are dropped.

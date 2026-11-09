@@ -13,6 +13,9 @@ import {
   characterSpecNode,
   regaliaSkillTreeMigrate,
   skillTreeEarnedSp,
+  skillTreeIdsWithout,
+  skillTreeIdsWithoutPresent,
+  skillTreeNodeRank,
   skillTreePrune,
 } from '@helpers/hero/skill-tree';
 import type {
@@ -403,5 +406,105 @@ describe('characterSpecNode', () => {
     });
 
     expect(characterSpecNode(jala)).toBeUndefined();
+  });
+});
+
+describe('multi-rank nodes', () => {
+  // tough: 3 ranks at Lv 1; toughChild (Lv 5) needs any rank of it.
+  const ranked = [
+    ...tree,
+    node('tough', {
+      maxRank: 3,
+      effects: [{ kind: 'Stat', stat: 'Vitality', value: 5 }],
+    }),
+    node('toughChild', { level: 5, requiredSkillTreeNodeIds: ids('tough') }),
+  ];
+  const at = (level: number, learned: string[]) =>
+    hero({ level, skillTreeNodes: { [jobId]: ids(...learned) } });
+
+  beforeEach(() => seedTree(ranked));
+
+  it('counts ranks as repeated ids and stops at the max', () => {
+    expect(
+      skillTreeNodeRank(ids('tough', 'aura', 'tough'), ids('tough')[0]),
+    ).toBe(2);
+    expect(
+      characterSkillTreeCanLearn(at(20, ['tough', 'tough']), ids('tough')[0]),
+    ).toBe(true);
+    expect(
+      characterSkillTreeCanLearn(
+        at(20, ['tough', 'tough', 'tough']),
+        ids('tough')[0],
+      ),
+    ).toBe(false);
+  });
+
+  it('confirms extra ranks but rejects going past the max', () => {
+    const learned = at(20, ['strike', 'tough']);
+    expect(
+      characterSkillTreeWithAdditions(
+        learned,
+        ids('strike', 'tough', 'tough', 'tough'),
+      ),
+    ).toEqual(ids('strike', 'tough', 'tough', 'tough'));
+    expect(
+      characterSkillTreeWithAdditions(
+        learned,
+        ids('strike', 'tough', 'tough', 'tough', 'tough'),
+      ),
+    ).toBeUndefined();
+    expect(
+      characterSkillTreeWithAdditions(
+        learned,
+        ids('strike', 'tough', 'tough').slice(1),
+      ),
+    ).toBeUndefined();
+  });
+
+  it('prunes ranks past the max and keeps children of any rank', () => {
+    expect(
+      skillTreePrune(
+        jobId,
+        ids('tough', 'tough', 'tough', 'tough', 'toughChild'),
+        20,
+      ),
+    ).toEqual(ids('tough', 'tough', 'tough', 'toughChild'));
+  });
+
+  it('stacks the effects of every rank', () => {
+    expect(characterNonGearEffects(at(20, ['tough', 'tough']))).toEqual([
+      { kind: 'Stat', stat: 'Vitality', value: 5 },
+      { kind: 'Stat', stat: 'Vitality', value: 5 },
+    ]);
+  });
+
+  it('auto-picks every rank of a perk', () => {
+    seedTree([
+      node('strike', { default: true }),
+      node('tough', {
+        maxRank: 3,
+        effects: [{ kind: 'Stat', stat: 'Vitality', value: 5 }],
+      }),
+    ]);
+    expect(characterSkillTreeAutoPicks(at(20, ['strike']))).toEqual(
+      ids('tough', 'tough', 'tough'),
+    );
+  });
+});
+
+describe('skillTreeIdsWithout', () => {
+  it('takes out one copy per removed id, or fails if any is missing', () => {
+    expect(skillTreeIdsWithout(ids('a', 'b', 'a'), ids('a'))).toEqual(
+      ids('b', 'a'),
+    );
+    expect(skillTreeIdsWithout(ids('a', 'b'), ids('a', 'a'))).toBeUndefined();
+  });
+});
+
+describe('skillTreeIdsWithoutPresent', () => {
+  it('takes out one copy per removed id, skipping missing ones', () => {
+    expect(
+      skillTreeIdsWithoutPresent(ids('a', 'b', 'a'), ids('a', 'c')),
+    ).toEqual(ids('b', 'a'));
   });
 });

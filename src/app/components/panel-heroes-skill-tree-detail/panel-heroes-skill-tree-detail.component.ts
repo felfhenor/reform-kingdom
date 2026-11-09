@@ -46,6 +46,7 @@ import type {
   JobContent,
   SkillTreeNodeContent,
   SkillTreeNodeId,
+  SkillTreeNodeRank,
   SkillTreeNodeState,
 } from '@interfaces';
 import { AnimationService } from '@services/animation.service';
@@ -72,6 +73,7 @@ export class PanelHeroesSkillTreeDetailComponent {
   public states = input.required<Map<SkillTreeNodeId, SkillTreeNodeState>>();
   public job = input.required<JobContent>();
   public character = input.required<Character>();
+  public rank = input<SkillTreeNodeRank>();
   public staged = input<SkillTreeNodeId[]>([]);
   public learn = output<SkillTreeNodeId>();
   public unlearn = output<SkillTreeNodeId>();

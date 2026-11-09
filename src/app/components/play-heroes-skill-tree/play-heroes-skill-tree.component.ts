@@ -31,9 +31,11 @@ import {
 import {
   characterSkillTreeAvailableSp,
   characterSkillTreeNodeIds,
+  skillTreeIdsWithoutPresent,
 } from '@helpers/hero/skill-tree';
 import { skillTreeResetPromptText } from '@helpers/hero/skill-tree-layout.ui';
 import {
+  characterSkillTreeNodeRanks,
   characterSkillTreeNodeStates,
   characterSkillTreeStagedWithout,
   skillTreeConfirm,
@@ -110,6 +112,18 @@ export class PlayHeroesSkillTreeComponent {
       : new Map();
   });
 
+  public ranks = computed(() => {
+    const character = this.character();
+    return character
+      ? characterSkillTreeNodeRanks(character, this.staged())
+      : new Map();
+  });
+
+  public selectedRank = computed(() => {
+    const id = this.selectedNodeId();
+    return id ? this.ranks().get(id) : undefined;
+  });
+
   public freeSp = computed(() => {
     const character = this.character();
     return character
@@ -174,12 +188,12 @@ export class PlayHeroesSkillTreeComponent {
   }
 
   public learnIfAvailable(id: SkillTreeNodeId): void {
-    if (this.states().get(id) !== 'available') return;
+    if (!this.ranks().get(id)?.canLearn) return;
     this.learn(id);
   }
 
   public unlearnIfAvailable(id: SkillTreeNodeId): void {
-    if (this.states().get(id) !== 'pending') return;
+    if (!this.staged().includes(id)) return;
     this.unlearn(id);
   }
 
@@ -206,7 +220,7 @@ export class PlayHeroesSkillTreeComponent {
     const learned = characterSkillTreeNodeIds(character, character.jobId);
     const saved = await skillTreeConfirm(character.id, [...learned, ...staged]);
     if (saved)
-      this.setStaged(this.staged().filter((id) => !staged.includes(id)));
+      this.setStaged(skillTreeIdsWithoutPresent(this.staged(), staged));
     return saved;
   }
 

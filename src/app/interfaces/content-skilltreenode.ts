@@ -93,6 +93,9 @@ export type SkillTreeNodeContent = IsContentItem &
     // Pre-allocated on new heroes; still costs SP.
     default: boolean;
 
+    // How many times it can be learned, 1 SP per rank; each rank stacks its effects again.
+    maxRank: number;
+
     effects: SkillTreeNodeEffect[];
   };
 

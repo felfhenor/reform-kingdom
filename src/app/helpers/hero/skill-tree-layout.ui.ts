@@ -31,6 +31,7 @@ import {
   characterSkillTreeNodeIds,
   characterSpecNode,
   skillTreeEarnedSp,
+  skillTreeNodeRank,
 } from '@helpers/hero/skill-tree';
 import {
   skillTreeIsOath,
@@ -58,7 +59,7 @@ import type {
   SkillTreeRow,
   StatBlock,
 } from '@interfaces';
-import { max, range, sortBy } from 'es-toolkit/compat';
+import { max, range, sortBy, uniqBy } from 'es-toolkit/compat';
 
 const HEADER_ROWS = 2;
 const OATH_FRAME_WIDTH =
@@ -310,6 +311,23 @@ function skillTreeNodeSummary(
   };
 }
 
+// A multi-rank node lists once, its name carrying how many ranks the build holds.
+function skillTreeRankedSummary(
+  node: SkillTreeNodeContent,
+  job: JobContent,
+  nodeIds: SkillTreeNodeId[],
+  format: (value: number) => string,
+): SkillTreeNodeSummary {
+  const summary = skillTreeNodeSummary(node, job);
+  if (node.maxRank <= 1) return summary;
+
+  const rank = format(skillTreeNodeRank(nodeIds, node.id));
+  return {
+    ...summary,
+    name: `${summary.name} (${rank}/${format(node.maxRank)})`,
+  };
+}
+
 export function skillTreeNodeRequirements(
   node: SkillTreeNodeContent,
   job: JobContent,
@@ -350,6 +368,7 @@ export function skillTreeBuildSummary(
   nodeIds: SkillTreeNodeId[],
   job: JobContent,
   level: number,
+  format: (value: number) => string,
 ): SkillTreeBuildSummary {
   const nodes = nodeIds
     .map((id) => getEntry<SkillTreeNodeContent>(id))
@@ -361,7 +380,9 @@ export function skillTreeBuildSummary(
     spent: nodeIds.length,
     earned: skillTreeEarnedSp(level),
     nodes: sortBy(
-      nodes.map((node) => skillTreeNodeSummary(node, job)),
+      uniqBy(nodes, (node) => node.id).map((node) =>
+        skillTreeRankedSummary(node, job, nodeIds, format),
+      ),
       (entry) => entry.name,
     ),
   };

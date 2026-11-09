@@ -530,6 +530,7 @@
   level: 1
   row: Marksmanship
   track: 2
+  maxRank: 3
   effects:
     - kind: Stat
       stat: Agility
@@ -608,6 +609,7 @@
   level: 5
   row: Wayfinder
   track: 1
+  maxRank: 3
   effects:
     - kind: Stat
       stat: Constitution
@@ -619,6 +621,7 @@
   sprite: '0033'
   level: 1
   row: Stalker
+  maxRank: 3
   effects:
     - kind: Stat
       stat: Strength
@@ -631,6 +634,7 @@
   level: 5
   row: Stalker
   track: 1
+  maxRank: 3
   effects:
     - kind: Stat
       stat: Luck
@@ -647,3 +651,42 @@
     - kind: MonsterTypeDamage
       monsterType: Humanoid
       value: 10
+
+- id: 70c70507-b318-41bc-a5bc-8162172a6156
+  name: 'Ranger: Serene'
+  jobId: Ranger
+  sprite: '0038'
+  level: 1
+  row: Nature
+  track: 0
+  maxRank: 3
+  effects:
+    - kind: Stat
+      stat: Spirit
+      value: 3
+
+- id: 0f705d88-21f9-49f7-baa4-8fbdd07e0eb0
+  name: 'Ranger: Focused Eye'
+  jobId: Ranger
+  sprite: '0013'
+  level: 10
+  row: Marksmanship
+  track: 2
+  maxRank: 3
+  effects:
+    - kind: Stat
+      stat: Energy
+      value: 20
+
+- id: 6ac9afe9-92fc-45ec-af5f-e0c7b2946780
+  name: 'Ranger: Stout'
+  jobId: Ranger
+  sprite: '0025'
+  level: 10
+  row: Wayfinder
+  track: 2
+  maxRank: 3
+  effects:
+    - kind: Stat
+      stat: Vitality
+      value: 5

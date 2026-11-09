@@ -1,8 +1,10 @@
-import { DecimalPipe, NgTemplateOutlet } from '@angular/common';
+import { DecimalPipe, formatNumber, NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
+  LOCALE_ID,
   signal,
   viewChild,
 } from '@angular/core';
@@ -101,6 +103,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   templateUrl: './play-heroes-regalia.component.html',
 })
 export class PlayHeroesRegaliaComponent {
+  private locale = inject(LOCALE_ID);
   private renameSwal = viewChild<SwalComponent>('renameSwal');
   private equipSwal = viewChild<SwalComponent>('equipSwal');
 
@@ -273,6 +276,7 @@ export class PlayHeroesRegaliaComponent {
           regalia.skillTreeNodeIds,
           job,
           characterJobLevel(character, regalia.jobId),
+          (value) => formatNumber(value, this.locale),
         )
       : undefined;
   });

@@ -1,5 +1,7 @@
 @let info = details();
 @let nodeState = state();
+@let nodeRank = rank();
+@let multiRank = !!nodeRank && nodeRank.maxRank > 1;
 
 <ng-template #echoTooltip let-skill="data">
   <app-tooltip-skill-preview
@@ -34,13 +36,19 @@
         <div class="flex gap-2 flex-wrap">
           <span class="badge badge-sm badge-data">1 SP</span>
 
+          @if (multiRank && nodeRank) {
+            <span class="badge badge-sm badge-data tabular-nums">
+              Rank {{ nodeRank.rank | number }}/{{ nodeRank.maxRank | number }}
+            </span>
+          }
+
           @if (info.skill; as skill) {
             <span class="badge badge-sm badge-data">
               {{ epCost(skill) | number }} EP
             </span>
           }
 
-          @if (nodeState === 'learned') {
+          @if (nodeRank?.learnedRank) {
             <span
               class="badge badge-sm badge-success"
               (animate.enter)="onEnter($event)"
@@ -116,7 +124,7 @@
       </div>
     }
 
-    @if (nodeState === 'available') {
+    @if (nodeRank?.canLearn) {
       <button
         type="button"
         class="btn btn-primary btn-sm"
@@ -126,7 +134,13 @@
         appSfx="ui-success"
         [sfxTrigger]="['click', 'hover']"
       >
-        Learn
+        @if (multiRank && nodeRank) {
+          Learn ({{ nodeRank.rank + 1 | number }}/{{
+            nodeRank.maxRank | number
+          }})
+        } @else {
+          Learn
+        }
       </button>
     }
 

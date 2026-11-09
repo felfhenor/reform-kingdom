@@ -468,6 +468,7 @@
   sprite: '0025'
   level: 5
   row: Fortune
+  maxRank: 3
   effects:
     - kind: Stat
       stat: Vitality
@@ -480,6 +481,7 @@
   level: 5
   row: Fieldcraft
   track: 2
+  maxRank: 3
   effects:
     - kind: Stat
       stat: Agility
@@ -530,6 +532,7 @@
   level: 45
   row: Treasure Hunter
   requiredSkillTreeNodeIds: ['Explorer: Treasure Hunter']
+  maxRank: 3
   effects:
     - kind: Stat
       stat: Health
@@ -544,6 +547,7 @@
   level: 5
   row: Treasure Hunter
   track: 1
+  maxRank: 3
   effects:
     - kind: Stat
       stat: Constitution
@@ -559,6 +563,7 @@
   level: 10
   row: Treasure Hunter
   track: 2
+  maxRank: 3
   effects:
     - kind: Stat
       stat: Luck
@@ -570,6 +575,7 @@
   sprite: '0033'
   level: 1
   row: Dungeon Delver
+  maxRank: 3
   effects:
     - kind: Stat
       stat: Strength
@@ -582,7 +588,21 @@
   level: 5
   row: Dungeon Delver
   track: 1
+  maxRank: 3
   effects:
     - kind: Stat
       stat: Intelligence
       value: 5
+
+- id: f63a6cd8-54aa-4dd5-a7f7-391e11a73090
+  name: 'Explorer: Steadfast'
+  jobId: Explorer
+  sprite: '0041'
+  level: 10
+  row: Dungeon Delver
+  track: 2
+  maxRank: 3
+  effects:
+    - kind: Stat
+      stat: Constitution
+      value: 3

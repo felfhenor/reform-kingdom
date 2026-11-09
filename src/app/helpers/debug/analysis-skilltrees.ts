@@ -254,6 +254,24 @@ function effectIssues(node: SkillTreeNodeContent): AnalysisIssue[] {
   });
 }
 
+// Repeated ids stack every effect, so only plain stat nodes may take more than one rank.
+function maxRankIssues(node: SkillTreeNodeContent): AnalysisIssue[] {
+  if (!Number.isInteger(node.maxRank) || node.maxRank < 1) {
+    return [analysisFail(`${node.name}: maxRank must be a whole number >= 1.`)];
+  }
+
+  const statOnly =
+    node.effects.length > 0 &&
+    node.effects.every((effect) => effect.kind === 'Stat');
+  return node.maxRank > 1 && (!statOnly || node.default || node.row === '')
+    ? [
+        analysisFail(
+          `${node.name}: only placed, non-default, stat-only nodes can have more than one rank.`,
+        ),
+      ]
+    : [];
+}
+
 function defaultIssues(
   job: JobContent,
   nodes: SkillTreeNodeContent[],
@@ -343,6 +361,7 @@ function jobTreeIssues(job: JobContent): AnalysisIssue[] {
     ...specIssues(job, nodes),
     ...specLineageIssues(job, nodes),
     ...nodes.flatMap(effectIssues),
+    ...nodes.flatMap(maxRankIssues),
     ...defaultIssues(job, nodes),
     ...skillTreeRankIssues(nodes),
     ...skillTreeModifierIssues(nodes),

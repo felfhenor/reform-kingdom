@@ -40,6 +40,7 @@ export function ensureSkillTreeNode(
     requiredSkillTreeNodeIds: node.requiredSkillTreeNodeIds ?? [],
     optionSkillTreeNodeIds: node.optionSkillTreeNodeIds ?? [],
     default: node.default ?? false,
+    maxRank: node.maxRank ?? 1,
     sprite: node.sprite ?? '',
     effects: ensureArray(
       (node.effects ?? []).filter(isSkillTreeNodeEffect),

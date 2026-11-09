@@ -65,6 +65,7 @@
             [job]="heroJob"
             [heroLevel]="hero.level"
             [states]="states()"
+            [ranks]="ranks()"
             [selectedId]="selectedNodeId()"
             (selected)="selectNode($event)"
             (learnRequested)="learnIfAvailable($event)"
@@ -97,8 +98,9 @@
 
               <p class="mt-2">
                 If you double click a skill, you will mark it to be learned
-                (indicated by orange outlines and arrows). To confirm your
-                choices, you must hit the Confirm button.
+                (indicated by orange outlines and arrows). Some skills can be
+                learned multiple times. To confirm your choices, you must hit
+                the Confirm button.
               </p>
 
               <p class="mt-2">
@@ -114,6 +116,7 @@
             class="mt-2"
             [node]="selectedNode()"
             [states]="states()"
+            [rank]="selectedRank()"
             [staged]="staged()"
             [job]="heroJob"
             [character]="hero"
