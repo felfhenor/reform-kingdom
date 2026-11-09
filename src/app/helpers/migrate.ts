@@ -167,8 +167,9 @@ export function migrateGameState() {
   const newState = merge(defaultGameState(), remappedState);
 
   // Validators below read the live state, whose sums may predate fields they need (e.g. removedWorldNodeTypes).
+  // Must be the remapped state: worker validation reads `visitedWorldNodes`, absent on pre-rename saves.
   setGameState(
-    { ...state, globalEffectSums: globalEffectSumsFor(newState) },
+    { ...remappedState, globalEffectSums: globalEffectSumsFor(newState) },
     false,
   );
 

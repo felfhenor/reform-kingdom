@@ -22,6 +22,7 @@ import { ensureSkill } from '@helpers/content/ensure-skill';
 import { ensureTask } from '@helpers/content/ensure-task';
 import { ensureTown } from '@helpers/content/ensure-town';
 import { ensureTradeskill } from '@helpers/content/ensure-tradeskill';
+import { ensureWorker } from '@helpers/content/ensure-worker';
 import {
   ensureTrainer,
   ensureTrainerTeaching,
@@ -37,6 +38,7 @@ import { characterXpForLevel } from '@helpers/hero/party';
 import { migrateGameState, migrateOptionsState } from '@helpers/migrate';
 import { defaultOptions, options, setOptions } from '@helpers/state-options';
 import { gamestate } from '@helpers/state-game';
+import { defaultWorkerState } from '@helpers/worker/worker-progression';
 import type {
   AutoModeState,
   CaravanId,
@@ -61,6 +63,7 @@ import type {
   TradeskillId,
   TrainerId,
   TrainerTeachingId,
+  WorkerId,
 } from '@interfaces';
 import {
   buildCharacter,
@@ -389,6 +392,34 @@ describe('migrateGameState', () => {
         'Wergen Woods': { foundAt: 7 },
       });
       expect(migrated).not.toHaveProperty('discoveredGatherNodes');
+    });
+
+    it('carry over under the old key while a worker is assigned to a gather node', () => {
+      seedGroves();
+      const workerId = 'nell' as WorkerId;
+      seedContent([ore, ensureWorker({ id: workerId, name: 'Nell' })]);
+
+      const migrated = migrate((save) => {
+        delete (save as Partial<GameState>).visitedWorldNodes;
+        Object.assign(save, {
+          discoveredGatherNodes: { 'Wergen Woods': { foundAt: 7 } },
+        });
+        const assignment = { nodeName: 'Wergen Woods', itemId: ore.id };
+        save.workers[workerId] = {
+          ...defaultWorkerState(),
+          status: {
+            kind: 'Gathering',
+            ...assignment,
+            itemsGathered: 0,
+            ticksIntoGather: 0,
+          },
+          assignment,
+        };
+      });
+
+      expect(migrated.visitedWorldNodes).toEqual({
+        'Wergen Woods': { foundAt: 7 },
+      });
     });
 
     it('are backfilled from developed shrines, visited towns and bestiary kills', () => {
