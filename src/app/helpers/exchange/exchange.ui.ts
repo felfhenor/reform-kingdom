@@ -17,8 +17,8 @@ import {
   exchangeNodeContent,
 } from '@helpers/exchange/exchange';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
-import { itemPreviewDisplay } from '@helpers/item/item-preview';
 import { equippedItems } from '@helpers/item/equipment';
+import { itemPreviewDisplay } from '@helpers/item/item-preview';
 import { isMaterialDiscovered } from '@helpers/item/materials';
 import { isEquipmentDiscovered } from '@helpers/kingdom/armory';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -36,7 +36,7 @@ import type {
   ExchangeRow,
   ItemContent,
 } from '@interfaces';
-import { uniqBy } from 'es-toolkit/compat';
+import { sortBy, uniqBy } from 'es-toolkit/compat';
 
 const EXCHANGE_ERRORS: Record<Exclude<ExchangeResult, 'ok'>, string> = {
   missing: 'You no longer have what that exchange requires.',
@@ -58,58 +58,74 @@ export function exchangeMayDestroyGems(
 export function exchangeRows(node: ExchangeNodeContent): ExchangeRow[] {
   const state = gamestate();
 
-  return node.exchanges.flatMap((exchange, exchangeIndex): ExchangeRow[] => {
-    if (!exchangeIsOffered(state, exchange)) return [];
+  const rows = node.exchanges.flatMap(
+    (exchange, exchangeIndex): ExchangeRow[] => {
+      if (!exchangeIsOffered(state, exchange)) return [];
 
-    const canAfford = exchangeCanAfford(state, exchange);
-    if (exchange.kind === 'Collectible') {
-      const collectible = getEntry<CollectibleContent>(
-        exchange.outputCollectibleId,
+      const canAfford = exchangeCanAfford(state, exchange);
+      if (exchange.kind === 'Collectible') {
+        const collectible = getEntry<CollectibleContent>(
+          exchange.outputCollectibleId,
+        );
+        if (!collectible) return [];
+
+        return [
+          {
+            kind: 'Collectible',
+            outputName: collectible.name,
+            exchangeIndex,
+            display: itemPreviewDisplay('collectible', collectible),
+            costs: exchange.costs,
+            canAfford,
+          },
+        ];
+      }
+
+      if (exchange.kind === 'Item') {
+        return [
+          {
+            kind: 'Item',
+            outputName:
+              getEntry<ItemContent>(exchange.output.itemId)?.name || 'UNKNOWN',
+            exchangeIndex,
+            exchange,
+            canAfford,
+          },
+        ];
+      }
+
+      const inputContent = getEntry<EquipmentContent>(
+        exchange.inputEquipmentId,
       );
-      if (!collectible) return [];
-
-      return [
-        {
-          kind: 'Collectible',
-          exchangeIndex,
-          display: itemPreviewDisplay('collectible', collectible),
-          costs: exchange.costs,
-          canAfford,
-        },
-      ];
-    }
-
-    if (exchange.kind === 'Item') {
-      return [{ kind: 'Item', exchangeIndex, exchange, canAfford }];
-    }
-
-    const inputContent = getEntry<EquipmentContent>(exchange.inputEquipmentId);
-    const outputContent = getEntry<EquipmentContent>(
-      exchange.outputEquipmentId,
-    );
-    if (!inputContent || !outputContent) return [];
-
-    return exchangeArmoryCandidates(state, exchange).map((item) => {
-      const outputItem = exchangedEquipmentItem(
-        item,
+      const outputContent = getEntry<EquipmentContent>(
         exchange.outputEquipmentId,
       );
+      if (!inputContent || !outputContent) return [];
 
-      return {
-        kind: 'Equipment',
-        exchangeIndex,
-        item,
-        inputContent,
-        inputName: equipmentItemDisplayName(item, inputContent.name),
-        outputItem,
-        outputContent,
-        outputName: equipmentItemDisplayName(outputItem, outputContent.name),
-        costs: exchange.costs,
-        canAfford,
-        losesGems: exchangeMayDestroyGems(item, outputItem),
-      };
-    });
-  });
+      return exchangeArmoryCandidates(state, exchange).map((item) => {
+        const outputItem = exchangedEquipmentItem(
+          item,
+          exchange.outputEquipmentId,
+        );
+
+        return {
+          kind: 'Equipment',
+          exchangeIndex,
+          item,
+          inputContent,
+          inputName: equipmentItemDisplayName(item, inputContent.name),
+          outputItem,
+          outputContent,
+          outputName: equipmentItemDisplayName(outputItem, outputContent.name),
+          costs: exchange.costs,
+          canAfford,
+          losesGems: exchangeMayDestroyGems(item, outputItem),
+        };
+      });
+    },
+  );
+
+  return sortBy(rows, (row) => row.outputName);
 }
 
 // True when a hero is wearing gear this node could exchange, but none of it is in the armory.

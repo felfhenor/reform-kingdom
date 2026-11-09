@@ -26,6 +26,7 @@ export type ExchangeItemRow = {
   exchangeIndex: number;
   exchange: ExchangeNodeItemExchange;
   canAfford: boolean;
+  outputName: string;
 };
 
 export type ExchangeCollectibleRow = {
@@ -34,6 +35,7 @@ export type ExchangeCollectibleRow = {
   display: ItemPreviewDisplay;
   costs: CostItem[];
   canAfford: boolean;
+  outputName: string;
 };
 
 export type ExchangeRow =
