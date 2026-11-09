@@ -48,6 +48,28 @@
                 </span>
               }
             </div>
+          } @else if (row.kind === 'Collectible') {
+            <app-tooltip-item-preview #preview [display]="row.display" />
+            <div
+              class="flex min-w-0 flex-[2] items-center gap-4 cursor-default"
+              [tp]="preview.template()"
+              [tpPlacement]="'top'"
+            >
+              <div class="zoom-row shrink-0">
+                <app-slot-rarity-outline
+                  [entry]="row.display"
+                  [spritesheet]="row.display.spritesheet"
+                />
+              </div>
+              <div class="flex min-w-0 flex-col">
+                <span class="type-entity-name text-{{ row.display.rarity }}">
+                  {{ row.display.name }}
+                </span>
+                @if (row.display.collectibleEffects; as effects) {
+                  <app-detail-collectible-effects [effects]="effects" />
+                }
+              </div>
+            </div>
           } @else {
             <app-row-currency-cost
               class="flex-1"
@@ -74,9 +96,7 @@
           >
             {{ nodeContent.actionLabel }}
             <app-row-currency-cost
-              [costs]="
-                row.kind === 'Equipment' ? row.costs : row.exchange.costs
-              "
+              [costs]="row.kind === 'Item' ? row.exchange.costs : row.costs"
               [showOwned]="true"
             />
           </button>
@@ -84,27 +104,29 @@
       } @empty {
         <app-blank-slate>
           {{ nodeContent.emptyText }}
-          <span
-            class="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1"
-          >
-            Accepts:
-            @for (hint of inputHints(); track hint.id) {
-              @if (hint.discovered) {
-                <span class="inline-flex items-center gap-1">
-                  <span class="min-h-[16px] min-w-[16px]">
-                    <app-atlas-image
-                      class="zoom-inline"
-                      [spritesheet]="hint.spritesheet"
-                      [assetName]="hint.sprite"
-                    />
+          @if (inputHints().length > 0) {
+            <span
+              class="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1"
+            >
+              Accepts:
+              @for (hint of inputHints(); track hint.id) {
+                @if (hint.discovered) {
+                  <span class="inline-flex items-center gap-1">
+                    <span class="min-h-[16px] min-w-[16px]">
+                      <app-atlas-image
+                        class="zoom-inline"
+                        [spritesheet]="hint.spritesheet"
+                        [assetName]="hint.sprite"
+                      />
+                    </span>
+                    {{ hint.name }}
                   </span>
-                  {{ hint.name }}
-                </span>
-              } @else {
-                <span class="type-unknown">???</span>
+                } @else {
+                  <span class="type-unknown">???</span>
+                }
               }
-            }
-          </span>
+            </span>
+          }
         </app-blank-slate>
       }
 

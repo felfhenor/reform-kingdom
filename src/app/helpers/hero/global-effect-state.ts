@@ -3,6 +3,7 @@ import { defaultGlobalEffectSums } from '@helpers/defaults';
 import { characterRecalculateStats } from '@helpers/hero/party';
 import {
   CombatStatDimension,
+  StatShorthand,
   StatusEffectTagDimension,
   type CollectibleContent,
   type CollectibleId,
@@ -61,11 +62,11 @@ export function globalEffectEffectDescription(
 ): string {
   switch (effect.effectType) {
     case 'GainStats':
-      return `Hero ${effect.stat}: ${signedNumber(effect.value)}`;
+      return `Hero ${StatShorthand[effect.stat]}: ${signedNumber(effect.value)}`;
     case 'GainStatPercent':
-      return `Hero ${effect.stat ?? 'stats'}: ${signedPercent(effect.value)}`;
+      return `Hero ${StatShorthand[effect.stat!] ?? 'stats'}: ${signedPercent(effect.value)}`;
     case 'EnemyStatPercent':
-      return `Enemy ${effect.stat ?? 'stats'}: ${signedPercent(effect.value)}`;
+      return `Enemy ${StatShorthand[effect.stat!] ?? 'stats'}: ${signedPercent(effect.value)}`;
     case 'GainCombatStat': {
       const isPercent =
         CombatStatDimension.isPercent?.[effect.combatStat] ?? true;
@@ -80,9 +81,9 @@ export function globalEffectEffectDescription(
     case 'GlobalTraderPriceMultiplier':
       return `Trader Prices: ${signedPercent(effect.value * 100)}`;
     case 'GlobalShrineBuffsPermanent':
-      return 'Shrine Buffs: Never expire';
+      return 'Shrine buffs never expire';
     case 'GlobalWipeEndsRun':
-      return 'A wipe ends the run';
+      return 'Dying is game over';
     case 'WorkerCraftSpeedPercent':
       return `Worker Craft Speed: ${signedPercent(effect.value)}`;
     case 'WorkerGatherSpeedPercent':
@@ -90,11 +91,11 @@ export function globalEffectEffectDescription(
     case 'GlobalTownShopNoEquipment':
       return 'Town shops sell no equipment';
     case 'GlobalFeaturesRevealed':
-      return 'Every feature is revealed from the start';
+      return 'Level-based features always available';
     case 'GlobalCursedDrops':
-      return 'Dropped gear is cursed';
+      return 'Combat-dropped gear is cursed';
     case 'GlobalDropExtraAffixes':
-      return `Dropped Gear Affixes: +${effect.value}`;
+      return `Combat-dropped Gear Affixes: +${effect.value}`;
     case 'GlobalCraftedExtraAffixes':
       return `Crafted Gear Affixes: +${effect.value}`;
     case 'GlobalRecipeMaterialBoost':
@@ -128,9 +129,9 @@ export function globalEffectEffectDescription(
     case 'GlobalAstralSpellStrength':
       return `Astral Spell Strength: ${signedPercent(effect.value * 100)}`;
     case 'EnemyExtraSkills':
-      return `Enemy Skills: +${effect.value} from the region`;
+      return `Enemy Skills: +${effect.value}`;
     case 'GlobalLevelStatMultiplier':
-      return `Stats per Level: ${signedPercent(effect.value * 100)}`;
+      return `Stats/Lv.: ${signedPercent(effect.value * 100)}`;
     case 'GlobalDeathPenaltyMultiplier':
       return `Deaths Door & Healing Time: ${signedPercent(effect.value * 100)}`;
     case 'DebuffResistance':

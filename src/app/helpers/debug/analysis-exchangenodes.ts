@@ -1,14 +1,16 @@
 /**
  * Validates exchange node content: every node is placed on a map exactly once
  * as an `ExchangeNode`, offers at least one exchange, and each exchange's
- * input, output and costs resolve to real content of the right type.
+ * input, output, required edict and costs resolve to real content of the right type.
  */
 
 import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { edictEntry } from '@helpers/edict/edict';
 import { allMaps } from '@helpers/maps';
 import type {
   AnalysisCheck,
   AnalysisRunResult,
+  CollectibleContent,
   EquipmentContent,
   ExchangeNodeContent,
   ExchangeNodeExchange,
@@ -40,6 +42,10 @@ function isItem(id: string): boolean {
   return getEntry<ItemContent>(id)?.__type === 'item';
 }
 
+function isCollectible(id: string): boolean {
+  return getEntry<CollectibleContent>(id)?.__type === 'collectible';
+}
+
 function exchangeProblems(
   exchange: ExchangeNodeExchange,
   index: number,
@@ -60,6 +66,17 @@ function exchangeProblems(
     }
     if (exchange.inputEquipmentId === exchange.outputEquipmentId) {
       problems.push(`${label} exchanges an item for itself`);
+    }
+  } else if (exchange.kind === 'Collectible') {
+    if (!edictEntry(exchange.requiredEdictId)) {
+      problems.push(
+        `${label} needs unknown edict "${exchange.requiredEdictId}"`,
+      );
+    }
+    if (!isCollectible(exchange.outputCollectibleId)) {
+      problems.push(
+        `${label} gives unknown collectible "${exchange.outputCollectibleId}"`,
+      );
     }
   } else {
     if (!isItem(exchange.input.itemId)) {

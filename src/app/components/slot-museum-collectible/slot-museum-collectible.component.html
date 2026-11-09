@@ -38,4 +38,7 @@
   } @else if (!e.discovered) {
     <div class="type-meta">Source unknown</div>
   }
+  @if (isExcludedFromRemembrance()) {
+    <div class="type-meta">This does not count towards Remembrance.</div>
+  }
 </ng-template>

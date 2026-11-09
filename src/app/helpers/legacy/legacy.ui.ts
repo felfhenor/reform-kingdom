@@ -9,6 +9,7 @@ import {
 } from '@helpers/legacy/legacy';
 import { isFelDefeated, isRunLost } from '@helpers/lore/outro';
 import { waitForGameloopIdle } from '@helpers/savefile/savefile-load';
+import { updateGamestate } from '@helpers/state-game';
 import type {
   EdictId,
   GameId,
@@ -66,6 +67,15 @@ export function legacyClearedEdictIds(): EdictId[] {
       .runs.filter((run) => run.outcome === 'Completed')
       .flatMap((run) => run.edicts),
   );
+}
+
+// Copied once at world setup, so the edict reward stock can't change mid-run.
+export async function legacyClearedEdictsCopyToRun(): Promise<void> {
+  const cleared = legacyClearedEdictIds();
+  await updateGamestate((state) => {
+    state.legacyClearedEdicts = cleared;
+    return state;
+  });
 }
 
 export function legacyHeroStatRows(stats: HeroRunStats): RunStatRow[] {

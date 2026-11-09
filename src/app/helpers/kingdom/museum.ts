@@ -45,6 +45,10 @@ function matchesTarget(output: object, target: SourceTarget): boolean {
 
 // Exchanges name their output per kind - normalize to the shared field names.
 function exchangeOutput(exchange: ExchangeNodeExchange): SourceFields {
+  if (exchange.kind === 'Collectible') {
+    return { collectibleId: exchange.outputCollectibleId };
+  }
+
   return exchange.kind === 'Item'
     ? { itemId: exchange.output.itemId }
     : { equipmentId: exchange.outputEquipmentId };

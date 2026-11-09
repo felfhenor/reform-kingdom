@@ -110,6 +110,7 @@ export const lootFiltersState = gamestateSlice('lootFilters');
 export const armoryState = gamestateSlice('armory');
 export const regaliasState = gamestateSlice('regalias');
 export const edictsState = gamestateSlice('edicts');
+export const legacyClearedEdictsState = gamestateSlice('legacyClearedEdicts');
 export const runStatsState = gamestateSlice('runStats');
 export const globalEffectsState = gamestateSlice('globalEffects');
 export const globalEffectSumsState = gamestateSlice('globalEffectSums');

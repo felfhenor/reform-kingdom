@@ -40,6 +40,7 @@ import {
 } from '@helpers/edict/edict.ui';
 import {
   legacyClearedEdictIds,
+  legacyClearedEdictsCopyToRun,
   legacyHasCompletedRun,
 } from '@helpers/legacy/legacy.ui';
 import {
@@ -275,6 +276,7 @@ export class GameSetupWorldComponent implements OnInit {
     // Reset first: hero stats read the run's edicts, which must not be the previous run's.
     gameReset();
     await edictsSet(this.pickedEdictIds());
+    await legacyClearedEdictsCopyToRun();
     const party = this.heroesModel().map((hero) =>
       createCharacter(hero.name, hero.jobId),
     );

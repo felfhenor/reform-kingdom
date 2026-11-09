@@ -3,6 +3,7 @@ import {
   isRecipeDiscovered,
   isRecipeDropGated,
 } from '@helpers/crafting/recipes';
+import { exchangeIsCollectibleAvailableThisRun } from '@helpers/exchange/exchange';
 import { isMaterialDiscovered } from '@helpers/item';
 import { getCollectibleSource } from '@helpers/item/collectible-source';
 import {
@@ -16,6 +17,7 @@ import {
   itemSources,
   recipeSources,
 } from '@helpers/kingdom/museum';
+import { legacyClearedEdictsState } from '@helpers/state-game';
 import { worldNodeDisplayName } from '@helpers/world-node/world-nodes';
 import type {
   CollectibleContent,
@@ -51,10 +53,16 @@ export function museumCollectibleEntry(
 }
 
 // Includes undiscovered collectibles (quantity: 0) so the museum can render them as silhouettes.
+// Edict rewards this run's Legacy can't stock are left out entirely.
 export function getMuseumCollectibleEntries(): MuseumCollectibleEntry[] {
-  const entries = getEntriesByType<CollectibleContent>('collectible').map(
-    museumCollectibleEntry,
-  );
+  const cleared = legacyClearedEdictsState();
+  const entries = getEntriesByType<CollectibleContent>('collectible')
+    .filter(
+      (collectible) =>
+        isCollectibleDiscovered(collectible.id) ||
+        exchangeIsCollectibleAvailableThisRun(cleared, collectible.id),
+    )
+    .map(museumCollectibleEntry);
 
   return orderBy(entries, [(entry) => entry.collectible.name], ['asc']);
 }

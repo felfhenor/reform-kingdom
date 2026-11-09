@@ -1,4 +1,5 @@
 import { getEntriesByType } from '@helpers/content/content';
+import { exchangeEdictRewardCollectibleIds } from '@helpers/exchange/exchange';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { isMaterialDiscovered } from '@helpers/item/materials';
 import { isEquipmentDiscovered } from '@helpers/kingdom/armory';
@@ -74,9 +75,12 @@ function obtainable<T extends { unobtainable?: boolean }>(entries: T[]): T[] {
 }
 
 export function remembranceCollectibles(): RemembranceCategory {
+  const edictRewards = exchangeEdictRewardCollectibleIds();
   return remembranceCount(
     'Collectibles',
-    obtainable(getEntriesByType<CollectibleContent>('collectible')),
+    obtainable(getEntriesByType<CollectibleContent>('collectible')).filter(
+      (collectible) => !edictRewards.has(collectible.id),
+    ),
     (collectible) => isCollectibleDiscovered(collectible.id),
   );
 }

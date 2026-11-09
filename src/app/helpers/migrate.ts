@@ -199,6 +199,9 @@ export function migrateGameState() {
   stateRegaliaMigrate(newState);
 
   newState.edicts = pruneInvalidEdicts(newState.edicts);
+  newState.legacyClearedEdicts = pruneInvalidEdicts(
+    newState.legacyClearedEdicts,
+  );
   newState.runStats.heroes = recordPrune(newState.runStats.heroes, (id) =>
     newState.world.party.some((character) => character.id === id),
   );

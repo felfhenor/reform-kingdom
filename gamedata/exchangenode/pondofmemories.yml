@@ -1,0 +1,188 @@
+- id: 8c69ed5c-4c09-4b57-85a1-72c4856e2603
+  name: Pond of Memories
+  description: A reflective pond, glistening in the sunlight. It holds your memories, and asks of you what you wish to recall.
+  emptyText: The pond reflects nothing more.
+  actionLabel: Recall
+
+  exchanges:
+    - kind: Collectible
+      requiredEdictId: Edict of Craven Frailty
+      outputCollectibleId: Vow of Craven Frailty
+      costs:
+        - itemId: Flax Flower
+          required: 15
+
+    - kind: Collectible
+      requiredEdictId: Edict of Esurient Poverty
+      outputCollectibleId: Vow of Esurient Poverty
+      costs:
+        - itemId: Gold Coin
+          required: 500
+
+    - kind: Collectible
+      requiredEdictId: Edict of Iron Blood
+      outputCollectibleId: Vow of Iron Blood
+      costs:
+        - itemId: Felrock
+          required: 50
+
+    - kind: Collectible
+      requiredEdictId: Edict of Magic Wilds
+      outputCollectibleId: Vow of Magic Wilds
+      costs:
+        - itemId: Wergen Wood
+          required: 25
+
+    - kind: Collectible
+      requiredEdictId: Edict of Nature's Wrath
+      outputCollectibleId: Vow of Nature's Wrath
+      costs:
+        - itemId: Spirit Flesh
+          required: 5
+
+    - kind: Collectible
+      requiredEdictId: Edict of Skillful Humility
+      outputCollectibleId: Vow of Skillful Humility
+      costs:
+        - itemId: Copper Ore
+          required: 25
+
+    - kind: Collectible
+      requiredEdictId: Edict of Artificial Scarcity
+      outputCollectibleId: Vow of Artificial Scarcity
+      costs:
+        - itemId: Gold Coin
+          required: 500
+
+    - kind: Collectible
+      requiredEdictId: Edict of Exogenous Support
+      outputCollectibleId: Vow of Exogenous Support
+      costs:
+        - itemId: Crimson Lucre
+          required: 500
+
+    - kind: Collectible
+      requiredEdictId: Edict of Fickle Curses
+      outputCollectibleId: Vow of Fickle Curses
+      costs:
+        - itemId: Miremetal Ingot
+          required: 25
+
+    - kind: Collectible
+      requiredEdictId: Edict of Golden Monopoly
+      outputCollectibleId: Vow of Golden Monopoly
+      costs:
+        - itemId: Malachite
+          required: 10
+
+    - kind: Collectible
+      requiredEdictId: Edict of Impeccable Foresight
+      outputCollectibleId: Vow of Impeccable Foresight
+      costs:
+        - itemId: Purple Slime Core
+          required: 10
+
+    - kind: Collectible
+      requiredEdictId: Edict of Nomadic Departure
+      outputCollectibleId: Vow of Nomadic Departure
+      costs:
+        - itemId: Firmwater
+          required: 25
+
+    - kind: Collectible
+      requiredEdictId: Edict of Reflective Mirrors
+      outputCollectibleId: Vow of Reflective Mirrors
+      costs:
+        - itemId: Brightwisp Core
+          required: 3
+
+    - kind: Collectible
+      requiredEdictId: Edict of True Devotion
+      outputCollectibleId: Vow of True Devotion
+      costs:
+        - itemId: Ghost Peridot
+          required: 15
+
+    - kind: Collectible
+      requiredEdictId: Edict of the Heated Forge
+      outputCollectibleId: Vow of the Heated Forge
+      costs:
+        - itemId: Crimson Ingot
+          required: 20
+
+    - kind: Collectible
+      requiredEdictId: Edict of the Starry Sky
+      outputCollectibleId: Vow of the Starry Sky
+      costs:
+        - itemId: Star Fragment
+          required: 3
+
+    - kind: Collectible
+      requiredEdictId: Edict of Calm Nature
+      outputCollectibleId: Vow of Calm Nature
+      costs:
+        - itemId: Wergen Stick
+          required: 10
+
+    - kind: Collectible
+      requiredEdictId: Edict of Cold Steel
+      outputCollectibleId: Vow of Cold Steel
+      costs:
+        - itemId: Goblin Nail
+          required: 10
+
+    - kind: Collectible
+      requiredEdictId: Edict of Eternal Blessings
+      outputCollectibleId: Vow of Eternal Blessings
+      costs:
+        - itemId: Spirit Flesh
+          required: 10
+
+    - kind: Collectible
+      requiredEdictId: Edict of Fleet Feet
+      outputCollectibleId: Vow of Fleet Feet
+      costs:
+        - itemId: Hawk Feather
+          required: 10
+
+    - kind: Collectible
+      requiredEdictId: Edict of Hasty Hammers
+      outputCollectibleId: Vow of Hasty Hammers
+      costs:
+        - itemId: Copper Ingot
+          required: 10
+
+    - kind: Collectible
+      requiredEdictId: Edict of Heroic Might
+      outputCollectibleId: Vow of Heroic Might
+      costs:
+        - itemId: Orc Bone
+          required: 10
+
+    - kind: Collectible
+      requiredEdictId: Edict of Storied Development
+      outputCollectibleId: Vow of Storied Development
+      costs:
+        - itemId: Crimson Ruby
+          required: 10
+
+    - kind: Collectible
+      requiredEdictId: Edict of Swift Mending
+      outputCollectibleId: Vow of Swift Mending
+      costs:
+        - itemId: Gold Coin
+          required: 500
+
+    - kind: Collectible
+      requiredEdictId: Edict of the Blessed Cornucopia
+      outputCollectibleId: Vow of the Blessed Cornucopia
+      costs:
+        - itemId: Cactspine
+          required: 10
+
+    - kind: Collectible
+      requiredEdictId: Edict of the Mercantile Winds
+      outputCollectibleId: Vow of the Mercantile Winds
+      costs:
+        - itemId: Gold Coin
+          required: 500

@@ -356,6 +356,22 @@ export function debugToggleEdict(edictIdOrName: string): void {
   });
 }
 
+// Stands in for finishing a run with this edict, so the Pond of Memories can be stocked mid-run.
+export function debugToggleLegacyClearedEdict(edictIdOrName: string): void {
+  const edict = getEntry<EdictContent>(edictIdOrName);
+  if (edict?.__type !== 'edict') {
+    console.warn(`Edict ${edictIdOrName} not found.`);
+    return;
+  }
+
+  updateGamestate((state) => {
+    state.legacyClearedEdicts = state.legacyClearedEdicts.includes(edict.id)
+      ? state.legacyClearedEdicts.filter((id) => id !== edict.id)
+      : [...state.legacyClearedEdicts, edict.id];
+    return state;
+  });
+}
+
 export function debugDiscoverAllCollectibles(): void {
   getEntriesByType<CollectibleContent>('collectible').forEach((collectible) => {
     collectiblesAdd(collectible.id, 1);

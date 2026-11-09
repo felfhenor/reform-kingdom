@@ -1,3 +1,5 @@
+import type { CollectibleId } from '@interfaces/content-collectible';
+import type { EdictId } from '@interfaces/content-edict';
 import type { EquipmentId } from '@interfaces/content-equipment';
 import type { CostItem, ItemQuantity } from '@interfaces/cost';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
@@ -21,8 +23,18 @@ export type ExchangeNodeItemExchange = {
   costs: CostItem[];
 };
 
+// Stocked only in runs whose Legacy has cleared its edict; sold once per run.
+export type ExchangeNodeCollectibleExchange = {
+  kind: 'Collectible';
+  requiredEdictId: EdictId;
+  outputCollectibleId: CollectibleId;
+  costs: CostItem[];
+};
+
 export type ExchangeNodeExchange =
-  ExchangeNodeEquipmentExchange | ExchangeNodeItemExchange;
+  | ExchangeNodeEquipmentExchange
+  | ExchangeNodeItemExchange
+  | ExchangeNodeCollectibleExchange;
 
 export type ExchangeNodeContent = IsContentItem &
   HasDescription &

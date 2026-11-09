@@ -14,7 +14,9 @@ import type {
   TownId,
   WorldNodeEntry,
   CollectibleId,
+  EdictId,
   EncounterId,
+  ExchangeNodeId,
   TownContentInput,
   OutpostId,
 } from '@interfaces';
@@ -22,6 +24,7 @@ import { describe, expect, it } from 'vitest';
 
 import { ensureCaravan } from '@helpers/content/ensure-caravan';
 import { ensureEncounter } from '@helpers/content/ensure-encounternode';
+import { ensureExchangeNode } from '@helpers/content/ensure-exchangenode';
 import { ensureNodeOverride } from '@helpers/content/ensure-nodeoverride';
 import { ensureOutpost } from '@helpers/content/ensure-outpost';
 import { ensureTown } from '@helpers/content/ensure-town';
@@ -345,6 +348,39 @@ describe('encounter-backed node accessors', () => {
       found({ collectibles: ['Gobweb', 'ruby'] });
 
       expect(isWorldNodeCollectibleGateMet(buildEntry())).toBe(true);
+    });
+
+    it('hides an edict reward exchange until the run has cleared one of its edicts', () => {
+      seedContent([
+        ensureExchangeNode({
+          id: 'pond' as ExchangeNodeId,
+          name: 'Pond of Memories',
+          exchanges: [
+            {
+              kind: 'Collectible',
+              requiredEdictId: 'iron-blood' as EdictId,
+              outputCollectibleId: 'vow' as CollectibleId,
+              costs: [],
+            },
+          ],
+        }),
+      ]);
+      const nodes = seedWorldNodes([
+        { name: 'Pond of Memories', type: 'ExchangeNode' },
+      ]);
+      const pond = nodes['Pond of Memories'];
+
+      expect(isWorldNodeCollectibleGateMet(pond)).toBe(false);
+
+      seedGamestate((state) => {
+        state.legacyClearedEdicts = ['other' as EdictId];
+      });
+      expect(isWorldNodeCollectibleGateMet(pond)).toBe(false);
+
+      seedGamestate((state) => {
+        state.legacyClearedEdicts = ['iron-blood' as EdictId];
+      });
+      expect(isWorldNodeCollectibleGateMet(pond)).toBe(true);
     });
 
     it('reads the gate off a town-backed node too', () => {

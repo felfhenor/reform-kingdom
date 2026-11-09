@@ -3,6 +3,7 @@ import type { EquipmentContent } from '@interfaces/content-equipment';
 import type { ExchangeNodeItemExchange } from '@interfaces/content-exchangenode';
 import type { CostItem } from '@interfaces/cost';
 import type { EquipmentItem } from '@interfaces/equipment';
+import type { ItemPreviewDisplay } from '@interfaces/item-preview';
 
 // One owned armory instance that an equipment exchange can be applied to.
 export type ExchangeEquipmentRow = {
@@ -27,7 +28,16 @@ export type ExchangeItemRow = {
   canAfford: boolean;
 };
 
-export type ExchangeRow = ExchangeEquipmentRow | ExchangeItemRow;
+export type ExchangeCollectibleRow = {
+  kind: 'Collectible';
+  exchangeIndex: number;
+  display: ItemPreviewDisplay;
+  costs: CostItem[];
+  canAfford: boolean;
+};
+
+export type ExchangeRow =
+  ExchangeEquipmentRow | ExchangeItemRow | ExchangeCollectibleRow;
 
 // One accepted input, shown when the player has nothing to exchange; masked until discovered.
 export type ExchangeInputHint = {

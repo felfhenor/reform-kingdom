@@ -203,6 +203,10 @@ export function runObtainabilityAnalysis(): AnalysisRunResult {
         addIfPresent(obtainableEquipment, exchange.outputEquipmentId);
         return;
       }
+      if (exchange.kind === 'Collectible') {
+        addIfPresent(obtainableCollectibles, exchange.outputCollectibleId);
+        return;
+      }
       addIfPresent(obtainableItems, exchange.output.itemId);
     });
   });

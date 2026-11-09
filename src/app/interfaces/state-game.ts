@@ -181,6 +181,8 @@ export type GameState = {
   world: GameStateWorld;
   // Picked at world setup and fixed for the run.
   edicts: EdictId[];
+  // The Legacy's cleared edicts as of world setup; they stock the edict reward exchange.
+  legacyClearedEdicts: EdictId[];
   runStats: GameStateRunStats;
   materials: GameStateMaterials;
   discoveredMaterials: GameStateDiscoveredMaterials;

@@ -1,3 +1,5 @@
-@for (label of effectLabels(); track $index) {
-  <div class="text-xs my-2">{{ label }}</div>
-}
+<div class="flex flex-col gap-1">
+  @for (label of effectLabels(); track $index) {
+    <div class="text-xs">{{ label }}</div>
+  }
+</div>

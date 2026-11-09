@@ -4,7 +4,10 @@ import {
   ensureItemQuantity,
 } from '@helpers/content/ensure-helpers-core';
 import type {
+  CollectibleId,
+  EdictId,
   EquipmentId,
+  ExchangeNodeCollectibleExchange,
   ExchangeNodeContent,
   ExchangeNodeEquipmentExchange,
   ExchangeNodeExchange,
@@ -12,14 +15,25 @@ import type {
   ExchangeNodeItemExchange,
 } from '@interfaces';
 
-// Raw YAML may carry either variant's fields, so accept the union of both partials.
+// Raw YAML may carry any variant's fields, so accept the union of every partial.
 type RawExchange = Partial<ExchangeNodeEquipmentExchange> &
-  Partial<Omit<ExchangeNodeItemExchange, 'kind'>>;
+  Partial<Omit<ExchangeNodeItemExchange, 'kind'>> &
+  Partial<Omit<ExchangeNodeCollectibleExchange, 'kind'>>;
 
 export function ensureExchangeNodeExchange(
   exchange: RawExchange = {},
 ): ExchangeNodeExchange {
   const costs = ensureArray(exchange.costs, ensureCostItem);
+
+  if ((exchange.kind as string) === 'Collectible') {
+    return {
+      kind: 'Collectible',
+      requiredEdictId: exchange.requiredEdictId ?? ('UNKNOWN' as EdictId),
+      outputCollectibleId:
+        exchange.outputCollectibleId ?? ('UNKNOWN' as CollectibleId),
+      costs,
+    };
+  }
 
   if ((exchange.kind as string) === 'Item') {
     return {

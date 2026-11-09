@@ -1,0 +1,283 @@
+- id: 74ad5201-d0ab-4ee8-af7b-7c2876204a24
+  name: Vow of Craven Frailty
+  rarity: Mystical
+  description: A vow to never forget what it means to be weak, to blow in the wind like a leaf.
+  sprite: '0080'
+
+  effects:
+    - effectType: GainStats
+      stat: Health
+      value: 100
+
+- id: 67885102-61de-4f0d-bf70-0c90aa15e17c
+  name: Vow of Esurient Poverty
+  rarity: Mystical
+  description: A vow to never forget the hunger that drives you to greater heights.
+  sprite: '0081'
+
+  effects:
+    - effectType: GlobalXPGainMultiplier
+      value: 0.1
+    - effectType: GlobalGoldGainMultiplier
+      value: 0.1
+
+- id: 56f50070-aae2-4823-9903-b65f135b7381
+  name: Vow of Iron Blood
+  rarity: Mystical
+  description: A vow to remember the strength of an iron fist and the place it has.
+  sprite: '0082'
+
+  effects:
+    - effectType: GainStatPercent
+      value: 10
+
+- id: eba4362f-8741-4658-86b4-b24c5e773ac8
+  name: Vow of Magic Wilds
+  rarity: Mystical
+  description: A vow to remember the shifting power of the wilderness. It twists, it envelops, it becomes.
+  sprite: '0083'
+
+  effects:
+    - effectType: GlobalCombatItemDropRateBoost
+      value: 5
+
+- id: 6e79e710-0772-43d7-a0cc-0d4514a692bc
+  name: Vow of Nature's Wrath
+  rarity: Mystical
+  description: A vow to never forget the power of nature. The fury it contains waxes and wanes.
+  sprite: '0084'
+
+  effects:
+    - effectType: EnemyStatPercent
+      value: -5
+
+- id: 315a3ef4-79e6-4f69-b407-6350c8ff6419
+  name: Vow of Skillful Humility
+  rarity: Mystical
+  description: A vow to never forget the power that comes from being overgeared and skillful.
+  sprite: '0085'
+
+  effects:
+    - effectType: GlobalLevelStatMultiplier
+      value: 0.05
+
+- id: 8224c747-6fad-4777-baca-a164f93f7d75
+  name: Vow of Artificial Scarcity
+  rarity: Mystical
+  description: A vow to never forget what can be taken from you at the mere whims of another.
+  sprite: '0086'
+
+  effects:
+    - effectType: GainStats
+      stat: Energy
+      value: 20
+
+- id: b1116a5a-288e-41c1-a988-0075bdb45b7a
+  name: Vow of Exogenous Support
+  rarity: Mystical
+  description: A vow to never forget those who support you, who hold you in high regard.
+  sprite: '0087'
+
+  effects:
+    - effectType: GlobalTownCommissionSlotBoost
+      value: 1
+
+- id: b0f3a071-abe1-44ed-908d-f6cecfad0a9a
+  name: Vow of Fickle Curses
+  rarity: Mystical
+  description: A vow to remember that the winds of change can blow at any time, in any place.
+  sprite: '0088'
+
+  effects:
+    - effectType: GlobalDropExtraAffixes
+      value: 1
+
+- id: fb3512a9-2f39-4ed2-8687-c1b306cf5eee
+  name: Vow of Golden Monopoly
+  rarity: Mystical
+  description: A vow to remember that you cannot control everything.
+  sprite: '0089'
+
+  effects:
+    - effectType: GlobalGoldGainMultiplier
+      value: 0.1
+
+- id: a373705b-de8a-49f1-9e28-0dbb6dc3f6b0
+  name: Vow of Impeccable Foresight
+  rarity: Mystical
+  description: A vow to never forget that foresight and planning can make a world of difference.
+  sprite: '0090'
+
+  effects:
+    - effectType: GainStats
+      stat: Intelligence
+      value: 5
+
+- id: a196ca65-8b03-44ae-859b-9042341260bc
+  name: Vow of Nomadic Departure
+  rarity: Mystical
+  description: A vow to remember that taking to the dusty trail and forging your own path, seeking more, and never settling, is sometimes the best path forward.
+  sprite: '0091'
+
+  effects:
+    - effectType: GlobalShrineBuffStrength
+      value: 0.1
+
+- id: ec723c79-03e3-47e5-b644-c895437655b2
+  name: Vow of Reflective Mirrors
+  rarity: Mystical
+  description: A vow to never forget that being a reflection of another is insufficient for personal growth.
+  sprite: '0092'
+
+  effects:
+    - effectType: GlobalDecreeClauseCapBoost
+      value: 3
+
+- id: eeceb218-cbf2-48e8-95bb-4370c0d0e2e5
+  name: Vow of True Devotion
+  rarity: Mystical
+  description: A vow to always stay true to yourself, your ideals, and your goals.
+  sprite: '0093'
+
+  effects:
+    - effectType: GainStats
+      stat: Luck
+      value: 5
+
+- id: 60cbb0d9-0ba3-447d-a0e1-0cae739ea2f2
+  name: Vow of the Heated Forge
+  rarity: Mystical
+  description: A vow to never take all of your irons out of the fire.
+  sprite: '0094'
+
+  effects:
+    - effectType: GlobalArmorySizeBoost
+      value: 25
+
+- id: d20dcdb8-adef-481d-abff-a3e64748d4b8
+  name: Vow of the Starry Sky
+  rarity: Mystical
+  description: A vow to never forget the vastness of the sea of stars.
+  sprite: '0095'
+
+  effects:
+    - effectType: GlobalAstralSpellStrength
+      value: 0.1
+
+- id: b7b847f0-605f-441d-8b8d-fac353577974
+  name: Vow of Calm Nature
+  rarity: Mystical
+  description: A vow to never forget the serenity of nature.
+  sprite: '0096'
+
+  effects:
+    - effectType: GainStats
+      stat: Vitality
+      value: 5
+    - effectType: GainStats
+      stat: Resistance
+      value: 5
+
+- id: ea46f8b8-bbfa-435b-b01d-911860170b5f
+  name: Vow of Cold Steel
+  rarity: Mystical
+  description: A vow to always remember that when all else fails, there exists the cold reality of steel.
+  sprite: '0097'
+
+  effects:
+    - effectType: GlobalXPGainMultiplier
+      value: 0.1
+
+- id: b0a098fc-18af-40f0-ba51-fbc08c67d728
+  name: Vow of Eternal Blessings
+  rarity: Mystical
+  description: A vow to always count your blessings, and ensure they persevere.
+  sprite: '0098'
+
+  effects:
+    - effectType: GlobalShrineBuffDuration
+      value: 0.2
+
+- id: 8902164a-8354-427f-830a-e7e53cb2f643
+  name: Vow of Fleet Feet
+  rarity: Mystical
+  description: A vow to never forget the value of moving forward.
+  sprite: '0099'
+
+  effects:
+    - effectType: GlobalOnPathTravelSpeedBoost
+      value: 0.05
+    - effectType: GlobalOffPathTravelSpeedBoost
+      value: 0.05
+
+- id: 10184cb9-2c86-43f8-ac6c-8308786f7d85
+  name: Vow of Hasty Hammers
+  rarity: Mystical
+  description: A vow to always remember to strike a balance between solving your problems fast, and solving your problems well.
+  sprite: '0100'
+
+  effects:
+    - effectType: GlobalCraftTimeMultiplier
+      value: -0.1
+
+- id: 14797fb3-7c86-4173-ac46-ffea7d5e35c8
+  name: Vow of Heroic Might
+  rarity: Mystical
+  description: A vow to always embody the heroism and might to support others as you wish to be supported.
+  sprite: '0101'
+
+  effects:
+    - effectType: GainStats
+      stat: Strength
+      value: 5
+    - effectType: GainStats
+      stat: Intelligence
+      value: 5
+
+- id: fc5b7dcc-8b07-431c-b93f-2d821f541750
+  name: Vow of Storied Development
+  rarity: Mystical
+  description: A vow to give your stories the expositions they deserve.
+  sprite: '0102'
+
+  effects:
+    - effectType: GlobalSkillPointsPerLevel
+      value: 0.125
+
+- id: 370b58ec-4401-428c-8778-7775da41db1d
+  name: Vow of Swift Mending
+  rarity: Mystical
+  description: A vow to always do what it takes to get back up after being knocked down.
+  sprite: '0103'
+
+  effects:
+    - effectType: GainStats
+      stat: Constitution
+      value: 5
+    - effectType: GainStats
+      stat: Spirit
+      value: 5
+
+- id: b65f4c26-38c4-4450-97a1-690f104f1031
+  name: Vow of the Blessed Cornucopia
+  rarity: Mystical
+  description: A vow to seek out and harvest the fruits of your labors.
+  sprite: '0104'
+
+  effects:
+    - effectType: GlobalGatheringItemDropRateBoost
+      value: 10
+    - effectType: GlobalGatheringItemDropAmountBoost
+      value: 2
+
+- id: 2020aa6a-6462-4b62-98f9-c5a60682cb14
+  name: Vow of the Mercantile Winds
+  rarity: Mystical
+  description: A vow to find your own fortune and blow with the winds of change.
+  sprite: '0105'
+
+  effects:
+    - effectType: GlobalShopPriceMultiplier
+      value: -0.15
+    - effectType: GlobalTraderPriceMultiplier
+      value: -0.15

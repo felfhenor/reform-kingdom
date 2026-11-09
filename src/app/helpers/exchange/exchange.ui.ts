@@ -6,26 +6,32 @@ import {
 } from '@helpers/engine/analytics';
 import { notifyError } from '@helpers/engine/notify';
 import {
+  applyCollectibleExchange,
   applyEquipmentExchange,
   applyItemExchange,
   exchangeArmoryCandidates,
   exchangeCanAfford,
   exchangedEquipmentItem,
   exchangeHasInput,
+  exchangeIsOffered,
   exchangeNodeContent,
 } from '@helpers/exchange/exchange';
 import { equipmentItemDisplayName } from '@helpers/item/affix';
+import { itemPreviewDisplay } from '@helpers/item/item-preview';
 import { equippedItems } from '@helpers/item/equipment';
 import { isMaterialDiscovered } from '@helpers/item/materials';
 import { isEquipmentDiscovered } from '@helpers/kingdom/armory';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import { taskEventCollectibleGained } from '@helpers/task/task-events';
 import type {
+  CollectibleContent,
   EquipmentContent,
   EquipmentItem,
   EquipmentItemId,
   ExchangeInputHint,
   ExchangeNodeContent,
-  ExchangeNodeExchange,
+  ExchangeNodeEquipmentExchange,
+  ExchangeNodeItemExchange,
   ExchangeResult,
   ExchangeRow,
   ItemContent,
@@ -53,9 +59,26 @@ export function exchangeRows(node: ExchangeNodeContent): ExchangeRow[] {
   const state = gamestate();
 
   return node.exchanges.flatMap((exchange, exchangeIndex): ExchangeRow[] => {
-    if (!exchangeHasInput(state, exchange)) return [];
+    if (!exchangeIsOffered(state, exchange)) return [];
 
     const canAfford = exchangeCanAfford(state, exchange);
+    if (exchange.kind === 'Collectible') {
+      const collectible = getEntry<CollectibleContent>(
+        exchange.outputCollectibleId,
+      );
+      if (!collectible) return [];
+
+      return [
+        {
+          kind: 'Collectible',
+          exchangeIndex,
+          display: itemPreviewDisplay('collectible', collectible),
+          costs: exchange.costs,
+          canAfford,
+        },
+      ];
+    }
+
     if (exchange.kind === 'Item') {
       return [{ kind: 'Item', exchangeIndex, exchange, canAfford }];
     }
@@ -108,7 +131,9 @@ export function exchangeHasOnlyEquippedInputs(
   );
 }
 
-function exchangeInputHint(exchange: ExchangeNodeExchange): ExchangeInputHint {
+function exchangeInputHint(
+  exchange: ExchangeNodeEquipmentExchange | ExchangeNodeItemExchange,
+): ExchangeInputHint {
   const isEquipment = exchange.kind === 'Equipment';
   const id = isEquipment ? exchange.inputEquipmentId : exchange.input.itemId;
   const content = getEntry<EquipmentContent | ItemContent>(id);
@@ -128,7 +153,10 @@ function exchangeInputHint(exchange: ExchangeNodeExchange): ExchangeInputHint {
 export function exchangeInputHints(
   node: ExchangeNodeContent,
 ): ExchangeInputHint[] {
-  return uniqBy(node.exchanges.map(exchangeInputHint), 'id');
+  const withInputs = node.exchanges.filter(
+    (exchange) => exchange.kind !== 'Collectible',
+  );
+  return uniqBy(withInputs.map(exchangeInputHint), 'id');
 }
 
 function exchangeVerb(nodeName: string): string {
@@ -213,6 +241,35 @@ export async function exchangePerformItem(
     `${exchangeVerb(nodeName)}: ${exchange.input.required.toLocaleString()}x ${inputName} became ${exchange.output.quantity.toLocaleString()}x ${outputName}.`,
   );
   exchangeAnalytics(nodeName, outputName);
+
+  return true;
+}
+
+export async function exchangePerformCollectible(
+  nodeName: string,
+  exchangeIndex: number,
+): Promise<boolean> {
+  let result = 'invalid' as ExchangeResult;
+
+  await updateGamestate((state) => {
+    result = applyCollectibleExchange(state, nodeName, exchangeIndex);
+    return state;
+  });
+
+  if (result !== 'ok') {
+    notifyError(EXCHANGE_ERRORS[result]);
+    return false;
+  }
+
+  const exchange = exchangeNodeContent(nodeName)?.exchanges[exchangeIndex];
+  if (exchange?.kind !== 'Collectible') return true;
+
+  const name =
+    getEntry<CollectibleContent>(exchange.outputCollectibleId)?.name ??
+    'UNKNOWN';
+  miscellaneousMessageLog(`${exchangeVerb(nodeName)}: received ${name}.`);
+  exchangeAnalytics(nodeName, name);
+  void taskEventCollectibleGained(exchange.outputCollectibleId);
 
   return true;
 }

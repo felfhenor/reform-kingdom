@@ -7,6 +7,7 @@ import type {
   CollectibleSource,
   EncounterContent,
   EncounterRandomContent,
+  ExchangeNodeContent,
   RecipeContent,
   TownContent,
 } from '@interfaces';
@@ -65,6 +66,17 @@ export function collectibleSourceMapBuild(): Map<
           type: 'trader',
           traderId: trader.id,
           name: trader.name,
+        });
+      }
+    });
+  });
+
+  getEntriesByType<ExchangeNodeContent>('exchangenode').forEach((node) => {
+    node.exchanges.forEach((exchange) => {
+      if (exchange.kind === 'Collectible') {
+        addSource(exchange.outputCollectibleId, {
+          type: 'node',
+          name: node.name,
         });
       }
     });

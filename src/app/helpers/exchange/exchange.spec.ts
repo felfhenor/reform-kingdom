@@ -1,9 +1,13 @@
 import type {
   AffixId,
+  CollectibleId,
+  EdictId,
   EquipmentId,
   EquipmentItem,
   EquipmentItemId,
+  ExchangeNodeEquipmentExchange,
   ExchangeNodeId,
+  ExchangeNodeItemExchange,
   GameState,
   IsContentItem,
   ItemId,
@@ -17,14 +21,21 @@ vi.mock('@helpers/item/affix', async (importOriginal) => ({
 
 import { ensureAffix } from '@helpers/content/ensure-affix';
 import { ensureExchangeNode } from '@helpers/content/ensure-exchangenode';
-import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
+import {
+  ensureCollectible,
+  ensureEquipment,
+  ensureItem,
+} from '@helpers/content/ensure-item';
 import { defaultGameState } from '@helpers/defaults';
 import {
+  applyCollectibleExchange,
   applyEquipmentExchange,
   applyItemExchange,
   exchangeArmoryCandidates,
   exchangedEquipmentItem,
+  exchangeEdictRewardCollectibleIds,
   exchangeHasInput,
+  exchangeIsOffered,
 } from '@helpers/exchange/exchange';
 import { rollAffixIds } from '@helpers/item/affix';
 import { buildEquipmentItem } from '@/testing/builders';
@@ -74,7 +85,29 @@ describe('exchange', () => {
       },
     ],
   });
-  const [swordExchange, hornExchange] = well.exchanges;
+  const [swordExchange, hornExchange] = well.exchanges as [
+    ExchangeNodeEquipmentExchange,
+    ExchangeNodeItemExchange,
+  ];
+  const ironBloodId = 'iron-blood' as EdictId;
+  const vow = ensureCollectible({
+    id: 'vow' as CollectibleId,
+    name: 'Unbroken Vow',
+    effects: [{ effectType: 'GainStats', stat: 'Health', value: 20 }],
+  });
+  const pond = ensureExchangeNode({
+    id: 'pond' as ExchangeNodeId,
+    name: 'Pond of Memories',
+    exchanges: [
+      {
+        kind: 'Collectible',
+        requiredEdictId: ironBloodId,
+        outputCollectibleId: vow.id,
+        costs: [{ itemId: water.id, required: 2 }],
+      },
+    ],
+  });
+  const [vowExchange] = pond.exchanges;
 
   const content: IsContentItem[] = [
     water,
@@ -85,6 +118,8 @@ describe('exchange', () => {
     purifiedSword,
     strengthAffix,
     well,
+    vow,
+    pond,
   ];
 
   let itemCounter = 0;
@@ -233,5 +268,53 @@ describe('exchange', () => {
       expect(applyItemExchange(state, well.name, 1)).toBe('unaffordable');
       expect(state.materials[horn.id]?.quantity).toBe(5);
     });
+  });
+
+  describe('applyCollectibleExchange', () => {
+    function pondState(waterOwned = 2, cleared = [ironBloodId]): GameState {
+      const state = stateWith([], { [water.id]: waterOwned });
+      state.legacyClearedEdicts = cleared;
+      return state;
+    }
+
+    it('spends costs and grants the collectible once its edict is cleared', () => {
+      const state = pondState();
+
+      expect(exchangeIsOffered(state, vowExchange)).toBe(true);
+      expect(applyCollectibleExchange(state, pond.name, 0)).toBe('ok');
+      expect(state.materials[water.id]?.quantity ?? 0).toBe(0);
+      expect(state.collectibles[vow.id]?.quantity).toBe(1);
+      expect(state.globalEffectSums.stats.Health).toBe(20);
+    });
+
+    it('is not stocked when the Legacy has not cleared its edict', () => {
+      const state = pondState(2, []);
+
+      expect(exchangeIsOffered(state, vowExchange)).toBe(false);
+      expect(applyCollectibleExchange(state, pond.name, 0)).toBe('invalid');
+      expect(state.materials[water.id]?.quantity).toBe(2);
+    });
+
+    it('sells out once owned', () => {
+      const state = pondState(4);
+      applyCollectibleExchange(state, pond.name, 0);
+
+      expect(exchangeIsOffered(state, vowExchange)).toBe(false);
+      expect(applyCollectibleExchange(state, pond.name, 0)).toBe('invalid');
+      expect(state.collectibles[vow.id]?.quantity).toBe(1);
+    });
+
+    it('rejects when costs are unaffordable', () => {
+      const state = pondState(1);
+
+      expect(applyCollectibleExchange(state, pond.name, 0)).toBe(
+        'unaffordable',
+      );
+      expect(state.collectibles[vow.id]).toBeUndefined();
+    });
+  });
+
+  it('lists only collectibles sold by collectible exchanges as edict rewards', () => {
+    expect([...exchangeEdictRewardCollectibleIds()]).toEqual([vow.id]);
   });
 });

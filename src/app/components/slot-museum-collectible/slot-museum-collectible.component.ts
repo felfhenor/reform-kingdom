@@ -10,6 +10,7 @@ import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.comp
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { itemPreviewDisplay } from '@helpers/item/item-preview';
 import { museumCollectibleSourceLabel } from '@helpers/kingdom/museum.ui';
+import { remembranceShowsCollectibleExcluded } from '@helpers/remembrance/remembrance.ui';
 import type { MuseumCollectibleEntry } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
@@ -37,6 +38,10 @@ export class SlotMuseumCollectibleComponent {
 
   public sourceLabel = computed(() =>
     museumCollectibleSourceLabel(this.entry()),
+  );
+
+  public isExcludedFromRemembrance = computed(() =>
+    remembranceShowsCollectibleExcluded(this.entry().collectible.id),
   );
 
   public displayQuantity = computed(() => {

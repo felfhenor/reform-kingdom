@@ -3,7 +3,10 @@ import { getEntry } from '@helpers/content/content';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { allMaps } from '@helpers/maps';
 import { tiledMapGetLayer } from '@helpers/pixi/tiled-map';
-import { globalEffectSumsState } from '@helpers/state-game';
+import {
+  globalEffectSumsState,
+  legacyClearedEdictsState,
+} from '@helpers/state-game';
 import { isWorldNodeDiscovered } from '@helpers/world-node/world-node-discovery';
 import { isWorldMapVisited } from '@helpers/world-node/world-map-discovery';
 import type {
@@ -231,9 +234,22 @@ export function isWorldNodeNameRemoved(nodeName: string): boolean {
   return !!entry && isWorldNodeTypeRemoved(entry.nodeData.type);
 }
 
+// An exchange selling only edict rewards stays off the map until this run's Legacy stocks one of them.
+function isWorldNodeEdictGateMet(entry: WorldNodeEntry): boolean {
+  const exchange = worldNodeExchange(entry);
+  if (!exchange) return true;
+
+  const cleared = legacyClearedEdictsState();
+  return exchange.exchanges.some(
+    (offer) =>
+      offer.kind !== 'Collectible' || cleared.includes(offer.requiredEdictId),
+  );
+}
+
 // Nodes with no gate are always met; gated nodes need every listed collectible found. A node type removed for the run never is.
 export function isWorldNodeCollectibleGateMet(entry: WorldNodeEntry): boolean {
   if (isWorldNodeTypeRemoved(entry.nodeData.type)) return false;
+  if (!isWorldNodeEdictGateMet(entry)) return false;
 
   return worldNodeCollectibleGateIds(entry).every((collectibleId) =>
     isCollectibleDiscovered(collectibleId),

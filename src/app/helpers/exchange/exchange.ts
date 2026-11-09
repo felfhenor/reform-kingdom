@@ -1,5 +1,6 @@
-import { getEntry } from '@helpers/content/content';
-import { ledgerMark } from '@helpers/engine/ledger';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
+import { applyCollectibleGrant } from '@helpers/item/collectibles';
 import { equipmentItemSlotCount } from '@helpers/item/infusion';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import {
@@ -7,10 +8,13 @@ import {
   worldNodeSpendCost,
 } from '@helpers/world-node/world-node-cost';
 import type {
+  CollectibleId,
   CostItem,
+  EdictId,
   EquipmentId,
   EquipmentItem,
   EquipmentItemId,
+  ExchangeNodeCollectibleExchange,
   ExchangeNodeContent,
   ExchangeNodeEquipmentExchange,
   ExchangeNodeExchange,
@@ -40,7 +44,7 @@ export function exchangeArmoryCandidates(
 // Whether the player owns the exchange's input - costs are checked separately so unaffordable exchanges still show.
 export function exchangeHasInput(
   state: GameState,
-  exchange: ExchangeNodeExchange,
+  exchange: ExchangeNodeEquipmentExchange | ExchangeNodeItemExchange,
 ): boolean {
   if (exchange.kind === 'Equipment') {
     return exchangeArmoryCandidates(state, exchange).length > 0;
@@ -79,6 +83,62 @@ function exchangeTotalCosts(exchange: ExchangeNodeExchange): CostItem[] {
   return exchange.kind === 'Item'
     ? mergedCosts([...exchange.costs, exchange.input])
     : exchange.costs;
+}
+
+export function exchangeIsCollectibleStocked(
+  state: GameState,
+  exchange: ExchangeNodeCollectibleExchange,
+): boolean {
+  return (
+    state.legacyClearedEdicts.includes(exchange.requiredEdictId) &&
+    !ledgerHas(state.collectibles, exchange.outputCollectibleId)
+  );
+}
+
+export function exchangeIsOffered(
+  state: GameState,
+  exchange: ExchangeNodeExchange,
+): boolean {
+  return exchange.kind === 'Collectible'
+    ? exchangeIsCollectibleStocked(state, exchange)
+    : exchangeHasInput(state, exchange);
+}
+
+// Each edict reward collectible mapped to the edicts that can stock it (any one is enough).
+export function exchangeEdictRewardRequiredEdicts(): Map<
+  CollectibleId,
+  EdictId[]
+> {
+  const required = new Map<CollectibleId, EdictId[]>();
+  getEntriesByType<ExchangeNodeContent>('exchangenode').forEach((node) => {
+    node.exchanges.forEach((exchange) => {
+      if (exchange.kind !== 'Collectible') return;
+
+      const edicts = required.get(exchange.outputCollectibleId) ?? [];
+      required.set(exchange.outputCollectibleId, [
+        ...edicts,
+        exchange.requiredEdictId,
+      ]);
+    });
+  });
+
+  return required;
+}
+
+// Their stock depends on the Legacy, so they sit outside Remembrance.
+export function exchangeEdictRewardCollectibleIds(): Set<CollectibleId> {
+  return new Set(exchangeEdictRewardRequiredEdicts().keys());
+}
+
+// Non-edict collectibles are always available; edict rewards only when this run's Legacy cleared one of their edicts.
+export function exchangeIsCollectibleAvailableThisRun(
+  legacyClearedEdicts: EdictId[],
+  collectibleId: CollectibleId,
+): boolean {
+  const required = exchangeEdictRewardRequiredEdicts().get(collectibleId);
+  if (!required) return true;
+
+  return required.some((edictId) => legacyClearedEdicts.includes(edictId));
 }
 
 export function exchangeCanAfford(
@@ -143,6 +203,23 @@ export function applyItemExchange(
 
   worldNodeSpendCost(state, exchangeTotalCosts(exchange));
   applyMaterialDelta(state, exchange.output.itemId, exchange.output.quantity);
+
+  return 'ok';
+}
+
+export function applyCollectibleExchange(
+  state: GameState,
+  nodeName: string,
+  exchangeIndex: number,
+): ExchangeResult {
+  const exchange = exchangeAt(nodeName, exchangeIndex, 'Collectible');
+  if (!exchange || !exchangeIsCollectibleStocked(state, exchange)) {
+    return 'invalid';
+  }
+  if (!exchangeCanAfford(state, exchange)) return 'unaffordable';
+
+  worldNodeSpendCost(state, exchange.costs);
+  applyCollectibleGrant(state, exchange.outputCollectibleId, 1);
 
   return 'ok';
 }

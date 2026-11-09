@@ -34,6 +34,7 @@ import {
 } from '@helpers/remembrance/remembrance';
 import type {
   CollectibleId,
+  EdictId,
   EquipmentId,
   ExchangeNodeId,
   GatheringId,
@@ -111,6 +112,30 @@ describe('remembrance discovery categories', () => {
 
     expect(remembranceCollectibles()).toMatchObject({ current: 1, max: 2 });
     expect(remembranceEquipment()).toMatchObject({ current: 1, max: 1 });
+  });
+
+  it('leaves edict reward collectibles out of the total', () => {
+    seedContent([
+      ensureCollectible({ id: relicId, name: 'Relic' }),
+      ensureCollectible({ id: 'vow' as CollectibleId, name: 'Vow' }),
+      ensureExchangeNode({
+        id: 'pond' as ExchangeNodeId,
+        name: 'Pond',
+        exchanges: [
+          {
+            kind: 'Collectible',
+            requiredEdictId: 'edict' as EdictId,
+            outputCollectibleId: 'vow' as CollectibleId,
+            costs: [],
+          },
+        ],
+      }),
+    ]);
+    seedGamestate((state) => {
+      state.collectibles['vow' as CollectibleId] = { quantity: 1, foundAt: 1 };
+    });
+
+    expect(remembranceCollectibles()).toMatchObject({ current: 0, max: 1 });
   });
 
   it('leaves unobtainable content out of the total', () => {

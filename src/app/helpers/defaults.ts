@@ -61,6 +61,7 @@ export function defaultGameState(): GameState {
       towns: {},
     },
     edicts: [],
+    legacyClearedEdicts: [],
     materials: {},
     discoveredMaterials: {},
     collectibles: {},
