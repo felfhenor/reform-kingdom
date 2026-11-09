@@ -28,6 +28,21 @@
   tradeskillXP: 24
   craftTime: 20
 
+- id: f7f131ec-1fa0-490c-a137-024fde692436
+  name: 'Material: Gold Ingot Forgery'
+  result:
+    itemId: Gold Ingot
+
+  requirements:
+    - itemId: Gold Coin
+      quantity: 25000
+
+  tradeskillId: Blacksmithing
+  minTradeskillLevel: 20
+  maxTradeskillLevel: 23
+  tradeskillXP: 24
+  craftTime: 20
+
 - id: 5d712b43-080c-41ef-8520-7332f2c6a56a
   name: 'Weapon: Crimson Sword'
   result:

@@ -133,6 +133,9 @@
     - recipeId: 'Material: Crimson Lucre Forgery'
       chance: 5
 
+    - recipeId: 'Material: Gold Ingot Forgery'
+      chance: 5
+
     - itemId: Crimson Lucre
       chance: 100
       min: 150
