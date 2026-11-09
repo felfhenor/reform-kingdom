@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
 import { ensureTown } from '@helpers/content/ensure-town';
 import {
@@ -19,10 +23,6 @@ import type {
   TownId,
   TownReputationBuffTier,
 } from '@interfaces';
-import { buildTownNodeState } from '@/testing/builders';
-import { seedContent } from '@/testing/content';
-import { inTick, seedGamestate } from '@/testing/gamestate';
-import { seedWorldNodes } from '@/testing/world';
 
 const desert = 'LarsianDesert';
 const now = 500;
@@ -107,7 +107,7 @@ describe('townReputationBuffRefresh', () => {
         name: buff.name,
         sprite: buff.sprite,
         effects: [{ effectType: 'GainStats', stat: 'Strength', value: 1 }],
-        extendedDescription: expect.stringContaining('Strength'),
+        extendedDescription: expect.stringContaining('STR'),
       }),
     ]);
   });

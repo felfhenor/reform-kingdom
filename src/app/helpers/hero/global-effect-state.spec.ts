@@ -1,5 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { buildCharacter } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 import { ensureEdict } from '@helpers/content/ensure-edict';
 import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
 import { ensureCollectible } from '@helpers/content/ensure-item';
@@ -8,11 +11,11 @@ import { ensureTradeskill } from '@helpers/content/ensure-tradeskill';
 import { defaultGameState, defaultStats } from '@helpers/defaults';
 import {
   applyGlobalEffectAdd,
-  globalEffectDescription,
-  globalEffectEffectsScaled,
   applyGlobalEffectPush,
   applyGlobalEffectRemove,
+  globalEffectDescription,
   globalEffectEffectsDescription,
+  globalEffectEffectsScaled,
   globalEffectSumsFor,
   recomputeGlobalEffectSums,
 } from '@helpers/hero/global-effect-state';
@@ -26,9 +29,6 @@ import type {
   JobId,
   TradeskillId,
 } from '@interfaces';
-import { buildCharacter } from '@/testing/builders';
-import { seedContent } from '@/testing/content';
-import { seedGamestate } from '@/testing/gamestate';
 
 const now = 1000;
 const jewelcrafting = ensureTradeskill({
@@ -144,9 +144,9 @@ describe('globalEffectEffectsDescription', () => {
       ]),
     ).toBe(
       [
-        'Hero Strength: +5',
+        'Hero STR: +5',
         'Hero stats: +25%',
-        'Enemy Health: -10%',
+        'Enemy HP: -10%',
         'Hero Revive Chance: +2%',
         'Hero Aggro: +3',
         'XP Gain: +10%',
