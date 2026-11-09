@@ -3,6 +3,10 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import {
+  sendEquipAnalytics,
+  stateEquipArmoryItems,
+} from '@helpers/hero/character-equipment';
 import { characterRecalculateStats } from '@helpers/hero/party';
 import {
   canModifyEquipment,
@@ -110,6 +114,24 @@ export function characterUnequipToArmory(
       : 'Hero:Unequip:Item',
   );
   return true;
+}
+
+export async function equipArmoryItems(
+  equipmentItemIds: EquipmentItemId[],
+): Promise<number> {
+  if (!canModifyEquipment()) return 0;
+
+  let equipped: EquipmentContent[] = [];
+  await updateGamestate((state) => {
+    equipped = stateEquipArmoryItems(state, equipmentItemIds);
+    return state;
+  });
+
+  equipped.forEach(sendEquipAnalytics);
+  if (equipped.length > 0) {
+    analyticsSendDesignEvent('Kingdom:Armory:EquipThese', equipped.length);
+  }
+  return equipped.length;
 }
 
 export function ownedEquipmentItem(

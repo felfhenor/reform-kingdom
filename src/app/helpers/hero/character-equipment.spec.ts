@@ -11,6 +11,7 @@ import {
   equipmentInfuse,
   optimizeCharacterEquipment,
   replaceEquippedItemInstance,
+  stateEquipArmoryItems,
 } from '@helpers/hero/character-equipment';
 import { infusionMaterialCost } from '@helpers/item/infusion';
 import { applyMaterialDelta } from '@helpers/item/materials';
@@ -18,6 +19,7 @@ import {
   armoryState,
   gamestate,
   materialsState,
+  updateGamestate,
   worldPartyState,
 } from '@helpers/state-game';
 import { taskEventEquipmentInfused } from '@helpers/task/task-events';
@@ -44,6 +46,7 @@ import { seedContent } from '@/testing/content';
 import { inTick, seedGamestate } from '@/testing/gamestate';
 
 const jobId = 'job-warrior' as JobId;
+const hatlessJobId = 'job-hatless' as JobId;
 const goldId = 'gold-coin' as ItemId;
 
 function gear(
@@ -142,6 +145,7 @@ beforeEach(() => {
         Bastion: [{ stat: 'Vitality', multiplier: 5 }],
       },
     }),
+    ensureJob({ id: hatlessJobId, name: 'Hatless' }),
     bastion,
     circlet,
     helmet,
@@ -360,5 +364,84 @@ describe('equipmentInfuse', () => {
     seedInfusion({}, [item], (state) => applyMaterialDelta(state, goldId, -1));
     expect(infuse(item)).toBe(false);
     expect(armoryState()).toEqual([item]);
+  });
+});
+
+describe('stateEquipArmoryItems', () => {
+  const rowanId = 'rowan' as CharacterId;
+
+  function seedParty(armory: EquipmentItem[], firstJobId = jobId): void {
+    seedGamestate((state) => {
+      state.world.party = [
+        { ...hero(), jobId: firstJobId },
+        buildCharacter({ id: rowanId, name: 'Rowan', jobId }),
+      ];
+      state.armory = armory;
+    });
+  }
+
+  function equipAll(items: EquipmentItem[]): string[] {
+    let equipped: EquipmentContent[] = [];
+    inTick(() =>
+      updateGamestate((state) => {
+        equipped = stateEquipArmoryItems(
+          state,
+          items.map((item) => item.id),
+        );
+        return state;
+      }),
+    );
+    return equipped.map((content) => content.id);
+  }
+
+  const wearer = (item: EquipmentItem) =>
+    worldPartyState().find((c) =>
+      Object.values(c.equipment).some((worn) => worn?.id === item.id),
+    )?.id;
+
+  it('gives each item, in order, to the first hero whose slot is still open', () => {
+    const [hat1, hat2, hat3] = [helmet, oldHat, circlet].map((hat) =>
+      buildEquipmentItem(hat.id),
+    );
+    const blade = buildEquipmentItem(sword.id);
+    seedParty([hat1, hat2, hat3, blade]);
+
+    expect(equipAll([hat1, blade, hat2, hat3])).toEqual([
+      'helmet',
+      'sword',
+      'old-hat',
+    ]);
+    expect([hat1, blade, hat2].map(wearer)).toEqual([heroId, heroId, rowanId]);
+    expect(armoryState()).toEqual([hat3]);
+  });
+
+  it('counts a two-hander as filling both hands', () => {
+    const twoHander = buildEquipmentItem(spear.id);
+    const offhand = buildEquipmentItem(shield.id);
+    seedParty([twoHander, offhand]);
+
+    equipAll([twoHander, offhand]);
+
+    expect([twoHander, offhand].map(wearer)).toEqual([heroId, rowanId]);
+  });
+
+  it('passes over a hero who cannot use the item', () => {
+    const hat = buildEquipmentItem(helmet.id);
+    seedParty([hat], hatlessJobId);
+
+    equipAll([hat]);
+
+    expect(wearer(hat)).toBe(rowanId);
+  });
+
+  it('skips gear nobody can use and items no longer in the armory', () => {
+    const tooHigh = buildEquipmentItem(crown.id);
+    const wrongType = buildEquipmentItem(bow.id);
+    seedParty([tooHigh, wrongType]);
+
+    expect(
+      equipAll([tooHigh, wrongType, buildEquipmentItem(helmet.id)]),
+    ).toEqual([]);
+    expect(armoryState()).toEqual([tooHigh, wrongType]);
   });
 });

@@ -91,7 +91,7 @@ export function stateEquipFromArmory(
   );
 }
 
-function sendEquipAnalytics(content: EquipmentContent): void {
+export function sendEquipAnalytics(content: EquipmentContent): void {
   analyticsSendDesignEvent(
     `Hero:Equip:Item:${analyticsSafeSegment(content.name)}`,
   );
@@ -150,6 +150,42 @@ export async function optimizeCharacterEquipment(
   });
 
   equipped.forEach(sendEquipAnalytics);
+}
+
+// Mutates `state` and `claimed`; a hero is skipped once any of the item's slots was filled earlier in the batch.
+function stateBatchEquipItem(
+  state: GameState,
+  equipmentItemId: EquipmentItemId,
+  claimed: Set<string>,
+): EquipmentContent | undefined {
+  const item = state.armory.find((owned) => owned.id === equipmentItemId);
+  const content = item
+    ? getEntry<EquipmentContent>(item.equipmentId)
+    : undefined;
+  if (!item || !content) return undefined;
+
+  const slots = EquipmentTypeToSlot[content.type];
+  const target = state.world.party.find(
+    (character) =>
+      canEquipItem(character, content) &&
+      !slots.some((slot) => claimed.has(`${character.id}:${slot}`)),
+  );
+  if (!target) return undefined;
+
+  stateEquipFromArmory(state, target.id, item, content);
+  slots.forEach((slot) => claimed.add(`${target.id}:${slot}`));
+  return content;
+}
+
+// Mutates `state`; equips in the given order, each item going to the first hero in party order that can take it.
+export function stateEquipArmoryItems(
+  state: GameState,
+  equipmentItemIds: EquipmentItemId[],
+): EquipmentContent[] {
+  const claimed = new Set<string>();
+  return compact(
+    equipmentItemIds.map((id) => stateBatchEquipItem(state, id, claimed)),
+  );
 }
 
 // A two-hander fills several slots with the same instance.

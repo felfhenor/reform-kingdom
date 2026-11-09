@@ -74,6 +74,27 @@
       >
         Auto Sell
       </button>
+
+      @if (equipCandidateIds().length > 0) {
+        <app-slot-button-container
+          (animate.enter)="onButtonEnter($event)"
+          (animate.leave)="onButtonLeave($event)"
+          [disabled]="!equipmentModifiable()"
+          [helpText]="'This cannot be done in combat.'"
+        >
+          <button
+            type="button"
+            class="btn btn-sm btn-neutral"
+            [disabled]="!equipmentModifiable() || equipping()"
+            (click)="equipFiltered()"
+            appSfx="ui-success"
+            [sfxTrigger]="['click', 'hover']"
+            [tp]="'Equip the matching items, in order, on the first hero who can use each one.'"
+          >
+            Equip These
+          </button>
+        </app-slot-button-container>
+      }
     }
   </div>
 

@@ -1,8 +1,11 @@
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, formatNumber } from '@angular/common';
+import type { AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
   Component,
+  LOCALE_ID,
   computed,
+  inject,
   signal,
   viewChild,
 } from '@angular/core';
@@ -10,8 +13,12 @@ import { CurrencyCostComponent } from '@components/currency-cost/currency-cost';
 import { ModalLootFiltersComponent } from '@components/modal-loot-filters/modal-loot-filters.component';
 import { PagePagedGridComponent } from '@components/page-paged-grid/page-paged-grid.component';
 import { SlotArmoryItemComponent } from '@components/slot-armory-item/slot-armory-item.component';
+import { SlotButtonContainerComponent } from '@components/slot-button-container/slot-button-container.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { modalOpen } from '@helpers/engine/modal-stack';
+import { notifySuccess, notifyWarning } from '@helpers/engine/notify';
+import { equipArmoryItems } from '@helpers/hero/character-equipment.ui';
+import { canModifyEquipment } from '@helpers/item/equipment';
 import { goldCoinId } from '@helpers/item/materials';
 import {
   armoryCap,
@@ -29,6 +36,8 @@ import {
   lootFilterSettings,
 } from '@helpers/kingdom/loot-filter.ui';
 import type { EquipmentArmoryEntry, EquipmentItemId } from '@interfaces';
+import { TippyDirective } from '@ngneat/helipopper';
+import { AnimationService } from '@services/animation.service';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { sum } from 'es-toolkit/compat';
 
@@ -37,12 +46,14 @@ import { sum } from 'es-toolkit/compat';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     SlotArmoryItemComponent,
+    SlotButtonContainerComponent,
     CurrencyCostComponent,
     ModalLootFiltersComponent,
     PagePagedGridComponent,
     SweetAlert2Module,
     DecimalPipe,
     SFXDirective,
+    TippyDirective,
   ],
   templateUrl: './play-kingdom-armory.component.html',
   styleUrl: './play-kingdom-armory.component.scss',
@@ -66,8 +77,45 @@ export class PlayKingdomArmoryComponent {
     isLootFilterActive(lootFilterSettings()),
   );
 
+  private anim = inject(AnimationService);
+  private locale = inject(LOCALE_ID);
+
+  public equipmentModifiable = computed(() => canModifyEquipment());
+
   public openLootFilters(): void {
     modalOpen('loot-filters');
+  }
+
+  public equipCandidateIds = computed(() => {
+    const grid = this.grid();
+    if (!grid?.searchText().trim()) return [];
+    return grid.filteredEntries().map((entry) => entry.item.id);
+  });
+
+  public equipping = signal(false);
+
+  public async equipFiltered(): Promise<void> {
+    this.equipping.set(true);
+    const count = await equipArmoryItems(this.equipCandidateIds()).finally(() =>
+      this.equipping.set(false),
+    );
+    if (count === 0) {
+      notifyWarning('No hero could equip any of those items.');
+      return;
+    }
+    const label = formatNumber(count, this.locale);
+    notifySuccess(`Equipped ${label} ${count === 1 ? 'item' : 'items'}.`);
+  }
+
+  public onButtonEnter(event: AnimationCallbackEvent): void {
+    this.anim.fadeIn(event.target);
+  }
+
+  public onButtonLeave(event: AnimationCallbackEvent): void {
+    this.anim
+      .fadeOut(event.target)
+      .then(() => event.animationComplete())
+      .catch(() => event.animationComplete());
   }
 
   public sellMode = signal(false);
