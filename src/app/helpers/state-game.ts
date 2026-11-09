@@ -65,9 +65,7 @@ export const discoveredRecipesState = gamestateSlice('discoveredRecipes');
 export const discoveredCaravansState = gamestateSlice('discoveredCaravans');
 export const discoveredTradersState = gamestateSlice('discoveredTraders');
 export const discoveredTrainersState = gamestateSlice('discoveredTrainers');
-export const discoveredGatherNodesState = gamestateSlice(
-  'discoveredGatherNodes',
-);
+export const visitedWorldNodesState = gamestateSlice('visitedWorldNodes');
 export const gatherNodeLevelsState = gamestateSlice('gatherNodeLevels');
 export const worldDiscoveriesState = gamestateSlice('worldDiscoveries');
 export const discoveredMapsState = gamestateSlice('discoveredMaps');

@@ -17,7 +17,7 @@ import {
   decreeClauseSetEnabled,
 } from '@helpers/decree/decree';
 import { equippedItems, isSlotAvailableForJob } from '@helpers/item/equipment';
-import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
+import { isWorldNodeVisited } from '@helpers/world-node/world-node-visit';
 import {
   gatheringStop,
   isGathering,
@@ -461,7 +461,7 @@ function isMaterialCurrentlyGatherable(materialId: MaterialId): boolean {
   const partyLevel = partyMinLevel();
 
   return worldNodesOfType('GatherNode').some((entry) => {
-    if (!isGatherNodeDiscovered(entry.nodeName) || !isWorldNodeVisible(entry)) {
+    if (!isWorldNodeVisited(entry.nodeName) || !isWorldNodeVisible(entry)) {
       return false;
     }
 

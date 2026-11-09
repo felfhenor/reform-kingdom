@@ -79,6 +79,7 @@ const KINGDOM_EXTRA_ICONS: Record<
   Exclude<KingdomIcon, KingdomFeatureSubview>,
   true
 > = {
+  improvements: true,
   kingdom: true,
   reclass: true,
   remembrance: true,

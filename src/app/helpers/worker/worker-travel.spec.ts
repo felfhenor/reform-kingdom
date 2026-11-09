@@ -68,7 +68,7 @@ function seedWorkerState(
 ): void {
   seedGamestate((state) => {
     state.workers[workerId] = { ...defaultWorkerState(), ...overrides };
-    state.discoveredGatherNodes[woods] = { foundAt: 1 };
+    state.visitedWorldNodes[woods] = { foundAt: 1 };
     edit?.(state);
   });
 }

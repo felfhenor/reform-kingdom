@@ -62,7 +62,7 @@ describe('retrofitTasks', () => {
 
   it('keeps an existing counter entry and its progress instead of guessing from ledgers', () => {
     const state = defaultGameState();
-    state.discoveredGatherNodes['Wergen Woods'] = { foundAt: 1 };
+    state.visitedWorldNodes['Wergen Woods'] = { foundAt: 1 };
     state.discoveredMaterials['item-stick' as ItemId] = { foundAt: 1 };
     state.tasks[GATHER_TASK] = { progress: 2 };
 

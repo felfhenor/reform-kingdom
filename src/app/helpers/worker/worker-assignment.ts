@@ -1,6 +1,6 @@
 import { getEntry } from '@helpers/content/content';
 import { travelPathBaseTotalTicks } from '@helpers/hero/travel-cost-base';
-import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
+import { isWorldNodeVisited } from '@helpers/world-node/world-node-visit';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
 import { isMaterialDiscovered } from '@helpers/item/materials';
 import {
@@ -86,7 +86,7 @@ export function workerGatherAssignmentIsValid(
   const stamina = workerStatsForLevel(content, level).stamina;
 
   return (
-    isGatherNodeDiscovered(assignment.nodeName) &&
+    isWorldNodeVisited(assignment.nodeName) &&
     workerGatherNodeHasItem(assignment.nodeName, assignment.itemId) &&
     canWorkerReachNode(assignment.nodeName, stamina, content.canUseTeleports)
   );

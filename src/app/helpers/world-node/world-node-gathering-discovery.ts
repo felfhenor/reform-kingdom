@@ -1,4 +1,4 @@
-import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
+import { isWorldNodeVisited } from '@helpers/world-node/world-node-visit';
 import { gatheringResultsAtLevel } from '@helpers/world-node/world-node-gathering';
 import { worldNodeLevel } from '@helpers/world-node/world-node-level';
 import {
@@ -44,8 +44,7 @@ export function worldNodeGatherMaterialTradeskillIds(
 
 export function discoveredGatherNodes(): WorldNodeEntry[] {
   return worldNodesOfType('GatherNode').filter(
-    (entry) =>
-      isGatherNodeDiscovered(entry.nodeName) && isWorldNodeVisible(entry),
+    (entry) => isWorldNodeVisited(entry.nodeName) && isWorldNodeVisible(entry),
   );
 }
 

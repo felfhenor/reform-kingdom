@@ -12,7 +12,6 @@ export * from './equipment-skill-bonus';
 export * from './equipment-slot-groups';
 export * from './equipment-types';
 export * from './equipment.ui';
-export * from './gather-node-discovery';
 export * from './gathering';
 export * from './infusion';
 export * from './item-preview';

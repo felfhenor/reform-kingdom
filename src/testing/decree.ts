@@ -179,9 +179,7 @@ export function seedDecreeWorld(
     state.world.party = [buildCharacter({ level: 10 })];
     named
       .filter((place) => place.content?.__type === 'gathering')
-      .forEach(
-        ({ name }) => (state.discoveredGatherNodes[name] = { foundAt: 1 }),
-      );
+      .forEach(({ name }) => (state.visitedWorldNodes[name] = { foundAt: 1 }));
     edit?.(state);
   });
   return seededNodes;

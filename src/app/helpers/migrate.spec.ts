@@ -14,6 +14,10 @@ import { ensureEdict } from '@helpers/content/ensure-edict';
 import { ensureJob } from '@helpers/content/ensure-job';
 import { ensureMonster } from '@helpers/content/ensure-monster';
 import { ensureRecipe } from '@helpers/content/ensure-recipe';
+import {
+  ensureShrine,
+  ensureShrineLevel,
+} from '@helpers/content/ensure-shrine';
 import { ensureSkill } from '@helpers/content/ensure-skill';
 import { ensureTask } from '@helpers/content/ensure-task';
 import { ensureTown } from '@helpers/content/ensure-town';
@@ -51,6 +55,7 @@ import type {
   JobId,
   MonsterId,
   RecipeId,
+  ShrineId,
   TaskId,
   TownId,
   TradeskillId,
@@ -334,7 +339,7 @@ describe('migrateGameState', () => {
     expect(migrated.armory).toEqual([]);
   });
 
-  describe('gather-node discoveries', () => {
+  describe('world-node visits', () => {
     const groves = ['Wergen Woods', 'Rocky Outcrop'];
     function seedGroves(): void {
       seedContent([ore]);
@@ -349,26 +354,83 @@ describe('migrateGameState', () => {
         save.materials[ore.id] = { quantity: 5, foundAt: 1 };
       });
 
-      expect(Object.keys(migrated.discoveredGatherNodes)).toEqual(groves);
+      expect(Object.keys(migrated.visitedWorldNodes)).toEqual(groves);
       expect(migrated.meta.version).toBe(GAMESTATE_VERSION);
     });
 
     it('are left alone for a fresh save or one that already records visits', () => {
       seedGroves();
-      expect(migrate(() => {}).discoveredGatherNodes).toEqual({});
+      expect(migrate(() => {}).visitedWorldNodes).toEqual({});
       expect(
         migrate(
           (save) => (save.materials[ore.id] = { quantity: 5, foundAt: 1 }),
-        ).discoveredGatherNodes,
+        ).visitedWorldNodes,
       ).toEqual({});
 
       const visited = { 'Wergen Woods': { foundAt: 1 } };
       expect(
         migrate((save) => {
           save.materials[ore.id] = { quantity: 5, foundAt: 1 };
-          save.discoveredGatherNodes = visited;
-        }).discoveredGatherNodes,
+          save.visitedWorldNodes = visited;
+        }).visitedWorldNodes,
       ).toEqual(visited);
+    });
+
+    it('carry over gather visits saved under the old key', () => {
+      seedGroves();
+
+      const migrated = migrate((save) => {
+        Object.assign(save, {
+          discoveredGatherNodes: { 'Wergen Woods': { foundAt: 7 } },
+        });
+      });
+
+      expect(migrated.visitedWorldNodes).toEqual({
+        'Wergen Woods': { foundAt: 7 },
+      });
+      expect(migrated).not.toHaveProperty('discoveredGatherNodes');
+    });
+
+    it('are backfilled from developed shrines, visited towns and bestiary kills', () => {
+      const shrine = ensureShrine({
+        id: 'shrine' as ShrineId,
+        name: 'Old Shrine',
+        levels: [ensureShrineLevel({ costs: [], developTime: 1 })],
+      });
+      const larsia = ensureTown({ id: 'larsia' as TownId, name: 'Larsia' });
+      const unvisitedTown = ensureTown({
+        id: 'other' as TownId,
+        name: 'Other Town',
+      });
+      seedContent([shrine, larsia, unvisitedTown, goblin]);
+      seedWorldNodes([
+        { name: shrine.name, type: 'Shrine' },
+        { name: 'Unvisited Shrine', type: 'Shrine' },
+        { name: larsia.name, type: 'NonPlayerKingdom' },
+        { name: unvisitedTown.name, type: 'NonPlayerKingdom' },
+        { name: 'Field Ruins', type: 'ExploreNode' },
+      ]);
+
+      const migrated = migrate((save) => {
+        save.shrines[shrine.name] = { level: 1 };
+        save.world.towns = {
+          [larsia.id]: buildTownNodeState({ firstVisitedAtTick: 1 }),
+          [unvisitedTown.id]: buildTownNodeState(),
+        };
+        save.bestiary = {
+          [goblin.id]: {
+            foundAt: 1,
+            kills: 1,
+            minLevelFound: 1,
+            maxLevelFound: 1,
+            foundAtNodes: ['Field Ruins', 'Gone Node'],
+          },
+        };
+      });
+
+      expect(new Set(Object.keys(migrated.visitedWorldNodes))).toEqual(
+        new Set(['Field Ruins', larsia.name, shrine.name]),
+      );
     });
   });
 

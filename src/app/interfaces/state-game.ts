@@ -103,8 +103,8 @@ export type GameStateActiveAstralProjectorSpell = {
   expiresAtTick: number;
 };
 
-// Keyed by Tiled node name (no branded id for world nodes). Scopes auto-mode's material picker to sources the player has actually found.
-export type GameStateDiscoveredGatherNodes = Ledger;
+// Keyed by Tiled node name (no branded id for world nodes), recorded on arrival at any node type.
+export type GameStateVisitedWorldNodes = Ledger;
 
 // Set while the next level is being developed; the level only increments once this tick is reached.
 export type GameStateWorldNodeLevel = {
@@ -126,7 +126,7 @@ export type GameStateShrineLevels = GameStateWorldNodeLevels;
 
 export type GameStateOutpostLevels = GameStateWorldNodeLevels;
 
-// Unlike `discoveredGatherNodes` (GatherNodes only, recorded on arrival), this covers every node type, recorded on click.
+// Unlike `visitedWorldNodes` (recorded on arrival), this tracks hidden nodes revealed on click.
 export type GameStateWorldDiscoveries = Ledger;
 
 // Keyed by Tiled map name, recorded on arrival.
@@ -193,7 +193,7 @@ export type GameState = {
   discoveredTraders: GameStateDiscoveredTraders;
   discoveredTrainers: GameStateDiscoveredTrainers;
   discoveredRecipes: GameStateDiscoveredRecipes;
-  discoveredGatherNodes: GameStateDiscoveredGatherNodes;
+  visitedWorldNodes: GameStateVisitedWorldNodes;
   gatherNodeLevels: GameStateGatherNodeLevels;
   shrines: GameStateShrineLevels;
   outposts: GameStateOutpostLevels;

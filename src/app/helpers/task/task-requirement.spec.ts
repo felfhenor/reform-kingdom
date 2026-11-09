@@ -68,7 +68,7 @@ describe('taskCounterRequirementHasEvidence', () => {
     state.discoveredMaterials[STICK] = { foundAt: 1 };
     expect(taskCounterRequirementHasEvidence(state, requirement)).toBe(false);
 
-    state.discoveredGatherNodes['Wergen Woods'] = { foundAt: 1 };
+    state.visitedWorldNodes['Wergen Woods'] = { foundAt: 1 };
     expect(taskCounterRequirementHasEvidence(state, requirement)).toBe(true);
   });
 

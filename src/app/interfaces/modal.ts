@@ -3,6 +3,7 @@ export type ModalId =
   | 'combat-orders'
   | 'hero-burst-skills'
   | 'hero-teachings'
+  | 'improvements'
   | 'loot-filters'
   | 'outpost-teleport'
   | 'reclass-heroes'

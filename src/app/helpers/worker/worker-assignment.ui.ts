@@ -1,7 +1,7 @@
 import { WORKER_MAX_LEVEL } from '@helpers/config';
 import { gatherDifficultyTier } from '@helpers/engine/difficulty-tier';
 import { rangeLabel } from '@helpers/engine/leveled-range';
-import { isGatherNodeDiscovered } from '@helpers/item/gather-node-discovery';
+import { isWorldNodeVisited } from '@helpers/world-node/world-node-visit';
 import {
   getMaterialQuantity,
   isMaterialDiscovered,
@@ -104,7 +104,7 @@ export function workerAssignmentNodeOptions(
   const options =
     mode === 'Gather'
       ? worldNodesOfType('GatherNode')
-          .filter((node) => isGatherNodeDiscovered(node.nodeName))
+          .filter((node) => isWorldNodeVisited(node.nodeName))
           .map((node) => gatherNodeOption(node, worker, level))
       : worldNodesOfType('ExploreNode')
           .filter((node) => isWorkerCombatNodeUnlocked(node.nodeName))

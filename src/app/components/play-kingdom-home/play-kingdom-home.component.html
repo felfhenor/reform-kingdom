@@ -307,6 +307,17 @@
             </button>
           }
 
+          <button
+            class="btn btn-neutral btn-sm"
+            (click)="openImprovementsModal()"
+            appSfx="ui-click"
+            [sfxOffset]="7"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            <app-icon-kingdom name="improvements" class="zoom-inline" />
+            Improvements
+          </button>
+
           @if (isFeatureAvailable('workshop')) {
             <button
               class="btn btn-neutral btn-sm"

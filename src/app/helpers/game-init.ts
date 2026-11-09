@@ -20,6 +20,7 @@ import { setOption } from '@helpers/state-options';
 import { setWorld } from '@helpers/world';
 import { worldNodeDevelopmentApplyStartingLevels } from '@helpers/world-node/world-node-development-state';
 import { applyOutpostBuffRefresh } from '@helpers/world-node/world-node-outpost-buff';
+import { worldNodeAt } from '@helpers/world-node/world-nodes';
 import { worldgenGenerateWorld } from '@helpers/worldgen';
 
 export async function gameStart(): Promise<void> {
@@ -35,7 +36,10 @@ export async function gameStart(): Promise<void> {
     worldNodeDevelopmentApplyStartingLevels(state);
     applyOutpostBuffRefresh(state, state.world.currentLocation.mapName);
     stateMarkPartyEquipmentDiscovered(state);
-    ledgerMark(state.discoveredMaps, state.world.currentLocation.mapName);
+    const { mapName, x, y } = state.world.currentLocation;
+    ledgerMark(state.discoveredMaps, mapName);
+    const startNode = worldNodeAt(mapName, x, y);
+    if (startNode) ledgerMark(state.visitedWorldNodes, startNode.nodeName);
     return state;
   });
 

@@ -4,7 +4,7 @@ import { settle } from './shims';
 
 import { getEntry } from '@helpers/content/content';
 import { gameReset, gameStart } from '@helpers/game-init';
-import { grandfatherGatherNodeDiscoveries } from '@helpers/item/gather-node-discovery';
+import { ledgerBackfill } from '@helpers/engine/ledger';
 import { migrateGameState } from '@helpers/migrate';
 import { createCharacter, setParty } from '@helpers/hero/party';
 import { gamestate, setGameState, updateGamestate } from '@helpers/state-game';
@@ -54,7 +54,8 @@ function discoverHiddenNodesForSimulation(): void {
 // analogous legacy-save case).
 function discoverAllGatherNodesForSimulation(): void {
   updateGamestate((state) => {
-    state.discoveredGatherNodes = grandfatherGatherNodeDiscoveries(
+    state.visitedWorldNodes = ledgerBackfill(
+      state.visitedWorldNodes,
       worldNodesOfType('GatherNode').map((entry) => entry.nodeName),
     );
     return state;

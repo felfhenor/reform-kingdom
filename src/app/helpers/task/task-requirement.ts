@@ -61,7 +61,7 @@ export function taskCounterRequirementHasEvidence(
   switch (requirement.kind) {
     case 'GatherItem':
       return (
-        ledgerHas(state.discoveredGatherNodes, requirement.nodeName) &&
+        ledgerHas(state.visitedWorldNodes, requirement.nodeName) &&
         ledgerHas(state.discoveredMaterials, requirement.itemId)
       );
     case 'CraftRecipe': {

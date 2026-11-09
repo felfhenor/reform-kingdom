@@ -33,7 +33,6 @@ import {
 } from '@helpers/hero/skill-tree';
 import { travelRelocateTo } from '@helpers/hero/travel';
 import { collectiblesAdd } from '@helpers/item/collectibles';
-import { gatherNodeDiscover } from '@helpers/item/gather-node-discovery';
 import { addMaterial } from '@helpers/item/materials';
 import { armoryAdd, armoryAddWithAffixes } from '@helpers/kingdom/armory';
 import {
@@ -63,6 +62,7 @@ import {
   WORLD_NODE_DEVELOPABLE_TYPES,
   WORLD_NODE_DEVELOPMENT_SLICES,
 } from '@helpers/world-node/world-node-development-state';
+import { worldNodeVisit } from '@helpers/world-node/world-node-visit';
 import {
   worldNodeByName,
   worldNodeGathering,
@@ -313,9 +313,10 @@ export function debugResetAllTutorials(): void {
   });
 }
 
-// Marks a GatherNode as visited without walking the party there - workers can only be assigned to nodes discovered this way.
-export function debugDiscoverGatherNode(nodeName: string): void {
-  gatherNodeDiscover(nodeName);
+// Marks a node visited without walking the party there - workers can only be assigned to gather nodes visited this way.
+export function debugVisitWorldNode(nodeName: string): void {
+  const entry = worldNodeByName(nodeName);
+  if (entry) worldNodeVisit(entry);
 }
 
 export function debugGiveCollectible(

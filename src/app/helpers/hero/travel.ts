@@ -27,7 +27,6 @@ import {
   travelTicksToUnits,
   travelUnitsToTicks,
 } from '@helpers/hero/travel-progress';
-import { gatherNodeDiscover } from '@helpers/item/gather-node-discovery';
 import { gatheringStart, gatheringStop } from '@helpers/item/gathering';
 import { mapHopsBetween } from '@helpers/pathfinding/pathfinding';
 import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
@@ -43,6 +42,7 @@ import { currentLocationSet } from '@helpers/world';
 import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';
 import { deathPenaltyMultiplier } from '@helpers/world-node/world-node-outpost';
 import { isWorldNodeGateOpen } from '@helpers/world-node/world-node-gate';
+import { worldNodeVisit } from '@helpers/world-node/world-node-visit';
 import {
   isWorldNodeCollectibleGateMet,
   worldNodeByName,
@@ -243,6 +243,7 @@ function travelArriveAtNode(
   const node = worldNodeByName(destinationNodeName);
   if (!node) return;
 
+  worldNodeVisit(node);
   mapNodeAutoShowOnArrival(node);
 
   const caravan = worldNodeCaravan(node);
@@ -265,10 +266,7 @@ function travelArriveAtNode(
   }
 
   const gathering = worldNodeGathering(node);
-  if (gathering) {
-    gatherNodeDiscover(destinationNodeName);
-    gatheringStart(destinationNodeName);
-  }
+  if (gathering) gatheringStart(destinationNodeName);
 }
 
 // Chains into every following step the carried progress covers (incl. instant Teleports) within the same tick.

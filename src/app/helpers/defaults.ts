@@ -72,7 +72,7 @@ export function defaultGameState(): GameState {
     discoveredTraders: {},
     discoveredTrainers: {},
     discoveredRecipes: {},
-    discoveredGatherNodes: {},
+    visitedWorldNodes: {},
     gatherNodeLevels: {},
     shrines: {},
     outposts: {},

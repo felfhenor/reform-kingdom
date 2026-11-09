@@ -611,6 +611,7 @@ describe('travelProcessTick', () => {
       expect(encounterStartFight).not.toHaveBeenCalled();
       expect(gatheringStart).not.toHaveBeenCalled();
       expect(caravanMarkVisited).not.toHaveBeenCalled();
+      expect(gamestate().visitedWorldNodes['Signpost']).toBeDefined();
     });
 
     it('starts the first fight at an encounter node', () => {
@@ -661,7 +662,7 @@ describe('travelProcessTick', () => {
     it('discovers and starts gathering at a gather node', () => {
       arriveAt('Wergen Woods');
 
-      expect(gamestate().discoveredGatherNodes['Wergen Woods']).toBeDefined();
+      expect(gamestate().visitedWorldNodes['Wergen Woods']).toBeDefined();
       expect(gatheringStart).toHaveBeenCalledWith('Wergen Woods');
     });
 

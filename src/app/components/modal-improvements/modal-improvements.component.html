@@ -1,0 +1,82 @@
+<app-modal
+  modalId="improvements"
+  [showCloseButton]="true"
+  [allowEscToClose]="true"
+  [closeOnBackdropClick]="true"
+  widthClass="max-w-3xl"
+>
+  <span title>Improvements</span>
+  <p subtitle>Locations you can still develop.</p>
+
+  <div
+    body
+    class="flex flex-col gap-2 max-h-[60vh] overflow-y-auto"
+    appListReflow
+  >
+    @for (row of rows(); track row.node.nodeName) {
+      <div class="flex items-center gap-4 p-3 bg-base-200">
+        <app-sprite-node class="zoom-row" [entry]="row.node" />
+
+        <div class="flex flex-col gap-1 min-w-0 w-48 shrink-0">
+          <span class="type-entity-name truncate">
+            {{ row.node.nodeName }}
+            @if (row.level > 0) {
+              +{{ row.level | number }}
+            }
+          </span>
+          <span class="type-meta truncate">{{ row.regionName }}</span>
+        </div>
+
+        <div class="flex flex-wrap gap-2 flex-1">
+          @if (row.developingTimerText; as remaining) {
+            <span class="badge badge-data tabular-nums">
+              Developing ({{ remaining }})
+            </span>
+          } @else {
+            @for (cost of row.costs; track cost.itemId) {
+              <app-slot-requirement
+                [content]="costContent(cost)"
+                spritesheet="item"
+                [owned]="costOwned(cost)"
+                [quantity]="cost.required"
+                [tooltip]="costTooltip(cost)"
+                [detailed]="true"
+              />
+            }
+          }
+        </div>
+
+        <div class="flex justify-end shrink-0">
+          @if (row.isPartyHere) {
+            <span class="badge badge-success">You are here</span>
+          } @else {
+            @if (row.travelEtaSeconds !== undefined) {
+              <button
+                type="button"
+                class="btn btn-xs btn-neutral tabular-nums"
+                disabled
+              >
+                {{ etaLabel(row.travelEtaSeconds) }}
+              </button>
+            } @else {
+              <button
+                type="button"
+                class="btn btn-xs btn-neutral"
+                [disabled]="!row.canTravel"
+                (click)="travelTo(row.node.nodeName)"
+                appSfx="ui-click"
+                [sfxTrigger]="['click', 'hover']"
+              >
+                Travel Here
+              </button>
+            }
+          }
+        </div>
+      </div>
+    } @empty {
+      <app-blank-slate>
+        There are no upgrades for locations you've visited.
+      </app-blank-slate>
+    }
+  </div>
+</app-modal>

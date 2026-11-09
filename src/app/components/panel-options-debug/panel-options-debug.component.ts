@@ -12,7 +12,6 @@ import { getEntriesByType } from '@helpers/content/content';
 import { isRecipeDropGated } from '@helpers/crafting/recipes';
 import {
   debugDiscoverAllRecipes,
-  debugDiscoverGatherNode,
   debugFillBestiary,
   debugGiveCollectible,
   debugGiveEquipment,
@@ -32,6 +31,7 @@ import {
   debugStartTownDefenseCombat,
   debugTelegraphRaid,
   debugUndiscoverRecipe,
+  debugVisitWorldNode,
 } from '@helpers/debug/debug.ui';
 import {
   debugResetIntroCrawl,
@@ -260,7 +260,7 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
     const nodeName = this.selectedGatherNodeName();
     if (!nodeName) return;
 
-    debugDiscoverGatherNode(nodeName);
+    debugVisitWorldNode(nodeName);
   }
 
   public setGatherNodeLevel(): void {

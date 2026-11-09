@@ -16,7 +16,7 @@ import {
 } from '@helpers/decree/decree';
 import { defaultGameState, GAMESTATE_VERSION } from '@helpers/defaults';
 import { pruneInvalidEdicts } from '@helpers/edict/edict';
-import { ledgerMark } from '@helpers/engine/ledger';
+import { ledgerBackfill, ledgerMark } from '@helpers/engine/ledger';
 import { recordPrune } from '@helpers/engine/record';
 import { pruneInvalidBurstSkills } from '@helpers/hero/burst-skill';
 import { retrofitPartyXp } from '@helpers/hero/character-progress';
@@ -33,7 +33,6 @@ import {
   backfillEquipmentItem,
   repairSplitEquippedItems,
 } from '@helpers/item/equipment';
-import { grandfatherGatherNodeDiscoveries } from '@helpers/item/gather-node-discovery';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import { pruneInvalidArmoryItems } from '@helpers/kingdom/armory';
 import { pruneInvalidActiveAstralProjectorSpells } from '@helpers/kingdom/astral-projector';
@@ -61,7 +60,6 @@ import {
   isWorkerContentKnown,
   pruneInvalidWorkerStates,
 } from '@helpers/worker/worker-discovery';
-import { backfillDiscoveredMaps } from '@helpers/world-node/world-map-discovery';
 import { pruneInvalidWorldNodeDevelopmentLevels } from '@helpers/world-node/world-node-development';
 import {
   WORLD_NODE_DEVELOPABLE_TYPES,
@@ -73,14 +71,15 @@ import { allGatherableMaterialIds } from '@helpers/world-node/world-node-gatheri
 import {
   worldNodeByName,
   worldNodesOfType,
+  worldNodeTown,
 } from '@helpers/world-node/world-nodes';
 import type {
   AutoModeState,
   DecreeRiskLevel,
   GameState,
-  GameStateDiscoveredGatherNodes,
   GameStateDiscoveredMaterials,
   GameStateMaterials,
+  GameStateVisitedWorldNodes,
   MaterialId,
 } from '@interfaces';
 import { merge } from 'es-toolkit/compat';
@@ -101,33 +100,52 @@ function backfillLegacyDiscoveredMaterials(
 
 // Backfill for pre-discovery-tracking saves: existing material progress with no recorded visits means treat every GatherNode as found.
 // Version-gated because a new game's starting gold alone would otherwise look like legacy progress.
-function backfillLegacyGatherNodeDiscoveries(
-  discoveredGatherNodes: GameStateDiscoveredGatherNodes,
+function backfillLegacyGatherNodeVisits(
+  visitedWorldNodes: GameStateVisitedWorldNodes,
   materials: GameStateMaterials,
   version: number,
-): GameStateDiscoveredGatherNodes {
+): GameStateVisitedWorldNodes {
   const isLegacySave = version < 2;
-  const hasNoRecordedVisits = Object.keys(discoveredGatherNodes).length === 0;
+  const hasNoRecordedVisits = Object.keys(visitedWorldNodes).length === 0;
   const hasExistingProgress = Object.keys(materials).length > 0;
 
   if (!isLegacySave || !hasNoRecordedVisits || !hasExistingProgress)
-    return discoveredGatherNodes;
+    return visitedWorldNodes;
 
-  return grandfatherGatherNodeDiscoveries(
+  return ledgerBackfill(
+    visitedWorldNodes,
     worldNodesOfType('GatherNode').map((entry) => entry.nodeName),
   );
 }
 
-// Pre-ledger saves: every node the party stood at, fought at, or developed proves its map was visited.
-function visitedNodeMapNames(state: GameState): string[] {
+function visitedTownNodeNames(state: GameState): string[] {
+  return worldNodesOfType('NonPlayerKingdom')
+    .filter((entry) => {
+      const townId = worldNodeTown(entry)?.id;
+      return (
+        !!townId && state.world.towns[townId]?.firstVisitedAtTick !== undefined
+      );
+    })
+    .map((entry) => entry.nodeName);
+}
+
+// Pre-ledger saves: every node the party developed, fought at, entered as a town, or calls home was visited.
+function legacyVisitedNodeNames(state: GameState): string[] {
   const sums = globalEffectSumsFor(state);
-  const nodeNames = [
-    ...Object.keys(state.discoveredGatherNodes),
-    ...Object.keys(state.worldDiscoveries),
+  return [
+    ...visitedTownNodeNames(state),
     ...worldNodesDevelopedPastStart(state, sums, 'shrine'),
     ...worldNodesDevelopedPastStart(state, sums, 'outpost'),
     ...Object.values(state.bestiary).flatMap((entry) => entry.foundAtNodes),
     ...(state.world.homeNodeName ? [state.world.homeNodeName] : []),
+  ].filter((nodeName) => !!worldNodeByName(nodeName));
+}
+
+// Revealed nodes count too: their map was on screen.
+function visitedNodeMapNames(state: GameState): string[] {
+  const nodeNames = [
+    ...Object.keys(state.visitedWorldNodes),
+    ...Object.keys(state.worldDiscoveries),
   ];
 
   return nodeNames.flatMap((nodeName) => {
@@ -137,10 +155,14 @@ function visitedNodeMapNames(state: GameState): string[] {
 }
 
 export function migrateGameState() {
-  const state = gamestate();
+  // Pre-rename saves recorded only GatherNode visits, under `discoveredGatherNodes`.
+  const { discoveredGatherNodes, ...state } = gamestate() as GameState & {
+    discoveredGatherNodes?: GameStateVisitedWorldNodes;
+  };
   const remappedState = {
     ...state,
     tradeskills: migrateTradeskillStateKeys(state.tradeskills ?? {}),
+    visitedWorldNodes: { ...discoveredGatherNodes, ...state.visitedWorldNodes },
   };
   const newState = merge(defaultGameState(), remappedState);
 
@@ -225,14 +247,18 @@ export function migrateGameState() {
     newState.discoveredRecipes,
     contentExists,
   );
-  newState.discoveredGatherNodes = recordPrune(
-    newState.discoveredGatherNodes,
+  newState.visitedWorldNodes = recordPrune(
+    newState.visitedWorldNodes,
     (nodeName) => !!worldNodeByName(nodeName),
   );
-  newState.discoveredGatherNodes = backfillLegacyGatherNodeDiscoveries(
-    newState.discoveredGatherNodes,
+  newState.visitedWorldNodes = backfillLegacyGatherNodeVisits(
+    newState.visitedWorldNodes,
     newState.materials,
     newState.meta.version,
+  );
+  newState.visitedWorldNodes = ledgerBackfill(
+    newState.visitedWorldNodes,
+    legacyVisitedNodeNames(newState),
   );
   newState.runStats = runStatsBackfillTracking(
     newState.runStats,
@@ -291,7 +317,7 @@ export function migrateGameState() {
   newState.world.currentLocation = repairUnwalkableCurrentLocation(
     newState.world.currentLocation,
   );
-  newState.discoveredMaps = backfillDiscoveredMaps(newState.discoveredMaps, [
+  newState.discoveredMaps = ledgerBackfill(newState.discoveredMaps, [
     newState.world.currentLocation.mapName,
     ...visitedNodeMapNames(newState),
   ]);

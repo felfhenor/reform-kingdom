@@ -129,7 +129,7 @@ describe('discoveredGatherNodesFor', () => {
 
     seedGamestate((state) => {
       state.gatherNodeLevels['Wergen Woods'] = { level: 0 };
-      state.discoveredGatherNodes['Wergen Woods'] = { foundAt: 1 };
+      state.visitedWorldNodes['Wergen Woods'] = { foundAt: 1 };
     });
     expect(discoveredGatherNodesFor('wood' as ItemId)).toEqual([
       nodes['Wergen Woods'],
@@ -148,7 +148,7 @@ describe('discoveredGatherNodesFor', () => {
       }),
     ]);
     seedGamestate((state) => {
-      state.discoveredGatherNodes['Wergen Woods'] = { foundAt: 1 };
+      state.visitedWorldNodes['Wergen Woods'] = { foundAt: 1 };
     });
 
     expect(discoveredGatherNodesFor('wood' as ItemId)).toEqual([]);

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
+import { ledgerBackfill, ledgerHas, ledgerMark } from '@helpers/engine/ledger';
 import type { Ledger } from '@interfaces';
 
 beforeEach(() => {
@@ -36,5 +36,17 @@ describe('ledgerMark', () => {
     ledgerMark(ledger, 'a', 42);
 
     expect(ledger).toEqual({ a: { foundAt: 42 } });
+  });
+});
+
+describe('ledgerBackfill', () => {
+  it('adds missing keys without touching existing entries or the input', () => {
+    const ledger: Ledger = { a: { foundAt: 1000 } };
+
+    expect(ledgerBackfill(ledger, ['a', 'b'])).toEqual({
+      a: { foundAt: 1000 },
+      b: { foundAt: 5000 },
+    });
+    expect(ledger).toEqual({ a: { foundAt: 1000 } });
   });
 });

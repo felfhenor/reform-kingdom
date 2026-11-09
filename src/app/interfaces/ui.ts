@@ -47,6 +47,7 @@ export type KingdomNavGroup =
 
 export type KingdomIcon =
   | KingdomFeatureSubview
+  | 'improvements'
   | 'kingdom'
   | 'reclass'
   | 'remembrance'

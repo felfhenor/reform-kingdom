@@ -516,7 +516,7 @@ describe('nearestGatherNodeFor', () => {
         { content: grove('Undiscovered', [wood]), steps: 1 },
         { content: grove('Hidden', [wood], { hidden: true }), steps: 1 },
       ],
-      (state) => delete state.discoveredGatherNodes['Undiscovered'],
+      (state) => delete state.visitedWorldNodes['Undiscovered'],
     );
 
     expect(nearestGatherNodeFor(wood)).toEqual(nodes['Grove']);

@@ -252,6 +252,10 @@ export class PlayKingdomHomeComponent {
     modalOpen('rumors');
   }
 
+  public openImprovementsModal(): void {
+    modalOpen('improvements');
+  }
+
   public resetHome(): void {
     void homeNodeResetToDuchy();
     notifySuccess('The Duchy is your home once again!');

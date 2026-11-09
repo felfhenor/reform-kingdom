@@ -58,7 +58,7 @@ function seedWorker(overrides: Partial<WorkerContent> = {}): void {
 function seedDiscovered(): void {
   seedGamestate((state) => {
     state.workers[workerId] = defaultWorkerState();
-    state.discoveredGatherNodes[woods] = { foundAt: 1 };
+    state.visitedWorldNodes[woods] = { foundAt: 1 };
   });
 }
 
