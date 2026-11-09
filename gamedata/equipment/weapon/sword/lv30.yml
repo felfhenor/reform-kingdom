@@ -23,7 +23,8 @@
   sprite: '0206'
   slots: 2
   baseStats:
-    Strength: 35.2
+    Strength: 19.0
+    Agility: 15.0
 
   monsterTypeDamage:
     Humanoid: 15

@@ -25,7 +25,7 @@
   sprite: '0197'
   slots: 2
   baseStats:
-    Vitality: 35.3
+    Vitality: 32.5
 
   monsterTypeDamage:
     Humanoid: 10

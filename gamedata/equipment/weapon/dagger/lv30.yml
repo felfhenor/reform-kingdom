@@ -22,7 +22,7 @@
   sprite: '0201'
   slots: 2
   baseStats:
-    Agility: 35.1
+    Agility: 24.6
 
 - id: 5cdf05a3-7a6a-4fb8-9091-9b0b62ad3458
   name: Ancestral Kukri

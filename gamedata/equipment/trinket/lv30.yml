@@ -33,8 +33,8 @@
   sprite: '0198'
   slots: 2
   baseStats:
-    Luck: 5.2
-    Agility: 8.7
+    Luck: 4.2
+    Agility: 6.0
 
   gatherYieldBonuses:
     - tradeskillId: Artificing
