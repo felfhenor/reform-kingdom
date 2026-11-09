@@ -55,4 +55,4 @@
 
   effects:
     - effectType: GlobalGoldGainMultiplier
-      value: 5
+      value: 0.05
