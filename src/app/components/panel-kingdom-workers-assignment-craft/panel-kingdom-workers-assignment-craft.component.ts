@@ -91,11 +91,12 @@ export class PanelKingdomWorkersAssignmentCraftComponent {
       : undefined;
   });
 
-  // Resets once a confirmed recipe lands, so the old one never flashes back in between.
+  // Immer keeps this reference stable across ticks, so the draft resets only when any panel's confirm lands.
+  private assignment = computed(() => this.worker()?.assignment);
   public draftRecipeId = linkedSignal<unknown, RecipeId | undefined>({
     source: () => ({
       workerId: this.workerId(),
-      recipeId: this.assignedRecipeId(),
+      assignment: this.assignment(),
     }),
     computation: () => undefined,
   });
@@ -107,24 +108,8 @@ export class PanelKingdomWorkersAssignmentCraftComponent {
     () => this.isActive() && this.worker()?.status.kind !== 'Crafting',
   );
 
-  // Keeps the last recipe on screen after the worker switches to a trip.
-  public shownRecipeId = linkedSignal<
-    { workerId: WorkerId; recipeId?: RecipeId },
-    RecipeId | undefined
-  >({
-    source: () => ({
-      workerId: this.workerId(),
-      recipeId: this.assignedRecipeId(),
-    }),
-    computation: (source, previous) =>
-      source.recipeId ??
-      (previous?.source.workerId === source.workerId
-        ? previous.value
-        : undefined),
-  });
-
   public displayedRecipeId = computed(
-    () => this.draftRecipeId() ?? this.shownRecipeId(),
+    () => this.draftRecipeId() ?? this.assignedRecipeId(),
   );
 
   public recipeOptions = computed<RecipeOption[]>(() => {

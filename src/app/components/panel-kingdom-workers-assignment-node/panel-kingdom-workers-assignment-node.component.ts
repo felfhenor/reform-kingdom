@@ -108,10 +108,11 @@ export class PanelKingdomWorkersAssignmentNodeComponent {
     },
   );
 
-  // Keyed on the stored job, so drafts reset only once a confirm lands, never on trip progress.
+  // Immer keeps this reference stable across ticks, so drafts reset only when any panel's confirm lands.
+  private assignment = computed(() => this.worker()?.assignment);
   private draftSource = computed(() => ({
     workerId: this.workerId(),
-    assignment: this.nodeAssignment(),
+    assignment: this.assignment(),
   }));
   public draftNodeName = linkedSignal<unknown, string | undefined>({
     source: this.draftSource,
@@ -124,24 +125,8 @@ export class PanelKingdomWorkersAssignmentNodeComponent {
 
   public isActive = computed(() => !!this.nodeAssignment());
 
-  // Keeps the last job on screen after the worker switches to another kind of job.
-  public shownAssignment = linkedSignal<
-    { workerId: WorkerId; assignment?: WorkerGatherAssignment },
-    WorkerGatherAssignment | undefined
-  >({
-    source: () => ({
-      workerId: this.workerId(),
-      assignment: this.currentAssignment(),
-    }),
-    computation: (source, previous) =>
-      source.assignment ??
-      (previous?.source.workerId === source.workerId
-        ? previous.value
-        : undefined),
-  });
-
   public displayedNodeName = computed(
-    () => this.draftNodeName() ?? this.shownAssignment()?.nodeName,
+    () => this.draftNodeName() ?? this.currentAssignment()?.nodeName,
   );
 
   public nodeOptions = computed<WorkerAssignmentNodeOption[]>(() => {
@@ -157,7 +142,7 @@ export class PanelKingdomWorkersAssignmentNodeComponent {
   });
 
   public displayedItemId = computed(() => {
-    const itemId = this.draftItemId() ?? this.shownAssignment()?.itemId;
+    const itemId = this.draftItemId() ?? this.currentAssignment()?.itemId;
     if (!itemId) return undefined;
     return this.itemOptions().some((option) => option.id === itemId)
       ? itemId
