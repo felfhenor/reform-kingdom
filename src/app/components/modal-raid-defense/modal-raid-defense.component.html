@@ -24,25 +24,12 @@
 
             @if (row.isPartyHere) {
               <span class="badge badge-success">You are here</span>
-            } @else if (row.travelEtaSeconds !== undefined) {
-              <button
-                type="button"
-                class="btn btn-xs btn-neutral tabular-nums"
-                disabled
-              >
-                {{ etaLabel(row.travelEtaSeconds) }}
-              </button>
             } @else {
-              <button
-                type="button"
-                class="btn btn-xs btn-neutral"
-                [disabled]="!row.canTravel"
-                (click)="travelTo(row.nodeName)"
-                appSfx="ui-click"
-                [sfxTrigger]="['click', 'hover']"
-              >
-                Travel Here
-              </button>
+              <app-button-travel-here
+                [nodeName]="row.nodeName"
+                [canTravel]="row.canTravel"
+                [etaSeconds]="row.travelEtaSeconds"
+              />
             }
           </div>
 

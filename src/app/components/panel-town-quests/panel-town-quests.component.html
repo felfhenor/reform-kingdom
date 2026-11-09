@@ -14,7 +14,6 @@
         <app-slot-commission
           [row]="row"
           [fulfill]="() => fulfillCommission(row)"
-          (travel)="travelToTown()"
         />
       } @empty {
         <app-blank-slate>No commissions are available yet.</app-blank-slate>

@@ -8,6 +8,7 @@ import {
   LOCALE_ID,
   output,
 } from '@angular/core';
+import { ButtonTravelHereComponent } from '@components/button-travel-here/button-travel-here.component';
 import { SlotCompletionRewardComponent } from '@components/slot-completion-reward/slot-completion-reward.component';
 import { SlotRequirementComponent } from '@components/slot-requirement/slot-requirement.component';
 import { SFXDirective } from '@directives/sfx.directive';
@@ -17,7 +18,6 @@ import { getEntry } from '@helpers/content';
 import { recipesProducing } from '@helpers/crafting/recipes';
 import { kingdomSubviewShow } from '@helpers/engine';
 import { playSFX } from '@helpers/engine/sfx';
-import { formatDuration } from '@helpers/engine/timer';
 import { bestiaryDropQuantityLabel } from '@helpers/kingdom/bestiary.ui';
 import type {
   CommissionRequirementEntry,
@@ -34,6 +34,7 @@ import type {
   selector: 'app-slot-commission',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ButtonTravelHereComponent,
     SlotRequirementComponent,
     DecimalPipe,
     SlotCompletionRewardComponent,
@@ -53,7 +54,6 @@ export class SlotCommissionComponent {
   public fulfill = input.required<() => Promise<boolean>>();
 
   public turnIn = output<void>();
-  public travel = output<void>();
 
   public commissionName = computed(() =>
     commissionDisplayName(this.row().commission?.name ?? 'Commission'),
@@ -68,10 +68,6 @@ export class SlotCommissionComponent {
     const owned = formatNumber(entry.owned, this.locale);
     const quantity = formatNumber(entry.quantity, this.locale);
     return `${name} (${owned}/${quantity})`;
-  }
-
-  public etaLabel(seconds: number): string {
-    return formatDuration(seconds);
   }
 
   // Commission rewards aren't level-scaled, so the level passed here is inert.

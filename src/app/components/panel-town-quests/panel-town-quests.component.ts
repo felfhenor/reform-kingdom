@@ -7,7 +7,6 @@ import {
 } from '@angular/core';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { SlotCommissionComponent } from '@components/slot-commission/slot-commission.component';
-import { travelStart } from '@helpers/hero/travel';
 import {
   townCommissionFulfill,
   townCommissionRowViewModels,
@@ -30,9 +29,5 @@ export class PanelTownQuestsComponent {
 
   public fulfillCommission(row: TownCommissionRowViewModel): Promise<boolean> {
     return townCommissionFulfill(row.townId, row.slotId);
-  }
-
-  public travelToTown(): void {
-    travelStart(this.entry().nodeName);
   }
 }

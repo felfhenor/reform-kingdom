@@ -41,25 +41,12 @@
           <div class="flex justify-end shrink-0">
             @if (destination.isPartyHere) {
               <span class="badge badge-success">You are here</span>
-            } @else if (destination.travelEtaSeconds !== undefined) {
-              <button
-                type="button"
-                class="btn btn-xs btn-neutral tabular-nums"
-                disabled
-              >
-                {{ etaLabel(destination.travelEtaSeconds) }}
-              </button>
             } @else {
-              <button
-                type="button"
-                class="btn btn-xs btn-neutral"
-                [disabled]="!destination.canTravel"
-                (click)="travelTo(destination.node.nodeName)"
-                appSfx="ui-click"
-                [sfxTrigger]="['click', 'hover']"
-              >
-                Travel Here
-              </button>
+              <app-button-travel-here
+                [nodeName]="destination.node.nodeName"
+                [canTravel]="destination.canTravel"
+                [etaSeconds]="destination.travelEtaSeconds"
+              />
             }
           </div>
         }

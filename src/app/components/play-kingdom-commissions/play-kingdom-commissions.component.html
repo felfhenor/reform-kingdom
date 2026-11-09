@@ -20,7 +20,6 @@
         <app-slot-commission
           [row]="row"
           [fulfill]="() => fulfillCaravan(row)"
-          (travel)="travelTo(row.nodeName)"
         />
       } @empty {
         <app-blank-slate>
@@ -34,11 +33,7 @@
         <span class="type-section-title">Towns</span>
 
         @for (row of townRows(); track row.slotId) {
-          <app-slot-commission
-            [row]="row"
-            [fulfill]="() => fulfillTown(row)"
-            (travel)="travelTo(row.nodeName)"
-          />
+          <app-slot-commission [row]="row" [fulfill]="() => fulfillTown(row)" />
         }
       </div>
     }

@@ -9,7 +9,6 @@ import { commissionRowViewModel } from '@helpers/commission/commission-fulfill.u
 import { nextCommissionResetAt } from '@helpers/commission/commission-reset.ui';
 import { formatDuration } from '@helpers/engine/timer';
 import { uiClockTick } from '@helpers/engine/ui';
-import { travelStart } from '@helpers/hero/travel';
 import {
   townCommissionFulfill,
   townCommissionRowViewModels,
@@ -51,10 +50,6 @@ export class PlayKingdomCommissionsComponent {
       townCommissionRowViewModels(entry),
     ),
   );
-
-  public travelTo(nodeName: string): void {
-    travelStart(nodeName);
-  }
 
   public fulfillCaravan(row: CommissionRowViewModel): Promise<boolean> {
     return commissionFulfill(row.caravanId);

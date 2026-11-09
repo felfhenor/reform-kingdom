@@ -58,27 +58,11 @@
 
       <div class="flex gap-2">
         @if (!isInLocationModal() && !r.isPartyHere) {
-          @if (r.travelEtaSeconds !== undefined) {
-            <button
-              type="button"
-              class="btn btn-xs btn-neutral tabular-nums"
-              disabled
-            >
-              {{ etaLabel(r.travelEtaSeconds) }}
-            </button>
-          } @else {
-            <button
-              type="button"
-              class="btn btn-xs btn-neutral"
-              [disabled]="!r.canTravel"
-              (click)="travel.emit()"
-              appSfx="ui-click"
-              [sfxOffset]="0"
-              [sfxTrigger]="['click', 'hover']"
-            >
-              Travel Here
-            </button>
-          }
+          <app-button-travel-here
+            [nodeName]="r.nodeName"
+            [canTravel]="r.canTravel"
+            [etaSeconds]="r.travelEtaSeconds"
+          />
         }
 
         <button
