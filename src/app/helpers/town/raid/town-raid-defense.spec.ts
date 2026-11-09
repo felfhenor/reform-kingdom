@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
 import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
 import { ensureTown } from '@helpers/content/ensure-town';
 import { defaultGameState } from '@helpers/defaults';
@@ -14,8 +16,6 @@ import type {
   TownId,
   TownNodeState,
 } from '@interfaces';
-import { buildTownNodeState } from '@/testing/builders';
-import { seedContent } from '@/testing/content';
 
 const now = 1000;
 // Looked up by name, so the stored id differs on purpose.
@@ -93,7 +93,7 @@ describe('raidDefenseGlobalEffectApply', () => {
 });
 
 describe('raidTelegraphClear', () => {
-  it('clears the town’s telegraph, keeps its raid history and re-syncs the effect', () => {
+  it('clears the towns telegraph, keeps its raid history and re-syncs the effect', () => {
     const state = stateWith(
       {
         [larsia.id]: { ...telegraphed, lastRaidResolvedAtTick: 50 },

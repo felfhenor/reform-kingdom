@@ -6,6 +6,10 @@ vi.mock('@helpers/rng', async (importOriginal) => {
   return { ...actual, rngNumberRange: vi.fn(actual.rngNumberRange) };
 });
 
+import { buildEquipmentItem } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
+import { abilityJobContent, buildAbilityHero } from '@/testing/job-ability';
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { ensureRecipe } from '@helpers/content/ensure-recipe';
 import { ensureTown } from '@helpers/content/ensure-town';
@@ -31,10 +35,6 @@ import type {
   WorkerId,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
-import { buildEquipmentItem } from '@/testing/builders';
-import { seedContent } from '@/testing/content';
-import { seedGamestate } from '@/testing/gamestate';
-import { abilityJobContent, buildAbilityHero } from '@/testing/job-ability';
 
 const goldCoinId = 'gold-coin' as ItemId;
 const cloakId = 'cloak' as EquipmentId;
@@ -175,7 +175,7 @@ describe('rollDroppedRewards', () => {
       expect(rollDroppedRewards([guaranteed.recipe], 5)).toHaveLength(1);
     });
 
-    it('don’t drop when only a town crafts them', () => {
+    it('dont drop when only a town crafts them', () => {
       seedRecipe(true, 5);
       expect(rollDroppedRewards([guaranteed.recipe], 5)).toEqual([]);
     });
@@ -322,7 +322,7 @@ describe('applyResolvedDropToState', () => {
     expect(applyResolvedDropToState(state, drop)).toBe(false);
   });
 
-  it('rescues a worker drop once, leaving an already-rescued worker’s progress alone', () => {
+  it('rescues a worker drop once, leaving an already-rescued workers progress alone', () => {
     const state = defaultGameState();
 
     expect(

@@ -15,22 +15,22 @@ import { EquipmentTypeToSlot } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { ensureEquipment } from '@helpers/content/ensure-item';
+import {
+  buildEquipmentItem,
+  buildCharacter as buildHero,
+} from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { getEntry } from '@helpers/content/content';
 import { ensureStats } from '@helpers/content/ensure-helpers-stats';
+import { ensureEquipment } from '@helpers/content/ensure-item';
+import { ensureJob } from '@helpers/content/ensure-job';
+import { ensureSkillTreeNode } from '@helpers/content/ensure-skilltreenode';
 import { defaultEquipment } from '@helpers/defaults';
 import { equippedItems } from '@helpers/item/equipment';
 import {
   characterStatPriority,
   planEquipmentOptimization,
 } from '@helpers/item/equipment-optimize';
-import { ensureSkillTreeNode } from '@helpers/content/ensure-skilltreenode';
-import { ensureJob } from '@helpers/content/ensure-job';
-import { getEntry } from '@helpers/content/content';
-import {
-  buildCharacter as buildHero,
-  buildEquipmentItem,
-} from '@/testing/builders';
-import { seedContent } from '@/testing/content';
 
 function mockEquipmentItem(equipmentId: EquipmentId): EquipmentItem {
   return buildEquipmentItem(equipmentId, {
@@ -796,17 +796,17 @@ describe('characterStatPriority', () => {
     ]);
   });
 
-  it('uses the held specialization’s priority', () => {
+  it('uses the held specializations priority', () => {
     expect(characterStatPriority(hunter(['stalker']), job)).toEqual(
       stalkerPriority,
     );
   });
 
-  it('falls back to the job’s priority without a specialization', () => {
+  it('falls back to the jobs priority without a specialization', () => {
     expect(characterStatPriority(hunter([]), job)).toEqual(job.statPriority);
   });
 
-  it('falls back to the job’s priority when the specialization has none', () => {
+  it('falls back to the jobs priority when the specialization has none', () => {
     expect(characterStatPriority(hunter(['wayfinder']), job)).toEqual(
       job.statPriority,
     );

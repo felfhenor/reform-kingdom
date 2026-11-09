@@ -2,6 +2,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/task/task-events');
 
+import { captureAnalyticsEvents } from '@/testing/analytics';
+import {
+  buildCharacter,
+  buildCombat,
+  buildEquipmentItem,
+} from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
 import { ensureJob } from '@helpers/content/ensure-job';
 import { ensureSkillTreeNode } from '@helpers/content/ensure-skilltreenode';
@@ -36,14 +44,6 @@ import type {
   JobId,
   SkillTreeNodeId,
 } from '@interfaces';
-import { captureAnalyticsEvents } from '@/testing/analytics';
-import {
-  buildCharacter,
-  buildCombat,
-  buildEquipmentItem,
-} from '@/testing/builders';
-import { seedContent } from '@/testing/content';
-import { inTick, seedGamestate } from '@/testing/gamestate';
 
 const jobId = 'job-warrior' as JobId;
 const hatlessJobId = 'job-hatless' as JobId;
@@ -225,7 +225,7 @@ describe('characterEquipFromArmory', () => {
 describe('optimizeCharacterEquipment', () => {
   const optimize = () => inTick(() => optimizeCharacterEquipment(heroId));
 
-  it('fills each slot with the best armory item for the job’s stat priority', async () => {
+  it('fills each slot with the best armory item for the jobs stat priority', async () => {
     const weaker = buildEquipmentItem(dagger.id);
     const best = buildEquipmentItem(sword.id);
     const offhand = buildEquipmentItem(shield.id);
@@ -239,8 +239,8 @@ describe('optimizeCharacterEquipment', () => {
   });
 
   it.each([
-    ['the job’s', [], 'circlet'],
-    ['a held specialization’s', ['bastion'], 'helmet'],
+    ['the jobs', [], 'circlet'],
+    ['a held specializations', ['bastion'], 'helmet'],
   ])('ranks by %s stat priority', async (_, nodeIds, expected) => {
     const items = [helmet, circlet].map((hat) => buildEquipmentItem(hat.id));
     seedHero({}, items, (state) => {
@@ -270,7 +270,7 @@ describe('optimizeCharacterEquipment', () => {
     expect(armoryState()).toEqual([twoHander]);
   });
 
-  it('changes nothing mid-combat, or when the hero’s job is gone', async () => {
+  it('changes nothing mid-combat, or when the heros job is gone', async () => {
     const item = buildEquipmentItem(sword.id);
     seedHero({}, [item], inCombat);
     await optimize();

@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { buildEquipmentItem, buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 import {
   buildCommissionRequirementEntries,
   commissionOfferReputationReward,
@@ -28,8 +32,8 @@ import type {
   CaravanTraderId,
   CommissionOfferContent,
   CommissionOfferId,
-  EncounterId,
   CommissionRequirement,
+  EncounterId,
   EquipmentId,
   GameState,
   IsContentItem,
@@ -39,10 +43,6 @@ import type {
   RecipeId,
   TownId,
 } from '@interfaces';
-import { buildEquipmentItem, buildTownNodeState } from '@/testing/builders';
-import { seedContent } from '@/testing/content';
-import { seedGamestate } from '@/testing/gamestate';
-import { seedWorldNodes } from '@/testing/world';
 
 const townId = 'larsia' as TownId;
 const stick = ensureItem({
@@ -255,7 +255,7 @@ describe('rollCommissionRequirements', () => {
     }
   });
 
-  it('scales by the town’s reputation tier, only for a town commission', () => {
+  it('scales by the towns reputation tier, only for a town commission', () => {
     const scaled = offer({
       reputationTierMultipliers: [
         { tier: 0, value: 1 },

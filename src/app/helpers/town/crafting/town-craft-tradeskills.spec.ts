@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { buildTownCraftQueueEntry } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
 import { TRADESKILL_MAX_LEVEL } from '@helpers/config';
 import { ensureRecipe } from '@helpers/content/ensure-recipe';
 import { ensureTown } from '@helpers/content/ensure-town';
@@ -9,8 +11,6 @@ import {
   townTradeskillsMaterialize,
 } from '@helpers/town/crafting/town-craft-tradeskills';
 import type { RecipeId, TownId, TradeskillId } from '@interfaces';
-import { buildTownCraftQueueEntry } from '@/testing/builders';
-import { seedContent } from '@/testing/content';
 
 const townId = 'larsia' as TownId;
 const smithing = ensureTradeskill({
@@ -37,7 +37,7 @@ function seedTown(levels: { tradeskillId: TradeskillId; level: number }[]) {
 }
 
 describe('townTradeskillsMaterialize', () => {
-  it('syncs every tradeskill to the town’s seed level, defaulting to 1 and capping at the max', () => {
+  it('syncs every tradeskill to the towns seed level, defaulting to 1 and capping at the max', () => {
     seedTown([{ tradeskillId: smithing.id, level: 12 }]);
     expect(townTradeskillsMaterialize(townId, {})).toEqual({
       [smithing.id]: { level: 12 },

@@ -14,7 +14,7 @@ describe('townCraftTimeFor', () => {
     expect(townCraftTimeFor(recipe(100), town(), 25)).toBe(75);
   });
 
-  it('scales by the town’s duration multiplier and any debuff', () => {
+  it('scales by the towns duration multiplier and any debuff', () => {
     expect(townCraftTimeFor(recipe(100), town(2), 25)).toBe(150);
     expect(townCraftTimeFor(recipe(100), town(), 25, 2)).toBe(150);
   });

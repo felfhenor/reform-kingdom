@@ -1,6 +1,14 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import {
+  buildCaravanNodeState,
+  buildCharacter,
+  buildCombat,
+} from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
+import { locationOf, seedWorldNodes } from '@/testing/world';
+import {
   ensureCaravan,
   ensureCaravanTrader,
 } from '@helpers/content/ensure-caravan';
@@ -22,14 +30,6 @@ import type {
   JobId,
   TownId,
 } from '@interfaces';
-import {
-  buildCaravanNodeState,
-  buildCharacter,
-  buildCombat,
-} from '@/testing/builders';
-import { seedContent } from '@/testing/content';
-import { seedGamestate } from '@/testing/gamestate';
-import { locationOf, seedWorldNodes } from '@/testing/world';
 
 type DiscordWindow = Window & {
   discordRPCStatus?: { state?: string; details?: string };
@@ -147,7 +147,7 @@ describe('discordUpdateStatus', () => {
     expect(presenceFor(gathering).state).toBe('Gathering in Iron Vein');
   });
 
-  it('shows trading with a caravan’s current trader, or resting at its brand name without one', () => {
+  it('shows trading with a caravans current trader, or resting at its brand name without one', () => {
     expect(
       presenceFor(
         (state) =>
@@ -231,7 +231,7 @@ describe('discordUpdateStatus', () => {
     ).toBe('Paused · Exploring Whispering Woods');
   });
 
-  it('lists the party’s jobs and levels, then their average level, as the details line', () => {
+  it('lists the partys jobs and levels, then their average level, as the details line', () => {
     expect(
       presenceFor(
         (state) =>

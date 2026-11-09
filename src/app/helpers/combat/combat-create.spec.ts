@@ -1,12 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { buildCharacter, buildEquipmentItem } from '@/testing/builders';
-import { recomputeGlobalEffectSums } from '@helpers/hero/global-effect-state';
 import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
 import { abilityJobContent, buildAbilityHero } from '@/testing/job-ability';
 import { buildEffectNode, heroLearning } from '@/testing/skill-tree';
-import { DEBUFF_POTENCY_PER_RANK } from '@helpers/config';
 import {
   combatantFromCharacter,
   combatantFromMonster,
@@ -14,6 +12,7 @@ import {
   combatantsFromTownGuardians,
   combatCreateForEncounter,
 } from '@helpers/combat/combat-create';
+import { DEBUFF_POTENCY_PER_RANK } from '@helpers/config';
 import { ensureEdict } from '@helpers/content/ensure-edict';
 import { ensureEquipment } from '@helpers/content/ensure-item';
 import { ensureJob } from '@helpers/content/ensure-job';
@@ -30,6 +29,7 @@ import {
   defaultStats,
   defaultTagResistances,
 } from '@helpers/defaults';
+import { recomputeGlobalEffectSums } from '@helpers/hero/global-effect-state';
 import type {
   Character,
   EdictId,
@@ -97,7 +97,7 @@ beforeEach(() => {
 });
 
 describe('combatantFromCharacter', () => {
-  it('fights as a hero with the character’s job, level and pools', () => {
+  it('fights as a hero with the characters job, level and pools', () => {
     const character = ranger({ level: 4, hp: 6, ep: 3 });
 
     expect(combatantFromCharacter(character)).toMatchObject({

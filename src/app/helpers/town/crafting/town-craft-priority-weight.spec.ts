@@ -1,5 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 import {
   TOWN_PRIORITY_MAX_FAILURES_FOR_WEIGHT,
   TOWN_PRIORITY_WEIGHT_PER_FAILURE,
@@ -28,9 +31,6 @@ import type {
   TownId,
   TownSpecialtyPriorityEntry,
 } from '@interfaces';
-import { buildTownNodeState } from '@/testing/builders';
-import { seedContent } from '@/testing/content';
-import { seedGamestate } from '@/testing/gamestate';
 
 const cactspine = 'cactspine' as ItemId;
 const petrifiwood = 'petrifiwood' as ItemId;
@@ -83,7 +83,7 @@ beforeEach(() => {
 });
 
 describe('townItemPriorityWeight', () => {
-  it('raises the weight of a struggling recipe’s materials with each failure, up to the cap', () => {
+  it('raises the weight of a struggling recipes materials with each failure, up to the cap', () => {
     expect(townItemPriorityWeight(struggling(4, ring), cactspine)).toBe(
       weightAt(4),
     );
@@ -117,7 +117,7 @@ describe('townItemPriorityWeight', () => {
 });
 
 describe('townReservedMaterialQuantity', () => {
-  it('reserves what every struggling recipe needs, less the asking recipe’s own share', () => {
+  it('reserves what every struggling recipe needs, less the asking recipes own share', () => {
     const priority = struggling(1, ring, pendant);
 
     expect(townReservedMaterialQuantity(priority, cactspine)).toBe(4);

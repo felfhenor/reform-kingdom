@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { seedContent } from '@/testing/content';
 import { ensureTown } from '@helpers/content/ensure-town';
 import { defaultTownWorkerState } from '@helpers/town/worker/town-worker-progression';
 import {
@@ -8,7 +9,6 @@ import {
   townWorkers,
 } from '@helpers/town/worker/town-worker-roster';
 import type { TownId, WorkerId } from '@interfaces';
-import { seedContent } from '@/testing/content';
 
 const darwinId = 'darwin' as WorkerId;
 const talbotId = 'talbot' as WorkerId;
@@ -23,7 +23,7 @@ const town = ensureTown({
 });
 
 describe('townWorkers', () => {
-  it('reads the town’s roster, empty for a town gone from content', () => {
+  it('reads the towns roster, empty for a town gone from content', () => {
     seedContent([town]);
     expect(townWorkers(town.id)).toEqual(roster);
 

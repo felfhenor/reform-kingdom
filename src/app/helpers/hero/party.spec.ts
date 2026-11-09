@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { buildCharacter, buildEquipmentItem } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
+import { buildEffectNode, heroLearning } from '@/testing/skill-tree';
 import {
   CHARACTER_MAX_LEVEL,
   CHARACTER_XP_END,
@@ -16,6 +20,7 @@ import {
   defaultGlobalEffectSums,
   defaultStats,
 } from '@helpers/defaults';
+import { recomputeGlobalEffectSums } from '@helpers/hero/global-effect-state';
 import {
   affixEffectsStatsPerLevel,
   characterRecalculateStats,
@@ -42,11 +47,6 @@ import type {
   TradeskillId,
   TrainerTeachingId,
 } from '@interfaces';
-import { buildCharacter, buildEquipmentItem } from '@/testing/builders';
-import { recomputeGlobalEffectSums } from '@helpers/hero/global-effect-state';
-import { seedContent } from '@/testing/content';
-import { buildEffectNode, heroLearning } from '@/testing/skill-tree';
-import { seedGamestate } from '@/testing/gamestate';
 
 const jobId = 'job-explorer' as JobId;
 const cloak = ensureEquipment({
@@ -383,7 +383,7 @@ describe('party-wide reads', () => {
     expect(isPartyAtFullEnergy()).toBe(false);
   });
 
-  it('collects affix effects and gather yield bonuses from every hero’s gear', () => {
+  it('collects affix effects and gather yield bonuses from every heros gear', () => {
     seedParty(
       hero({
         equipment: withGear({

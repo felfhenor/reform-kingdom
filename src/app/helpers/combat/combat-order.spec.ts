@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
+import { buildCharacter } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 import {
   combatOrderClauseUsesUnknownFamily,
   combatOrderClauses,
@@ -14,9 +17,6 @@ import type {
   JobDefaultCombatOrder,
   JobId,
 } from '@interfaces';
-import { buildCharacter } from '@/testing/builders';
-import { seedContent } from '@/testing/content';
-import { seedGamestate } from '@/testing/gamestate';
 
 const warrior = 'warrior' as JobId;
 const ranger = 'ranger' as JobId;
@@ -28,7 +28,7 @@ const clause: CombatOrderClause = {
 };
 
 describe('combatOrderClauses', () => {
-  it('reads a party member’s orders for a job, empty for another job or a missing hero', () => {
+  it('reads a party members orders for a job, empty for another job or a missing hero', () => {
     const hero = buildCharacter({ combatOrders: { [warrior]: [clause] } });
     seedGamestate((state) => (state.world.party = [hero]));
 

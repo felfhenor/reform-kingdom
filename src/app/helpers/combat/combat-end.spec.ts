@@ -10,12 +10,21 @@ vi.mock('@helpers/town/raid/town-raid-resolve');
 vi.mock('@helpers/task/task-progress');
 vi.mock('@helpers/engine/sfx');
 
-import { combatantMessageToken, combatLog } from '@helpers/combat/combat-log';
+import { captureAnalyticsEvents } from '@/testing/analytics';
+import {
+  buildCharacter,
+  buildCombat,
+  buildHeroCombatant,
+  buildMonsterCombatant,
+} from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 import {
   combatCheckIfOver,
   combatResolveAutoWin,
   isCombatOver,
 } from '@helpers/combat/combat-end';
+import { combatantMessageToken, combatLog } from '@helpers/combat/combat-log';
 import { monsterXpReward, xpForOverLevel } from '@helpers/combat/monster';
 import { commissionRecordMonsterKill } from '@helpers/commission/commission-kill-progress';
 import {
@@ -63,15 +72,6 @@ import type {
   RegionId,
   TownId,
 } from '@interfaces';
-import { captureAnalyticsEvents } from '@/testing/analytics';
-import {
-  buildCharacter,
-  buildCombat,
-  buildHeroCombatant,
-  buildMonsterCombatant,
-} from '@/testing/builders';
-import { seedContent } from '@/testing/content';
-import { inTick, seedGamestate } from '@/testing/gamestate';
 
 const goblinId = 'goblin' as MonsterId;
 const encounterId = 'field-ruins' as EncounterId;
@@ -218,7 +218,7 @@ describe('combatCheckIfOver', () => {
       expect(gamestate().materials[oreId]).toBeUndefined();
     });
 
-    it('starts the next fight, granting this fight’s drops first, without resetting combat', () => {
+    it('starts the next fight, granting this fights drops first, without resetting combat', () => {
       seedContent([
         goblin,
         encounter({ fights: [{ monsters: [] }, { monsters: [] }] }),

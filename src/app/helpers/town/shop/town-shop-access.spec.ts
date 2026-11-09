@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 import { ensureTown } from '@helpers/content/ensure-town';
 import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
 import { townShopItemCap } from '@helpers/town/shop/town-shop-access';
 import type { TownId } from '@interfaces';
-import { buildTownNodeState } from '@/testing/builders';
-import { seedContent } from '@/testing/content';
-import { seedGamestate } from '@/testing/gamestate';
 
 const townId = 'larsia' as TownId;
 
@@ -24,7 +24,7 @@ function seedTownAtTier(
 }
 
 describe('townShopItemCap', () => {
-  it('uses the cap of the town’s reputation tier, or the nearest listed tier below it', () => {
+  it('uses the cap of the towns reputation tier, or the nearest listed tier below it', () => {
     const caps = [
       { tier: 0, value: 5 },
       { tier: 3, value: 11 },

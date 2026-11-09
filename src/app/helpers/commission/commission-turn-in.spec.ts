@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { buildEquipmentItem } from '@/testing/builders';
 import { combatLog } from '@helpers/combat/combat-log';
 import {
   commissionDisplayName,
@@ -19,7 +20,6 @@ import type {
   MonsterId,
   WorkerId,
 } from '@interfaces';
-import { buildEquipmentItem } from '@/testing/builders';
 
 const stick = 'wergen-stick' as ItemId;
 const sword = 'sword' as EquipmentId;
@@ -65,7 +65,7 @@ describe('spendCommissionRequirements', () => {
 });
 
 describe('grantCommissionRewards', () => {
-  it('rolls the offer’s rewards, adds them to the state and returns them', () => {
+  it('rolls the offers rewards, adds them to the state and returns them', () => {
     const offer = ensureCommissionOffer({
       id: 'offer-a' as CommissionOfferId,
       rewards: [

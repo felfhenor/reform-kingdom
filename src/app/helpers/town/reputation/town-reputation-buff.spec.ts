@@ -97,7 +97,7 @@ describe('townReputationBuffEffects', () => {
 });
 
 describe('townReputationBuffRefresh', () => {
-  it('grants the town’s buff for its tier on its map, described from the tier', () => {
+  it('grants the towns buff for its tier on its map, described from the tier', () => {
     seedTown(1);
 
     refresh(desert);

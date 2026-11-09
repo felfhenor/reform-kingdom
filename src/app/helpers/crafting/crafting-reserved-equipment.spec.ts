@@ -1,11 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
+import { buildCraftQueueEntry, buildEquipmentItem } from '@/testing/builders';
+import { ensureRecipe } from '@helpers/content/ensure-recipe';
 import {
   backfillReservedEquipment,
   refundQueueEntry,
   reservedEquipmentIdsFor,
   splitReservedEquipment,
 } from '@helpers/crafting/crafting-reserved-equipment';
+import { defaultGameState } from '@helpers/defaults';
 import type {
   AffixId,
   CraftQueueEntry,
@@ -17,9 +20,6 @@ import type {
   RecipeId,
   TradeskillId,
 } from '@interfaces';
-import { ensureRecipe } from '@helpers/content/ensure-recipe';
-import { defaultGameState } from '@helpers/defaults';
-import { buildCraftQueueEntry, buildEquipmentItem } from '@/testing/builders';
 
 const infusedDagger = buildEquipmentItem('dagger' as EquipmentId, {
   id: 'dagger-1' as EquipmentItemId,
@@ -134,7 +134,7 @@ describe('reservedEquipmentIdsFor', () => {
 });
 
 describe('backfillReservedEquipment', () => {
-  it('keeps an entry’s existing reservation as-is', () => {
+  it('keeps an entrys existing reservation as-is', () => {
     const entry = buildQueueEntry({ reservedEquipment: [infusedDagger] });
 
     expect(backfillReservedEquipment(entry, upgradeRecipe)).toBe(

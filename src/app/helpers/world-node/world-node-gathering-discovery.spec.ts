@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 import {
-  ensureGatherResult,
   ensureGathering,
+  ensureGatherResult,
 } from '@helpers/content/ensure-gathernode';
 import {
   discoveredGatherNodesFor,
@@ -16,9 +19,6 @@ import type {
   TradeskillId,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
-import { seedContent } from '@/testing/content';
-import { seedGamestate } from '@/testing/gamestate';
-import { seedWorldNodes } from '@/testing/world';
 
 const result = (itemId: string, overrides: Partial<GatherResult> = {}) =>
   ensureGatherResult({
@@ -71,7 +71,7 @@ describe('worldNodeGatherMaterialIds', () => {
     ]);
   });
 
-  it('is empty for a node that isn’t a gather node', () => {
+  it('is empty for a node that isnt a gather node', () => {
     const nodes = seedWoods([result('wood')]);
 
     expect(materialsAt(nodes, 'Signpost')).toEqual([]);
@@ -137,7 +137,7 @@ describe('discoveredGatherNodesFor', () => {
     expect(discoveredGatherNodesFor('sap' as ItemId)).toEqual([]);
   });
 
-  it('skips a hidden node the player hasn’t revealed', () => {
+  it('skips a hidden node the player hasnt revealed', () => {
     seedWoods([]);
     seedContent([
       ensureGathering({

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { buildEquipmentItem } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
 import { ensureAffix } from '@helpers/content/ensure-affix';
 import {
   ensureCollectible,
@@ -33,8 +35,6 @@ import type {
   TradeskillId,
   WorkerId,
 } from '@interfaces';
-import { buildEquipmentItem } from '@/testing/builders';
-import { seedContent } from '@/testing/content';
 
 const ore = ensureItem({
   id: 'ore' as ItemId,
@@ -62,7 +62,7 @@ const trinket = ensureCollectible({
 });
 
 describe('itemPreviewDisplay', () => {
-  it('shows an item’s infusion stats', () => {
+  it('shows an items infusion stats', () => {
     expect(itemPreviewDisplay('item', ore)).toMatchObject({
       name: 'Copper Ore',
       description: 'Shiny.',
@@ -142,7 +142,7 @@ describe('itemPreviewDisplay', () => {
     ]);
   });
 
-  it('names an infusion material’s skill stat bonuses by their skill', () => {
+  it('names an infusion materials skill stat bonuses by their skill', () => {
     seedContent([
       ensureSkill({
         id: 'snipe-1' as EquipmentSkillId,
@@ -162,7 +162,7 @@ describe('itemPreviewDisplay', () => {
     ]);
   });
 
-  it('shows a collectible’s effects, without stats or a level requirement', () => {
+  it('shows a collectibles effects, without stats or a level requirement', () => {
     expect(itemPreviewDisplay('collectible', trinket)).toEqual({
       name: 'Trinket',
       description: 'Curious.',
@@ -203,7 +203,7 @@ describe('resolveRewardDisplay', () => {
     });
   });
 
-  it('previews a recipe reward as what it crafts, under the recipe’s own name', () => {
+  it('previews a recipe reward as what it crafts, under the recipes own name', () => {
     const smithing = ensureTradeskill({
       id: 'smithing' as TradeskillId,
       name: 'Smithing',

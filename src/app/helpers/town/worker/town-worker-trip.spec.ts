@@ -3,6 +3,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('@helpers/engine/gather-vfx');
 vi.mock('@helpers/pathfinding/pathfinding-travel');
 
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 import {
   ensureGatherResult,
   ensureGathering,
@@ -33,10 +37,6 @@ import type {
   WorkerId,
   WorkerStatusGathering,
 } from '@interfaces';
-import { buildTownNodeState } from '@/testing/builders';
-import { seedContent } from '@/testing/content';
-import { inTick, seedGamestate } from '@/testing/gamestate';
-import { seedWorldNodes } from '@/testing/world';
 
 const darwin = ensureWorker({
   id: 'darwin' as WorkerId,
@@ -299,7 +299,7 @@ describe('town worker travel', () => {
     });
   });
 
-  it('banks no more hidden gold than the town’s gold cap, and still rests the worker after an empty haul', () => {
+  it('banks no more hidden gold than the towns gold cap, and still rests the worker after an empty haul', () => {
     const larsia = town();
     seedWorker(larsia, returning(goldCap));
     travelHome(larsia);

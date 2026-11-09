@@ -10,6 +10,9 @@ vi.mock('@helpers/rng', async (importOriginal) => {
   };
 });
 
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 import {
   SPECIALTY_RECIPE_WEIGHT,
   TOWN_PRIORITY_MAX_FAILURES_FOR_WEIGHT,
@@ -30,9 +33,6 @@ import type {
   TownSpecialtyPriorityEntry,
   TradeskillId,
 } from '@interfaces';
-import { buildTownNodeState } from '@/testing/builders';
-import { seedContent } from '@/testing/content';
-import { seedGamestate } from '@/testing/gamestate';
 
 const smithing = 'smithing' as TradeskillId;
 const woodworking = 'woodworking' as TradeskillId;
@@ -89,7 +89,7 @@ beforeEach(() => {
 });
 
 describe('townPickRecipeToQueue', () => {
-  it('picks among every craftable recipe across tradeskills, favoring the town’s specialty', () => {
+  it('picks among every craftable recipe across tradeskills, favoring the towns specialty', () => {
     vi.mocked(isRecipeCraftableByTown).mockImplementation(
       (candidate) => candidate.id !== blade.id,
     );

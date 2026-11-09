@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 import {
   ensureGatherResult,
   ensureGathering,
@@ -25,9 +28,6 @@ import type {
   WorkerId,
   WorkerStatusGathering,
 } from '@interfaces';
-import { seedContent } from '@/testing/content';
-import { seedGamestate } from '@/testing/gamestate';
-import { seedWorldNodes } from '@/testing/world';
 
 const WORKER_ID = 'weaver-nell' as WorkerId;
 const COPPER_ID = 'copper-ore' as ItemId;
@@ -112,7 +112,7 @@ describe('workerGatherRate', () => {
   const speedAt = (level: number) =>
     workerStatsForLevel(workerContent, level).gatherSpeed;
 
-  it('scales the worker’s gather speed by the item’s share of the table at the node’s level', () => {
+  it('scales the workers gather speed by the items share of the table at the nodes level', () => {
     const gathering = buildGathering();
 
     expect(workerGatherRate(workerContent, 1, gathering, COPPER_ID, 0)).toBe(
@@ -129,7 +129,7 @@ describe('workerGatherRate', () => {
     ).toBeCloseTo(speedAt(11) * (80 / 100));
   });
 
-  it('is 0 for an item the node can’t yield at its level', () => {
+  it('is 0 for an item the node cant yield at its level', () => {
     const gathering = buildGathering();
 
     expect(
@@ -164,7 +164,7 @@ describe('workerGatherNodeHasItem', () => {
     expect(workerGatherNodeHasItem('Wergen Woods', GOLD_VEIN_ID)).toBe(true);
   });
 
-  it('is false for a node that isn’t a gather node, or doesn’t exist', () => {
+  it('is false for a node that isnt a gather node, or doesnt exist', () => {
     seedWoods();
 
     expect(workerGatherNodeHasItem('Signpost', COPPER_ID)).toBe(false);

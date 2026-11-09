@@ -2,7 +2,12 @@ import { beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
 vi.mock('@helpers/commission/commission-tick');
 
+import { buildCaravanNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
+import { locationOf, seedWorldNodes } from '@/testing/world';
 import {
+  backfillDiscoveredTraders,
   caravanBrandName,
   caravanBusyTraderIds,
   caravanEligibleTraders,
@@ -11,10 +16,9 @@ import {
   caravanTimerLabel,
   caravanTimerUrgency,
   caravanTraderMapNames,
-  backfillDiscoveredTraders,
   isCaravanDiscovered,
-  isTraderDiscovered,
   isPartyAtCaravan,
+  isTraderDiscovered,
 } from '@helpers/caravan/caravan';
 import { commissionGenerateIfMissing } from '@helpers/commission/commission-tick';
 import {
@@ -33,10 +37,6 @@ import type {
   CaravanTraderContent,
   CaravanTraderId,
 } from '@interfaces';
-import { buildCaravanNodeState } from '@/testing/builders';
-import { seedContent } from '@/testing/content';
-import { inTick, seedGamestate } from '@/testing/gamestate';
-import { locationOf, seedWorldNodes } from '@/testing/world';
 
 const caravan = ensureCaravan({
   id: 'carrina-duchy' as CaravanId,
@@ -160,7 +160,7 @@ describe('isPartyAtCaravan', () => {
       { name: 'Field', type: 'ExploreNode', x: 3 },
     ]);
 
-  it('is true only while standing on that caravan’s node', () => {
+  it('is true only while standing on that caravans node', () => {
     const entries = nodes();
     const standOn = (name: string) =>
       seedGamestate(

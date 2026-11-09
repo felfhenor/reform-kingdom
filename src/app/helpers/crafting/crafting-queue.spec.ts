@@ -7,6 +7,10 @@ vi.mock('@helpers/rng', async (importOriginal) => ({
 }));
 vi.mock('@helpers/task/task-progress');
 
+import { captureAnalyticsEvents } from '@/testing/analytics';
+import { buildCraftQueueEntry, buildEquipmentItem } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 import { combatLog } from '@helpers/combat/combat-log';
 import { MAX_CRAFTABLE_CAP } from '@helpers/config';
 import {
@@ -44,10 +48,6 @@ import type {
   TradeskillBuildingState,
   TradeskillId,
 } from '@interfaces';
-import { captureAnalyticsEvents } from '@/testing/analytics';
-import { buildCraftQueueEntry, buildEquipmentItem } from '@/testing/builders';
-import { seedContent } from '@/testing/content';
-import { inTick, seedGamestate } from '@/testing/gamestate';
 
 const BLACKSMITHING_ID = 'blacksmithing' as TradeskillId;
 const WOODWORKING_ID = 'woodworking' as TradeskillId;
@@ -652,7 +652,7 @@ describe('reserved equipment', () => {
     ]);
   });
 
-  it('completing a unit drops only that unit’s reserved gear', () => {
+  it('completing a unit drops only that units reserved gear', () => {
     seedBlacksmithing({
       queue: [
         entry({
@@ -668,7 +668,7 @@ describe('reserved equipment', () => {
     expect(blacksmithing().queue[0].reservedEquipment).toEqual([plainDagger]);
   });
 
-  it('consumes the last unit’s reserved gear when the batch finishes', () => {
+  it('consumes the last units reserved gear when the batch finishes', () => {
     seedBlacksmithing(
       {
         queue: [

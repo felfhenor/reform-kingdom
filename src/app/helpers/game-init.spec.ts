@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('@helpers/migrate');
 vi.mock('@helpers/savefile/savefile-load');
 
+import { buildCharacter, buildCombat } from '@/testing/builders';
+import { seedGamestate } from '@/testing/gamestate';
 import { combatLog, combatMessageLog } from '@helpers/combat/combat-log';
 import {
   gamePlayView,
@@ -15,8 +17,6 @@ import { migrateGameState } from '@helpers/migrate';
 import { savefileMarkFresh } from '@helpers/savefile/savefile-load';
 import { gamestate } from '@helpers/state-game';
 import { getOption, setOption } from '@helpers/state-options';
-import { buildCharacter, buildCombat } from '@/testing/builders';
-import { seedGamestate } from '@/testing/gamestate';
 
 beforeEach(() => {
   vi.resetAllMocks();
@@ -47,7 +47,7 @@ describe('gameReset', () => {
     expect(partyWhenUnblocked).toBe(1);
   });
 
-  it('unpauses the gameloop and clears the previous session’s view and log', () => {
+  it('unpauses the gameloop and clears the previous sessions view and log', () => {
     setOption('gameloopPaused', true);
     setGamePlayView('town');
     kingdomSubviewShow('museum');

@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { buildCharacter, buildEquipmentItem } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 import {
   caravanIsTradeSoldOut,
   caravanTradeMaxQuantity,
@@ -29,10 +33,6 @@ import type {
   RecipeId,
   RumorId,
 } from '@interfaces';
-import { buildCharacter, buildEquipmentItem } from '@/testing/builders';
-import { seedContent } from '@/testing/content';
-import { seedGamestate } from '@/testing/gamestate';
-import { seedWorldNodes } from '@/testing/world';
 
 const goldCoin = ensureItem({ id: 'gold-coin' as ItemId, name: 'Gold Coin' });
 const scrip = ensureItem({ id: 'scrip' as ItemId, name: 'Trader Scrip' });
@@ -70,13 +70,13 @@ beforeEach(() => {
 });
 
 describe('caravanTradePrice', () => {
-  it('marks sells up and buys down by the caravan’s markups, never below 1 gold', () => {
+  it('marks sells up and buys down by the caravans markups, never below 1 gold', () => {
     expect(caravanTradePrice(caravan(), trade({ type: 'sell' }))).toBe(125);
     expect(caravanTradePrice(caravan(), trade({ type: 'buy' }))).toBe(85);
     expect(caravanTradePrice(caravan(0, -100), trade({ type: 'buy' }))).toBe(1);
   });
 
-  it('applies the party’s caravan affixes for the trade’s direction only', () => {
+  it('applies the partys caravan affixes for the trades direction only', () => {
     const wearing = (...effects: AffixEffect[]) => {
       const affix = ensureAffix({ id: 'trader' as AffixId, effects });
       seedContent([goldCoin, scrip, sword, affix]);
@@ -157,7 +157,7 @@ describe('caravanTradeOwnedQuantity', () => {
     caravanTradeOwnedQuantity(trade({}), state),
   ];
 
-  it('counts what the player holds of the trade’s target', () => {
+  it('counts what the player holds of the trades target', () => {
     seedGamestate(owning);
 
     expect(ownedOf()).toEqual([7, 2, 3, 1, 0]);

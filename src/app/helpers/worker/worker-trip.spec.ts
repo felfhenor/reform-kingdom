@@ -1,11 +1,14 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
+import { WORKER_COMBAT_BASE_TICKS } from '@helpers/config';
+import { ensureEncounter } from '@helpers/content/ensure-encounternode';
 import {
   ensureGatherResult,
   ensureGathering,
 } from '@helpers/content/ensure-gathernode';
-import { WORKER_COMBAT_BASE_TICKS } from '@helpers/config';
-import { ensureEncounter } from '@helpers/content/ensure-encounternode';
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { ensureItem } from '@helpers/content/ensure-item';
 import { ensureMonster } from '@helpers/content/ensure-monster';
@@ -33,9 +36,6 @@ import type {
   WorkerStatusGathering,
   WorkerTripHost,
 } from '@interfaces';
-import { seedContent } from '@/testing/content';
-import { inTick, seedGamestate } from '@/testing/gamestate';
-import { seedWorldNodes } from '@/testing/world';
 
 const nell = ensureWorker({
   id: 'weaver-nell' as WorkerId,
@@ -167,7 +167,7 @@ describe('workerTripGatheringTick', () => {
     });
   });
 
-  it('scales the rate by the host’s multiplier', () => {
+  it('scales the rate by the hosts multiplier', () => {
     const ticksForOneUnit = (gatherRateMultiplier: number) => {
       const { host } = stubHost({ gatherRateMultiplier });
       seedWorker(gathering());

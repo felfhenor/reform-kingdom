@@ -1,14 +1,14 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { buildCombat } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
+import { locationOf, seedWorldNodes } from '@/testing/world';
 import { OUTPOST_TELEPORT_LEVEL } from '@helpers/config';
 import { ensureOutpost } from '@helpers/content/ensure-outpost';
 import { ledgerMark } from '@helpers/engine/ledger';
 import { outpostCanTeleport } from '@helpers/world-node/world-node-outpost-teleport';
 import type { GameState, OutpostId, WorldNodeEntry } from '@interfaces';
-import { buildCombat } from '@/testing/builders';
-import { seedContent } from '@/testing/content';
-import { seedGamestate } from '@/testing/gamestate';
-import { locationOf, seedWorldNodes } from '@/testing/world';
 
 const names = ['Carrina Outpost', 'Larsian Outpost', 'Hidden Outpost'];
 let carrina: WorldNodeEntry;
@@ -50,7 +50,7 @@ describe('outpostCanTeleport', () => {
     expect(outpostCanTeleport(carrina, larsian)).toBe(true);
   });
 
-  it('refuses a jump to the outpost the party is at, or to one it can’t see', () => {
+  it('refuses a jump to the outpost the party is at, or to one it cant see', () => {
     seedTeleports();
 
     expect(outpostCanTeleport(carrina, carrina)).toBe(false);

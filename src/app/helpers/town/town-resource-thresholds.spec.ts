@@ -1,5 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 import { ensureItem } from '@helpers/content/ensure-item';
 import { ensureTown } from '@helpers/content/ensure-town';
 import {
@@ -13,9 +16,6 @@ import type {
   TownId,
   TownMaterialThreshold,
 } from '@interfaces';
-import { buildTownNodeState } from '@/testing/builders';
-import { seedContent } from '@/testing/content';
-import { seedGamestate } from '@/testing/gamestate';
 
 const oreId = 'copper-ore' as ItemId;
 const gold = ensureItem({ id: 'gold' as ItemId, name: 'Gold Coin' });
@@ -44,7 +44,7 @@ beforeEach(() => {
 });
 
 describe('townMaterialThreshold', () => {
-  it('reads each town’s own cap, leaving items without one uncapped', () => {
+  it('reads each towns own cap, leaving items without one uncapped', () => {
     const capped = town([{ itemId: oreId, maxQuantity: 200 }]);
     const uncapped = town([], 'elsewhere');
 

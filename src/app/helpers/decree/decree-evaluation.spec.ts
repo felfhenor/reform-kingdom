@@ -2,6 +2,24 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/decree/decree-route');
 
+import { buildCharacter } from '@/testing/builders';
+import {
+  decreeClause,
+  explore,
+  grove,
+  hurtAndWaiting,
+  mystical,
+  mysticalUp,
+  nodeFailures,
+  partyAt,
+  raidOn,
+  seedDecreeWorld,
+  standingAt,
+  stocked,
+  town,
+  useStubDecreeRoutes,
+  withEdits,
+} from '@/testing/decree';
 import {
   CHARACTER_MAX_LEVEL,
   LEVEL_UP_NODE_FAILURE_LIMIT,
@@ -29,24 +47,6 @@ import type {
   GameState,
   ItemId,
 } from '@interfaces';
-import { buildCharacter } from '@/testing/builders';
-import {
-  decreeClause,
-  explore,
-  grove,
-  hurtAndWaiting,
-  mystical,
-  mysticalUp,
-  nodeFailures,
-  partyAt,
-  raidOn,
-  seedDecreeWorld,
-  standingAt,
-  stocked,
-  town,
-  useStubDecreeRoutes,
-  withEdits,
-} from '@/testing/decree';
 
 useStubDecreeRoutes();
 
@@ -533,7 +533,7 @@ describe('clauseTargetNode', () => {
       targetQuantity: 10,
     });
 
-  it('targets a GatherMaterial clause’s pinned node, whatever it yields', () => {
+  it('targets a GatherMaterial clauses pinned node, whatever it yields', () => {
     const nodes = seedDecreeWorld([
       { content: grove('Quarry', [stone]), steps: 2 },
       { content: grove('Grove', [wood]), steps: 1 },
@@ -562,7 +562,7 @@ describe('clauseTargetNode', () => {
     }
   });
 
-  it('targets a FarmNode clause’s node', () => {
+  it('targets a FarmNode clauses node', () => {
     const nodes = seedDecreeWorld([
       {
         content: explore('Forest Ruins', 1, 1, { completionRewards: [] }),

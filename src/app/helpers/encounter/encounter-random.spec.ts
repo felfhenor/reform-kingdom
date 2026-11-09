@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { seedGamestate } from '@/testing/gamestate';
 import { ensureEncounterRandom } from '@helpers/content/ensure-encounternode';
 import {
   encounterRandomIsAvailable,
@@ -9,7 +10,6 @@ import {
 } from '@helpers/encounter/encounter-random';
 import { formatDuration } from '@helpers/engine/timer';
 import type { EncounterRandomId, EncounterRandomNodeState } from '@interfaces';
-import { seedGamestate } from '@/testing/gamestate';
 
 const shrineId = 'gobslime-shrine' as EncounterRandomId;
 const shrine = (resetTime = 3600) =>
@@ -28,7 +28,7 @@ const atTick = (numTicks: number) =>
   seedGamestate((state) => (state.clock.numTicks = numTicks));
 
 describe('encounterRandomState', () => {
-  it('reads the node’s state, if it has any', () => {
+  it('reads the nodes state, if it has any', () => {
     const rolled = nodeState();
     seedGamestate((state) => (state.world.exploreRandom[shrineId] = rolled));
 

@@ -4,23 +4,6 @@ vi.mock('@helpers/decree/decree-route');
 vi.mock('@helpers/hero/travel');
 vi.mock('@helpers/town/raid/town-raid-combat');
 
-import { DECREE_PRIORITY_RECHECK_INTERVAL_TICKS } from '@helpers/config';
-import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
-import { autoModeProcessTick } from '@helpers/decree/auto-mode';
-import { isGlobalEffectActive } from '@helpers/hero/global-effects';
-import { applyGlobalEffectAdd } from '@helpers/hero/global-effect-state';
-import { travelStart } from '@helpers/hero/travel';
-import { applyMaterialDelta } from '@helpers/item/materials';
-import { gamestate, updateGamestate } from '@helpers/state-game';
-import { raidEngageCombat } from '@helpers/town/raid/town-raid-combat';
-import type {
-  DecreeClause,
-  DecreeClauseId,
-  GameState,
-  GatheringId,
-  GlobalEffectId,
-  ItemId,
-} from '@interfaces';
 import { buildCombat } from '@/testing/builders';
 import {
   decreeClause,
@@ -38,6 +21,23 @@ import {
   withEdits,
 } from '@/testing/decree';
 import { inTick } from '@/testing/gamestate';
+import { DECREE_PRIORITY_RECHECK_INTERVAL_TICKS } from '@helpers/config';
+import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
+import { autoModeProcessTick } from '@helpers/decree/auto-mode';
+import { applyGlobalEffectAdd } from '@helpers/hero/global-effect-state';
+import { isGlobalEffectActive } from '@helpers/hero/global-effects';
+import { travelStart } from '@helpers/hero/travel';
+import { applyMaterialDelta } from '@helpers/item/materials';
+import { gamestate, updateGamestate } from '@helpers/state-game';
+import { raidEngageCombat } from '@helpers/town/raid/town-raid-combat';
+import type {
+  DecreeClause,
+  DecreeClauseId,
+  GameState,
+  GatheringId,
+  GlobalEffectId,
+  ItemId,
+} from '@interfaces';
 
 useStubDecreeRoutes();
 
@@ -201,7 +201,7 @@ describe('the Auto Mode global effect', () => {
 });
 
 describe('picking a clause while idle', () => {
-  it('travels to the top clause’s target and tracks it as active', () => {
+  it('travels to the top clauses target and tracks it as active', () => {
     seedAutoMode([gatherOre, finishAreas], {
       edit: stocked(ore, gatherOre.targetQuantity),
     });
@@ -378,7 +378,7 @@ describe('gathering for a GatherMaterial clause', () => {
     expect(gathering().status).toBe('Idle');
   });
 
-  it('never adopts a clause for a material the node doesn’t yield, even pinned there', () => {
+  it('never adopts a clause for a material the node doesnt yield, even pinned there', () => {
     seedAutoMode([{ ...gatherOre, nodeName: 'Wergen Woods' }], {
       gatheringAt: 'Wergen Woods',
     });
@@ -447,7 +447,7 @@ describe('an orphaned gather', () => {
     expect(travelStart).toHaveBeenCalledExactlyOnceWith('Kingdom', true);
   });
 
-  it('is not a reason to go home for a hurt party that isn’t set to wait', () => {
+  it('is not a reason to go home for a hurt party that isnt set to wait', () => {
     seedAutoMode([finishAreas], {
       gatheringAt: 'Wergen Woods',
       edit: (state) => state.world.party.forEach((hero) => (hero.hp = 0)),
@@ -628,7 +628,7 @@ describe('the periodic priority recheck while gathering', () => {
     expect(travelStart).not.toHaveBeenCalled();
   });
 
-  it('ignores the active clause’s own target moving as the party moves', () => {
+  it('ignores the active clauses own target moving as the party moves', () => {
     seedAutoMode([gatherOre], {
       active: gatherOre,
       gatheringAt: 'Copper Mines',

@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
+import { buildTownStockEntry } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 import { ensureEquipment } from '@helpers/content/ensure-item';
 import { ensureTown } from '@helpers/content/ensure-town';
 import { defaultStats } from '@helpers/defaults';
 import { equipmentSellValue } from '@helpers/kingdom/armory';
 import { townShopPrice, townStockPrice } from '@helpers/town/shop/town-price';
 import type { EquipmentId, TownId } from '@interfaces';
-import { buildTownStockEntry } from '@/testing/builders';
-import { seedContent } from '@/testing/content';
-import { seedGamestate } from '@/testing/gamestate';
 
 const sword = ensureEquipment({
   id: 'sword' as EquipmentId,
@@ -22,7 +22,7 @@ const townWithMarkup = (sell: number) =>
   });
 
 describe('townStockPrice', () => {
-  it('marks up the item’s sell value by the town’s sell markup, never below 1 gold', () => {
+  it('marks up the items sell value by the towns sell markup, never below 1 gold', () => {
     seedContent([sword]);
     const entry = buildTownStockEntry(sword.id);
     const value = equipmentSellValue({

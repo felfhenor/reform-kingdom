@@ -3,11 +3,15 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('@helpers/hero/travel-cost-base');
 vi.mock('@helpers/pathfinding/pathfinding-travel');
 
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
+import { locationOf, seedWorldNodes } from '@/testing/world';
+import { ensureEncounter } from '@helpers/content/ensure-encounternode';
 import {
   ensureGatherResult,
   ensureGathering,
 } from '@helpers/content/ensure-gathernode';
-import { ensureEncounter } from '@helpers/content/ensure-encounternode';
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { ensureItem } from '@helpers/content/ensure-item';
 import { ensureMonster } from '@helpers/content/ensure-monster';
@@ -16,6 +20,7 @@ import { ensureWorker } from '@helpers/content/ensure-worker';
 import { travelPathBaseTotalTicks } from '@helpers/hero/travel-cost-base';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
 import { worldTownsState } from '@helpers/state-game';
+import { defaultTownWorkerState } from '@helpers/town/worker/town-worker-progression';
 import {
   townWorkerAssignmentIsValid,
   townWorkerStaminaCostToNode,
@@ -25,7 +30,6 @@ import {
   workerTripBeginOutbound,
   workerTripBeginReturn,
 } from '@helpers/worker/worker-trip';
-import { defaultTownWorkerState } from '@helpers/town/worker/town-worker-progression';
 import type {
   EncounterId,
   GatheringId,
@@ -36,10 +40,6 @@ import type {
   TravelStep,
   WorkerId,
 } from '@interfaces';
-import { buildTownNodeState } from '@/testing/builders';
-import { seedContent } from '@/testing/content';
-import { inTick, seedGamestate } from '@/testing/gamestate';
-import { locationOf, seedWorldNodes } from '@/testing/world';
 
 const ore = 'copper-ore' as ItemId;
 const town = ensureTown({ id: 'larsia' as TownId, name: 'Larsia' });
@@ -119,7 +119,7 @@ beforeEach(() => {
 });
 
 describe('townWorkerStaminaCostToNode', () => {
-  it('costs the route from the town’s own node', () => {
+  it('costs the route from the towns own node', () => {
     const nodes = seedTown();
     routesCost(12);
 
@@ -143,7 +143,7 @@ describe('townWorkerStaminaCostToNode', () => {
 });
 
 describe('townWorkerAssignmentIsValid', () => {
-  it('needs the node to yield the item within the worker’s stamina at its level', () => {
+  it('needs the node to yield the item within the workers stamina at its level', () => {
     seedTown();
 
     routesCost(20);
@@ -165,7 +165,7 @@ describe('townWorkerAssignmentIsValid', () => {
     );
   });
 
-  it('rejects an item the node doesn’t yield, or a worker gone from content', () => {
+  it('rejects an item the node doesnt yield, or a worker gone from content', () => {
     seedTown();
     routesCost(1);
 
@@ -180,7 +180,7 @@ describe('townWorkerAssignmentIsValid', () => {
     ).toBe(false);
   });
 
-  it('routes without teleports for a worker that can’t use them', () => {
+  it('routes without teleports for a worker that cant use them', () => {
     seedTown();
     routesCost(1);
 
@@ -293,7 +293,7 @@ describe('town worker outbound trip', () => {
     expect(workerState().status.kind).toBe('AtTown');
   });
 
-  it('routes without teleports for a worker that can’t use them', () => {
+  it('routes without teleports for a worker that cant use them', () => {
     seedTown();
     routesCost(5);
 

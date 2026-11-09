@@ -1,5 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 import { OUTPOST_TRAVEL_SPEED_BONUS_PER_LEVEL } from '@helpers/config';
 import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
 import { globalEffectSumsState, globalEffectsState } from '@helpers/state-game';
@@ -8,9 +11,6 @@ import {
   outpostBuffRefresh,
 } from '@helpers/world-node/world-node-outpost-buff';
 import type { GlobalEffectId } from '@interfaces';
-import { seedContent } from '@/testing/content';
-import { inTick, seedGamestate } from '@/testing/gamestate';
-import { seedWorldNodes } from '@/testing/world';
 
 const now = 500;
 const buff = ensureGlobalEffect({
@@ -48,7 +48,7 @@ describe('outpostBuffEffects', () => {
 });
 
 describe('outpostBuffRefresh', () => {
-  it('grants the buff on the outpost’s map, scaled by its level', () => {
+  it('grants the buff on the outposts map, scaled by its level', () => {
     seedOutpost(2);
 
     refresh('Carrina');

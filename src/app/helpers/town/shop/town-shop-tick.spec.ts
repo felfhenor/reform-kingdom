@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
+import { buildTownNodeState, buildTownStockEntry } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 import { ensureTown } from '@helpers/content/ensure-town';
 import { worldTownsState } from '@helpers/state-game';
 import { townShopProcessTick } from '@helpers/town/shop/town-shop-tick';
 import type { EquipmentId, TownId, TownNodeState } from '@interfaces';
-import { buildTownNodeState, buildTownStockEntry } from '@/testing/builders';
-import { seedContent } from '@/testing/content';
-import { inTick, seedGamestate } from '@/testing/gamestate';
 
 const now = 500;
 const town = (itemExpirationTimer: number) =>
@@ -41,7 +41,7 @@ const stockAges = () =>
   );
 
 describe('townShopProcessTick', () => {
-  it('expires stock once it reaches the town’s expiration age', () => {
+  it('expires stock once it reaches the towns expiration age', () => {
     seedStock(100, [50, 99, 100, 200]);
 
     inTick(() => townShopProcessTick());

@@ -11,12 +11,16 @@ vi.mock('@helpers/rng', async (importOriginal) => {
   };
 });
 
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 import { TOWN_PRIORITY_WEIGHT_PER_FAILURE } from '@helpers/config';
+import { ensureEncounter } from '@helpers/content/ensure-encounternode';
 import {
   ensureGatherResult,
   ensureGathering,
 } from '@helpers/content/ensure-gathernode';
-import { ensureEncounter } from '@helpers/content/ensure-encounternode';
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { ensureItem } from '@helpers/content/ensure-item';
 import { ensureMonster } from '@helpers/content/ensure-monster';
@@ -24,11 +28,11 @@ import { ensureRecipe } from '@helpers/content/ensure-recipe';
 import { ensureTown } from '@helpers/content/ensure-town';
 import { ensureWorker } from '@helpers/content/ensure-worker';
 import { rngChoiceWeighted } from '@helpers/rng';
+import { worldTownsState } from '@helpers/state-game';
 import {
   townPickGatherAssignment,
   townWorkerAutoAssign,
 } from '@helpers/town/worker/town-worker-auto-assign';
-import { worldTownsState } from '@helpers/state-game';
 import { defaultTownWorkerState } from '@helpers/town/worker/town-worker-progression';
 import {
   townWorkerAssignmentIsValid,
@@ -46,10 +50,6 @@ import type {
   TownNodeState,
   WorkerId,
 } from '@interfaces';
-import { buildTownNodeState } from '@/testing/builders';
-import { seedContent } from '@/testing/content';
-import { seedGamestate } from '@/testing/gamestate';
-import { seedWorldNodes } from '@/testing/world';
 
 const townId = 'larsia' as TownId;
 const workerId = 'darwin' as WorkerId;
@@ -129,7 +129,7 @@ beforeEach(() => {
 });
 
 describe('townPickGatherAssignment', () => {
-  it('offers every reachable gatherable item at the node’s level, weighted by its chance', () => {
+  it('offers every reachable gatherable item at the nodes level, weighted by its chance', () => {
     seedWorld();
 
     const picked = townPickGatherAssignment(town, workerId, 1);
@@ -141,7 +141,7 @@ describe('townPickGatherAssignment', () => {
     expect([ore, wood]).toContain(picked?.itemId);
   });
 
-  it('includes results unlocked by the node’s level', () => {
+  it('includes results unlocked by the nodes level', () => {
     seedWorld(
       {},
       (state) => (state.gatherNodeLevels[mine.name] = { level: 2 }),

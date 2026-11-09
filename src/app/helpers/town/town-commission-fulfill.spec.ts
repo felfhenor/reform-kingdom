@@ -1,8 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
+import { abilityJobContent, buildAbilityHero } from '@/testing/job-ability';
 import { ensureCommissionOffer } from '@helpers/content/ensure-commission';
 import { ensureItem } from '@helpers/content/ensure-item';
 import { applyMaterialDelta } from '@helpers/item/materials';
+import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
 import {
   townCommissionCanFulfill,
   townCommissionReputationReward,
@@ -15,11 +20,6 @@ import type {
   TownCommissionSlotId,
   TownId,
 } from '@interfaces';
-import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
-import { buildTownNodeState } from '@/testing/builders';
-import { seedContent } from '@/testing/content';
-import { seedGamestate } from '@/testing/gamestate';
-import { abilityJobContent, buildAbilityHero } from '@/testing/job-ability';
 
 const townId = 'larsia' as TownId;
 const slotId = 'slot-1' as TownCommissionSlotId;
@@ -53,7 +53,7 @@ function seedSlot(edit?: (state: GameState) => void): GameState {
 const missing = 'gone' as TownCommissionSlotId;
 
 describe('townCommissionRequirementEntries', () => {
-  it('lists a slot’s requirements against what the player owns', () => {
+  it('lists a slots requirements against what the player owns', () => {
     seedSlot((state) => applyMaterialDelta(state, stick.id, 40));
 
     expect(townCommissionRequirementEntries(townId, slotId)).toEqual([
@@ -64,7 +64,7 @@ describe('townCommissionRequirementEntries', () => {
 });
 
 describe('townCommissionReputationReward', () => {
-  it('pays the slot’s offer reward, nothing for a missing slot or offer', () => {
+  it('pays the slots offer reward, nothing for a missing slot or offer', () => {
     seedSlot();
 
     expect(townCommissionReputationReward(townId, slotId)).toBe(25);
@@ -74,7 +74,7 @@ describe('townCommissionReputationReward', () => {
     expect(townCommissionReputationReward(townId, slotId)).toBe(0);
   });
 
-  it('scales the reward by the town’s reputation tier', () => {
+  it('scales the reward by the towns reputation tier', () => {
     seedSlot(
       (state) =>
         (state.world.towns[townId].reputation = TOWN_REPUTATION_THRESHOLDS[1]),

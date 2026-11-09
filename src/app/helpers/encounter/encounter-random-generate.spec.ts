@@ -45,7 +45,7 @@ describe('generateEncounterRandomFights', () => {
     expect(sortBy([...counts])).toEqual([1, 2]);
   });
 
-  it('ramps level and combatant count from each range’s min to max across the fights', () => {
+  it('ramps level and combatant count from each ranges min to max across the fights', () => {
     const fights = generateEncounterRandomFights(shrine());
 
     expect(fights.map((fight) => fight.level)).toEqual([10, 15, 20]);

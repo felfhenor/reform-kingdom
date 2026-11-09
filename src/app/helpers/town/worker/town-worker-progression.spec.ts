@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
+import { locationOf, seedWorldNodes } from '@/testing/world';
 import { ensureTown } from '@helpers/content/ensure-town';
 import { defaultTownWorkerState } from '@helpers/town/worker/town-worker-progression';
 import type { TownId } from '@interfaces';
-import { locationOf, seedWorldNodes } from '@/testing/world';
 
 const town = ensureTown({ id: 'larsia' as TownId, name: 'Larsia' });
 
 describe('defaultTownWorkerState', () => {
-  it('starts idle at the town’s own node, at the given level', () => {
+  it('starts idle at the towns own node, at the given level', () => {
     const nodes = seedWorldNodes([
       { name: 'Elsewhere', type: 'ExploreNode' },
       { name: town.name, type: 'NonPlayerKingdom' },

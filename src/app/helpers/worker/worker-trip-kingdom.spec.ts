@@ -4,14 +4,17 @@ vi.mock('@helpers/engine/gather-vfx');
 vi.mock('@helpers/pathfinding/pathfinding-travel');
 vi.mock('@helpers/worker/worker-assignment');
 
+import { seedContent } from '@/testing/content';
+import { inTick, seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 import { combatLog } from '@helpers/combat/combat-log';
 import { WORKER_COMBAT_XP_POWER_WINDOW } from '@helpers/config';
 import { ensureEncounter } from '@helpers/content/ensure-encounternode';
-import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import {
   ensureGatherResult,
   ensureGathering,
 } from '@helpers/content/ensure-gathernode';
+import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { ensureItem } from '@helpers/content/ensure-item';
 import { ensureMonster } from '@helpers/content/ensure-monster';
 import { ensureWorker } from '@helpers/content/ensure-worker';
@@ -47,9 +50,6 @@ import type {
   WorkerStatusGathering,
   WorkerStatusTravelingBack,
 } from '@interfaces';
-import { seedContent } from '@/testing/content';
-import { inTick, seedGamestate } from '@/testing/gamestate';
-import { seedWorldNodes } from '@/testing/world';
 
 const nell = ensureWorker({
   id: 'weaver-nell' as WorkerId,
@@ -243,7 +243,7 @@ describe('kingdom worker gathering', () => {
     expect(xpAfterOneUnit(6 + WORKER_COMBAT_XP_POWER_WINDOW)).toBe(0);
   });
 
-  it('earns no xp outside the node’s worker level range', () => {
+  it('earns no xp outside the nodes worker level range', () => {
     seedNodes(woods({ workerLevelRange: { min: 5, max: 10 } }));
     seedWorker(gathering(), { assignment });
 

@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
+import { buildTownNodeState } from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 import { ensureTown } from '@helpers/content/ensure-town';
+import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
 import {
   townGuardianMonsterIds,
   townGuardiansForCurrentReputation,
 } from '@helpers/town/town-guardian';
-import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
 import type { MonsterId, TownId } from '@interfaces';
-import { buildTownNodeState } from '@/testing/builders';
-import { seedContent } from '@/testing/content';
-import { seedGamestate } from '@/testing/gamestate';
 
 const citizenId = 'larsian-citizen' as MonsterId;
 const guardId = 'larsian-guard' as MonsterId;
@@ -64,7 +64,7 @@ describe('townGuardiansForCurrentReputation', () => {
         })),
     );
 
-  it('uses the guardians of exactly the town’s current reputation tier', () => {
+  it('uses the guardians of exactly the towns current reputation tier', () => {
     atTier(2);
     expect(townGuardiansForCurrentReputation(larsia)).toEqual([
       { monsterId: citizenId, quantity: 2 },

@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 import {
   OUTPOST_DEATH_PENALTY_MAX_LEVEL,
   OUTPOST_DEATH_PENALTY_REDUCTION_PER_LEVEL,
@@ -17,9 +20,6 @@ import {
   worldNodeOutpostLevel,
 } from '@helpers/world-node/world-node-outpost';
 import type { GameState, OutpostId } from '@interfaces';
-import { seedContent } from '@/testing/content';
-import { seedGamestate } from '@/testing/gamestate';
-import { seedWorldNodes } from '@/testing/world';
 
 const carrina = 'Carrina Outpost';
 
@@ -79,7 +79,7 @@ describe('outpostDeathPenaltyMultiplier', () => {
     expect(outpostDeathPenaltyMultiplier(carrina)).toBe(capped);
   });
 
-  it('is 1 for a node that isn’t an outpost', () => {
+  it('is 1 for a node that isnt an outpost', () => {
     atLevel(OUTPOST_DEATH_PENALTY_MAX_LEVEL);
 
     expect(outpostDeathPenaltyMultiplier('Duchy of Carrina')).toBe(1);

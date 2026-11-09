@@ -1,6 +1,8 @@
-import { describe, expect, it, onTestFinished } from 'vitest';
 import { analyticsEvent$ } from '@helpers/engine/analytics';
+import { describe, expect, it, onTestFinished } from 'vitest';
 
+import { decreeClause } from '@/testing/decree';
+import { inTick, seedGamestate } from '@/testing/gamestate';
 import {
   autoModeIsEnabled,
   autoModeRecordClauseFailure,
@@ -13,8 +15,6 @@ import {
 } from '@helpers/decree/auto-mode-state';
 import { worldAutoModeState } from '@helpers/state-game';
 import type { AutoModeState, DecreeClauseId } from '@interfaces';
-import { decreeClause } from '@/testing/decree';
-import { inTick, seedGamestate } from '@/testing/gamestate';
 
 const clauseA = decreeClause(
   { type: 'ReturnToKingdom' },
@@ -72,7 +72,7 @@ describe('autoModeSetActiveClause', () => {
   });
 });
 
-describe('the active clause’s failure streak', () => {
+describe('the active clauses failure streak', () => {
   const clauses = [
     { ...clauseA, failureCount: 4 },
     { ...clauseB, failureCount: 2 },

@@ -7,6 +7,15 @@ vi.mock('@helpers/rng', async (importOriginal) => {
 });
 
 import {
+  buildCharacter,
+  buildEquipmentItem,
+  buildEquipmentSkill,
+  buildHeroCombatant,
+  buildTestCombatant,
+} from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { abilityJobContent, buildAbilityHero } from '@/testing/job-ability';
+import {
   combatCombatantCombatStatSucceedsChance,
   combatCombatantCombatStatValue,
   combatCombatantSkillEpCost,
@@ -22,15 +31,6 @@ import type {
   JobId,
   TrainerTeachingId,
 } from '@interfaces';
-import {
-  buildCharacter,
-  buildEquipmentItem,
-  buildEquipmentSkill,
-  buildHeroCombatant,
-  buildTestCombatant,
-} from '@/testing/builders';
-import { seedContent } from '@/testing/content';
-import { abilityJobContent, buildAbilityHero } from '@/testing/job-ability';
 
 const warrior = 'warrior' as JobId;
 const ranger = 'ranger' as JobId;
@@ -96,7 +96,7 @@ describe('combatant combat stat rolls', () => {
       combatStats: { ...defaultCombatStats(), stunChance },
     });
 
-  it('reads the combatant’s value for a stat', () => {
+  it('reads the combatants value for a stat', () => {
     expect(combatCombatantCombatStatValue(withStat(40), 'stunChance')).toBe(40);
   });
 

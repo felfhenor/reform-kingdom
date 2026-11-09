@@ -75,7 +75,7 @@ beforeEach(() => {
 });
 
 describe('collectibleSourceMapBuild', () => {
-  it('finds each collectible’s single source across nodes, crafting, traders and raids', () => {
+  it('finds each collectibles single source across nodes, crafting, traders and raids', () => {
     seedContent(allSources);
 
     const sources = collectibleSourceMapBuild();
