@@ -16,7 +16,7 @@ import { range } from 'es-toolkit/compat';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [IconElementChargeComponent],
   template: `
-    <div class="flex flex-col gap-2">
+    <div class="flex gap-2" [class.flex-col]="!horizontal()">
       @for (row of rows(); track row.element) {
         <div class="flex flex-row gap-2">
           @for (slot of slots; track slot) {
@@ -35,6 +35,7 @@ import { range } from 'es-toolkit/compat';
 export class StatusElementPoolComponent {
   public combat = input.required<Combat>();
   public expanded = input<boolean>(false);
+  public horizontal = input<boolean>(false);
 
   public readonly slots = range(COMBAT_ELEMENT_CHARGES_PER_ELEMENT);
 

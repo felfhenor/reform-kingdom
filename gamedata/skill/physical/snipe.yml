@@ -7,10 +7,9 @@
   sprite: '0005'
 
   epCost: 5
-  usesPerCombat: 1
+  usesPerCombat: -1
 
   requiredWeaponTypes: [Bow]
-
 
   techniques:
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
@@ -33,10 +32,9 @@
   sprite: '0005'
 
   epCost: 12
-  usesPerCombat: 1
+  usesPerCombat: -1
 
   requiredWeaponTypes: [Bow]
-
 
   techniques:
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
@@ -59,10 +57,9 @@
   sprite: '0005'
 
   epCost: 34
-  usesPerCombat: 1
+  usesPerCombat: -1
 
   requiredWeaponTypes: [Bow]
-
 
   techniques:
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]
@@ -85,10 +82,9 @@
   sprite: '0005'
 
   epCost: 41
-  usesPerCombat: 1
+  usesPerCombat: -1
 
   requiredWeaponTypes: [Bow]
-
 
   techniques:
     - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected]

@@ -189,9 +189,15 @@ export function combatantFromMonster(
   index: number,
   isEnemy = true,
 ): Combatant {
-  const stats = isEnemy
+  const scaled = isEnemy
     ? monsterStatsForRun(monster, level)
     : monsterStatsAtLevel(monster, level);
+  // Level scaling leaves fractional pools; HP/EP stay whole like hero pools.
+  const stats = {
+    ...scaled,
+    Health: Math.floor(scaled.Health),
+    Energy: Math.floor(scaled.Energy),
+  };
   const skills = isEnemy
     ? monsterSkillsForRun(monster, level)
     : monsterSkillsAtLevel(monster, level);

@@ -258,7 +258,16 @@
               placeholder="Any town"
               [ngModel]="draftTownName()"
               (change)="setDraftTownName($event)"
-            ></ng-select>
+            >
+              <ng-template ng-option-tmp let-item="item">
+                <div class="type-label">{{ item.name }}</div>
+                @if (item.lockedReason) {
+                  <div class="type-meta text-warning whitespace-normal">
+                    {{ item.lockedReason }}
+                  </div>
+                }
+              </ng-template>
+            </ng-select>
           }
 
           @if (

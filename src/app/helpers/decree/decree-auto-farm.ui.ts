@@ -4,6 +4,7 @@ import {
   decreeClauses,
   isAutoFarmClause,
 } from '@helpers/decree/decree';
+import { combatAutomationAllowedAt } from '@helpers/combat/combat-manual';
 import { isExploreNodeCleared } from '@helpers/decree/decree-farm-node';
 import { decreeClauseRemove } from '@helpers/decree/decree.ui';
 import {
@@ -18,6 +19,7 @@ export function decreeAutoFarmAvailable(entry: WorldNodeEntry): boolean {
   return (
     entry.nodeData.type === 'ExploreNode' &&
     isExploreNodeCleared(entry) &&
+    combatAutomationAllowedAt(entry.mapName) &&
     isPartyAtNode(entry.nodeName)
   );
 }

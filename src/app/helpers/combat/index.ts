@@ -15,6 +15,8 @@ export * from './combat-element-pool.ui';
 export * from './combat-end';
 export * from './combat-log';
 export * from './combat-log.ui';
+export * from './combat-manual';
+export * from './combat-manual.ui';
 export * from './combat-order';
 export * from './combat-order-evaluation';
 export * from './combat-order-evaluation.ui';

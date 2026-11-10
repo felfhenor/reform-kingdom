@@ -9,6 +9,12 @@ import {
   combatMessageLog,
   endCombatLogCommits,
 } from '@helpers/combat/combat-log';
+import {
+  combatantTakesOrders,
+  combatIsManual,
+  combatManualEscaped,
+  combatManualPick,
+} from '@helpers/combat/combat-manual';
 import { pickSkillFromCombatOrders } from '@helpers/combat/combat-order-evaluation';
 import { combatantPickSkill } from '@helpers/combat/combat-skill-pick';
 import {
@@ -54,7 +60,7 @@ type CombatTurnResult = {
   takeAnotherTurn?: boolean;
 };
 
-function orderCombatantsByAgility(combat: Combat): Combatant[] {
+export function orderCombatantsByAgility(combat: Combat): Combatant[] {
   return sortBy(
     [...combat.guardians, ...combat.heroes, ...combat.helpers],
     (c) => -c.totalStats.Agility,
@@ -121,11 +127,14 @@ function combatantAct(combat: Combat, combatant: Combatant): boolean {
       0,
   );
 
-  // Combat Orders override the weighted-random pick only if the hero has any configured.
-  const combatOrderPick =
-    !combatant.isEnemy && combatant.combatOrders.length > 0
+  // Manual orders, then Combat Orders, override the weighted-random pick.
+  const takesOrders = combatantTakesOrders(combat, combatant);
+  const combatOrderPick = takesOrders
+    ? combatManualPick(combat, combatant, skills)
+    : !combatant.isEnemy && combatant.combatOrders.length > 0
       ? pickSkillFromCombatOrders(combat, combatant, skills)
       : undefined;
+  if (takesOrders && !combatOrderPick) return false;
 
   const chosenSkill =
     combatOrderPick?.skill ?? combatantPickSkill(combatant, skills);
@@ -222,12 +231,14 @@ export function combatDoCombatIteration(): void {
   if (combatWaitStartDelay(current)) return;
 
   if (combatCheckIfOver(current)) return;
+  if (combatIsManual() && !current.manualActions) return;
 
   // The engine mutates combatants in place and committed state is frozen, so each round works on its own copy.
   const combat = structuredClone(current);
 
   beginCombatLogCommits();
   runStatsCombatBegin();
+  if (combat.manualFlee) combatMessageLog(combat, 'The party tries to flee!');
 
   if (combat.ambushedBy) {
     combatDoAmbushRound(combat);
@@ -235,14 +246,18 @@ export function combatDoCombatIteration(): void {
     combatDoRound(combat);
   }
 
+  const escaped = combatManualEscaped(combat);
+  if (escaped) combatMessageLog(combat, 'The party escaped!');
+  combat.manualActions = undefined;
+  combat.manualFlee = undefined;
   gamestateFreezeSubtree(combat);
   updateGamestate((state) => {
-    state.world.combat = combat;
+    state.world.combat = escaped ? undefined : combat;
     runStatsCombatFlush(state);
     return state;
   });
 
-  combatCheckIfOver(combat);
+  if (!escaped) combatCheckIfOver(combat);
 
   endCombatLogCommits();
 }

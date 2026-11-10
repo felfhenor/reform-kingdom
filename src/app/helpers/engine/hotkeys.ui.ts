@@ -10,16 +10,23 @@ const MODIFIER_KEYS: Record<string, (event: KeyboardEvent) => boolean> = {
 
 // NG_EVENT_PLUGINS' OptionsEventPlugin mis-claims "keydown.t"/"keydown.r" (their letters are
 // substrings of its own "capture.once.passive"), leaving those hotkeys unfiltered by key.
-export function hotkeyMatches(event: KeyboardEvent | Hotkey, key: string): boolean {
+export function hotkeyMatches(
+  event: KeyboardEvent | Hotkey,
+  key: string,
+): boolean {
   if (!(event instanceof KeyboardEvent)) return false;
 
   const segments = key.toLowerCase().split('.');
   const targetKey = segments.pop() ?? '';
   const keyMatches =
-    targetKey === 'space' ? event.key === ' ' : event.key.toLowerCase() === targetKey;
+    targetKey === 'space'
+      ? event.key === ' '
+      : event.key.toLowerCase() === targetKey;
   if (!keyMatches) return false;
 
-  return segments.every((modifier) => MODIFIER_KEYS[modifier]?.(event) ?? false);
+  return segments.every(
+    (modifier) => MODIFIER_KEYS[modifier]?.(event) ?? false,
+  );
 }
 
 function inSwal(event: KeyboardEvent): boolean {
@@ -34,7 +41,14 @@ export function hotkeysBlockOutside(host: HTMLElement): () => void {
     if (event.key === 'Escape' || modalHasAnyOpen() || inSwal(event)) return;
 
     event.stopImmediatePropagation();
-    if (event.key === 'Tab' || host.contains(event.target as Node)) return;
+    // Ctrl/Cmd shortcuts (copy) aren't game hotkeys, so the browser keeps them.
+    const isShortcut = event.ctrlKey || event.metaKey;
+    if (
+      event.key === 'Tab' ||
+      isShortcut ||
+      host.contains(event.target as Node)
+    )
+      return;
     event.preventDefault();
   };
 

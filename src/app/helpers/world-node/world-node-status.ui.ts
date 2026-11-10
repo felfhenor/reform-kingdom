@@ -1,4 +1,5 @@
 import { caravanBrandName } from '@helpers/caravan/caravan';
+import { combatAutomationLockedReason } from '@helpers/combat/combat-manual.ui';
 import {
   exploreDifficultyTier,
   gatherDifficultyTier,
@@ -110,11 +111,14 @@ export function worldNodeFarmOption(
   entry: WorldNodeEntry,
 ): ExploreNodeFarmOption {
   const levelRange = worldNodeLevelRange(entry);
+  const lockedReason = combatAutomationLockedReason(entry.mapName);
   return {
     nodeName: entry.nodeName,
     levelLabel: levelRange ? rangeLabel(levelRange) : '?',
     difficulty: worldNodeDifficultyTier(entry),
     entry,
+    disabled: !!lockedReason,
+    lockedReason,
   };
 }
 

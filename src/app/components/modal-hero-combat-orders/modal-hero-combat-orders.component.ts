@@ -39,7 +39,7 @@ import { getEntry } from '@helpers/content/content';
 import { combatOrdersModalCharacterId } from '@helpers/engine/ui';
 import { characterSkills } from '@helpers/hero/job';
 import { characterSkillPreviewContext } from '@helpers/hero/skill-modifier.ui';
-import { worldPartyState } from '@helpers/state-game';
+import { globalEffectSumsState, worldPartyState } from '@helpers/state-game';
 import type {
   Character,
   CharacterId,
@@ -141,6 +141,7 @@ export class ModalHeroCombatOrdersComponent {
   private anim = inject(AnimationService);
 
   public readonly rowCap = COMBAT_ORDER_ROW_CAP;
+  public isManualCombat = computed(() => globalEffectSumsState().manualCombat);
   public readonly conditionTypeOptions = CONDITION_TYPE_OPTIONS;
   public readonly comparatorOptions = COMPARATOR_OPTIONS;
   public readonly healthDirectionOptions = HEALTH_DIRECTION_OPTIONS;

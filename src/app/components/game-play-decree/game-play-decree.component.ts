@@ -62,7 +62,11 @@ import {
   gatherNodeMaterialIds,
 } from '@helpers/world-node/world-node-gathering-discovery.ui';
 import { rewardKey } from '@helpers/world-node/world-node-rewards';
-import { worldNodeTown } from '@helpers/world-node/world-nodes';
+import { combatAutomationLockedReason } from '@helpers/combat/combat-manual.ui';
+import {
+  worldNodeByName,
+  worldNodeTown,
+} from '@helpers/world-node/world-nodes';
 import type {
   DecreeClause,
   DecreeClauseAction,
@@ -263,7 +267,12 @@ export class GamePlayDecreeComponent {
   public draftTownName = signal<string | undefined>(undefined);
 
   public townOptions = computed(() =>
-    sortBy(visitedTowns(), (town) => town.name),
+    sortBy(visitedTowns(), (town) => town.name).map((town) => {
+      const lockedReason = combatAutomationLockedReason(
+        worldNodeByName(town.name)?.mapName ?? '',
+      );
+      return { ...town, disabled: !!lockedReason, lockedReason };
+    }),
   );
 
   public rewardOptions = computed<FarmNodeRewardOption[]>(() => {
@@ -384,7 +393,9 @@ export class GamePlayDecreeComponent {
 
     const nodeOptions = this.gatherNodeOptions();
     this.draftNodeName.set(
-      nodeOptions.length === 1 ? nodeOptions[0].nodeName : undefined,
+      nodeOptions.length === 1 && !nodeOptions[0].disabled
+        ? nodeOptions[0].nodeName
+        : undefined,
     );
   }
 
@@ -405,7 +416,9 @@ export class GamePlayDecreeComponent {
 
     const nodeOptions = this.exploreNodeOptions();
     this.draftNodeName.set(
-      nodeOptions.length === 1 ? nodeOptions[0].nodeName : undefined,
+      nodeOptions.length === 1 && !nodeOptions[0].disabled
+        ? nodeOptions[0].nodeName
+        : undefined,
     );
   }
 

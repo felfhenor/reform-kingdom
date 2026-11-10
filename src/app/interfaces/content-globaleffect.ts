@@ -205,6 +205,16 @@ export type GlobalEffectEffectReclassDisabled = {
   effectType: 'GlobalReclassDisabled';
 };
 
+// Heroes act only on the player's round orders, except in Decree fights on sealed maps.
+export type GlobalEffectEffectManualCombat = {
+  effectType: 'GlobalManualCombat';
+};
+
+// The Decree can't target nodes on a map until its region is sealed.
+export type GlobalEffectEffectRequireSealForDecreeAutomation = {
+  effectType: 'GlobalRequireSealForDecreeAutomation';
+};
+
 // Every hero must have the same job; reclassing moves the whole party at once.
 export type GlobalEffectEffectPartySharesClass = {
   effectType: 'GlobalPartySharesClass';
@@ -301,6 +311,8 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectCraftTimeMultiplier
   | GlobalEffectEffectSkillPointsPerLevel
   | GlobalEffectEffectReclassDisabled
+  | GlobalEffectEffectManualCombat
+  | GlobalEffectEffectRequireSealForDecreeAutomation
   | GlobalEffectEffectPartySharesClass
   | GlobalEffectEffectJobAbilitiesStack
   | GlobalEffectEffectWorldNodeTypeRemoved

@@ -124,6 +124,9 @@ export type ExploreNodeFarmOption = {
   levelLabel: string;
   difficulty?: DifficultyTier;
   entry: WorldNodeEntry;
+  // ng-select greys out a disabled item.
+  disabled?: boolean;
+  lockedReason?: string;
 };
 
 // One option in the Farm Node clause's reward picker, scoped to a single

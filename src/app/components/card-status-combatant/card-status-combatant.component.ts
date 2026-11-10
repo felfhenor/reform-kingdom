@@ -56,6 +56,7 @@ export class CardStatusCombatantComponent {
 
   public entry = input.required<StatusCardEntry>();
   public expanded = input<boolean>(false);
+  public effectsBelow = input<boolean>(false);
 
   public damageNumbersByCombatant = this.playback.damageNumbersByCombatant;
   public skillCastByCombatant = this.playback.skillCastByCombatant;

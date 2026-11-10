@@ -19,4 +19,6 @@
   />
 } @else if (isVictoryPopupPending()) {
   <app-card-victory />
+} @else if (isManualCombat()) {
+  <app-overlay-combat-orders />
 }

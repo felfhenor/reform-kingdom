@@ -8,6 +8,7 @@ export * from './character';
 export * from './collectible-source';
 export * from './combat';
 export * from './combat-log';
+export * from './combat-manual.ui';
 export * from './combat-order';
 export * from './commission-state';
 export * from './content-affix';

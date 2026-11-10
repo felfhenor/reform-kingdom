@@ -154,6 +154,8 @@ export function ensureGlobalEffectEffect(
 
   if (
     effect.effectType === 'GlobalReclassDisabled' ||
+    effect.effectType === 'GlobalManualCombat' ||
+    effect.effectType === 'GlobalRequireSealForDecreeAutomation' ||
     effect.effectType === 'GlobalPartySharesClass' ||
     effect.effectType === 'GlobalJobAbilitiesStack'
   ) {

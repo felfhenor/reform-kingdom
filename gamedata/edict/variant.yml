@@ -173,3 +173,14 @@
   fragments: 0
   effects:
     - effectType: GlobalFeaturesRevealed
+
+- id: 0bef519c-aaeb-4bed-b107-57db538eb19a
+  name: Edict of the Taskmaster's Intervention
+  enabled: true
+  sprite: '0032'
+  description: You control hero actions in combat. The Decree can only send them to locations in regions you've sealed.
+  kind: Variant
+  fragments: 0
+  effects:
+    - effectType: GlobalManualCombat
+    - effectType: GlobalRequireSealForDecreeAutomation

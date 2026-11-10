@@ -275,6 +275,8 @@ export function defaultGlobalEffectSums(): GlobalEffectSums {
     craftTimeMultiplierBonus: 0,
     skillPointsPerLevel: 0,
     reclassDisabled: false,
+    manualCombat: false,
+    requireSealForDecreeAutomation: false,
     partySharesClass: false,
     jobAbilitiesStack: false,
     removedWorldNodeTypes: {},

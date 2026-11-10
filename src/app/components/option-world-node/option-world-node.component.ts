@@ -15,6 +15,11 @@ import type { ExploreNodeFarmOption } from '@interfaces';
         <div class="type-meta text-difficulty-{{ option().difficulty }}">
           Lv. {{ option().levelLabel }}
         </div>
+        @if (option().lockedReason; as reason) {
+          <div class="type-meta text-warning whitespace-normal">
+            {{ reason }}
+          </div>
+        }
       </div>
     } @else {
       {{ option().nodeName }}

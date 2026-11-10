@@ -109,7 +109,8 @@ export function combatMessageLog(
 export function combatantStatusText(combatant: Combatant): string {
   const shield = combatant.shield ?? 0;
   const shieldText = shield > 0 ? ` [${shield} shield]` : '';
-  return `[${combatant.hp}/${combatant.totalStats.Health} HP]${shieldText} [${combatant.ep}/${combatant.totalStats.Energy} EP]`;
+  const whole = (value: number) => Math.floor(value);
+  return `[${whole(combatant.hp)}/${whole(combatant.totalStats.Health)} HP]${shieldText} [${whole(combatant.ep)}/${whole(combatant.totalStats.Energy)} EP]`;
 }
 
 // Stands in for a combatant's name.

@@ -33,6 +33,8 @@ export type GlobalEffectSums = {
   craftTimeMultiplierBonus: number;
   skillPointsPerLevel: number;
   reclassDisabled: boolean;
+  manualCombat: boolean;
+  requireSealForDecreeAutomation: boolean;
   partySharesClass: boolean;
   jobAbilitiesStack: boolean;
   // Sparse - only removed node types have an entry.

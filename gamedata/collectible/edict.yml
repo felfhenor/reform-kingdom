@@ -281,3 +281,12 @@
       value: -0.15
     - effectType: GlobalTraderPriceMultiplier
       value: -0.15
+
+- id: 64912578-de2d-4715-8863-630c3b8dc262
+  name: Vow of the Taskmaster's Intervention
+  rarity: Mystical
+  description: A vow to let what happens, happen. A vow to intervene only when necessary.
+  sprite: '0106'
+
+  effects:
+    - effectType: GlobalManualCombat

@@ -1,4 +1,5 @@
 import type { AnimationCallbackEvent } from '@angular/core';
+import { combatManualOverlayVisible } from '@helpers/combat/combat-manual.ui';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -83,9 +84,11 @@ export class TutorialOverlayComponent {
   });
 
   // Targeted steps wait indefinitely (no timeout fallback) rather than showing a dimmed screen with no highlight before the target resolves - targets that depend on UI state are kept on screen by their step's prepare.
+  // The combat orders overlay would sit under the dimming frames and stop taking clicks.
   public isReadyToRender = computed(() => {
     const view = this.stepView();
-    return !!view && (!view.step.targetKey || !!this.targetRect());
+    if (!view || combatManualOverlayVisible()) return false;
+    return !view.step.targetKey || !!this.targetRect();
   });
 
   public calloutPosition = computed(() => {

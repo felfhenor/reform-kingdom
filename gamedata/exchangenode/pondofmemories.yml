@@ -186,3 +186,10 @@
       costs:
         - itemId: Gold Coin
           required: 500
+
+    - kind: Collectible
+      requiredEdictId: Edict of the Taskmaster's Intervention
+      outputCollectibleId: Vow of the Taskmaster's Intervention
+      costs:
+        - itemId: Gold Coin
+          required: 1

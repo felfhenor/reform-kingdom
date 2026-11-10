@@ -1,11 +1,13 @@
 @let isExpanded = expanded();
 @let data = entry();
 
-@if (isExpanded && data.statusEffects) {
+<ng-template #effectsRow>
   <!-- Always rendered in combat (min height) so the first effect landing doesn't nudge the card down. -->
   <!-- Zero width + min-w-full wraps at the card's width instead of widening the host past it. -->
   <div
-    class="flex flex-wrap items-end gap-2 w-0 min-w-full min-h-[18px] mb-[2px]"
+    class="flex flex-wrap items-end gap-2 w-0 min-w-full min-h-[18px]"
+    [class.mb-0.5]="!effectsBelow()"
+    [class.mt-0.5]="effectsBelow()"
   >
     @for (effect of data.statusEffects; track effect.id) {
       <app-icon-statuseffect
@@ -15,6 +17,10 @@
       />
     }
   </div>
+</ng-template>
+
+@if (isExpanded && data.statusEffects && !effectsBelow()) {
+  <ng-container [ngTemplateOutlet]="effectsRow" />
 }
 
 <div
@@ -151,3 +157,7 @@
     }
   </div>
 </div>
+
+@if (isExpanded && data.statusEffects && effectsBelow()) {
+  <ng-container [ngTemplateOutlet]="effectsRow" />
+}

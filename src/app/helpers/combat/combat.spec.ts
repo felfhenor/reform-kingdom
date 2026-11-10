@@ -157,6 +157,44 @@ describe('combatDoCombatIteration', () => {
     expect(worldCombatState()?.rounds).toBe(1);
   });
 
+  it('holds a manual round until orders exist, then clears them', () => {
+    available(skill('weighted'));
+    seedGamestate((state) => {
+      state.globalEffectSums.manualCombat = true;
+      state.world.combat = buildCombat({ rounds: 0, heroes: [caster()] });
+    });
+    inTick(combatDoCombatIteration);
+    expect(worldCombatState()?.rounds).toBe(0);
+
+    seedGamestate((state) => {
+      state.globalEffectSums.manualCombat = true;
+      state.world.combat = buildCombat({
+        rounds: 0,
+        heroes: [caster()],
+        manualActions: {},
+      });
+    });
+    inTick(combatDoCombatIteration);
+    expect(worldCombatState()?.rounds).toBe(1);
+    expect(worldCombatState()?.manualActions).toBeUndefined();
+  });
+
+  it('ends a fled fight once the round is over', () => {
+    available(skill('weighted'));
+    seedGamestate((state) => {
+      state.globalEffectSums.manualCombat = true;
+      state.world.combat = buildCombat({
+        rounds: 0,
+        heroes: [caster()],
+        guardians: [caster({ id: 'foe', isEnemy: true })],
+        manualActions: {},
+        manualFlee: true,
+      });
+    });
+    inTick(combatDoCombatIteration);
+    expect(worldCombatState()).toBeUndefined();
+  });
+
   it('commits the round on a copy, leaving the previous round untouched', () => {
     const previous = buildCombat({ rounds: 1, heroes: [caster()] });
     const snapshot = structuredClone(previous);

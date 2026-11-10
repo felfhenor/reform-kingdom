@@ -1,3 +1,4 @@
+import { combatAutomationAllowedAt } from '@helpers/combat/combat-manual';
 import { isXpTrivialAtOverLevel } from '@helpers/combat/monster';
 import {
   CHARACTER_MAX_LEVEL,
@@ -105,6 +106,7 @@ function nearestReachableNode(
   let nearestSteps = Infinity;
 
   candidates.forEach((candidate) => {
+    if (!combatAutomationAllowedAt(candidate.mapName)) return;
     const steps = routeTo(candidate, riskTolerance)?.steps;
     if (steps === undefined || steps >= nearestSteps) return;
 
@@ -176,6 +178,7 @@ export function mostChallengingExploreNodeForRisk(
 
   const candidates = worldNodesOfType('ExploreNode')
     .filter((entry) => isWorldNodeVisible(entry))
+    .filter((entry) => combatAutomationAllowedAt(entry.mapName))
     .filter((entry) =>
       riskLevelSatisfies(riskLevelOfExploreNode(entry), ceiling),
     )
@@ -234,6 +237,7 @@ function reachableVisibleNode(
 ): WorldNodeEntry | undefined {
   const entry = worldNodeByName(nodeName);
   if (!entry || !isWorldNodeVisible(entry)) return undefined;
+  if (!combatAutomationAllowedAt(entry.mapName)) return undefined;
   return routeTo(entry, riskTolerance) ? entry : undefined;
 }
 

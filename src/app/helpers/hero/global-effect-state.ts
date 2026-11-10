@@ -108,6 +108,10 @@ export function globalEffectEffectDescription(
         : `Skill Points: ${signedNumber(Math.sign(effect.value))} every ${Math.round(1 / Math.abs(effect.value))} levels`;
     case 'GlobalReclassDisabled':
       return 'Heroes cannot reclass';
+    case 'GlobalManualCombat':
+      return 'Heroes act only on your orders';
+    case 'GlobalRequireSealForDecreeAutomation':
+      return 'The Decree only goes to sealed regions';
     case 'GlobalPartySharesClass':
       return 'Every hero shares one class';
     case 'GlobalJobAbilitiesStack':
@@ -257,6 +261,12 @@ function accumulateGlobalEffectEffect(
       return;
     case 'GlobalReclassDisabled':
       sums.reclassDisabled = true;
+      return;
+    case 'GlobalManualCombat':
+      sums.manualCombat = true;
+      return;
+    case 'GlobalRequireSealForDecreeAutomation':
+      sums.requireSealForDecreeAutomation = true;
       return;
     case 'GlobalPartySharesClass':
       sums.partySharesClass = true;

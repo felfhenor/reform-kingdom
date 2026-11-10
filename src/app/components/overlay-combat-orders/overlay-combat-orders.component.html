@@ -1,0 +1,353 @@
+<div class="absolute inset-0 bg-black/60"></div>
+
+@if (combat(); as fight) {
+  <div class="relative flex h-full items-center justify-center p-4">
+    <div class="card bg-base-100 shadow-xl w-full max-w-[1440px] max-h-full">
+      <div class="card-body relative flex flex-col gap-2 p-4">
+        <app-icon
+          name="gameHelp"
+          size="inline"
+          class="text-lighter absolute top-4 right-4"
+          [tp]="tooltip"
+          [tpPlacement]="'left'"
+        />
+
+        <ng-template #tooltip>
+          <p>Pick a skill for each hero, then click its target.</p>
+
+          <p class="mt-2">
+            Multi-target skills pick their extra targets at random, and targets
+            marked (auto) are everyone the skill can reach.
+          </p>
+
+          <p class="mt-2">
+            Previously-used skills have a unique highlight color. Press enter to
+            choose it again. If the previously-selected target doesn't exist, a
+            new one will be chosen automatically
+          </p>
+        </ng-template>
+
+        <h2 class="type-page-title justify-center text-center">
+          {{ title() }}
+        </h2>
+        <p class="type-flavor text-center tabular-nums">
+          @if (isReview()) {
+            {{ isVictory() ? 'Victory' : 'Combat over' }}
+          } @else {
+            Round {{ fight.rounds + 1 | number }}
+          }
+        </p>
+
+        <div class="flex gap-4 h-[736px] shrink-0">
+          <div class="flex flex-col gap-2 w-[856px] shrink-0">
+            <!-- Padding keeps the hover glow inside the clip, which hard-cuts a long order. -->
+            @if (!isReview()) {
+              <div class="flex items-center h-14 px-3 shrink-0 overflow-hidden">
+                @for (
+                  actor of turnOrder();
+                  track actor.id;
+                  let first = $first
+                ) {
+                  @if (!first) {
+                    <span class="w-2 h-px shrink-0 bg-base-content/40"></span>
+                  }
+                  <div
+                    class="shrink-0 border"
+                    [class.border-error]="actor.isEnemy"
+                    [class.border-base-content/40]="!actor.isEnemy"
+                    [class.ring-2]="hoveredId() === actor.id"
+                    [class.ring-warning]="hoveredId() === actor.id"
+                    [class.shadow-[0_0_8px_var(--color-warning)]]="
+                      hoveredId() === actor.id
+                    "
+                    [tp]="actor.name"
+                  >
+                    <app-slot-icon-blank class="zoom-row block">
+                      <app-atlas-image
+                        [spritesheet]="actor.icon.spritesheet"
+                        [assetName]="actor.icon.sprite"
+                      />
+                    </app-slot-icon-blank>
+                  </div>
+                }
+              </div>
+            }
+
+            <div
+              class="flex flex-wrap justify-center content-start gap-4 h-[264px] shrink-0"
+            >
+              @if (!isReview()) {
+                @for (enemy of fight.guardians; track enemy.id) {
+                  @let targetable = targetableIds().has(enemy.id);
+                  <button
+                    type="button"
+                    class="p-1 border-2"
+                    [class.border-warning]="targetable"
+                    [class.cursor-pointer]="targetable"
+                    [class.border-transparent]="!targetable"
+                    [class.cursor-default]="!targetable"
+                    [class.opacity-50]="!!pendingOption() && !targetable"
+                    (click)="clickCombatant(enemy)"
+                    (mouseenter)="hoveredId.set(enemy.id)"
+                    (mouseleave)="hoveredId.set(undefined)"
+                    appSfx="ui-click"
+                    [sfxTrigger]="['click', 'hover']"
+                  >
+                    <app-card-status-combatant
+                      [entry]="cardFor(enemy)"
+                      [expanded]="true"
+                      [effectsBelow]="true"
+                    />
+                  </button>
+                }
+              }
+            </div>
+
+            <div
+              class="flex flex-wrap justify-center content-start gap-4 h-[400px] shrink-0"
+            >
+              @for (ally of allies(); track ally.id) {
+                @let order = orders()[ally.id];
+                @let targetable = targetableIds().has(ally.id);
+                @let canOrder = orderable().includes(ally);
+                <button
+                  type="button"
+                  class="relative flex flex-col gap-2 p-1 border-2 text-left"
+                  [class.border-warning]="targetable"
+                  [class.border-primary]="!targetable && activeHero() === ally"
+                  [class.border-transparent]="
+                    !targetable && activeHero() !== ally
+                  "
+                  [class.cursor-pointer]="targetable || canOrder"
+                  [class.cursor-default]="!targetable && !canOrder"
+                  [disabled]="isResolving() || isReview()"
+                  (click)="clickCombatant(ally)"
+                  (mouseenter)="hoveredId.set(ally.id)"
+                  (mouseleave)="hoveredId.set(undefined)"
+                  appSfx="ui-click"
+                  [sfxTrigger]="['click', 'hover']"
+                >
+                  @if (order) {
+                    <span
+                      class="absolute top-1 right-1 z-10 flex items-center justify-center w-5 h-5 bg-success text-white"
+                    >
+                      <app-icon name="tablerCheck" size="inline" />
+                    </span>
+                  }
+                  <app-card-status-combatant
+                    [entry]="cardFor(ally)"
+                    [expanded]="true"
+                    [effectsBelow]="true"
+                  />
+                  <div
+                    class="flex flex-col gap-0 h-12 w-[190px] bg-black/70 px-2 py-1 text-sm"
+                    [class.invisible]="!order && !canOrder"
+                  >
+                    @if (!order && activeHero() === ally) {
+                      <span class="m-auto text-lighter">Selecting...</span>
+                    }
+                    @if (order) {
+                      <span class="flex items-center gap-2 truncate">
+                        <app-atlas-image
+                          class="zoom-inline shrink-0"
+                          spritesheet="skill"
+                          [assetName]="order.skillSprite"
+                        />
+                        <span class="truncate">{{ order.skillName }}</span>
+                      </span>
+                      <span class="flex items-center gap-2 truncate type-meta">
+                        @if (order.targetIcon; as icon) {
+                          <app-atlas-image
+                            class="zoom-inline shrink-0"
+                            [spritesheet]="icon.spritesheet"
+                            [assetName]="icon.sprite"
+                          />
+                        } @else {
+                          <app-icon name="gameTargeted" size="inline" />
+                        }
+                        <span class="truncate">{{ order.targetLabel }}</span>
+                      </span>
+                    }
+                  </div>
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-2 flex-1 min-w-0">
+            <div
+              class="min-h-0 overflow-y-auto bg-black/50 border border-base-content/20 px-3 py-2 text-sm select-text"
+              [class.h-[328px]]="!isReview()"
+              [class.flex-1]="isReview()"
+            >
+              @for (entry of logEntries(); track entry.messageId) {
+                <div class="leading-5">
+                  <app-adventure-log-message [entry]="entry" />
+                </div>
+              }
+            </div>
+
+            @if (!isReview()) {
+              <div class="flex items-center gap-2 h-8 shrink-0">
+                <span
+                  class="type-label flex-1 truncate"
+                  [class.invisible]="isResolving()"
+                >
+                  {{ activeHero()?.name }}
+                </span>
+                <app-status-element-pool
+                  [combat]="fight"
+                  [expanded]="true"
+                  [horizontal]="true"
+                />
+              </div>
+
+              <div
+                class="grid grid-cols-2 gap-2 content-start h-[352px] shrink-0 overflow-y-auto"
+              >
+                @if (!isResolving() && activeHero(); as hero) {
+                  @for (option of skillOptions(); track option.skill.id) {
+                    <app-tooltip-skill-preview
+                      #preview
+                      [display]="option.skill"
+                      [displayCombatant]="hero"
+                    />
+                    <button
+                      type="button"
+                      class="flex items-center gap-2 h-12 px-2 bg-black/50 border border-base-content/20 hover:border-primary text-left"
+                      [class.border-primary]="
+                        pendingSkillId() === option.skill.id
+                      "
+                      [class.border-info]="
+                        previousSkillId() === option.skill.id
+                      "
+                      [class.bg-primary]="pendingSkillId() === option.skill.id"
+                      [class.text-primary-content]="
+                        pendingSkillId() === option.skill.id
+                      "
+                      [class.cursor-pointer]="!option.disabledReason"
+                      [class.cursor-not-allowed]="!!option.disabledReason"
+                      [class.opacity-50]="!!option.disabledReason"
+                      [tp]="preview.template()"
+                      [tpPlacement]="'top'"
+                      (click)="pickSkill(option)"
+                      appSfx="ui-click"
+                      [sfxTrigger]="['click', 'hover']"
+                    >
+                      <app-atlas-image
+                        class="zoom-row shrink-0"
+                        spritesheet="skill"
+                        [assetName]="option.skill.sprite"
+                      />
+                      <span class="flex flex-col flex-1 min-w-0">
+                        <span class="font-semibold whitespace-nowrap truncate">
+                          {{ option.skill.name }}
+                        </span>
+                        @if (option.disabledReason; as reason) {
+                          <span class="type-meta text-error truncate">
+                            {{ reason }}
+                          </span>
+                        } @else {
+                          <span
+                            class="type-meta flex items-center gap-2 truncate"
+                          >
+                            <app-icon name="gameTargeted" size="inline" />
+                            @if (option.targetCount === undefined) {
+                              Self
+                            } @else {
+                              {{ option.targetCount | number }}
+                            }
+                          </span>
+                        }
+                      </span>
+                      @if (option.epCost > 0) {
+                        <span
+                          class="text-xs whitespace-nowrap shrink-0 text-ep"
+                        >
+                          {{ option.epCost | number }} EP
+                        </span>
+                      }
+                    </button>
+                  }
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 h-12 shrink-0">
+          @let current = status();
+          <div class="alert py-2 w-1/2 min-w-0" [class]="current.tone">
+            <span class="truncate">{{ current.text }}</span>
+            @if (isPaused() && !isReview()) {
+              <button
+                type="button"
+                class="btn btn-sm cursor-pointer"
+                (click)="resume()"
+                appSfx="ui-click"
+                [sfxTrigger]="['click', 'hover']"
+              >
+                Resume
+              </button>
+            }
+          </div>
+
+          <span class="flex-1"></span>
+          @if (isReview()) {
+            <button
+              type="button"
+              class="btn btn-primary cursor-pointer"
+              (click)="close()"
+              appSfx="ui-click"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              Close
+            </button>
+          } @else {
+            <button
+              type="button"
+              class="btn btn-error cursor-pointer"
+              [disabled]="isResolving()"
+              (click.shift)="flee()"
+              (click)="$event.shiftKey || fleeSwal.fire()"
+              appSfx="ui-error"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              Flee
+            </button>
+            <button
+              type="button"
+              class="btn btn-ghost cursor-pointer"
+              [disabled]="isResolving()"
+              (click)="resetOrders()"
+              appSfx="ui-error"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              Reset orders
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary cursor-pointer"
+              [disabled]="isResolving() || !canConfirm()"
+              (click)="confirm()"
+              appSfx="ui-success"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              Confirm round
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<swal
+  #fleeSwal
+  title="Flee this fight?"
+  text="Your heroes skip their actions this round and try to escape after it. If they all fall before then, it'll be game over."
+  icon="warning"
+  confirmButtonText="Yes, flee"
+  cancelButtonText="No, keep fighting"
+  (confirm)="flee()"
+></swal>

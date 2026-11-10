@@ -9,6 +9,12 @@
   <span title>Combat Orders</span>
 
   <div body class="flex flex-col gap-4">
+    @if (isManualCombat()) {
+      <div class="alert alert-info">
+        Under Taskmaster's Intervention, orders only apply when the Decree
+        fights on a sealed map.
+      </div>
+    }
     @let hero = character();
     @let context = skillContext();
     @if (!hero || !job() || !context) {

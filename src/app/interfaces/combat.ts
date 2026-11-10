@@ -257,6 +257,15 @@ export type Combat = {
   ambushedBy?: string;
   // Ticks to wait before the first round, e.g. a pause between an encounter's fights.
   startDelayTicks?: number;
+  // A manual round's confirmed orders by hero combatant id; cleared once the round runs.
+  manualActions?: Record<string, CombatManualAction>;
+  // Set with empty orders: heroes skip the round, then escape if any survive it.
+  manualFlee?: boolean;
+};
+
+export type CombatManualAction = {
+  skillId: EquipmentSkillId;
+  targetId?: string;
 };
 
 // A combatant HP change; amount is signed for display (positive = heal).
