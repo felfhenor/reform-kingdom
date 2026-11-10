@@ -10,7 +10,7 @@
     gatherSpeed: 0.5
     craftSpeed: 1
     stamina: 150
-    combatPower: 5
+    combatPower: 15
     combatSpeed: 0.8
 
   statsPerLevel:
@@ -18,5 +18,5 @@
     gatherSpeed: 0.2
     craftSpeed: 0.1
     stamina: 4
-    combatPower: 0.62
+    combatPower: 0.5
     combatSpeed: 0.1
