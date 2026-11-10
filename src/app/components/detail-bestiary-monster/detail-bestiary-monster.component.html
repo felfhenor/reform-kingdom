@@ -19,10 +19,13 @@
     <div class="flex gap-4">
       <div class="flex flex-col gap-2 min-w-[170px]">
         <span class="type-label">Stats at Lv. {{ selectedLevel() }}</span>
+        @let combatant = combatantAtSelectedLevel();
         <app-row-stat-summary
-          [stats]="stats()"
+          [stats]="combatant.totalStats"
           [showSign]="false"
-          [elementalResistances]="combatantAtSelectedLevel().resistance"
+          [combatStats]="combatant.combatStats"
+          [resistances]="combatant.tagResistance"
+          [elementalResistances]="combatant.resistance"
         />
       </div>
 

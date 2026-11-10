@@ -16,7 +16,6 @@ import { SlotCompletionRewardComponent } from '@components/slot-completion-rewar
 import { combatantFromMonster } from '@helpers/combat/combat-create';
 import { monsterSkillsAtLevel } from '@helpers/combat/monster';
 import { getEntry } from '@helpers/content/content';
-import { monsterStatsForRun } from '@helpers/edict/edict-stats';
 import {
   bestiaryDropQuantityLabel,
   bestiaryEntryLevels,
@@ -26,7 +25,6 @@ import {
   type Combatant,
   type EquipmentSkillContent,
   type MonsterId,
-  type StatBlock,
 } from '@interfaces';
 
 import { NgSelectComponent } from '@ng-select/ng-select';
@@ -62,10 +60,6 @@ export class DetailBestiaryMonsterComponent {
       value,
       label: `Lv. ${value}`,
     })),
-  );
-
-  public stats = computed<StatBlock>(() =>
-    monsterStatsForRun(this.entry().monster, this.selectedLevel()),
   );
 
   public skills = computed<EquipmentSkillContent[]>(() =>
