@@ -184,6 +184,8 @@
   effects:
     - effectType: GlobalManualCombat
     - effectType: GlobalRequireSealForDecreeAutomation
+    - effectType: GlobalXPGainMultiplier
+      value: 3
 
 - id: 653282b4-0a0e-4a10-9858-55fa2244acee
   name: Edict of the Warren Hunt
