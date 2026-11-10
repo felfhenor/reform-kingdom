@@ -119,7 +119,7 @@ function workerAssignmentItemIds(
 ): ItemId[] {
   if (mode === 'Combat') {
     return uniq(
-      workerCombatItemDrops(nodeName).map((drop) => drop.itemId),
+      workerCombatItemDrops(nodeName, true).map((drop) => drop.itemId),
     ).filter((itemId) => isMaterialDiscovered(itemId));
   }
 

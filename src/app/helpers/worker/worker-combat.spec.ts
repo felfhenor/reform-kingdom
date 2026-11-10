@@ -151,7 +151,7 @@ beforeEach(() => {
 
 describe('workerCombatItemDrops', () => {
   it('keeps level-eligible item drops per monster and drops core currencies', () => {
-    const ids = workerCombatItemDrops(den).map((drop) => drop.itemId);
+    const ids = workerCombatItemDrops(den, true).map((drop) => drop.itemId);
 
     expect(ids).toEqual([teeth.id, rareEye.id, bone.id, teeth.id]);
   });
@@ -159,27 +159,35 @@ describe('workerCombatItemDrops', () => {
 
 describe('workerCombatUnitTicks', () => {
   it('uses the best chance among the node monsters', () => {
-    expect(workerCombatUnitTicks(fighter(), 1, den, teeth.id)).toBe(
+    expect(workerCombatUnitTicks(fighter(), 1, den, teeth.id, true)).toBe(
       WORKER_COMBAT_BASE_TICKS / 0.8,
     );
   });
 
   it('floors very rare drops and scales with combat speed', () => {
-    expect(workerCombatUnitTicks(fighter(), 1, den, rareEye.id)).toBe(
+    expect(workerCombatUnitTicks(fighter(), 1, den, rareEye.id, true)).toBe(
       WORKER_COMBAT_BASE_TICKS * 10,
     );
     expect(
-      workerCombatUnitTicks(fighter({ combatSpeed: 2 }), 1, den, bone.id),
+      workerCombatUnitTicks(fighter({ combatSpeed: 2 }), 1, den, bone.id, true),
     ).toBe(WORKER_COMBAT_BASE_TICKS / 2);
   });
 
   it('is undefined for an item the node never drops, or a worker that cannot fight', () => {
     expect(
-      workerCombatUnitTicks(fighter(), 1, den, highHorn.id),
+      workerCombatUnitTicks(fighter(), 1, den, highHorn.id, true),
     ).toBeUndefined();
-    expect(workerCombatUnitTicks(fighter(), 1, den, flux.id)).toBeUndefined();
     expect(
-      workerCombatUnitTicks(fighter({ combatSpeed: 0 }), 1, den, teeth.id),
+      workerCombatUnitTicks(fighter(), 1, den, flux.id, true),
+    ).toBeUndefined();
+    expect(
+      workerCombatUnitTicks(
+        fighter({ combatSpeed: 0 }),
+        1,
+        den,
+        teeth.id,
+        true,
+      ),
     ).toBeUndefined();
   });
 });

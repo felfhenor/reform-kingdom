@@ -65,7 +65,7 @@ function workerCombatAssignmentIsValid(
   return (
     isWorkerCombatNodeUnlocked(nodeName) &&
     isMaterialDiscovered(itemId) &&
-    workerCanFightFor(content, level, nodeName, itemId) &&
+    workerCanFightFor(content, level, nodeName, itemId, true) &&
     canWorkerReachNode(nodeName, stamina, content.canUseTeleports)
   );
 }

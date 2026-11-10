@@ -141,6 +141,7 @@ describe('globalEffectEffectsDescription', () => {
         { effectType: 'GlobalOffPathTravelSpeedBoost', value: 0.1 },
         { effectType: 'GlobalOnPathTravelSpeedBoost', value: 0.05 },
         { effectType: 'GlobalDecreeClauseCapBoost', value: 1 },
+        { effectType: 'GlobalMonstersDropRegionGathering', value: 50 },
       ]),
     ).toBe(
       [
@@ -163,6 +164,7 @@ describe('globalEffectEffectsDescription', () => {
         'Off-Path Travel Speed: +10%',
         'On-Path Travel Speed: +5%',
         'Decree Clause Cap: +1',
+        'Monsters: 50% chance to drop regional gathering materials',
       ].join(', '),
     );
   });
@@ -225,6 +227,8 @@ describe('recomputeGlobalEffectSums', () => {
           { effectType: 'GlobalOffPathTravelSpeedBoost', value: 0.1 },
           { effectType: 'GlobalOnPathTravelSpeedBoost', value: 0.05 },
           { effectType: 'GlobalDecreeClauseCapBoost', value: 1 },
+          { effectType: 'GlobalMonstersDropRegionGathering', value: 30 },
+          { effectType: 'GlobalMonstersDropRegionGathering', value: 20 },
         ]),
       ];
     });
@@ -247,6 +251,7 @@ describe('recomputeGlobalEffectSums', () => {
       offPathTravelSpeedBonus: 0.1,
       onPathTravelSpeedBonus: 0.05,
       decreeClauseCapBoost: 1,
+      regionGatheringDropChance: 50,
     });
   });
 

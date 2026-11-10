@@ -72,6 +72,7 @@ export function townWorkerTripHost(
       townWorkerTravelPath(from, town.name, canUseTeleports),
     gatherRateMultiplier: town.gathering.gatherRateMultiplier,
     combatRateMultiplier: town.gathering.combatRateMultiplier,
+    withRegionDrops: false,
     onArrivedHome: (cargo) => townWorkerArrivedHome(town, workerId, cargo),
   };
 }

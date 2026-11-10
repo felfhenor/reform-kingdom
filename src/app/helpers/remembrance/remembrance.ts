@@ -9,16 +9,14 @@ import {
 } from '@helpers/kingdom/bestiary';
 import { isFoundOnlyAtRemovedNodes } from '@helpers/kingdom/museum';
 import { globalEffectSumsState, tasksState } from '@helpers/state-game';
+import { isTaskOnRemovedNode } from '@helpers/task/task';
 import { isWorkerRescued } from '@helpers/worker/worker-discovery';
 import { worldNodeDevelopmentMaxLevel } from '@helpers/world-node/world-node-development';
 import {
   WORLD_NODE_DEVELOPABLE_TYPES,
   WORLD_NODE_DEVELOPMENT_SELECTORS,
 } from '@helpers/world-node/world-node-development-state';
-import {
-  isWorldNodeNameRemoved,
-  isWorldNodeTypeRemoved,
-} from '@helpers/world-node/world-nodes';
+import { isWorldNodeTypeRemoved } from '@helpers/world-node/world-nodes';
 import type {
   CollectibleContent,
   EquipmentContent,
@@ -52,13 +50,6 @@ function findable<T extends { id: string; unobtainable?: boolean }>(
     Object.keys(globalEffectSumsState().removedWorldNodeTypes).length > 0;
   return obtainable(entries).filter(
     (entry) => !anyRemoved || !isFoundOnlyAtRemovedNodes(target(entry.id)),
-  );
-}
-
-function isTaskOnRemovedNode(task: TaskContent): boolean {
-  return (
-    'nodeName' in task.requirement &&
-    isWorldNodeNameRemoved(task.requirement.nodeName)
   );
 }
 

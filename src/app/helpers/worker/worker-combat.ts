@@ -57,11 +57,14 @@ export function isWorkerCombatNodeUnlocked(nodeName: string): boolean {
   return isExploreNodeCleared(entry) && isWorldNodeFought(nodeName);
 }
 
-export function workerCombatItemDrops(nodeName: string): DroppedItemReward[] {
+export function workerCombatItemDrops(
+  nodeName: string,
+  withRegionDrops: boolean,
+): DroppedItemReward[] {
   const entry = worldNodeByName(nodeName);
   if (!entry || !isWorkerCombatNode(nodeName)) return [];
 
-  const itemDrops = worldNodeMonsterDropTable(entry).filter(
+  const itemDrops = worldNodeMonsterDropTable(entry, withRegionDrops).filter(
     (reward): reward is DroppedItemReward => reward.kind === 'Item',
   );
   if (itemDrops.length === 0) return [];
@@ -73,8 +76,9 @@ export function workerCombatItemDrops(nodeName: string): DroppedItemReward[] {
 export function workerCombatBestDropChance(
   nodeName: string,
   itemId: ItemId,
+  withRegionDrops: boolean,
 ): number {
-  const drops = workerCombatItemDrops(nodeName).filter(
+  const drops = workerCombatItemDrops(nodeName, withRegionDrops).filter(
     (drop) => drop.itemId === itemId,
   );
   return maxBy(drops, (drop) => drop.chance)?.chance ?? 0;
@@ -85,8 +89,9 @@ export function workerCombatUnitTicks(
   level: number,
   nodeName: string,
   itemId: ItemId,
+  withRegionDrops: boolean,
 ): number | undefined {
-  const chance = workerCombatBestDropChance(nodeName, itemId);
+  const chance = workerCombatBestDropChance(nodeName, itemId, withRegionDrops);
   const speed = workerStatsForLevel(worker, level).combatSpeed;
   if (chance <= 0 || speed <= 0) return undefined;
 
@@ -100,12 +105,14 @@ export function workerCanFightFor(
   level: number,
   nodeName: string,
   itemId: ItemId,
+  withRegionDrops: boolean,
 ): boolean {
   const nodeLevel = workerCombatNodeLevel(nodeName);
   return (
     nodeLevel !== undefined &&
     workerCombatPower(worker, level) >= nodeLevel &&
-    workerCombatUnitTicks(worker, level, nodeName, itemId) !== undefined
+    workerCombatUnitTicks(worker, level, nodeName, itemId, withRegionDrops) !==
+      undefined
   );
 }
 

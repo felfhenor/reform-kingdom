@@ -166,6 +166,7 @@ export function kingdomWorkerTripHost(
     },
     gatherRateMultiplier: kingdomWorkerGatherMultiplier(),
     combatRateMultiplier: 1,
+    withRegionDrops: true,
     onUnitGathered: (nodeName, _itemId, level) =>
       kingdomWorkerGainUnitXp(workerId, nodeName, level),
     onUnitBanked: kingdomWorkerGatherVfx,

@@ -3,8 +3,13 @@ import { getEntriesByType } from '@helpers/content/content';
 import { isMonsterDiscovered } from '@helpers/kingdom';
 import { isTownVisited } from '@helpers/town/town-visit';
 import {
+  regionGatheringDrops,
+  worldNodeMonsterIds,
+} from '@helpers/world-node/world-node-monster-drops';
+import {
   isWorldNodeMapVisited,
   isWorldNodeNameRemoved,
+  worldNodesOfType,
 } from '@helpers/world-node/world-nodes';
 import type {
   CaravanTraderContent,
@@ -22,7 +27,7 @@ import type {
   SourceTarget,
   TownContent,
 } from '@interfaces';
-import { uniqBy } from 'es-toolkit/compat';
+import { uniq, uniqBy } from 'es-toolkit/compat';
 
 // Drops, trades, recipe results, gather results and town sales all name their output with these same fields, so one matcher covers every channel.
 const SOURCE_KEYS = [
@@ -103,6 +108,29 @@ const nodeSource = (entry: { name: string }): CollectibleSource => ({
   type: 'node',
   name: entry.name,
 });
+
+// Every fight on a map whose gather tables monsters drop from.
+function regionGatheringSources(target: SourceTarget): CollectibleSource[] {
+  const mapNames = new Set(
+    uniq(worldNodesOfType('GatherNode').map((entry) => entry.mapName)).filter(
+      (mapName) =>
+        regionGatheringDrops(mapName).some((drop) =>
+          matchesTarget(drop, target),
+        ),
+    ),
+  );
+  if (mapNames.size === 0) return [];
+
+  return [
+    ...worldNodesOfType('ExploreNode'),
+    ...worldNodesOfType('ExploreRandomNode'),
+  ]
+    .filter(
+      (entry) =>
+        mapNames.has(entry.mapName) && worldNodeMonsterIds(entry).length > 0,
+    )
+    .map((entry) => nodeSource({ name: entry.nodeName }));
+}
 
 function isCollectibleSourceRemoved(source: CollectibleSource): boolean {
   return source.type === 'node' && isWorldNodeNameRemoved(source.name);
@@ -190,6 +218,7 @@ function everyContentSource(target: SourceTarget): CollectibleSource[] {
           monsterId: monster.id,
         }),
       ),
+      ...regionGatheringSources(target),
     ],
     sourceKey,
   );

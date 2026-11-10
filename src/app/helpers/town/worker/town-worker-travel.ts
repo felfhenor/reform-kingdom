@@ -73,7 +73,7 @@ export function townWorkerAssignmentIsValid(
 
   const { nodeName, itemId } = assignment;
   const canDoJob = isWorkerCombatNode(nodeName)
-    ? workerCanFightFor(content, level, nodeName, itemId)
+    ? workerCanFightFor(content, level, nodeName, itemId, false)
     : workerGatherNodeHasItem(nodeName, itemId);
 
   return canDoJob && townWorkerCanReach(town, content, level, nodeName);

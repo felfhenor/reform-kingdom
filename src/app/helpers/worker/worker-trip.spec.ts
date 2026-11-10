@@ -78,6 +78,7 @@ function stubHost(overrides: Partial<WorkerTripHost<WorkerState>> = {}) {
     pathHome: () => path,
     gatherRateMultiplier: 1,
     combatRateMultiplier: 1,
+    withRegionDrops: true,
     onUnitGathered: () => calls.push(`gathered while ${statusNow()}`),
     onUnitBanked: () => calls.push(`banked while ${statusNow()}`),
     onArrivedHome: (cargo, pending, level) =>

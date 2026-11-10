@@ -184,3 +184,18 @@
   effects:
     - effectType: GlobalManualCombat
     - effectType: GlobalRequireSealForDecreeAutomation
+
+- id: 653282b4-0a0e-4a10-9858-55fa2244acee
+  name: Edict of the Warren Hunt
+  groups:
+    - WarrenCornucopia
+  enabled: true
+  sprite: '0033'
+  description: Gathering locations are permanently forgotten. Monsters have a 50% chance to drop regional gathering materials.
+  kind: Variant
+  fragments: 0
+  effects:
+    - effectType: GlobalWorldNodeTypeRemoved
+      nodeType: GatherNode
+    - effectType: GlobalMonstersDropRegionGathering
+      value: 50

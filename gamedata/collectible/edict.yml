@@ -290,3 +290,13 @@
 
   effects:
     - effectType: GlobalManualCombat
+
+- id: 56b352fa-b9d4-409c-89f4-62ce0a8a7732
+  name: Vow of the Warren Hunt
+  rarity: Mystical
+  description: A vow to responsibly use what you take, and to not take in excess.
+  sprite: '0107'
+
+  effects:
+    - effectType: GlobalMonstersDropRegionGathering
+      value: 5

@@ -132,6 +132,8 @@ export function globalEffectEffectDescription(
       return `Astral Spell Duration: ${signedPercent(effect.value * 100)}`;
     case 'GlobalAstralSpellStrength':
       return `Astral Spell Strength: ${signedPercent(effect.value * 100)}`;
+    case 'GlobalMonstersDropRegionGathering':
+      return `Monsters: ${effect.value}% chance to drop regional gathering materials`;
     case 'EnemyExtraSkills':
       return `Enemy Skills: +${effect.value}`;
     case 'GlobalLevelStatMultiplier':
@@ -298,6 +300,9 @@ function accumulateGlobalEffectEffect(
       return;
     case 'GlobalAstralSpellStrength':
       sums.astralSpellStrengthBonus += effect.value;
+      return;
+    case 'GlobalMonstersDropRegionGathering':
+      sums.regionGatheringDropChance += effect.value;
       return;
     case 'DebuffResistance':
       sums.debuffResistanceFlat += effect.value;

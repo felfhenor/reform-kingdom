@@ -37,6 +37,7 @@ import { workerLevelUp } from '@helpers/worker/worker-progression.ui';
 import { workerRecall } from '@helpers/worker/worker-travel';
 import { travelTicksRemaining } from '@helpers/hero/travel-progress';
 import {
+  isWorldNodeTypeRemoved,
   kingdomNodeGet,
   worldNodeByName,
 } from '@helpers/world-node/world-nodes';
@@ -106,6 +107,8 @@ export class PlayKingdomWorkersComponent {
       })
       .filter((entry): entry is WorkerEntry => !!entry);
   });
+
+  public canGather = computed(() => !isWorldNodeTypeRemoved('GatherNode'));
 
   public busyCount = computed(
     () =>

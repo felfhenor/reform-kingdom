@@ -193,3 +193,10 @@
       costs:
         - itemId: Gold Coin
           required: 1
+
+    - kind: Collectible
+      requiredEdictId: Edict of the Warren Hunt
+      outputCollectibleId: Vow of the Warren Hunt
+      costs:
+        - itemId: Tattered Hide
+          required: 100

@@ -145,7 +145,13 @@ function workerTripUnitTicks<W extends WorkerTripWorker>(
   itemId: ItemId,
 ): number | undefined {
   if (isWorkerCombatNode(nodeName)) {
-    const ticks = workerCombatUnitTicks(content, level, nodeName, itemId);
+    const ticks = workerCombatUnitTicks(
+      content,
+      level,
+      nodeName,
+      itemId,
+      host.withRegionDrops,
+    );
     return ticks !== undefined && host.combatRateMultiplier > 0
       ? ticks / host.combatRateMultiplier
       : undefined;

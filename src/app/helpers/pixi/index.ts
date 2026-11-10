@@ -7,6 +7,7 @@ export * from './pixi-frame-rate.ui';
 export * from './pixi-grid.ui';
 export * from './pixi-indicators';
 export * from './pixi-map-render';
+export * from './pixi-node-forgotten.ui';
 export * from './pixi-node-reveal';
 export * from './pixi-node-reveal.ui';
 export * from './pixi-party-formation.ui';

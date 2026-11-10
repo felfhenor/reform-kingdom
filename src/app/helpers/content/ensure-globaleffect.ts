@@ -199,6 +199,7 @@ export function ensureGlobalEffectEffect(
     effect.effectType === 'GlobalTownCommissionSlotBoost' ||
     effect.effectType === 'GlobalAstralSpellDuration' ||
     effect.effectType === 'GlobalAstralSpellStrength' ||
+    effect.effectType === 'GlobalMonstersDropRegionGathering' ||
     effect.effectType === 'GlobalShrineBuffDuration' ||
     effect.effectType === 'GlobalShrineBuffStrength'
   ) {

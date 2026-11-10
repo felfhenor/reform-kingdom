@@ -48,6 +48,8 @@ import {
   raidResolveDefeat,
   raidResolveVictory,
 } from '@helpers/town/raid/town-raid-resolve';
+import { monsterDropsOnMap } from '@helpers/world-node/world-node-monster-drops';
+import { worldNodeByName } from '@helpers/world-node/world-nodes';
 import type {
   CharacterXpGain,
   Combat,
@@ -174,8 +176,9 @@ function grantVictoryXp(combat: Combat, rawXps: number[]): void {
 
 function rollMonsterDrops(combat: Combat): ResolvedDrop[] {
   const bonus = combatDropChanceBonus();
+  const mapName = worldNodeByName(combat.locationName)?.mapName ?? '';
   return rewardingMonsters(combat).flatMap(({ monster, level }) =>
-    rollDroppedRewards(monster.drops, level, bonus),
+    rollDroppedRewards(monsterDropsOnMap(monster, mapName), level, bonus),
   );
 }
 

@@ -56,7 +56,7 @@ function toRewardIdentity(reward: DroppedReward): RewardIdentity {
 // Discovered kill drops from every monster fought at `entry`, de-duplicated; excludes undiscovered drops and Gold Coin.
 function worldNodeMonsterDrops(entry: WorldNodeEntry): DroppedReward[] {
   return uniqBy(
-    worldNodeMonsterDropTable(entry).filter(
+    worldNodeMonsterDropTable(entry, true).filter(
       (reward) => !isGoldCoinReward(reward) && isRewardDiscovered(reward),
     ),
     (reward) => rewardKey(reward),

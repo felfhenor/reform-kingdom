@@ -72,6 +72,7 @@ import {
   pixiNodeLabelColor,
 } from '@helpers/pixi/pixi-indicators';
 import { pixiTiledMapRender } from '@helpers/pixi/pixi-map-render';
+import { pixiNodeForgottenSet } from '@helpers/pixi/pixi-node-forgotten.ui';
 import { pixiNodeRevealCreate } from '@helpers/pixi/pixi-node-reveal.ui';
 import {
   partyFollowerCatchUpPosition,
@@ -106,6 +107,7 @@ import {
 } from '@helpers/world-node/world-node-status.ui';
 import {
   isWorldNodeCollectibleGateMet,
+  isWorldNodeForgotten,
   isWorldNodeVisible,
   worldNodeByName,
 } from '@helpers/world-node/world-nodes';
@@ -705,8 +707,10 @@ export class GamePlayWorldComponent implements OnDestroy {
       }
 
       const unlocked = isWorldNodeCollectibleGateMet(entry);
-      wrapper.visible = unlocked;
+      const forgotten = isWorldNodeForgotten(entry);
+      wrapper.visible = unlocked || forgotten;
       wrapper.eventMode = unlocked ? 'static' : 'none';
+      pixiNodeForgottenSet(wrapper, forgotten);
     });
   }
 

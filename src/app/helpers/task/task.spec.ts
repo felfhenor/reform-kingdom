@@ -1,11 +1,19 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { ensureTaskRequirement } from '@helpers/content/ensure-task';
+import {
+  ensureTask,
+  ensureTaskRequirement,
+} from '@helpers/content/ensure-task';
 import { ensureTown } from '@helpers/content/ensure-town';
 import { ensureTrainer } from '@helpers/content/ensure-trainer';
-import { taskRequirementNodeName } from '@helpers/task/task';
+import {
+  isTaskOnRemovedNode,
+  taskRequirementNodeName,
+} from '@helpers/task/task';
 import type { TownId, TrainerId } from '@interfaces';
 import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
+import { seedWorldNodes } from '@/testing/world';
 
 const TOWN = 'town-elfheim' as TownId;
 const TRAINER = 'trainer-reyn' as TrainerId;
@@ -45,5 +53,29 @@ describe('taskRequirementNodeName', () => {
   it('is undefined for requirements with no node', () => {
     const requirement = ensureTaskRequirement({ kind: 'ReachLevel' });
     expect(taskRequirementNodeName(requirement)).toBeUndefined();
+  });
+});
+
+describe('isTaskOnRemovedNode', () => {
+  it('is true only for tasks set at a node type removed this run', () => {
+    seedWorldNodes([{ name: 'Woods', type: 'GatherNode' }]);
+    const gather = ensureTask({
+      requirement: ensureTaskRequirement({
+        kind: 'GatherItem',
+        nodeName: 'Woods',
+      }),
+    });
+    const level = ensureTask({
+      requirement: ensureTaskRequirement({ kind: 'ReachLevel' }),
+    });
+
+    seedGamestate();
+    expect(isTaskOnRemovedNode(gather)).toBe(false);
+
+    seedGamestate((state) => {
+      state.globalEffectSums.removedWorldNodeTypes.GatherNode = true;
+    });
+    expect(isTaskOnRemovedNode(gather)).toBe(true);
+    expect(isTaskOnRemovedNode(level)).toBe(false);
   });
 });

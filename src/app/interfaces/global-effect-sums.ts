@@ -47,6 +47,8 @@ export type GlobalEffectSums = {
   shrineBuffStrengthBonus: number;
   astralSpellDurationBonus: number;
   astralSpellStrengthBonus: number;
+  // Whole percent, summed additively.
+  regionGatheringDropChance: number;
   combatItemDropRateBoost: number;
   gatheringItemDropRateBoost: number;
   gatheringItemDropAmountBoost: number;

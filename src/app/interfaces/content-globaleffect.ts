@@ -274,6 +274,12 @@ export type GlobalEffectEffectAstralSpellStrength = {
   value: number;
 };
 
+// Whole percent per monster killed, split by weight into independent drops from its map's max-development gathering tables.
+export type GlobalEffectEffectMonstersDropRegionGathering = {
+  effectType: 'GlobalMonstersDropRegionGathering';
+  value: number;
+};
+
 // Every material a kingdom recipe needs changes by `value` (whole units), never below 1.
 export type GlobalEffectEffectRecipeMaterialBoost = {
   effectType: 'GlobalRecipeMaterialBoost';
@@ -323,6 +329,7 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectShrineBuffStrength
   | GlobalEffectEffectAstralSpellDuration
   | GlobalEffectEffectAstralSpellStrength
+  | GlobalEffectEffectMonstersDropRegionGathering
   | GlobalEffectEffectDebuffResistance
   | GlobalEffectEffectDebuffResistanceTag
   | GlobalEffectEffectCombatItemDropRateBoost

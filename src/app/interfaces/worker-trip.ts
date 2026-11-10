@@ -37,6 +37,8 @@ export type WorkerTripHost<W extends WorkerTripWorker> = {
   ) => TravelStep[] | undefined;
   gatherRateMultiplier: number;
   combatRateMultiplier: number;
+  // Off for NPC towns, which never get the player's edict drops.
+  withRegionDrops: boolean;
   onUnitGathered?: (nodeName: string, itemId: ItemId, level: number) => void;
   onUnitBanked?: (nodeName: string, itemId: ItemId) => void;
   onArrivedHome: (

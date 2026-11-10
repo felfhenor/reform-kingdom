@@ -9,6 +9,7 @@ import {
   worldCurrentLocationState,
 } from '@helpers/state-game';
 import {
+  isTaskOnRemovedNode,
   isTaskRequirementCounter,
   taskRequirementNodeName,
   tasksOrdered,
@@ -82,6 +83,8 @@ function taskRowViewModel(
 
 // Completed tasks stay listed so a reward earned off-map can still be claimed.
 function isTaskVisible(task: TaskContent, tasks: GameStateTasks): boolean {
+  if (isTaskOnRemovedNode(task)) return false;
+
   return (
     !task.requireMapVisit ||
     !!tasks[task.id]?.completedAt ||

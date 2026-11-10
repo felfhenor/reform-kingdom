@@ -353,6 +353,7 @@ export const NODE_REVEAL_POP_MS = 450;
 // easeOutBack's overshoot; ~1.7 peaks about 10% past full size before settling.
 export const NODE_REVEAL_OVERSHOOT = 1.70158;
 export const NODE_REVEAL_RING_RADIUS_TILES = 1.5;
+export const NODE_FORGOTTEN_ALPHA = 0.4;
 export const INDICATOR_PROGRESS_BAR_HEIGHT = 6;
 export const INDICATOR_PROGRESS_BAR_OFFSET_Y = -60;
 export const NODE_STATUS_ICON_RADIUS = 7;

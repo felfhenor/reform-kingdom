@@ -26,6 +26,8 @@
 
 - id: 1ccc343d-4575-40f9-85b4-ab51ca86ee34
   name: Edict of the Blessed Cornucopia
+  groups:
+    - WarrenCornucopia
   enabled: true
   sprite: '0002'
   description: Item drop chance is increased by 25%, and workers gather 25% faster.

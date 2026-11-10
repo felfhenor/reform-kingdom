@@ -110,7 +110,7 @@ function combatCandidates(
   priorityMap: TownItemPriorityMap,
 ): TownWorkerCandidate[] {
   return townWorkerCombatNodeNames(town, workerId, level).flatMap((nodeName) =>
-    uniq(workerCombatItemDrops(nodeName).map((drop) => drop.itemId))
+    uniq(workerCombatItemDrops(nodeName, false).map((drop) => drop.itemId))
       .filter((itemId) => townNeedsCombatItem(town, itemId))
       .filter((itemId) =>
         townWorkerAssignmentIsValid(town, workerId, level, {
@@ -123,7 +123,7 @@ function combatCandidates(
         itemId,
         // Fraction, not percent: gather weights are small relative numbers, so raw percents would make towns nearly always fight.
         weight:
-          (workerCombatBestDropChance(nodeName, itemId) / 100) *
+          (workerCombatBestDropChance(nodeName, itemId, false) / 100) *
           townItemPriorityWeightFromMap(priorityMap, itemId),
       })),
   );

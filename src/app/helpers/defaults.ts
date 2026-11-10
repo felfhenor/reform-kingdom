@@ -287,6 +287,7 @@ export function defaultGlobalEffectSums(): GlobalEffectSums {
     shrineBuffStrengthBonus: 0,
     astralSpellDurationBonus: 0,
     astralSpellStrengthBonus: 0,
+    regionGatheringDropChance: 0,
     combatItemDropRateBoost: 0,
     gatheringItemDropRateBoost: 0,
     gatheringItemDropAmountBoost: 0,

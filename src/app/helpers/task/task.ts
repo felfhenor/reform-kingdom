@@ -1,4 +1,5 @@
 import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { isWorldNodeNameRemoved } from '@helpers/world-node/world-nodes';
 import type {
   TaskContent,
   TaskRequirement,
@@ -38,4 +39,10 @@ export function taskRequirementNodeName(
     default:
       return undefined;
   }
+}
+
+// Set at a node this run's edicts removed, so it can never be done.
+export function isTaskOnRemovedNode(task: TaskContent): boolean {
+  const nodeName = taskRequirementNodeName(task.requirement);
+  return !!nodeName && isWorldNodeNameRemoved(nodeName);
 }

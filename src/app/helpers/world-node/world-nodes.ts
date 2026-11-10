@@ -246,13 +246,27 @@ function isWorldNodeEdictGateMet(entry: WorldNodeEntry): boolean {
   );
 }
 
-// Nodes with no gate are always met; gated nodes need every listed collectible found. A node type removed for the run never is.
-export function isWorldNodeCollectibleGateMet(entry: WorldNodeEntry): boolean {
-  if (isWorldNodeTypeRemoved(entry.nodeData.type)) return false;
+function isWorldNodeContentGateMet(entry: WorldNodeEntry): boolean {
   if (!isWorldNodeEdictGateMet(entry)) return false;
 
   return worldNodeCollectibleGateIds(entry).every((collectibleId) =>
     isCollectibleDiscovered(collectibleId),
+  );
+}
+
+// Nodes with no gate are always met; gated nodes need every listed collectible found. A node type removed for the run never is.
+export function isWorldNodeCollectibleGateMet(entry: WorldNodeEntry): boolean {
+  return (
+    !isWorldNodeTypeRemoved(entry.nodeData.type) &&
+    isWorldNodeContentGateMet(entry)
+  );
+}
+
+// Removed this run but otherwise there, so the map still draws it as scenery.
+export function isWorldNodeForgotten(entry: WorldNodeEntry): boolean {
+  return (
+    isWorldNodeTypeRemoved(entry.nodeData.type) &&
+    isWorldNodeContentGateMet(entry)
   );
 }
 
