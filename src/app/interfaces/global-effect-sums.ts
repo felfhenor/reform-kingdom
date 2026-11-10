@@ -24,6 +24,7 @@ export type GlobalEffectSums = {
   wipeEndsRun: boolean;
   workerCraftSpeedPercent: number;
   workerGatherSpeedPercent: number;
+  workerXpGainMultiplierBonus: number;
   townShopNoEquipment: boolean;
   featuresRevealed: boolean;
   cursedDrops: boolean;

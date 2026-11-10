@@ -199,4 +199,11 @@
       outputCollectibleId: Vow of the Warren Hunt
       costs:
         - itemId: Tattered Hide
-          required: 100
+          required: 15
+
+    - kind: Collectible
+      requiredEdictId: Edict of Sharp Unionization
+      outputCollectibleId: Vow of Sharp Unionization
+      costs:
+        - itemId: Weak Spider Silk
+          required: 25

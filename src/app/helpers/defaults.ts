@@ -266,6 +266,7 @@ export function defaultGlobalEffectSums(): GlobalEffectSums {
     wipeEndsRun: false,
     workerCraftSpeedPercent: 0,
     workerGatherSpeedPercent: 0,
+    workerXpGainMultiplierBonus: 0,
     townShopNoEquipment: false,
     featuresRevealed: false,
     cursedDrops: false,

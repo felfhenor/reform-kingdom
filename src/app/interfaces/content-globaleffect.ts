@@ -167,6 +167,12 @@ export type GlobalEffectEffectWorkerGatherSpeedPercent = {
   value: number;
 };
 
+// Whole percent on kingdom workers' gather speed, stacking additively.
+export type GlobalEffectEffectWorkerGainXPMultiplierBonus = {
+  effectType: 'WorkerXPGainMultiplier';
+  value: number;
+};
+
 // Town shops stop stocking equipment, and towns stop crafting it.
 export type GlobalEffectEffectTownShopNoEquipment = {
   effectType: 'GlobalTownShopNoEquipment';
@@ -308,6 +314,7 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectWipeEndsRun
   | GlobalEffectEffectWorkerCraftSpeedPercent
   | GlobalEffectEffectWorkerGatherSpeedPercent
+  | GlobalEffectEffectWorkerGainXPMultiplierBonus
   | GlobalEffectEffectTownShopNoEquipment
   | GlobalEffectEffectFeaturesRevealed
   | GlobalEffectEffectCursedDrops

@@ -6,9 +6,14 @@ import type {
   GlobalEffectEffect,
   GlobalEffectEffectArmorySizeBoost,
   GlobalEffectEffectCombatItemDropRateBoost,
+  GlobalEffectEffectCraftedExtraAffixes,
+  GlobalEffectEffectCraftTimeMultiplier,
+  GlobalEffectEffectDeathPenaltyMultiplier,
   GlobalEffectEffectDebuffResistance,
   GlobalEffectEffectDebuffResistanceTag,
   GlobalEffectEffectDecreeClauseCapBoost,
+  GlobalEffectEffectDropExtraAffixes,
+  GlobalEffectEffectEnemyExtraSkills,
   GlobalEffectEffectEnemyStatPercent,
   GlobalEffectEffectGainCombatStat,
   GlobalEffectEffectGainStatPercent,
@@ -17,27 +22,22 @@ import type {
   GlobalEffectEffectGatheringItemDropRateBoost,
   GlobalEffectEffectGatheringItemFlatBoost,
   GlobalEffectEffectGoldGainMultiplier,
+  GlobalEffectEffectLevelStatMultiplier,
   GlobalEffectEffectOffPathTravelSpeedBoost,
   GlobalEffectEffectOnPathTravelSpeedBoost,
-  GlobalEffectEffectShopPriceMultiplier,
-  GlobalEffectEffectDeathPenaltyMultiplier,
-  GlobalEffectEffectLevelStatMultiplier,
-  GlobalEffectEffectShrineBuffsPermanent,
-  GlobalEffectEffectEnemyExtraSkills,
-  GlobalEffectEffectDropExtraAffixes,
-  GlobalEffectEffectCraftedExtraAffixes,
   GlobalEffectEffectRecipeMaterialBoost,
-  GlobalEffectEffectCraftTimeMultiplier,
+  GlobalEffectEffectShopPriceMultiplier,
+  GlobalEffectEffectShrineBuffsPermanent,
   GlobalEffectEffectSkillPointsPerLevel,
-  GlobalEffectEffectWipeEndsRun,
   GlobalEffectEffectTradeskillQueueSizeBoost,
+  GlobalEffectEffectWipeEndsRun,
+  GlobalEffectEffectWorldNodeStartingLevel,
+  GlobalEffectEffectWorldNodeTypeRemoved,
   GlobalEffectEffectXPGainMultiplier,
   GlobalEffectId,
   StatusEffectTag,
   TradeskillId,
   WorldNodeType,
-  GlobalEffectEffectWorldNodeTypeRemoved,
-  GlobalEffectEffectWorldNodeStartingLevel,
 } from '@interfaces';
 
 export function ensureGlobalEffectEffect(
@@ -143,7 +143,8 @@ export function ensureGlobalEffectEffect(
 
   if (
     effect.effectType === 'WorkerCraftSpeedPercent' ||
-    effect.effectType === 'WorkerGatherSpeedPercent'
+    effect.effectType === 'WorkerGatherSpeedPercent' ||
+    effect.effectType === 'WorkerXPGainMultiplier'
   ) {
     return { effectType: effect.effectType, value: effect.value ?? 0 };
   }

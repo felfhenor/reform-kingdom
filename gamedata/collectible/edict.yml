@@ -300,3 +300,13 @@
   effects:
     - effectType: GlobalMonstersDropRegionGathering
       value: 5
+
+- id: a5e7edf5-b83a-4a13-bcb1-41ff5eab0520
+  name: Vow of Sharp Unionization
+  rarity: Mystical
+  description: A vow to stick together through tough times.
+  sprite: '0108'
+
+  effects:
+    - effectType: WorkerXPGainMultiplier
+      value: 1

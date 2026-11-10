@@ -133,3 +133,14 @@
     - effectType: GlobalWorldNodeStartingLevel
       nodeType: GatherNode
       value: 1
+
+- id: 1b3ffa90-0f05-4b98-8270-c836f44f136c
+  name: Edict of Sharp Unionization
+  enabled: true
+  sprite: '0034'
+  description: Workers get +300% XP.
+  kind: Boon
+  fragments: -2
+  effects:
+    - effectType: WorkerXPGainMultiplier
+      value: 3

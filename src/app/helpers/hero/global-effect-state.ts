@@ -88,6 +88,8 @@ export function globalEffectEffectDescription(
       return `Worker Craft Speed: ${signedPercent(effect.value)}`;
     case 'WorkerGatherSpeedPercent':
       return `Worker Gather Speed: ${signedPercent(effect.value)}`;
+    case 'WorkerXPGainMultiplier':
+      return `Worker XP Gain: ${signedPercent(effect.value * 100)}`;
     case 'GlobalTownShopNoEquipment':
       return 'Town shops sell no equipment';
     case 'GlobalFeaturesRevealed':
@@ -236,6 +238,9 @@ function accumulateGlobalEffectEffect(
       return;
     case 'WorkerGatherSpeedPercent':
       sums.workerGatherSpeedPercent += effect.value;
+      return;
+    case 'WorkerXPGainMultiplier':
+      sums.workerXpGainMultiplierBonus += effect.value;
       return;
     case 'GlobalTownShopNoEquipment':
       sums.townShopNoEquipment = true;

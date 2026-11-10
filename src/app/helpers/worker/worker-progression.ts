@@ -110,11 +110,19 @@ export function defaultWorkerState(): WorkerState {
 export function workerGainXp(workerId: WorkerId, amount: number): void {
   if (amount <= 0) return;
 
+  const finalAmount = Math.floor(
+    amount + amount * globalEffectSumsState().workerXpGainMultiplierBonus,
+  );
+
   updateGamestate((state) => {
     const worker = state.workers[workerId];
     if (!worker) return state;
 
-    worker.xp.current = clamp(worker.xp.current + amount, 0, worker.xp.maximum);
+    worker.xp.current = clamp(
+      worker.xp.current + finalAmount,
+      0,
+      worker.xp.maximum,
+    );
 
     return state;
   });
