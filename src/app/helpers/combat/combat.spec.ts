@@ -43,6 +43,7 @@ import {
   combatUnapplyAllStatusEffects,
 } from '@helpers/combat/combat-statuseffects';
 import {
+  combatantSkills,
   combatAvailableSkillsForCombatant,
   combatGetPossibleCombatantTargetsForSkill,
   combatGetPossibleCombatantTargetsForSkillTechnique,
@@ -55,8 +56,13 @@ import {
 } from '@helpers/content/ensure-skill';
 import { defaultStats } from '@helpers/defaults';
 import { rngChoiceWeighted, rngSucceedsChance } from '@helpers/rng';
-import { gamestate, worldCombatState } from '@helpers/state-game';
+import {
+  gamestate,
+  updateGamestate,
+  worldCombatState,
+} from '@helpers/state-game';
 import type {
+  Combat,
   Combatant,
   CombatOrderClause,
   CombatOrderClauseId,
@@ -157,42 +163,117 @@ describe('combatDoCombatIteration', () => {
     expect(worldCombatState()?.rounds).toBe(1);
   });
 
-  it('holds a manual round until orders exist, then clears them', () => {
-    available(skill('weighted'));
-    seedGamestate((state) => {
-      state.globalEffectSums.manualCombat = true;
-      state.world.combat = buildCombat({ rounds: 0, heroes: [caster()] });
-    });
-    inTick(combatDoCombatIteration);
-    expect(worldCombatState()?.rounds).toBe(0);
-
-    seedGamestate((state) => {
-      state.globalEffectSums.manualCombat = true;
-      state.world.combat = buildCombat({
-        rounds: 0,
-        heroes: [caster()],
-        manualActions: {},
+  describe('manual fights', () => {
+    const weighted = skill('weighted');
+    const foe = (id: string, agility = 0) =>
+      caster({
+        id,
+        isEnemy: true,
+        totalStats: { ...defaultStats(), Health: 40, Agility: agility },
       });
-    });
-    inTick(combatDoCombatIteration);
-    expect(worldCombatState()?.rounds).toBe(1);
-    expect(worldCombatState()?.manualActions).toBeUndefined();
-  });
 
-  it('ends a fled fight once the round is over', () => {
-    available(skill('weighted'));
-    seedGamestate((state) => {
-      state.globalEffectSums.manualCombat = true;
-      state.world.combat = buildCombat({
-        rounds: 0,
-        heroes: [caster()],
-        guardians: [caster({ id: 'foe', isEnemy: true })],
-        manualActions: {},
-        manualFlee: true,
+    function manualFight(overrides: Partial<Combat>): void {
+      available(weighted);
+      vi.mocked(combatantSkills).mockReturnValue([weighted]);
+      seedGamestate((state) => {
+        state.globalEffectSums.manualCombat = true;
+        state.world.combat = buildCombat({ rounds: 0, ...overrides });
       });
+    }
+
+    function order(): void {
+      inTick(() =>
+        updateGamestate((state) => {
+          state.world.combat!.manualAction = { skillId: weighted.id };
+          return state;
+        }),
+      );
+    }
+
+    const casters = () => combatantSkillCastEvents().map((e) => e.combatantId);
+
+    it('plays one turn per tick', () => {
+      manualFight({ guardians: [foe('fast', 10), foe('slow')] });
+
+      inTick(combatDoCombatIteration);
+      expect(casters()).toEqual(['fast']);
+      expect(worldCombatState()?.rounds).toBe(0);
+
+      inTick(combatDoCombatIteration);
+      expect(casters()).toEqual(['fast', 'slow']);
+      expect(worldCombatState()).toMatchObject({ rounds: 1 });
+      expect(worldCombatState()?.turnQueue).toBeUndefined();
     });
-    inTick(combatDoCombatIteration);
-    expect(worldCombatState()).toBeUndefined();
+
+    it("stops at a hero's turn until its order arrives", () => {
+      manualFight({ heroes: [caster()] });
+
+      inTick(combatDoCombatIteration);
+      const waiting = worldCombatState();
+      expect(waiting?.turnQueue?.[0]).toMatchObject({ awaitingOrders: true });
+
+      inTick(combatDoCombatIteration);
+      expect(worldCombatState()).toBe(waiting);
+      expect(casters()).toEqual([]);
+
+      order();
+      inTick(combatDoCombatIteration);
+      expect(casters()).toEqual(['caster-1']);
+      expect(worldCombatState()).toMatchObject({ rounds: 1 });
+      expect(worldCombatState()?.manualAction).toBeUndefined();
+    });
+
+    it('asks again for a blessed extra turn, but only once', () => {
+      rollsSucceed('repeatActionChance');
+      manualFight({ heroes: [caster()] });
+
+      inTick(combatDoCombatIteration);
+      order();
+      inTick(combatDoCombatIteration);
+      expect(worldCombatState()?.turnQueue).toEqual([
+        { combatantId: 'caster-1', bonus: true },
+      ]);
+
+      inTick(combatDoCombatIteration);
+      order();
+      inTick(combatDoCombatIteration);
+      expect(casters()).toEqual(['caster-1', 'caster-1']);
+      expect(worldCombatState()).toMatchObject({ rounds: 1 });
+    });
+
+    it("plays the dead's skipped turns along with the next one", () => {
+      vi.mocked(combatantIsDead).mockImplementation((c) => c.id === 'dead');
+      manualFight({ guardians: [foe('dead', 10), foe('alive')] });
+
+      inTick(combatDoCombatIteration);
+      expect(casters()).toEqual(['alive']);
+      expect(worldCombatState()).toMatchObject({ rounds: 1 });
+    });
+
+    it('lets the rest of the round play out, then escapes', () => {
+      const hero = caster({
+        totalStats: { ...defaultStats(), Health: 40, Agility: 10 },
+      });
+      manualFight({ heroes: [hero], guardians: [foe('foe')] });
+
+      inTick(combatDoCombatIteration);
+      inTick(() =>
+        updateGamestate((state) => {
+          state.world.combat!.manualFlee = true;
+          return state;
+        }),
+      );
+      inTick(combatDoCombatIteration);
+      expect(casters()).toEqual([]);
+      expect(worldCombatState()).toBeDefined();
+
+      inTick(combatDoCombatIteration);
+      expect(casters()).toEqual(['foe']);
+      expect(worldCombatState()).toBeUndefined();
+      expect(combatLog().map(({ message }) => message)).toContain(
+        'The party escaped!',
+      );
+    });
   });
 
   it('commits the round on a copy, leaving the previous round untouched', () => {

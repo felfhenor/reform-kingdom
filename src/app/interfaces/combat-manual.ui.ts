@@ -1,8 +1,8 @@
-import type { Combatant, CombatManualAction } from '@interfaces/combat';
+import type { Combatant } from '@interfaces/combat';
 import type { CombatLogIcon } from '@interfaces/combat-log';
 import type { EquipmentSkill } from '@interfaces/content-skill';
 
-// Empty targets = the round fills them, so the player doesn't pick one; autoTargetLabel says who.
+// Empty targets = the engine fills them, so the player doesn't pick one; autoTargetLabel says who.
 export type CombatManualSkillOption = {
   skill: EquipmentSkill;
   targets: Combatant[];
@@ -13,9 +13,13 @@ export type CombatManualSkillOption = {
   disabledReason?: string;
 };
 
-export type CombatManualOrder = CombatManualAction & {
-  skillName: string;
-  skillSprite: string;
-  targetLabel: string;
-  targetIcon?: CombatLogIcon;
-};
+export type CombatManualTurnSlot =
+  | {
+      kind: 'turn';
+      key: string;
+      id: string;
+      name: string;
+      isEnemy: boolean;
+      icon: CombatLogIcon;
+    }
+  | { kind: 'divider'; key: string; round: number };

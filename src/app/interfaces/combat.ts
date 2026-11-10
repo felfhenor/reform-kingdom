@@ -257,11 +257,26 @@ export type Combat = {
   ambushedBy?: string;
   // Ticks to wait before the first round, e.g. a pause between an encounter's fights.
   startDelayTicks?: number;
-  // A manual round's confirmed orders by hero combatant id; cleared once the round runs.
-  manualActions?: Record<string, CombatManualAction>;
-  // Set with empty orders: heroes skip the round, then escape if any survive it.
+  // The current round's turns still to play, front first; unset between rounds.
+  turnQueue?: CombatTurn[];
+  // The front hero's confirmed order in a manual fight; cleared once that turn runs.
+  manualAction?: CombatManualAction;
+  // Heroes skip the rest of the round, then escape if any survive it.
   manualFlee?: boolean;
 };
+
+export type CombatTurn = {
+  combatantId: string;
+  // An elemental blessing's extra turn, which can't earn another.
+  bonus?: boolean;
+  // Its start-of-turn effects have run and it waits on manual orders.
+  awaitingOrders?: boolean;
+};
+
+// over: the turn is done; lost: it can't act but its end-of-turn effects still run.
+export type CombatTurnStart = 'over' | 'lost' | 'ready';
+
+export type CombatQueuedTurnOutcome = 'waiting' | 'taken' | 'skipped';
 
 export type CombatManualAction = {
   skillId: EquipmentSkillId;

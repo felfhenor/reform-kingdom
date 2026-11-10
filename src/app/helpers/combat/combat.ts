@@ -12,7 +12,9 @@ import {
 import {
   combatantTakesOrders,
   combatIsManual,
+  combatManualAwaitingOrders,
   combatManualEscaped,
+  combatManualNeedsOrders,
   combatManualPick,
 } from '@helpers/combat/combat-manual';
 import { pickSkillFromCombatOrders } from '@helpers/combat/combat-order-evaluation';
@@ -31,7 +33,10 @@ import {
   combatTickCombatantStatusEffects,
   combatUnapplyAllStatusEffects,
 } from '@helpers/combat/combat-statuseffects';
-import { combatHasCombatant } from '@helpers/combat/combat-summon';
+import {
+  combatRoundQueue,
+  combatTurnCombatant,
+} from '@helpers/combat/combat-turn-queue';
 import {
   combatAvailableSkillsForCombatant,
   combatGetPossibleCombatantTargetsForSkill,
@@ -47,25 +52,25 @@ import {
   worldCombatState,
 } from '@helpers/state-game';
 
-import { clamp, sortBy } from 'es-toolkit/compat';
+import { clamp } from 'es-toolkit/compat';
 
 import {
   combatCombatantCombatStatSucceedsChance,
   combatCombatantSkillEpCost,
 } from '@helpers/combat/combat-stats';
 import { rngSucceedsChance } from '@helpers/rng';
-import type { Combat, Combatant, EquipmentSkill } from '@interfaces';
+import type {
+  Combat,
+  Combatant,
+  CombatQueuedTurnOutcome,
+  CombatTurn,
+  CombatTurnStart,
+  EquipmentSkill,
+} from '@interfaces';
 
 type CombatTurnResult = {
   takeAnotherTurn?: boolean;
 };
-
-export function orderCombatantsByAgility(combat: Combat): Combatant[] {
-  return sortBy(
-    [...combat.guardians, ...combat.heroes, ...combat.helpers],
-    (c) => -c.totalStats.Agility,
-  );
-}
 
 function combatantMarkSkillUse(
   combatant: Combatant,
@@ -119,8 +124,6 @@ function combatantCanAct(combat: Combat, combatant: Combatant): boolean {
 
 // Returns whether the combatant actually acted, which gates an extra turn.
 function combatantAct(combat: Combat, combatant: Combatant): boolean {
-  if (!combatantCanAct(combat, combatant)) return false;
-
   const skills = combatAvailableSkillsForCombatant(combat, combatant).filter(
     (s) =>
       combatGetPossibleCombatantTargetsForSkill(combat, combatant, s).length >
@@ -158,10 +161,10 @@ function combatantAct(combat: Combat, combatant: Combatant): boolean {
   return true;
 }
 
-export function combatantTakeTurn(
+export function combatantStartTurn(
   combat: Combat,
   combatant: Combatant,
-): CombatTurnResult {
+): CombatTurnStart {
   if (combatantIsDead(combatant)) {
     if (rngSucceedsChance(combatant.combatStats.reviveChance)) {
       combatMessageLog(
@@ -178,20 +181,28 @@ export function combatantTakeTurn(
         combat,
         `**${combatantMessageToken(combatant)}** is dead, skipping turn.`,
       );
-      return {};
+      return 'over';
     }
   }
 
   combatantTickSkillCooldowns(combatant);
 
   const firedDelayed = combatantFireDelayedSkills(combat, combatant);
-  if (firedDelayed && combatantLogIfDefeated(combat, combatant)) return {};
+  if (firedDelayed && combatantLogIfDefeated(combat, combatant)) return 'over';
 
   combatTickCombatantStatusEffects(combat, combatant, 'TurnStart');
 
-  if (combatantLogIfDefeated(combat, combatant)) return {};
+  if (combatantLogIfDefeated(combat, combatant)) return 'over';
 
-  const acted = combatantAct(combat, combatant);
+  return combatantCanAct(combat, combatant) ? 'ready' : 'lost';
+}
+
+export function combatantFinishTurn(
+  combat: Combat,
+  combatant: Combatant,
+  canAct: boolean,
+): CombatTurnResult {
+  const acted = canAct && combatantAct(combat, combatant);
 
   combatTickCombatantStatusEffects(combat, combatant, 'TurnEnd');
   combatExpireCombatantStatusEffects(combat, combatant);
@@ -214,6 +225,15 @@ export function combatantTakeTurn(
   return {};
 }
 
+export function combatantTakeTurn(
+  combat: Combat,
+  combatant: Combatant,
+): CombatTurnResult {
+  const start = combatantStartTurn(combat, combatant);
+  if (start === 'over') return {};
+  return combatantFinishTurn(combat, combatant, start === 'ready');
+}
+
 function combatWaitStartDelay(current: Combat): boolean {
   const delay = current.startDelayTicks ?? 0;
   if (delay <= 0) return false;
@@ -231,25 +251,18 @@ export function combatDoCombatIteration(): void {
   if (combatWaitStartDelay(current)) return;
 
   if (combatCheckIfOver(current)) return;
-  if (combatIsManual() && !current.manualActions) return;
+  if (combatManualAwaitingOrders(current)) return;
 
-  // The engine mutates combatants in place and committed state is frozen, so each round works on its own copy.
+  // The engine mutates combatants in place and committed state is frozen, so each step works on its own copy.
   const combat = structuredClone(current);
 
   beginCombatLogCommits();
   runStatsCombatBegin();
-  if (combat.manualFlee) combatMessageLog(combat, 'The party tries to flee!');
 
-  if (combat.ambushedBy) {
-    combatDoAmbushRound(combat);
-  } else {
-    combatDoRound(combat);
-  }
-
-  const escaped = combatManualEscaped(combat);
+  const escaped = combatIsManual()
+    ? combatDoManualStep(combat)
+    : combatDoRound(combat);
   if (escaped) combatMessageLog(combat, 'The party escaped!');
-  combat.manualActions = undefined;
-  combat.manualFlee = undefined;
   gamestateFreezeSubtree(combat);
   updateGamestate((state) => {
     state.world.combat = escaped ? undefined : combat;
@@ -262,39 +275,89 @@ export function combatDoCombatIteration(): void {
   endCombatLogCommits();
 }
 
-// A summon replaced earlier this round no longer acts; an elemental blessing grants one extra turn.
-function combatantTakeRoundTurn(combat: Combat, char: Combatant): void {
-  if (!combatHasCombatant(combat, char)) return;
+// Picks up where a manual fight left a round half-played.
+function combatDoRound(combat: Combat): boolean {
+  const queue = (combat.turnQueue ??= combatBeginRound(combat));
+  while (queue.length > 0) combatTakeQueuedTurn(combat, queue);
+  return combatEndRound(combat);
+}
 
-  const res = combatantTakeTurn(combat, char);
+// One turn per tick so each lands on screen; the skipped turns of the dead ride along with the next.
+function combatDoManualStep(combat: Combat): boolean {
+  const queue = (combat.turnQueue ??= combatBeginRound(combat));
+  let outcome: CombatQueuedTurnOutcome = 'skipped';
+  while (outcome === 'skipped' && queue.length > 0) {
+    outcome = combatTakeQueuedTurn(combat, queue);
+  }
+  return queue.length === 0 ? combatEndRound(combat) : false;
+}
 
-  if (res?.takeAnotherTurn) {
+function combatBeginRound(combat: Combat): CombatTurn[] {
+  combatMessageLog(
+    combat,
+    combat.ambushedBy
+      ? `**${combat.ambushedBy}** sprung an ambush!`
+      : `_Combat round ${combat.rounds + 1}._`,
+  );
+  return combatRoundQueue(combat);
+}
+
+// Returns whether a fleeing party got away.
+function combatEndRound(combat: Combat): boolean {
+  combat.turnQueue = undefined;
+  if (combat.ambushedBy) combat.ambushedBy = undefined;
+  else combatCountRound(combat);
+
+  const escaped = combatManualEscaped(combat);
+  combat.manualFlee = undefined;
+  return escaped;
+}
+
+function combatTakeQueuedTurn(
+  combat: Combat,
+  queue: CombatTurn[],
+): CombatQueuedTurnOutcome {
+  const turn = queue[0];
+  const combatant = combatTurnCombatant(combat, turn);
+  const wasDead = !combatant || combatantIsDead(combatant);
+  const result = combatant ? combatPlayTurn(combat, turn, combatant) : {};
+  if (result === 'waiting') return 'waiting';
+
+  queue.shift();
+  combat.manualAction = undefined;
+  if (combatant && result.takeAnotherTurn && !turn.bonus) {
     combatMessageLog(
       combat,
-      `**${combatantMessageToken(char)}** was blessed by the elements, and gets to go again!`,
+      `**${combatantMessageToken(combatant)}** was blessed by the elements, and gets to go again!`,
     );
-    combatantTakeTurn(combat, char);
+    queue.unshift({ combatantId: combatant.id, bonus: true });
   }
+  return wasDead && (!combatant || combatantIsDead(combatant))
+    ? 'skipped'
+    : 'taken';
 }
 
-// Only living heroes act, and it isn't a counted round, so the exhaustion timer doesn't move.
-function combatDoAmbushRound(combat: Combat): void {
-  combatMessageLog(combat, `**${combat.ambushedBy}** sprung an ambush!`);
+// A hero who needs orders stops after the start of the turn and resumes there once they arrive.
+function combatPlayTurn(
+  combat: Combat,
+  turn: CombatTurn,
+  combatant: Combatant,
+): CombatTurnResult | 'waiting' {
+  if (turn.awaitingOrders) {
+    if (combat.manualFlee) combatMessageLog(combat, 'The party tries to flee!');
+    return combatantFinishTurn(combat, combatant, true);
+  }
 
-  orderCombatantsByAgility(combat)
-    .filter((char) => combat.heroes.includes(char) && !combatantIsDead(char))
-    .forEach((char) => combatantTakeRoundTurn(combat, char));
-
-  combat.ambushedBy = undefined;
+  const start = combatantStartTurn(combat, combatant);
+  if (start === 'over') return {};
+  if (start === 'ready' && combatManualNeedsOrders(combat, combatant)) {
+    turn.awaitingOrders = true;
+    return 'waiting';
+  }
+  return combatantFinishTurn(combat, combatant, start === 'ready');
 }
 
-function combatDoRound(combat: Combat): void {
-  combatMessageLog(combat, `_Combat round ${combat.rounds + 1}._`);
-
-  orderCombatantsByAgility(combat).forEach((char) =>
-    combatantTakeRoundTurn(combat, char),
-  );
-
+function combatCountRound(combat: Combat): void {
   const previousRounds = combat.rounds;
   combat.rounds++;
 

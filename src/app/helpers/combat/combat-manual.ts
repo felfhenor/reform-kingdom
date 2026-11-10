@@ -2,8 +2,13 @@ import {
   combatantMessageToken,
   combatMessageLog,
 } from '@helpers/combat/combat-log';
-import { combatantSkills } from '@helpers/combat/combat-targetting';
+import {
+  combatantSkills,
+  combatAvailableSkillsForCombatant,
+  combatGetPossibleCombatantTargetsForSkillTechnique,
+} from '@helpers/combat/combat-targetting';
 import { autoModeIsEnabled } from '@helpers/decree/auto-mode-state';
+import { skillOwnTechniques } from '@helpers/hero/skill-modifier';
 import { regionForMap } from '@helpers/lore/region-intro';
 import { rngShuffle } from '@helpers/rng';
 import {
@@ -46,9 +51,53 @@ export function combatantTakesOrders(
   combatant: Combatant,
 ): boolean {
   return (
-    !!combat.manualActions &&
     !combatant.summonerId &&
-    combat.heroes.includes(combatant)
+    combat.heroes.includes(combatant) &&
+    combatIsManual()
+  );
+}
+
+// Ignores confusion and redirection, which are only rolled when the skill is cast.
+export function combatManualSkillUsable(
+  combat: Combat,
+  hero: Combatant,
+  skill: EquipmentSkill,
+): boolean {
+  return (
+    combatAvailableSkillsForCombatant(combat, hero).includes(skill) &&
+    skillOwnTechniques(skill).some(
+      (tech) =>
+        combatGetPossibleCombatantTargetsForSkillTechnique(
+          combat,
+          hero,
+          skill,
+          tech,
+          false,
+        ).length > 0,
+    )
+  );
+}
+
+// A hero with nothing usable, or a fleeing party, plays the turn out without asking.
+export function combatManualNeedsOrders(
+  combat: Combat,
+  combatant: Combatant,
+): boolean {
+  return (
+    !combat.manualFlee &&
+    combatantTakesOrders(combat, combatant) &&
+    combatantSkills(combatant).some((s) =>
+      combatManualSkillUsable(combat, combatant, s),
+    )
+  );
+}
+
+export function combatManualAwaitingOrders(combat: Combat): boolean {
+  return (
+    !!combat.turnQueue?.[0]?.awaitingOrders &&
+    !combat.manualAction &&
+    !combat.manualFlee &&
+    combatIsManual()
   );
 }
 
@@ -80,7 +129,7 @@ export function combatManualPick(
   skills: EquipmentSkill[],
 ): CombatOrderPick | undefined {
   if (combat.manualFlee) return undefined;
-  const action = combat.manualActions?.[combatant.id];
+  const action = combat.manualAction;
   if (!action) return combatantLosesTurn(combat, combatant, 'has no orders');
 
   const skill = skills.find((s) => s.id === action.skillId);

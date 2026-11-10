@@ -178,7 +178,7 @@
   name: Edict of the Taskmaster's Intervention
   enabled: true
   sprite: '0032'
-  description: You control hero actions in combat. The Decree can only send them to locations in regions you've sealed.
+  description: You control hero actions in combat. The Decree can only send them to locations in regions you've sealed. Heroes gain +300% XP.
   kind: Variant
   fragments: 0
   effects:

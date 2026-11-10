@@ -1,0 +1,22 @@
+// Box size and icon scale grow together, so the leader pushes the rest of the bar over as it doubles.
+.turn-slot {
+  width: 34px;
+  height: 34px;
+  transition:
+    width 300ms ease,
+    height 300ms ease;
+
+  app-slot-icon-blank {
+    transform-origin: top left;
+    transition: transform 300ms ease;
+  }
+}
+
+.turn-slot-leader {
+  width: 66px;
+  height: 66px;
+
+  app-slot-icon-blank {
+    transform: scale(2);
+  }
+}

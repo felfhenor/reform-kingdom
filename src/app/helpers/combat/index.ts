@@ -37,4 +37,5 @@ export * from './combat-statuseffects-technique';
 export * from './combat-statuseffects.ui';
 export * from './combat-summon';
 export * from './combat-targetting';
+export * from './combat-turn-queue';
 export * from './monster';

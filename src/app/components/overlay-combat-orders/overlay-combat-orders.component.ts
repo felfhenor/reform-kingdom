@@ -1,5 +1,7 @@
 import { DecimalPipe } from '@angular/common';
+import type { AnimationCallbackEvent } from '@angular/core';
 import {
+  afterRenderEffect,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -9,6 +11,7 @@ import {
   inject,
   signal,
   untracked,
+  viewChild,
 } from '@angular/core';
 import { AdventureLogMessageComponent } from '@components/adventure-log-message/adventure-log-message.component';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
@@ -17,25 +20,26 @@ import { IconComponent } from '@components/icon/icon.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { StatusElementPoolComponent } from '@components/status-element-pool/status-element-pool.component';
 import { TooltipSkillPreviewComponent } from '@components/tooltip-skill-preview/tooltip-skill-preview.component';
+import { ListReflowDirective } from '@directives/list-reflow.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { combatLog } from '@helpers/combat/combat-log';
 import { combatIsManual } from '@helpers/combat/combat-manual';
 import {
-  combatantIcon,
-  combatManualFlee,
-  combatManualOrder,
-  combatManualRepeatOrder,
-  combatManualTurnOrder,
+  combatManualAction,
+  combatManualActiveHero,
   combatManualConfirm,
-  combatManualHeroes,
+  combatManualFlee,
   combatManualOverlayOpen,
+  combatManualRepeatAction,
   combatManualSkillOptions,
   combatManualStatusCard,
   combatManualTitle,
+  combatManualTurnKey,
+  combatManualTurnOrder,
 } from '@helpers/combat/combat-manual.ui';
 import {
   COMBAT_MANUAL_REPEAT_DELAY_MS,
-  COMBAT_MANUAL_ROUND_HOLD_MS,
+  COMBAT_MANUAL_TURN_HOLD_MS,
 } from '@helpers/config';
 import { hotkeysBlockOutside } from '@helpers/engine/hotkeys.ui';
 import { playGameSFX } from '@helpers/engine/sfx';
@@ -47,7 +51,6 @@ import type {
   Combatant,
   CombatLog,
   CombatManualAction,
-  CombatManualOrder,
   CombatManualSkillOption,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -63,6 +66,7 @@ import { AnimationService } from '@services/animation.service';
     CardStatusCombatantComponent,
     DecimalPipe,
     IconComponent,
+    ListReflowDirective,
     SFXDirective,
     SlotIconBlankComponent,
     StatusElementPoolComponent,
@@ -71,13 +75,15 @@ import { AnimationService } from '@services/animation.service';
     SweetAlert2Module,
   ],
   templateUrl: './overlay-combat-orders.component.html',
+  styleUrl: './overlay-combat-orders.component.scss',
   host: { class: 'fixed inset-0 z-40 block' },
 })
 export class OverlayCombatOrdersComponent {
+  private anim = inject(AnimationService);
   private liveCombat = computed(() =>
     combatIsManual() ? worldCombatState() : undefined,
   );
-  // Lags the live fight while a resolved round settles, so its damage numbers play before anything swaps.
+  // Lags the live fight while a resolved turn settles, so its damage numbers play before anything swaps.
   // Seeded with the live fight: effects read it before their first run would set it.
   private shownCombat = signal<Combat | undefined>(this.liveCombat());
   public isSettling = signal(false);
@@ -87,37 +93,18 @@ export class OverlayCombatOrdersComponent {
   private seenCombatIds = signal<Set<string>>(new Set());
 
   public title = computed(() => combatManualTitle(this.combat()));
-  public orders = signal<Partial<Record<string, CombatManualOrder>>>({});
-  private chosenHeroId = signal<string | undefined>(undefined);
   public pendingSkillId = signal<string | undefined>(undefined);
 
   public isPaused = isGameloopPaused;
-  public isResolving = computed(
-    () => !!this.combat()?.manualActions || this.isSettling(),
-  );
   public allies = computed(() => [
     ...this.combat().heroes,
     ...this.combat().helpers,
   ]);
 
-  // Living heroes with at least one usable skill must have orders.
-  public orderable = computed(() =>
-    this.isReview()
-      ? []
-      : combatManualHeroes(this.combat()).filter(
-          (hero) =>
-            hero.hp > 0 &&
-            combatManualSkillOptions(this.combat(), hero).some(
-              (o) => !o.disabledReason,
-            ),
-        ),
+  public activeHero = computed(() =>
+    this.isReview() ? undefined : combatManualActiveHero(this.combat()),
   );
-
-  public activeHero = computed(() => {
-    const heroes = this.orderable();
-    const chosen = heroes.find((h) => h.id === this.chosenHeroId());
-    return chosen ?? heroes.find((h) => !this.orders()[h.id]);
-  });
+  public isResolving = computed(() => !this.activeHero() || this.isSettling());
 
   public skillOptions = computed(() => {
     const hero = this.activeHero();
@@ -132,27 +119,27 @@ export class OverlayCombatOrdersComponent {
     () => new Set((this.pendingOption()?.targets ?? []).map((c) => c.id)),
   );
 
-  public canConfirm = computed(() =>
-    this.orderable().every((hero) => !!this.orders()[hero.id]),
-  );
-
-  // The latest round's lines, oldest first; spans fights so a chained fight still shows the last one's loot.
+  // This round's and the last round's lines, oldest first; spans fights so a chained fight still shows the last one's loot.
   public logEntries = computed(() => {
     const ids = this.seenCombatIds();
-    const round: CombatLog[] = [];
+    const lines: CombatLog[] = [];
+    let rounds = 0;
     for (const entry of combatLog()) {
       if (!entry.combatId || !ids.has(entry.combatId)) continue;
-      round.push(entry);
-      if (entry.message.startsWith('_Combat round')) break;
+      lines.push(entry);
+      if (entry.message.startsWith('_Combat round')) rounds++;
+      if (rounds === 2) break;
     }
-    return round.reverse();
+    return lines.reverse();
   });
+
+  private logBox = viewChild<ElementRef<HTMLElement>>('logBox');
 
   public isEscaped = computed(() =>
     this.logEntries().some((e) => e.message === 'The party escaped!'),
   );
 
-  // Last round's orders: pre-highlighted, and replayed when Enter is pressed.
+  // Each hero's last order: pre-highlighted, and replayed when Enter is pressed.
   private previousOrders = signal<Record<string, CombatManualAction>>({});
   public previousSkillId = computed(() => {
     const hero = this.activeHero();
@@ -161,14 +148,7 @@ export class OverlayCombatOrdersComponent {
 
   public hoveredId = signal<string | undefined>(undefined);
   private lastEnterStepAt = 0;
-  public turnOrder = computed(() =>
-    combatManualTurnOrder(this.combat()).map((c) => ({
-      id: c.id,
-      name: c.name,
-      isEnemy: c.isEnemy,
-      icon: combatantIcon(c),
-    })),
-  );
+  public turnOrder = computed(() => combatManualTurnOrder(this.combat()));
 
   public isVictory = computed(() =>
     this.logEntries().some((e) => e.message === 'Heroes have won the combat!'),
@@ -191,32 +171,26 @@ export class OverlayCombatOrdersComponent {
     if (this.isPaused()) {
       return { tone: 'alert-warning', text: 'The game is paused.' };
     }
-    if (this.isResolving()) {
+    if (this.isResolving() || !hero) {
       return { tone: 'alert-info', text: 'Resolving...' };
     }
-    if (option && hero) {
+    if (option) {
       return {
         tone: 'alert-info',
         text: `Pick a target for ${hero.name}'s ${option.skill.name}.`,
       };
     }
-    if (hero) {
-      return { tone: 'alert-info', text: `Choose a skill for ${hero.name}.` };
-    }
-    return {
-      tone: 'alert-success',
-      text: 'Every hero has orders!',
-    };
+    return { tone: 'alert-info', text: `Choose a skill for ${hero.name}.` };
   });
 
   public cardFor = combatManualStatusCard;
 
   constructor() {
     const host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
-    const fadeIn = inject(AnimationService).fadeIn(host, 300);
+    const fadeIn = this.anim.fadeIn(host, 300);
     // Registered ahead of the hotkey block, which stops every later keydown listener.
     const onEnter = (event: KeyboardEvent) => {
-      if (event.key === 'Enter') this.repeatLastRound(event);
+      if (event.key === 'Enter') this.repeatLastOrder(event);
     };
     window.addEventListener('keydown', onEnter, { capture: true });
     const unblock = hotkeysBlockOutside(host);
@@ -241,7 +215,7 @@ export class OverlayCombatOrdersComponent {
       holdTimer = setTimeout(() => {
         then();
         this.isSettling.set(false);
-      }, COMBAT_MANUAL_ROUND_HOLD_MS);
+      }, COMBAT_MANUAL_TURN_HOLD_MS);
     };
 
     effect(() => {
@@ -252,15 +226,29 @@ export class OverlayCombatOrdersComponent {
           this.seenCombatIds.update((ids) => new Set([...ids, live.id]));
         }
         if (!shown || (live && !this.isSettling() && live.id === shown.id)) {
-          if (live && shown && live.rounds !== shown.rounds) hold(() => {});
+          if (
+            live &&
+            shown &&
+            combatManualTurnKey(live) !== combatManualTurnKey(shown)
+          ) {
+            hold(() => {});
+          }
           if (live) this.shownCombat.set(live);
           return;
         }
-        // A new fight or the end of this one waits until the last round's numbers have played.
+        // A new fight or the end of this one waits until the last turn's numbers have played.
         if (live?.id !== shown.id)
           hold(() => this.shownCombat.set(live ?? shown));
         else this.shownCombat.set(live);
       });
+    });
+
+    afterRenderEffect({
+      write: () => {
+        this.logEntries();
+        const box = this.logBox()?.nativeElement;
+        box?.scrollTo({ top: box.scrollHeight });
+      },
     });
 
     let wasReview = false;
@@ -270,16 +258,13 @@ export class OverlayCombatOrdersComponent {
       wasReview = review;
     });
 
-    // A new round, fight or resolved order set starts planning over.
-    const roundKey = computed(() => {
-      const c = this.combat();
-      return c
-        ? `${c.id}|${c.rounds}|${!!c.manualActions}|${!!c.ambushedBy}`
-        : '';
-    });
+    // A new turn drops any half-picked skill.
+    const turnKey = computed(() =>
+      this.combat() ? combatManualTurnKey(this.combat()) : '',
+    );
     effect(() => {
-      roundKey();
-      this.resetOrders();
+      turnKey();
+      this.pendingSkillId.set(undefined);
     });
   }
 
@@ -287,7 +272,7 @@ export class OverlayCombatOrdersComponent {
     const hero = this.activeHero();
     if (!hero || option.disabledReason) return;
     if (option.targets.length === 0) {
-      this.setOrder(hero, option);
+      this.submit(hero, combatManualAction(option));
       return;
     }
     this.pendingSkillId.set(option.skill.id);
@@ -297,47 +282,18 @@ export class OverlayCombatOrdersComponent {
     const hero = this.activeHero();
     const option = this.pendingOption();
     if (hero && option && this.targetableIds().has(c.id)) {
-      this.setOrder(hero, option, c);
-      return;
-    }
-    if (this.orderable().includes(c)) {
-      this.chosenHeroId.set(c.id);
-      this.pendingSkillId.set(undefined);
+      this.submit(hero, combatManualAction(option, c));
     }
   }
 
-  private setOrder(
-    hero: Combatant,
-    option: CombatManualSkillOption,
-    target?: Combatant,
-  ): void {
-    const order = combatManualOrder(option, target);
-    this.orders.update((orders) => ({ ...orders, [hero.id]: order }));
-    this.chosenHeroId.set(undefined);
+  private submit(hero: Combatant, action: CombatManualAction): void {
+    if (this.isResolving()) return;
     this.pendingSkillId.set(undefined);
+    this.previousOrders.update((orders) => ({ ...orders, [hero.id]: action }));
+    combatManualConfirm(this.combat(), action);
   }
 
-  public resetOrders(): void {
-    this.orders.set({});
-    this.chosenHeroId.set(undefined);
-    this.pendingSkillId.set(undefined);
-  }
-
-  public confirm(): void {
-    if (!this.canConfirm()) return;
-    const actions: Record<string, CombatManualAction> = {};
-    Object.entries(this.orders()).forEach(([id, order]) => {
-      if (order) {
-        actions[id] = { skillId: order.skillId, targetId: order.targetId };
-      }
-    });
-    this.previousOrders.set(actions);
-    combatManualConfirm(this.combat(), actions);
-  }
-
-  // Holding Enter keeps replaying last round's orders, filling in only heroes without one.
-  // Each press (or held repeat) readies one hero from last round's orders; the press after the last one confirms.
-  public repeatLastRound(event: KeyboardEvent): void {
+  public repeatLastOrder(event: KeyboardEvent): void {
     if (this.isReview() || this.isResolving() || this.isPaused()) return;
     if (document.querySelector('.swal2-container')) return;
     event.preventDefault();
@@ -346,18 +302,19 @@ export class OverlayCombatOrdersComponent {
     this.lastEnterStepAt = Date.now();
 
     const hero = this.activeHero();
-    if (!hero) {
-      this.confirm();
-      return;
-    }
-    const previous = this.previousOrders()[hero.id];
-    const order = previous
-      ? combatManualRepeatOrder(this.combat(), hero, previous)
-      : undefined;
-    if (!order) return;
-    this.orders.update((orders) => ({ ...orders, [hero.id]: order }));
-    this.chosenHeroId.set(undefined);
-    this.pendingSkillId.set(undefined);
+    const previous = hero ? this.previousOrders()[hero.id] : undefined;
+    const action =
+      hero && previous
+        ? combatManualRepeatAction(this.combat(), hero, previous)
+        : undefined;
+    if (hero && action) this.submit(hero, action);
+  }
+
+  public onSlotLeave(event: AnimationCallbackEvent): void {
+    this.anim
+      .fadeOut(event.target)
+      .then(() => event.animationComplete())
+      .catch(() => event.animationComplete());
   }
 
   public flee(): void {

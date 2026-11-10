@@ -1,8 +1,8 @@
 import {
   combatantHasLivingSummon,
-  combatHasCombatant,
   combatSummonMonster,
 } from '@helpers/combat/combat-summon';
+import { combatTurnCombatant } from '@helpers/combat/combat-turn-queue';
 import { ensureEdict } from '@helpers/content/ensure-edict';
 import { ensureMonster } from '@helpers/content/ensure-monster';
 import { defaultStats } from '@helpers/defaults';
@@ -133,16 +133,18 @@ describe('combatantHasLivingSummon', () => {
   });
 });
 
-describe('combatHasCombatant', () => {
-  it('is false once a summon has been replaced', () => {
+describe('combatTurnCombatant', () => {
+  it('finds nobody once a summon has been replaced', () => {
     const hero = buildTestCombatant({ id: 'hero-1' });
     const combat = buildCombat({ heroes: [hero] });
     const first = combatSummonMonster(combat, hero, wolf.id)!;
+    const turnOf = (c: { id: string }) =>
+      combatTurnCombatant(combat, { combatantId: c.id });
 
-    expect(combatHasCombatant(combat, hero)).toBe(true);
-    expect(combatHasCombatant(combat, first)).toBe(true);
+    expect(turnOf(hero)).toBe(hero);
+    expect(turnOf(first)).toBe(first);
 
     combatSummonMonster(combat, hero, wolf.id);
-    expect(combatHasCombatant(combat, first)).toBe(false);
+    expect(turnOf(first)).toBeUndefined();
   });
 });

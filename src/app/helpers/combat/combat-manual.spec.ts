@@ -3,7 +3,9 @@ import {
   combatAutomationAllowedAt,
   combatantTakesOrders,
   combatIsManual,
+  combatManualAwaitingOrders,
   combatManualEscaped,
+  combatManualNeedsOrders,
   combatManualPick,
   regionIsSealed,
 } from '@helpers/combat/combat-manual';
@@ -79,17 +81,57 @@ describe('combat-manual', () => {
       return buildCombat({
         heroes: [hero, summon],
         guardians: [enemyA, enemyB],
-        manualActions: { hero: { skillId: skill.id, targetId } },
+        manualAction: { skillId: skill.id, targetId },
       });
     }
 
-    it('only real heroes take orders, and only once orders exist', () => {
+    it('only real heroes take orders, and only in a manual fight', () => {
       seed({ manual: true, sealed: false, auto: false });
       expect(combatantTakesOrders(combatWith(), hero)).toBe(true);
       expect(combatantTakesOrders(combatWith(), summon)).toBe(false);
-      expect(combatantTakesOrders(buildCombat({ heroes: [hero] }), hero)).toBe(
+      seed({ manual: false, sealed: false, auto: false });
+      expect(combatantTakesOrders(combatWith(), hero)).toBe(false);
+    });
+
+    it('waits only on a started hero turn that has no order or flee yet', () => {
+      seed({ manual: true, sealed: false, auto: false });
+      const waiting = {
+        ...combatWith(),
+        manualAction: undefined,
+        turnQueue: [{ combatantId: hero.id, awaitingOrders: true }],
+      };
+      expect(combatManualAwaitingOrders(waiting)).toBe(true);
+      expect(
+        combatManualAwaitingOrders({
+          ...waiting,
+          turnQueue: [{ combatantId: hero.id }],
+        }),
+      ).toBe(false);
+      expect(
+        combatManualAwaitingOrders({
+          ...waiting,
+          manualAction: { skillId: skill.id },
+        }),
+      ).toBe(false);
+      expect(combatManualAwaitingOrders({ ...waiting, manualFlee: true })).toBe(
         false,
       );
+      seed({ manual: false, sealed: false, auto: false });
+      expect(combatManualAwaitingOrders(waiting)).toBe(false);
+    });
+
+    it('never asks a fleeing party or a hero with no skills', () => {
+      seed({ manual: true, sealed: false, auto: false });
+      const fleeing = { ...combatWith(), manualFlee: true };
+      expect(combatManualNeedsOrders(fleeing, hero)).toBe(false);
+      expect(combatManualNeedsOrders(combatWith(), summon)).toBe(false);
+      expect(
+        combatManualNeedsOrders(combatWith(), {
+          ...hero,
+          skillIds: [],
+          skillRefs: [],
+        }),
+      ).toBe(false);
     });
 
     it('puts the chosen target first', () => {
@@ -127,7 +169,11 @@ describe('combat-manual', () => {
       seed({ manual: true, sealed: false, auto: false });
       expect(combatManualPick(combatWith('a'), hero, [])).toBeUndefined();
       expect(
-        combatManualPick(combatWith('a'), summon, [skill]),
+        combatManualPick(
+          { ...combatWith('a'), manualAction: undefined },
+          hero,
+          [skill],
+        ),
       ).toBeUndefined();
     });
   });

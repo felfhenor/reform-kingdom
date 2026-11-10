@@ -13,7 +13,10 @@
         />
 
         <ng-template #tooltip>
-          <p>Pick a skill for each hero, then click its target.</p>
+          <p>
+            Turns go in the order shown along the top. Pick a skill for the hero
+            whose turn it is, then click its target.
+          </p>
 
           <p class="mt-2">
             Multi-target skills pick their extra targets at random, and targets
@@ -42,32 +45,45 @@
           <div class="flex flex-col gap-2 w-[856px] shrink-0">
             <!-- Padding keeps the hover glow inside the clip, which hard-cuts a long order. -->
             @if (!isReview()) {
-              <div class="flex items-center h-14 px-3 shrink-0 overflow-hidden">
-                @for (
-                  actor of turnOrder();
-                  track actor.id;
-                  let first = $first
-                ) {
-                  @if (!first) {
-                    <span class="w-2 h-px shrink-0 bg-base-content/40"></span>
-                  }
+              <div
+                class="flex items-center h-[72px] px-3 shrink-0 overflow-hidden"
+                appListReflow
+              >
+                @for (slot of turnOrder(); track slot.key; let first = $first) {
                   <div
-                    class="shrink-0 border"
-                    [class.border-error]="actor.isEnemy"
-                    [class.border-base-content/40]="!actor.isEnemy"
-                    [class.ring-2]="hoveredId() === actor.id"
-                    [class.ring-warning]="hoveredId() === actor.id"
-                    [class.shadow-[0_0_8px_var(--color-warning)]]="
-                      hoveredId() === actor.id
-                    "
-                    [tp]="actor.name"
+                    class="flex items-center shrink-0"
+                    (animate.leave)="onSlotLeave($event)"
                   >
-                    <app-slot-icon-blank class="zoom-row block">
-                      <app-atlas-image
-                        [spritesheet]="actor.icon.spritesheet"
-                        [assetName]="actor.icon.sprite"
-                      />
-                    </app-slot-icon-blank>
+                    @if (!first) {
+                      <span class="w-2 h-px shrink-0 bg-base-content/40"></span>
+                    }
+                    @if (slot.kind === 'divider') {
+                      <span
+                        class="type-meta text-lighter whitespace-nowrap tabular-nums px-2"
+                      >
+                        Round {{ slot.round | number }}
+                      </span>
+                    } @else {
+                      <div
+                        class="turn-slot shrink-0 border"
+                        [class.turn-slot-leader]="first"
+                        [class.border-error]="slot.isEnemy"
+                        [class.border-base-content/40]="!slot.isEnemy"
+                        [class.ring-2]="hoveredId() === slot.id"
+                        [class.ring-warning]="hoveredId() === slot.id"
+                        [class.shadow-[0_0_8px_var(--color-warning)]]="
+                          hoveredId() === slot.id
+                        "
+                        [tp]="slot.name"
+                      >
+                        <app-slot-icon-blank class="zoom-row block">
+                          <app-atlas-image
+                            [spritesheet]="slot.icon.spritesheet"
+                            [assetName]="slot.icon.sprite"
+                          />
+                        </app-slot-icon-blank>
+                      </div>
+                    }
                   </div>
                 }
               </div>
@@ -104,22 +120,20 @@
             </div>
 
             <div
-              class="flex flex-wrap justify-center content-start gap-4 h-[400px] shrink-0"
+              class="flex flex-wrap justify-center content-start gap-4 h-[384px] shrink-0"
             >
               @for (ally of allies(); track ally.id) {
-                @let order = orders()[ally.id];
                 @let targetable = targetableIds().has(ally.id);
-                @let canOrder = orderable().includes(ally);
                 <button
                   type="button"
-                  class="relative flex flex-col gap-2 p-1 border-2 text-left"
+                  class="p-1 border-2 text-left"
                   [class.border-warning]="targetable"
                   [class.border-primary]="!targetable && activeHero() === ally"
                   [class.border-transparent]="
                     !targetable && activeHero() !== ally
                   "
-                  [class.cursor-pointer]="targetable || canOrder"
-                  [class.cursor-default]="!targetable && !canOrder"
+                  [class.cursor-pointer]="targetable"
+                  [class.cursor-default]="!targetable"
                   [disabled]="isResolving() || isReview()"
                   (click)="clickCombatant(ally)"
                   (mouseenter)="hoveredId.set(ally.id)"
@@ -127,48 +141,11 @@
                   appSfx="ui-click"
                   [sfxTrigger]="['click', 'hover']"
                 >
-                  @if (order) {
-                    <span
-                      class="absolute top-1 right-1 z-10 flex items-center justify-center w-5 h-5 bg-success text-white"
-                    >
-                      <app-icon name="tablerCheck" size="inline" />
-                    </span>
-                  }
                   <app-card-status-combatant
                     [entry]="cardFor(ally)"
                     [expanded]="true"
                     [effectsBelow]="true"
                   />
-                  <div
-                    class="flex flex-col gap-0 h-12 w-[190px] bg-black/70 px-2 py-1 text-sm"
-                    [class.invisible]="!order && !canOrder"
-                  >
-                    @if (!order && activeHero() === ally) {
-                      <span class="m-auto text-lighter">Selecting...</span>
-                    }
-                    @if (order) {
-                      <span class="flex items-center gap-2 truncate">
-                        <app-atlas-image
-                          class="zoom-inline shrink-0"
-                          spritesheet="skill"
-                          [assetName]="order.skillSprite"
-                        />
-                        <span class="truncate">{{ order.skillName }}</span>
-                      </span>
-                      <span class="flex items-center gap-2 truncate type-meta">
-                        @if (order.targetIcon; as icon) {
-                          <app-atlas-image
-                            class="zoom-inline shrink-0"
-                            [spritesheet]="icon.spritesheet"
-                            [assetName]="icon.sprite"
-                          />
-                        } @else {
-                          <app-icon name="gameTargeted" size="inline" />
-                        }
-                        <span class="truncate">{{ order.targetLabel }}</span>
-                      </span>
-                    }
-                  </div>
                 </button>
               }
             </div>
@@ -176,6 +153,7 @@
 
           <div class="flex flex-col gap-2 flex-1 min-w-0">
             <div
+              #logBox
               class="min-h-0 overflow-y-auto bg-black/50 border border-base-content/20 px-3 py-2 text-sm select-text"
               [class.h-[328px]]="!isReview()"
               [class.flex-1]="isReview()"
@@ -315,26 +293,6 @@
             >
               Flee
             </button>
-            <button
-              type="button"
-              class="btn btn-ghost cursor-pointer"
-              [disabled]="isResolving()"
-              (click)="resetOrders()"
-              appSfx="ui-error"
-              [sfxTrigger]="['click', 'hover']"
-            >
-              Reset orders
-            </button>
-            <button
-              type="button"
-              class="btn btn-primary cursor-pointer"
-              [disabled]="isResolving() || !canConfirm()"
-              (click)="confirm()"
-              appSfx="ui-success"
-              [sfxTrigger]="['click', 'hover']"
-            >
-              Confirm round
-            </button>
           }
         </div>
       </div>
@@ -345,7 +303,7 @@
 <swal
   #fleeSwal
   title="Flee this fight?"
-  text="Your heroes skip their actions this round and try to escape after it. If they all fall before then, it'll be game over."
+  text="Your heroes skip the rest of this round and try to escape after it. If they all fall before then, it'll be game over."
   icon="warning"
   confirmButtonText="Yes, flee"
   cancelButtonText="No, keep fighting"

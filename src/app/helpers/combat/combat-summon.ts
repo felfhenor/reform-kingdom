@@ -12,15 +12,6 @@ export function combatantHasLivingSummon(
   );
 }
 
-export function combatHasCombatant(
-  combat: Combat,
-  combatant: Combatant,
-): boolean {
-  return [...combat.guardians, ...combat.heroes, ...combat.helpers].includes(
-    combatant,
-  );
-}
-
 // Replaces any previous summon of this summoner; hero-side summons join the helpers.
 export function combatSummonMonster(
   combat: Combat,

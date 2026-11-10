@@ -1,18 +1,24 @@
 import { signal } from '@angular/core';
-import { orderCombatantsByAgility } from '@helpers/combat/combat';
+import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
 import { combatantHealthBar } from '@helpers/combat/combat-combatant-hp.ui';
 import {
   combatAutomationAllowedAt,
   combatIsManual,
+  combatManualAwaitingOrders,
+  combatManualSkillUsable,
 } from '@helpers/combat/combat-manual';
 import { combatantSkillOnCooldown } from '@helpers/combat/combat-skill-cooldown';
 import { combatCombatantSkillEpCost } from '@helpers/combat/combat-stats';
 import { combatantStatusEffectPreviews } from '@helpers/combat/combat-statuseffects.ui';
 import {
   combatantSkills,
-  combatAvailableSkillsForCombatant,
   combatGetPossibleCombatantTargetsForSkillTechnique,
 } from '@helpers/combat/combat-targetting';
+import {
+  combatRoundQueue,
+  combatTurnCombatant,
+  orderCombatantsByAgility,
+} from '@helpers/combat/combat-turn-queue';
 import { getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { skillTechniqueNumTargets } from '@helpers/hero/skill';
@@ -24,8 +30,9 @@ import type {
   Combatant,
   CombatLogIcon,
   CombatManualAction,
-  CombatManualOrder,
   CombatManualSkillOption,
+  CombatManualTurnSlot,
+  CombatTurn,
   EncounterContent,
   EncounterRandomContent,
   EquipmentSkill,
@@ -52,10 +59,6 @@ export function combatAutomationLockedReason(
   const region = regionForMap(mapName);
   const boss = getEntry<EncounterContent>(region?.seal.sealEncounterId ?? '');
   return `Seal ${region?.name} first (clear ${boss?.name}).`;
-}
-
-export function combatManualHeroes(combat: Combat): Combatant[] {
-  return combat.heroes.filter((c) => !c.summonerId);
 }
 
 export function combatManualTitle(combat: Combat): string {
@@ -209,17 +212,12 @@ function combatManualDisabledReason(
   hero: Combatant,
   skill: EquipmentSkill,
 ): string | undefined {
+  if (combatManualSkillUsable(combat, hero, skill)) return undefined;
+  if (hero.ep < combatCombatantSkillEpCost(hero, skill)) return 'Not enough EP';
+  if (combatantSkillOnCooldown(hero, skill)) return 'Cooling down';
   const hasTargets = skillOwnTechniques(skill).some(
     (tech) => unconfusedPool(combat, hero, skill, tech).length > 0,
   );
-  if (
-    combatAvailableSkillsForCombatant(combat, hero).includes(skill) &&
-    hasTargets
-  ) {
-    return undefined;
-  }
-  if (hero.ep < combatCombatantSkillEpCost(hero, skill)) return 'Not enough EP';
-  if (combatantSkillOnCooldown(hero, skill)) return 'Cooling down';
   return hasTargets ? 'Unavailable' : 'No valid targets';
 }
 
@@ -243,21 +241,40 @@ export function combatManualSkillOptions(
   });
 }
 
-// Only lands on the round it was planned for, so a late double-click can't arm the next one.
+// Whose turn it is; input planned on an earlier turn is dropped.
+export function combatManualTurnKey(combat: Combat): string {
+  const turn = combat.turnQueue?.[0];
+  return [
+    combat.id,
+    combat.rounds,
+    !!combat.ambushedBy,
+    combat.turnQueue?.length ?? 0,
+    turn?.combatantId,
+    !!turn?.bonus,
+  ].join('|');
+}
+
+export function combatManualActiveHero(combat: Combat): Combatant | undefined {
+  const turn = combat.turnQueue?.[0];
+  return turn && combatManualAwaitingOrders(combat)
+    ? combatTurnCombatant(combat, turn)
+    : undefined;
+}
+
+// Only lands on the turn it was planned for, so a late double-click can't order the next one.
 export function combatManualConfirm(
   planned: Combat,
-  actions: Record<string, CombatManualAction>,
+  action?: CombatManualAction,
   flee = false,
 ): void {
   updateGamestate((state) => {
     const combat = state.world.combat;
     if (
-      combat?.id === planned.id &&
-      combat.rounds === planned.rounds &&
-      !!combat.ambushedBy === !!planned.ambushedBy &&
-      !combat.manualActions
+      combat &&
+      combatManualAwaitingOrders(combat) &&
+      combatManualTurnKey(combat) === combatManualTurnKey(planned)
     ) {
-      combat.manualActions = actions;
+      combat.manualAction = action;
       if (flee) combat.manualFlee = true;
     }
     return state;
@@ -268,43 +285,65 @@ export function combatManualConfirm(
 }
 
 export function combatManualFlee(planned: Combat): void {
-  combatManualConfirm(planned, {}, true);
+  combatManualConfirm(planned, undefined, true);
 }
 
-// Ambush rounds only let the heroes act; the dead are skipped either way.
-export function combatManualTurnOrder(combat: Combat): Combatant[] {
-  const order = orderCombatantsByAgility(combat).filter((c) => c.hp > 0);
-  return combat.ambushedBy
-    ? order.filter((c) => combat.heroes.includes(c))
-    : order;
+function combatManualTurnSlots(
+  combat: Combat,
+  turns: CombatTurn[],
+  round: string,
+): CombatManualTurnSlot[] {
+  return turns.flatMap((turn) => {
+    const c = combatTurnCombatant(combat, turn);
+    if (!c || combatantIsDead(c)) return [];
+    return [
+      {
+        kind: 'turn',
+        key: `${round}:${c.id}${turn.bonus ? ':bonus' : ''}`,
+        id: c.id,
+        name: c.name,
+        isEnemy: c.isEnemy,
+        icon: combatantIcon(c),
+      },
+    ];
+  });
 }
 
-export function combatManualOrder(
+// This round's remaining turns, then a guess at the next; keys hold steady as the next round becomes this one.
+export function combatManualTurnOrder(combat: Combat): CombatManualTurnSlot[] {
+  const nextRound = combat.ambushedBy ? combat.rounds : combat.rounds + 1;
+  const next = orderCombatantsByAgility(combat).map((c) => ({
+    combatantId: c.id,
+  }));
+  return [
+    ...combatManualTurnSlots(
+      combat,
+      combat.turnQueue ?? combatRoundQueue(combat),
+      combat.ambushedBy ? 'ambush' : `${combat.rounds}`,
+    ),
+    { kind: 'divider', key: `divider:${nextRound}`, round: nextRound + 1 },
+    ...combatManualTurnSlots(combat, next, `${nextRound}`),
+  ];
+}
+
+export function combatManualAction(
   option: CombatManualSkillOption,
   target?: Combatant,
-): CombatManualOrder {
-  return {
-    skillId: option.skill.id,
-    targetId: target?.id,
-    skillName: option.skill.name,
-    skillSprite: option.skill.sprite,
-    targetLabel: target?.name ?? option.autoTargetLabel,
-    targetIcon: target ? combatantIcon(target) : undefined,
-  };
+): CombatManualAction {
+  return { skillId: option.skill.id, targetId: target?.id };
 }
 
-// Reuses last round's skill; a target that's gone falls back to the first valid one.
-export function combatManualRepeatOrder(
+// Reuses the hero's last skill; a target that's gone falls back to the first valid one.
+export function combatManualRepeatAction(
   combat: Combat,
   hero: Combatant,
   previous: CombatManualAction,
-): CombatManualOrder | undefined {
+): CombatManualAction | undefined {
   const option = combatManualSkillOptions(combat, hero).find(
     (o) => o.skill.id === previous.skillId && !o.disabledReason,
   );
   if (!option) return undefined;
-  if (option.targets.length === 0) return combatManualOrder(option);
   const target =
     option.targets.find((c) => c.id === previous.targetId) ?? option.targets[0];
-  return combatManualOrder(option, target);
+  return combatManualAction(option, target);
 }

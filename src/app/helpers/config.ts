@@ -25,9 +25,9 @@ export const URGENCY_WARNING_MIN_TICKS = 300; // 5 minutes
 export const COMBAT_ORDER_ROW_CAP = 10;
 export const SKILL_MAX_ALLY_TARGETS = 4;
 export const COMBAT_ELEMENT_CHARGES_PER_ELEMENT = 2;
-// How long a resolved manual round stays on screen so its damage numbers play out.
-export const COMBAT_MANUAL_ROUND_HOLD_MS = 1500;
-// Gap between steps while Enter is held (readying each hero, then confirming); single presses act at once.
+// How long a resolved manual turn stays on screen so its damage numbers play out.
+export const COMBAT_MANUAL_TURN_HOLD_MS = 1000;
+// Gap between turns while Enter is held; single presses act at once.
 export const COMBAT_MANUAL_REPEAT_DELAY_MS = 2000;
 
 // Resistance can't reach immunity; a weakness can at most double incoming damage.
