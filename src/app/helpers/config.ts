@@ -474,9 +474,9 @@ export const RAID_LOSS_MATERIAL_STEAL_PERCENT = 50;
 // Re-check cadence, not the actual cap - see RAID_COOLDOWN_TICKS for that.
 export const RAID_CHECK_INTERVAL_TICKS = 60;
 export const RAID_COOLDOWN_TICKS = 14400;
-export const RAID_BASE_WARNING_TICKS = 300;
-export const RAID_WARNING_TICKS_PER_MAP_HOP = 120;
-export const RAID_WARNING_TICKS_PER_REPUTATION_TIER = 60;
+export const RAID_BASE_WARNING_TICKS = 1800;
+export const RAID_WARNING_TICKS_PER_MAP_HOP = 600;
+export const RAID_WARNING_TICKS_PER_REPUTATION_TIER = 300;
 
 // Checking stock ages is cheap - run every tick so an expired entry disappears promptly, not in whatever-tick-interval batches.
 export const SHOP_TICK_INTERVAL = 1;
