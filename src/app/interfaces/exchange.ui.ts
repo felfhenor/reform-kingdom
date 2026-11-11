@@ -1,6 +1,7 @@
 import type { AtlasedImage } from '@interfaces/artable';
 import type { EquipmentContent } from '@interfaces/content-equipment';
 import type { ExchangeNodeItemExchange } from '@interfaces/content-exchangenode';
+import type { ItemContent } from '@interfaces/content-item';
 import type { CostItem } from '@interfaces/cost';
 import type { EquipmentItem } from '@interfaces/equipment';
 import type { ItemPreviewDisplay } from '@interfaces/item-preview';
@@ -26,7 +27,11 @@ export type ExchangeItemRow = {
   exchangeIndex: number;
   exchange: ExchangeNodeItemExchange;
   canAfford: boolean;
+  inputName: string;
+  inputContent: ItemContent;
   outputName: string;
+  outputContent: ItemContent;
+  owned: number;
 };
 
 export type ExchangeCollectibleRow = {

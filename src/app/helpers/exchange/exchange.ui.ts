@@ -19,7 +19,10 @@ import {
 import { equipmentItemDisplayName } from '@helpers/item/affix';
 import { equippedItems } from '@helpers/item/equipment';
 import { itemPreviewDisplay } from '@helpers/item/item-preview';
-import { isMaterialDiscovered } from '@helpers/item/materials';
+import {
+  getMaterialQuantity,
+  isMaterialDiscovered,
+} from '@helpers/item/materials';
 import { isEquipmentDiscovered } from '@helpers/kingdom/armory';
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { taskEventCollectibleGained } from '@helpers/task/task-events';
@@ -85,11 +88,16 @@ export function exchangeRows(node: ExchangeNodeContent): ExchangeRow[] {
         return [
           {
             kind: 'Item',
+            inputContent: getEntry<ItemContent>(exchange.input.itemId)!,
+            inputName:
+              getEntry<ItemContent>(exchange.input.itemId)?.name || 'UNKNOWN',
+            outputContent: getEntry<ItemContent>(exchange.output.itemId)!,
             outputName:
               getEntry<ItemContent>(exchange.output.itemId)?.name || 'UNKNOWN',
             exchangeIndex,
             exchange,
             canAfford,
+            owned: getMaterialQuantity(exchange.input.itemId),
           },
         ];
       }

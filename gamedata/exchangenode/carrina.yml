@@ -1,3 +1,62 @@
+- id: af46ea50-4dff-4ee0-b9a1-c586e250bfb1
+  name: Alerian Exchange
+  description: A place where those of Carrina go to exchange with visitors from lands far and near. Here, they exchange the various resources they have for things more esoteric.
+  emptyText: You do not have anything that can be exchanged here.
+  actionLabel: Exchange
+
+  exchanges:
+    - kind: Item
+      input:
+        itemId: Copper Ore
+        required: 25
+
+      output:
+        itemId: Pumpkin Gem
+        quantity: 1
+
+      costs:
+        - itemId: Gold Coin
+          required: 500
+
+    - kind: Item
+      input:
+        itemId: Wergen Stick
+        required: 25
+
+      output:
+        itemId: Small Goblin Bone
+        quantity: 1
+
+      costs:
+        - itemId: Gold Coin
+          required: 500
+
+    - kind: Item
+      input:
+        itemId: Wergen Wood
+        required: 25
+
+      output:
+        itemId: Small Asura Tendon
+        quantity: 1
+
+      costs:
+        - itemId: Gold Coin
+          required: 1500
+
+    - kind: Item
+      input:
+        itemId: Tattered Hide
+        required: 25
+
+      output:
+        itemId: Orc Bone
+        quantity: 1
+
+      costs:
+        - itemId: Gold Coin
+          required: 2500
+
 - id: 30601436-eef3-47f4-846d-4cc11f8a3e94
   name: Dies Irae
   description: A dedication to those the Founder never wants to forget. Powerful gear can be traded with the memories of the Lost to acquire their unique items.

@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { formatNumber } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  LOCALE_ID,
+} from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { DetailCollectibleEffectsComponent } from '@components/detail-collectible-effects/detail-collectible-effects.component';
@@ -7,8 +14,10 @@ import { ModalComponent } from '@components/modal/modal.component';
 import { RowCurrencyCostComponent } from '@components/row-currency-cost/row-currency-cost.component';
 import { SlotArmoryItemComponent } from '@components/slot-armory-item/slot-armory-item.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
+import { SlotRequirementComponent } from '@components/slot-requirement/slot-requirement.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
 import { SFXDirective } from '@directives/sfx.directive';
+import { getEntry } from '@helpers/content';
 import { activeExchangeNode } from '@helpers/engine/ui';
 import {
   exchangeHasOnlyEquippedInputs,
@@ -18,9 +27,10 @@ import {
   exchangePerformItem,
   exchangeRows,
 } from '@helpers/exchange/exchange.ui';
+import { getMaterialQuantity } from '@helpers/index';
 import { isPartyAtNode } from '@helpers/world';
 import { worldNodeExchange } from '@helpers/world-node/world-nodes';
-import type { CostItem, ExchangeItemRow, ExchangeRow } from '@interfaces';
+import type { ExchangeItemRow, ExchangeRow, ItemContent } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
@@ -38,10 +48,13 @@ import { TippyDirective } from '@ngneat/helipopper';
     TippyDirective,
     TooltipItemPreviewComponent,
     IconComponent,
+    SlotRequirementComponent,
   ],
   templateUrl: './modal-exchange-node.component.html',
 })
 export class ModalExchangeNodeComponent {
+  private locale = inject(LOCALE_ID);
+
   public node = computed(() => {
     const entry = activeExchangeNode();
     return entry ? worldNodeExchange(entry) : undefined;
@@ -73,17 +86,26 @@ export class ModalExchangeNodeComponent {
       : `${row.exchangeIndex}`;
   }
 
-  public itemInput(row: ExchangeItemRow): CostItem[] {
-    return [row.exchange.input];
+  public itemInput(row: ExchangeItemRow) {
+    return {
+      item: getEntry<ItemContent>(row.exchange.input.itemId)!,
+      required: row.exchange.input.required,
+    };
   }
 
-  public itemOutput(row: ExchangeItemRow): CostItem[] {
-    return [
-      {
-        itemId: row.exchange.output.itemId,
-        required: row.exchange.output.quantity,
-      },
-    ];
+  public itemOutput(row: ExchangeItemRow) {
+    return {
+      item: getEntry<ItemContent>(row.exchange.output.itemId)!,
+      quantity: row.exchange.output.quantity,
+    };
+  }
+
+  public inputRequirement(row: ExchangeItemRow): string {
+    const ownedTotal = getMaterialQuantity(row.exchange.input.itemId);
+
+    const owned = formatNumber(ownedTotal, this.locale);
+    const quantity = formatNumber(row.exchange.input.required, this.locale);
+    return `${row.inputName} (${owned}/${quantity})`;
   }
 
   public perform(row: ExchangeRow): void {
