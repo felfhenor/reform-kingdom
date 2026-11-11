@@ -7,6 +7,9 @@
     Fire: 50
     Water: -25
 
+  debuffResistances:
+    Burn: 50
+
   sprite: '0088'
   frames: 4
 
@@ -98,6 +101,9 @@
     Fire: 50
     Water: -25
 
+  debuffResistances:
+    Burn: 50
+
   sprite: '0140'
   frames: 4
 
@@ -165,6 +171,9 @@
   types: [Demon, Amalgamation]
   elementalResistances:
     Earth: 50
+
+  debuffResistances:
+    Accuracy: 100
 
   sprite: '0136'
   frames: 4
@@ -306,6 +315,9 @@
 
   types: [Demon]
   elementalResistances: {}
+
+  combatStats:
+    coverThreshold: 30
 
   sprite: '0144'
   frames: 4

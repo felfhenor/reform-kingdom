@@ -8,6 +8,9 @@
     Earth: 25
     Fire: -25
 
+  debuffResistances:
+    Bleed: 100
+
   sprite: '0156'
   frames: 4
 
@@ -77,6 +80,9 @@
   elementalResistances:
     Water: 25
     Fire: -25
+
+  debuffResistances:
+    Bleed: 100
 
   sprite: '0160'
   frames: 4

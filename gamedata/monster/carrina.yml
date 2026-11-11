@@ -73,6 +73,9 @@
   name: Goblin Warrior
   description: An improved goblin. It excels at feats of strength. Only small ones, though.
 
+  combatStats:
+    coverThreshold: 25
+
   types: [Humanoid]
 
   sprite: '0004'
@@ -216,6 +219,9 @@
     Fire: 25
     Water: -15
 
+  debuffResistances:
+    Bleed: 25
+
   sprite: '0036'
   frames: 4
 
@@ -287,6 +293,9 @@
     Air: 25
     Earth: -15
 
+  debuffResistances:
+    Bleed: 100
+
   sprite: '0012'
   frames: 4
 
@@ -347,6 +356,9 @@
   elementalResistances:
     Water: 25
     Air: -15
+
+  debuffResistances:
+    Bleed: 100
 
   sprite: '0016'
   frames: 4
@@ -411,6 +423,9 @@
     Fire: 25
     Water: -15
 
+  debuffResistances:
+    Bleed: 100
+
   sprite: '0020'
   frames: 4
 
@@ -471,6 +486,9 @@
   elementalResistances:
     Fire: -25
 
+  debuffResistances:
+    Poison: 5
+
   sprite: '0024'
   frames: 4
 
@@ -524,6 +542,9 @@
   types: [Insect]
   elementalResistances:
     Fire: -25
+
+  debuffResistances:
+    Poison: 25
 
   sprite: '0028'
   frames: 4
@@ -580,6 +601,9 @@
   types: [Insect]
   elementalResistances:
     Fire: -25
+
+  debuffResistances:
+    Poison: 25
 
   sprite: '0032'
   frames: 4
@@ -638,6 +662,9 @@
 - id: 91dc7608-46e1-45e5-9bae-32b30d3de4db
   name: Orc Smasher
   description: A very smashy orc.
+
+  debuffResistances:
+    Bleed: 50
 
   types: [Humanoid]
   elementalResistances:
@@ -710,6 +737,10 @@
   name: Orc Screamchanter
   description: An orc that screams loudly to do magic.
 
+  debuffResistances:
+    StatDown: 25
+    Bleed: 25
+
   types: [Humanoid]
 
   sprite: '0044'
@@ -772,6 +803,9 @@
 - id: 8645273c-e5ca-4f55-bde6-840b78d5b2e0
   name: Elf Scout
   description: A stealthy elven scout that excels in ambushes.
+
+  debuffResistances:
+    StatDown: 25
 
   types: [Humanoid]
 
@@ -852,6 +886,9 @@
   name: Elf Archer
   description: A very dextrous elf that's very dangerous with bows.
 
+  debuffResistances:
+    StatDown: 25
+
   types: [Humanoid]
 
   sprite: '0052'
@@ -931,6 +968,9 @@
   types: [Humanoid]
   elementalResistances:
     Air: 15
+
+  debuffResistances:
+    StatDown: 75
 
   sprite: '0048'
   frames: 4
@@ -1073,6 +1113,9 @@
   types: [Humanoid]
   elementalResistances:
     Air: 15
+
+  debuffResistances:
+    StatDown: 100
 
   sprite: '0064'
   frames: 4

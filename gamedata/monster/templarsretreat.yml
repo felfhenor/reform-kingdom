@@ -7,6 +7,9 @@
     Water: 15
     Air: 15
 
+  combatStats:
+    coverThreshold: 30
+
   sprite: '0084'
   frames: 4
 

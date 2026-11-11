@@ -7,6 +7,9 @@
     Fire: 25
     Water: -15
 
+  debuffResistances:
+    Bleed: 100
+
   sprite: '0152'
   frames: 4
 

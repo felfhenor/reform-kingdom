@@ -173,6 +173,9 @@
     Fire: 25
     Water: -15
 
+  debuffResistances:
+    StatDown: 75
+
   sprite: '0132'
   frames: 4
 

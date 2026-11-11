@@ -7,6 +7,10 @@
     Fire: 25
     Water: -15
 
+  debuffResistances:
+    Burn: 75
+    StatDown: 25
+
   sprite: '0096'
   frames: 4
 
@@ -73,6 +77,12 @@
   elementalResistances:
     Earth: 75
     Air: -15
+
+  debuffResistances:
+    Burn: 75
+
+  combatStats:
+    coverThreshold: 50
 
   sprite: '0100'
   frames: 4
@@ -144,6 +154,10 @@
 - id: 5ad99b28-e8d9-4a2f-90f9-48c79aec07d7
   name: Akroki Swashbuckler
   description: A lizard warrior that strikes its foes with deadly precision and speed.
+
+  debuffResistances:
+    Burn: 75
+    Bleed: 25
 
   types: [Humanoid]
 
@@ -226,6 +240,11 @@
     Air: 50
     Earth: -25
 
+  debuffResistances:
+    Bleed: 100
+    Accuracy: 100
+    Poison: 100
+
   sprite: '0104'
   frames: 4
 
@@ -288,6 +307,9 @@
   types: [Insect]
   elementalResistances:
     Fire: -25
+
+  debuffResistances:
+    StatDown: 100
 
   sprite: '0108'
   frames: 4

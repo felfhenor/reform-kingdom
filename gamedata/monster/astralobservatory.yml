@@ -8,6 +8,9 @@
     Air: 25
     Water: -50
 
+  debuffResistances:
+    Stun: 100
+
   sprite: '0176'
   frames: 4
 
@@ -79,6 +82,9 @@
     Earth: 25
     Fire: -50
 
+  debuffResistances:
+    Stun: 100
+
   sprite: '0184'
   frames: 4
 
@@ -149,6 +155,9 @@
     Earth: 75
     Fire: 25
     Air: -50
+
+  debuffResistances:
+    Stun: 100
 
   sprite: '0168'
   frames: 4
@@ -222,6 +231,9 @@
     Fire: -35
     Air: -35
 
+  debuffResistances:
+    Stun: 100
+
   sprite: '0172'
   frames: 4
 
@@ -293,6 +305,9 @@
     Air: 75
     Water: 25
     Earth: -50
+
+  debuffResistances:
+    Stun: 100
 
   sprite: '0180'
   frames: 4
