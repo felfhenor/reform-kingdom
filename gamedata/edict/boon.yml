@@ -55,7 +55,7 @@
       value: -0.25
   startingItems:
     - itemId: Gold Coin
-      quantity: 10000
+      quantity: 100000
 
 - id: 76096547-8e80-4964-ab36-f0a85947247e
   name: Edict of Cold Steel
