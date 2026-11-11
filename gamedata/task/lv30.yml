@@ -1,6 +1,6 @@
 - id: ec0094e8-859b-4b3e-bac6-1786b9347f6f
   name: Find the Elven Satchel
-  description: In the Larsian Desert, search the Rolling Sands until you find the Elven Satchel. It reveals a hidden path to the Erden Woodland, northeast of the Duchy of Carrina.
+  description: In the Larsian Desert, search the Ghostmirage Wreck until you find the Elven Satchel. It reveals a hidden path to the Erden Woodland, northeast of the Duchy of Carrina.
   order: 520
   requireMapVisit: LarsianDesert
   requirement:

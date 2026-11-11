@@ -63,8 +63,8 @@
         - monsterId: Akroki Swashbuckler
 
   completionRewards:
-    - collectibleId: Elven Satchel
-      chance: 75
+    - collectibleId: Desertcrab Claw
+      chance: 25
 
     - itemId: Cactspine
       chance: 50
@@ -138,7 +138,7 @@
         - monsterId: Bloodmoth
 
   completionRewards:
-    - collectibleId: Desertcrab Claw
+    - collectibleId: Elven Satchel
       chance: 25
 
     - itemId: Firmwater
