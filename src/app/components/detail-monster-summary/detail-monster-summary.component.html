@@ -27,6 +27,8 @@
       @let nodes = foundIn();
       @if (showLocations() && e.foundAtNodes.length > 0 && nodes.length > 0) {
         <span class="type-meta">Found in: {{ nodes.join(', ') }}</span>
+      } @else {
+        <span class="min-h-[16px]"></span>
       }
 
       @let xp = xpLabel();

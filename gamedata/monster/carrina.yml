@@ -271,7 +271,7 @@
   statsPerLevel:
     Health: 6.9
     Energy: 0.3
-    Luck: 0.02
+    Luck: 0.1
     Intelligence: 0.1
     Strength: 3.5
     Vitality: 0.1
