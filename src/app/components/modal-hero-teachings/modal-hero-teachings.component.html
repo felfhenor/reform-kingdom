@@ -53,8 +53,15 @@
             [skillContext]="context"
             mode="teachings"
           >
-            <span class="type-meta" actionslot>
+            <span class="type-meta flex gap-2" actionslot>
               Taught by {{ row.trainerDisplayName }}
+              @if (row.trainerDisplayName !== '???') {
+                for
+                <app-row-currency-cost
+                  [costs]="row.teaching.costs"
+                  [showOwned]="true"
+                ></app-row-currency-cost>
+              }
             </span>
           </app-row-trainer-teaching>
         }

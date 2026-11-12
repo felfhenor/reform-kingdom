@@ -10,6 +10,7 @@ import { BlankSlateComponent } from '@components/blank-slate/blank-slate.compone
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { LabelJobComponent } from '@components/label-job/label-job.component';
 import { ModalComponent } from '@components/modal/modal.component';
+import { RowCurrencyCostComponent } from '@components/row-currency-cost/row-currency-cost.component';
 import { RowTrainerTeachingComponent } from '@components/row-trainer-teaching/row-trainer-teaching.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { heroTeachingsModalCharacterId } from '@helpers/engine/ui';
@@ -33,6 +34,7 @@ import { sumBy } from 'es-toolkit/compat';
     ModalComponent,
     RowTrainerTeachingComponent,
     SFXDirective,
+    RowCurrencyCostComponent,
   ],
   templateUrl: './modal-hero-teachings.component.html',
 })
