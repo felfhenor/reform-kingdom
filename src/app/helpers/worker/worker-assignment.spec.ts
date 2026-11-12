@@ -110,6 +110,17 @@ describe('workerStaminaCostToNode / canWorkerReachNode', () => {
     expect(workerStaminaCostToNode(woods)).toBeUndefined();
     expect(canWorkerReachNode(woods, 9999)).toBe(false);
   });
+
+  it('can route through other nodes for a display-only cost', () => {
+    workerStaminaCostToNode(woods, true, true);
+    expect(travelPathFrom).toHaveBeenCalledWith(
+      duchy,
+      woods,
+      true,
+      false,
+      true,
+    );
+  });
 });
 
 describe('workerGatherAssignmentIsValid', () => {
@@ -142,7 +153,13 @@ describe('workerGatherAssignmentIsValid', () => {
 
     workerGatherAssignmentIsValid(workerId, 1, assignment);
 
-    expect(travelPathFrom).toHaveBeenCalledWith(duchy, woods, false);
+    expect(travelPathFrom).toHaveBeenCalledWith(
+      duchy,
+      woods,
+      false,
+      false,
+      false,
+    );
   });
 });
 

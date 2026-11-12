@@ -78,10 +78,22 @@
                     Lv. {{ item.levelRangeLabel }}
                   }
                 </span>
-                @if (item.staminaCost !== undefined) {
-                  · {{ item.staminaCost | number }} stamina
-                } @else {
-                  · unreachable
+                ·
+                <span
+                  [class.text-error]="
+                    item.staminaCost > (modeStats?.stamina ?? 0)
+                  "
+                >
+                  {{
+                    item.staminaCost === undefined
+                      ? '?'
+                      : (item.staminaCost | number)
+                  }}
+                  stamina
+                </span>
+                @if (!item.reachable) {
+                  ·
+                  <span class="text-error">unreachable</span>
                 }
               </div>
             </div>

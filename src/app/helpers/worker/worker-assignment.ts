@@ -24,11 +24,18 @@ import type {
 export function workerStaminaCostToNode(
   nodeName: string,
   allowTeleport = true,
+  passThroughNodes = false,
 ): number | undefined {
   const kingdom = kingdomNodeGet();
   if (!kingdom) return undefined;
 
-  const path = travelPathFrom(kingdom, nodeName, allowTeleport);
+  const path = travelPathFrom(
+    kingdom,
+    nodeName,
+    allowTeleport,
+    false,
+    passThroughNodes,
+  );
   if (!path) return undefined;
 
   return travelPathBaseTotalTicks(path, kingdom);

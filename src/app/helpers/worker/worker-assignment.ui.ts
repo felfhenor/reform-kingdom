@@ -6,10 +6,7 @@ import {
   getMaterialQuantity,
   isMaterialDiscovered,
 } from '@helpers/item/materials';
-import {
-  canWorkerReachNode,
-  workerStaminaCostToNode,
-} from '@helpers/worker/worker-assignment';
+import { workerStaminaCostToNode } from '@helpers/worker/worker-assignment';
 import {
   isWorkerCombatNodeUnlocked,
   workerCombatGrantsXp,
@@ -48,6 +45,19 @@ export function workerAssignmentKind(
   return undefined;
 }
 
+function nodeOptionStamina(
+  nodeName: string,
+  worker: WorkerContent,
+  stamina: number,
+): Pick<WorkerAssignmentNodeOption, 'staminaCost' | 'reachable'> {
+  const cost = workerStaminaCostToNode(nodeName, worker.canUseTeleports);
+  return {
+    // With no worker route, show what the hero's looser route would cost.
+    staminaCost: cost ?? workerStaminaCostToNode(nodeName, true, true),
+    reachable: cost !== undefined && cost <= stamina,
+  };
+}
+
 function gatherNodeOption(
   node: WorldNodeEntry,
   worker: WorkerContent,
@@ -56,17 +66,16 @@ function gatherNodeOption(
   const gathering = worldNodeGathering(node);
   const stamina = workerStatsForLevel(worker, level).stamina;
   const range = gathering?.workerLevelRange;
+  const staminaInfo = nodeOptionStamina(node.nodeName, worker, stamina);
 
   return {
     nodeName: node.nodeName,
     entry: node,
-    staminaCost: workerStaminaCostToNode(node.nodeName, worker.canUseTeleports),
+    ...staminaInfo,
     levelRangeLabel: range ? rangeLabel(range) : '?',
     difficulty: range ? gatherDifficultyTier(range, level) : undefined,
     noXp: level > (range?.max ?? WORKER_MAX_LEVEL),
-    disabled:
-      !canWorkerReachNode(node.nodeName, stamina, worker.canUseTeleports) ||
-      (range?.min ?? 0) > level,
+    disabled: !staminaInfo.reachable || (range?.min ?? 0) > level,
   };
 }
 
@@ -80,18 +89,16 @@ function combatNodeOption(
   const tooWeak =
     nodeLevel === undefined || workerCombatPower(worker, level) < nodeLevel;
   const noXp = !workerCombatGrantsXp(worker, level, node.nodeName);
+  const staminaInfo = nodeOptionStamina(node.nodeName, worker, stats.stamina);
 
   return {
     nodeName: node.nodeName,
     entry: node,
-    staminaCost: workerStaminaCostToNode(node.nodeName, worker.canUseTeleports),
+    ...staminaInfo,
     requiredPower: nodeLevel,
     difficulty: tooWeak ? 'TooHigh' : noXp ? 'Trivial' : 'Easy',
     noXp,
-    disabled:
-      tooWeak ||
-      stats.combatSpeed <= 0 ||
-      !canWorkerReachNode(node.nodeName, stats.stamina, worker.canUseTeleports),
+    disabled: tooWeak || stats.combatSpeed <= 0 || !staminaInfo.reachable,
   };
 }
 

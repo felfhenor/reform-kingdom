@@ -123,6 +123,7 @@ export type WorkerAssignmentNodeOption = {
   nodeName: string;
   entry: WorldNodeEntry;
   staminaCost?: number;
+  reachable: boolean;
   levelRangeLabel?: string;
   requiredPower?: number;
   difficulty?: DifficultyTier;
