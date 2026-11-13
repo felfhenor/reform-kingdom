@@ -155,6 +155,11 @@ export type GlobalEffectEffectWipeEndsRun = {
   effectType: 'GlobalWipeEndsRun';
 };
 
+// Deaths Door revives the party where it fell instead of recalling it home.
+export type GlobalEffectEffectReviveInPlace = {
+  effectType: 'GlobalReviveInPlace';
+};
+
 // Whole percent on kingdom workers' craft speed, stacking additively.
 export type GlobalEffectEffectWorkerCraftSpeedPercent = {
   effectType: 'WorkerCraftSpeedPercent';
@@ -324,6 +329,7 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectShrineBuffsPermanent
   | GlobalEffectEffectEnemyExtraSkills
   | GlobalEffectEffectWipeEndsRun
+  | GlobalEffectEffectReviveInPlace
   | GlobalEffectEffectWorkerCraftSpeedPercent
   | GlobalEffectEffectWorkerGatherSpeedPercent
   | GlobalEffectEffectWorkerGainXPMultiplierBonus

@@ -264,6 +264,7 @@ export function defaultGlobalEffectSums(): GlobalEffectSums {
     shrineBuffsPermanent: false,
     enemyExtraSkills: 0,
     wipeEndsRun: false,
+    reviveInPlace: false,
     workerCraftSpeedPercent: 0,
     workerGatherSpeedPercent: 0,
     workerXpGainMultiplierBonus: 0,

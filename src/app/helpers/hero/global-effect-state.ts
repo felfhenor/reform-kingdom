@@ -84,6 +84,8 @@ export function globalEffectEffectDescription(
       return 'Shrine buffs never expire';
     case 'GlobalWipeEndsRun':
       return 'Dying is game over';
+    case 'GlobalReviveInPlace':
+      return 'The fallen party revives where it fell';
     case 'WorkerCraftSpeedPercent':
       return `Worker Craft Speed: ${signedPercent(effect.value)}`;
     case 'WorkerGatherSpeedPercent':
@@ -236,6 +238,9 @@ function accumulateGlobalEffectEffect(
       return;
     case 'GlobalWipeEndsRun':
       sums.wipeEndsRun = true;
+      return;
+    case 'GlobalReviveInPlace':
+      sums.reviveInPlace = true;
       return;
     case 'WorkerCraftSpeedPercent':
       sums.workerCraftSpeedPercent += effect.value;

@@ -87,14 +87,13 @@
   name: Edict of Swift Mending
   enabled: true
   sprite: '0006'
-  description: Deaths Door and Healing timers are reduced by 50%.
+  description: The fallen party revives where it fell.
   kind: Boon
   fragments: -1
   groups:
     - Death
   effects:
-    - effectType: GlobalDeathPenaltyMultiplier
-      value: -0.5
+    - effectType: GlobalReviveInPlace
 
 - id: 7df5e003-4e99-4912-830f-66ca83aad694
   name: Edict of Eternal Blessings

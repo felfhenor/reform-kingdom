@@ -194,6 +194,10 @@ export function ensureGlobalEffectEffect(
     return { effectType: 'GlobalWipeEndsRun' };
   }
 
+  if (effect.effectType === 'GlobalReviveInPlace') {
+    return { effectType: 'GlobalReviveInPlace' };
+  }
+
   if (
     effect.effectType === 'EnemyExtraSkills' ||
     effect.effectType === 'GlobalDropExtraAffixes' ||

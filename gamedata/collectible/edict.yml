@@ -251,12 +251,7 @@
   sprite: '0103'
 
   effects:
-    - effectType: GainStats
-      stat: Constitution
-      value: 5
-    - effectType: GainStats
-      stat: Spirit
-      value: 5
+    - effectType: GlobalReviveInPlace
 
 - id: b65f4c26-38c4-4450-97a1-690f104f1031
   name: Vow of the Blessed Cornucopia

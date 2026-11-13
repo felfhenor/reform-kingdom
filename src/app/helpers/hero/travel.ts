@@ -31,6 +31,7 @@ import { gatheringStart, gatheringStop } from '@helpers/item/gathering';
 import { mapHopsBetween } from '@helpers/pathfinding/pathfinding';
 import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
 import {
+  globalEffectSumsState,
   updateGamestate,
   worldCombatState,
   worldCurrentLocationState,
@@ -204,12 +205,13 @@ export function travelStart(
   return true;
 }
 
-// 10 seconds per teleport-hop to the home node's map, 10 second minimum so dying nearby still costs a beat; a developed home outpost shortens the total.
+// Per-hop time models the trip home, so reviving in place skips it; the minimum keeps a nearby death costing a beat.
 function deathsDoorDurationTicks(): number {
   const home = homeNodeGet();
-  const hops = home
-    ? mapHopsBetween(worldCurrentLocationState().mapName, home.mapName)
-    : 0;
+  const hops =
+    home && !globalEffectSumsState().reviveInPlace
+      ? mapHopsBetween(worldCurrentLocationState().mapName, home.mapName)
+      : 0;
   const baseTicks = Math.max(
     DEATHS_DOOR_MINIMUM_SECONDS,
     hops * DEATHS_DOOR_SECONDS_PER_MAP,
@@ -217,14 +219,15 @@ function deathsDoorDurationTicks(): number {
   return Math.ceil(baseTicks * deathPenaltyMultiplier(home?.nodeName));
 }
 
-// Deaths Door is purely a timer; on expiry the party teleports home.
 export function travelBeginDeathsDoor(): void {
   addGlobalEffect('Deaths Door' as GlobalEffectId, deathsDoorDurationTicks());
 
   categoryMessageLog(
     'Travel',
     worldCurrentLocationState().mapName,
-    'The fallen party awaits recall home.',
+    globalEffectSumsState().reviveInPlace
+      ? 'The fallen party awaits revival.'
+      : 'The fallen party awaits recall home.',
   );
 }
 

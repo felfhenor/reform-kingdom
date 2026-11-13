@@ -43,7 +43,7 @@ import {
   trainerVisitOpen,
 } from '@helpers/engine/ui';
 
-import { travelStart } from '@helpers/hero/travel';
+import { canPartyTravel, travelStart } from '@helpers/hero/travel';
 import { travelCanStartTo } from '@helpers/hero/travel.ui';
 import { travelTicksRemaining } from '@helpers/hero/travel-progress';
 import {
@@ -53,7 +53,6 @@ import {
 import { rewardDisplayOrder } from '@helpers/item/loot';
 import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
 import {
-  worldCombatState,
   worldCurrentLocationState,
   worldGatheringState,
   worldTravelState,
@@ -317,11 +316,9 @@ export class PanelMapNodeComponent {
       this.travelPath()?.length === 0 && this.travelState().status === 'Idle',
   );
 
-  private isInCombat = computed(() => !!worldCombatState());
-
   public canReExplore = computed(() => {
     const entry = this.node();
-    if (!entry || !this.isAtNode() || this.isInCombat()) return false;
+    if (!entry || !this.isAtNode() || !canPartyTravel()) return false;
 
     if (worldNodeEncounter(entry)) return true;
 

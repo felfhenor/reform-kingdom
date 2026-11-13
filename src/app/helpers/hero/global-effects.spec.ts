@@ -3,10 +3,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('@helpers/hero/region-buffs');
 
 import { combatLog } from '@helpers/combat/combat-log';
+import { ensureEdict } from '@helpers/content/ensure-edict';
 import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
 import { ensureOutpost } from '@helpers/content/ensure-outpost';
 import { healingTicksForLevel } from '@helpers/hero/character-progress';
-import { applyGlobalEffectAdd } from '@helpers/hero/global-effect-state';
+import {
+  applyGlobalEffectAdd,
+  recomputeGlobalEffectSums,
+} from '@helpers/hero/global-effect-state';
 import {
   activeGlobalEffects,
   addGlobalEffect,
@@ -23,6 +27,7 @@ import {
 import { regionBuffsSync } from '@helpers/hero/region-buffs';
 import { outpostDeathPenaltyMultiplier } from '@helpers/world-node/world-node-outpost';
 import type {
+  EdictId,
   GameState,
   GlobalEffect,
   GlobalEffectId,
@@ -48,6 +53,11 @@ const blessing = ensureGlobalEffect({
 const outpost = ensureOutpost({
   id: 'carrina-outpost' as OutpostId,
   name: 'Carrina Outpost',
+});
+const reviveInPlace = ensureEdict({
+  id: 'revive-in-place' as EdictId,
+  name: 'Revive In Place',
+  effects: [{ effectType: 'GlobalReviveInPlace' }],
 });
 const now = 100;
 
@@ -75,7 +85,7 @@ function grantedHealingTicks(): number | undefined {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  seedContent([healing, deathsDoor, blessing, outpost]);
+  seedContent([healing, deathsDoor, blessing, outpost, reviveInPlace]);
 });
 
 describe('activeGlobalEffects / isGlobalEffectActive', () => {
@@ -207,6 +217,29 @@ describe('globalEffectsProcessTick', () => {
       );
       expect(grantedHealingTicks()).toBe(
         Math.ceil(healingTicksForLevel(worldPartyState()) * multiplier),
+      );
+    });
+
+    it('revives where the party fell instead of recalling it home', () => {
+      seedWorldNodes([
+        { name: 'Duchy', type: 'Kingdom', mapName: 'Carrina', x: 24, y: 24 },
+      ]);
+      seedDeath((state) => {
+        state.edicts = [reviveInPlace.id];
+        recomputeGlobalEffectSums(state);
+      });
+
+      tick();
+
+      expect(worldCurrentLocationState()).toEqual({
+        mapName: 'CraggledMire',
+        x: 3,
+        y: 3,
+      });
+      expect(regionBuffsSync).not.toHaveBeenCalled();
+      expect(combatLog()[0].message).toContain('revived where it fell');
+      expect(grantedHealingTicks()).toBe(
+        healingTicksForLevel(worldPartyState()),
       );
     });
 

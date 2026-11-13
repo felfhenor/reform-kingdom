@@ -29,6 +29,7 @@ import {
   ensureEncounterRandom,
 } from '@helpers/content/ensure-encounternode';
 import { ensureGathering } from '@helpers/content/ensure-gathernode';
+import { ensureEdict } from '@helpers/content/ensure-edict';
 import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
 import { ensureOutpost } from '@helpers/content/ensure-outpost';
 import { encounterStartFight } from '@helpers/encounter/encounter';
@@ -43,6 +44,7 @@ import {
   travelStart,
 } from '@helpers/hero/travel';
 import { applyCollectibleGrant } from '@helpers/item/collectibles';
+import { recomputeGlobalEffectSums } from '@helpers/hero/global-effect-state';
 import { gatheringStart, gatheringStop } from '@helpers/item/gathering';
 import { mapHopsBetween } from '@helpers/pathfinding/pathfinding';
 import { travelPathTo } from '@helpers/pathfinding/pathfinding-travel';
@@ -61,6 +63,7 @@ import type {
   CollectibleId,
   Combat,
   CurrentLocation,
+  EdictId,
   EncounterId,
   EncounterRandomId,
   GameState,
@@ -154,6 +157,12 @@ function activeEffect(state: GameState, name: string): void {
   } as GameState['globalEffects'][number]);
 }
 
+const reviveInPlace = ensureEdict({
+  id: 'revive-in-place' as EdictId,
+  name: 'Revive In Place',
+  effects: [{ effectType: 'GlobalReviveInPlace' }],
+});
+
 function messages(): string[] {
   return combatLog().map((entry) => entry.message);
 }
@@ -163,6 +172,7 @@ beforeEach(() => {
   vi.mocked(mapHopsBetween).mockReturnValue(0);
   seedWorld();
   seedContent([
+    reviveInPlace,
     ensureGlobalEffect({
       id: 'Deaths Door' as GlobalEffectId,
       name: 'Deaths Door',
@@ -419,6 +429,19 @@ describe('travelBeginDeathsDoor', () => {
     expect(deathsDoorTicks()).toBe(2 * DEATHS_DOOR_SECONDS_PER_MAP);
     expect(worldCurrentLocationState().mapName).toBe('CraggledMire');
     expect(messages()).toEqual(['The fallen party awaits recall home.']);
+  });
+
+  it('has no walk-back time when reviving in place', () => {
+    vi.mocked(mapHopsBetween).mockReturnValue(2);
+
+    die((state) => {
+      state.edicts = [reviveInPlace.id];
+      recomputeGlobalEffectSums(state);
+    });
+
+    expect(mapHopsBetween).not.toHaveBeenCalled();
+    expect(deathsDoorTicks()).toBe(DEATHS_DOOR_MINIMUM_SECONDS);
+    expect(messages()).toEqual(['The fallen party awaits revival.']);
   });
 
   it('applies the minimum when already on the home map', () => {
