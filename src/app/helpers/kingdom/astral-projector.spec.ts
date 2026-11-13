@@ -8,6 +8,7 @@ import { applyMaterialDelta } from '@helpers/item/materials';
 import {
   astralProjectorDuration,
   astralProjectorProcessTick,
+  astralProjectorRequiredMaterials,
   astralProjectorStrength,
   astralProjectorSpellToBeOverwritten,
   isAstralProjectorCastable,
@@ -115,6 +116,19 @@ describe('isAstralProjectorCastable', () => {
       applyCollectibleGrant(state, orbId, 1);
       applyMaterialDelta(state, dustId, 5);
     });
+    expect(isAstralProjectorCastable(starfall)).toBe(true);
+  });
+
+  it('checks materials against the boosted cost', () => {
+    seed((state) => {
+      applyCollectibleGrant(state, orbId, 1);
+      applyMaterialDelta(state, dustId, 2);
+      state.globalEffectSums.astralProjectorMaterialBoost = -0.5;
+    });
+
+    expect(astralProjectorRequiredMaterials(starfall)).toEqual([
+      { itemId: dustId, quantity: 2 },
+    ]);
     expect(isAstralProjectorCastable(starfall)).toBe(true);
   });
 

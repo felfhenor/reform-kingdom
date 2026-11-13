@@ -1,3 +1,5 @@
+import { scaledMaterialCost } from '@helpers/item/materials';
+import { globalEffectSumsState } from '@helpers/state-game';
 import type {
   CostItem,
   GameStateWorldNodeLevel,
@@ -23,7 +25,11 @@ export function worldNodeDevelopmentLevelUpCost(
   content: WorldNodeDevelopable,
   level: number,
 ): CostItem[] {
-  return content.levels[level]?.costs ?? [];
+  const boost = globalEffectSumsState().developMaterialBoost;
+  return (content.levels[level]?.costs ?? []).map((cost) => ({
+    ...cost,
+    required: scaledMaterialCost(cost.required, boost),
+  }));
 }
 
 export function worldNodeDevelopmentTime(

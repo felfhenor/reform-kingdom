@@ -36,6 +36,10 @@ export function reforgeReagentId(): ItemId {
   return getEntry<ItemContent>(REFORGE_REAGENT_NAME)!.id;
 }
 
+export function scaledMaterialCost(quantity: number, boost: number): number {
+  return Math.max(1, Math.floor(quantity * (1 + boost)));
+}
+
 export function getMaterialQuantity(materialId: MaterialId): number {
   return materialsState()[materialId]?.quantity ?? 0;
 }

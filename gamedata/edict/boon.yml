@@ -144,3 +144,14 @@
   effects:
     - effectType: WorkerXPGainMultiplier
       value: 3
+
+- id: 0ce125c6-cf7f-46a0-8534-0541a8b9cad5
+  name: Edict of Astral Abatement
+  enabled: true
+  sprite: '0035'
+  description: Astral projector spells cost 50% fewer materials.
+  kind: Boon
+  fragments: -1
+  effects:
+    - effectType: GlobalAstralProjectorMaterialBoost
+      value: -0.5

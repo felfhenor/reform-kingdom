@@ -13,6 +13,7 @@ import {
 import {
   astralProjectorDuration,
   astralProjectorEntries,
+  astralProjectorRequiredMaterials,
   astralProjectorStrength,
   astralProjectorSpellToBeOverwritten,
   isAstralProjectorCastable,
@@ -34,7 +35,7 @@ export function unlockedAstralProjectorEntries(): AstralProjectorContent[] {
 export function astralProjectorMaterialEntries(
   content: AstralProjectorContent,
 ): AstralProjectorMaterialEntry[] {
-  return content.requiredMaterials.map((requirement) => ({
+  return astralProjectorRequiredMaterials(content).map((requirement) => ({
     content: getEntry<ItemContent>(requirement.itemId),
     quantity: requirement.quantity,
     owned: getMaterialQuantity(requirement.itemId),
@@ -53,7 +54,7 @@ export function astralProjectorCast(id: AstralProjectorId): void {
   const duration = astralProjectorDuration(content);
 
   updateGamestate((state) => {
-    content.requiredMaterials.forEach((requirement) => {
+    astralProjectorRequiredMaterials(content).forEach((requirement) => {
       applyMaterialDelta(state, requirement.itemId, -requirement.quantity);
     });
 

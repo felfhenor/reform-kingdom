@@ -30,7 +30,9 @@ export type GlobalEffectSums = {
   cursedDrops: boolean;
   dropExtraAffixes: number;
   craftedExtraAffixes: number;
-  recipeMaterialBoost: number;
+  tradeskillMaterialBoost: number;
+  astralProjectorMaterialBoost: number;
+  developMaterialBoost: number;
   craftTimeMultiplierBonus: number;
   skillPointsPerLevel: number;
   reclassDisabled: boolean;

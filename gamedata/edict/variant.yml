@@ -131,11 +131,11 @@
   name: Edict of Artificial Scarcity
   enabled: true
   sprite: '0009'
-  description: Recipes need 1 more of every material. Crafted gear always rolls one extra affix.
+  description: Recipes need 100% more of every material. Crafted gear always rolls one extra affix.
   kind: Variant
   fragments: 0
   effects:
-    - effectType: GlobalRecipeMaterialBoost
+    - effectType: GlobalTradeskillMaterialBoost
       value: 1
     - effectType: GlobalCraftedExtraAffixes
       value: 1

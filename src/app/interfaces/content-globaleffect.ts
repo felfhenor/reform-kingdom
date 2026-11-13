@@ -286,9 +286,21 @@ export type GlobalEffectEffectMonstersDropRegionGathering = {
   value: number;
 };
 
-// Every material a kingdom recipe needs changes by `value` (whole units), never below 1.
-export type GlobalEffectEffectRecipeMaterialBoost = {
-  effectType: 'GlobalRecipeMaterialBoost';
+// Fraction (0.5 = 50% more) on every kingdom recipe material, rounded down, never below 1.
+export type GlobalEffectEffectTradeskillMaterialBoost = {
+  effectType: 'GlobalTradeskillMaterialBoost';
+  value: number;
+};
+
+// Fraction (-0.5 = half) on every astral projector spell material, rounded down, never below 1.
+export type GlobalEffectEffectAstralProjectorMaterialBoost = {
+  effectType: 'GlobalAstralProjectorMaterialBoost';
+  value: number;
+};
+
+// Fraction (-0.5 = half) on every world node development cost, rounded down, never below 1.
+export type GlobalEffectEffectDevelopMaterialBoost = {
+  effectType: 'GlobalDevelopMaterialBoost';
   value: number;
 };
 
@@ -320,7 +332,9 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectCursedDrops
   | GlobalEffectEffectDropExtraAffixes
   | GlobalEffectEffectCraftedExtraAffixes
-  | GlobalEffectEffectRecipeMaterialBoost
+  | GlobalEffectEffectTradeskillMaterialBoost
+  | GlobalEffectEffectAstralProjectorMaterialBoost
+  | GlobalEffectEffectDevelopMaterialBoost
   | GlobalEffectEffectCraftTimeMultiplier
   | GlobalEffectEffectSkillPointsPerLevel
   | GlobalEffectEffectReclassDisabled

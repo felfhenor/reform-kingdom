@@ -25,7 +25,9 @@ import type {
   GlobalEffectEffectLevelStatMultiplier,
   GlobalEffectEffectOffPathTravelSpeedBoost,
   GlobalEffectEffectOnPathTravelSpeedBoost,
-  GlobalEffectEffectRecipeMaterialBoost,
+  GlobalEffectEffectTradeskillMaterialBoost,
+  GlobalEffectEffectAstralProjectorMaterialBoost,
+  GlobalEffectEffectDevelopMaterialBoost,
   GlobalEffectEffectShopPriceMultiplier,
   GlobalEffectEffectShrineBuffsPermanent,
   GlobalEffectEffectSkillPointsPerLevel,
@@ -53,7 +55,9 @@ export function ensureGlobalEffectEffect(
     Partial<GlobalEffectEffectEnemyExtraSkills> &
     Partial<GlobalEffectEffectDropExtraAffixes> &
     Partial<GlobalEffectEffectCraftedExtraAffixes> &
-    Partial<GlobalEffectEffectRecipeMaterialBoost> &
+    Partial<GlobalEffectEffectTradeskillMaterialBoost> &
+    Partial<GlobalEffectEffectAstralProjectorMaterialBoost> &
+    Partial<GlobalEffectEffectDevelopMaterialBoost> &
     Partial<GlobalEffectEffectCraftTimeMultiplier> &
     Partial<GlobalEffectEffectSkillPointsPerLevel> &
     Partial<GlobalEffectEffectWipeEndsRun> &
@@ -194,7 +198,9 @@ export function ensureGlobalEffectEffect(
     effect.effectType === 'EnemyExtraSkills' ||
     effect.effectType === 'GlobalDropExtraAffixes' ||
     effect.effectType === 'GlobalCraftedExtraAffixes' ||
-    effect.effectType === 'GlobalRecipeMaterialBoost' ||
+    effect.effectType === 'GlobalTradeskillMaterialBoost' ||
+    effect.effectType === 'GlobalAstralProjectorMaterialBoost' ||
+    effect.effectType === 'GlobalDevelopMaterialBoost' ||
     effect.effectType === 'GlobalSkillPointsPerLevel' ||
     effect.effectType === 'GlobalCommissionReputationBoost' ||
     effect.effectType === 'GlobalTownCommissionSlotBoost' ||

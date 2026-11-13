@@ -100,8 +100,12 @@ export function globalEffectEffectDescription(
       return `Combat-dropped Gear Affixes: +${effect.value}`;
     case 'GlobalCraftedExtraAffixes':
       return `Crafted Gear Affixes: +${effect.value}`;
-    case 'GlobalRecipeMaterialBoost':
-      return `Recipe Materials: ${signedNumber(effect.value)} each`;
+    case 'GlobalTradeskillMaterialBoost':
+      return `Recipe Materials: ${signedPercent(effect.value * 100)}`;
+    case 'GlobalAstralProjectorMaterialBoost':
+      return `Astral Projector Materials: ${signedPercent(effect.value * 100)}`;
+    case 'GlobalDevelopMaterialBoost':
+      return `Development Costs: ${signedPercent(effect.value * 100)}`;
     case 'GlobalCraftTimeMultiplier':
       return `Craft Time: ${signedPercent(effect.value * 100)}`;
     case 'GlobalSkillPointsPerLevel':
@@ -257,8 +261,14 @@ function accumulateGlobalEffectEffect(
     case 'GlobalCraftedExtraAffixes':
       sums.craftedExtraAffixes += effect.value;
       return;
-    case 'GlobalRecipeMaterialBoost':
-      sums.recipeMaterialBoost += effect.value;
+    case 'GlobalTradeskillMaterialBoost':
+      sums.tradeskillMaterialBoost += effect.value;
+      return;
+    case 'GlobalAstralProjectorMaterialBoost':
+      sums.astralProjectorMaterialBoost += effect.value;
+      return;
+    case 'GlobalDevelopMaterialBoost':
+      sums.developMaterialBoost += effect.value;
       return;
     case 'GlobalCraftTimeMultiplier':
       sums.craftTimeMultiplierBonus += effect.value;

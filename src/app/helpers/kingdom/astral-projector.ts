@@ -6,7 +6,10 @@ import { notifySuccess } from '@helpers/engine/notify';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { jobAbilityValue } from '@helpers/hero/job-ability';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
-import { getMaterialQuantity } from '@helpers/item/materials';
+import {
+  getMaterialQuantity,
+  scaledMaterialCost,
+} from '@helpers/item/materials';
 import {
   activeAstralProjectorSpellsState,
   gamestate,
@@ -16,6 +19,7 @@ import {
 import type {
   AstralProjectorContent,
   AstralProjectorId,
+  AstralProjectorRequirementMaterial,
   GameStateActiveAstralProjectorSpell,
 } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
@@ -49,12 +53,22 @@ export function astralProjectorStrength(): number {
   return 1 + globalEffectSumsState().astralSpellStrengthBonus;
 }
 
+export function astralProjectorRequiredMaterials(
+  content: AstralProjectorContent,
+): AstralProjectorRequirementMaterial[] {
+  const boost = globalEffectSumsState().astralProjectorMaterialBoost;
+  return content.requiredMaterials.map((requirement) => ({
+    ...requirement,
+    quantity: scaledMaterialCost(requirement.quantity, boost),
+  }));
+}
+
 export function isAstralProjectorCastable(
   content: AstralProjectorContent,
 ): boolean {
   if (!isAstralProjectorCollectiblesMet(content)) return false;
 
-  return content.requiredMaterials.every(
+  return astralProjectorRequiredMaterials(content).every(
     (requirement) =>
       getMaterialQuantity(requirement.itemId) >= requirement.quantity,
   );

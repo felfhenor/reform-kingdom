@@ -8,6 +8,7 @@ import {
   worldNodeDevelopmentTime,
 } from '@helpers/world-node/world-node-development';
 import type { ItemId, WorldNodeDevelopable } from '@interfaces';
+import { seedGamestate } from '@/testing/gamestate';
 
 function buildDevelopable(required: number[] = [500, 10000, 25000]) {
   return {
@@ -39,6 +40,16 @@ describe('worldNodeDevelopmentLevelUpCost', () => {
   it('returns the costs for the next level', () => {
     expect(worldNodeDevelopmentLevelUpCost(buildDevelopable(), 0)).toEqual([
       { itemId: 'Gold Coin', required: 500 },
+    ]);
+  });
+
+  it('scales the costs by the development material boost', () => {
+    seedGamestate((state) => {
+      state.globalEffectSums.developMaterialBoost = -0.5;
+    });
+
+    expect(worldNodeDevelopmentLevelUpCost(buildDevelopable(), 0)).toEqual([
+      { itemId: 'Gold Coin', required: 250 },
     ]);
   });
 

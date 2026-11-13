@@ -13,6 +13,7 @@ import {
   hasTraderTokens,
   isMaterialDiscovered,
   removeMaterial,
+  scaledMaterialCost,
   spendGold,
 } from '@helpers/item/materials';
 import { gamestate } from '@helpers/state-game';
@@ -159,5 +160,18 @@ describe('gold and trader scrip', () => {
 
     expect(hasTraderTokens(5)).toBe(true);
     expect(hasTraderTokens(6)).toBe(false);
+  });
+});
+
+describe('scaledMaterialCost', () => {
+  it('scales by the boost and rounds down', () => {
+    expect(scaledMaterialCost(4, 0)).toBe(4);
+    expect(scaledMaterialCost(3, 0.5)).toBe(4);
+    expect(scaledMaterialCost(5, -0.5)).toBe(2);
+  });
+
+  it('never drops below 1, even past -100%', () => {
+    expect(scaledMaterialCost(1, -0.5)).toBe(1);
+    expect(scaledMaterialCost(10, -2)).toBe(1);
   });
 });

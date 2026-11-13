@@ -16,7 +16,7 @@ const recipe = ensureRecipe({
 
 function withBoost(boost: number) {
   seedGamestate((state) => {
-    state.globalEffectSums.recipeMaterialBoost = boost;
+    state.globalEffectSums.tradeskillMaterialBoost = boost;
   });
   return recipeKingdomRequirements(recipe);
 }
@@ -26,17 +26,17 @@ describe('recipeKingdomRequirements', () => {
     expect(withBoost(0)).toBe(recipe.requirements);
   });
 
-  it('adds the boost to every material, leaving gear and collectibles alone', () => {
-    expect(withBoost(1)).toEqual([
+  it('scales every material, rounding down, leaving gear and collectibles alone', () => {
+    expect(withBoost(0.5)).toEqual([
       { itemId: 'ore', quantity: 4 },
-      { itemId: 'coal', quantity: 2 },
+      { itemId: 'coal', quantity: 1 },
       { equipmentId: 'sword' },
       { collectibleId: 'hammer' },
     ]);
   });
 
   it('never drops a material below 1', () => {
-    expect(withBoost(-2).slice(0, 2)).toEqual([
+    expect(withBoost(-1).slice(0, 2)).toEqual([
       { itemId: 'ore', quantity: 1 },
       { itemId: 'coal', quantity: 1 },
     ]);
