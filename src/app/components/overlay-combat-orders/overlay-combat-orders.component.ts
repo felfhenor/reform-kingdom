@@ -47,6 +47,7 @@ import {
   COMBAT_MANUAL_TURN_HOLD_MS,
 } from '@helpers/config';
 import { hotkeysBlockOutside } from '@helpers/engine/hotkeys.ui';
+import { isMotionReduced } from '@helpers/engine/motion';
 import { playGameSFX } from '@helpers/engine/sfx';
 import { isGameloopPaused } from '@helpers/gameloop';
 import { worldCombatState } from '@helpers/state-game';
@@ -113,6 +114,7 @@ export class OverlayCombatOrdersComponent {
   public pendingSkillId = signal<string | undefined>(undefined);
 
   public isPaused = isGameloopPaused;
+  public isMotionReduced = isMotionReduced;
   public allies = computed(() => [
     ...this.combat().heroes,
     ...this.combat().helpers,
@@ -367,6 +369,10 @@ export class OverlayCombatOrdersComponent {
   }
 
   public onTurnSlotLeave(event: AnimationCallbackEvent): void {
+    if (isMotionReduced()) {
+      event.animationComplete();
+      return;
+    }
     this.anim
       .fadeOutCollapseWidth(event.target)
       .then(() => event.animationComplete())

@@ -22,6 +22,14 @@
   width: 0;
 }
 
+.turn-bar-instant {
+  .turn-slot,
+  .turn-slot-connector,
+  app-slot-icon-blank {
+    transition: none;
+  }
+}
+
 .turn-slot-leader {
   width: 66px;
   height: 66px;

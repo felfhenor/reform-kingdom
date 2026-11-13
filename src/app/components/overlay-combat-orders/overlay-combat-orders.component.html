@@ -61,6 +61,7 @@
             @if (!isReview()) {
               <div
                 class="glass flex items-center h-[72px] pr-3 shrink-0 overflow-hidden"
+                [class.turn-bar-instant]="isMotionReduced()"
                 appListReflow
               >
                 @for (slot of turnOrder(); track slot.key; let first = $first) {
