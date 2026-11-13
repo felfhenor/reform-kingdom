@@ -1,8 +1,10 @@
 @let e = entry();
+@let known = e.discovered || e.discoveredButNotMade;
 
-@if (e.discovered) {
+@if (known) {
   <div
     class="relative w-[64px] h-[64px] cursor-default"
+    [class.opacity-50]="!e.discovered"
     [tp]="tooltip"
     [tpPlacement]="'top'"
   >
@@ -18,7 +20,7 @@
 
 <ng-template #tooltip>
   <div class="max-w-[400px]">
-    @if (e.discovered) {
+    @if (known) {
       <app-detail-item-preview [display]="display()">
         <div class="text-xs">Found: {{ displayQuantity() }}</div>
         <ng-container [ngTemplateOutlet]="sourceLine" />

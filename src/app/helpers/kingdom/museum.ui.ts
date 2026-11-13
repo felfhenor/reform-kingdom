@@ -3,7 +3,10 @@ import {
   isRecipeDiscovered,
   isRecipeDropGated,
 } from '@helpers/crafting/recipes';
-import { exchangeIsCollectibleAvailableThisRun } from '@helpers/exchange/exchange';
+import {
+  exchangeEdictRewardCollectibleIds,
+  exchangeIsCollectibleAvailableThisRun,
+} from '@helpers/exchange/exchange';
 import { isMaterialDiscovered } from '@helpers/item';
 import { getCollectibleSource } from '@helpers/item/collectible-source';
 import {
@@ -42,14 +45,30 @@ export function museumCollectibleEntry(
   collectible: CollectibleContent,
 ): MuseumCollectibleEntry {
   const discovered = isCollectibleDiscovered(collectible.id);
+  const discoveredButNotMade =
+    !discovered && isEdictRewardStockedThisRun(collectible.id);
 
   return {
     collectible,
     discovered,
-    discoveredButNotMade: false,
+    discoveredButNotMade,
     quantity: getCollectibleQuantity(collectible.id),
-    source: museumCollectibleSource(collectible.id, discovered),
+    source: museumCollectibleSource(
+      collectible.id,
+      discovered || discoveredButNotMade,
+    ),
   };
+}
+
+// The Legacy already earned these, so they're known from the start of the run.
+function isEdictRewardStockedThisRun(collectibleId: CollectibleId): boolean {
+  return (
+    exchangeEdictRewardCollectibleIds().has(collectibleId) &&
+    exchangeIsCollectibleAvailableThisRun(
+      legacyClearedEdictsState(),
+      collectibleId,
+    )
+  );
 }
 
 // Includes undiscovered collectibles (quantity: 0) so the museum can render them as silhouettes.
@@ -67,14 +86,14 @@ export function getMuseumCollectibleEntries(): MuseumCollectibleEntry[] {
   return orderBy(entries, [(entry) => entry.collectible.name], ['asc']);
 }
 
-// An undiscovered collectible's source stays unknown until its map is visited or its town visited; an unmet trader is hinted at without a name.
+// An unknown collectible's source stays hidden until its map is visited or its town visited; an unmet trader is hinted at without a name.
 function museumCollectibleSource(
   collectibleId: CollectibleId,
-  discovered: boolean,
+  known: boolean,
 ): CollectibleSource | undefined {
   const source = getCollectibleSource(collectibleId);
   if (!source) return undefined;
-  if (!discovered && !isCollectibleSourceKnown(source)) {
+  if (!known && !isCollectibleSourceKnown(source)) {
     return source.type === 'trader'
       ? { ...source, name: UNMET_TRADER_NAME }
       : undefined;
@@ -145,7 +164,7 @@ export function filterMuseumCollectibleEntries(
     ) {
       return true;
     }
-    if (!entry.discovered) return false;
+    if (!entry.discovered && !entry.discoveredButNotMade) return false;
 
     return (
       textIncludes(entry.collectible.name, text) ||
