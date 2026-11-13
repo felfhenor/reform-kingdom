@@ -205,6 +205,14 @@ describe('combatDoCombatIteration', () => {
       expect(worldCombatState()?.turnQueue).toBeUndefined();
     });
 
+    it('leaves the end check for the next tick so the last hit is shown', () => {
+      manualFight({ guardians: [foe('fast', 10), foe('slow')] });
+      const before = worldCombatState();
+
+      inTick(combatDoCombatIteration);
+      expect(combatCheckIfOver).toHaveBeenCalledExactlyOnceWith(before);
+    });
+
     it("stops at a hero's turn until its order arrives", () => {
       manualFight({ heroes: [caster()] });
 

@@ -270,7 +270,8 @@ export function combatDoCombatIteration(): void {
     return state;
   });
 
-  if (!escaped) combatCheckIfOver(combat);
+  // Manual fights end on the next tick so the overlay can show the killing blow's state first.
+  if (!escaped && !combatIsManual()) combatCheckIfOver(combat);
 
   endCombatLogCommits();
 }
