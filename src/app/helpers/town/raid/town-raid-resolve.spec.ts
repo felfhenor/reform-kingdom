@@ -123,8 +123,12 @@ describe('raidResolveVictory', () => {
     { kind: 'Item', itemId: ore.id, quantity: 20 },
   ];
 
-  it('grants the kill drops plus the town raid rewards, and gains reputation', () => {
-    seedTown();
+  it('grants the kill drops plus the town raid rewards, gains reputation and clears the telegraph', () => {
+    seedTown({
+      raidTelegraphedAtTick: 900,
+      raidEngageWindowExpiresAtTick: 1200,
+      raidTelegraphedAssaulterIds: ['bloodmoth' as MonsterId],
+    });
     const combat = buildCombat();
     const events = captureAnalyticsEvents();
 
@@ -134,8 +138,13 @@ describe('raidResolveVictory', () => {
       ...killDrops,
       { kind: 'Equipment', equipmentId: trophyId },
     ]);
-    expect(townState().reputation).toBe(RAID_WIN_REPUTATION_AMOUNT);
-    expect(townState().lastRaidResolvedAtTick).toBe(now);
+    expect(townState()).toMatchObject({
+      reputation: RAID_WIN_REPUTATION_AMOUNT,
+      lastRaidResolvedAtTick: now,
+      raidTelegraphedAtTick: undefined,
+      raidEngageWindowExpiresAtTick: undefined,
+      raidTelegraphedAssaulterIds: undefined,
+    });
     expect(events).toContain('Town:Raid:Win:Larsia');
   });
 

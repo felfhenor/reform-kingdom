@@ -75,7 +75,7 @@ export function telegraphRaid(town: TownContent): void {
 function processTownRaid(town: TownContent): void {
   const state = worldTownsState()[town.id];
   if (!state || state.firstVisitedAtTick === undefined) return;
-  // Its raid is actively being fought - without this the checks below would re-telegraph mid-fight.
+  // Its raid is actively being fought - an expiry mid-fight waits until the fight is decided.
   if (worldCombatState()?.raidTownId === town.id) return;
 
   const now = timerTicksElapsed();

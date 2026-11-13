@@ -601,11 +601,11 @@ describe('combatCheckIfOver', () => {
       });
     });
 
-    it('also resolves the raid defeat for a raid loss', () => {
+    it('leaves a lost raid retryable instead of resolving the town defeat', () => {
       endFight(lost({ raidTownId: larsiaId }));
 
       expect(travelBeginDeathsDoor).toHaveBeenCalled();
-      expect(raidResolveDefeat).toHaveBeenCalledWith(larsiaId);
+      expect(raidResolveDefeat).not.toHaveBeenCalled();
     });
 
     it('ends the run instead of Deaths Door when a wipe ends the run', () => {

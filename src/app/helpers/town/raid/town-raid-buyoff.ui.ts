@@ -9,7 +9,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { updateGamestate } from '@helpers/state-game';
+import { updateGamestate, worldCombatState } from '@helpers/state-game';
 import {
   applyRaidBuyoff,
   raidBuyoffCost,
@@ -41,6 +41,7 @@ const RAID_BUYOFF_LOG_MESSAGES: Record<
 
 export function raidBuyoffOptions(town: TownContent): TownRaidBuyoffOption[] {
   const isPartyHere = isPartyAtTown(town.id);
+  const isFighting = worldCombatState()?.raidTownId === town.id;
 
   return (Object.keys(RAID_BUYOFF_LABELS) as TownRaidBuyoffKind[])
     .map((kind) => ({ kind, cost: raidBuyoffCost(town, kind) }))
@@ -54,7 +55,8 @@ export function raidBuyoffOptions(town: TownContent): TownRaidBuyoffOption[] {
           required: req.quantity,
         }),
       ) as CostItem[],
-      canBuyoff: isPartyHere && commissionRequirementsSatisfied(cost),
+      canBuyoff:
+        isPartyHere && !isFighting && commissionRequirementsSatisfied(cost),
     }));
 }
 
@@ -75,6 +77,8 @@ export async function raidBuyoff(
     if (expiresAtTick === undefined || state.clock.numTicks >= expiresAtTick) {
       return state;
     }
+    // The telegraph stays up during the fight, so buying off mid-fight would dodge a loss and still win.
+    if (state.world.combat?.raidTownId === townId) return state;
 
     const cost = raidBuyoffCost(town, kind, state);
     if (cost.length === 0 || !commissionRequirementsSatisfied(cost, state)) {

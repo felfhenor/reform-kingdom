@@ -61,7 +61,7 @@ export function raidDefenseGlobalEffectApply(
   );
 }
 
-// Every way a raid ends (engage, loss, buy-off) drops the telegraph the same way.
+// Every way a raid ends (victory, timeout, buy-off) drops the telegraph the same way.
 export function raidTelegraphClear(
   state: GameState,
   townId: TownId,

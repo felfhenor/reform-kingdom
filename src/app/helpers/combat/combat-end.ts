@@ -1,8 +1,3 @@
-import {
-  runStatsFightHeroIds,
-  runStatsRecordFightEnd,
-  runStatsRecordSeal,
-} from '@helpers/run-stats/run-stats';
 import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
 import {
   combatantMessageToken,
@@ -10,12 +5,6 @@ import {
 } from '@helpers/combat/combat-log';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
 import { combatReset } from '@helpers/combat/combat-state';
-import {
-  globalEffectSumsState,
-  updateGamestate,
-  worldCombatState,
-} from '@helpers/state-game';
-import { taskRecordEncounterClear } from '@helpers/task/task-progress';
 import { monsterXpReward, xpForOverLevel } from '@helpers/combat/monster';
 import { commissionRecordMonsterKill } from '@helpers/commission/commission-kill-progress';
 import { getEntry } from '@helpers/content/content';
@@ -36,7 +25,6 @@ import {
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
 import { playGameSFX } from '@helpers/engine/sfx';
-import { founderWhisperLog } from '@helpers/lore/founder-whisper';
 import {
   partyGainXp,
   syncPartyHpFromCombat,
@@ -44,10 +32,19 @@ import {
 import { travelBeginDeathsDoor } from '@helpers/hero/travel';
 import { combatDropChanceBonus, rollDroppedRewards } from '@helpers/item/loot';
 import { monsterRecordKill } from '@helpers/kingdom/bestiary';
+import { founderWhisperLog } from '@helpers/lore/founder-whisper';
 import {
-  raidResolveDefeat,
-  raidResolveVictory,
-} from '@helpers/town/raid/town-raid-resolve';
+  runStatsFightHeroIds,
+  runStatsRecordFightEnd,
+  runStatsRecordSeal,
+} from '@helpers/run-stats/run-stats';
+import {
+  globalEffectSumsState,
+  updateGamestate,
+  worldCombatState,
+} from '@helpers/state-game';
+import { taskRecordEncounterClear } from '@helpers/task/task-progress';
+import { raidResolveVictory } from '@helpers/town/raid/town-raid-resolve';
 import { monsterDropsOnMap } from '@helpers/world-node/world-node-monster-drops';
 import { worldNodeByName } from '@helpers/world-node/world-nodes';
 import type {
@@ -351,13 +348,17 @@ export function combatHandleDefeat(combat: Combat): void {
 
   if (globalEffectSumsState().wipeEndsRun) {
     combatEndRunOnWipe();
-  } else {
-    travelBeginDeathsDoor();
+    return;
   }
 
-  // A raid loss is still a real party wipe (handled above) plus its own town-scoped consequence.
+  travelBeginDeathsDoor();
+
+  // A lost raid fight leaves the telegraph up; the town only falls when the window expires.
   if (combat.raidTownId) {
-    raidResolveDefeat(combat.raidTownId as TownId);
+    combatMessageLog(
+      combat,
+      `The raiders still threaten ${combat.locationName} - regroup and defend it before time runs out!`,
+    );
   }
 }
 

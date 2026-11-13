@@ -4,11 +4,7 @@ import { combatLog } from '@helpers/combat/combat-log';
 import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
 import { ensureMonster } from '@helpers/content/ensure-monster';
 import { ensureTown } from '@helpers/content/ensure-town';
-import {
-  gamestate,
-  worldCombatState,
-  worldTownsState,
-} from '@helpers/state-game';
+import { worldCombatState, worldTownsState } from '@helpers/state-game';
 import { raidEngageCombat } from '@helpers/town/raid/town-raid-combat';
 import type {
   GameState,
@@ -52,11 +48,9 @@ const town = ensureTown({
   },
 });
 
-const otherTown = ensureTown({ id: 'vesper' as TownId, name: 'Vesper' });
-// Looked up by name, so the stored id differs on purpose.
-const raidEffect = ensureGlobalEffect({
-  id: 'raid-defense-requested' as GlobalEffectId,
-  name: 'Raid Defense Requested',
+const deathsDoor = ensureGlobalEffect({
+  id: 'Deaths Door' as GlobalEffectId,
+  name: 'Deaths Door',
 });
 
 const telegraphed: Partial<TownNodeState> = {
@@ -128,29 +122,34 @@ describe('raidEngageCombat', () => {
     expect(worldCombatState()?.ambushedBy).toBeDefined();
   });
 
-  it('clears the telegraph once engaged, leaving the defense request to other raided towns', () => {
-    seedContent([town, otherTown, raidEffect, moth, guard]);
-    seedRaid(telegraphed, {
-      edit: (state) => {
-        state.clock.numTicks = 1000;
-        state.world.towns[otherTown.id] = buildTownNodeState(telegraphed);
-      },
-    });
+  it('keeps the telegraph up once engaged, so a lost fight can be retried', () => {
+    seedRaid();
 
     inTick(() => raidEngageCombat(townId));
 
-    expect(worldTownsState()[townId]).toMatchObject({
-      raidTelegraphedAtTick: undefined,
-      raidEngageWindowExpiresAtTick: undefined,
-      raidTelegraphedAssaulterIds: undefined,
+    expect(worldTownsState()[townId]).toMatchObject(telegraphed);
+  });
+
+  it('refuses during Deaths Door, so a wiped party cannot retry at 0 HP', () => {
+    seedContent([town, moth, guard, deathsDoor]);
+    seedRaid(telegraphed, {
+      edit: (state) =>
+        state.globalEffects.push({
+          ...deathsDoor,
+          startTick: 0,
+          expiresAtTick: 999,
+        }),
     });
-    expect(gamestate().globalEffects).toEqual([
-      expect.objectContaining({
-        id: raidEffect.id,
-        extendedDescription: otherTown.name,
-        startTick: 1000,
-      }),
-    ]);
+
+    expect(inTick(() => raidEngageCombat(townId))).toBe(false);
+    expect(worldCombatState()).toBeUndefined();
+  });
+
+  it('refuses once the engage window has expired', () => {
+    seedRaid(telegraphed, { edit: (state) => (state.clock.numTicks = 500) });
+
+    expect(inTick(() => raidEngageCombat(townId))).toBe(false);
+    expect(worldCombatState()).toBeUndefined();
   });
 
   it('skips assaulters gone from content', () => {

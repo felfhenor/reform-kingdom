@@ -17,7 +17,10 @@ import {
   raidBuyoff,
   raidBuyoffOptions,
 } from '@helpers/town/raid/town-raid-buyoff.ui';
-import { raidEngageCombat } from '@helpers/town/raid/town-raid-combat';
+import {
+  raidCanEngage,
+  raidEngageCombat,
+} from '@helpers/town/raid/town-raid-combat';
 import {
   raidAssaulterPreview,
   raidDefenderPreview,
@@ -48,6 +51,8 @@ export class PanelTownRaidComponent {
   public town = input.required<TownContent>();
 
   public raidTelegraph = computed(() => townRaidTelegraph(this.town().id));
+
+  public canEngage = computed(() => raidCanEngage(this.town()));
 
   public raidCountdown = computed(() => {
     const telegraph = this.raidTelegraph();

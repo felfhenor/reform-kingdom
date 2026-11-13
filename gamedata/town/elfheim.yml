@@ -303,7 +303,7 @@
               quantity: 1
 
     assaulter:
-      numMonsters: 12
+      numMonsters: 8
       monsterIds:
         - Fel Demon
         - Woodspider

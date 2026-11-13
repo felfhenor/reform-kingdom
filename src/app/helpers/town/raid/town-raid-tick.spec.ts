@@ -176,6 +176,20 @@ describe('townRaidProcessTick', () => {
     ]);
   });
 
+  it('holds an expired raid until its fight is decided', () => {
+    seedTown(
+      { raidTelegraphedAtTick: 1, raidEngageWindowExpiresAtTick: now },
+      (state) => {
+        state.world.combat = buildCombat({ raidTownId: larsia.id });
+      },
+    );
+
+    tick();
+
+    expect(raidResolveDefeat).not.toHaveBeenCalled();
+    expect(townState().raidTelegraphedAtTick).toBe(1);
+  });
+
   it.each([
     [
       'during cooldown',

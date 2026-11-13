@@ -83,7 +83,9 @@ export function raidResolveVictory(
     const target = state.world.towns[townId];
     if (!target) return state;
 
-    target.lastRaidResolvedAtTick = timerTicksElapsed();
+    const now = timerTicksElapsed();
+    target.lastRaidResolvedAtTick = now;
+    raidTelegraphClear(state, townId, now);
 
     return state;
   });
