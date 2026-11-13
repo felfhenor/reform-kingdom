@@ -23,22 +23,21 @@ import { AnimationService } from '@services/animation.service';
   ],
   template: `
     @if (!isManualCombat()) {
-      <div
-        class="flex flex-row items-end gap-4"
-        (mouseenter)="setHovered(true)"
-        (mouseleave)="setHovered(false)"
-      >
-        @if (combat(); as combat) {
-          <app-status-element-pool
-            class="pointer-events-auto"
-            [combat]="combat"
-            [expanded]="isExpanded()"
-            (animate.enter)="anim.fadeIn($event.target)"
-          />
-        }
-
+      <div (mouseenter)="setHovered(true)" (mouseleave)="setHovered(false)">
         <div class="encounter-status">
-          <app-status-hero [expanded]="isExpanded()"></app-status-hero>
+          <!-- The pool shares the hero row so enemy row widths can't move it. -->
+          <div class="flex flex-row items-end justify-end gap-4">
+            @if (combat(); as combat) {
+              <app-status-element-pool
+                class="pointer-events-auto"
+                [combat]="combat"
+                [expanded]="isExpanded()"
+                (animate.enter)="anim.fadeIn($event.target)"
+              />
+            }
+
+            <app-status-hero [expanded]="isExpanded()"></app-status-hero>
+          </div>
 
           @if (helpers().length > 0) {
             <app-status-encounter-combatants
