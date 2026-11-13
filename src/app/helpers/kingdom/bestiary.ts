@@ -7,6 +7,7 @@ import { ledgerHas } from '@helpers/engine/ledger';
 import { bestiaryState, updateGamestate } from '@helpers/state-game';
 import { townGuardianMonsterIds } from '@helpers/town/town-guardian';
 import type {
+  DropRarity,
   EncounterContent,
   EncounterRandomContent,
   GameStateBestiary,
@@ -14,7 +15,10 @@ import type {
   MonsterContent,
   MonsterId,
 } from '@interfaces';
-import { taskEventMonsterKilled } from '@helpers/task/task-events';
+import {
+  taskEventMonsterKilled,
+  taskEventMonstersAnalyzed,
+} from '@helpers/task/task-events';
 
 export function isMonsterDiscovered(monsterId: MonsterId): boolean {
   return ledgerHas(bestiaryState(), monsterId);
@@ -34,8 +38,7 @@ export function getMonsterFoundAtNodes(monsterId: MonsterId): string[] {
   return bestiaryState()[monsterId]?.foundAtNodes ?? [];
 }
 
-// The actual min/max level the party has fought this monster at -
-// undefined until it's been killed at least once.
+// The actual min/max level the party has killed or analyzed this monster at; undefined until then.
 export function getMonsterLevelRangeFound(
   monsterId: MonsterId,
 ): LevelRange | undefined {
@@ -45,12 +48,34 @@ export function getMonsterLevelRangeFound(
   return { min: entry.minLevelFound, max: entry.maxLevelFound };
 }
 
+// Enough kills teach as much as Analyze, so parties without an Explorer still fill the bestiary.
+export const ANALYZE_KILLS_BY_RARITY: Record<DropRarity, number> = {
+  Common: 100,
+  Uncommon: 75,
+  Rare: 50,
+  Mystical: 25,
+  Legendary: 1,
+};
+
+export function monsterAnalyzeKillsRemaining(
+  monster: MonsterContent,
+  kills: number,
+): number {
+  return Math.max(0, ANALYZE_KILLS_BY_RARITY[monster.rarity] - kills);
+}
+
+function monsterKillsAnalyze(monsterId: MonsterId, kills: number): boolean {
+  const monster = getEntry<MonsterContent>(monsterId);
+  return !!monster && monsterAnalyzeKillsRemaining(monster, kills) === 0;
+}
+
 // First kill marks the monster discovered; later kills fold in level/location. Treats non-finite min/max as unset to avoid NaN poisoning from pre-level-tracking entries.
+// Returns true when this kill analyzed the monster (only knowable inside a tick).
 export function monsterRecordKill(
   monsterId: MonsterId,
   level: number,
   foundAtNode?: string,
-): void {
+): boolean {
   const alreadyDiscovered = isMonsterDiscovered(monsterId);
   let totalKills = undefined as number | undefined;
 
@@ -72,26 +97,102 @@ export function monsterRecordKill(
         ? Math.max(existingMax as number, level)
         : level,
       foundAtNodes: [...foundAtNodes],
+      analyzed: existing?.analyzed ?? false,
     };
     totalKills = state.bestiary[monsterId].kills;
     return state;
   });
 
+  if (!alreadyDiscovered) bestiarySendEvent('Progress:Bestiary:Unlock', monsterId);
+
   // Outside a tick the write lands later, so the new total isn't known until then.
   if (totalKills !== undefined) {
-    void taskEventMonsterKilled(monsterId, totalKills);
-  } else {
-    void write.then(() => taskEventMonsterKilled(monsterId, totalKills ?? 0));
+    return monsterAfterKill(monsterId, totalKills, level, foundAtNode);
   }
+  void write.then(() =>
+    monsterAfterKill(monsterId, totalKills ?? 0, level, foundAtNode),
+  );
+  return false;
+}
 
-  if (!alreadyDiscovered) {
-    const monsterName = getEntry<MonsterContent>(monsterId)?.name;
-    if (monsterName) {
-      analyticsSendDesignEvent(
-        `Progress:Bestiary:Unlock:${analyticsSafeSegment(monsterName)}`,
-      );
+function monsterAfterKill(
+  monsterId: MonsterId,
+  totalKills: number,
+  level: number,
+  foundAtNode?: string,
+): boolean {
+  void taskEventMonsterKilled(monsterId, totalKills);
+  return (
+    monsterKillsAnalyze(monsterId, totalKills) &&
+    monsterRecordAnalyze(monsterId, level, foundAtNode)
+  );
+}
+
+function bestiarySendEvent(prefix: string, monsterId: MonsterId): void {
+  const monsterName = getEntry<MonsterContent>(monsterId)?.name;
+  if (!monsterName) return;
+  analyticsSendDesignEvent(`${prefix}:${analyticsSafeSegment(monsterName)}`);
+}
+
+export function isMonsterAnalyzed(monsterId: MonsterId): boolean {
+  return !!bestiaryState()[monsterId]?.analyzed;
+}
+
+export function bestiaryAnalyzedCount(bestiary: GameStateBestiary): number {
+  return Object.values(bestiary).filter((entry) => entry.analyzed).length;
+}
+
+// Returns true only on the first analysis; an unkilled monster gets a zero-kill entry, which discovers it.
+export function monsterRecordAnalyze(
+  monsterId: MonsterId,
+  level: number,
+  foundAtNode?: string,
+): boolean {
+  if (isMonsterAnalyzed(monsterId)) return false;
+
+  const alreadyDiscovered = isMonsterDiscovered(monsterId);
+  const totalAnalyzed = bestiaryAnalyzedCount(bestiaryState()) + 1;
+
+  void updateGamestate((state) => {
+    const existing = state.bestiary[monsterId];
+    if (existing) {
+      existing.analyzed = true;
+      return state;
     }
-  }
+
+    state.bestiary[monsterId] = {
+      foundAt: Date.now(),
+      kills: 0,
+      minLevelFound: level,
+      maxLevelFound: level,
+      foundAtNodes: foundAtNode ? [foundAtNode] : [],
+      analyzed: true,
+    };
+    return state;
+  });
+
+  void taskEventMonstersAnalyzed(totalAnalyzed);
+
+  bestiarySendEvent('Progress:Bestiary:Analyze', monsterId);
+  if (!alreadyDiscovered) bestiarySendEvent('Progress:Bestiary:Unlock', monsterId);
+  return true;
+}
+
+// Saves from before Analyze had no flag, so everything they had killed counts; kill thresholds also apply retroactively.
+export function syncBestiaryAnalyzed(
+  bestiary: GameStateBestiary,
+): GameStateBestiary {
+  const synced: GameStateBestiary = {};
+  (Object.keys(bestiary) as MonsterId[]).forEach((monsterId) => {
+    const entry = bestiary[monsterId];
+    const analyzed =
+      !('analyzed' in entry) ||
+      entry.analyzed ||
+      monsterKillsAnalyze(monsterId, entry.kills);
+    synced[monsterId] =
+      analyzed === entry.analyzed ? entry : { ...entry, analyzed };
+  });
+  return synced;
 }
 
 // Repairs entries predating min/max level tracking by collapsing them to a single unknown level; widens again on the next kill.

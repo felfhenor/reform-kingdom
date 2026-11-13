@@ -126,6 +126,7 @@ function seedProgress(opts: { cleared?: boolean; fought?: boolean } = {}) {
         minLevelFound: 15,
         maxLevelFound: 15,
         foundAtNodes: [den],
+        analyzed: false,
       };
     }
   });

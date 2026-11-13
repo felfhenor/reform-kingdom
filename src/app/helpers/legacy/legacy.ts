@@ -173,7 +173,7 @@ function legacyRunStats(): RunRecordStats {
   const bestiary = Object.values(bestiaryState());
   return {
     kills: sumBy(bestiary, (entry) => entry.kills),
-    monstersKilled: bestiary.length,
+    monstersKilled: bestiary.filter((entry) => entry.kills > 0).length,
     mapsReached: Object.keys(discoveredMapsState()).length,
     townsVisited: Object.values(worldTownsState()).filter(
       (town) => town.firstVisitedAtTick !== undefined,

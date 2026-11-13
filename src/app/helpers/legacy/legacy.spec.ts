@@ -34,6 +34,7 @@ const bestiaryEntry = (kills: number) => ({
   minLevelFound: 1,
   maxLevelFound: 1,
   foundAtNodes: [],
+  analyzed: false,
 });
 
 describe('legacyRunFromGame', () => {
@@ -50,6 +51,7 @@ describe('legacyRunFromGame', () => {
       draft.bestiary = {
         ['wolf' as MonsterId]: bestiaryEntry(3),
         ['bat' as MonsterId]: bestiaryEntry(2),
+        ['analyzed-only' as MonsterId]: bestiaryEntry(0),
       };
       draft.discoveredMaps = { Vale: { foundAt: 0 } };
       draft.world.towns = {

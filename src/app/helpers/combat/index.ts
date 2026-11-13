@@ -1,5 +1,6 @@
 export * from './combat';
 export * from './combat-ambush';
+export * from './combat-analyze';
 export * from './combat-combatant-hp';
 export * from './combat-combatant-hp.ui';
 export * from './combat-cover';
@@ -12,6 +13,7 @@ export * from './combat-damage-mitigation';
 export * from './combat-element';
 export * from './combat-element-pool';
 export * from './combat-element-pool.ui';
+export * from './combat-element-verdict';
 export * from './combat-end';
 export * from './combat-log';
 export * from './combat-log.ui';

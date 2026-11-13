@@ -58,6 +58,14 @@
                 >
                   {{ entry.monster.name }}
                 </span>
+                @if (entry.analyzed) {
+                  <app-icon
+                    name="gameSevenPointedStar"
+                    size="inline"
+                    class="text-warning ml-auto shrink-0"
+                    [tp]="'You analyzed this foe!'"
+                  />
+                }
               } @else {
                 <span class="type-unknown truncate">???</span>
               }

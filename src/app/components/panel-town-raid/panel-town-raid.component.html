@@ -33,7 +33,11 @@
 
       @let defenders = raidDefenders();
       @if (defenders.length > 0) {
-        <app-row-raid-combatants label="Defenders" [combatants]="defenders" />
+        <app-row-raid-combatants
+          label="Defenders"
+          [combatants]="defenders"
+          [isEnemy]="false"
+        />
       }
 
       @let rewards = raidRewards();

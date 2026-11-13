@@ -298,3 +298,15 @@
       quantity: 2500
     - itemId: Oozehide
       quantity: 5
+
+- id: 4d600282-75a0-469d-8ddd-399cbb07e921
+  name: Analyze 10 Foes
+  description: Learn the strengths and weaknesses of 10 different foes.
+  order: 365
+  requireMapVisit: CraggledMire
+  requirement:
+    kind: AnalyzeMonsters
+    quantity: 10
+  rewards:
+    - itemId: Gold Coin
+      quantity: 3500

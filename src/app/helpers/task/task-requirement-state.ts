@@ -1,6 +1,7 @@
 import { getEntry } from '@helpers/content/content';
 import { tradeskillBuildingIn } from '@helpers/crafting/tradeskill';
 import { ledgerHas } from '@helpers/engine/ledger';
+import { bestiaryAnalyzedCount } from '@helpers/kingdom/bestiary';
 import { equippedItems } from '@helpers/item/equipment';
 import { partyMaxLevel } from '@helpers/item/gathering';
 import { townReputationTierForAmount } from '@helpers/town/reputation/town-reputation';
@@ -67,6 +68,8 @@ export function taskStateRequirementSatisfied(
         (state.bestiary[requirement.monsterId]?.kills ?? 0) >=
         requirement.quantity
       );
+    case 'AnalyzeMonsters':
+      return bestiaryAnalyzedCount(state.bestiary) >= requirement.quantity;
     case 'ShrineLevel':
       return (
         (state.shrines[requirement.nodeName]?.level ?? 0) >= requirement.level

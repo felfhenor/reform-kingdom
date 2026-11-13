@@ -90,7 +90,7 @@
             }
 
             <div
-              class="flex flex-wrap justify-center content-start gap-4 h-[264px] shrink-0"
+              class="flex flex-wrap justify-center content-start gap-4 h-[300px] shrink-0"
             >
               @if (!isReview()) {
                 @for (enemy of fight.guardians; track enemy.id) {
@@ -113,6 +113,8 @@
                       [entry]="cardFor(enemy)"
                       [expanded]="true"
                       [effectsBelow]="true"
+                      [reserveElementTag]="true"
+                      [elementTag]="enemyElementTags().get(enemy.id)"
                     />
                   </button>
                 }
@@ -120,7 +122,7 @@
             </div>
 
             <div
-              class="flex flex-wrap justify-center content-start gap-4 h-[384px] shrink-0"
+              class="flex flex-wrap justify-center content-start gap-4 h-[348px] shrink-0"
             >
               @for (ally of allies(); track ally.id) {
                 @let targetable = targetableIds().has(ally.id);
@@ -209,6 +211,8 @@
                       [tp]="preview.template()"
                       [tpPlacement]="'top'"
                       (click)="pickSkill(option)"
+                      (mouseenter)="hoveredSkillId.set(option.skill.id)"
+                      (mouseleave)="hoveredSkillId.set(undefined)"
                       appSfx="ui-click"
                       [sfxTrigger]="['click', 'hover']"
                     >
@@ -234,6 +238,26 @@
                               Self
                             } @else {
                               {{ option.targetCount | number }}
+                            }
+                            @switch (skillElementHints().get(option.skill.id)) {
+                              @case ('Weak') {
+                                <span
+                                  class="badge badge-xs badge-difficulty-Easy"
+                                  (animate.enter)="onTagEnter($event)"
+                                  (animate.leave)="onSlotLeave($event)"
+                                >
+                                  WEAK
+                                </span>
+                              }
+                              @case ('Resist') {
+                                <span
+                                  class="badge badge-xs badge-difficulty-Hard"
+                                  (animate.enter)="onTagEnter($event)"
+                                  (animate.leave)="onSlotLeave($event)"
+                                >
+                                  RESIST
+                                </span>
+                              }
                             }
                           </span>
                         }

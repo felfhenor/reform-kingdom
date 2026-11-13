@@ -72,6 +72,12 @@ export type TaskRequirementDefeatMonster = {
   quantity: number;
 };
 
+// Counts distinct monsters the party has ever analyzed.
+export type TaskRequirementAnalyzeMonsters = {
+  kind: 'AnalyzeMonsters';
+  quantity: number;
+};
+
 export type TaskRequirementShrineLevel = {
   kind: 'ShrineLevel';
   nodeName: string;
@@ -113,6 +119,7 @@ export type TaskRequirementStateBased =
   | TaskRequirementLearnTeaching
   | TaskRequirementRescueWorker
   | TaskRequirementDefeatMonster
+  | TaskRequirementAnalyzeMonsters
   | TaskRequirementShrineLevel
   | TaskRequirementTownReputationTier
   | TaskRequirementVisitTown

@@ -6,9 +6,12 @@ import {
   getMonsterFoundAtNodes,
   getMonsterKillCount,
   getMonsterLevelRangeFound,
+  isMonsterAnalyzed,
   isMonsterDiscovered,
+  monsterAnalyzeKillsRemaining,
   monsterSourceNodeNames,
 } from '@helpers/kingdom/bestiary';
+import { monsterSkillsAtLevel } from '@helpers/combat/monster';
 import {
   isRewardDiscovered,
   rewardContentInfo,
@@ -16,8 +19,10 @@ import {
 import { worldNodeDisplayName } from '@helpers/world-node/world-nodes';
 import type {
   BestiaryEntry,
+  Combatant,
   DroppedReward,
   EncounterContent,
+  EquipmentSkillContent,
   MonsterContent,
 } from '@interfaces';
 import { orderBy, range, sortBy, uniq } from 'es-toolkit/compat';
@@ -41,10 +46,13 @@ export function bestiaryXpLabel(
 }
 
 export function bestiaryEntry(monster: MonsterContent): BestiaryEntry {
+  const kills = getMonsterKillCount(monster.id);
   return {
     monster,
     discovered: isMonsterDiscovered(monster.id),
-    kills: getMonsterKillCount(monster.id),
+    analyzed: isMonsterAnalyzed(monster.id),
+    analyzeKillsRemaining: monsterAnalyzeKillsRemaining(monster, kills),
+    kills,
     levelRange: getMonsterLevelRangeFound(monster.id),
     foundAtNodes: getMonsterFoundAtNodes(monster.id).map(worldNodeDisplayName),
     sourceNodeNames: monsterSourceNodeNames(monster.id).map(
@@ -55,6 +63,23 @@ export function bestiaryEntry(monster: MonsterContent): BestiaryEntry {
       discovered: isRewardDiscovered(reward),
     })),
   };
+}
+
+export function bestiaryMonsterSkills(
+  monster: MonsterContent,
+  level: number,
+): EquipmentSkillContent[] {
+  return monsterSkillsAtLevel(monster, level)
+    .map((skill) => getEntry<EquipmentSkillContent>(skill.skillId))
+    .filter((skill): skill is EquipmentSkillContent => !!skill);
+}
+
+export function bestiaryCombatantSkills(
+  combatant: Combatant,
+): EquipmentSkillContent[] {
+  return combatant.skillIds
+    .map((skillId) => getEntry<EquipmentSkillContent>(skillId))
+    .filter((skill): skill is EquipmentSkillContent => !!skill);
 }
 
 function bestiarySourceNodes(entry: BestiaryEntry): EncounterContent[] {

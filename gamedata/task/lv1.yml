@@ -366,3 +366,15 @@
       quantity: 1000
     - itemId: Trislime Core
       quantity: 5
+
+- id: e2a303c8-5b0a-4390-9a0f-07f2fcd3e503
+  name: Analyze 5 Foes
+  description: Learn the strengths and weaknesses of 5 different foes, either by analyzing them in combat or by defeating enough of them.
+  order: 85
+  requireMapVisit: Carrina
+  requirement:
+    kind: AnalyzeMonsters
+    quantity: 5
+  rewards:
+    - itemId: Gold Coin
+      quantity: 500

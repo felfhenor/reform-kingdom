@@ -1,4 +1,5 @@
 import type { AtlasedImage } from '@interfaces/artable';
+import type { Combatant } from '@interfaces/combat';
 import type { MonsterContent } from '@interfaces/content-monster';
 import type { SkillTreeNodeContent } from '@interfaces/content-skilltreenode';
 import type { StatusEffectPreview } from '@interfaces/statuseffect-preview.ui';
@@ -20,6 +21,8 @@ export type StatusCardEntry = {
   subtitleSpec?: SkillTreeNodeContent;
   // Monsters only - drives the rarity-colored name and the bestiary tooltip.
   monster?: MonsterContent;
+  // The live fighter, so the tooltip shows its real stats and rolled skills.
+  combatant?: Combatant;
   level?: number;
   spritesheet: AtlasedImage;
   spriteAssetName: string;

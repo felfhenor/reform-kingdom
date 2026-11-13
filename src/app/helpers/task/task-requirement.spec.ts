@@ -110,6 +110,7 @@ describe('taskCounterRequirementHasEvidence', () => {
       minLevelFound: 2,
       maxLevelFound: 3,
       foundAtNodes: ['Forest Ruins'],
+      analyzed: false,
     };
     expect(taskCounterRequirementHasEvidence(state, requirement)).toBe(false);
 

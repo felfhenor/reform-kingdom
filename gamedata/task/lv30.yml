@@ -232,3 +232,15 @@
       quantity: 10000
     - itemId: Demon Horn
       quantity: 5
+
+- id: e22c14a8-bb45-417a-8bcc-1cde6daea253
+  name: Analyze 25 Foes
+  description: Learn the strengths and weaknesses of 25 different foes.
+  order: 585
+  requireMapVisit: ErdenWoodland
+  requirement:
+    kind: AnalyzeMonsters
+    quantity: 25
+  rewards:
+    - itemId: Crimson Lucre
+      quantity: 250

@@ -155,7 +155,12 @@ function logVictoryXp(combat: Combat, gains: CharacterXpGain[]): void {
 
 function recordVictoryKills(combat: Combat): void {
   defeatedMonsters(combat.guardians).forEach(({ monster, level }) => {
-    monsterRecordKill(monster.id, level, combat.locationName);
+    if (monsterRecordKill(monster.id, level, combat.locationName)) {
+      combatMessageLog(
+        combat,
+        `The party has fought enough **${monster.name}** to learn its strengths and weaknesses!`,
+      );
+    }
   });
 
   rewardingMonsters(combat).forEach(({ monster }) =>

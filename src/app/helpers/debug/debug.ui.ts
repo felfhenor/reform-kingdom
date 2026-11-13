@@ -291,6 +291,11 @@ export function debugFillBestiary(): void {
       monsterRecordKill(monster.id, encounter.levelRange.max, encounter.name);
     });
   });
+
+  void updateGamestate((state) => {
+    Object.values(state.bestiary).forEach((entry) => (entry.analyzed = true));
+    return state;
+  });
 }
 
 // Clears every caravan's commission state so it regenerates on the next

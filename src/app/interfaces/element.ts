@@ -5,6 +5,8 @@ export type GameElement = 'Fire' | 'Water' | 'Earth' | 'Air';
 
 export type ElementBlock = Record<GameElement, number>;
 
+export type ElementVerdict = 'Weak' | 'Resist';
+
 export const GameElementOrder: GameElement[] = [
   'Fire',
   'Water',

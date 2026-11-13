@@ -270,3 +270,15 @@
       quantity: 7500
     - itemId: Cimmerian Dust
       quantity: 10
+
+- id: 96142e47-df5c-4271-ae86-8c38ac4545c0
+  name: Analyze 15 Foes
+  description: Learn the strengths and weaknesses of 15 different foes.
+  order: 475
+  requireMapVisit: LarsianDesert
+  requirement:
+    kind: AnalyzeMonsters
+    quantity: 15
+  rewards:
+    - itemId: Gold Coin
+      quantity: 5000

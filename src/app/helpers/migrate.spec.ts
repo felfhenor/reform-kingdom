@@ -149,6 +149,7 @@ describe('migrateGameState', () => {
         minLevelFound: 1,
         maxLevelFound: 1,
         foundAtNodes: [],
+        analyzed: false,
       };
       save.bestiary = { [goblin.id]: kill, [gone<MonsterId>('goblin')]: kill };
       save.discoveredRecipes = {
@@ -455,6 +456,7 @@ describe('migrateGameState', () => {
             minLevelFound: 1,
             maxLevelFound: 1,
             foundAtNodes: ['Field Ruins', 'Gone Node'],
+            analyzed: false,
           },
         };
       });

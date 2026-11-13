@@ -1,3 +1,4 @@
+import { combatAnalyzeTarget } from '@helpers/combat/combat-analyze';
 import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
 import { combatCoveringAlly } from '@helpers/combat/combat-cover';
 import { combatApplySkillToTarget } from '@helpers/combat/combat-damage';
@@ -113,6 +114,7 @@ export function combatantUseSkill(
           `**${combatantMessageToken(combatant)}**'s **${chosenSkill.name}** misses **${combatantMessageToken(target)}**!`,
         );
         combatantDamageEventEmit(target.id, 0, 'miss');
+        combatAnalyzeTarget(combat, combatant, target, tech);
         return;
       }
 
@@ -124,6 +126,7 @@ export function combatantUseSkill(
         tech,
         capturedCreatorStats,
       );
+      combatAnalyzeTarget(combat, combatant, target, tech);
 
       const shouldApplyAgain =
         !tech.summonMonsterId &&

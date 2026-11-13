@@ -27,6 +27,7 @@ import { TippyDirective } from '@ngneat/helipopper';
 })
 export class RowRaidCombatantsComponent {
   public label = input.required<string>();
+  public isEnemy = input<boolean>(true);
   public combatants = input.required<TownRaidCombatantRow[]>();
 
   public total = computed(() => raidCombatantCount(this.combatants()));

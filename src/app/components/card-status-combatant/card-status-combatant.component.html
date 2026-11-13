@@ -82,6 +82,7 @@
         #monsterPreview
         [monster]="monster"
         [level]="data.level"
+        [combatant]="data.combatant"
       />
 
       <div class="entry-sprite" [tp]="monsterPreview.template()">
@@ -156,6 +157,31 @@
       </app-bar-progress>
     }
   </div>
+
+  @if (reserveElementTag()) {
+    <span class="flex justify-center items-center h-[16px]">
+      @switch (elementTag()) {
+        @case ('Weak') {
+          <span
+            class="badge badge-xs badge-difficulty-Easy"
+            (animate.enter)="onStatusEffectEnter($event)"
+            (animate.leave)="onStatusEffectLeave($event)"
+          >
+            WEAK
+          </span>
+        }
+        @case ('Resist') {
+          <span
+            class="badge badge-xs badge-difficulty-Hard"
+            (animate.enter)="onStatusEffectEnter($event)"
+            (animate.leave)="onStatusEffectLeave($event)"
+          >
+            RESIST
+          </span>
+        }
+      }
+    </span>
+  }
 </div>
 
 @if (isExpanded && data.statusEffects && effectsBelow()) {

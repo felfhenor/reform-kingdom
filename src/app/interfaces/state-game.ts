@@ -143,7 +143,7 @@ export type GameStateTutorials = Ledger;
 // Keyed by Tiled map name; one-time ledger of region intros already shown.
 export type GameStateRegionIntros = Ledger;
 
-// `kills` keeps counting past the first kill (unlike other discovery slices) for the bestiary's running count. `minLevelFound`/`maxLevelFound` are actual fought levels, not encounter data's theoretical range.
+// `kills` keeps counting past the first kill (unlike other discovery slices) for the bestiary's running count; an entry made by Analyze can have 0. `minLevelFound`/`maxLevelFound` are actual fought (killed or analyzed) levels, not encounter data's theoretical range.
 export type GameStateBestiary = {
   [key: MonsterId]: {
     foundAt: number;
@@ -151,6 +151,7 @@ export type GameStateBestiary = {
     minLevelFound: number;
     maxLevelFound: number;
     foundAtNodes: string[];
+    analyzed: boolean;
   };
 };
 

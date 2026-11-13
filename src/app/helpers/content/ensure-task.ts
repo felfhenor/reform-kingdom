@@ -69,6 +69,8 @@ export function ensureTaskRequirement(
         monsterId: id<MonsterId>('monsterId'),
         quantity,
       };
+    case 'AnalyzeMonsters':
+      return { kind: 'AnalyzeMonsters', quantity };
     case 'ShrineLevel':
       return { kind: 'ShrineLevel', nodeName, level };
     case 'TownReputationTier':

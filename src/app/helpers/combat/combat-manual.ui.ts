@@ -7,6 +7,7 @@ import {
   combatManualAwaitingOrders,
   combatManualSkillUsable,
 } from '@helpers/combat/combat-manual';
+import { skillElementVerdict } from '@helpers/combat/combat-element-verdict';
 import { combatantSkillOnCooldown } from '@helpers/combat/combat-skill-cooldown';
 import { combatCombatantSkillEpCost } from '@helpers/combat/combat-stats';
 import { combatantStatusEffectPreviews } from '@helpers/combat/combat-statuseffects.ui';
@@ -23,6 +24,7 @@ import { getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { skillTechniqueNumTargets } from '@helpers/hero/skill';
 import { skillOwnTechniques } from '@helpers/hero/skill-modifier';
+import { isMonsterAnalyzed } from '@helpers/kingdom/bestiary';
 import { regionForMap } from '@helpers/lore/region-intro';
 import { updateGamestate, worldCombatState } from '@helpers/state-game';
 import type {
@@ -34,10 +36,13 @@ import type {
   CombatManualTurnSlot,
   CombatTurn,
   EncounterContent,
+  ElementVerdict,
   EncounterRandomContent,
   EquipmentSkill,
   EquipmentSkillContentTechnique,
   JobContent,
+  MonsterContent,
+  MonsterId,
   StatusCardBar,
   StatusCardEntry,
 } from '@interfaces';
@@ -98,13 +103,15 @@ function combatManualBars(c: Combatant): StatusCardBar[] {
   ];
 }
 
-// No `monster` field, so the card skips its bestiary tooltip.
 export function combatManualStatusCard(c: Combatant): StatusCardEntry {
   const job = getEntry<JobContent>(c.jobId ?? '');
   const icon = combatantIcon(c);
   return {
     combatantId: c.id,
     name: c.name,
+    monster: c.monsterId ? getEntry<MonsterContent>(c.monsterId) : undefined,
+    level: c.monsterId ? c.level : undefined,
+    combatant: c.monsterId ? c : undefined,
     subtitleLevel: c.monsterId ? undefined : c.level,
     subtitleLabel: job?.shorthand,
     spritesheet: icon.spritesheet,
@@ -114,6 +121,17 @@ export function combatManualStatusCard(c: Combatant): StatusCardEntry {
     bars: combatManualBars(c),
     statusEffects: combatantStatusEffectPreviews(c),
   };
+}
+
+// Only foes the party has analyzed reveal how an element lands on them.
+export function combatManualElementVerdict(
+  hero: Combatant,
+  target: Combatant,
+  skill: EquipmentSkill,
+): ElementVerdict | undefined {
+  if (!isFoeOf(hero, target) || !target.monsterId) return undefined;
+  if (!isMonsterAnalyzed(target.monsterId as MonsterId)) return undefined;
+  return skillElementVerdict(hero, target, skill);
 }
 
 function isFoeOf(hero: Combatant, c: Combatant): boolean {

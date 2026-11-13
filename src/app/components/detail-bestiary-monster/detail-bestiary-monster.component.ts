@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import type { AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
@@ -14,11 +15,10 @@ import { RowBestiarySkillComponent } from '@components/row-bestiary-skill/row-be
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { SlotCompletionRewardComponent } from '@components/slot-completion-reward/slot-completion-reward.component';
 import { combatantFromMonster } from '@helpers/combat/combat-create';
-import { monsterSkillsAtLevel } from '@helpers/combat/monster';
-import { getEntry } from '@helpers/content/content';
 import {
   bestiaryDropQuantityLabel,
   bestiaryEntryLevels,
+  bestiaryMonsterSkills,
 } from '@helpers/kingdom/bestiary.ui';
 import {
   type BestiaryEntry,
@@ -36,6 +36,7 @@ type LevelOption = { value: number; label: string };
   selector: 'app-detail-bestiary-monster',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    DecimalPipe,
     DetailMonsterSummaryComponent,
     RowBestiarySkillComponent,
     SlotCompletionRewardComponent,
@@ -63,9 +64,7 @@ export class DetailBestiaryMonsterComponent {
   );
 
   public skills = computed<EquipmentSkillContent[]>(() =>
-    monsterSkillsAtLevel(this.entry().monster, this.selectedLevel())
-      .map((skill) => getEntry<EquipmentSkillContent>(skill.skillId))
-      .filter((skill): skill is EquipmentSkillContent => !!skill),
+    bestiaryMonsterSkills(this.entry().monster, this.selectedLevel()),
   );
 
   public combatantAtSelectedLevel = computed<Combatant>(() =>

@@ -13,13 +13,20 @@ import {
   getMonsterFoundAtNodes,
   getMonsterKillCount,
   getMonsterLevelRangeFound,
+  bestiaryAnalyzedCount,
+  isMonsterAnalyzed,
   isMonsterDiscovered,
+  monsterRecordAnalyze,
   monsterRecordKill,
   monsterSourceNodeNames,
   repairInvalidBestiaryLevels,
+  syncBestiaryAnalyzed,
 } from '@helpers/kingdom/bestiary';
 import { bestiaryState } from '@helpers/state-game';
-import { taskEventMonsterKilled } from '@helpers/task/task-events';
+import {
+  taskEventMonsterKilled,
+  taskEventMonstersAnalyzed,
+} from '@helpers/task/task-events';
 import type {
   EncounterId,
   EncounterRandomId,
@@ -44,6 +51,7 @@ function entry(
     minLevelFound: 3,
     maxLevelFound: 3,
     foundAtNodes: [],
+    analyzed: false,
     ...overrides,
   };
 }
@@ -79,6 +87,7 @@ describe('reading the bestiary', () => {
       minLevelFound: 2,
       maxLevelFound: 7,
       foundAtNodes: ['Field Ruins', 'Swamp'],
+      analyzed: false,
     });
 
     expect(isMonsterDiscovered(goblinId)).toBe(true);
@@ -261,5 +270,87 @@ describe('bestiaryMonsters', () => {
       goblinId,
       staleId,
     ]);
+  });
+});
+
+describe('monsterRecordAnalyze', () => {
+  it('discovers an unkilled monster with a zero-kill entry', () => {
+    seedGoblin();
+
+    const first = inTick(() => monsterRecordAnalyze(goblinId, 4, 'Swamp'));
+
+    expect(first).toBe(true);
+    expect(isMonsterDiscovered(goblinId)).toBe(true);
+    expect(bestiaryState()[goblinId]).toEqual(
+      entry({
+        foundAt: 5000,
+        kills: 0,
+        minLevelFound: 4,
+        maxLevelFound: 4,
+        foundAtNodes: ['Swamp'],
+        analyzed: true,
+      }),
+    );
+    expect(taskEventMonstersAnalyzed).toHaveBeenCalledWith(1);
+  });
+
+  it('only flags an existing entry, leaving its kill history alone', () => {
+    seedGoblin({ kills: 3, foundAtNodes: ['Field Ruins'] });
+
+    inTick(() => monsterRecordAnalyze(goblinId, 9, 'Swamp'));
+
+    expect(bestiaryState()[goblinId]).toEqual(
+      entry({ kills: 3, foundAtNodes: ['Field Ruins'], analyzed: true }),
+    );
+  });
+
+  it('is a no-op once analyzed', () => {
+    seedGoblin({ analyzed: true });
+
+    expect(inTick(() => monsterRecordAnalyze(goblinId, 3))).toBe(false);
+    expect(taskEventMonstersAnalyzed).not.toHaveBeenCalled();
+  });
+});
+
+describe('analysis by kills', () => {
+  it('analyzes a common monster on its 100th kill', () => {
+    seedGoblin({ kills: 98 });
+
+    expect(inTick(() => monsterRecordKill(goblinId, 3))).toBe(false);
+    expect(isMonsterAnalyzed(goblinId)).toBe(false);
+    expect(inTick(() => monsterRecordKill(goblinId, 3))).toBe(true);
+    expect(isMonsterAnalyzed(goblinId)).toBe(true);
+  });
+
+  it('analyzes a legendary monster on its first kill', () => {
+    seedContent([
+      ensureMonster({ id: goblinId, name: 'Goblin', rarity: 'Legendary' }),
+    ]);
+    seedGoblin();
+
+    expect(inTick(() => monsterRecordKill(goblinId, 3))).toBe(true);
+  });
+});
+
+describe('syncBestiaryAnalyzed', () => {
+  it('flags pre-Analyze entries and ones past the kill threshold only', () => {
+    const legacy: Partial<GameStateBestiary[MonsterId]> = entry();
+    delete legacy.analyzed;
+    const synced = syncBestiaryAnalyzed({
+      [goblinId]: legacy as GameStateBestiary[MonsterId],
+      [staleId]: entry({ kills: 5, analyzed: false }),
+    });
+
+    expect(synced[goblinId].analyzed).toBe(true);
+    expect(synced[staleId].analyzed).toBe(false);
+  });
+
+  it('applies kill thresholds retroactively', () => {
+    const synced = syncBestiaryAnalyzed({
+      [goblinId]: entry({ kills: 100, analyzed: false }),
+    });
+
+    expect(synced[goblinId].analyzed).toBe(true);
+    expect(bestiaryAnalyzedCount(synced)).toBe(1);
   });
 });

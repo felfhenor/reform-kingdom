@@ -36,7 +36,10 @@ import {
 import { applyMaterialDelta } from '@helpers/item/materials';
 import { pruneInvalidArmoryItems } from '@helpers/kingdom/armory';
 import { pruneInvalidActiveAstralProjectorSpells } from '@helpers/kingdom/astral-projector';
-import { repairInvalidBestiaryLevels } from '@helpers/kingdom/bestiary';
+import {
+  syncBestiaryAnalyzed,
+  repairInvalidBestiaryLevels,
+} from '@helpers/kingdom/bestiary';
 import { pruneInvalidLootFilters } from '@helpers/kingdom/loot-filter';
 import { getMap } from '@helpers/maps';
 import { repairUnwalkableCurrentLocation } from '@helpers/pathfinding/pathfinding';
@@ -294,6 +297,7 @@ export function migrateGameState() {
   );
   newState.bestiary = recordPrune(newState.bestiary, contentExists);
   newState.bestiary = repairInvalidBestiaryLevels(newState.bestiary);
+  newState.bestiary = syncBestiaryAnalyzed(newState.bestiary);
   newState.discoveredWorkers = recordPrune(
     newState.discoveredWorkers,
     isWorkerContentKnown,

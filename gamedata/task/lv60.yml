@@ -12,3 +12,18 @@
       quantity: 25
     - itemId: Memory Flux
       quantity: 25
+
+- id: d844bff7-4b5c-439b-a4da-33a715f5007c
+  name: Analyze 50 Foes
+  description: Learn the strengths and weaknesses of 50 different foes.
+  order: 895
+  requireMapVisit: AstralObservatory
+  requirement:
+    kind: AnalyzeMonsters
+    quantity: 50
+  rewards:
+    - itemId: Duskhall Flux
+      quantity: 25
+
+    - itemId: Memory Flux
+      quantity: 25

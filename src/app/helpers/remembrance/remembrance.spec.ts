@@ -152,6 +152,7 @@ describe('remembrance discovery categories', () => {
         minLevelFound: 1,
         maxLevelFound: 1,
         foundAtNodes: [],
+        analyzed: false,
       };
     });
 

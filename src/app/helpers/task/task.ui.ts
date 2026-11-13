@@ -1,5 +1,6 @@
 import { TASK_WIDGET_ENTRY_COUNT } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
+import { bestiaryAnalyzedCount } from '@helpers/kingdom/bestiary';
 import { modalClose } from '@helpers/engine/modal-stack';
 import { setGamePlayView, worldCameraFocus } from '@helpers/engine/ui';
 import { regionNameForMap } from '@helpers/lore/region-intro';
@@ -37,13 +38,22 @@ function taskProgress(
       target: requirement.quantity,
     };
   }
-  if (requirement.kind !== 'DefeatMonster') return undefined;
+  if (requirement.kind === 'DefeatMonster') {
+    const kills = bestiaryState()[requirement.monsterId]?.kills ?? 0;
+    return cappedProgress(kills, requirement.quantity);
+  }
+  if (requirement.kind === 'AnalyzeMonsters') {
+    const analyzed = bestiaryAnalyzedCount(bestiaryState());
+    return cappedProgress(analyzed, requirement.quantity);
+  }
+  return undefined;
+}
 
-  const kills = bestiaryState()[requirement.monsterId]?.kills ?? 0;
-  return {
-    current: Math.min(kills, requirement.quantity),
-    target: requirement.quantity,
-  };
+function cappedProgress(
+  current: number,
+  target: number,
+): TaskRowViewModel['progress'] {
+  return { current: Math.min(current, target), target };
 }
 
 function taskLocate(task: TaskContent): TaskRowViewModel['locate'] {

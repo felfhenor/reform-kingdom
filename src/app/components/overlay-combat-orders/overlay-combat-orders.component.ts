@@ -28,6 +28,7 @@ import {
   combatManualAction,
   combatManualActiveHero,
   combatManualConfirm,
+  combatManualElementVerdict,
   combatManualFlee,
   combatManualOverlayOpen,
   combatManualRepeatAction,
@@ -52,6 +53,7 @@ import type {
   CombatLog,
   CombatManualAction,
   CombatManualSkillOption,
+  ElementVerdict,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
@@ -147,6 +149,41 @@ export class OverlayCombatOrdersComponent {
   });
 
   public hoveredId = signal<string | undefined>(undefined);
+  public hoveredSkillId = signal<string | undefined>(undefined);
+
+  // A picked skill wins over a hovered one, so tags stay put while choosing a target.
+  private taggedSkill = computed(
+    () =>
+      this.pendingOption()?.skill ??
+      this.skillOptions().find((o) => o.skill.id === this.hoveredSkillId())
+        ?.skill,
+  );
+
+  public enemyElementTags = computed(() => {
+    const hero = this.activeHero();
+    const skill = this.taggedSkill();
+    const tags = new Map<string, ElementVerdict | undefined>();
+    if (!hero || !skill) return tags;
+    this.combat()
+      .guardians.filter((enemy) => enemy.hp > 0)
+      .forEach((enemy) =>
+        tags.set(enemy.id, combatManualElementVerdict(hero, enemy, skill)),
+      );
+    return tags;
+  });
+
+  public skillElementHints = computed(() => {
+    const hero = this.activeHero();
+    const enemy = this.combat().guardians.find(
+      (c) => c.id === this.hoveredId(),
+    );
+    const hints = new Map<string, ElementVerdict | undefined>();
+    if (!hero || !enemy) return hints;
+    this.skillOptions().forEach(({ skill }) =>
+      hints.set(skill.id, combatManualElementVerdict(hero, enemy, skill)),
+    );
+    return hints;
+  });
   private lastEnterStepAt = 0;
   public turnOrder = computed(() => combatManualTurnOrder(this.combat()));
 
@@ -308,6 +345,10 @@ export class OverlayCombatOrdersComponent {
         ? combatManualRepeatAction(this.combat(), hero, previous)
         : undefined;
     if (hero && action) this.submit(hero, action);
+  }
+
+  public onTagEnter(event: AnimationCallbackEvent): void {
+    this.anim.fadeIn(event.target, 150);
   }
 
   public onSlotLeave(event: AnimationCallbackEvent): void {

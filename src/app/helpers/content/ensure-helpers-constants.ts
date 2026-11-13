@@ -73,6 +73,7 @@ export const VALID_SKILL_ATTRIBUTES: EquipmentSkillAttribute[] = [
   'ShieldsTarget',
   'Buff',
   'Debuff',
+  'Analyzes',
 ];
 
 export const VALID_MONSTER_TYPES: MonsterType[] = [

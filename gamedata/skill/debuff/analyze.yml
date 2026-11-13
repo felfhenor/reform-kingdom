@@ -1,7 +1,7 @@
 - id: 6d24b4d1-544a-48e6-90a5-967cee3fe653
   name: Analyze I
   family: Analyze
-  description: Analyze the weak spot of an enemy, inflicting Weakspot.
+  description: Analyze an enemy, inflicting Weakspot and learning its strengths and weaknesses.
 
   sprite: '0006'
 
@@ -12,7 +12,7 @@
 
 
   techniques:
-    - attributes: [Debuff]
+    - attributes: [Debuff, Analyzes]
       elements: []
       targets: 1
       targetType: Enemies
@@ -31,7 +31,7 @@
 - id: d957cdd4-28c8-4f90-90b5-3a6bf83fad1f
   name: Analyze II
   family: Analyze
-  description: Analyze the weak spot of an enemy, dealing {{ value }} damage to them and inflicting Weakspot.
+  description: Analyze an enemy, dealing {{ value }} damage, inflicting Weakspot, and learning its strengths and weaknesses.
 
   sprite: '0006'
 
@@ -42,7 +42,7 @@
 
 
   techniques:
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff, CanBeReflected]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff, CanBeReflected, Analyzes]
       elements: []
       targets: 1
       targetType: Enemies
@@ -64,7 +64,7 @@
 - id: 77319f61-ffb4-4524-b066-8aa547631776
   name: Analyze III
   family: Analyze
-  description: Analyze the weak spot of an enemy, dealing {{ value }} damage to them and inflicting Weakspot.
+  description: Analyze an enemy, dealing {{ value }} damage, inflicting Weakspot, and learning its strengths and weaknesses.
 
   sprite: '0006'
 
@@ -75,7 +75,7 @@
 
 
   techniques:
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff, CanBeReflected]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff, CanBeReflected, Analyzes]
       elements: []
       targets: 1
       targetType: Enemies
@@ -97,7 +97,7 @@
 - id: bc6e75ce-e1d2-430d-b2bf-3ab2140f14e8
   name: Analyze IV
   family: Analyze
-  description: Analyze the weak spot of 2 enemies, dealing {{ value }} damage to them and inflicting Weakspot.
+  description: Analyze 2 enemies, dealing {{ value }} damage, inflicting Weakspot, and learning their strengths and weaknesses.
 
   sprite: '0006'
 
@@ -108,7 +108,7 @@
 
 
   techniques:
-    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff, CanBeReflected]
+    - attributes: [DamagesTarget, AllowPlink, AllowLuckDodge, Debuff, CanBeReflected, Analyzes]
       elements: []
       targets: 2
       targetType: Enemies

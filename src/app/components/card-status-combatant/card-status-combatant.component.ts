@@ -17,7 +17,11 @@ import { TextNumberTweenComponent } from '@components/text-number-tween/text-num
 import { TooltipMonsterPreviewComponent } from '@components/tooltip-monster-preview/tooltip-monster-preview.component';
 import { damageNumberScale } from '@helpers/combat/combat-damage-events.ui';
 import { heroLevelUpVfx$ } from '@helpers/engine/hero-level-up-vfx';
-import type { DamageEventVariant, StatusCardEntry } from '@interfaces';
+import type {
+  DamageEventVariant,
+  ElementVerdict,
+  StatusCardEntry,
+} from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { AnimationService } from '@services/animation.service';
 import type { JSAnimation } from 'animejs';
@@ -57,6 +61,9 @@ export class CardStatusCombatantComponent {
   public entry = input.required<StatusCardEntry>();
   public expanded = input<boolean>(false);
   public effectsBelow = input<boolean>(false);
+  // Reserving the line keeps cards from growing when a tag appears.
+  public reserveElementTag = input<boolean>(false);
+  public elementTag = input<ElementVerdict>();
 
   public damageNumbersByCombatant = this.playback.damageNumbersByCombatant;
   public skillCastByCombatant = this.playback.skillCastByCombatant;

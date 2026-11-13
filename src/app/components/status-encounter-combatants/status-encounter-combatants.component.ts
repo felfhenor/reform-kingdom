@@ -39,6 +39,7 @@ export class StatusEncounterCombatantsComponent {
         ? getEntry<MonsterContent>(combatant.monsterId)
         : undefined,
       level: combatant.level,
+      combatant,
       spritesheet: 'monster',
       spriteAssetName: combatant.sprite ?? '',
       spriteFrames: combatant.frames,

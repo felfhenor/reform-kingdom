@@ -70,6 +70,16 @@ export function taskEventMonsterKilled(
   );
 }
 
+export function taskEventMonstersAnalyzed(
+  totalAnalyzed: number,
+): Promise<void> {
+  return tasksRecord(
+    (requirement) =>
+      requirement.kind === 'AnalyzeMonsters' &&
+      totalAnalyzed >= requirement.quantity,
+  );
+}
+
 export function taskEventShrineLevel(
   nodeName: string,
   level: number,

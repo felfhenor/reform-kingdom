@@ -10,11 +10,13 @@ export type BestiaryDropEntry = {
 export type BestiaryEntry = {
   monster: MonsterContent;
   discovered: boolean;
+  // Unlocks the stats/skills sections and the combat tooltip details.
+  analyzed: boolean;
+  analyzeKillsRemaining: number;
   kills: number;
-  // The actual min/max level the party has fought this monster at -
-  // undefined until it's been killed at least once.
+  // The actual min/max level the party has fought (killed or analyzed) this monster at; undefined until then.
   levelRange?: LevelRange;
-  // Every distinct location this monster has been killed at.
+  // Every distinct location this monster has been killed or analyzed at.
   foundAtNodes: string[];
   sourceNodeNames: string[];
   drops: BestiaryDropEntry[];

@@ -41,7 +41,9 @@ export type EquipmentSkillAttribute =
   | 'DrainsTargetEnergy'
   | 'ShieldsTarget'
   | 'Buff'
-  | 'Debuff';
+  | 'Debuff'
+  // A hero casting this at an enemy monster analyzes it, even on a miss.
+  | 'Analyzes';
 
 export type EquipmentSkillTargetType = 'Allies' | 'Enemies' | 'Self' | 'All';
 

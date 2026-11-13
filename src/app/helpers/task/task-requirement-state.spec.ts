@@ -162,7 +162,26 @@ describe('taskStateRequirementSatisfied', () => {
       minLevelFound: 1,
       maxLevelFound: 2,
       foundAtNodes: [],
+      analyzed: false,
     };
+    expect(taskStateRequirementSatisfied(state, requirement)).toBe(true);
+  });
+
+  it('counts analyzed bestiary entries for AnalyzeMonsters', () => {
+    const state = defaultGameState();
+    const requirement = { kind: 'AnalyzeMonsters' as const, quantity: 2 };
+    const entry = {
+      foundAt: 1,
+      kills: 0,
+      minLevelFound: 1,
+      maxLevelFound: 1,
+      foundAtNodes: [],
+    };
+
+    state.bestiary['a' as MonsterId] = { ...entry, analyzed: true };
+    state.bestiary['b' as MonsterId] = { ...entry, analyzed: false };
+    expect(taskStateRequirementSatisfied(state, requirement)).toBe(false);
+    state.bestiary['b' as MonsterId] = { ...entry, analyzed: true };
     expect(taskStateRequirementSatisfied(state, requirement)).toBe(true);
   });
 
