@@ -205,3 +205,128 @@
     Vitality: 0.6
     Resistance: 0.6
     Agility: 0.6
+
+- id: 0a45b058-e1fa-43a5-8428-133d1bcbbeda
+  name: Deathchill Akroki Shaman
+  description: One of the original Akroki tribe, recalled as one who survives the deathchill. They manipulate the nature around them to make it habitable for their kind, and are looked highly upon in their tribe.
+
+  types: [Humanoid]
+  elementalResistances:
+    Fire: 100
+    Water: 100
+    Earth: 100
+    Air: 100
+
+  combatStats:
+    debuffIgnoreChance: 100
+
+  sprite: '0224'
+  frames: 4
+
+  targetting:
+    - type: Weakest
+
+  rarity: Mystical
+
+  xp:
+    min: 3680
+    max: 3827
+    bonusPerLevel: 53
+
+  drops: []
+
+  skills:
+    - skillId: Attack
+      weight: 1
+    - skillId: Fireball IV
+      weight: 2
+    - skillId: Thunderbolt IV
+      weight: 2
+    - skillId: Frostfire Bolt III
+      weight: 2
+    - skillId: Chilling Touch II
+      weight: 1
+    - skillId: Refresh II
+      weight: 1
+
+  baseStats:
+    Health: 482
+    Energy: 169
+    Luck: 11
+    Intelligence: 47
+    Strength: 8
+    Vitality: 12
+    Resistance: 0
+    Agility: 9
+
+  statsPerLevel:
+    Health: 13.3
+    Energy: 4.8
+    Luck: 0.2
+    Intelligence: 1.2
+    Strength: 0.1
+    Vitality: 0.4
+    Resistance: 0
+    Agility: 0.3
+
+- id: a3b7baa7-0558-495d-a8db-7485bd4e010b
+  name: Deathchill Akroki Bastion
+  description: One of the original Akroki tribe, recalled as one who survives the deathchill. They support and protect those who can't do so themselves, making them a valuable member of the tribe.
+
+  types: [Humanoid]
+  elementalResistances:
+    Water: 50
+    Fire: -25
+
+  combatStats:
+    coverThreshold: 100
+    debuffIgnoreChance: 50
+    damageReflectPercent: 20
+
+  sprite: '0228'
+  frames: 4
+
+  targetting: []
+
+  rarity: Mystical
+
+  xp:
+    min: 3680
+    max: 3827
+    bonusPerLevel: 53
+
+  drops: []
+
+  skills:
+    - skillId: Attack
+      weight: 1
+    - skillId: Smashing Board III
+      weight: 2
+    - skillId: Spiked Smash II
+      weight: 1
+    - skillId: Spellshield II
+      weight: 2
+    - skillId: Defensive Stance II
+      weight: 1
+    - skillId: Taunt I
+      weight: 1
+
+  baseStats:
+    Health: 689
+    Energy: 100
+    Luck: 11
+    Intelligence: 12
+    Strength: 28
+    Vitality: 41
+    Resistance: 31
+    Agility: 3
+
+  statsPerLevel:
+    Health: 19
+    Energy: 2.9
+    Luck: 0.2
+    Intelligence: 0.4
+    Strength: 0.9
+    Vitality: 1
+    Resistance: 1
+    Agility: 0.1

@@ -17,10 +17,10 @@ function block(overrides: Partial<ElementBlock> = {}): ElementBlock {
 }
 
 describe('elementalResistanceClamp / elementalBoonFloor', () => {
-  it('clamps resistance to [-100, 75]', () => {
+  it('clamps resistance to [-100, 100]', () => {
     expect(
       elementalResistanceClamp(block({ Fire: 120, Water: -150, Earth: 30 })),
-    ).toEqual(block({ Fire: 75, Water: -100, Earth: 30 }));
+    ).toEqual(block({ Fire: 100, Water: -100, Earth: 30 }));
   });
 
   it('floors boons at 0', () => {

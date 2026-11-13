@@ -189,3 +189,33 @@
       chance: 100
       min: 2500
       max: 3000
+
+- id: 233b1f61-3e8a-44b4-b092-9ee5bcb83027
+  name: Forgotten Townstead
+  description: An ancient, frozen town. It's nearly indistinguishable in the vast frozen landscape.
+
+  invisibleUntilCollectibleIdsFound:
+    - Broken Zelk Doll
+
+  levelRange:
+    min: 70
+    max: 70
+
+  fights:
+    - monsters:
+        - monsterId: Deathchill Akroki Bastion
+        - monsterId: Deathchill Akroki Shaman
+        - monsterId: Deathchill Akroki Bastion
+        - monsterId: Deathchill Akroki Shaman
+
+  completionRewards:
+    - collectibleId: Memory of the Akroki
+      chance: 100
+
+    - itemId: Gold Coin
+      min: 5000
+      max: 6000
+      chance: 100
+
+    - equipmentId: Deathchill Bulwark
+      chance: 20

@@ -121,3 +121,9 @@
   rarity: Uncommon
   description: A broken feather, torn from the wing of a fel demon. It stands as a reminder of the evil that infests the world.
   sprite: '0039'
+
+- id: 594280c4-1067-4111-97e7-c7e9f4c2f98f
+  name: Memory of the Makers
+  rarity: Mystical
+  description: A memory of those who helped Culcula make paths where it was tough to. They are many, and they all carry pickaxes.
+  sprite: '0109'

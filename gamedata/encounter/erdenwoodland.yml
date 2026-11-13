@@ -178,3 +178,34 @@
       chance: 100
       min: 200
       max: 300
+
+- id: 5ffc9d51-108f-4eb0-a31e-fb41c0b5b82d
+  name: Forgotten Grove
+  description: An eerie grove, inhabited by the protectors of the Woodlands. They're very protective of their home.
+
+  invisibleUntilCollectibleIdsFound:
+    - Ritual Crown
+
+  levelRange:
+    min: 50
+    max: 50
+
+  fights:
+    - monsters:
+        - monsterId: Conflict
+        - monsterId: Harmony
+
+  completionRewards:
+    - collectibleId: Memory of the Guardians
+      chance: 100
+
+    - itemId: Gold Coin
+      min: 2500
+      max: 3000
+      chance: 100
+
+    - equipmentId: Talons of Conflict
+      chance: 20
+
+    - equipmentId: Plumes of Harmony
+      chance: 20

@@ -55,3 +55,9 @@
     - effectType: GainStats
       stat: Constitution
       value: 1
+
+- id: ead9dd76-6309-4301-95ac-9846307c3cb4
+  name: Memory of the Akroki
+  description: A memory of the chilled Akroki, frozen in space, frozen in time.
+  rarity: Mystical
+  sprite: '0112'

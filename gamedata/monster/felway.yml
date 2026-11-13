@@ -381,3 +381,67 @@
     Vitality: 0.5
     Resistance: 0.7
     Agility: 0.9
+
+- id: 3dd5e36a-cfb9-4163-8441-cf5089af2c3b
+  name: Demon Berserker
+  description: One of the first demons forgotten. They are uncontrollable, unsatisfiable, and bloodthirsty. They will stop at nothing for the thrill of battle, even if it means fighting their own.
+
+  types: [Humanoid, Demon]
+  elementalResistances:
+    Fire: 25
+    Water: -25
+
+  combatStats:
+    repeatActionChance: 20
+    damageReflectPercent: 20
+
+  sprite: '0220'
+  frames: 4
+
+  targetting:
+    - type: Strongest
+
+  rarity: Mystical
+
+  xp:
+    min: 3895
+    max: 4051
+    bonusPerLevel: 65
+
+  drops: []
+
+  skills:
+    - skillId: Attack
+      weight: 1
+    - skillId: Double Strike IV
+      weight: 3
+    - skillId: Sweep IV
+      weight: 2
+    - skillId: Empower II
+      weight: 2
+    - skillId: Red Slash I
+      weight: 2
+    - skillId: Charged Strike I
+      weight: 1
+    - skillId: Octa Strike I
+      weight: 1
+
+  baseStats:
+    Health: 558
+    Energy: 50
+    Luck: 7
+    Intelligence: 0
+    Strength: 42
+    Vitality: 120
+    Resistance: 4
+    Agility: 19
+
+  statsPerLevel:
+    Health: 18
+    Energy: 1.7
+    Luck: 0.3
+    Intelligence: 0.1
+    Strength: 1.4
+    Vitality: 3.9
+    Resistance: 0.1
+    Agility: 0.7

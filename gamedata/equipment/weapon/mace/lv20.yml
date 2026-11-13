@@ -33,3 +33,22 @@
 
   elementalResistances:
     Air: 5
+
+- id: 60567788-7425-4e3f-a155-8b90765e9ed4
+  name: Tollkeeper's Maul
+  description: The tool that made sure brigands went back to the straight and narrow.
+  levelRequirement: 20
+  rarity: Mystical
+  type: Mace
+  sprite: '0328'
+  slots: 2
+  baseStats:
+    Strength: 13.5
+    Intelligence: 6.8
+    Vitality: 4.5
+
+  debuffResistances:
+    Stun: 15
+
+  grantedSkillIds:
+    - Stunning Blow

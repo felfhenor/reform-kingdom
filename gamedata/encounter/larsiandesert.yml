@@ -184,3 +184,32 @@
       chance: 50
       min: 3
       max: 6
+
+- id: 0588ea7c-f0ca-4f79-9ddf-ebfd193eff01
+  name: Forgotten Monastery
+  description: An anachronistic monastery. It feels eerie, still, and the very look of it unsettles even the steadiest of hero.
+
+  invisibleUntilCollectibleIdsFound:
+    - Three-Leaf Clover
+
+  levelRange:
+    min: 40
+    max: 40
+
+  fights:
+    - monsters:
+        - monsterId: Cimmerian Ascetic
+        - monsterId: Cimmerian Ascetic
+        - monsterId: Cimmerian Ascetic
+
+  completionRewards:
+    - collectibleId: Memory of the Cimmerians
+      chance: 100
+
+    - itemId: Gold Coin
+      min: 1500
+      max: 2000
+      chance: 100
+
+    - equipmentId: Ascetic's Prayer Beads
+      chance: 20

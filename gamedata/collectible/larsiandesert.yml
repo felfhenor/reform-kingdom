@@ -61,3 +61,9 @@
   rarity: Uncommon
   description: A large red slime core coated in layer upon layer of sand.
   sprite: '0064'
+
+- id: 0d7427ca-17d3-4068-b3b0-b15a18c9b786
+  name: Memory of the Cimmerians
+  description: A memory of those who realize their place in the world and embrace it fully.
+  rarity: Mystical
+  sprite: '0114'

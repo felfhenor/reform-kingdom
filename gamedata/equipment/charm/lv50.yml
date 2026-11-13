@@ -71,3 +71,27 @@
     - skillFamily: Spellshield
       stat: Health
       value: 0.1
+
+- id: a34fe094-6964-485b-ba10-23fa8f088284
+  name: Plumes of Harmony
+  description: A set of plumes from Harmony, defender of the Erden Woodland. They're very soft!
+  levelRequirement: 50
+  rarity: Mystical
+  type: Charm
+  sprite: '0332'
+  slots: 2
+  baseStats:
+    Vitality: 15.5
+    Resistance: 18.1
+    Health: 38
+
+  elementalResistances:
+    Air: 10
+
+  combatStats:
+    reviveChance: 5
+
+  skillStatBonuses:
+    - skillFamily: Cure
+      stat: Intelligence
+      value: 0.5

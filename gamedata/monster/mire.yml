@@ -240,3 +240,66 @@
     Vitality: 0.5
     Resistance: 0.6
     Agility: 0.9
+
+- id: f9b1c79e-0167-4b2b-bbcc-09c0098e07e5
+  name: Ancient Mummy
+  description: An ancient ruler of their domain. They led with the power of the undead, and paid the price for it. Their end was fitting, yet, they seek vengeance.
+
+  types: [Humanoid, Spirit]
+  elementalResistances:
+    Earth: 25
+    Fire: -50
+
+  combatStats:
+    debuffIgnoreChance: 100
+
+  sprite: '0204'
+  frames: 4
+
+  targetting:
+    - type: Random
+
+  rarity: Mystical
+
+  xp:
+    min: 1347
+    max: 1401
+    bonusPerLevel: 45
+
+  drops: []
+
+  skills:
+    - skillId: Attack
+      weight: 1
+    - skillId: Gnash I
+      weight: 2
+    - skillId: Rake I
+      weight: 2
+    - skillId: Flash I
+      weight: 2
+    - skillId: Hex I
+      weight: 2
+    - skillId: Shadowburn I
+      weight: 2
+    - skillId: Toxic Breath
+      weight: 1
+
+  baseStats:
+    Health: 392
+    Energy: 160
+    Luck: 10
+    Intelligence: 18
+    Strength: 14
+    Vitality: 14
+    Resistance: 20
+    Agility: 8
+
+  statsPerLevel:
+    Health: 24.4
+    Energy: 10
+    Luck: 0.7
+    Intelligence: 1.1
+    Strength: 0.9
+    Vitality: 0.9
+    Resistance: 1.2
+    Agility: 0.6

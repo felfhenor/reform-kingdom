@@ -30,8 +30,8 @@ export const COMBAT_MANUAL_TURN_HOLD_MS = 1000;
 // Gap between turns while Enter is held; single presses act at once.
 export const COMBAT_MANUAL_REPEAT_DELAY_MS = 2000;
 
-// Resistance can't reach immunity; a weakness can at most double incoming damage.
-export const ELEMENT_RESISTANCE_MAX = 75;
+// A weakness can at most double incoming damage.
+export const ELEMENT_RESISTANCE_MAX = 100;
 export const ELEMENT_RESISTANCE_MIN = -100;
 
 // XP degrades once the party out-levels a node's max, then drops to 0 at the hard cap - keeps overleveled parties from farming trivial nodes.

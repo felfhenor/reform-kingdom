@@ -47,3 +47,9 @@
     - effectType: GainStats
       stat: Intelligence
       value: 1
+
+- id: 0a0b8c93-5495-458c-bfc2-ac43aadefc98
+  name: Memory of the Lost Rulers
+  description: A memory of those who ruled. They ruled with power, with an iron fist. They were forgotten, but not forgiven.
+  rarity: Mystical
+  sprite: '0110'

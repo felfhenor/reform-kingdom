@@ -33,3 +33,9 @@
   rarity: Uncommon
   description: A musical instrument that produces haunting tones, often utilized by demonic worshippers and demons themselves. The music it produces can summon demonic creatures from afar.
   sprite: '0063'
+
+- id: d222c03c-8bfa-41d8-a4c4-78e165f3c74a
+  name: Memory of the Fel
+  description: No one deserves to be forgotten, not even the Fel. Not even with the tragedy they wrought. This stone, carried by the berserkers, resonates with all who touch it and fill them with bloodlust.
+  rarity: Mystical
+  sprite: '0113'

@@ -37,3 +37,24 @@
 
   elementalResistances:
     Fire: 5
+
+- id: 4032094b-9715-4f70-9ab5-bc2cc9e745e1
+  name: Triumvir's Crown
+  description: A crown lost to time. It provides the wearer with strange, dark magic.
+  levelRequirement: 30
+  rarity: Mystical
+  type: Helm
+  sprite: '0329'
+  slots: 2
+  baseStats:
+    Vitality: 22.1
+    Health: 50
+    Resistance: 6.9
+
+  debuffResistances:
+    Bleed: 15
+    Accuracy: 15
+    StatDown: 10
+
+  grantedSkillIds:
+    - Hex I

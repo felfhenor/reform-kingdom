@@ -520,6 +520,19 @@
                  "width":64,
                  "x":2176,
                  "y":320
+                }, 
+                {
+                 "gid":405,
+                 "height":64,
+                 "id":166,
+                 "name":"Forgotten Townstead",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"ExploreNode",
+                 "visible":true,
+                 "width":64,
+                 "x":1408,
+                 "y":1152
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -528,7 +541,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":166,
+ "nextobjectid":167,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

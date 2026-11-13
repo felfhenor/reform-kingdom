@@ -765,6 +765,19 @@
                  "width":64,
                  "x":960,
                  "y":2432
+                }, 
+                {
+                 "gid":405,
+                 "height":64,
+                 "id":194,
+                 "name":"Forgotten Monastery",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"ExploreNode",
+                 "visible":true,
+                 "width":64,
+                 "x":384,
+                 "y":1984
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -773,7 +786,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":194,
+ "nextobjectid":195,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

@@ -56,3 +56,22 @@
     - skillFamily: Double Strike
       stat: Vitality
       value: 0.5
+
+- id: 559195fd-0449-4320-ae7b-663b6a7ff93f
+  name: Talons of Conflict
+  description: Talons from Conflict, one of the defenders of the Erden Woodland. They're very sharp!
+  levelRequirement: 50
+  rarity: Mystical
+  type: Dagger
+  sprite: '0331'
+  slots: 2
+  baseStats:
+    Agility: 31.7
+    Strength: 26.1
+    Luck: 6.2
+
+  elementalResistances:
+    Air: 10
+
+  combatStats:
+    repeatActionChance: 5

@@ -532,3 +532,30 @@
       min: 2000
       max: 2500
       chance: 100
+
+- id: 0897ddc1-750f-4acd-a266-e17213f743d8
+  name: Forgotten Bridge
+  description: A bridge, lost to time. It's the home of a troll who's angry that he was forgotten.
+
+  invisibleUntilCollectibleIdsFound:
+    - Gobslime Flower
+
+  levelRange:
+    min: 20
+    max: 20
+
+  fights:
+    - monsters:
+        - monsterId: Bridge Troll
+
+  completionRewards:
+    - collectibleId: Memory of the Makers
+      chance: 100
+
+    - itemId: Gold Coin
+      min: 500
+      max: 750
+      chance: 100
+
+    - equipmentId: Tollkeeper's Maul
+      chance: 20

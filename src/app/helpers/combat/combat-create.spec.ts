@@ -247,12 +247,12 @@ describe('combatantFromMonster', () => {
   it('carries its elemental resistances, clamped to the cap', () => {
     const monster = ensureMonster({
       id: 'demon' as MonsterId,
-      elementalResistances: { ...defaultAffinities(), Fire: 90, Water: -25 },
+      elementalResistances: { ...defaultAffinities(), Fire: 120, Water: -25 },
     });
 
     expect(combatantFromMonster(monster, 1, 0).resistance).toEqual({
       ...defaultAffinities(),
-      Fire: 75,
+      Fire: 100,
       Water: -25,
     });
   });

@@ -1,0 +1,23 @@
+- id: 528708b9-3bd4-46fa-8179-c50166600cd4
+  name: Deathchill Bulwark
+  description: A powerful shield, reinforced with deathchill cloth to mitigate even the harshest of cold.
+  levelRequirement: 70
+  rarity: Mystical
+  type: Shield
+  sprite: '0334'
+  slots: 2
+  baseStats:
+    Vitality: 35.7
+    Resistance: 25.4
+
+  elementalResistances:
+    Water: 20
+    Earth: 10
+    Air: 10
+    Fire: -5
+
+  debuffResistances:
+    StatDown: 15
+
+  combatStats:
+    coverThreshold: 30

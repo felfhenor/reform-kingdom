@@ -17,7 +17,6 @@
     Water: 1
     Earth: 1
 
-
   techniques:
     - elements: []
       attributes:
@@ -55,7 +54,6 @@
   elementCosts:
     Earth: 2
 
-
   techniques:
     - elements: []
       attributes:
@@ -85,7 +83,6 @@
 
   epCost: 4
   usesPerCombat: -1
-
 
   techniques:
     - elements: [Earth]
@@ -118,7 +115,6 @@
 
   elementCosts:
     Air: 2
-
 
   techniques:
     - elements: [Air]
@@ -168,7 +164,6 @@
     Earth: 1
     Air: 1
 
-
   techniques:
     - elements: [Earth]
       attributes: [DamagesTarget, AllowPlink, BypassDefense, CanBeReflected]
@@ -181,3 +176,60 @@
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
+
+- id: 97db9b77-576a-4555-b1c5-c8b7c1c9b6ad
+  name: Stunning Blow
+  family: Stunning Blow
+  description: Bring a crushing blow down on an enemy for {{ value }} damage, with a 75% chance of inflicting Stunned.
+
+  sprite: '0087'
+
+  rarity: Mystical
+
+  epCost: 15
+  usesPerCombat: -1
+  cooldown: 3
+
+  techniques:
+    - elements: []
+      attributes:
+        [DamagesTarget, AllowPlink, AllowLuckDodge, CanBeReflected, Debuff]
+      targets: 1
+      targetType: Enemies
+      targetBehaviors:
+        - behavior: NotZeroHealth
+      damageScaling:
+        Strength: 3.5
+
+      statusEffects:
+        - statusEffectId: Stunned
+          chance: 75
+          duration: 1
+
+      combatMessage: '**{{ combatant.name }}** crushes **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
+
+- id: 0c1ded25-5367-4378-b772-1c76073543cc
+  name: Call the Hawks
+  family: Call the Hawks
+  description: Call a Hawk down from the canopy to fight.
+
+  sprite: '0088'
+
+  rarity: Mystical
+
+  epCost: 20
+  usesPerCombat: -1
+  cooldown: 4
+
+  techniques:
+    - attributes: [NeverMisses]
+      elements: []
+      targets: 1
+      targetType: Self
+      targetBehaviors:
+        - behavior: NotZeroHealth
+        - behavior: IfNoSummon
+      damageScaling: {}
+      statusEffects: []
+      summonMonsterId: Hawk
+      combatMessage: '**{{ combatant.name }}** calls down **{{ summon.name }}**!'

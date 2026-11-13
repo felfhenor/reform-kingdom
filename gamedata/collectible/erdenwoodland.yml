@@ -56,3 +56,9 @@
   effects:
     - effectType: GlobalGoldGainMultiplier
       value: 0.05
+
+- id: 2c6932b9-aa0d-46e3-b7e1-4aeb8a2a7334
+  name: Memory of the Guardians
+  description: A memory of those who protect the Woodlands from danger. Seeing it is enough to bring the protectors back from their exile.
+  rarity: Mystical
+  sprite: '0111'

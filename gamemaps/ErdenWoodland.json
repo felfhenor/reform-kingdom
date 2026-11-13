@@ -676,6 +676,19 @@
                  "width":64,
                  "x":448,
                  "y":1280
+                }, 
+                {
+                 "gid":592,
+                 "height":64,
+                 "id":215,
+                 "name":"Forgotten Grove",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"ExploreNode",
+                 "visible":true,
+                 "width":64,
+                 "x":2112,
+                 "y":2880
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -684,7 +697,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":215,
+ "nextobjectid":216,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

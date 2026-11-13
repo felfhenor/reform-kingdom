@@ -1177,3 +1177,62 @@
     Vitality: 1.4
     Resistance: 0.9
     Agility: 1.2
+
+- id: 602daccb-f671-4a51-8ad6-988165ac0bfb
+  name: Bridge Troll
+  description: One of the forgotten creatures of the Duchy. He was charged with ensuring bandits never became highwaymen. When they stopped trying, his protection was forgotten.
+
+  types: [Humanoid]
+  elementalResistances:
+    Earth: 25
+    Fire: -25
+
+  combatStats:
+    debuffIgnoreChance: 20
+
+  sprite: '0200'
+  frames: 4
+
+  targetting:
+    - type: Strongest
+
+  rarity: Mystical
+
+  xp:
+    min: 2155
+    max: 2241
+    bonusPerLevel: 108
+
+  drops: []
+
+  skills:
+    - skillId: Attack
+      weight: 2
+    - skillId: Stunning Blow
+      weight: 3
+    - skillId: Sweep II
+      weight: 2
+    - skillId: Smashing Board II
+      weight: 1
+    - skillId: Defensive Stance I
+      weight: 1
+
+  baseStats:
+    Health: 1335
+    Energy: 55
+    Luck: 2
+    Intelligence: 2
+    Strength: 29
+    Vitality: 21
+    Resistance: 11
+    Agility: 4
+
+  statsPerLevel:
+    Health: 121.3
+    Energy: 5
+    Luck: 0.3
+    Intelligence: 0.3
+    Strength: 2.7
+    Vitality: 1.8
+    Resistance: 1
+    Agility: 0.3

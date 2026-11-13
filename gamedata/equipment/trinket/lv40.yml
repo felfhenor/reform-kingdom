@@ -35,3 +35,24 @@
       value: 1
     - tradeskillId: Jewelcrafting
       value: 1
+
+- id: bddf19eb-46c0-43b2-9361-772de1592cc4
+  name: Ascetic's Prayer Beads
+  description: Beads that ancient Cimmerians used to pray for salvation.
+  levelRequirement: 40
+  rarity: Mystical
+  type: Trinket
+  sprite: '0330'
+  slots: 2
+  baseStats:
+    Luck: 11.2
+    Agility: 5.5
+
+  elementalResistances:
+    Fire: 10
+    Water: 10
+    Earth: 10
+    Air: 10
+
+  combatStats:
+    skillStrikeAgainChance: 5

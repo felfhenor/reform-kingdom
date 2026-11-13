@@ -548,6 +548,19 @@
                  "width":64,
                  "x":1024,
                  "y":1344
+                }, 
+                {
+                 "gid":409,
+                 "height":64,
+                 "id":166,
+                 "name":"Forgotten Grotto",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"ExploreNode",
+                 "visible":true,
+                 "width":64,
+                 "x":384,
+                 "y":1216
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -556,7 +569,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":165,
+ "nextobjectid":167,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

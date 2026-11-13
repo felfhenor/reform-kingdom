@@ -361,3 +361,70 @@
     Vitality: 0.3
     Resistance: 0.3
     Agility: 0.6
+
+- id: 0af101ef-5173-4b4f-a910-0176d307fb56
+  name: Cimmerian Ascetic
+  description: A forgotten Cimmerian. A decisive and powerful ascetic who gave up much and gained much more.
+
+  types: [Humanoid]
+  elementalResistances:
+    Fire: 75
+    Water: 75
+    Earth: 75
+    Air: 75
+
+  combatStats:
+    skillStrikeAgainChance: 20
+
+  sprite: '0208'
+  frames: 4
+
+  targetting:
+    - type: Weakest
+
+  rarity: Mystical
+
+  xp:
+    min: 2117
+    max: 2202
+    bonusPerLevel: 52
+
+  drops: []
+
+  skills:
+    - skillId: Attack
+      weight: 1
+    - skillId: Double Strike III
+      weight: 2
+    - skillId: Holy Smite III
+      weight: 2
+    - skillId: Spellshield II
+      weight: 2
+    - skillId: Oblivisci Ignis
+      weight: 1
+    - skillId: Oblivisci Aqua
+      weight: 1
+    - skillId: Oblivisci Terra
+      weight: 1
+    - skillId: Oblivisci Ventus
+      weight: 1
+
+  baseStats:
+    Health: 901
+    Energy: 113
+    Luck: 3
+    Intelligence: 30
+    Strength: 23
+    Vitality: 22
+    Resistance: 24
+    Agility: 11
+
+  statsPerLevel:
+    Health: 42.8
+    Energy: 5.3
+    Luck: 0.3
+    Intelligence: 1.4
+    Strength: 1.2
+    Vitality: 1.1
+    Resistance: 1.3
+    Agility: 0.5

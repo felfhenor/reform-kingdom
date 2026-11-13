@@ -1,0 +1,19 @@
+- id: 5dbde46a-ae5b-4bc8-b1e7-7e3b3435c1a8
+  name: Berserker's Brand
+  description: A ring worn by all fel berserkers, to help cultivate their rage. It increases their stamina and makes their energy flow smoothly.
+  levelRequirement: 60
+  rarity: Mystical
+  type: Ring
+  sprite: '0333'
+  slots: 2
+  baseStats:
+    Health: 105
+    Energy: 30
+    Strength: 8.8
+
+  elementalResistances:
+    Fire: 10
+    Water: -10
+
+  combatStats:
+    damageReflectPercent: 5

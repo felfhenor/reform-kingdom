@@ -251,3 +251,127 @@
     Vitality: 0.7
     Resistance: 0.6
     Agility: 0.3
+
+- id: 3af18a16-f8b1-41ac-8e98-71547e2c1caa
+  name: Conflict
+  description: One of the two protectors of the Erden Woodland. When the Woodland is safe, he can hide in the shadows and be forgotten. He always arrives when he's needed.
+
+  types: [Beast, Spirit]
+  elementalResistances:
+    Air: 25
+    Earth: -15
+
+  combatStats:
+    repeatActionChance: 20
+
+  sprite: '0212'
+  frames: 4
+
+  targetting:
+    - type: Strongest
+
+  rarity: Mystical
+
+  xp:
+    min: 4405
+    max: 4581
+    bonusPerLevel: 89
+
+  drops: []
+
+  skills:
+    - skillId: Attack
+      weight: 1
+    - skillId: Double Strike IV
+      weight: 2
+    - skillId: Sweep IV
+      weight: 2
+    - skillId: Charged Strike III
+      weight: 1
+    - skillId: Empower II
+      weight: 1
+    - skillId: Call the Hawks
+      weight: 1
+
+  baseStats:
+    Health: 1144
+    Energy: 104
+    Luck: 5
+    Intelligence: 5
+    Strength: 37
+    Vitality: 26
+    Resistance: 5
+    Agility: 16
+
+  statsPerLevel:
+    Health: 44
+    Energy: 4
+    Luck: 0.3
+    Intelligence: 0.2
+    Strength: 1.5
+    Vitality: 1.1
+    Resistance: 0.3
+    Agility: 0.7
+
+- id: 03321126-2439-4c80-8b1f-928b5444c239
+  name: Harmony
+  description: One of the two protectors of the Erden Woodland. She ensures that the Woodland is peaceful, keeping her charges safe.
+
+  types: [Beast, Spirit]
+  elementalResistances:
+    Air: 25
+    Earth: -15
+
+  combatStats:
+    debuffIgnoreChance: 50
+    reviveChance: 100
+
+  sprite: '0216'
+  frames: 4
+
+  targetting: []
+
+  rarity: Mystical
+
+  xp:
+    min: 4405
+    max: 4581
+    bonusPerLevel: 89
+
+  drops: []
+
+  skills:
+    - skillId: Attack
+      weight: 1
+    - skillId: Cure IV
+      weight: 3
+    - skillId: Starshine IV
+      weight: 2
+    - skillId: Regrowth II
+      weight: 2
+    - skillId: Tidal Grace
+      weight: 1
+    - skillId: Refresh II
+      weight: 1
+    - skillId: Call the Hawks
+      weight: 1
+
+  baseStats:
+    Health: 900
+    Energy: 172
+    Luck: 5
+    Intelligence: 36
+    Strength: 10
+    Vitality: 5
+    Resistance: 31
+    Agility: 999
+
+  statsPerLevel:
+    Health: 34.7
+    Energy: 6.7
+    Luck: 0.3
+    Intelligence: 1.3
+    Strength: 0.4
+    Vitality: 0.3
+    Resistance: 1.2
+    Agility: 0

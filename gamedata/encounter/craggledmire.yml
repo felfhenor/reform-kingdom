@@ -185,3 +185,32 @@
 
     - recipeId: 'Ring: Golden Miremetal Pristine Ring'
       chance: 25
+
+- id: 13c57fcf-4c15-48c3-bd84-b85af7edccf8
+  name: Forgotten Grotto
+  description: A cave filled with shallow graves. Here, the dead yearn for life.
+
+  invisibleUntilCollectibleIdsFound:
+    - Cane of Etheria
+
+  levelRange:
+    min: 30
+    max: 30
+
+  fights:
+    - monsters:
+        - monsterId: Ancient Mummy
+        - monsterId: Ancient Mummy
+        - monsterId: Ancient Mummy
+
+  completionRewards:
+    - collectibleId: Memory of the Lost Rulers
+      chance: 100
+
+    - itemId: Gold Coin
+      min: 900
+      max: 1200
+      chance: 100
+
+    - equipmentId: Triumvir's Crown
+      chance: 20

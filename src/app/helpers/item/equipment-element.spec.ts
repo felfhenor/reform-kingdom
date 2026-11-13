@@ -48,7 +48,7 @@ beforeEach(() =>
     }),
     ensureAffix({
       id: flamewardId,
-      effects: [{ kind: 'ElementalResistance', element: 'Fire', value: 70 }],
+      effects: [{ kind: 'ElementalResistance', element: 'Fire', value: 90 }],
     }),
     ensureAffix({
       id: flammableId,
@@ -95,10 +95,10 @@ describe('characterElementalResistances', () => {
       }),
     });
 
-    // Fire 10 + 5 + 70 = 85, capped at 75.
+    // Fire 10 + 5 + 90 = 105, capped at 100.
     expect(characterElementalResistances(character)).toEqual({
       ...defaultAffinities(),
-      Fire: 75,
+      Fire: 100,
       Water: -10,
     });
   });

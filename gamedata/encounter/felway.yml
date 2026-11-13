@@ -166,3 +166,32 @@
       chance: 100
       min: 2500
       max: 3000
+
+- id: eeca89b5-76c3-4d12-9926-efd896a12b44
+  name: Forgotten Demonopolis
+  description: A place of the Fel, or what was the Fel. When the front lines were no longer needed, they were sent here to rest.
+
+  invisibleUntilCollectibleIdsFound:
+    - Ritualistic Fel Tines
+
+  levelRange:
+    min: 60
+    max: 60
+
+  fights:
+    - monsters:
+        - monsterId: Demon Berserker
+        - monsterId: Demon Berserker
+        - monsterId: Demon Berserker
+
+  completionRewards:
+    - collectibleId: Memory of the Fel
+      chance: 100
+
+    - itemId: Gold Coin
+      min: 3500
+      max: 4500
+      chance: 100
+
+    - equipmentId: Berserker's Brand
+      chance: 20
