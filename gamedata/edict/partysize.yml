@@ -8,6 +8,7 @@
     - PartySize
   partySize: 3
   seatBoonIds:
+    - Boosted Glory
     - Undivided Spoils
 
 - id: 5c898090-0869-4f8d-b870-1934eb7fed57
@@ -20,6 +21,7 @@
     - PartySize
   partySize: 2
   seatBoonIds:
+    - Triumphant Glory
     - Light Caravan
     - Shoulder to Shoulder
 
@@ -33,7 +35,7 @@
     - PartySize
   partySize: 1
   seatBoonIds:
-    - Lone Wolf
     - Undivided Glory
+    - Lone Wolf
     - Unbreakable
     - Empty Bunks

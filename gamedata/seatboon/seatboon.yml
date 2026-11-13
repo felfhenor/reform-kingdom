@@ -7,6 +7,20 @@
     - effectType: GlobalCombatItemDropRateBoost
       value: 25
 
+- id: b91b6c52-9d19-40be-8868-65e72fa9ec52
+  name: Boosted Glory
+  description: Hero XP gain is increased by 25%.
+  effects:
+    - effectType: GlobalXPGainMultiplier
+      value: 0.25
+
+- id: 697b2f37-3ce7-4f80-ad93-022bbeebb904
+  name: Triumphant Glory
+  description: Hero XP gain is increased by 50%.
+  effects:
+    - effectType: GlobalXPGainMultiplier
+      value: 0.50
+
 - id: 54109d8e-7924-419e-9ddc-e273b2e601ab
   name: Light Caravan
   description: Travel speed is increased by 25%, both on and off paths.
