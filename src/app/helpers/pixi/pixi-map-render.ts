@@ -26,6 +26,13 @@ import {
   type Texture,
 } from 'pixi.js';
 
+export const NODE_SPRITE_LABEL = 'node-sprite';
+
+// Looked up by label, not index: effects (e.g. the reveal ring) insert children ahead of it.
+export function pixiNodeSprite(wrapper: Container): Container | null {
+  return wrapper.getChildByLabel(NODE_SPRITE_LABEL);
+}
+
 export type PixiTiledMapRenderResult = {
   container: Container;
   // Node-name -> nametag Text, so callers can live-update a label after render (e.g. a countdown timer).
@@ -148,6 +155,7 @@ function pixiTiledObjectRender(
   // The gid's own flip flags reorient the tile image within its bounding
   // box, so that transform is centered on the box (it never moves the box).
   const sprite = new Sprite(texture);
+  sprite.label = NODE_SPRITE_LABEL;
   sprite.anchor.set(0.5, 0.5);
   sprite.x = object.width / 2;
   sprite.y = -object.height / 2;

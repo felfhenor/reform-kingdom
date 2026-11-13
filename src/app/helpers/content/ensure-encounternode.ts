@@ -1,6 +1,7 @@
 import { ensureArray } from '@helpers/content/ensure-helpers-core';
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import type {
+  CombatBackground,
   EncounterContent,
   EncounterFight,
   EncounterFightMonster,
@@ -46,6 +47,9 @@ export function ensureEncounter(
     hidden: encounter.hidden ?? false,
     invisibleUntilCollectibleIdsFound:
       encounter.invisibleUntilCollectibleIdsFound ?? [],
+    combatBackground:
+      encounter.combatBackground ?? ('UNKNOWN' as CombatBackground),
+    combatBackgroundFilter: encounter.combatBackgroundFilter ?? 'None',
   };
 }
 
@@ -82,5 +86,8 @@ export function ensureEncounterRandom(
     hidden: encounter.hidden ?? false,
     invisibleUntilCollectibleIdsFound:
       encounter.invisibleUntilCollectibleIdsFound ?? [],
+    combatBackground:
+      encounter.combatBackground ?? ('UNKNOWN' as CombatBackground),
+    combatBackgroundFilter: encounter.combatBackgroundFilter ?? 'None',
   };
 }

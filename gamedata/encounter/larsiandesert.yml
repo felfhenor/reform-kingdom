@@ -1,6 +1,7 @@
 - id: d320f709-1d7a-40ae-ac56-84912be9c71d
   name: Deadwoods
   description: A forest dry as the desert surrounding it. The petrifiwood sparkles brightly, and the sunflowers provide a stark contrast to the dead landscape.
+  combatBackground: desert-palms
 
   levelRange:
     min: 24
@@ -43,6 +44,7 @@
 - id: 80050323-967a-4ae1-989d-9c9b2bd0be8e
   name: Rolling Sands
   description: A strange place in the middle of the desert. In every direction is sand, sand, and more sand. Here the winds lie still, yet the sand still moves.
+  combatBackground: desert-camp
 
   levelRange:
     min: 26
@@ -77,6 +79,7 @@
 - id: cc216288-7eae-4b1f-8132-b9e8480ff0e4
   name: Cimmerian Temple
   description: A temple sequestered away in the desert mountain range. It was home to a nomadic tribe that prayed to an unknown deity.
+  combatBackground: desert-ruins
 
   levelRange:
     min: 28
@@ -113,6 +116,7 @@
 - id: 7239ede2-311e-4114-a595-afcf52842699
   name: Ghostmirage Wreck
   description: A long-abandoned wreck. It's simultaneously haunted by ghosts, inhabited by lizardmen, and home to many crustaceans from the local desert lake.
+  combatBackground: ship-deck
 
   levelRange:
     min: 30
@@ -157,6 +161,7 @@
 - id: fabdbd60-f9d9-4266-b048-59f601979c9b
   name: Sandslime Mound
   description: A home for arid, desert slimes. They roll around in the sand and their cores become more solid, leading to them being hunted aggressively by those who seek them.
+  combatBackground: desert-shore
 
   levelRange:
     min: 28
@@ -188,6 +193,8 @@
 - id: 0588ea7c-f0ca-4f79-9ddf-ebfd193eff01
   name: Forgotten Monastery
   description: An anachronistic monastery. It feels eerie, still, and the very look of it unsettles even the steadiest of hero.
+  combatBackground: ruins-stone
+  combatBackgroundFilter: Faded
 
   invisibleUntilCollectibleIdsFound:
     - Three-Leaf Clover

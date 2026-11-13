@@ -1,6 +1,7 @@
 - id: 3794885f-6e5a-4bfb-95a1-f0c1ef6bb833
   name: Felstone Temple
   description: A temple created entirely of felstone. An impressively haunting feat of demonkind.
+  combatBackground: ruins-portal
 
   levelRange:
     min: 50

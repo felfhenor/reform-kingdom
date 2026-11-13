@@ -1,4 +1,5 @@
 import type { CombatStatBlock } from '@interfaces/combat';
+import type { HasCombatBackground } from '@interfaces/combat-background';
 import type {
   CaravanMarkupPercentages,
   CommissionOfferSlot,
@@ -148,7 +149,8 @@ export type TownDefenseConfig = {
 
 export type TownContent = IsContentItem &
   HasDescription &
-  WorldNodeHideable & {
+  WorldNodeHideable &
+  HasCombatBackground & {
     id: TownId;
     __type: 'town';
 

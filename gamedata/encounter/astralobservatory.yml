@@ -1,6 +1,7 @@
 - id: 3353a9c5-176a-4b64-817d-76b674eed7d9
   name: Mons Oblitus
   description: A forgotten mountain, rebuilt through Fel's memory of the valley. Here exists a fragment of Fel, enmeshed with his own kind. They, too, may be forgotten with time.
+  combatBackground: sky-temple
   levelRange:
     min: 60
     max: 63
@@ -19,6 +20,8 @@
 - id: 3ad978d9-a758-415f-b7f6-91bb8a4deb4c
   name: Glacis Oblitus
   description: A forgotten snowscape, rebuilt through Fel's memory of the summit. Here, a fragment of Fel will try to forget even the cold, biting winds.
+  combatBackground: arena-snow
+  combatBackgroundFilter: Astral
   levelRange:
     min: 60
     max: 63
@@ -37,6 +40,8 @@
 - id: 6bcef894-2408-4cd4-9ed7-524739fa3407
   name: Pulvis Oblitus
   description: A forgotten desert, rebuilt through Fel's memory of the sands. The land forgot how to grow plantlife, and in time, it may forget itself.
+  combatBackground: desert-ruins
+  combatBackgroundFilter: Astral
   levelRange:
     min: 60
     max: 63
@@ -55,6 +60,8 @@
 - id: ce958e1c-1ce1-4566-b25e-3ab52cc9728a
   name: Lutum Oblitus
   description: A forgotten bog, rebuilt through Fel's memory of the mire. Here, Fel will try to forget the terrible stench and all contained by it.
+  combatBackground: swamp-roots
+  combatBackgroundFilter: Astral
   levelRange:
     min: 60
     max: 63
@@ -73,6 +80,8 @@
 - id: e999e12e-e21d-4760-9b5f-6c4f02db2ab4
   name: Arbor Oblitus
   description: A forgotten forest, rebuilt through Fel's memory of the woodland. Here, the trees forget being cut down. They forget growing. Soon, Fel will try to make them forget sprouting, too.
+  combatBackground: forest-magic
+  combatBackgroundFilter: Astral
   levelRange:
     min: 60
     max: 63
@@ -91,6 +100,7 @@
 - id: 06df087c-cc8b-4b30-97c8-143ce6ec3944
   name: Forgetter's Fane
   description: A temple dedicated to the Forgetter. Here, he surrounds himself with all he tries to forget. It's both his greatest weakness and his strongest power.
+  combatBackground: sky-castle
   levelRange:
     min: 67
     max: 70

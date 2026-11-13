@@ -1,4 +1,5 @@
 import type { MonsterId } from '@interfaces/content-monster';
+import type { HasCombatBackground } from '@interfaces/combat-background';
 import type { DroppedReward } from '@interfaces/droppable';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { LevelRange } from '@interfaces/level-range';
@@ -21,7 +22,8 @@ export type EncounterFight = {
 
 export type EncounterContent = IsContentItem &
   HasDescription &
-  WorldNodeHideable & {
+  WorldNodeHideable &
+  HasCombatBackground & {
     id: EncounterId;
     __type: 'encounter';
 

@@ -1,6 +1,7 @@
 - id: 7363754b-b2bd-496a-b870-35e666524be2
   name: Elfheim
   description: The kingdom of elves, nestled away in the deep Erden Woodland. Vigilant guards keep watch at all times.
+  combatBackground: arena-grove
 
   scaleType: City
 

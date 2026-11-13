@@ -1,6 +1,11 @@
+import { Container, Graphics, Sprite } from 'pixi.js';
 import { describe, expect, it } from 'vitest';
 
-import { tiledGidOrientationRead } from '@helpers/pixi/pixi-map-render';
+import {
+  NODE_SPRITE_LABEL,
+  pixiNodeSprite,
+  tiledGidOrientationRead,
+} from '@helpers/pixi/pixi-map-render';
 
 const HALF_PI = Math.PI / 2;
 
@@ -77,5 +82,17 @@ describe('tiledGidOrientationRead', () => {
       scaleX: -1,
       scaleY: 1,
     });
+  });
+});
+
+describe('pixiNodeSprite', () => {
+  it('finds the sprite after another child is inserted ahead of it', () => {
+    const sprite = new Sprite();
+    sprite.label = NODE_SPRITE_LABEL;
+    const wrapper = new Container();
+    wrapper.addChild(sprite);
+    wrapper.addChildAt(new Graphics(), 0);
+
+    expect(pixiNodeSprite(wrapper)).toBe(sprite);
   });
 });

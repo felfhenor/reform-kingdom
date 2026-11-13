@@ -1,6 +1,7 @@
 - id: 1ebbb90e-8a9f-412b-ab29-269b037f220c
   name: Demon Foray
   description: A forward scouting base, set up by demons to spy on elves and adventurers.
+  combatBackground: swamp-camp
   levelRange:
     min: 28
     max: 31
@@ -32,6 +33,7 @@
 - id: 9d2e1a40-bf0b-4ed5-bcbc-58d59ed81d94
   name: Spiderwolf Forest
   description: Deceptively named, here is a place for spiders and wolves, but not a wolf/spider hybrid.
+  combatBackground: forest-clearing
   levelRange:
     min: 32
     max: 34
@@ -67,6 +69,7 @@
 - id: d3d0f964-ff09-481e-81ee-9470ac6c4e2b
   name: Windwood Training
   description: An elven training facility. Here, elves receive instruction on how to resist demonic influences and combat training most effective against them.
+  combatBackground: arena-grove
   levelRange:
     min: 33
     max: 36
@@ -106,6 +109,7 @@
 - id: 3c362132-eb38-483f-9670-60a91511ec62
   name: Demonelf Hideaway
   description: A small hideout for elves and demons that cohabitate and seek harmony with each other.
+  combatBackground: forest-hut
   levelRange:
     min: 35
     max: 38
@@ -144,6 +148,7 @@
 - id: 550e4813-163d-47a9-8467-1af243008eb8
   name: Demon's Den
   description: A twisted place of darkness, this cave is primarily inhabited by demons and the elves they corrupted.
+  combatBackground: lava-cave
   levelRange:
     min: 37
     max: 40
@@ -182,6 +187,8 @@
 - id: 5ffc9d51-108f-4eb0-a31e-fb41c0b5b82d
   name: Forgotten Grove
   description: An eerie grove, inhabited by the protectors of the Woodlands. They're very protective of their home.
+  combatBackground: forest-magic
+  combatBackgroundFilter: Faded
 
   invisibleUntilCollectibleIdsFound:
     - Ritual Crown

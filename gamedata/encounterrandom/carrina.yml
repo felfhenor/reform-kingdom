@@ -1,6 +1,7 @@
 - id: 24ed04dc-cce7-4e2b-8fb6-93c34d3d7093
   name: Gobslime Temple
   description: A mysterious, ever-changing shrine inhabited by a variety of creatures with seemingly no end.
+  combatBackground: ruins-stone
 
   resetTime: 3600
 

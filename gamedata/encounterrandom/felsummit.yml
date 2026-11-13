@@ -1,6 +1,8 @@
 - id: 14c8c708-7713-4657-ae95-8a3d9661a3ed
   name: Mausoleum of the Zelks
   description: A mausoleum filled to the brim with ancient corpses of a lost people. All manner of creatures find their way in here, attracted by the strong magic contained within.
+  combatBackground: castle-dungeon
+  combatBackgroundFilter: Frozen
 
   levelRange:
     min: 60

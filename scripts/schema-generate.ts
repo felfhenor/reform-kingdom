@@ -19,7 +19,7 @@ function fixSchema(schema: any): any {
   if (!schema) return schema;
 
   // Recursively process the schema
-  function processSchema(obj: any, parentKey?: string): any {
+  function processSchema(obj: any): any {
     if (typeof obj !== 'object' || obj === null) return obj;
 
     if (Array.isArray(obj)) {
@@ -28,7 +28,7 @@ function fixSchema(schema: any): any {
 
     const processed: any = {};
     for (const [key, value] of Object.entries(obj)) {
-      let processedValue = processSchema(value as any, key);
+      let processedValue = processSchema(value as any);
 
       // Fix branded type IDs - convert complex allOf structures to simple strings for ID fields
       if (key === 'id' || key.includes('Id') || key.endsWith('id')) {

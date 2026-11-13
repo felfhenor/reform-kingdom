@@ -1,15 +1,17 @@
 import { NODE_REVEAL_RING_RADIUS_TILES } from '@helpers/config';
 import { isMotionReduced } from '@helpers/engine/motion';
+import { pixiNodeSprite } from '@helpers/pixi/pixi-map-render';
 import { nodeRevealState } from '@helpers/pixi/pixi-node-reveal';
 import type { Container } from 'pixi.js';
 import { Graphics } from 'pixi.js';
 
-// Scales the node's sprite (always the wrapper's first child) so labels/status icons don't bounce with it.
+// Scales only the node's sprite so labels/status icons don't bounce with it.
 export function pixiNodeRevealCreate(
   wrapper: Container,
   tileSize: number,
 ): (elapsedMs: number) => boolean {
-  const sprite = wrapper.children[0];
+  const sprite = pixiNodeSprite(wrapper);
+  if (!sprite) return () => false;
   const baseScale = { x: sprite.scale.x, y: sprite.scale.y };
 
   const ring = new Graphics()

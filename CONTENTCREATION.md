@@ -33,7 +33,7 @@ The most massive type of content, requiring a lot of design and sub-content piec
 
 ## Combat Nodes
 
-These have monsters, and a level. Monsters need to exist before they can be put into combat nodes. In terms of rewards, these _always_ need a collectible. They should have some drops beyond that - spread between gathering materials, equipment, recipes, or workers. Typically, workers will drop from "hard" encounters, so, boss encounters would drop these.
+These have monsters, and a level. Every combat node (and raidable town) needs a `combatBackground` from `public/asset/combatbg/`, optionally tinted with `combatBackgroundFilter` (`Faded`, `Frozen`, `Astral`) when reused art should read as a different place. Monsters need to exist before they can be put into combat nodes. In terms of rewards, these _always_ need a collectible. They should have some drops beyond that - spread between gathering materials, equipment, recipes, or workers. Typically, workers will drop from "hard" encounters, so, boss encounters would drop these.
 
 ## Exchange Nodes
 

@@ -1,6 +1,7 @@
 - id: f072f35a-29c1-4e90-a057-3ebdf15d392f
   name: Collapsed Temple
   description: A collapsed temple deep within a cave. It's haunted by all manner of spirits and those who channel their essence into the world.
+  combatBackground: cave-shrine
 
   levelRange:
     min: 22

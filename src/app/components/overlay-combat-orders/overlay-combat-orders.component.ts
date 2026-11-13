@@ -22,6 +22,10 @@ import { StatusElementPoolComponent } from '@components/status-element-pool/stat
 import { TooltipSkillPreviewComponent } from '@components/tooltip-skill-preview/tooltip-skill-preview.component';
 import { ListReflowDirective } from '@directives/list-reflow.directive';
 import { SFXDirective } from '@directives/sfx.directive';
+import {
+  combatBackgroundSource,
+  combatBackgroundURL,
+} from '@helpers/combat/combat-background.ui';
 import { combatLog } from '@helpers/combat/combat-log';
 import { combatIsManual } from '@helpers/combat/combat-manual';
 import {
@@ -95,6 +99,17 @@ export class OverlayCombatOrdersComponent {
   private seenCombatIds = signal<Set<string>>(new Set());
 
   public title = computed(() => combatManualTitle(this.combat()));
+  private backdrop = computed(() => {
+    const combat = this.shownCombat();
+    return combat ? combatBackgroundSource(combat) : undefined;
+  });
+  public backdropImage = computed(() => {
+    const background = this.backdrop()?.combatBackground;
+    return background ? `url('${combatBackgroundURL(background)}')` : 'none';
+  });
+  public backdropFilter = computed(
+    () => this.backdrop()?.combatBackgroundFilter ?? 'None',
+  );
   public pendingSkillId = signal<string | undefined>(undefined);
 
   public isPaused = isGameloopPaused;

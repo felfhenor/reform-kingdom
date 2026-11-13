@@ -5,6 +5,7 @@ import { TIPPY_LOADER } from '@ngneat/helipopper/config';
 import { SweetAlert2LoaderService } from '@sweetalert2/ngx-sweetalert2';
 import { LOADING_PRELOAD_FONTS, LOADING_PRELOAD_IMAGES } from '@helpers/config';
 import { unfurlContent } from '@helpers/content/content';
+import { combatBackgroundURLs } from '@helpers/combat/combat-background.ui';
 import { kingdomIconURLs } from '@helpers/kingdom/kingdom-nav.ui';
 import { allMaps, setAllMaps } from '@helpers/maps';
 import { tiledMapsTilesetImagePaths } from '@helpers/pixi/tiled-map';
@@ -39,9 +40,11 @@ export class ContentService {
   public hasLoadedMaps = signal<boolean>(false);
   public hasLoadedMapArt = signal<boolean>(false);
   public hasLoadedUIArt = signal<boolean>(false);
+  public hasLoadedCombatArt = signal<boolean>(false);
   public hasLoadedUILibraries = signal<boolean>(false);
   public hasLoadedFonts = signal<boolean>(false);
   private uiImages: HTMLImageElement[] = [];
+  private combatImages: HTMLImageElement[] = [];
 
   public artAtlases = signal<ArtAtlases>({});
 
@@ -59,6 +62,7 @@ export class ContentService {
 
     void this.loadJSON();
     void this.loadUIArt();
+    void this.loadCombatArt();
     void this.loadUILibraries();
     void this.loadFonts();
     await Promise.all([this.loadArt(), this.loadMaps()]);
@@ -110,6 +114,26 @@ export class ContentService {
     ).filter((img) => !!img);
 
     this.hasLoadedUIArt.set(true);
+  }
+
+  // Held but never decode()d: decoding every full-size backdrop up front would pin hundreds of MB of bitmaps.
+  private async loadCombatArt() {
+    this.combatImages = await Promise.all(
+      combatBackgroundURLs().map(
+        (url) =>
+          new Promise<HTMLImageElement>((resolve) => {
+            const img = new Image();
+            img.onload = () => resolve(img);
+            img.onerror = () => {
+              this.logger.error('Content:LoadCombatArt', `Failed: ${url}`);
+              resolve(img);
+            };
+            img.src = url;
+          }),
+      ),
+    );
+
+    this.hasLoadedCombatArt.set(true);
   }
 
   // Text would otherwise reflow when a swap-display face lands after the loading screen.

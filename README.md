@@ -25,6 +25,7 @@
 - SpellBook Megapack - global effect icons
 - Admurins Items Mega Pack - item icons
 - Oryx Ultimate Fantasy - sprite sheets for characters and enemies
+- CraftPix - manual combat background images
 
 ## Useful Scripts
 

@@ -1,6 +1,7 @@
 - id: 08711d79-afbd-4845-b295-661ec7e53628
   name: Miserable Mire
   description: A temple lost in the ancient mire. It's home to a diverse set of creatures and is a home to many magical spirits.
+  combatBackground: ruins-brick
 
   levelRange:
     min: 22

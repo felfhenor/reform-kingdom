@@ -2,7 +2,19 @@
 
 @if (combat(); as fight) {
   <div class="relative flex h-full items-center justify-center p-4">
-    <div class="card bg-base-100 shadow-xl w-full max-w-[1440px] max-h-full">
+    <div
+      class="card relative bg-base-100 shadow-xl w-full max-w-[1440px] max-h-full"
+    >
+      <div class="absolute inset-0 overflow-hidden rounded-[inherit]">
+        <div
+          class="combat-backdrop"
+          [class.combat-backdrop-clear]="isReview()"
+          [class]="['bg-filter-' + backdropFilter()]"
+          [style.background-image]="backdropImage()"
+        ></div>
+        <div class="combat-vignette"></div>
+      </div>
+
       <div class="card-body relative flex flex-col gap-2 p-4">
         <app-icon
           name="gameHelp"
@@ -30,10 +42,12 @@
           </p>
         </ng-template>
 
-        <h2 class="type-page-title justify-center text-center">
+        <h2
+          class="type-page-title combat-text-shadow justify-center text-center"
+        >
           {{ title() }}
         </h2>
-        <p class="type-flavor text-center tabular-nums">
+        <p class="type-flavor combat-text-shadow text-center tabular-nums">
           @if (isReview()) {
             {{ isVictory() ? 'Victory' : 'Combat over' }}
           } @else {
@@ -46,7 +60,7 @@
             <!-- Padding keeps the hover glow inside the clip, which hard-cuts a long order. -->
             @if (!isReview()) {
               <div
-                class="flex items-center h-[72px] px-3 shrink-0 overflow-hidden"
+                class="glass flex items-center h-[72px] pr-3 shrink-0 overflow-hidden"
                 appListReflow
               >
                 @for (slot of turnOrder(); track slot.key; let first = $first) {
@@ -156,7 +170,7 @@
           <div class="flex flex-col gap-2 flex-1 min-w-0">
             <div
               #logBox
-              class="min-h-0 overflow-y-auto bg-black/50 border border-base-content/20 px-3 py-2 text-sm select-text"
+              class="glass-scrim min-h-0 overflow-y-auto px-3 py-2 text-sm select-text"
               [class.h-[328px]]="!isReview()"
               [class.flex-1]="isReview()"
             >
@@ -170,7 +184,7 @@
             @if (!isReview()) {
               <div class="flex items-center gap-2 h-8 shrink-0">
                 <span
-                  class="type-label flex-1 truncate"
+                  class="type-label combat-text-shadow flex-1 truncate"
                   [class.invisible]="isResolving()"
                 >
                   {{ activeHero()?.name }}
@@ -183,7 +197,7 @@
               </div>
 
               <div
-                class="grid grid-cols-2 gap-2 content-start h-[352px] shrink-0 overflow-y-auto"
+                class="glass grid grid-cols-2 gap-2 content-start h-[352px] p-2 shrink-0 overflow-y-auto"
               >
                 @if (!isResolving() && activeHero(); as hero) {
                   @for (option of skillOptions(); track option.skill.id) {
@@ -194,7 +208,7 @@
                     />
                     <button
                       type="button"
-                      class="flex items-center gap-2 h-12 px-2 bg-black/50 border border-base-content/20 hover:border-primary text-left"
+                      class="flex items-center gap-2 h-12 px-2 bg-black/30 border border-white/15 hover:border-primary text-left"
                       [class.border-primary]="
                         pendingSkillId() === option.skill.id
                       "

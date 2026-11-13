@@ -78,7 +78,14 @@
                 }
               ],
               "outputHashing": "all",
-              "sourceMap": true
+              "sourceMap": true,
+              "assets": [
+                {
+                  "glob": "**/*",
+                  "input": "public",
+                  "ignore": ["asset/combatbg/**"]
+                }
+              ]
             },
             "development": {
               "optimization": false,

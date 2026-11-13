@@ -1,5 +1,6 @@
 export * from './analysis-affixes';
 export * from './analysis-collectiblegates';
+export * from './analysis-combatbackgrounds';
 export * from './analysis-commissionrewards';
 export * from './analysis-commissionusage';
 export * from './analysis-completionrewards';
