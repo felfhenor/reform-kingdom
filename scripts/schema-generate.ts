@@ -279,116 +279,80 @@ const settings = {
   rejectDateType: false,
 };
 
-// Create a program from the actual interface files
-const program = TJS.getProgramFromFiles(
-  [
-    path.resolve(__dirname, '../src/app/interfaces/content-affix.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-astralprojector.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-caravan.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-caravan-trader.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-collectible.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-collectiblegate.ts'),
-    path.resolve(
-      __dirname,
-      '../src/app/interfaces/content-commission-offer.ts',
-    ),
-    path.resolve(__dirname, '../src/app/interfaces/content-encounter.ts'),
-    path.resolve(
-      __dirname,
-      '../src/app/interfaces/content-encounter-random.ts',
-    ),
-    path.resolve(__dirname, '../src/app/interfaces/content-edict.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-equipment.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-exchangenode.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-gathering.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-globaleffect.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-item.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-job.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-jobability.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-monster.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-node-override.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-outpost.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-recipe.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-region.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-rumor.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-seatboon.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-shrine.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-skill.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-skilltreenode.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-statuseffect.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-task.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-trait.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-town.ts'),
-    path.resolve(__dirname, '../src/app/interfaces/content-tradeskill.ts'),
-    path.resolve(
-      __dirname,
-      '../src/app/interfaces/content-tradeskill-level-requirement.ts',
-    ),
-    path.resolve(__dirname, '../src/app/interfaces/content-trainer.ts'),
-    path.resolve(
-      __dirname,
-      '../src/app/interfaces/content-trainer-teaching.ts',
-    ),
-    path.resolve(__dirname, '../src/app/interfaces/content-worker.ts'),
-  ],
-  {
-    strictNullChecks: false, // Disabled to handle complex types
-    esModuleInterop: true,
-    skipLibCheck: true,
-    noImplicitAny: false, // Disabled to handle complex types
-    resolveJsonModule: true,
-    moduleResolution: 1, // NodeJs
-    target: 99, // ESNext
-    allowSyntheticDefaultImports: true,
-    baseUrl: path.resolve(__dirname, '../'),
-    paths: {
-      '@interfaces/*': ['src/app/interfaces/*'],
-      '@interfaces': ['src/app/interfaces/index.ts'],
-      '@helpers/*': ['src/app/helpers/*'],
-      '@helpers': ['src/app/helpers/index.ts'],
-    },
-  },
-);
+const interfacesDir = path.resolve(__dirname, '../src/app/interfaces');
+const gamedataDir = path.resolve(__dirname, '../gamedata');
 
-// Content type mappings to actual TypeScript interface names.
-// Keys must match the gamedata folder names (and `ContentType` union).
-const contentTypeMap = {
-  affix: 'AffixContent',
-  astralprojector: 'AstralProjectorContent',
-  caravan: 'CaravanContent',
-  caravantrader: 'CaravanTraderContent',
-  collectible: 'CollectibleContent',
-  collectiblegate: 'CollectibleGateContent',
-  commissionoffer: 'CommissionOfferContent',
-  edict: 'EdictContent',
-  encounter: 'EncounterContent',
-  encounterrandom: 'EncounterRandomContent',
-  equipment: 'EquipmentContent',
-  exchangenode: 'ExchangeNodeContent',
-  gathering: 'GatheringContent',
-  globaleffect: 'GlobalEffectContent',
-  item: 'ItemContent',
-  job: 'JobContent',
-  jobability: 'JobAbilityContent',
-  monster: 'MonsterContent',
-  nodeoverride: 'NodeOverrideContent',
-  outpost: 'OutpostContent',
-  recipe: 'RecipeContent',
-  region: 'RegionContent',
-  rumor: 'RumorContent',
-  seatboon: 'SeatBoonContent',
-  shrine: 'ShrineContent',
-  skill: 'EquipmentSkillContent',
-  skilltreenode: 'SkillTreeNodeContent',
-  statuseffect: 'StatusEffectContent',
-  task: 'TaskContent',
-  town: 'TownContent',
-  tradeskill: 'TradeskillContent',
-  tradeskilllevelrequirement: 'TradeskillLevelRequirementContent',
-  trainer: 'TrainerContent',
-  trainerteaching: 'TrainerTeachingContent',
-  worker: 'WorkerContent',
-};
+const contentInterfaceFiles = fs
+  .readdirSync(interfacesDir)
+  .filter((file) => /^content-.*(?<!\.ui)\.ts$/.test(file))
+  .map((file) => path.join(interfacesDir, file));
+
+const program = TJS.getProgramFromFiles(contentInterfaceFiles, {
+  strictNullChecks: false, // Disabled to handle complex types
+  esModuleInterop: true,
+  skipLibCheck: true,
+  noImplicitAny: false, // Disabled to handle complex types
+  resolveJsonModule: true,
+  moduleResolution: 1, // NodeJs
+  target: 99, // ESNext
+  allowSyntheticDefaultImports: true,
+  baseUrl: path.resolve(__dirname, '../'),
+  paths: {
+    '@interfaces/*': ['src/app/interfaces/*'],
+    '@interfaces': ['src/app/interfaces/index.ts'],
+    '@helpers/*': ['src/app/helpers/*'],
+    '@helpers': ['src/app/helpers/index.ts'],
+  },
+});
+
+// Exported `*Content` types from the content interface files, with their `__type` literal if they narrow it.
+function findContentTypeAliases(): { name: string; typeLiteral?: string }[] {
+  const checker = program.getTypeChecker();
+  const fileSet = new Set(contentInterfaceFiles.map((f) => path.normalize(f)));
+
+  return program
+    .getSourceFiles()
+    .filter((sf) => fileSet.has(path.normalize(sf.fileName)))
+    .flatMap((sf) =>
+      checker.getExportsOfModule(checker.getSymbolAtLocation(sf)!),
+    )
+    .filter((symbol) => symbol.name.endsWith('Content'))
+    .map((symbol) => {
+      const typeProp = checker
+        .getDeclaredTypeOfSymbol(symbol)
+        .getProperty('__type');
+      const propType = typeProp ? checker.getTypeOfSymbol(typeProp) : undefined;
+      return {
+        name: symbol.name,
+        typeLiteral: propType?.isStringLiteral() ? propType.value : undefined,
+      };
+    });
+}
+
+// Gamedata folder -> interface: a type narrowing `__type` to the folder name wins, else `<Folder>Content` by name.
+function buildContentTypeMap(): Record<string, string> {
+  const aliases = findContentTypeAliases();
+  const folders = fs
+    .readdirSync(gamedataDir, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name);
+
+  const map: Record<string, string> = {};
+  for (const folder of folders) {
+    const match =
+      aliases.find((a) => a.typeLiteral === folder) ??
+      aliases.find(
+        (a) => a.name.replace(/Content$/, '').toLowerCase() === folder,
+      );
+    if (!match)
+      throw new Error(`No *Content interface found for gamedata/${folder}`);
+    map[folder] = match.name;
+  }
+
+  return map;
+}
+
+const contentTypeMap = buildContentTypeMap();
 
 // Content types whose schema generated successfully - used to populate
 // `.vscode/settings.json` -> `yaml.schemas` below.
