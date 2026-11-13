@@ -305,3 +305,13 @@
   effects:
     - effectType: WorkerXPGainMultiplier
       value: 1
+
+- id: e6fceeb3-b7b2-47e2-8315-1c04f575f7a4
+  name: Vow of Astral Abatement
+  rarity: Mystical
+  description: A vow to stay grounded while looking at the stars.
+  sprite: '0115'
+
+  effects:
+    - effectType: GlobalAstralProjectorMaterialBoost
+      value: -0.25

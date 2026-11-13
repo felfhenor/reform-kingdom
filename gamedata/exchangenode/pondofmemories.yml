@@ -207,3 +207,10 @@
       costs:
         - itemId: Weak Spider Silk
           required: 25
+
+    - kind: Collectible
+      requiredEdictId: Edict of Astral Abatement
+      outputCollectibleId: Vow of Astral Abatement
+      costs:
+        - itemId: Gold Coin
+          required: 500
