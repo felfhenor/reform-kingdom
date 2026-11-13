@@ -3,6 +3,7 @@ import {
   ensureArray,
   ensureItemQuantity,
 } from '@helpers/content/ensure-helpers-core';
+import { PARTY_SIZE_MAX } from '@helpers/config';
 import type { EdictContent, EdictId } from '@interfaces';
 
 export function ensureEdict(
@@ -17,8 +18,9 @@ export function ensureEdict(
     kind: edict.kind ?? 'Challenge',
     fragments: edict.fragments ?? 0,
     groups: edict.groups ?? [],
-    enabled: edict.enabled ?? false,
     effects: ensureArray(edict.effects, ensureGlobalEffectEffect),
     startingItems: ensureArray(edict.startingItems, ensureItemQuantity),
+    partySize: edict.partySize ?? PARTY_SIZE_MAX,
+    seatBoonIds: edict.seatBoonIds ?? [],
   };
 }

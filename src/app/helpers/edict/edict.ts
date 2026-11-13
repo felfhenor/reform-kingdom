@@ -1,11 +1,18 @@
 import {
   EDICT_FRAGMENT_MULTIPLIER_STEP,
   EDICT_SCORE_MULTIPLIER_FLOOR,
+  PARTY_SIZE_MAX,
 } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import { edictsState } from '@helpers/state-game';
-import type { EdictContent, EdictId, EdictKind, GameState } from '@interfaces';
+import type {
+  EdictContent,
+  EdictId,
+  EdictKind,
+  GameState,
+  SeatBoonContent,
+} from '@interfaces';
 import { intersection, sortBy, sumBy, uniq } from 'es-toolkit/compat';
 
 const EDICT_KIND_ORDER: EdictKind[] = [
@@ -13,7 +20,6 @@ const EDICT_KIND_ORDER: EdictKind[] = [
   'Challenge',
   'Variant',
   'Boon',
-  'SeatBoon',
 ];
 
 // getEntry also resolves names, so require the id itself to match.
@@ -33,15 +39,27 @@ export function pruneInvalidEdicts(ids: EdictId[]): EdictId[] {
   return uniq(ids).filter((id) => !!edictEntry(id));
 }
 
-// Seat boons come from the party size, so they're never picked directly.
 export function edictsPickable(): EdictContent[] {
-  const pickable = getEntriesByType<EdictContent>('edict').filter(
-    (edict) => !!edict.enabled && edict.kind !== 'SeatBoon',
-  );
-  return sortBy(pickable, [
+  return sortBy(getEntriesByType<EdictContent>('edict'), [
     (edict) => EDICT_KIND_ORDER.indexOf(edict.kind),
     (edict) => edict.name,
   ]);
+}
+
+export function edictSeatBoons(edict: EdictContent): SeatBoonContent[] {
+  return (edict.seatBoonIds ?? []).flatMap((id) => {
+    const seatBoon = getEntry<SeatBoonContent>(id);
+    return seatBoon?.__type === 'seatboon' && seatBoon.id === id
+      ? [seatBoon]
+      : [];
+  });
+}
+
+export function edictsPartySize(edicts: EdictContent[]): number {
+  return Math.min(
+    PARTY_SIZE_MAX,
+    ...edicts.map((edict) => edict.partySize ?? PARTY_SIZE_MAX),
+  );
 }
 
 export function edictIsBlocked(

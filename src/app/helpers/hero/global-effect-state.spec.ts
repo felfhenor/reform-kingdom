@@ -7,6 +7,7 @@ import { ensureEdict } from '@helpers/content/ensure-edict';
 import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
 import { ensureCollectible } from '@helpers/content/ensure-item';
 import { ensureJob } from '@helpers/content/ensure-job';
+import { ensureSeatBoon } from '@helpers/content/ensure-seatboon';
 import { ensureTradeskill } from '@helpers/content/ensure-tradeskill';
 import { defaultGameState, defaultStats } from '@helpers/defaults';
 import {
@@ -27,6 +28,7 @@ import type {
   GlobalEffectEffect,
   GlobalEffectId,
   JobId,
+  SeatBoonId,
   TradeskillId,
 } from '@interfaces';
 
@@ -89,6 +91,19 @@ const eternal = ensureEdict({
   name: 'Eternal',
   effects: [{ effectType: 'GlobalShrineBuffsPermanent' }],
 });
+const loneWolf = ensureSeatBoon({
+  id: 'lone-wolf' as SeatBoonId,
+  name: 'Lone Wolf',
+  effects: [{ effectType: 'GainStatPercent', value: 50 }],
+});
+const fretless = ensureEdict({
+  id: 'fretless' as EdictId,
+  name: 'Fretless',
+  kind: 'PartySize',
+  partySize: 1,
+  seatBoonIds: [loneWolf.id, 'gone' as SeatBoonId],
+  effects: [{ effectType: 'GlobalXPGainMultiplier', value: 0.5 }],
+});
 const knight = ensureJob({
   id: 'knight' as JobId,
   name: 'Knight',
@@ -105,6 +120,8 @@ beforeEach(() => {
     fury,
     humility,
     eternal,
+    loneWolf,
+    fretless,
     knight,
   ]);
   seedGamestate((state) => (state.clock.numTicks = now));
@@ -308,6 +325,15 @@ describe('edicts as a source', () => {
       freshState((s) => (s.edicts = [might.id, frailty.id])),
     );
     expect(cancelled.heroStatPercents).toEqual(defaultStats());
+  });
+
+  it("adds an edict's seat boons beside its own effects", () => {
+    const sums = globalEffectSumsFor(
+      freshState((s) => (s.edicts = [fretless.id])),
+    );
+
+    expect(sums.heroStatPercents.Strength).toBe(50);
+    expect(sums.xpGainMultiplierBonus).toBeCloseTo(0.5);
   });
 });
 

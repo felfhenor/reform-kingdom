@@ -1,19 +1,22 @@
 import { describe, expect, it } from 'vitest';
 
-import { EDICT_SCORE_MULTIPLIER_FLOOR } from '@helpers/config';
+import { EDICT_SCORE_MULTIPLIER_FLOOR, PARTY_SIZE_MAX } from '@helpers/config';
 import { ensureEdict } from '@helpers/content/ensure-edict';
 import { ensureItem } from '@helpers/content/ensure-item';
+import { ensureSeatBoon } from '@helpers/content/ensure-seatboon';
 import {
   applyEdictStartingItems,
   edictIsBlocked,
   edictScoreMultiplier,
+  edictSeatBoons,
   edictsActive,
   edictsFragmentTotal,
+  edictsPartySize,
   edictsPickable,
   edictsSanitized,
   pruneInvalidEdicts,
 } from '@helpers/edict/edict';
-import type { EdictContent, EdictId, ItemId } from '@interfaces';
+import type { EdictContent, EdictId, ItemId, SeatBoonId } from '@interfaces';
 import { seedContent } from '@/testing/content';
 import { inTick, seedGamestate } from '@/testing/gamestate';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -76,8 +79,7 @@ describe('pruneInvalidEdicts', () => {
 const pickable = (
   id: string,
   overrides: Partial<EdictContent> = {},
-): EdictContent =>
-  ensureEdict({ id: id as EdictId, name: id, enabled: true, ...overrides });
+): EdictContent => ensureEdict({ id: id as EdictId, name: id, ...overrides });
 
 const frailty = pickable('frailty', {
   kind: 'Challenge',
@@ -86,17 +88,21 @@ const frailty = pickable('frailty', {
 const strength = pickable('strength', { kind: 'Boon', groups: ['HeroStats'] });
 const sky = pickable('sky', { kind: 'Variant', groups: ['Sky', 'Coin'] });
 const coin = pickable('coin', { kind: 'Variant' });
-const triad = pickable('triad', { kind: 'PartySize' });
-const loneWolf = pickable('lone-wolf', { kind: 'SeatBoon' });
-const locked = ensureEdict({
-  id: 'locked' as EdictId,
-  name: 'locked',
-  kind: 'Challenge',
+const loneWolf = ensureSeatBoon({
+  id: 'lone-wolf' as SeatBoonId,
+  name: 'Lone Wolf',
 });
+const loneWolfAsEdict = loneWolf.id as unknown as EdictId;
+const triad = pickable('triad', {
+  kind: 'PartySize',
+  partySize: 3,
+  seatBoonIds: [loneWolf.id],
+});
+const duo = pickable('duo', { kind: 'PartySize', partySize: 2 });
 
 describe('edictsPickable', () => {
-  it('lists enabled edicts by kind then name, leaving out seat boons', () => {
-    seedContent([strength, coin, loneWolf, locked, frailty, triad]);
+  it('lists edicts by kind then name, leaving out seat boons', () => {
+    seedContent([strength, coin, loneWolf, frailty, triad]);
 
     expect(edictsPickable().map((edict) => edict.id)).toEqual([
       triad.id,
@@ -127,19 +133,41 @@ describe('edictIsBlocked', () => {
 
 describe('edictsSanitized', () => {
   it('keeps pickable ids in order, dropping repeats, unpickable and later-blocked ones', () => {
-    seedContent([strength, coin, loneWolf, locked, frailty, triad]);
+    seedContent([strength, coin, loneWolf, frailty, triad]);
 
     expect(
       edictsSanitized([
         coin.id,
         frailty.id,
         coin.id,
-        loneWolf.id,
-        locked.id,
+        loneWolfAsEdict,
         strength.id,
         gone,
       ]),
     ).toEqual([coin.id, frailty.id]);
+  });
+});
+
+describe('edictSeatBoons', () => {
+  it('resolves seat boons in order, skipping ids that are not seat boons', () => {
+    seedContent([loneWolf, ore]);
+    const edict = pickable('mixed', {
+      seatBoonIds: [
+        'gone' as SeatBoonId,
+        ore.id as unknown as SeatBoonId,
+        loneWolf.id,
+      ],
+    });
+
+    expect(edictSeatBoons(edict)).toEqual([loneWolf]);
+  });
+});
+
+describe('edictsPartySize', () => {
+  it('is the smallest picked party size, or the full party without one', () => {
+    expect(edictsPartySize([])).toBe(PARTY_SIZE_MAX);
+    expect(edictsPartySize([coin])).toBe(PARTY_SIZE_MAX);
+    expect(edictsPartySize([coin, triad, duo])).toBe(2);
   });
 });
 

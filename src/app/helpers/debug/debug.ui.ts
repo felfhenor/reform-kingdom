@@ -344,7 +344,7 @@ export function debugGiveCollectible(
   collectiblesAdd(collectible.id, quantity);
 }
 
-// Skips the setup page's enabled, group and conflict rules, so unbuilt edicts can be tried too.
+// Skips the setup page's group rules, so conflicting edicts can be tried together.
 export function debugToggleEdict(edictIdOrName: string): void {
   const edict = getEntry<EdictContent>(edictIdOrName);
   if (edict?.__type !== 'edict') {

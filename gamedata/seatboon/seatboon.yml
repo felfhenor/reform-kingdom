@@ -1,0 +1,58 @@
+- id: cfb02cac-c2d2-42bf-987e-238d9f35d807
+  name: Undivided Spoils
+  description: Gold gain is increased by 25%, and item drop chance by 25%.
+  effects:
+    - effectType: GlobalGoldGainMultiplier
+      value: 0.25
+    - effectType: GlobalCombatItemDropRateBoost
+      value: 25
+
+- id: 54109d8e-7924-419e-9ddc-e273b2e601ab
+  name: Light Caravan
+  description: Travel speed is increased by 25%, both on and off paths.
+  effects:
+    - effectType: GlobalOnPathTravelSpeedBoost
+      value: 0.25
+    - effectType: GlobalOffPathTravelSpeedBoost
+      value: 0.25
+
+- id: 2a86c1f3-206c-4f41-8c84-46948422eb7f
+  name: Shoulder to Shoulder
+  description: Hero stats are increased by 20%.
+  effects:
+    - effectType: GainStatPercent
+      value: 20
+
+- id: b636cdc4-ff65-4a5d-9c8c-d21549cd2dab
+  name: Lone Wolf
+  description: Hero stats are increased by 50%, and Health by 100%.
+  effects:
+    - effectType: GainStatPercent
+      value: 50
+    - effectType: GainStatPercent
+      stat: Health
+      value: 50
+
+- id: ce6d9389-b510-4d8f-9923-39d1e62d0377
+  name: Undivided Glory
+  description: Hero XP gain is increased by 100%.
+  effects:
+    - effectType: GlobalXPGainMultiplier
+      value: 1
+
+- id: 9ef3b23b-638b-4f4d-9274-fd98054f3908
+  name: Unbreakable
+  description: Unless a wipe ends the run, the fallen hero revives where they fell, and Deaths Door and Healing are 75% shorter.
+  effects:
+    - effectType: GlobalReviveInPlace
+    - effectType: GlobalDeathPenaltyMultiplier
+      value: -0.75
+
+- id: e7a70e76-a712-48bc-b787-653c8b57004e
+  name: Empty Bunks
+  description: Workers gather and craft 50% faster.
+  effects:
+    - effectType: WorkerGatherSpeedPercent
+      value: 50
+    - effectType: WorkerCraftSpeedPercent
+      value: 50

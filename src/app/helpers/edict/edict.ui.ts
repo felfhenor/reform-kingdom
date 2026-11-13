@@ -12,7 +12,6 @@ const EDICT_KIND_LABELS: Record<EdictKind, string> = {
   Challenge: 'Challenge',
   Variant: 'Variant',
   Boon: 'Boon',
-  SeatBoon: 'Seat boon',
 };
 
 const EDICT_KIND_GROUP_LABELS: Record<EdictKind, string> = {
@@ -20,7 +19,6 @@ const EDICT_KIND_GROUP_LABELS: Record<EdictKind, string> = {
   Challenge: 'Challenges',
   Variant: 'Variants',
   Boon: 'Boons',
-  SeatBoon: 'Seat boons',
 };
 
 export async function edictsSet(ids: EdictId[]): Promise<void> {

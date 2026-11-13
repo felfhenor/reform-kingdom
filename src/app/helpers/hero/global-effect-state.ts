@@ -1,5 +1,6 @@
 import { getEntry } from '@helpers/content/content';
 import { defaultGlobalEffectSums } from '@helpers/defaults';
+import { edictEntry, edictSeatBoons } from '@helpers/edict/edict';
 import { characterRecalculateStats } from '@helpers/hero/party';
 import {
   CombatStatDimension,
@@ -7,7 +8,6 @@ import {
   StatusEffectTagDimension,
   type CollectibleContent,
   type CollectibleId,
-  type EdictContent,
   type GameStat,
   type GameState,
   type GlobalEffect,
@@ -372,7 +372,7 @@ export function globalEffectSumsOf(
   return sums;
 }
 
-// Totals of every timed effect, owned collectible and run edict, without writing them anywhere.
+// Totals of every timed effect, owned collectible, run edict and its seat boons, without writing them anywhere.
 export function globalEffectSumsFor(state: GameState): GlobalEffectSums {
   const activeEffectEntries = state.globalEffects
     .filter((effect) => effect.expiresAtTick > state.clock.numTicks)
@@ -382,9 +382,14 @@ export function globalEffectSumsFor(state: GameState): GlobalEffectSums {
     Object.keys(state.collectibles) as CollectibleId[]
   ).flatMap((id) => getEntry<CollectibleContent>(id)?.effects ?? []);
 
-  const edictEffectEntries = state.edicts.flatMap(
-    (id) => getEntry<EdictContent>(id)?.effects ?? [],
-  );
+  const edictEffectEntries = state.edicts.flatMap((id) => {
+    const edict = edictEntry(id);
+    if (!edict) return [];
+    return [
+      ...(edict.effects ?? []),
+      ...edictSeatBoons(edict).flatMap((seatBoon) => seatBoon.effects),
+    ];
+  });
 
   return globalEffectSumsOf([
     ...activeEffectEntries,

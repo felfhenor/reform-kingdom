@@ -1,6 +1,5 @@
 - id: a4855bb8-4d5d-4f4b-bbd9-4cca91413611
   name: Edict of Heroic Might
-  enabled: true
   sprite: '0000'
   description: Hero stats are increased by 25%.
   kind: Boon
@@ -13,7 +12,6 @@
 
 - id: a76ae14f-4c67-440f-b8d0-5e32c25eb933
   name: Edict of Calm Nature
-  enabled: true
   sprite: '0001'
   description: Monster stats are reduced by 25%.
   kind: Boon
@@ -28,7 +26,6 @@
   name: Edict of the Blessed Cornucopia
   groups:
     - WarrenCornucopia
-  enabled: true
   sprite: '0002'
   description: Item drop chance is increased by 25%, and workers gather 25% faster.
   kind: Boon
@@ -41,7 +38,6 @@
 
 - id: 26a02706-b73d-4009-b9fc-466374f9c8e7
   name: Edict of the Mercantile Winds
-  enabled: true
   sprite: '0003'
   description: Start with extra gold, and caravan/town shop prices are reduced by 25%.
   kind: Boon
@@ -59,7 +55,6 @@
 
 - id: 76096547-8e80-4964-ab36-f0a85947247e
   name: Edict of Cold Steel
-  enabled: true
   sprite: '0004'
   description: XP gain is increased by 50%.
   kind: Boon
@@ -72,7 +67,6 @@
 
 - id: 024c9438-c014-4b73-aaa3-276ed4bcdb64
   name: Edict of Fleet Feet
-  enabled: true
   sprite: '0005'
   description: Travel speed is increased by 50%, both on and off paths.
   kind: Boon
@@ -85,7 +79,6 @@
 
 - id: 1abaf8ae-7a55-4513-a0b7-d9a47f1d19e3
   name: Edict of Swift Mending
-  enabled: true
   sprite: '0006'
   description: The fallen party revives where it fell.
   kind: Boon
@@ -99,7 +92,6 @@
   name: Edict of Eternal Blessings
   groups:
     - StarryEternal
-  enabled: true
   sprite: '0007'
   description: Shrine buffs never expire.
   kind: Boon
@@ -109,8 +101,7 @@
 
 - id: afeb283e-97fd-4bbb-a5e9-905e6c766304
   name: Edict of Hasty Hammers
-  enabled: true
-  sprite: '0029'
+  sprite: '0026'
   description: Crafting timers are reduced by 50%.
   kind: Boon
   fragments: -1
@@ -120,8 +111,7 @@
 
 - id: 6580e020-2ee1-4629-b655-3d5da9637a0d
   name: Edict of Storied Development
-  enabled: true
-  sprite: '0030'
+  sprite: '0027'
   description: Every outpost and gather location starts at +1.
   kind: Boon
   fragments: -4
@@ -135,8 +125,7 @@
 
 - id: 1b3ffa90-0f05-4b98-8270-c836f44f136c
   name: Edict of Sharp Unionization
-  enabled: true
-  sprite: '0034'
+  sprite: '0031'
   description: Workers get +300% XP.
   kind: Boon
   fragments: -2
@@ -146,8 +135,7 @@
 
 - id: 0ce125c6-cf7f-46a0-8534-0541a8b9cad5
   name: Edict of Astral Abatement
-  enabled: true
-  sprite: '0035'
+  sprite: '0032'
   description: Astral projector spells cost 50% fewer materials.
   kind: Boon
   fragments: -1

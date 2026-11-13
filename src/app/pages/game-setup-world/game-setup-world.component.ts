@@ -9,9 +9,11 @@ import {
   signal,
 } from '@angular/core';
 import {
+  apply,
   applyEach,
   form,
   FormField,
+  hidden,
   maxLength,
   minLength,
   required,
@@ -30,6 +32,7 @@ import {
   edictIsBlocked,
   edictScoreMultiplier,
   edictsFragmentTotal,
+  edictsPartySize,
   edictsPickable,
   edictsSanitized,
 } from '@helpers/edict/edict';
@@ -39,19 +42,19 @@ import {
   edictsTrackRun,
 } from '@helpers/edict/edict.ui';
 import {
-  legacyClearedEdictIds,
-  legacyClearedEdictsCopyToRun,
-  legacyHasCompletedRun,
-} from '@helpers/legacy/legacy.ui';
-import {
   discordSetMainStatus,
   discordSetStatus,
 } from '@helpers/engine/discord';
 import { gameReset, gameStart } from '@helpers/game-init';
-import { titleCrawlQueue } from '@helpers/lore/title-crawl.ui';
 import { globalEffectSumsOf } from '@helpers/hero/global-effect-state';
 import { getUnlockedJobs, jobIdsShared } from '@helpers/hero/job';
 import { createCharacter, setParty } from '@helpers/hero/party';
+import {
+  legacyClearedEdictIds,
+  legacyClearedEdictsCopyToRun,
+  legacyHasCompletedRun,
+} from '@helpers/legacy/legacy.ui';
+import { titleCrawlQueue } from '@helpers/lore/title-crawl.ui';
 import { rngChoiceIdentifiable } from '@helpers/rng';
 import { isSetup } from '@helpers/setup';
 import { setOption } from '@helpers/state-options';
@@ -155,11 +158,14 @@ export class GameSetupWorldComponent implements OnInit {
     }),
   );
   public edictGroups = computed(() =>
-    uniq(this.pickableEdicts().map((edict) => edict.kind)).map((kind) => ({
-      kind,
-      label: edictKindGroupLabel(kind),
-      edicts: this.pickableEdicts().filter((edict) => edict.kind === kind),
-    })),
+    sortBy(
+      uniq(this.pickableEdicts().map((edict) => edict.kind)).map((kind) => ({
+        kind,
+        label: edictKindGroupLabel(kind),
+        edicts: this.pickableEdicts().filter((edict) => edict.kind === kind),
+      })),
+      (g) => g.label,
+    ),
   );
   public fragmentTotal = computed(() =>
     edictsFragmentTotal(this.pickedEdicts()),
@@ -174,14 +180,24 @@ export class GameSetupWorldComponent implements OnInit {
         this.pickedEdicts().flatMap((edict) => edict.effects ?? []),
       ).partySharesClass,
   );
+  public partySize = computed(() => edictsPartySize(this.pickedEdicts()));
+  public emptySeats = computed(() =>
+    Array.from({ length: PARTY_SIZE_MAX - this.partySize() }, (_, i) => i),
+  );
+  private seatedHeroes = computed(() =>
+    this.heroesModel().slice(0, this.partySize()),
+  );
   public partyBreaksSharedClass = computed(
     () =>
       this.partySharesClass() &&
-      !jobIdsShared(this.heroesModel().map((hero) => hero.jobId)),
+      !jobIdsShared(this.seatedHeroes().map((hero) => hero.jobId)),
   );
 
   public partyForm = form(this.heroesModel, (heroes) => {
-    applyEach(heroes, heroPickSchema);
+    applyEach(heroes, (hero) => {
+      apply(hero, heroPickSchema);
+      hidden(hero, { when: ({ index }) => index() >= this.partySize() });
+    });
   });
 
   constructor() {
@@ -277,7 +293,7 @@ export class GameSetupWorldComponent implements OnInit {
     gameReset();
     await edictsSet(this.pickedEdictIds());
     await legacyClearedEdictsCopyToRun();
-    const party = this.heroesModel().map((hero) =>
+    const party = this.seatedHeroes().map((hero) =>
       createCharacter(hero.name, hero.jobId),
     );
     setParty(party);

@@ -9,13 +9,19 @@ import {
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { CurrencyNameComponent } from '@components/currency-name/currency-name.component';
+import { RowSeatBoonsComponent } from '@components/row-seat-boons/row-seat-boons.component';
 import { edictKindLabel } from '@helpers/edict/edict.ui';
 import type { EdictContent } from '@interfaces';
 
 @Component({
   selector: 'app-tooltip-edict',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AtlasImageComponent, CurrencyNameComponent, DecimalPipe],
+  imports: [
+    AtlasImageComponent,
+    CurrencyNameComponent,
+    DecimalPipe,
+    RowSeatBoonsComponent,
+  ],
   host: { class: 'hidden' },
   template: `
     <ng-template #tooltipContent>
@@ -34,6 +40,8 @@ import type { EdictContent } from '@interfaces';
           </div>
 
           <p>{{ e.description }}</p>
+
+          <app-row-seat-boons [edict]="e" />
 
           @if (e.startingItems?.length) {
             <ul class="flex flex-col gap-2 text-sm">

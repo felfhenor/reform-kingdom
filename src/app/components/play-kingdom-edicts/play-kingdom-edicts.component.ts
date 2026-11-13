@@ -4,6 +4,7 @@ import { AtlasImageComponent } from '@components/atlas-image/atlas-image.compone
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
+import { RowSeatBoonsComponent } from '@components/row-seat-boons/row-seat-boons.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import {
   edictScoreMultiplier,
@@ -22,6 +23,7 @@ import type { EdictKind } from '@interfaces';
     CardPageComponent,
     DecimalPipe,
     AtlasImageComponent,
+    RowSeatBoonsComponent,
     SlotIconBlankComponent,
   ],
   template: `
@@ -49,6 +51,7 @@ import type { EdictKind } from '@interfaces';
             <div class="flex-1 flex flex-col gap-2 min-w-0">
               <span class="type-entity-name">{{ edict.name }}</span>
               <span class="type-meta">{{ edict.description }}</span>
+              <app-row-seat-boons [edict]="edict" />
             </div>
 
             <div class="flex flex-col items-end gap-2 shrink-0">

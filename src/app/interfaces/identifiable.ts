@@ -22,6 +22,7 @@ export type ContentType =
   | 'recipe'
   | 'region'
   | 'rumor'
+  | 'seatboon'
   | 'shrine'
   | 'skill'
   | 'skilltreenode'
