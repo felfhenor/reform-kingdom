@@ -7,6 +7,7 @@ import type { TownId } from '@interfaces/content-town';
 import type { TradeskillId } from '@interfaces/content-tradeskill';
 import type { WorkerId } from '@interfaces/content-worker';
 import type { CraftQueueEntryId } from '@interfaces/crafting';
+import type { DifficultyTier } from '@interfaces/difficulty-tier';
 import type { EquipmentItem } from '@interfaces/equipment';
 import type { Branded } from '@interfaces/identifiable';
 import type { ItemPreviewDisplay } from '@interfaces/item-preview';
@@ -118,6 +119,12 @@ export type TownRaidTelegraph = {
 export type TownRaidCombatantRow = {
   monster: MonsterContent;
   quantity: number;
+  level: number;
+};
+
+export type TownRaidThreat = {
+  level: number;
+  difficulty: DifficultyTier;
 };
 
 // One row per telegraphed raid for the Requested Defenses modal - sorted by soonest engageWindowExpiresAtTick.
@@ -129,6 +136,7 @@ export type RaidDefenseRowViewModel = {
   remainingLabel: string;
   assaulters: TownRaidCombatantRow[];
   defenders: TownRaidCombatantRow[];
+  threat: TownRaidThreat;
   isPartyHere: boolean;
   canTravel: boolean;
   // Set only while actively traveling toward this row's node.

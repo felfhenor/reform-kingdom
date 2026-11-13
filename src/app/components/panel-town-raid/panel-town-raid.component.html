@@ -2,8 +2,17 @@
   <h2 class="type-section-title justify-between">
     Raid
     @if (raidCountdown(); as countdown) {
-      <span class="badge badge-sm badge-warning tabular-nums">
-        {{ countdown }}
+      @let threat = raidThreat();
+      <span class="flex gap-2">
+        <span
+          class="badge badge-sm"
+          [class]="'badge-difficulty-' + threat.difficulty"
+        >
+          Lv. {{ threat.level | number }}
+        </span>
+        <span class="badge badge-sm badge-warning tabular-nums">
+          {{ countdown }}
+        </span>
       </span>
     }
   </h2>

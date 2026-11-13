@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -26,7 +27,10 @@ import {
   raidDefenderPreview,
   townRaidTelegraph,
 } from '@helpers/town/raid/town-raid-state';
-import { townCraftDebuffExpiresAtTick } from '@helpers/town/raid/town-raid-state.ui';
+import {
+  raidThreat,
+  townCraftDebuffExpiresAtTick,
+} from '@helpers/town/raid/town-raid-state.ui';
 import type {
   TownContent,
   TownRaidBuyoffKind,
@@ -38,6 +42,7 @@ import type {
   selector: 'app-panel-town-raid',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    DecimalPipe,
     RowRaidCombatantsComponent,
     BlankSlateComponent,
     SlotCompletionRewardComponent,
@@ -69,6 +74,8 @@ export class PanelTownRaidComponent {
 
     return formatDuration(expiresAtTick - timerTicksElapsed());
   });
+
+  public raidThreat = computed(() => raidThreat(this.town()));
 
   public raidRewards = computed(() => this.town().defense.rewards ?? []);
 

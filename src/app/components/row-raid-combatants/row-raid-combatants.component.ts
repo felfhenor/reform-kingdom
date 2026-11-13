@@ -1,7 +1,14 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from '@angular/core';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { TooltipMonsterPreviewComponent } from '@components/tooltip-monster-preview/tooltip-monster-preview.component';
+import { raidCombatantCount } from '@helpers/town/raid/town-raid-state.ui';
 import type { TownRaidCombatantRow } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
@@ -9,6 +16,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-row-raid-combatants',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    DecimalPipe,
     SlotIconBlankComponent,
     AtlasAnimationComponent,
     TippyDirective,
@@ -20,4 +28,6 @@ import { TippyDirective } from '@ngneat/helipopper';
 export class RowRaidCombatantsComponent {
   public label = input.required<string>();
   public combatants = input.required<TownRaidCombatantRow[]>();
+
+  public total = computed(() => raidCombatantCount(this.combatants()));
 }

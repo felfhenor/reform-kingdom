@@ -158,9 +158,13 @@ describe('raidAssaulterPreview', () => {
       },
     });
 
-    expect(raidAssaulterPreview(town())).toEqual([
-      { monster: citizen, quantity: 3 },
-      { monster: guard, quantity: 2 },
+    const raided = town(townId, {
+      assaulter: { level: { min: 15, max: 22 } },
+    });
+
+    expect(raidAssaulterPreview(raided)).toEqual([
+      { monster: citizen, quantity: 3, level: 22 },
+      { monster: guard, quantity: 2, level: 22 },
     ]);
   });
 
@@ -191,8 +195,8 @@ describe('raidDefenderPreview', () => {
     seedTowns({ [townId]: { reputation: 0 } });
 
     expect(raidDefenderPreview(defended)).toEqual([
-      { monster: citizen, quantity: 2 },
-      { monster: guard, quantity: 1 },
+      { monster: citizen, quantity: 2, level: defended.level },
+      { monster: guard, quantity: 1, level: defended.level },
     ]);
   });
 });

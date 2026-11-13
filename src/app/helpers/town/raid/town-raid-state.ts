@@ -69,10 +69,11 @@ export function raidAssaulterPreview(
     counts.set(monsterId, (counts.get(monsterId) ?? 0) + 1);
   });
 
+  const level = town.defense.assaulter.level.max;
   return [...counts.entries()]
     .map(([monsterId, quantity]) => {
       const monster = getEntry<MonsterContent>(monsterId);
-      return monster ? { monster, quantity } : undefined;
+      return monster ? { monster, quantity, level } : undefined;
     })
     .filter((row): row is TownRaidCombatantRow => !!row);
 }
@@ -81,7 +82,9 @@ export function raidDefenderPreview(town: TownContent): TownRaidCombatantRow[] {
   return townGuardiansForCurrentReputation(town)
     .map((entry) => {
       const monster = getEntry<MonsterContent>(entry.monsterId);
-      return monster ? { monster, quantity: entry.quantity } : undefined;
+      return monster
+        ? { monster, quantity: entry.quantity, level: town.level }
+        : undefined;
     })
     .filter((row): row is TownRaidCombatantRow => !!row);
 }

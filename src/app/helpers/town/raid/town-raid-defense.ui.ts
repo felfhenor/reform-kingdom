@@ -7,6 +7,7 @@ import {
   telegraphedRaidTownIds,
   townRaidTelegraph,
 } from '@helpers/town/raid/town-raid-state';
+import { raidThreat } from '@helpers/town/raid/town-raid-state.ui';
 import { isPartyAtTown } from '@helpers/town/town-visit';
 import type { RaidDefenseRowViewModel, TownContent } from '@interfaces';
 import { sortBy } from 'es-toolkit/compat';
@@ -33,6 +34,7 @@ export function raidDefenseRowViewModels(): RaidDefenseRowViewModel[] {
         remainingLabel: formatDuration(ticksUntilResolve),
         assaulters: raidAssaulterPreview(town),
         defenders: raidDefenderPreview(town),
+        threat: raidThreat(town),
         isPartyHere: isPartyAtTown(town.id),
         canTravel,
         travelEtaSeconds: travelEtaSecondsTo(town.name),
