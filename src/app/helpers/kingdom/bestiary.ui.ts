@@ -63,15 +63,17 @@ function bestiarySourceNodes(entry: BestiaryEntry): EncounterContent[] {
     .filter((node): node is EncounterContent => !!node);
 }
 
-// Every level the monster can be met at, across all the nodes it spawns in.
+// Every level the monster can be met at; summons spawn in no node, so they fall back to the levels actually fought.
 export function bestiaryEntryLevels(entry: BestiaryEntry): number[] {
-  return sortBy(
-    uniq(
-      bestiarySourceNodes(entry).flatMap(({ levelRange }) =>
-        range(levelRange.min, levelRange.max + 1),
-      ),
-    ),
+  const nodeRanges = bestiarySourceNodes(entry).map(
+    ({ levelRange }) => levelRange,
   );
+  const ranges =
+    nodeRanges.length === 0 && entry.levelRange
+      ? [entry.levelRange]
+      : nodeRanges;
+
+  return sortBy(uniq(ranges.flatMap(({ min, max }) => range(min, max + 1))));
 }
 
 // Without a level, every node it spawns in.
