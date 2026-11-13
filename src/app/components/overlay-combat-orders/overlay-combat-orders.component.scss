@@ -12,6 +12,16 @@
   }
 }
 
+// Shrinks with the outgoing leader's collapse and the new leader's growth, so the bar moves as one.
+.turn-slot-connector {
+  width: 8px;
+  transition: width 300ms ease;
+}
+
+.turn-slot-connector-hidden {
+  width: 0;
+}
+
 .turn-slot-leader {
   width: 66px;
   height: 66px;

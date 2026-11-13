@@ -66,11 +66,12 @@
                 @for (slot of turnOrder(); track slot.key; let first = $first) {
                   <div
                     class="flex items-center shrink-0"
-                    (animate.leave)="onSlotLeave($event)"
+                    (animate.leave)="onTurnSlotLeave($event)"
                   >
-                    @if (!first) {
-                      <span class="w-2 h-px shrink-0 bg-base-content/40"></span>
-                    }
+                    <span
+                      class="turn-slot-connector h-px shrink-0 bg-base-content/40"
+                      [class.turn-slot-connector-hidden]="first"
+                    ></span>
                     @if (slot.kind === 'divider') {
                       <span
                         class="type-meta text-lighter whitespace-nowrap tabular-nums px-2"

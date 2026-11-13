@@ -366,6 +366,13 @@ export class OverlayCombatOrdersComponent {
     this.anim.fadeIn(event.target, 150);
   }
 
+  public onTurnSlotLeave(event: AnimationCallbackEvent): void {
+    this.anim
+      .fadeOutCollapseWidth(event.target)
+      .then(() => event.animationComplete())
+      .catch(() => event.animationComplete());
+  }
+
   public onSlotLeave(event: AnimationCallbackEvent): void {
     this.anim
       .fadeOut(event.target)

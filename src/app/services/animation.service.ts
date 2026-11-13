@@ -111,6 +111,18 @@ export class AnimationService {
     });
   }
 
+  // Collapses the width alongside the fade so siblings in a row close up in step instead of jumping on removal.
+  fadeOutCollapseWidth(target: Element, duration = 300): JSAnimation {
+    const el = target as HTMLElement;
+    el.style.overflow = 'hidden';
+    return animate(el as DOMTarget, {
+      opacity: [1, 0],
+      ...this.motion({ width: [el.offsetWidth, 0] }),
+      duration,
+      ease: 'inOutQuad',
+    });
+  }
+
   // Opacity only and cleared afterwards: a lingering transform would become the containing block for fixed descendants.
   // Opacity is zeroed up front so the target doesn't paint once at full opacity before the first frame.
   fadeIn(target: Element, duration = 300): JSAnimation {
