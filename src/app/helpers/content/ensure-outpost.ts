@@ -1,6 +1,7 @@
 import {
   ensureArray,
   ensureWorldNodeDevelopmentLevel,
+  ensureNodeBackground,
 } from '@helpers/content/ensure-helpers-core';
 import type { OutpostContent, OutpostId } from '@interfaces';
 
@@ -13,6 +14,7 @@ export function ensureOutpost(
     __type: 'outpost',
     description: outpost.description ?? 'UNKNOWN',
     hidden: outpost.hidden ?? false,
+    ...ensureNodeBackground(outpost),
     invisibleUntilCollectibleIdsFound:
       outpost.invisibleUntilCollectibleIdsFound ?? [],
     levels: ensureArray(outpost.levels, ensureWorldNodeDevelopmentLevel),

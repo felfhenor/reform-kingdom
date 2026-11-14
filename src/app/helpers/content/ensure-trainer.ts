@@ -2,6 +2,7 @@ import { ensureAffixEffect } from '@helpers/content/ensure-affix';
 import {
   ensureArray,
   ensureCostItem,
+  ensureNodeBackground,
 } from '@helpers/content/ensure-helpers-core';
 import {
   TrainerTeachingEffectKinds,
@@ -29,6 +30,7 @@ export function ensureTrainer(
     __type: 'trainer',
     description: trainer.description ?? 'UNKNOWN',
     hidden: trainer.hidden ?? false,
+    ...ensureNodeBackground(trainer),
     invisibleUntilCollectibleIdsFound:
       trainer.invisibleUntilCollectibleIdsFound ?? [],
     trainerTeachingIds: trainer.trainerTeachingIds ?? [],

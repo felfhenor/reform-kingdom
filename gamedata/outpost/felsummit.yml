@@ -1,6 +1,7 @@
 - id: 7f986636-2f3a-44b6-8af4-3ca0bd3a16b1
   name: Fel Summit Outpost
   description: An outpost destroyed by the harsh elements.
+  background: arena-snow
 
   levels:
     - developTime: 300

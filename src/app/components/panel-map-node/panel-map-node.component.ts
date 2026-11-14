@@ -1,10 +1,4 @@
-import type { AnimationCallbackEvent } from '@angular/core';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { BarTownReputationComponent } from '@components/bar-town-reputation/bar-town-reputation.component';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
 import { BackdropNodeComponent } from '@components/backdrop-node/backdrop-node.component';
@@ -94,7 +88,6 @@ import {
 } from '@helpers/world-node/world-nodes';
 import { TippyDirective } from '@ngneat/helipopper';
 import { sortBy } from 'es-toolkit/compat';
-import { AnimationService } from '@services/animation.service';
 
 @Component({
   selector: 'app-panel-map-node',
@@ -129,8 +122,6 @@ import { AnimationService } from '@services/animation.service';
   styleUrl: './panel-map-node.component.scss',
 })
 export class PanelMapNodeComponent {
-  private anim = inject(AnimationService);
-
   public node = computed(() => selectedMapNode());
 
   public gatherNodeLevel = computed(() => {
@@ -432,16 +423,5 @@ export class PanelMapNodeComponent {
 
   public close(): void {
     mapNodeDeselect();
-  }
-
-  public onBannerEnter(event: AnimationCallbackEvent): void {
-    this.anim.fadeIn(event.target, 200);
-  }
-
-  public onBannerLeave(event: AnimationCallbackEvent): void {
-    this.anim
-      .fadeOut(event.target, 200)
-      .then(() => event.animationComplete())
-      .catch(() => event.animationComplete());
   }
 }

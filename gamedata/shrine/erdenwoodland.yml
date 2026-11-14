@@ -1,6 +1,7 @@
 - id: 577ebd9d-0a3e-43d4-b54e-c887d4795bc9
   name: Shrine of Culcula
   description: A shrine dedicated to Culcula, the explorer. They were known for their extraordinary mobility.
+  background: ruins-arches
   legendName: Legend of the Pioneer
 
   levels:

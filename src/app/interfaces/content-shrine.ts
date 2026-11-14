@@ -1,5 +1,6 @@
 import type { GlobalEffectId } from '@interfaces/content-globaleffect';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
+import type { HasNodeBackground } from '@interfaces/node-background';
 import type { HasDescription } from '@interfaces/traits';
 import type {
   WorldNodeDevelopmentLevel,
@@ -17,7 +18,8 @@ export type ShrineLevel = WorldNodeDevelopmentLevel & {
 
 export type ShrineContent = IsContentItem &
   HasDescription &
-  WorldNodeHideable & {
+  WorldNodeHideable &
+  HasNodeBackground & {
     id: ShrineId;
     __type: 'shrine';
 

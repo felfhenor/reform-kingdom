@@ -1,14 +1,17 @@
 - id: b936d34d-de57-4a54-a52b-095aba6f6589
   name: Carrina Cave
   description: A short passageway back to the Duchy of Carrina.
+  background: cave-crystal-red
 
 - id: 685c435d-d572-43b7-ab46-3597893787d6
   name: Craggled Cave
   description: A short passageway towards the Craggled Mire.
+  background: cave-crystal-red
 
 - id: fef0e00a-9047-4356-ab1e-3a84943397b1
   name: Templar's Pathway
   description: A hidden passageway to Templar's Retreat.
+  background: castle-dungeon
 
   invisibleUntilCollectibleIdsFound:
     - Craggle Pebble
@@ -16,26 +19,32 @@
 - id: f43cbdc1-d635-4448-9906-80bc91cce184
   name: Templar's Exit
   description: A passageway from Templar's Retreat back to Carrina.
+  background: castle-dungeon
 
 - id: 458a1ee7-080e-4463-a247-c297d079b16e
   name: Felway Path
   description: A passageway used by the demons of Fel to invade Carrina.
+  background: ruins-brick
 
 - id: 290f772d-af55-4915-9d12-9119ecaf106e
   name: Carrina Path
   description: A passageway used by the demons of Fel to invade Carrina.
+  background: ruins-brick
 
 - id: 7efeae55-bb93-41bf-8cad-d3fd7c333cf0
   name: Mire Traverse
   description: A caveway that helps travelers get from the Larsian Desert to the Craggled Mire.
+  background: cave-mine
 
 - id: 21755fe5-4c56-4967-9b9e-9eec98768250
   name: Larsian Traverse
   description: A caveway that helps travelers get from the Craggled Mire to the Larsian Desert.
+  background: cave-mine
 
 - id: 87914c7b-614c-4852-8aad-84f9997fe509
   name: Elfway Entrance
   description: A teleportation circle hidden deep within the elven woods. Without help, it'd be impossible to find.
+  background: forest-runestones
 
   invisibleUntilCollectibleIdsFound:
     - Elven Satchel
@@ -43,26 +52,36 @@
 - id: 07a664f1-597b-4861-90d2-1f0ec395d79c
   name: Elfway Exit
   description: A teleportation circle leading to Carrina from the Erden Woodland.
+  background: forest-runestones
 
 - id: 0f8bb1bc-065a-4993-8df3-a528429b6472
   name: Frostway Entrance
   description: A cave with a powerfully cold breeze flowing through it.
+  background: cave-crystal-blue
 
 - id: 60a5440c-91da-43cf-be45-9bd2dfa4a435
   name: Frostway Exit
   description: A frozen cave that slowly melts as you travel through it.
+  background: cave-crystal-blue
+  backgroundFilter: Frozen
 
 - id: 964d1345-8ac2-49c8-99b2-e8178cc1deda
   name: Mysterious Boat
   description: An ominous boat moored in an even more ominous lagoon. What could this boat be for?
+  background: ship-deck
+  backgroundFilter: Astral
 
 - id: a58e4c40-f70a-465b-b0e2-5d5c0d52a5d4
   name: Chronoport
   description: A portal from the compressed timespace of the Astral Observatory back to the Fel Summit.
+  background: ruins-portal
+  backgroundFilter: Astral
 
 - id: bb008d41-a80f-401a-81b7-a0f91b8657af
   name: Observatory Chronoport
   description: A chronoport leading from Carrina to the Astral Observatory. Created by a link between the Founder and the current Heroes.
+  background: ruins-portal
+  backgroundFilter: Astral
 
   invisibleUntilCollectibleIdsFound:
     - Founder's Thoughts
@@ -70,6 +89,8 @@
 - id: fdca9cf8-3cb7-483c-8d50-14ab5b9557b7
   name: Carrina Chronoport
   description: A chronoport leading from the Astral Observatory back to Carrina.
+  background: ruins-portal
+  backgroundFilter: Astral
 
   invisibleUntilCollectibleIdsFound:
     - Founder's Thoughts

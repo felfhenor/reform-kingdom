@@ -1,6 +1,7 @@
 - id: 339f5f05-643f-4bfb-a860-fe55154de226
   name: Shrine of Lalal
   description: A shrine dedicated to Lalal, the artificer. She was known for her ingenuitive and creative mind.
+  background: ruins-portal
   legendName: Legend of the Artificer
 
   levels:

@@ -1,6 +1,7 @@
 - id: b5a20feb-f212-439d-a333-ceef70b84705
   name: Shrine of Parcilyte
   description: A shrine dedicated to a war hero whose origins are lost to time. It's said that orcs come here to pray for battle spoils.
+  background: arena-castle
   legendName: Legend of the Champion
 
   levels:

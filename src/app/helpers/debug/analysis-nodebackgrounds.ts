@@ -2,13 +2,19 @@ import { getEntriesByType } from '@helpers/content/content';
 import type {
   AnalysisCheck,
   AnalysisRunResult,
+  CaravanContent,
+  CollectibleGateContent,
   EncounterContent,
   EncounterRandomContent,
   ExchangeNodeContent,
   GatheringContent,
   HasNodeBackground,
   IsContentItem,
+  NodeOverrideContent,
+  OutpostContent,
+  ShrineContent,
   TownContent,
+  TrainerContent,
 } from '@interfaces';
 import { NODE_BACKGROUNDS } from '@interfaces';
 
@@ -35,6 +41,12 @@ export function runNodeBackgroundsAnalysis(): AnalysisRunResult {
     ...getEntriesByType<TownContent>('town'),
     ...getEntriesByType<GatheringContent>('gathering'),
     ...getEntriesByType<ExchangeNodeContent>('exchangenode'),
+    ...getEntriesByType<CaravanContent>('caravan'),
+    ...getEntriesByType<ShrineContent>('shrine'),
+    ...getEntriesByType<OutpostContent>('outpost'),
+    ...getEntriesByType<TrainerContent>('trainer'),
+    ...getEntriesByType<CollectibleGateContent>('collectiblegate'),
+    ...getEntriesByType<NodeOverrideContent>('nodeoverride'),
   ];
   const checks = entries.map(checkNodeBackground);
   const failures = checks.filter((c) => c.status !== 'pass').length;

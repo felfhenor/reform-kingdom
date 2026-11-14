@@ -1,6 +1,7 @@
 - id: 8b2c3d46-6ba7-49d8-a5d6-e577e74b0bcb
   name: Felway Outpost
   description: An outpost destroyed by the Fel. They have no need of such things.
+  background: ruins-brick
 
   levels:
     - developTime: 300

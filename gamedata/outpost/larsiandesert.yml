@@ -1,6 +1,7 @@
 - id: 7b4ced28-3d71-4a59-aadc-1721596ec0a7
   name: Larsian Outpost
   description: An outpost overtaken by the desert sands near the deadwoods of the Larsian Desert. It can provide great boon to any adventurer tenacious enough to repair it.
+  background: desert-ruins
 
   levels:
     - developTime: 300

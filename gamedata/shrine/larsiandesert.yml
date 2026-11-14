@@ -1,6 +1,7 @@
 - id: 71835f9c-3ecc-4da8-a519-d15c24cfccec
   name: Shrine of Medina
   description: A shrine dedicated to a legendary farmer who was said to turn sand into soil.
+  background: desert-palms
   legendName: Legend of the Grovetender
 
   levels:

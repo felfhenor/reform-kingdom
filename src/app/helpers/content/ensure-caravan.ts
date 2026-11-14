@@ -2,6 +2,7 @@ import { VALID_CARAVAN_TRADE_TYPES } from '@helpers/content/ensure-helpers-const
 import {
   ensureArray,
   ensureEnumValue,
+  ensureNodeBackground,
 } from '@helpers/content/ensure-helpers-core';
 import { ensureCommissionOfferSlot } from '@helpers/content/ensure-helpers-quests';
 import type {
@@ -48,6 +49,7 @@ export function ensureCaravan(
     startingCommissionOfferId:
       caravan.startingCommissionOfferId ?? ('UNKNOWN' as CommissionOfferId),
     hidden: caravan.hidden ?? false,
+    ...ensureNodeBackground(caravan),
     invisibleUntilCollectibleIdsFound:
       caravan.invisibleUntilCollectibleIdsFound ?? [],
   };

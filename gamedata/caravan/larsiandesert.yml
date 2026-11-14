@@ -1,6 +1,7 @@
 - id: 46b3d73b-d870-4bc1-86b2-ac0fcae149bf
   name: Larsian Lizards - Larsia
   description: An intrepid group of Akroki that go around peddling wares and buying things they find useful.
+  background: desert-camp
 
   traderResetTime: 3600
 

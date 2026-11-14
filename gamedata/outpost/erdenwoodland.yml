@@ -1,6 +1,7 @@
 - id: c36c8348-3807-4070-b0f8-58b31704ea7e
   name: Erden Outpost
   description: An abandoned outpost near the demoniacs of the Erden Woodland. It can provide great boon to any adventurer tenacious enough to repair it.
+  background: forest-hut
 
   levels:
     - developTime: 300

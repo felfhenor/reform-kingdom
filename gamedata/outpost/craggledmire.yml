@@ -1,6 +1,7 @@
 - id: bc79532c-0965-4178-a9e2-039bf4f9f544
   name: Mired Outpost
   description: A run-down outpost in the heart of the Craggled Mire. It can provide great boon to any adventurer tenacious enough to repair it.
+  background: swamp-camp
 
   levels:
     - developTime: 300

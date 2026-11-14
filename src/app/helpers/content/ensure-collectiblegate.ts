@@ -1,3 +1,4 @@
+import { ensureNodeBackground } from '@helpers/content/ensure-helpers-core';
 import type { CollectibleGateContent, CollectibleGateId } from '@interfaces';
 
 export function ensureCollectibleGate(
@@ -9,6 +10,7 @@ export function ensureCollectibleGate(
     __type: 'collectiblegate',
     description: gate.description ?? 'UNKNOWN',
     hidden: gate.hidden ?? false,
+    ...ensureNodeBackground(gate),
     invisibleUntilCollectibleIdsFound:
       gate.invisibleUntilCollectibleIdsFound ?? [],
     requiredCollectibleIds: gate.requiredCollectibleIds ?? [],

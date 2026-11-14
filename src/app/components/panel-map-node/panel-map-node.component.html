@@ -14,9 +14,7 @@
       @let nodeBackground = background();
       @if (nodeBackground) {
         <div
-          class="absolute inset-x-0 top-0 h-28 overflow-hidden pointer-events-none"
-          (animate.enter)="onBannerEnter($event)"
-          (animate.leave)="onBannerLeave($event)"
+          class="node-banner absolute inset-x-0 top-0 h-28 overflow-hidden pointer-events-none"
         >
           <app-backdrop-node
             class="absolute inset-0"
@@ -24,7 +22,6 @@
             [filter]="nodeBackground.backgroundFilter ?? 'None'"
             align="top"
           />
-          <div class="node-banner-fade absolute inset-0"></div>
         </div>
       }
 

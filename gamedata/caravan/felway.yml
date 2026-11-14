@@ -1,6 +1,7 @@
 - id: 27f1d90d-7c5c-49c0-b813-7d079ac5234c
   name: Fel Smugglers - Felway
   description: A band of Fel who move goods between the Fel and the Duchy. They'll trade with anyone who has the coin they need.
+  background: castle-gate
 
   traderResetTime: 3600
 

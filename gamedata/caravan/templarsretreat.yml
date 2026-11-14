@@ -1,6 +1,7 @@
 - id: f1601d8e-a7f1-40fb-a610-89f5d057fedc
   name: Duchy Trading Caravan - Templar's Retreat
   description: The Templar's Retreat branch of the Duchy Trading Caravan. They operate in secret and deal in black market goods.
+  background: ship-hold
 
   traderResetTime: 3600
 

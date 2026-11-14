@@ -1,6 +1,8 @@
 - id: 22d0b01f-cc5d-411e-a06d-6592b000a40f
   name: Memory Gateway
   description: A gateway the land has all but forgotten. The lands will remember it when their keepsakes are united in this place. In that moment, the progress of your journey will be saved.
+  background: ruins-portal
+  backgroundFilter: Faded
 
   requiredCollectibleIds:
     - Goblin Ruby

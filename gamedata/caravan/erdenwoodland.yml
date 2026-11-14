@@ -1,6 +1,7 @@
 - id: f20e84a3-a33e-443d-abe4-f34a2a020ac1
   name: Elfheim Merchants - Erden Woodland
   description: The Erden Woodland branch of the Elfheim Merchants Caravan. They rarely extend trade with others, so their high quality goods are often kept to themselves.
+  background: forest-runestones
 
   traderResetTime: 3600
 

@@ -1,6 +1,8 @@
 - id: cc634ab4-44c1-4121-a460-cd7a7d119982
   name: Forgetter's Barrier
   description: A magical wall protecting Fel from those who might remember. Here, everything he tries desperately to forget is preserved. Those who can remember what he forgot are the only ones who can get through.
+  background: castle-gate
+  backgroundFilter: Astral
 
   requiredCollectibleIds:
     - Memory of the Ritualists

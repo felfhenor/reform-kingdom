@@ -273,7 +273,7 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     id: 'nodebackgrounds',
     title: 'Node Backgrounds',
     description:
-      'Every encounter, random encounter, raidable town, gather node, and exchange node names a background that exists.',
+      'Every map node with content (and every node override) names a background that exists.',
     category: 'World & Maps',
     strict: true,
     inputKeys: [],

@@ -1,3 +1,4 @@
+import { ensureNodeBackground } from '@helpers/content/ensure-helpers-core';
 import type { NodeOverrideContent, NodeOverrideId } from '@interfaces';
 
 export function ensureNodeOverride(
@@ -9,6 +10,7 @@ export function ensureNodeOverride(
     __type: 'nodeoverride',
     description: override.description ?? 'UNKNOWN',
     hidden: override.hidden ?? false,
+    ...ensureNodeBackground(override),
     invisibleUntilCollectibleIdsFound:
       override.invisibleUntilCollectibleIdsFound ?? [],
   };

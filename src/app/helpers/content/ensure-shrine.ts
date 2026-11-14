@@ -1,6 +1,7 @@
 import {
   ensureArray,
   ensureWorldNodeDevelopmentLevel,
+  ensureNodeBackground,
 } from '@helpers/content/ensure-helpers-core';
 import type {
   GlobalEffectId,
@@ -29,6 +30,7 @@ export function ensureShrine(
     __type: 'shrine',
     description: shrine.description ?? 'UNKNOWN',
     hidden: shrine.hidden ?? false,
+    ...ensureNodeBackground(shrine),
     invisibleUntilCollectibleIdsFound:
       shrine.invisibleUntilCollectibleIdsFound ?? [],
     legendName: shrine.legendName ?? 'Legend of the Shrine',
