@@ -1,3 +1,4 @@
+import { environment } from '@environments/environment';
 import { getEntriesByType } from '@helpers/content/content';
 import {
   findTeleportArrivalByTag,
@@ -5,6 +6,10 @@ import {
 } from '@helpers/pathfinding/pathfinding';
 import { runStatsState } from '@helpers/state-game';
 import type { RegionContent, WorldNodeEntry } from '@interfaces';
+
+export function isDemoBuild(): boolean {
+  return environment.demo;
+}
 
 // Only the demo build strips the maps that its exits lead to.
 export function teleportIsDemoLocked(entry: WorldNodeEntry): boolean {

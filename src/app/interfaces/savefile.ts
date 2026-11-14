@@ -52,6 +52,12 @@ export type ElectronSavefileStoreBridge = {
   savefileExportWithLogs: () => Promise<boolean>;
   legacyWrite: (json: string) => Promise<boolean>;
   legacyRead: () => Promise<string | undefined>;
+  demoSaveRead: () => Promise<DemoSaveFiles>;
+};
+
+export type DemoSaveFiles = {
+  savefile?: string;
+  legacy?: string;
 };
 
 export type WindowWithElectronSavefileStoreBridge = Window & {

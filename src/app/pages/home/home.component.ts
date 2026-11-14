@@ -1,5 +1,6 @@
+import { ButtonSavefileImportDemoComponent } from '@components/button-savefile-import-demo/button-savefile-import-demo.component';
 import { ButtonWishlistComponent } from '@components/button-wishlist/button-wishlist.component';
-import { isDemoBuild } from '@helpers/demo/demo.ui';
+import { isDemoBuild } from '@helpers/demo/demo';
 import type { OnInit } from '@angular/core';
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
@@ -21,6 +22,7 @@ import { gameReset } from '@helpers/game-init';
 import { legacy } from '@helpers/legacy/legacy';
 import { legacyHasUnfinishedBackup } from '@helpers/legacy/legacy.ui';
 import { savefileBackupsRead } from '@helpers/savefile/savefile-backup-storage';
+import { savefileDemoImportable } from '@helpers/savefile/savefile-load.ui';
 import {
   savefileFailureMessage,
   savefileLoadStatus,
@@ -37,6 +39,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   imports: [
     SweetAlert2Module,
     ButtonWishlistComponent,
+    ButtonSavefileImportDemoComponent,
     ButtonConnectComponent,
     AnalyticsClickDirective,
     SFXDirective,
@@ -87,6 +90,19 @@ export class HomeComponent implements OnInit {
       !this.savefileFailureText(),
   );
 
+  private demoSaveFound = signal(false);
+  public showDemoImport = computed(
+    () =>
+      this.demoSaveFound() &&
+      !this.hasStartedGame() &&
+      !this.savefileFailureText() &&
+      !getOption('demoImportDismissed'),
+  );
+
+  dismissDemoImport(): void {
+    setOption('demoImportDismissed', true);
+  }
+
   openSavefileSettings(): void {
     setOption('optionsTab', 'Savefile');
     modalOpen('settings');
@@ -99,6 +115,9 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     void savefileBackupsRead().then(({ backups }) => this.backups.set(backups));
+    void savefileDemoImportable().then((found) =>
+      this.demoSaveFound.set(found),
+    );
 
     discordSetMainStatus('');
     discordSetStatus({

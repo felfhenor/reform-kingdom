@@ -10,6 +10,7 @@ contextBridge.exposeInMainWorld('reformElectron', {
   savefileExportWithLogs: () => ipcRenderer.invoke('savefile:export-with-logs'),
   legacyWrite: (json) => ipcRenderer.invoke('legacy:write', json),
   legacyRead: () => ipcRenderer.invoke('legacy:read'),
+  demoSaveRead: () => ipcRenderer.invoke('demo-save:read'),
   savefileBackupWrite: (id, json) =>
     ipcRenderer.invoke('savefile-backup:write', id, json),
   savefileBackupReadAll: () => ipcRenderer.invoke('savefile-backup:read-all'),

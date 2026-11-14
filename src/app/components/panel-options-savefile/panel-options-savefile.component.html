@@ -93,6 +93,9 @@
               <app-button-savefile-export></app-button-savefile-export>
             }
             <app-button-savefile-import></app-button-savefile-import>
+            @if (demoSaveFound() && !isSetup()) {
+              <app-button-savefile-import-demo />
+            }
           </div>
         </div>
       </div>

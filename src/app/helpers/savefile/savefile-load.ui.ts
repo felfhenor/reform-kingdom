@@ -1,3 +1,4 @@
+import { isDemoBuild } from '@helpers/demo/demo';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { idbGet } from '@helpers/engine/idb';
 import { error, info } from '@helpers/engine/logging';
@@ -22,12 +23,22 @@ import {
 import { savefileBundleUnpack } from '@helpers/savefile/savefile-bundle';
 import {
   savefileDiskBridge,
+  savefileDiskDemoRead,
   savefileDiskLegacyRead,
   savefileDiskLegacyWrite,
 } from '@helpers/savefile/savefile-disk';
-import { savefileValidationErrors } from '@helpers/savefile/savefile-validate';
+import {
+  savefileIsWorthKeeping,
+  savefileValidationErrors,
+} from '@helpers/savefile/savefile-validate';
 import { GAMESTATE_STORAGE_KEY } from '@helpers/state-game';
-import type { GameState, LegacyMergeResult, SavefileBackup } from '@interfaces';
+import { setOption } from '@helpers/state-options';
+import type {
+  GameState,
+  LegacyMergeResult,
+  SavefileBackup,
+  SavefileBundleSections,
+} from '@interfaces';
 
 const LEGACY_MERGE_WARNINGS: Partial<Record<LegacyMergeResult, string>> = {
   invalid: "its Legacy couldn't be read.",
@@ -160,15 +171,30 @@ function parseSavefileJson(json: string): unknown {
   }
 }
 
-export async function savefileImportJson(json: string): Promise<boolean> {
-  const { savefile: state, legacy } = savefileBundleUnpack(
-    parseSavefileJson(json),
-  );
+// A full-game save would lose everything the demo strips the moment it migrates.
+function savefileImportProblem(state: unknown): string | undefined {
   const problems = savefileValidationErrors(state);
   if (problems.length > 0) {
-    notifyError(`That file is not a usable savefile: ${problems[0]}`);
+    return `That file is not a usable savefile: ${problems[0]}`;
+  }
+  if (isDemoBuild() && (state as GameState).meta.isDemo !== true) {
+    return 'The demo can only import savefiles made in the demo.';
+  }
+  return undefined;
+}
+
+async function savefileImportSections({
+  savefile: state,
+  legacy,
+}: SavefileBundleSections): Promise<boolean> {
+  const problem = savefileImportProblem(state);
+  if (problem) {
+    notifyError(problem);
     return false;
   }
+
+  // Once in the full game it's a full-game save, so it can't be taken back into the demo.
+  if (!isDemoBuild()) delete (state as GameState).meta.isDemo;
 
   const failures = await savefileReplace(state as GameState, 'import');
   if (failures.length > 0) {
@@ -179,6 +205,31 @@ export async function savefileImportJson(json: string): Promise<boolean> {
   notifySuccess('Successfully imported savefile!');
   savefileMergeLegacy(legacy, 'imported');
   return true;
+}
+
+export function savefileImportJson(json: string): Promise<boolean> {
+  return savefileImportSections(savefileBundleUnpack(parseSavefileJson(json)));
+}
+
+export async function savefileDemoImportable(): Promise<boolean> {
+  if (isDemoBuild()) return false;
+  return savefileIsWorthKeeping((await savefileDiskDemoRead())?.savefile);
+}
+
+export async function savefileImportDemo(): Promise<boolean> {
+  const sections = await savefileDiskDemoRead();
+  if (!sections) {
+    notifyError('Could not find a savefile from the demo.');
+    return false;
+  }
+
+  const imported = await savefileImportSections(sections);
+  // A carried-over run that later ends shouldn't bring the offer back.
+  if (imported) setOption('demoImportDismissed', true);
+  analyticsSendDesignEvent(
+    `Savefile:ImportDemo:${imported ? 'Success' : 'Failure'}`,
+  );
+  return imported;
 }
 
 export function savefileExportDownload(data: unknown, fileName: string): void {

@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { isDemoBuild } from '@helpers/demo/demo.ui';
+import { isDemoBuild } from '@helpers/demo/demo';
 import { ButtonGlowComponent } from '@components/button-glow/button-glow.component';
 import { ButtonQuitComponent } from '@components/button-quit/button-quit.component';
 import { ButtonRunEndComponent } from '@components/button-run-end/button-run-end.component';

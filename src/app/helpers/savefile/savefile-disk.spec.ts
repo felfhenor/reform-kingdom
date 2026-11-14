@@ -1,6 +1,7 @@
 import { defaultGameState } from '@helpers/defaults';
 import { defaultLegacy } from '@helpers/legacy/legacy';
 import {
+  savefileDiskDemoRead,
   savefileDiskLegacyRead,
   savefileDiskLegacyWrite,
   savefileDiskRead,
@@ -139,5 +140,31 @@ describe('savefile disk bridge', () => {
 
     bridgeWindow.reformElectron = { legacyRead: async () => '{oops' };
     expect(await savefileDiskLegacyRead()).toEqual({ status: 'unreadable' });
+  });
+  it('reads the demo save with its Legacy', async () => {
+    const state = savefile('demo', 2);
+    bridgeWindow.reformElectron = {
+      demoSaveRead: async () => ({
+        savefile: JSON.stringify(state),
+        legacy: JSON.stringify(defaultLegacy()),
+      }),
+    };
+
+    expect(await savefileDiskDemoRead()).toEqual({
+      savefile: state,
+      legacy: defaultLegacy(),
+    });
+  });
+
+  it('finds no demo save when it is missing, garbled or the shell is old', async () => {
+    expect(await savefileDiskDemoRead()).toBeUndefined();
+
+    bridgeWindow.reformElectron = { demoSaveRead: async () => ({}) };
+    expect(await savefileDiskDemoRead()).toBeUndefined();
+
+    bridgeWindow.reformElectron = {
+      demoSaveRead: async () => ({ savefile: '{oops' }),
+    };
+    expect(await savefileDiskDemoRead()).toBeUndefined();
   });
 });

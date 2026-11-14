@@ -40,7 +40,7 @@ import {
   debugShowDemoEnd,
 } from '@helpers/debug/debug-story.ui';
 import { debugResetTasks } from '@helpers/debug/debug-tasks.ui';
-import { isDemoBuild } from '@helpers/demo/demo.ui';
+import { isDemoBuild } from '@helpers/demo/demo';
 import { worldPartyState } from '@helpers/state-game';
 import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
 import { worldNodesOfType } from '@helpers/world-node/world-nodes';

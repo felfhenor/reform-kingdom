@@ -10,6 +10,7 @@ export type GameOption =
   | 'showBackdropGrid'
   | 'analyticsEnabled'
   | 'analyticsOptInDismissed'
+  | 'demoImportDismissed'
   | 'partyViewAlwaysExpand'
   | 'craftingViewAlwaysExpand'
   | 'adventureLogOverlay'

@@ -4,6 +4,7 @@ import type {
   ElectronSavefileStoreBridge,
   GameState,
   LegacyState,
+  SavefileBundleSections,
   SavefileDiskRead,
   SavefileStorage,
   WindowWithElectronSavefileStoreBridge,
@@ -77,6 +78,30 @@ export function savefileDiskLegacyWrite(
   legacy: LegacyState,
 ): Promise<boolean | undefined> {
   return diskWriteJson(savefileDiskBridge()?.legacyWrite, legacy, 'Legacy');
+}
+
+// Undefined outside the desktop build or when the demo has never saved.
+export async function savefileDiskDemoRead(): Promise<
+  SavefileBundleSections | undefined
+> {
+  const read = savefileDiskBridge()?.demoSaveRead;
+  if (!read) return undefined;
+
+  try {
+    const files = await read();
+    const savefile = await diskReadJson(
+      async () => files.savefile,
+      'demo savefile',
+    );
+    if (savefile === undefined) return undefined;
+    return {
+      savefile,
+      legacy: await diskReadJson(async () => files.legacy, 'demo Legacy'),
+    };
+  } catch (e) {
+    error('Savefile:Disk', 'Could not read the demo save from disk.', e);
+    return undefined;
+  }
 }
 
 // Save stamps, not tick counts: a new game or an older restored backup can legitimately have fewer ticks.

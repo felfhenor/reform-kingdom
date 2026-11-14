@@ -14,6 +14,7 @@ import { Router } from '@angular/router';
 import { ButtonRunEndComponent } from '@components/button-run-end/button-run-end.component';
 import { ButtonSavefileExportComponent } from '@components/button-savefile-export/button-savefile-export.component';
 import { ButtonSavefileImportComponent } from '@components/button-savefile-import/button-savefile-import.component';
+import { ButtonSavefileImportDemoComponent } from '@components/button-savefile-import-demo/button-savefile-import-demo.component';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
@@ -36,6 +37,7 @@ import {
 } from '@helpers/savefile/savefile-load';
 import {
   savefileBackupsResetUnreadable,
+  savefileDemoImportable,
   savefileExportDownload,
   savefileRecover,
   savefileRestoreBackup,
@@ -59,6 +61,7 @@ type AutosaveIntervalChoice = { label: string; value: number };
     ButtonRunEndComponent,
     ButtonSavefileExportComponent,
     ButtonSavefileImportComponent,
+    ButtonSavefileImportDemoComponent,
     AnalyticsClickDirective,
     SFXDirective,
     FormsModule,
@@ -91,6 +94,7 @@ export class PanelOptionsSavefileComponent
 
   public autosaveInterval = signal<number>(this.getOption('autosaveInterval'));
   public readonly writesToDisk = isInElectron();
+  public demoSaveFound = signal(false);
 
   public backups = signal<SavefileBackup[]>([]);
   public hasLoadedBackups = signal(false);
@@ -122,6 +126,9 @@ export class PanelOptionsSavefileComponent
 
   ngOnInit() {
     void this.refreshBackups();
+    void savefileDemoImportable().then((found) =>
+      this.demoSaveFound.set(found),
+    );
   }
 
   public durationText(ticks: number): string {

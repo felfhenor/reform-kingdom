@@ -16,9 +16,8 @@ const savefileDir = () =>
     app.isPackaged ? 'savefiles' : 'savefiles-dev',
   );
 
-const savefilePath = () => path.join(savefileDir(), 'savefile.json');
-const savefileTempPath = () => `${savefilePath()}.tmp`;
-const legacyPath = () => path.join(savefileDir(), 'legacy.json');
+const savefilePath = (dir = savefileDir()) => path.join(dir, 'savefile.json');
+const legacyPath = (dir = savefileDir()) => path.join(dir, 'legacy.json');
 
 const syncFile = async (file, contents) => {
   const handle = await fs.open(file, contents ? 'w' : 'r+');
@@ -70,12 +69,12 @@ const readParseable = async (file) => {
   }
 };
 
-const readSavefile = async () => {
+const readSavefile = async (dir) => {
   await writeQueue;
 
   // The tmp is newer when its copy over savefile.json failed or was cut short.
-  const main = await readParseable(savefilePath());
-  const temp = await readParseable(savefileTempPath());
+  const main = await readParseable(savefilePath(dir));
+  const temp = await readParseable(`${savefilePath(dir)}.tmp`);
   if (temp && (!main || temp.savedAt > main.savedAt)) {
     coreLog().warn(
       'Savefile',
@@ -99,12 +98,12 @@ const readJsonOrMissing = async (file) => {
 };
 
 // Legacy carries no save stamp; the tmp is only the fallback when legacy.json is missing or unreadable.
-const readLegacy = async () => {
+const readLegacy = async (dir) => {
   await writeQueue;
 
   let mainError;
   try {
-    const main = await readJsonOrMissing(legacyPath());
+    const main = await readJsonOrMissing(legacyPath(dir));
     if (main) return main;
   } catch (e) {
     mainError = e;
@@ -115,13 +114,30 @@ const readLegacy = async () => {
     );
   }
 
-  const temp = await readJsonOrMissing(`${legacyPath()}.tmp`).catch(
+  const temp = await readJsonOrMissing(`${legacyPath(dir)}.tmp`).catch(
     () => undefined,
   );
   if (temp) return temp;
   if (mainError) throw mainError;
   return undefined;
 };
+
+// Read-only, so the full game can offer to carry a demo run over without touching the demo's files.
+const demoSavefileDir = () =>
+  path.join(
+    app.getPath('appData'),
+    'reformkingdom-demo',
+    app.isPackaged ? 'savefiles' : 'savefiles-dev',
+  );
+
+// Same tmp fallbacks as our own save, since the demo may have quit mid-write.
+const readDemoSave = async () => ({
+  savefile: await readSavefile(demoSavefileDir()),
+  legacy: await readLegacy(demoSavefileDir()).catch((e) => {
+    coreLog().warn('Savefile', 'demo legacy.json unreadable', e);
+    return undefined;
+  }),
+});
 
 // openPath resolves to an error string rather than rejecting.
 const openSavefileFolder = async () => {
@@ -223,11 +239,12 @@ const registerSavefileStoreHandlers = () => {
   finishWritesBeforeQuit();
   coreLog().info('Savefile', `savefile at ${savefilePath()}`);
   ipcMain.handle('savefile:write', writeSavefile);
-  ipcMain.handle('savefile:read', readSavefile);
+  ipcMain.handle('savefile:read', () => readSavefile());
   ipcMain.handle('savefile:open-folder', openSavefileFolder);
   ipcMain.handle('savefile:export-with-logs', exportWithLogs);
   ipcMain.handle('legacy:write', writeLegacy);
-  ipcMain.handle('legacy:read', readLegacy);
+  ipcMain.handle('legacy:read', () => readLegacy());
+  ipcMain.handle('demo-save:read', readDemoSave);
 };
 
 module.exports = { registerSavefileStoreHandlers };
