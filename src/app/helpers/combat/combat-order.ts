@@ -27,6 +27,15 @@ export function combatOrderClauses(
   return character?.combatOrders[jobId] ?? [];
 }
 
+export function combatOrdersMostEnabled(characters: Character[]): number {
+  const counts = characters.flatMap((character) =>
+    Object.values(character.combatOrders).map(
+      (clauses) => (clauses ?? []).filter((clause) => clause.enabled).length,
+    ),
+  );
+  return Math.max(0, ...counts);
+}
+
 export function combatOrdersFromJobDefaults(jobId: JobId): CombatOrderClause[] {
   const job = getEntry<JobContent>(jobId);
   return (job?.defaultCombatOrders ?? []).map((order) => ({

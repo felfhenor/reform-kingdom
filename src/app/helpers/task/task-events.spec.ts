@@ -4,6 +4,7 @@ import { ensureTask } from '@helpers/content/ensure-task';
 import { ensureTrainer } from '@helpers/content/ensure-trainer';
 import { tasksState } from '@helpers/state-game';
 import {
+  taskEventCombatOrdersSet,
   taskEventLevelReached,
   taskEventMonsterKilled,
   taskEventShrineLevel,
@@ -41,6 +42,7 @@ const requirements: Record<string, TaskRequirement> = {
   shrine: { kind: 'ShrineLevel', nodeName: 'Shrine of Izchak', level: 1 },
   reputation: { kind: 'TownReputationTier', townId: LARSIA, tier: 2 },
   teaching: { kind: 'LearnTeaching', trainerId: REYN },
+  orders: { kind: 'SetCombatOrders', quantity: 3 },
 };
 
 function isComplete(key: string): boolean {
@@ -110,5 +112,13 @@ describe('task events', () => {
 
     void inTick(() => taskEventTeachingLearned(REYN_TEACHING));
     expect(isComplete('teaching')).toBe(true);
+  });
+
+  it('latches SetCombatOrders once the enabled count meets it', () => {
+    void inTick(() => taskEventCombatOrdersSet(2));
+    expect(isComplete('orders')).toBe(false);
+
+    void inTick(() => taskEventCombatOrdersSet(3));
+    expect(isComplete('orders')).toBe(true);
   });
 });

@@ -111,6 +111,14 @@ export function taskEventTownVisited(townId: TownId): Promise<void> {
   );
 }
 
+export function taskEventCombatOrdersSet(enabledCount: number): Promise<void> {
+  return tasksRecord(
+    (requirement) =>
+      requirement.kind === 'SetCombatOrders' &&
+      enabledCount >= requirement.quantity,
+  );
+}
+
 export function taskEventEquipmentInfused(): Promise<void> {
   return tasksRecord((requirement) => requirement.kind === 'InfuseEquipment');
 }

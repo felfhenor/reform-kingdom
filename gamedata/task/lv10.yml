@@ -77,6 +77,18 @@
     - itemId: Memory Flux
       quantity: 3
 
+- id: 3f1b7c2e-9a4d-4e8b-b6c1-2d7e5f8a9c03
+  name: Issue 3 Combat Orders
+  description: Open a hero's Combat Orders and give them 3 enabled orders. This will allow them to fight more intelligently.
+  order: 282
+  requireMapVisit: Carrina
+  requirement:
+    kind: SetCombatOrders
+    quantity: 3
+  rewards:
+    - itemId: Gold Coin
+      quantity: 3000
+
 - id: 98caeb6a-55f1-4565-8aa2-7e874943324b
   name: Gather 25 Miremetal Ore
   description: Travel to the Miremetal Mines and gather until you have collected 25 Miremetal Ore.

@@ -99,6 +99,12 @@ export type TaskRequirementInfuseEquipment = {
   kind: 'InfuseEquipment';
 };
 
+// Met when any hero has this many enabled Combat Orders for a single job.
+export type TaskRequirementSetCombatOrders = {
+  kind: 'SetCombatOrders';
+  quantity: number;
+};
+
 export type TaskRequirementFulfillCommission = {
   kind: 'FulfillCommission';
   quantity: number;
@@ -123,7 +129,8 @@ export type TaskRequirementStateBased =
   | TaskRequirementShrineLevel
   | TaskRequirementTownReputationTier
   | TaskRequirementVisitTown
-  | TaskRequirementInfuseEquipment;
+  | TaskRequirementInfuseEquipment
+  | TaskRequirementSetCombatOrders;
 
 export type TaskRequirement =
   TaskRequirementCounter | TaskRequirementStateBased;

@@ -10,6 +10,20 @@
     - itemId: Gold Coin
       quantity: 10000
 
+- id: 8d2e4a61-5c3b-4f7a-9e0d-1b6c7a3f2e54
+  name: Issue 4 Combat Orders
+  description: Give a single hero 4 enabled Combat Orders.
+  order: 522
+  requireMapVisit: LarsianDesert
+  requirement:
+    kind: SetCombatOrders
+    quantity: 4
+  rewards:
+    - itemId: Gold Coin
+      quantity: 12000
+    - itemId: Memory Flux
+      quantity: 2
+
 - id: 4d4351eb-41af-40c8-84c6-0d5db1f5ae5a
   name: Clear the Ghostmirage Wreck
   description: Defeat every ghost, crab, and Akroki in the Ghostmirage Wreck in the Larsian Desert.

@@ -1,7 +1,11 @@
-import { combatOrderClauses } from '@helpers/combat/combat-order';
+import {
+  combatOrderClauses,
+  combatOrdersMostEnabled,
+} from '@helpers/combat/combat-order';
 import { COMBAT_ORDER_ROW_CAP } from '@helpers/config';
 import { rngUuid } from '@helpers/rng';
 import { updateGamestate, worldPartyState } from '@helpers/state-game';
+import { taskEventCombatOrdersSet } from '@helpers/task/task-events';
 import type {
   CharacterId,
   CombatOrderAction,
@@ -97,12 +101,12 @@ export function combatOrderClauseSummary(clause: CombatOrderClause): string {
 
 // Shared by every clause mutator below. `transform` returning `undefined` means "no change" -
 // the character is left untouched (same reference) rather than rebuilt with an identical list.
-function updateCombatOrderClauses(
+async function updateCombatOrderClauses(
   characterId: CharacterId,
   jobId: JobId,
   transform: (clauses: CombatOrderClause[]) => CombatOrderClause[] | undefined,
-): void {
-  updateGamestate((state) => {
+): Promise<void> {
+  await updateGamestate((state) => {
     const character = state.world.party.find((c) => c.id === characterId);
     if (!character) return state;
 
@@ -111,6 +115,8 @@ function updateCombatOrderClauses(
 
     return state;
   });
+
+  await taskEventCombatOrdersSet(combatOrdersMostEnabled(worldPartyState()));
 }
 
 export function combatOrderClauseAdd(
@@ -130,7 +136,7 @@ export function combatOrderClauseAdd(
     action,
   };
 
-  updateCombatOrderClauses(characterId, jobId, (clauses) => [
+  void updateCombatOrderClauses(characterId, jobId, (clauses) => [
     clause,
     ...clauses,
   ]);
@@ -147,7 +153,7 @@ export function combatOrderClauseUpdate(
   condition: CombatOrderCondition,
   action: CombatOrderAction,
 ): void {
-  updateCombatOrderClauses(characterId, jobId, (clauses) =>
+  void updateCombatOrderClauses(characterId, jobId, (clauses) =>
     clauses.map((clause) =>
       clause.id === clauseId ? { ...clause, condition, action } : clause,
     ),
@@ -159,7 +165,7 @@ export function combatOrderClauseRemove(
   jobId: JobId,
   clauseId: CombatOrderClauseId,
 ): void {
-  updateCombatOrderClauses(characterId, jobId, (clauses) =>
+  void updateCombatOrderClauses(characterId, jobId, (clauses) =>
     clauses.filter((clause) => clause.id !== clauseId),
   );
 }
@@ -170,7 +176,7 @@ export function combatOrderClauseSetEnabled(
   clauseId: CombatOrderClauseId,
   enabled: boolean,
 ): void {
-  updateCombatOrderClauses(characterId, jobId, (clauses) =>
+  void updateCombatOrderClauses(characterId, jobId, (clauses) =>
     clauses.map((clause) =>
       clause.id === clauseId ? { ...clause, enabled } : clause,
     ),
@@ -185,7 +191,7 @@ export function combatOrderClauseReorder(
   previousIndex: number,
   newIndex: number,
 ): void {
-  updateCombatOrderClauses(characterId, jobId, (clauses) => {
+  void updateCombatOrderClauses(characterId, jobId, (clauses) => {
     const reordered = [...clauses];
     const [moved] = reordered.splice(previousIndex, 1);
     if (!moved) return undefined;

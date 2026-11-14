@@ -6,6 +6,8 @@ import { taskStateRequirementSatisfied } from '@helpers/task/task-requirement-st
 import type {
   Character,
   CollectibleId,
+  CombatOrderClause,
+  CombatOrderClauseId,
   EquipmentId,
   EquipmentItem,
   GameState,
@@ -245,5 +247,28 @@ describe('taskStateRequirementSatisfied', () => {
       }),
     ];
     expect(taskStateRequirementSatisfied(equipped, requirement)).toBe(true);
+  });
+
+  it('needs enough enabled Combat Orders on one hero', () => {
+    const requirement = { kind: 'SetCombatOrders' as const, quantity: 2 };
+    const clause: CombatOrderClause = {
+      id: 'clause' as CombatOrderClauseId,
+      enabled: true,
+      condition: { type: 'Always' },
+      action: { type: 'RandomSkill' },
+    };
+
+    const state = defaultGameState();
+    state.world.party = [
+      hero(1, [], {
+        combatOrders: { [WARRIOR]: [clause, { ...clause, enabled: false }] },
+      }),
+    ];
+    expect(taskStateRequirementSatisfied(state, requirement)).toBe(false);
+
+    state.world.party = [
+      hero(1, [], { combatOrders: { [WARRIOR]: [clause, clause] } }),
+    ];
+    expect(taskStateRequirementSatisfied(state, requirement)).toBe(true);
   });
 });

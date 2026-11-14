@@ -1,3 +1,4 @@
+import { combatOrdersMostEnabled } from '@helpers/combat/combat-order';
 import { TASK_WIDGET_ENTRY_COUNT } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { bestiaryAnalyzedCount } from '@helpers/kingdom/bestiary';
@@ -8,6 +9,7 @@ import {
   bestiaryState,
   tasksState,
   worldCurrentLocationState,
+  worldPartyState,
 } from '@helpers/state-game';
 import {
   isTaskOnRemovedNode,
@@ -45,6 +47,10 @@ function taskProgress(
   if (requirement.kind === 'AnalyzeMonsters') {
     const analyzed = bestiaryAnalyzedCount(bestiaryState());
     return cappedProgress(analyzed, requirement.quantity);
+  }
+  if (requirement.kind === 'SetCombatOrders') {
+    const enabled = combatOrdersMostEnabled(worldPartyState());
+    return cappedProgress(enabled, requirement.quantity);
   }
   return undefined;
 }

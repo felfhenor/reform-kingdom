@@ -7,6 +7,7 @@ import {
   combatOrderClauseUsesUnknownFamily,
   combatOrderClauses,
   combatOrdersFromJobDefaults,
+  combatOrdersMostEnabled,
   combatOrdersWithJobDefaults,
 } from '@helpers/combat/combat-order';
 import { ensureJob } from '@helpers/content/ensure-job';
@@ -35,6 +36,21 @@ describe('combatOrderClauses', () => {
     expect(combatOrderClauses(hero.id, warrior)).toEqual([clause]);
     expect(combatOrderClauses(hero.id, ranger)).toEqual([]);
     expect(combatOrderClauses('missing' as CharacterId, warrior)).toEqual([]);
+  });
+});
+
+describe('combatOrdersMostEnabled', () => {
+  it('takes the best single job across heroes, ignoring disabled clauses', () => {
+    const disabled = { ...clause, enabled: false };
+    const heroA = buildCharacter({
+      combatOrders: { [warrior]: [clause, disabled], [ranger]: [clause] },
+    });
+    const heroB = buildCharacter({
+      combatOrders: { [warrior]: [clause, clause, disabled] },
+    });
+
+    expect(combatOrdersMostEnabled([heroA, heroB])).toBe(2);
+    expect(combatOrdersMostEnabled([])).toBe(0);
   });
 });
 

@@ -83,6 +83,8 @@ export function ensureTaskRequirement(
       return { kind: 'VisitTown', townId: id<TownId>('townId') };
     case 'InfuseEquipment':
       return { kind: 'InfuseEquipment' };
+    case 'SetCombatOrders':
+      return { kind: 'SetCombatOrders', quantity };
     case 'FulfillCommission':
       return { kind: 'FulfillCommission', quantity };
     case 'ReachLevel':
