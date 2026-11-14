@@ -45,6 +45,7 @@ public/json
 public/spritesheets
 public/art
 public/maps
+.demo
 
 public/version.json
 public/updates.json
@@ -54,6 +55,7 @@ electron/browser
 electron/icons
 electron/node_modules
 electron/out
+electron/out-demo
 
 # Generated schemas
 /schemas

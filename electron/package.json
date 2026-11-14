@@ -12,13 +12,16 @@
     "start:prodref": "cross-env APP_URL=https://reformkingdom.felfhenor.com electron-forge start -- --dev",
     "build": "npm run build:copy && npm run build:replacebasehref && npm run build:replaceimgrefs && npm run build:createicons",
     "build:createicons": "node -e \"require('fs').mkdirSync('./icons',{recursive:true})\" && cpy ../public/favicon/web-app-manifest-512x512.png --rename icon.png ./icons --flat && png2icons ./icons/icon.png icon -allp -hm -i && cpy ./icon.icns ./icons && cpy ./icon.ico ./icons && rimraf icon.icns && rimraf icon.ico",
-    "build:copy": "cpy ../dist/reformkingdom/browser/ .",
+    "build:copy": "rimraf browser && cpy ../dist/reformkingdom/browser/ .",
+    "build:copy:demo": "rimraf browser && cpy ../dist/reformkingdom-demo/browser/ .",
+    "build:demo": "npm run build:copy:demo && npm run build:replacebasehref && npm run build:replaceimgrefs && npm run build:createicons",
     "build:replacebasehref": "replace-in-file \"\\\"/\\\"\" \"\\\"./\\\"\" browser/index.html",
     "build:replaceimgrefs": "replace-in-file \"/url\\(\\//gm\" \"url(./\" browser/*.css",
     "prepackage": "npm run build",
     "package": "electron-forge package",
     "premake": "npm run build",
     "make": "electron-forge make",
+    "make:demo": "npm run build:demo && cross-env REFORM_DEMO=1 electron-forge make",
     "publish": "electron-forge publish"
   },
   "dependencies": {

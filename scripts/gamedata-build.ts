@@ -4,9 +4,10 @@ import { isArray, isObject, isString, sortBy } from 'es-toolkit/compat';
 import fs from 'fs-extra';
 import * as yaml from 'js-yaml';
 import rec from 'recursive-readdir';
+import { CONTENT_OUT_DIR } from './content-out-dir';
 import { writeJsonIfChanged } from './write-json-if-changed';
 
-fs.ensureDirSync('./public/json');
+fs.ensureDirSync(CONTENT_OUT_DIR);
 
 const allData: Record<string, any[]> = {};
 const trackedIds: Record<string, boolean> = {};
@@ -153,10 +154,10 @@ const rewriteDataIds = () => {
 
   // write
   allIds.forEach((key) => {
-    writeJsonIfChanged(`./public/json/${key}.json`, allData[key]);
+    writeJsonIfChanged(`${CONTENT_OUT_DIR}/${key}.json`, allData[key]);
   });
 
-  writeJsonIfChanged('public/json/all.json', allData);
+  writeJsonIfChanged(`${CONTENT_OUT_DIR}/all.json`, allData);
 };
 
 const run = async () => {

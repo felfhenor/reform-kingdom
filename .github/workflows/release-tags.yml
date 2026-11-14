@@ -133,6 +133,51 @@ jobs:
         with:
           name: reformkingdom.exe
           path: ./electron/out/make/squirrel.windows/x64/reformkingdom.exe
+
+  publish-windows-demo:
+    needs: [build]
+    name: Create Windows Demo Binary
+
+    runs-on: ${{ matrix.os }}
+
+    permissions:
+      contents: write
+
+    strategy:
+      matrix:
+        os: [windows-latest]
+        node-version: [26.0.0]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - run: npm install
+
+      - run: cd electron && npm install
+
+      - run: npm run build:electron:demo
+
+      - name: Upload Binary
+        uses: svenstaro/upload-release-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ./electron/out-demo/make/squirrel.windows/x64/reformkingdom-demo.exe
+          asset_name: reformkingdom-demo.exe
+          tag: ${{ github.ref }}
+          overwrite: true
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: reformkingdom-demo.exe
+          path: ./electron/out-demo/make/squirrel.windows/x64/reformkingdom-demo.exe
   #
   #  publish-linux:
   #    needs: [build]

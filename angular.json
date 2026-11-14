@@ -87,6 +87,27 @@
                 }
               ]
             },
+            "demo": {
+              "outputPath": "dist/reformkingdom-demo",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.demo.ts"
+                }
+              ],
+              "assets": [
+                {
+                  "glob": "**/*",
+                  "input": "public",
+                  "ignore": ["asset/nodebg/**", "json/**"]
+                },
+                {
+                  "glob": "**/*",
+                  "input": ".demo/json",
+                  "output": "json"
+                }
+              ]
+            },
             "development": {
               "optimization": false,
               "extractLicenses": false,
