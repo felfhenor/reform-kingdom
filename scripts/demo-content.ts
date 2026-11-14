@@ -9,8 +9,10 @@ interface DemoManifest {
   maps: string[];
   stripFiles: string[];
   keep: string[];
+  unobtainable: string[];
   cascade: string[];
   prune: Record<string, string[]>;
+  orphans: string[];
   pinned: string[];
 }
 
@@ -45,6 +47,7 @@ const entryIsStripped = (
 ): boolean =>
   entry.demoStrip === true ||
   (!manifest.keep.includes(entry.name) &&
+    !manifest.unobtainable.includes(entry.name) &&
     (fileIsStripped(file, manifest) ||
       (folder === 'region' && !manifest.maps.includes(entry.mapName)) ||
       (folder === 'nodeoverride' && !nodeNames.has(entry.name))));
@@ -104,6 +107,10 @@ export const demoFilterContent = (
   const isStrippedName = (ref: ContentRef) =>
     stripped.get(ref.folder)?.has(ref.name) ?? false;
 
+  // Unobtainable content stays for whatever only names it, but nothing can be finished with it.
+  const isUnavailable = (ref: ContentRef) =>
+    isStrippedName(ref) || manifest.unobtainable.includes(ref.name);
+
   Object.entries(allData).forEach(([folder, entries]) =>
     entries
       .filter((entry) =>
@@ -120,8 +127,10 @@ export const demoFilterContent = (
     );
 
   const gateNames = gateCollectibleNames(keptEntries(), refsOf);
+  const lockedGates = gateNames.filter((name) =>
+    isStrippedName({ folder: 'collectible', name }),
+  );
   gateNames.forEach((name) => stripped.get('collectible')?.delete(name));
-  fs.writeJsonSync(DEMO_UNOBTAINABLE_FILE, [...manifest.keep, ...gateNames]);
 
   const cascaded: string[] = [];
   let changed = true;
@@ -133,7 +142,7 @@ export const demoFilterContent = (
         const reason = cascadeReason(
           entry,
           refsOf(entry),
-          isStrippedName,
+          isUnavailable,
           manifest,
           nodeNames,
         );
@@ -145,22 +154,74 @@ export const demoFilterContent = (
       });
   }
 
-  const pruned = keptEntries().flatMap(({ folder, entry }) =>
-    (manifest.prune[folder] ?? []).flatMap((field) => {
-      const removed = (entry[field] ?? []).filter((element: Entry) =>
-        refsOf(element).some(isStrippedName),
-      );
-      if (removed.length > 0) {
-        entry[field] = entry[field].filter(
-          (element: Entry) => !removed.includes(element),
+  const pruneStripped = () =>
+    keptEntries().flatMap(({ folder, entry }) =>
+      (manifest.prune[folder] ?? []).flatMap((field) => {
+        // Wrapped in its field so a bare name list (e.g. trainerTeachingIds) still resolves.
+        const elementRefs = (element: Entry) => refsOf({ [field]: [element] });
+        const removed = (entry[field] ?? []).filter((element: Entry) =>
+          elementRefs(element).some(isUnavailable),
         );
-      }
-      return removed.map(
-        (element: Entry) =>
-          `${folder} ${entry.name} ${field}: ${refsOf(element).find(isStrippedName)!.name}`,
-      );
-    }),
-  );
+        if (removed.length > 0) {
+          entry[field] = entry[field].filter(
+            (element: Entry) => !removed.includes(element),
+          );
+        }
+        return removed.map(
+          (element: Entry) =>
+            `${folder} ${entry.name} ${field}: ${elementRefs(element).find(isUnavailable)!.name}`,
+        );
+      }),
+    );
+
+  // Entries hidden behind a gate the demo never opens can't hand out what they reference.
+  const isSealed = (entry: Entry) =>
+    (entry.invisibleUntilCollectibleIdsFound ?? []).some((name: string) =>
+      lockedGates.includes(name),
+    );
+
+  const stripOrphans = () => {
+    const referenced = new Set(
+      keptEntries()
+        .filter(({ entry }) => !isSealed(entry))
+        .flatMap(({ entry }) =>
+          refsOf(entry).map((ref) => `${ref.folder}/${ref.name}`),
+        ),
+    );
+    return keptEntries()
+      .filter(
+        ({ folder, entry }) =>
+          manifest.orphans.includes(folder) &&
+          ![...manifest.keep, ...manifest.pinned, ...gateNames].includes(
+            entry.name,
+          ) &&
+          !referenced.has(`${folder}/${entry.name}`),
+      )
+      .map(({ folder, entry }) => {
+        markStripped(folder, entry);
+        return `${folder} ${entry.name}`;
+      });
+  };
+
+  // Pruning can orphan more entries, and stripping orphans can make more list entries prunable.
+  const pruned: string[] = [];
+  const orphaned: string[] = [];
+  let orphanCount = -1;
+  while (orphanCount !== orphaned.length) {
+    orphanCount = orphaned.length;
+    pruned.push(...pruneStripped());
+    orphaned.push(...stripOrphans());
+  }
+
+  const sealedNames = keptEntries()
+    .filter(({ entry }) => isSealed(entry))
+    .map(({ entry }) => entry.name);
+  fs.writeJsonSync(DEMO_UNOBTAINABLE_FILE, [
+    ...manifest.keep,
+    ...manifest.unobtainable,
+    ...gateNames,
+    ...sealedNames,
+  ]);
 
   const dangling = keptEntries().flatMap(({ folder, entry }) =>
     refsOf(entry)
@@ -193,6 +254,7 @@ export const demoFilterContent = (
   );
   printSection('Cascade-stripped (unfinishable in the demo)', cascaded);
   printSection('Pruned list entries', pruned);
+  printSection('Orphan-stripped (nothing kept produces them)', orphaned);
   printSection('Kept content referencing stripped content', dangling);
   printSection('Pinned content that was stripped', missingPinned);
   printSection(

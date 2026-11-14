@@ -26,24 +26,27 @@ stripFiles:
 keep:
   # Ghostcopper gear sold by Mire traders and the Shrine of Parcilyte's upgrades
   - Ghostcopper Dust
-  # Stori Kesan's stock and Maxim Tasnica's teachings
+  # Felway Gate (Carrina) and Look for Trouble II's summon
+  - Fel Demon
+  - Akroki Vanguard
+  # Pond of Memories costs that the demo does produce
+  - Hawk Feather
+  - Star Fragment
+
+# Kept because the Pond of Memories and Stori Kesan name them, but nothing in the demo produces them.
+# Cascade content that needs them is stripped and prune lists drop them, like stripped content.
+unobtainable:
+  - Brightwisp Core
+  - Cactspine
   - Cimmerian Fire Charm
   - Cimmerian Holy Charm
   - Cimmerian Lightning Charm
   - Cimmerian Skull Charm
   - Cimmerian Water Charm
-  # Felway Gate (Carrina) and Look for Trouble II's summon
-  - Fel Demon
-  - Akroki Vanguard
-  # Pond of Memories costs (never stocked in the demo, but the node needs its content)
-  - Brightwisp Core
-  - Cactspine
   - Crimson Ingot
   - Crimson Ruby
   - Felrock
   - Firmwater
-  - Hawk Feather
-  - Star Fragment
 
 # Kept entries in these folders are stripped too once they need a stripped map, node or entry (they can't be finished).
 cascade:
@@ -61,6 +64,15 @@ prune:
   caravantrader:
     - tokenTrades
     - trades
+  exchangenode:
+    - exchanges
+  trainer:
+    - trainerTeachingIds
+
+# Kept entries in these folders are stripped once no kept content references them (nothing can produce them).
+orphans:
+  - equipment
+  - collectible
 
 # Looked up by name in code, so the demo build fails if any of these get stripped.
 pinned:

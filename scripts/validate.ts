@@ -102,7 +102,7 @@ const demoUnobtainable = new Set<string>(
   isDemo ? fs.readJsonSync(DEMO_UNOBTAINABLE_FILE) : [],
 );
 
-// Demo exits lead to maps it doesn't ship; level-split gear and keep/gate names stay in on purpose, unobtainable.
+// Demo exits lead to maps it doesn't ship, affixes can outlive the gear it ships, and kept, gate and sealed names stay in unreachable.
 function isExpectedInDemo(
   title: string,
   check: { label?: string; message: string },
@@ -110,9 +110,11 @@ function isExpectedInDemo(
   return (
     (title === 'validate:teleportnodes' &&
       check.message.includes("does not match any teleport node's")) ||
-    (title === 'validate:obtainability' &&
-      (check.message.startsWith('Equipment ') ||
-        demoUnobtainable.has(check.label ?? '')))
+    (title === 'validate:affixes' &&
+      check.message.includes('no obtainable gear matches')) ||
+    ((title === 'validate:obtainability' ||
+      title === 'validate:exchangenodes') &&
+      demoUnobtainable.has(check.label ?? ''))
   );
 }
 
