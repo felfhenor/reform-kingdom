@@ -15,7 +15,7 @@
   sprite: '0001'
   description: Monster stats are reduced by 25%.
   kind: Boon
-  fragments: -3
+  fragments: -4
   groups:
     - MonsterStats
   effects:
@@ -41,7 +41,7 @@
   sprite: '0003'
   description: Start with extra gold, and caravan/town shop prices are reduced by 25%.
   kind: Boon
-  fragments: -2
+  fragments: -3
   groups:
     - TownCaravanGold
   effects:
@@ -95,7 +95,7 @@
   sprite: '0007'
   description: Shrine buffs never expire.
   kind: Boon
-  fragments: -2
+  fragments: -4
   effects:
     - effectType: GlobalShrineBuffsPermanent
 
@@ -111,10 +111,13 @@
 
 - id: 6580e020-2ee1-4629-b655-3d5da9637a0d
   name: Edict of Storied Development
+  groups:
+    - StoriedNomadic
+    - StoriedWarren
   sprite: '0027'
   description: Every outpost and gather location starts at +1.
   kind: Boon
-  fragments: -4
+  fragments: -3
   effects:
     - effectType: GlobalWorldNodeStartingLevel
       nodeType: Outpost

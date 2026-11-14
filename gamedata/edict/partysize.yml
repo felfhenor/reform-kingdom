@@ -16,7 +16,7 @@
   sprite: '0023'
   description: Your party has 2 heroes.
   kind: PartySize
-  fragments: 4
+  fragments: 3
   groups:
     - PartySize
   partySize: 2
@@ -30,7 +30,7 @@
   sprite: '0024'
   description: Your party has a single hero.
   kind: PartySize
-  fragments: 7
+  fragments: 5
   groups:
     - PartySize
   partySize: 1

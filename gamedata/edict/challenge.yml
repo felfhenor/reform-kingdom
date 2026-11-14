@@ -3,7 +3,7 @@
   sprite: '0011'
   description: Hero stats are reduced by 25%.
   kind: Challenge
-  fragments: 3
+  fragments: 4
   groups:
     - HeroStats
   effects:
@@ -33,7 +33,7 @@
   sprite: '0013'
   description: Heroes gain no stats from leveling, from their class or their specialization.
   kind: Challenge
-  fragments: 5
+  fragments: 6
   effects:
     - effectType: GlobalLevelStatMultiplier
       value: -1
@@ -58,7 +58,7 @@
   sprite: '0015'
   description: XP and combat gold gains are reduced by 50%.
   kind: Challenge
-  fragments: 2
+  fragments: 4
   groups:
     - XP
   effects:

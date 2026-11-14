@@ -16,6 +16,7 @@
   name: Edict of Nomadic Departure
   groups:
     - StarryNomadic
+    - StoriedNomadic
   sprite: '0025'
   description: Outposts are permanently forgotten. Shrine buffs are 50% stronger.
   kind: Variant
@@ -180,6 +181,7 @@
   name: Edict of the Warren Hunt
   groups:
     - WarrenCornucopia
+    - StoriedWarren
   sprite: '0030'
   description: Gathering locations are permanently forgotten. Monsters have a 50% chance to drop regional gathering materials.
   kind: Variant
