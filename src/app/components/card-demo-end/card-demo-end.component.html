@@ -1,0 +1,50 @@
+<div #backdrop class="absolute inset-0 bg-black/60"></div>
+
+<div class="relative flex h-full items-center justify-center p-4">
+  <div #card class="card bg-base-100 shadow-xl page-card w-full max-w-xl">
+    <div class="card-body">
+      <h2 class="type-page-title justify-center">The Edge of Memory</h2>
+      <p class="type-flavor text-center">
+        You have reached the end of the demo.
+      </p>
+
+      <div class="my-2 flex flex-col gap-4">
+        <p>
+          Carrina and the Craggled Mire are sealed, and their memories are set
+          in stone.
+        </p>
+
+        <p>
+          The rest of the forgotten world that exists beyond the Duchy: desert
+          sands, elven woods, and the Fel themselves. Those roads will open to
+          you in the full release of the game.
+        </p>
+
+        <p>
+          You can keep playing this run as long as you like, or start a new one
+          with different Edicts. I definitely recommend trying out different
+          ways to play. There are so many fun combinations! If you haven't tried
+          Edict of the Taskmaster's Intervention, it's a completely different
+          playstyle, too.
+        </p>
+
+        <p>Thank you for playing!</p>
+      </div>
+
+      <div class="card-actions justify-end">
+        <button
+          #continueButton
+          type="button"
+          class="btn btn-neutral"
+          (click)="dismiss()"
+          appSfx="ui-click"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Keep Playing
+        </button>
+
+        <app-button-wishlist [small]="false" />
+      </div>
+    </div>
+  </div>
+</div>

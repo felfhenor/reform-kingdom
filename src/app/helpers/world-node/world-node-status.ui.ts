@@ -1,4 +1,5 @@
 import { caravanBrandName } from '@helpers/caravan/caravan';
+import { teleportIsDemoLocked } from '@helpers/demo/demo';
 import { combatAutomationLockedReason } from '@helpers/combat/combat-manual.ui';
 import {
   exploreDifficultyTier,
@@ -83,6 +84,8 @@ export function worldNodeLabelInfo(
   if (levelRange && kind !== 'Trade') {
     lines.push(`Lv. ${rangeLabel(levelRange)}`);
   }
+
+  if (teleportIsDemoLocked(entry)) lines.push('Full game');
 
   const developTimerText = worldNodeDevelopmentTimerText(entry.nodeName);
   if (developTimerText) lines.unshift(developTimerText);

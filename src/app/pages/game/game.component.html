@@ -19,6 +19,8 @@
   />
 } @else if (isVictoryPopupPending()) {
   <app-card-victory />
+} @else if (isDemoEndPending()) {
+  <app-card-demo-end />
 } @else if (isManualCombat()) {
   <app-overlay-combat-orders />
 }

@@ -37,8 +37,10 @@ import {
   debugResetIntroCrawl,
   debugResetOutroCrawl,
   debugResetVictoryCard,
+  debugShowDemoEnd,
 } from '@helpers/debug/debug-story.ui';
 import { debugResetTasks } from '@helpers/debug/debug-tasks.ui';
+import { isDemoBuild } from '@helpers/demo/demo.ui';
 import { worldPartyState } from '@helpers/state-game';
 import { TOWN_REPUTATION_THRESHOLDS } from '@helpers/town/reputation/town-reputation';
 import { worldNodesOfType } from '@helpers/world-node/world-nodes';
@@ -76,6 +78,7 @@ import { sortBy } from 'es-toolkit/compat';
   styleUrl: './panel-options-debug.component.scss',
 })
 export class PanelOptionsDebugComponent extends OptionsBaseComponent {
+  public readonly isDemo = isDemoBuild();
   public debugItems = computed(() =>
     sortBy(getEntriesByType<ItemContent>('item'), (item) => item.name).filter(
       (item) => !item.unobtainable,
@@ -221,6 +224,10 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
 
   public resetVictoryCard(): void {
     debugResetVictoryCard();
+  }
+
+  public showDemoEnd(): void {
+    debugShowDemoEnd();
   }
 
   public resetAllTutorials(): void {

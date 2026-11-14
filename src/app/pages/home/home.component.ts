@@ -1,3 +1,5 @@
+import { ButtonWishlistComponent } from '@components/button-wishlist/button-wishlist.component';
+import { isDemoBuild } from '@helpers/demo/demo.ui';
 import type { OnInit } from '@angular/core';
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
@@ -34,6 +36,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   selector: 'app-home',
   imports: [
     SweetAlert2Module,
+    ButtonWishlistComponent,
     ButtonConnectComponent,
     AnalyticsClickDirective,
     SFXDirective,
@@ -50,6 +53,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 })
 export class HomeComponent implements OnInit {
   public meta = inject(MetaService);
+  public readonly isDemo = isDemoBuild();
   private router = inject(Router);
 
   public resetGameSwal = viewChild<SwalComponent>('newGameSwal');

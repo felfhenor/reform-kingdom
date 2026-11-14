@@ -1,6 +1,13 @@
 <div class="homescreen flex flex-col page-size items-center space-between">
   <div class="w-full text-center pt-20">
     <span class="title text-8xl">re:Form Kingdom</span>
+
+    @if (isDemo) {
+      <div class="mt-4 flex flex-col items-center gap-2">
+        <span class="badge badge-info">Demo</span>
+        <app-button-wishlist />
+      </div>
+    }
   </div>
 
   <div class="mt-8">

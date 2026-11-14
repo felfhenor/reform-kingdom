@@ -544,6 +544,18 @@
         >
           Reset Victory Card
         </button>
+        @if (isDemo) {
+          <button
+            type="button"
+            class="btn btn-error btn-outline btn-sm"
+            appAnalyticsClick="Options:Debug:ShowDemoEnd"
+            (click)="showDemoEnd()"
+            appSfx="ui-error"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            Show Demo End Card
+          </button>
+        }
         <button
           type="button"
           class="btn btn-neutral btn-sm"

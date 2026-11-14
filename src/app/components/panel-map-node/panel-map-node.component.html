@@ -124,7 +124,12 @@
           </div>
         }
 
-        @if (!isAtNode()) {
+        @if (isDemoLocked()) {
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-sm type-muted">Available in the full game.</span>
+            <app-button-wishlist />
+          </div>
+        } @else if (!isAtNode()) {
           @if (!meetsCaravanAvailability()) {
             <div class="text-sm text-error">
               No traders are available for this timeframe. Check back later.

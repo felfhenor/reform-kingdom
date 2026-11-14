@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { BarTownReputationComponent } from '@components/bar-town-reputation/bar-town-reputation.component';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
+import { ButtonWishlistComponent } from '@components/button-wishlist/button-wishlist.component';
 import { BackdropNodeComponent } from '@components/backdrop-node/backdrop-node.component';
 import { ButtonWorldNodeDevelopComponent } from '@components/button-world-node-develop/button-world-node-develop.component';
 import { PanelMapNodeActionsCaravanComponent } from '@components/panel-map-node-actions-caravan/panel-map-node-actions-caravan.component';
@@ -23,6 +24,7 @@ import { SlotGatherMaterialComponent } from '@components/slot-gather-material/sl
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { caravanBrandName } from '@helpers/caravan/caravan';
+import { teleportIsDemoLocked } from '@helpers/demo/demo';
 import {
   decreeAutoFarmAvailable,
   decreeAutoFarmIsActive,
@@ -97,6 +99,7 @@ import { sortBy } from 'es-toolkit/compat';
     TippyDirective,
     BarTownReputationComponent,
     ButtonCloseComponent,
+    ButtonWishlistComponent,
     SlotCompletionRewardComponent,
     SlotGatherMaterialComponent,
     PanelMapNodeActionsCaravanComponent,
@@ -268,6 +271,11 @@ export class PanelMapNodeComponent {
   public isTownNode = computed(() => {
     const entry = this.node();
     return !!entry && !!worldNodeTown(entry);
+  });
+
+  public isDemoLocked = computed(() => {
+    const entry = this.node();
+    return !!entry && teleportIsDemoLocked(entry);
   });
 
   public isGateNode = computed(() => {

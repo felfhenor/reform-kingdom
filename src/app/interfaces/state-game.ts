@@ -171,6 +171,7 @@ export type GameStateMeta = {
   victoryPopupSeen: boolean;
   // Set when a wipe ends the run; the game stays held until the run is ended.
   runLost?: boolean;
+  demoEndSeen?: boolean;
   // Wall-clock stamp of the last save; missing on saves from before it existed.
   savedAt?: number;
 };

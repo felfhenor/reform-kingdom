@@ -1,4 +1,6 @@
+import { getEntriesByType } from '@helpers/content/content';
 import { updateGamestate } from '@helpers/state-game';
+import type { RegionContent } from '@interfaces';
 
 export function debugResetIntroCrawl(): void {
   updateGamestate((state) => {
@@ -27,6 +29,17 @@ export function debugResetVictoryCard(): void {
 export function debugSetRunLost(lost = true): void {
   updateGamestate((state) => {
     state.meta.runLost = lost;
+    return state;
+  });
+}
+
+// Seals every region, so it also unlocks anything gated on those seals.
+export function debugShowDemoEnd(): void {
+  updateGamestate((state) => {
+    getEntriesByType<RegionContent>('region').forEach((region) => {
+      state.runStats.seals[region.id] ??= state.clock.numTicks;
+    });
+    state.meta.demoEndSeen = false;
     return state;
   });
 }

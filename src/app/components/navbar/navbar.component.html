@@ -118,6 +118,10 @@
   <app-button-update class="mx-1"></app-button-update>
 
   <div class="navbar-end">
+    @if (isDemo) {
+      <span class="badge badge-info mx-1">Demo</span>
+    }
+
     <ul class="menu menu-horizontal px-1 flex gap-1">
       @for (panel of panelConfigs; track $index) {
         <li class="action-button" appRequireSetup>

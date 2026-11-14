@@ -17,6 +17,14 @@ if (isSquirrelEvent) {
   app.quit();
 }
 
+// Packaged demos get this from their renamed package.json; dev runs must not load the full game's save.
+if (!app.isPackaged && process.env.REFORM_DEMO === '1') {
+  app.setPath(
+    'userData',
+    path.join(app.getPath('appData'), 'reformkingdom-demo'),
+  );
+}
+
 // A second copy would tick and save the same game alongside this one.
 const hasInstanceLock = app.requestSingleInstanceLock();
 if (!hasInstanceLock) {

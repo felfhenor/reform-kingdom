@@ -8,8 +8,9 @@
   "scripts": {
     "start": "concurrently \"npm run start:app\" \"npm run gamedata:watch\"",
     "start:app": "ng serve --open --port 9766",
-    "start:demo": "npm run build:demo:content && ng serve --configuration demo --port 9767",
+    "start:demo": "npm run build:demo:content && ng serve --configuration demo --open --port 9767",
     "start:electron": "cd electron && npm run start:localref",
+    "start:electron:demo": "cd electron && npm run start:localref:demo",
     "setup": "npm run gamedata:build",
     "lint": "ng lint",
     "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.spec.json --noEmit",

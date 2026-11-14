@@ -1,6 +1,7 @@
 import type { OnInit } from '@angular/core';
 import { Component, computed } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { CardDemoEndComponent } from '@components/card-demo-end/card-demo-end.component';
 import { CardRunLostComponent } from '@components/card-run-lost/card-run-lost.component';
 import { CardVictoryComponent } from '@components/card-victory/card-victory.component';
 import { NavbarComponent } from '@components/navbar/navbar.component';
@@ -8,6 +9,7 @@ import { OverlayCombatOrdersComponent } from '@components/overlay-combat-orders/
 import { combatManualOverlayVisible } from '@helpers/combat/combat-manual.ui';
 import { ScreenTitleCrawlComponent } from '@components/screen-title-crawl/screen-title-crawl.component';
 import { FadeInDirective } from '@directives/fade-in.directive';
+import { isDemoEndPending } from '@helpers/demo/demo.ui';
 import { discordUpdateStatus } from '@helpers/engine/discord';
 import {
   isOutroCrawlPending,
@@ -33,6 +35,7 @@ import {
     ScreenTitleCrawlComponent,
     CardVictoryComponent,
     CardRunLostComponent,
+    CardDemoEndComponent,
   ],
   hostDirectives: [FadeInDirective],
   templateUrl: './game.component.html',
@@ -44,6 +47,7 @@ export class GameComponent implements OnInit {
   public isVictoryPopupPending = computed(() => isVictoryPopupPending());
   public isManualCombat = computed(() => combatManualOverlayVisible());
   public isRunLost = computed(() => isRunLost());
+  public isDemoEndPending = computed(() => isDemoEndPending());
 
   public titleCrawlParagraphs = TITLE_CRAWL_PARAGRAPHS;
   public outroCrawlParagraphs = OUTRO_CRAWL_PARAGRAPHS;
