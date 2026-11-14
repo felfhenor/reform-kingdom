@@ -1,5 +1,5 @@
-// One entry per image in public/asset/combatbg, named <setting>-<feature>[-<variant>].
-export const COMBAT_BACKGROUNDS = [
+// One entry per image in public/asset/nodebg, named <setting>-<feature>[-<variant>].
+export const NODE_BACKGROUNDS = [
   'arena-castle',
   'arena-colosseum',
   'arena-graveyard',
@@ -45,12 +45,12 @@ export const COMBAT_BACKGROUNDS = [
   'swamp-tusks',
 ] as const;
 
-export type CombatBackground = (typeof COMBAT_BACKGROUNDS)[number];
+export type NodeBackground = (typeof NODE_BACKGROUNDS)[number];
 
-export type CombatBackgroundFilter = 'None' | 'Faded' | 'Frozen' | 'Astral';
+export type NodeBackgroundFilter = 'None' | 'Faded' | 'Frozen' | 'Astral';
 
-export type HasCombatBackground = {
-  combatBackground: CombatBackground;
+export type HasNodeBackground = {
+  background: NodeBackground;
   // Tints reused art so it reads as a different place.
-  combatBackgroundFilter?: CombatBackgroundFilter;
+  backgroundFilter?: NodeBackgroundFilter;
 };

@@ -1,0 +1,32 @@
+:host {
+  --backdrop-tint: saturate(1);
+  --backdrop-dim: brightness(0.8);
+
+  display: block;
+  background-size: cover;
+  background-position: center;
+  image-rendering: pixelated;
+  filter: var(--backdrop-tint) var(--backdrop-dim);
+}
+
+// The scenery sits in the top of every image; the rest is open floor.
+:host(.node-backdrop-top) {
+  background-position: top;
+}
+
+:host(.node-backdrop-clear) {
+  --backdrop-dim: brightness(1);
+}
+
+:host(.bg-filter-Faded) {
+  --backdrop-tint: grayscale(0.7) sepia(0.3) contrast(0.9);
+}
+
+// Sepia first gives every hue a common base, so the rotate lands on one tint.
+:host(.bg-filter-Frozen) {
+  --backdrop-tint: sepia(0.6) hue-rotate(165deg) saturate(1.3) brightness(1.1);
+}
+
+:host(.bg-filter-Astral) {
+  --backdrop-tint: sepia(0.5) hue-rotate(235deg) saturate(1.6);
+}

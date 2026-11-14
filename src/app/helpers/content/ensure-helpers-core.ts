@@ -1,7 +1,9 @@
 import type {
   CostItem,
+  HasNodeBackground,
   ItemId,
   ItemQuantity,
+  NodeBackground,
   WorldNodeDevelopmentLevel,
 } from '@interfaces';
 
@@ -58,4 +60,14 @@ export function ensureEnumValue<T extends string>(
   fallback: T,
 ): T {
   return validValues.includes(value as T) ? (value as T) : fallback;
+}
+
+// 'UNKNOWN' rather than a real default, so validate:nodebackgrounds flags an entry that never picked one.
+export function ensureNodeBackground(
+  content: Partial<HasNodeBackground>,
+): Required<HasNodeBackground> {
+  return {
+    background: content.background ?? ('UNKNOWN' as NodeBackground),
+    backgroundFilter: content.backgroundFilter ?? 'None',
+  };
 }

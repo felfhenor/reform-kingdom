@@ -1,6 +1,7 @@
 - id: 9448f248-0684-4e6b-a621-169d8b624d2d
   name: Astral Purifier
   description: An elven font of holy water. It can purify some demonic items and bring them new power.
+  background: forest-runestones
   emptyText: You do not have anything that can be purified.
   actionLabel: Purify
 

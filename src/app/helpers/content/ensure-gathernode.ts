@@ -1,6 +1,7 @@
 import {
   ensureArray,
   ensureItemQuantity,
+  ensureNodeBackground,
   ensureWorldNodeDevelopmentLevel,
 } from '@helpers/content/ensure-helpers-core';
 import type { GatheringContent, GatheringId, GatherResult } from '@interfaces';
@@ -31,6 +32,7 @@ export function ensureGathering(
       gathering.gatherReductionPerUpgradeLevel ?? 0,
     gatherResults: ensureArray(gathering.gatherResults, ensureGatherResult),
     hidden: gathering.hidden ?? false,
+    ...ensureNodeBackground(gathering),
     invisibleUntilCollectibleIdsFound:
       gathering.invisibleUntilCollectibleIdsFound ?? [],
     workerLevelRange: gathering.workerLevelRange ?? { min: 1, max: 99 },

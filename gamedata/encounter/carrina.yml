@@ -1,7 +1,7 @@
 - id: c3f38a12-890d-492c-bca9-90ce717d6ecf
   name: Field Ruins
   description: A crumbling ruin at the edge of the fields, picked over by goblins.
-  combatBackground: field-terrace
+  background: field-terrace
 
   levelRange:
     min: 1
@@ -38,7 +38,7 @@
 - id: c6e4119c-b365-4de1-a952-5bf86f7ff173
   name: Forest Ruins
   description: A dilapidated ruin in the forest, home to a small goblin tribe.
-  combatBackground: forest-clearing
+  background: forest-clearing
 
   levelRange:
     min: 2
@@ -81,7 +81,7 @@
 - id: c89e5d32-f802-4398-ae81-ceb0fdc04224
   name: Slimed Waystation
   description: A ruined waystation in the forest, guarding the way to a more sinister tower. This place is held together entirely by slime and goo.
-  combatBackground: swamp-roots
+  background: swamp-roots
 
   levelRange:
     min: 5
@@ -126,7 +126,7 @@
 - id: def818a1-e9b4-462a-a108-4544d388ba4f
   name: Spider Tower
   description: A tower covered in green spiderwebs. It emits a palpable, sinister aura.
-  combatBackground: cave-webs
+  background: cave-webs
 
   invisibleUntilCollectibleIdsFound:
     - Gobweb
@@ -169,7 +169,7 @@
 - id: 1c711838-085f-4be3-b1cb-2d672f8b4660
   name: Jelly Fields
   description: A majestic field where slimes run free in peaceful harmony.
-  combatBackground: field-meadow
+  background: field-meadow
 
   levelRange:
     min: 8
@@ -221,7 +221,7 @@
 - id: f98cf9b9-2060-4e50-80cf-a5cbc041905a
   name: Copperpan Cave
   description: A cave filled with goblins who seek copper to barter.
-  combatBackground: cave-mine
+  background: cave-mine
 
   levelRange:
     min: 3
@@ -270,7 +270,7 @@
 - id: be1a482f-5a94-4af9-b820-5a6c782900ff
   name: S.S. Antigonus
   description: A sailboat sunken and taken over by a hostile tribe of goblins.
-  combatBackground: ship-hold
+  background: ship-hold
 
   levelRange:
     min: 5
@@ -316,7 +316,7 @@
 - id: c405b6a7-bbf2-4b6a-b7cb-d22bd42aea82
   name: Gobsilk Forest
   description: A forest inhabited by a tribe of goblins that befriended spiders and learned to use their silk to make clothing.
-  combatBackground: forest-mushroom
+  background: forest-mushroom
 
   levelRange:
     min: 4
@@ -364,7 +364,7 @@
 - id: dedfdf96-94ff-4dcc-9f16-b046fe6a0d03
   name: Copperorc Retreat
   description: A cave in the mountains, home to a tribe of orcs and goblins that use copper to make tools to gather more copper.
-  combatBackground: swamp-tusks
+  background: swamp-tusks
 
   levelRange:
     min: 9
@@ -407,7 +407,7 @@
 - id: 6f35047f-8aea-4e79-9513-f90a20971ebf
   name: Fallen Elven Outpost
   description: An old elven outpost in the middle of the woods. It used to be their base of operations in the Carrina region before it was destroyed.
-  combatBackground: ruins-stone
+  background: ruins-stone
 
   levelRange:
     min: 10
@@ -445,7 +445,7 @@
 - id: 0ceb0531-c96d-48b5-b920-1c5556542df4
   name: Elven River Camp
   description: A camp by the Carrina river, inhabited by elves. They don't take kindly to non-elves approaching.
-  combatBackground: forest-waterfall
+  background: forest-waterfall
 
   levelRange:
     min: 13
@@ -483,7 +483,7 @@
 - id: c31d693b-7018-4cae-897c-b7a1435d76b7
   name: Elven Training Grounds
   description: A hidden training ground where elves grow into stronger versions of themselves. There are always elves training here.
-  combatBackground: arena-castle
+  background: arena-castle
 
   hidden: true
 
@@ -520,7 +520,7 @@
 - id: 0270fc1f-781f-4e7e-98b1-211c3b92b544
   name: Felway Gate
   description: A waystation that leads to the Felway, the path towards Fel. It's infested with demons and their minions.
-  combatBackground: castle-gate
+  background: castle-gate
 
   levelRange:
     min: 38
@@ -549,8 +549,8 @@
 - id: 0897ddc1-750f-4acd-a266-e17213f743d8
   name: Forgotten Bridge
   description: A bridge, lost to time. It's the home of a troll who's angry that he was forgotten.
-  combatBackground: forest-waterfall
-  combatBackgroundFilter: Faded
+  background: forest-waterfall
+  backgroundFilter: Faded
 
   invisibleUntilCollectibleIdsFound:
     - Gobslime Flower

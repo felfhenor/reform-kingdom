@@ -1,6 +1,8 @@
 - id: 067b2a6e-0060-4eb7-aceb-a5af84dcd945
   name: Chillwoods
   description: A forest full of trees frozen solid. A hauntingly scenic region where snow piles upon snow.
+  background: forest-clearing
+  backgroundFilter: Frozen
 
   levelRange:
     min: 50
@@ -124,6 +126,8 @@
 - id: 4b6e50a3-953c-43ea-b6ad-77c6dcd7febd
   name: Felfrost Cellar
   description: A cave that goes deep into the summit where demons facilitate the growth of felfrost and refine metals with sub-zero temperatures.
+  background: cave-crystal-blue
+  backgroundFilter: Frozen
 
   levelRange:
     min: 50

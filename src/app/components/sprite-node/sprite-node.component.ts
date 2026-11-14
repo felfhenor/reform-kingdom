@@ -12,7 +12,8 @@ import type { WorldNodeEntry } from '@interfaces';
   selector: 'app-sprite-node',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class: 'overflow-hidden shrink-0 bg-base-200 inline-block',
+    class: 'overflow-hidden shrink-0 inline-block',
+    '[class.bg-base-200]': 'framed()',
   },
   template: `
     @if (spriteFrame(); as frame) {
@@ -30,6 +31,8 @@ import type { WorldNodeEntry } from '@interfaces';
 })
 export class SpriteNodeComponent {
   public entry = input.required<WorldNodeEntry>();
+  // Off where the node sits on its own backdrop, which the frame would cover.
+  public framed = input(true);
 
   public spriteFrame = computed(() => worldNodeSpriteFrame(this.entry()));
 }

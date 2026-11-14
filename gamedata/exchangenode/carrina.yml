@@ -1,6 +1,7 @@
 - id: af46ea50-4dff-4ee0-b9a1-c586e250bfb1
   name: Alerian Exchange
   description: A place where those of Carrina go to exchange with visitors from lands far and near. Here, they exchange the various resources they have for things more esoteric.
+  background: castle-hall-windows
   emptyText: You do not have anything that can be exchanged here.
   actionLabel: Exchange
 
@@ -60,6 +61,7 @@
 - id: 30601436-eef3-47f4-846d-4cc11f8a3e94
   name: Dies Irae
   description: A dedication to those the Founder never wants to forget. Powerful gear can be traded with the memories of the Lost to acquire their unique items.
+  background: arena-graveyard
   emptyText: You do not have anything the well can remember.
   actionLabel: Remember
 

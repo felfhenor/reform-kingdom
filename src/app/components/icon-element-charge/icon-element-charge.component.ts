@@ -15,7 +15,7 @@ import { GameElementIcon } from '@interfaces';
   imports: [ButtonGlowComponent, IconComponent],
   template: `
     <span
-      class="flex items-center justify-center rounded-full border-2 leading-none"
+      class="flex items-center justify-center border-2 leading-none"
       [class]="classes()"
       appButtonGlow
       [buttonGlowActive]="canGlow() && filled()"

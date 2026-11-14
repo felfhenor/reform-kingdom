@@ -26,7 +26,7 @@ import { runRecipeNamesAnalysis } from '@helpers/debug/analysis-recipenames';
 import { runRecipeRewardsAnalysis } from '@helpers/debug/analysis-reciperewards';
 import { runExchangeNodesAnalysis } from '@helpers/debug/analysis-exchangenodes';
 import { runRegionsAnalysis } from '@helpers/debug/analysis-regions';
-import { runCombatBackgroundsAnalysis } from '@helpers/debug/analysis-combatbackgrounds';
+import { runNodeBackgroundsAnalysis } from '@helpers/debug/analysis-nodebackgrounds';
 import { runRumorsAnalysis } from '@helpers/debug/analysis-rumors';
 import { runShrinesAnalysis } from '@helpers/debug/analysis-shrines';
 import { runSkillBonusesAnalysis } from '@helpers/debug/analysis-skillbonuses';
@@ -270,14 +270,14 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     run: runRegionsAnalysis,
   },
   {
-    id: 'combatbackgrounds',
-    title: 'Combat Backgrounds',
+    id: 'nodebackgrounds',
+    title: 'Node Backgrounds',
     description:
-      'Every encounter, random encounter, and raidable town names a combat background that exists.',
+      'Every encounter, random encounter, raidable town, gather node, and exchange node names a background that exists.',
     category: 'World & Maps',
     strict: true,
     inputKeys: [],
-    run: runCombatBackgroundsAnalysis,
+    run: runNodeBackgroundsAnalysis,
   },
   {
     id: 'exchangenodes',

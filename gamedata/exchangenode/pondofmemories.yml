@@ -1,6 +1,8 @@
 - id: 8c69ed5c-4c09-4b57-85a1-72c4856e2603
   name: Pond of Memories
   description: A reflective pond, glistening in the sunlight. It holds your memories, and asks of you what you wish to recall.
+  background: forest-waterfall
+  backgroundFilter: Astral
   emptyText: The pond reflects nothing more.
   actionLabel: Recall
 

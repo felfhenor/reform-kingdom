@@ -7,7 +7,7 @@ export * from './difficulty-tier';
 export * from './character';
 export * from './collectible-source';
 export * from './combat';
-export * from './combat-background';
+export * from './node-background';
 export * from './combat-log';
 export * from './combat-manual.ui';
 export * from './combat-order';

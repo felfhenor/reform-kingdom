@@ -1,6 +1,7 @@
 - id: eb61005a-96c4-4378-b206-717e3045fea7
   name: Elven Slash
   description: A clearcutting field where elves gather wood en masse to support their excessive crafting and building operations.
+  background: forest-clearing
 
   levelRange:
     min: 32
@@ -82,6 +83,7 @@
 - id: 8fdca3eb-c076-406b-ac59-04c01ff40461
   name: Elfheim Royal Mines
   description: Ruled by the marquis of Elfheim, these mines are always busy gathering ore to support Elfheim.
+  background: cave-mine
 
   levelRange:
     min: 33
@@ -200,6 +202,7 @@
 - id: 78ec4331-651a-46d0-8252-053959dc8939
   name: Silkleaf Glade
   description: A hidden glade where spider silk is often left behind for elves to collect.
+  background: cave-webs
 
   hidden: true
 

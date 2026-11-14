@@ -105,8 +105,8 @@ export class LoadingService {
       isDone: this.contentService.hasLoadedUIArt(),
     },
     {
-      label: 'Loading combat art...',
-      isDone: this.contentService.hasLoadedCombatArt(),
+      label: 'Loading background art...',
+      isDone: this.contentService.hasLoadedBackgroundArt(),
     },
     {
       label: 'Loading UI fonts...',

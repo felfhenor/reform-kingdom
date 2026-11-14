@@ -1,6 +1,7 @@
 - id: 8d733645-a13d-4c47-b1e6-405483abb552
   name: Ghostlight Mines
   description: A dry forest, perfect for gathering wood and leather from the local wildlife.
+  background: cave-crystal-blue
 
   levelRange:
     min: 14

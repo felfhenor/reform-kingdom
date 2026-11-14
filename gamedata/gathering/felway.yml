@@ -1,6 +1,7 @@
 - id: a7a131c3-8a37-4abf-96fc-e534715d5a97
   name: Tainted Woods
   description: A demonic wooded area, haunted by fel energies that glimmer like ghostlights in the night.
+  background: forest-magic
 
   levelRange:
     min: 41
@@ -98,6 +99,7 @@
 - id: 9a9e69ab-4115-42e2-ba15-0015e1afb239
   name: Felrock Quarry
   description: A corrupted quarry where demons mine felrock, and infuse their fel energies into rock to create more felrock.
+  background: lava-cave
 
   levelRange:
     min: 40

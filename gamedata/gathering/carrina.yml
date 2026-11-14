@@ -1,6 +1,7 @@
 - id: 957c309b-e3f7-4bb4-b017-5a8e983c9fc0
   name: Wergen Woods
   description: A dry forest, perfect for gathering wood and leather from the local wildlife.
+  background: forest-clearing
 
   levelRange:
     min: 1
@@ -130,6 +131,7 @@
 - id: b947fc5a-9e29-413e-b529-b202ab540821
   name: Fieren Fields
   description: A tiny field full of flax flowers.
+  background: field-meadow
 
   levelRange:
     min: 1
@@ -185,6 +187,7 @@
 - id: 18846107-ec4c-479c-bd81-82c8d986d24e
   name: Carrina Copper Mines
   description: A small copper mine, perfect for gathering copper ore.
+  background: cave-mine
 
   levelRange:
     min: 1
@@ -336,6 +339,7 @@
 - id: 42c72ae0-56ba-42f5-ad7f-7b4b155074cf
   name: Elven Woods
   description: A mystical glade, prized by elves for the abundance of crafting materials. Here, you can feel the care that goes into gathering resources.
+  background: forest-waterfall
 
   hidden: true
 

@@ -5,13 +5,16 @@
     <div
       class="card relative bg-base-100 shadow-xl w-full max-w-[1440px] max-h-full"
     >
-      <div class="absolute inset-0 overflow-hidden rounded-[inherit]">
-        <div
-          class="combat-backdrop"
-          [class.combat-backdrop-clear]="isReview()"
-          [class]="['bg-filter-' + backdropFilter()]"
-          [style.background-image]="backdropImage()"
-        ></div>
+      <div class="absolute inset-0 overflow-hidden">
+        @if (backdrop(); as bd) {
+          <!-- Only the combat review eases its dim off; a node panel swapping tints would flash. -->
+          <app-backdrop-node
+            class="absolute inset-0 transition-[filter] duration-[600ms]"
+            [background]="bd.background"
+            [filter]="bd.backgroundFilter ?? 'None'"
+            [clear]="isReview()"
+          />
+        }
         <div class="combat-vignette"></div>
       </div>
 

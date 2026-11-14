@@ -2,6 +2,7 @@
   name: Crimson Stones
   hidden: true
   description: A demonic ritual altar containing the power to corrupt and add crimson under the Crimson Moon. This is heavily utilized by demons who wish to infiltrate the elven way of life.
+  background: ruins-portal
   emptyText: You do not have anything that can be converted.
   actionLabel: Convert
 

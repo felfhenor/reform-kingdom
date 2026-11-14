@@ -8,3 +8,21 @@
   align-items: flex-end;
   padding: 1rem;
 }
+
+.node-banner-fade {
+  background: linear-gradient(
+    to bottom,
+    transparent 35%,
+    var(--color-base-100)
+  );
+}
+
+.node-banner-text {
+  text-shadow:
+    0 1px 2px #000,
+    0 0 6px rgb(0 0 0 / 0.8);
+}
+
+.node-banner-drop-shadow {
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.8));
+}

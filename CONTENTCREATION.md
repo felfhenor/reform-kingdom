@@ -33,11 +33,11 @@ The most massive type of content, requiring a lot of design and sub-content piec
 
 ## Combat Nodes
 
-These have monsters, and a level. Every combat node (and raidable town) needs a `combatBackground` from `public/asset/combatbg/`, optionally tinted with `combatBackgroundFilter` (`Faded`, `Frozen`, `Astral`) when reused art should read as a different place. Monsters need to exist before they can be put into combat nodes. In terms of rewards, these _always_ need a collectible. They should have some drops beyond that - spread between gathering materials, equipment, recipes, or workers. Typically, workers will drop from "hard" encounters, so, boss encounters would drop these.
+These have monsters, and a level. Every combat node, gathering node, exchange node and raidable town needs a `background` from `public/asset/nodebg/`, optionally tinted with `backgroundFilter` (`Faded`, `Frozen`, `Astral`) when reused art should read as a different place. Monsters need to exist before they can be put into combat nodes. In terms of rewards, these _always_ need a collectible. They should have some drops beyond that - spread between gathering materials, equipment, recipes, or workers. Typically, workers will drop from "hard" encounters, so, boss encounters would drop these.
 
 ## Exchange Nodes
 
-These trade one thing the player owns, plus a list of costs, for something else.
+These need a `background`. These trade one thing the player owns, plus a list of costs, for something else.
 
 Each exchange is one of two kinds:
 
@@ -52,7 +52,7 @@ These have monsters, and a level. They're configured a bit more randomly than no
 
 ## Gathering Nodes
 
-These need to exist for workers to level up. They should typically drop 1-3 materials - trending towards 2-3 rather than 1, with at least one drop being a rare-ish drop.
+These need a `background`. These need to exist for workers to level up. They should typically drop 1-3 materials - trending towards 2-3 rather than 1, with at least one drop being a rare-ish drop.
 
 ## Travel Nodes
 

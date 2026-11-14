@@ -1,7 +1,7 @@
 - id: 7e6c8603-6cd5-4bf1-a828-81478315b462
   name: Larsia
   description: A bustling center of commerce at the heart of the Larsian Desert.
-  combatBackground: arena-colosseum
+  background: arena-colosseum
 
   scaleType: City
 

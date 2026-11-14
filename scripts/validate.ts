@@ -28,7 +28,7 @@ import { runExchangeNodesAnalysis } from '@helpers/debug/analysis-exchangenodes'
 import { runRumorsAnalysis } from '@helpers/debug/analysis-rumors';
 import { runShrinesAnalysis } from '@helpers/debug/analysis-shrines';
 import { runRegionsAnalysis } from '@helpers/debug/analysis-regions';
-import { runCombatBackgroundsAnalysis } from '@helpers/debug/analysis-combatbackgrounds';
+import { runNodeBackgroundsAnalysis } from '@helpers/debug/analysis-nodebackgrounds';
 import { runTasksAnalysis } from '@helpers/debug/analysis-tasks';
 import { runTrainersAnalysis } from '@helpers/debug/analysis-trainers';
 import { runSkillBonusesAnalysis } from '@helpers/debug/analysis-skillbonuses';
@@ -42,7 +42,7 @@ import { loadCompiledContentFromDisk } from './debug/load-compiled-content';
 import { printAnalysisResult, STATUS_ICON } from './debug/run-analysis-cli';
 import { runSchemaValidation } from './debug/schema-validation';
 import { runUnusedSpriteValidation } from './debug/unused-sprite-validation';
-import { runCombatBackgroundFileValidation } from './debug/combat-background-file-validation';
+import { runNodeBackgroundFileValidation } from './debug/node-background-file-validation';
 
 const ANALYSIS_CHECKS: Array<{ title: string; run: () => AnalysisRunResult }> =
   [
@@ -74,8 +74,8 @@ const ANALYSIS_CHECKS: Array<{ title: string; run: () => AnalysisRunResult }> =
     { title: 'validate:rumors', run: runRumorsAnalysis },
     { title: 'validate:regions', run: runRegionsAnalysis },
     {
-      title: 'validate:combatbackgrounds',
-      run: runCombatBackgroundsAnalysis,
+      title: 'validate:nodebackgrounds',
+      run: runNodeBackgroundsAnalysis,
     },
     { title: 'validate:outposts', run: runOutpostsAnalysis },
     {
@@ -132,7 +132,7 @@ async function main(): Promise<void> {
   const fileProblems = [
     ...(await runSchemaValidation()),
     ...(await runUnusedSpriteValidation()),
-    ...(await runCombatBackgroundFileValidation()),
+    ...(await runNodeBackgroundFileValidation()),
   ];
   fileProblems.forEach((message) => problems.push({ status: 'fail', message }));
 

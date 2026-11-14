@@ -20,12 +20,10 @@ import { IconComponent } from '@components/icon/icon.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { StatusElementPoolComponent } from '@components/status-element-pool/status-element-pool.component';
 import { TooltipSkillPreviewComponent } from '@components/tooltip-skill-preview/tooltip-skill-preview.component';
+import { BackdropNodeComponent } from '@components/backdrop-node/backdrop-node.component';
 import { ListReflowDirective } from '@directives/list-reflow.directive';
 import { SFXDirective } from '@directives/sfx.directive';
-import {
-  combatBackgroundSource,
-  combatBackgroundURL,
-} from '@helpers/combat/combat-background.ui';
+import { combatNodeBackground } from '@helpers/world-node/world-node-background.ui';
 import { combatLog } from '@helpers/combat/combat-log';
 import { combatIsManual } from '@helpers/combat/combat-manual';
 import {
@@ -74,6 +72,7 @@ import { AnimationService } from '@services/animation.service';
     DecimalPipe,
     IconComponent,
     ListReflowDirective,
+    BackdropNodeComponent,
     SFXDirective,
     SlotIconBlankComponent,
     StatusElementPoolComponent,
@@ -100,17 +99,10 @@ export class OverlayCombatOrdersComponent {
   private seenCombatIds = signal<Set<string>>(new Set());
 
   public title = computed(() => combatManualTitle(this.combat()));
-  private backdrop = computed(() => {
+  public backdrop = computed(() => {
     const combat = this.shownCombat();
-    return combat ? combatBackgroundSource(combat) : undefined;
+    return combat ? combatNodeBackground(combat) : undefined;
   });
-  public backdropImage = computed(() => {
-    const background = this.backdrop()?.combatBackground;
-    return background ? `url('${combatBackgroundURL(background)}')` : 'none';
-  });
-  public backdropFilter = computed(
-    () => this.backdrop()?.combatBackgroundFilter ?? 'None',
-  );
   public pendingSkillId = signal<string | undefined>(undefined);
 
   public isPaused = isGameloopPaused;

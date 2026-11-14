@@ -2,6 +2,7 @@ import type { TradeskillId } from '@interfaces/content-tradeskill';
 import type { ItemQuantity } from '@interfaces/cost';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { LevelRange } from '@interfaces/level-range';
+import type { HasNodeBackground } from '@interfaces/node-background';
 import type { HasDescription } from '@interfaces/traits';
 import type {
   WorldNodeDevelopable,
@@ -26,7 +27,8 @@ export type GatherResult = {
 export type GatheringContent = IsContentItem &
   HasDescription &
   WorldNodeHideable &
-  WorldNodeDevelopable & {
+  WorldNodeDevelopable &
+  HasNodeBackground & {
     id: GatheringId;
     __type: 'gathering';
 

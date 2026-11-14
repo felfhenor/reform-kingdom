@@ -1,6 +1,7 @@
 - id: db7d5e8b-738d-439e-93e1-438a8ad8a396
   name: Miremetal Mines
   description: A swampy plains, perfect for finding a variety of natural resources to craft.
+  background: cave-mine
 
   levelRange:
     min: 15
@@ -83,6 +84,7 @@
 - id: 46f49626-9c31-4bee-9ce6-b2cf3acf8a5f
   name: Swampfields
   description: A swampy plains, perfect for finding a variety of natural resources to craft.
+  background: swamp-roots
 
   levelRange:
     min: 15

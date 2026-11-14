@@ -1,7 +1,7 @@
 - id: a08cd1a5-5f7d-464f-bd95-9a9ca98df86d
   name: Mired Ruins
   description: A goblin tribe far stronger than its kin has made this sunken ruin its den.
-  combatBackground: swamp-roots
+  background: swamp-roots
 
   levelRange:
     min: 10
@@ -42,7 +42,7 @@
 - id: 0de2b10e-51ff-4b6d-b46c-99288fccb560
   name: Craggleorc Bluff
   description: A cave overlooking a swamp where a tribe of mire orcs lives.
-  combatBackground: castle-throne
+  background: castle-throne
 
   levelRange:
     min: 16
@@ -78,7 +78,7 @@
 - id: b04d13b9-586f-4c56-8002-5413ce5ed552
   name: Mirefrog Marsh
   description: A small marsh, home to many, many mire frogs. It smells like death, and the air is palpable. And yet, goblins around ride the marsh creatures as if it was a casual day out.
-  combatBackground: swamp-camp
+  background: swamp-camp
 
   levelRange:
     min: 17
@@ -120,7 +120,7 @@
 - id: 7e651b41-48d6-434f-87ea-bab973915b14
   name: Ghostyard
   description: A massive graveyard with tombstones in every orientation, due to the mire being excessively marshy. A haunting chill lingers in the air.
-  combatBackground: arena-graveyard
+  background: arena-graveyard
 
   levelRange:
     min: 18
@@ -157,7 +157,7 @@
 - id: 4fc58634-8a5c-4336-930a-e926fa32d348
   name: Spirit Nexus
   description: An intense magical facility, staffed by both living orcs and ghostly spirits working in tandem.
-  combatBackground: forest-runestones
+  background: forest-runestones
 
   levelRange:
     min: 19
@@ -194,8 +194,8 @@
 - id: 13c57fcf-4c15-48c3-bd84-b85af7edccf8
   name: Forgotten Grotto
   description: A cave filled with shallow graves. Here, the dead yearn for life.
-  combatBackground: cave-crystal-red
-  combatBackgroundFilter: Faded
+  background: cave-crystal-red
+  backgroundFilter: Faded
 
   invisibleUntilCollectibleIdsFound:
     - Cane of Etheria

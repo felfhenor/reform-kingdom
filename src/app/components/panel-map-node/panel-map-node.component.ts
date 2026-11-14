@@ -1,6 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import type { AnimationCallbackEvent } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+} from '@angular/core';
 import { BarTownReputationComponent } from '@components/bar-town-reputation/bar-town-reputation.component';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
+import { BackdropNodeComponent } from '@components/backdrop-node/backdrop-node.component';
 import { ButtonWorldNodeDevelopComponent } from '@components/button-world-node-develop/button-world-node-develop.component';
 import { PanelMapNodeActionsCaravanComponent } from '@components/panel-map-node-actions-caravan/panel-map-node-actions-caravan.component';
 import { PanelMapNodeActionsExchangeComponent } from '@components/panel-map-node-actions-exchange/panel-map-node-actions-exchange.component';
@@ -62,6 +69,7 @@ import {
   worldNodeCaravanIsAvailable,
   worldNodeCaravanVisitedTraderName,
 } from '@helpers/world-node/world-node-caravan.ui';
+import { worldNodeBackground } from '@helpers/world-node/world-node-background.ui';
 import { worldNodeDescription } from '@helpers/world-node/world-node-content.ui';
 import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';
 import { worldNodeGatherMaterialIds } from '@helpers/world-node/world-node-gathering-discovery';
@@ -86,11 +94,13 @@ import {
 } from '@helpers/world-node/world-nodes';
 import { TippyDirective } from '@ngneat/helipopper';
 import { sortBy } from 'es-toolkit/compat';
+import { AnimationService } from '@services/animation.service';
 
 @Component({
   selector: 'app-panel-map-node',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    BackdropNodeComponent,
     TippyDirective,
     BarTownReputationComponent,
     ButtonCloseComponent,
@@ -119,6 +129,8 @@ import { sortBy } from 'es-toolkit/compat';
   styleUrl: './panel-map-node.component.scss',
 })
 export class PanelMapNodeComponent {
+  private anim = inject(AnimationService);
+
   public node = computed(() => selectedMapNode());
 
   public gatherNodeLevel = computed(() => {
@@ -166,6 +178,11 @@ export class PanelMapNodeComponent {
     const entry = this.node();
     const difficulty = entry ? worldNodeDifficultyTier(entry) : undefined;
     return difficulty ? `badge-difficulty-${difficulty}` : 'badge-data';
+  });
+
+  public background = computed(() => {
+    const entry = this.node();
+    return entry ? worldNodeBackground(entry) : undefined;
   });
 
   public description = computed(() => {
@@ -415,5 +432,16 @@ export class PanelMapNodeComponent {
 
   public close(): void {
     mapNodeDeselect();
+  }
+
+  public onBannerEnter(event: AnimationCallbackEvent): void {
+    this.anim.fadeIn(event.target, 200);
+  }
+
+  public onBannerLeave(event: AnimationCallbackEvent): void {
+    this.anim
+      .fadeOut(event.target, 200)
+      .then(() => event.animationComplete())
+      .catch(() => event.animationComplete());
   }
 }

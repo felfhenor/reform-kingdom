@@ -3,6 +3,7 @@ import type { EdictId } from '@interfaces/content-edict';
 import type { EquipmentId } from '@interfaces/content-equipment';
 import type { CostItem, ItemQuantity } from '@interfaces/cost';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
+import type { HasNodeBackground } from '@interfaces/node-background';
 import type { HasDescription } from '@interfaces/traits';
 import type { WorldNodeHideable } from '@interfaces/world-nodes';
 
@@ -38,7 +39,8 @@ export type ExchangeNodeExchange =
 
 export type ExchangeNodeContent = IsContentItem &
   HasDescription &
-  WorldNodeHideable & {
+  WorldNodeHideable &
+  HasNodeBackground & {
     id: ExchangeNodeId;
     __type: 'exchangenode';
 

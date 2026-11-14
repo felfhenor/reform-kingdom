@@ -83,7 +83,7 @@
                 {
                   "glob": "**/*",
                   "input": "public",
-                  "ignore": ["asset/combatbg/**"]
+                  "ignore": ["asset/nodebg/**"]
                 }
               ]
             },

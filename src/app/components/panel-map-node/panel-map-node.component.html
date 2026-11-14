@@ -8,11 +8,37 @@
       <app-panel-map-node-status-encounter [entry]="entry" />
     }
 
-    <div class="map-node-panel card bg-base-100 shadow-xl pointer-events-auto">
-      <div class="card-body gap-2 p-4">
-        <div class="flex items-start justify-between gap-2">
+    <div
+      class="map-node-panel card relative bg-base-100 shadow-xl pointer-events-auto"
+    >
+      @let nodeBackground = background();
+      @if (nodeBackground) {
+        <div
+          class="absolute inset-x-0 top-0 h-28 overflow-hidden pointer-events-none"
+          (animate.enter)="onBannerEnter($event)"
+          (animate.leave)="onBannerLeave($event)"
+        >
+          <app-backdrop-node
+            class="absolute inset-0"
+            [background]="nodeBackground.background"
+            [filter]="nodeBackground.backgroundFilter ?? 'None'"
+            align="top"
+          />
+          <div class="node-banner-fade absolute inset-0"></div>
+        </div>
+      }
+
+      <div class="card-body relative gap-2 p-4">
+        <div
+          class="flex items-start justify-between gap-2"
+          [class.node-banner-text]="!!nodeBackground"
+        >
           <div class="flex items-center gap-2">
-            <app-sprite-node [entry]="entry" />
+            <app-sprite-node
+              [entry]="entry"
+              [framed]="!nodeBackground"
+              [class.node-banner-drop-shadow]="!!nodeBackground"
+            />
 
             <div class="flex flex-col gap-2">
               <h2 class="type-page-title">{{ displayName() }}</h2>
@@ -39,7 +65,10 @@
             </div>
           </div>
 
-          <app-button-close (click)="close()"></app-button-close>
+          <app-button-close
+            [class.node-banner-drop-shadow]="!!nodeBackground"
+            (click)="close()"
+          ></app-button-close>
         </div>
 
         <div class="flex flex-wrap gap-2 text-sm">

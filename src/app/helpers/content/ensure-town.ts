@@ -1,4 +1,7 @@
-import { ensureArray } from '@helpers/content/ensure-helpers-core';
+import {
+  ensureArray,
+  ensureNodeBackground,
+} from '@helpers/content/ensure-helpers-core';
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import {
   ensureCombatStats,
@@ -6,7 +9,6 @@ import {
   ensureTagResistances,
 } from '@helpers/content/ensure-helpers-stats';
 import type {
-  CombatBackground,
   CommissionOfferId,
   CommissionOfferSlot,
   GlobalEffectId,
@@ -250,8 +252,7 @@ export function ensureTown(town: TownContentInput): Required<TownContent> {
     hidden: town.hidden ?? false,
     invisibleUntilCollectibleIdsFound:
       town.invisibleUntilCollectibleIdsFound ?? [],
-    combatBackground: town.combatBackground ?? ('UNKNOWN' as CombatBackground),
-    combatBackgroundFilter: town.combatBackgroundFilter ?? 'None',
+    ...ensureNodeBackground(town),
     scaleType: town.scaleType ?? 'Outpost',
     level: town.level ?? 1,
     materialThresholds: ensureArray(

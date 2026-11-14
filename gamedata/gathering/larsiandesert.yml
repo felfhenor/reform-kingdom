@@ -1,6 +1,7 @@
 - id: 7faab500-8beb-4c83-b58e-99f9cccf8552
   name: Mescalin Expanse
   description: A sandfield with cacti as far as the eye can see. Dead trees lay on the ground, but cacti thrive.
+  background: desert-palms
 
   levelRange:
     min: 24
@@ -93,6 +94,7 @@
 - id: 97d6c2ca-9eb1-46fd-af60-983b0ad05511
   name: Oasis Wellspring
   description: A beautiful oasis with relaxing pools filled with firmwater, and sparkling trees that bring life to the energy of the oasis.
+  background: desert-shore
 
   levelRange:
     min: 25
@@ -202,6 +204,7 @@
 - id: 59e04673-e239-449e-bcca-2af7ad23692d
   name: Wet Dry Forest
   description: A lively forest containing zounds of living and not-quite-alive trees.
+  background: forest-mushroom
 
   levelRange:
     min: 26

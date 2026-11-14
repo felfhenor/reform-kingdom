@@ -2,6 +2,7 @@ import {
   ensureArray,
   ensureCostItem,
   ensureItemQuantity,
+  ensureNodeBackground,
 } from '@helpers/content/ensure-helpers-core';
 import type {
   CollectibleId,
@@ -61,6 +62,7 @@ export function ensureExchangeNode(
     __type: 'exchangenode',
     description: node.description ?? 'UNKNOWN',
     hidden: node.hidden ?? false,
+    ...ensureNodeBackground(node),
     invisibleUntilCollectibleIdsFound:
       node.invisibleUntilCollectibleIdsFound ?? [],
     emptyText: node.emptyText ?? 'Nothing here can be exchanged.',

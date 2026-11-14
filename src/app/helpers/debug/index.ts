@@ -1,6 +1,5 @@
 export * from './analysis-affixes';
 export * from './analysis-collectiblegates';
-export * from './analysis-combatbackgrounds';
 export * from './analysis-commissionrewards';
 export * from './analysis-commissionusage';
 export * from './analysis-completionrewards';
@@ -19,6 +18,7 @@ export * from './analysis-jobstarter';
 export * from './analysis-materialutilization';
 export * from './analysis-monsterdrops';
 export * from './analysis-monsterstats';
+export * from './analysis-nodebackgrounds';
 export * from './analysis-nodedevelopmenttimes';
 export * from './analysis-nodelevels';
 export * from './analysis-nodenames';

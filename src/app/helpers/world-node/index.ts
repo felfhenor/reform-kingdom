@@ -1,4 +1,5 @@
 export * from './world-map-discovery';
+export * from './world-node-background.ui';
 export * from './world-node-caravan';
 export * from './world-node-caravan.ui';
 export * from './world-node-collectible-gate.ui';

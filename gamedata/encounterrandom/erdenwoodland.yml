@@ -1,7 +1,7 @@
 - id: 89c773c3-b775-4237-8ae9-830f947a7171
   name: Kor'ratha
   description: A temple buried in the depths of the Erden Woodland. Elves come here to pray, and pursue all sorts of ritualistic endeavours.
-  combatBackground: ruins-arches
+  background: ruins-arches
 
   levelRange:
     min: 41
