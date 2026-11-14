@@ -3,6 +3,8 @@ const fs = require('fs');
 
 const isDemo = process.env.REFORM_DEMO === '1';
 const appName = isDemo ? 'reformkingdom-demo' : 'reformkingdom';
+// Shortcut and Programs-list name; Windows file names can't hold the colon in "re:Form".
+const displayName = isDemo ? 'reForm Kingdom Demo' : 'reForm Kingdom';
 
 module.exports = {
   outDir: isDemo ? 'out-demo' : 'out',
@@ -12,6 +14,10 @@ module.exports = {
     appCopyright: 're:Form Kingdom Team',
     appCategoryType: 'public.app-category.games',
     icon: './icons/icon',
+    win32metadata: {
+      FileDescription: displayName,
+      ProductName: displayName,
+    },
   },
   rebuildConfig: {},
   makers: [
@@ -19,6 +25,7 @@ module.exports = {
       name: '@electron-forge/maker-squirrel',
       config: {
         name: appName,
+        title: displayName,
         icon: './icons/icon.ico',
         setupIcon: './icons/icon.ico',
         setupExe: `${appName}.exe`,
