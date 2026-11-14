@@ -1,0 +1,82 @@
+# Demo build content rules (`npm run build:demo`). Single entries can also opt out with `demoStrip: true`.
+
+# Only these maps ship; any map not listed (including new ones) is stripped.
+maps:
+  - Carrina
+  - CraggledMire
+
+# Every gamedata file whose path (relative to gamedata/) contains one of these is stripped.
+stripFiles:
+  - astralobservatory
+  - erdenwoodland
+  - felsummit
+  - felway
+  - larsiandesert
+  - templarsretreat
+  - larsia
+  - town/elfheim
+  - town-elfheim
+  - elfhelm
+  - lizard
+  - foundersblessed
+  - smugglers
+  - caravantrader/fel.yml
+
+# Kept despite a stripFiles match, because demo content still uses them.
+keep:
+  # Ghostcopper gear sold by Mire traders and the Shrine of Parcilyte's upgrades
+  - Ghostcopper Dust
+  # Stori Kesan's stock and Maxim Tasnica's teachings
+  - Cimmerian Fire Charm
+  - Cimmerian Holy Charm
+  - Cimmerian Lightning Charm
+  - Cimmerian Skull Charm
+  - Cimmerian Water Charm
+  # Felway Gate (Carrina) and Look for Trouble II's summon
+  - Fel Demon
+  - Akroki Vanguard
+  # Pond of Memories costs (never stocked in the demo, but the node needs its content)
+  - Brightwisp Core
+  - Cactspine
+  - Crimson Ingot
+  - Crimson Ruby
+  - Felrock
+  - Firmwater
+  - Hawk Feather
+  - Star Fragment
+
+# Kept entries in these folders are stripped too once they need a stripped map, node or entry (they can't be finished).
+cascade:
+  - task
+  - rumor
+  - recipe
+  - astralprojector
+  - trainerteaching
+  - skill
+
+# List fields whose elements are dropped (instead of failing) when they need stripped content.
+prune:
+  monster:
+    - drops
+  caravantrader:
+    - tokenTrades
+    - trades
+
+# Looked up by name in code, so the demo build fails if any of these get stripped.
+pinned:
+  - Gold Coin
+  - Crimson Lucre
+  - Trader Scrip
+  - Memory Flux
+  - Duskhall Flux
+  - Founding Stone
+  - Recipe Backdrop
+  - Rumor
+  - Attack
+  - Auto Mode
+  - Deaths Door
+  - Healing
+  - Idle
+  - Raid Defense Requested
+  - Regional Outpost
+  - Trepidation

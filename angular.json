@@ -130,6 +130,9 @@
             },
             "development": {
               "buildTarget": "reformkingdom:build:development"
+            },
+            "demo": {
+              "buildTarget": "reformkingdom:build:development,demo"
             }
           },
           "defaultConfiguration": "development"

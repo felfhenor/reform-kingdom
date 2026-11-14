@@ -3,8 +3,10 @@
 import { isArray, isObject, isString, sortBy } from 'es-toolkit/compat';
 import fs from 'fs-extra';
 import * as yaml from 'js-yaml';
+import path from 'path';
 import rec from 'recursive-readdir';
 import { CONTENT_OUT_DIR } from './content-out-dir';
+import { demoFilterContent } from './demo-content';
 import { writeJsonIfChanged } from './write-json-if-changed';
 
 fs.ensureDirSync(CONTENT_OUT_DIR);
@@ -13,6 +15,7 @@ const allData: Record<string, any[]> = {};
 const trackedIds: Record<string, boolean> = {};
 const trackedNames: Record<string, boolean> = {};
 const idToName: Record<string, Record<string, string>> = {};
+const fileOf = new Map<any, string>();
 
 // preload
 const processFiles = async () => {
@@ -33,6 +36,7 @@ const processFiles = async () => {
         allData[folder].push(...doc);
 
         doc.forEach((entry: any) => {
+          fileOf.set(entry, path.relative('gamedata', file));
           if (!entry.name) {
             console.error(`Entry "${entry.id}" has no name.`);
             return;
@@ -69,86 +73,100 @@ const processFiles = async () => {
   );
 };
 
+type Resolve = (name: string, folder: string) => string;
+
+// magically transform any key that requests an id, through resolve
+const iterateObject = (entry: any, resolve: Resolve) => {
+  const allIds = Object.keys(allData).reverse();
+  Object.keys(entry).forEach((entryKey) => {
+    // no match, skip. Prefer the longest (most specific) matching folder
+    // name over the first one found - e.g. `tradeskillId` contains both
+    // `skill` and `tradeskill` as substrings, and only the latter is the
+    // correct match.
+    const keyMatch = sortBy(
+      allIds.filter((id) => entryKey.toLowerCase().includes(id)),
+      (id) => id.length,
+    ).at(-1);
+    if (!keyMatch) {
+      // check deeper, if it's an array we want to check our sub objects
+      if (isArray(entry[entryKey])) {
+        entry[entryKey].forEach((subObj: any) => {
+          iterateObject(subObj, resolve);
+        });
+
+        // if it's not an array, but an object, we want to dig deeper
+      } else if (isObject(entry[entryKey])) {
+        iterateObject(entry[entryKey], resolve);
+      }
+
+      return;
+    }
+
+    // if the property name has id in it, we rewrite it
+    if (entryKey.toLowerCase().includes('id')) {
+      // match
+      // our match key is an array of strings, so we rewrite them all to be ids
+      if (isArray(entry[entryKey])) {
+        entry[entryKey] = entry[entryKey].map((i: string) =>
+          resolve(i, keyMatch),
+        );
+      }
+
+      // our match key is a simple string, so we rewrite it to be an id
+      else if (entry[entryKey] !== 'Any') {
+        entry[entryKey] = resolve(entry[entryKey], keyMatch);
+      }
+
+      // otherwise, if it's an array, we go deeper, again
+    } else {
+      if (isArray(entry[entryKey])) {
+        if (isString(entry[entryKey][0])) {
+          entry[entryKey] = entry[entryKey].map((i: string) =>
+            resolve(i, keyMatch),
+          );
+        } else {
+          entry[entryKey].forEach((subObj: any) => {
+            iterateObject(subObj, resolve);
+          });
+        }
+
+        // and if it's an object instead of an array, we still want to dive in
+      } else if (isObject(entry[entryKey])) {
+        iterateObject(entry[entryKey], resolve);
+      }
+    }
+  });
+};
+
+// Walks a copy, so the entry keeps its names.
+const contentRefsOf = (entry: any) => {
+  const refs: Array<{ folder: string; name: string }> = [];
+  iterateObject(structuredClone(entry), (name, folder) => {
+    refs.push({ folder, name });
+    return name;
+  });
+  return refs;
+};
+
+const getIdForName = (name: string, type: string) => {
+  const res = idToName[type][name];
+  if (!res) {
+    console.log(new Error().stack);
+    console.error(`Name ${name} (${type}) has no corresponding id.`);
+    process.exit(1);
+  }
+
+  return res;
+};
+
 const rewriteDataIds = () => {
   const allIds = Object.keys(allData).reverse();
   console.log(`Valid identifiers: ${allIds.join(', ')}`);
 
-  const getIdForName = (name: string, type: string) => {
-    const res = idToName[type][name];
-    if (!res) {
-      console.log(new Error().stack);
-      console.error(`Name ${name} (${type}) has no corresponding id.`);
-      process.exit(1);
-    }
-
-    return res;
-  };
-
-  // magically transform any key that requests an id to that id
-  const iterateObject = (entry: any) => {
-    Object.keys(entry).forEach((entryKey) => {
-      // no match, skip. Prefer the longest (most specific) matching folder
-      // name over the first one found - e.g. `tradeskillId` contains both
-      // `skill` and `tradeskill` as substrings, and only the latter is the
-      // correct match.
-      const keyMatch = sortBy(
-        allIds.filter((id) => entryKey.toLowerCase().includes(id)),
-        (id) => id.length,
-      ).at(-1);
-      if (!keyMatch) {
-        // check deeper, if it's an array we want to check our sub objects
-        if (isArray(entry[entryKey])) {
-          entry[entryKey].forEach((subObj: any) => {
-            iterateObject(subObj);
-          });
-
-          // if it's not an array, but an object, we want to dig deeper
-        } else if (isObject(entry[entryKey])) {
-          iterateObject(entry[entryKey]);
-        }
-
-        return;
-      }
-
-      // if the property name has id in it, we rewrite it
-      if (entryKey.toLowerCase().includes('id')) {
-        // match
-        // our match key is an array of strings, so we rewrite them all to be ids
-        if (isArray(entry[entryKey])) {
-          entry[entryKey] = entry[entryKey].map((i: string) =>
-            getIdForName(i, keyMatch),
-          );
-        }
-
-        // our match key is a simple string, so we rewrite it to be an id
-        else if (entry[entryKey] !== 'Any') {
-          entry[entryKey] = getIdForName(entry[entryKey], keyMatch);
-        }
-
-        // otherwise, if it's an array, we go deeper, again
-      } else {
-        if (isArray(entry[entryKey])) {
-          if (isString(entry[entryKey][0])) {
-            entry[entryKey] = entry[entryKey].map((i: string) =>
-              getIdForName(i, keyMatch),
-            );
-          } else {
-            entry[entryKey].forEach((subObj: any) => {
-              iterateObject(subObj);
-            });
-          }
-
-          // and if it's an object instead of an array, we still want to dive in
-        } else if (isObject(entry[entryKey])) {
-          iterateObject(entry[entryKey]);
-        }
-      }
-    });
-  };
-
   allIds.forEach((key) => {
     Object.values(allData[key]).forEach((entry) => {
-      iterateObject(entry);
+      delete entry.demoStrip;
+      iterateObject(entry, getIdForName);
     });
   });
 
@@ -162,6 +180,9 @@ const rewriteDataIds = () => {
 
 const run = async () => {
   await processFiles();
+  if (process.argv.includes('--demo')) {
+    demoFilterContent(allData, fileOf, contentRefsOf);
+  }
   rewriteDataIds();
 };
 

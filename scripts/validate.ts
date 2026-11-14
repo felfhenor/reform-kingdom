@@ -38,6 +38,8 @@ import { runJobAbilitiesAnalysis } from '@helpers/debug/analysis-jobabilities';
 import { runSkillTreesAnalysis } from '@helpers/debug/analysis-skilltrees';
 import { runJobStarterAnalysis } from '@helpers/debug/analysis-jobstarter';
 import { runMonsterDropsAnalysis } from '@helpers/debug/analysis-monsterdrops';
+import fs from 'fs-extra';
+import { DEMO_UNOBTAINABLE_FILE } from './demo-content';
 import { loadCompiledContentFromDisk } from './debug/load-compiled-content';
 import { printAnalysisResult, STATUS_ICON } from './debug/run-analysis-cli';
 import { runSchemaValidation } from './debug/schema-validation';
@@ -95,6 +97,25 @@ const ANALYSIS_CHECKS: Array<{ title: string; run: () => AnalysisRunResult }> =
     { title: 'validate:monsterdrops', run: runMonsterDropsAnalysis },
   ];
 
+const isDemo = process.argv.includes('--demo');
+const demoUnobtainable = new Set<string>(
+  isDemo ? fs.readJsonSync(DEMO_UNOBTAINABLE_FILE) : [],
+);
+
+// Demo exits lead to maps it doesn't ship; level-split gear and keep/gate names stay in on purpose, unobtainable.
+function isExpectedInDemo(
+  title: string,
+  check: { label?: string; message: string },
+): boolean {
+  return (
+    (title === 'validate:teleportnodes' &&
+      check.message.includes("does not match any teleport node's")) ||
+    (title === 'validate:obtainability' &&
+      (check.message.startsWith('Equipment ') ||
+        demoUnobtainable.has(check.label ?? '')))
+  );
+}
+
 function printFinalSummary(
   problems: Array<{ status: string; message: string }>,
 ): void {
@@ -121,6 +142,7 @@ async function main(): Promise<void> {
     printAnalysisResult(title, result, { strict: false });
     result.checks
       .filter((check) => check.status === 'fail' || check.status === 'warning')
+      .filter((check) => !isDemo || !isExpectedInDemo(title, check))
       .forEach((check) =>
         problems.push({
           status: check.status,

@@ -8,6 +8,7 @@
   "scripts": {
     "start": "concurrently \"npm run start:app\" \"npm run gamedata:watch\"",
     "start:app": "ng serve --open --port 9766",
+    "start:demo": "npm run build:demo:content && ng serve --configuration demo --port 9767",
     "start:electron": "cd electron && npm run start:localref",
     "setup": "npm run gamedata:build",
     "lint": "ng lint",
@@ -34,6 +35,7 @@
     "gamedata:build": "ts-node --project tsconfig.scripts.json scripts/gamedata-build",
     "gamedata:art:spritesheets": "ts-node --project tsconfig.scripts.json scripts/gamedata-art-spritesheets",
     "schemas:generate": "npx ts-node --project tsconfig.scripts.json scripts/schema-generate",
+    "validate:demo": "npm run build:demo:content && ts-node --project tsconfig.scripts.json -r tsconfig-paths/register scripts/validate --demo",
     "validate": "npm run gamedata:build && npm run schemas:generate && ts-node --project tsconfig.scripts.json -r tsconfig-paths/register scripts/validate",
     "bump:major": "npm version major -m \"chore(release): Major %s\"",
     "bump:minor": "npm version minor -m \"chore(release): Minor %s\"",

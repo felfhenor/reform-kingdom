@@ -12,9 +12,10 @@ import { setAllMaps } from '@helpers/maps';
 import type { GameMap, IsContentItem } from '@interfaces';
 import fs from 'fs-extra';
 import path from 'path';
+import { CONTENT_OUT_DIR } from '../content-out-dir';
 
 const ROOT_DIR = path.resolve(__dirname, '..', '..');
-const JSON_DIR = path.join(ROOT_DIR, 'public', 'json');
+const JSON_DIR = path.join(ROOT_DIR, CONTENT_OUT_DIR);
 
 function requireJson(filePath: string, description: string): unknown {
   if (!fs.existsSync(filePath)) {
@@ -29,13 +30,13 @@ function requireJson(filePath: string, description: string): unknown {
 export function loadCompiledContentFromDisk(): void {
   const assets = requireJson(
     path.join(JSON_DIR, 'all.json'),
-    'compiled content (public/json/all.json)',
+    'compiled content (all.json)',
   ) as Record<string, IsContentItem[]>;
   unfurlContent(assets, (message) => console.warn(`[Content] ${message}`));
 
   const allMaps = requireJson(
     path.join(JSON_DIR, 'all-maps.json'),
-    'the compiled map bundle (public/json/all-maps.json)',
+    'the compiled map bundle (all-maps.json)',
   ) as Record<string, unknown>;
 
   const maps = new Map<string, GameMap>();

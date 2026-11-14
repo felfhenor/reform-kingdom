@@ -2,13 +2,21 @@
 import fs from 'fs-extra';
 import path from 'path';
 import { CONTENT_OUT_DIR } from './content-out-dir';
+import { demoManifest } from './demo-content';
 import { writeJsonIfChanged } from './write-json-if-changed';
 
 fs.ensureDirSync(CONTENT_OUT_DIR);
 
+const demoMaps = process.argv.includes('--demo')
+  ? demoManifest().maps
+  : undefined;
+
 const mapFiles = fs
   .readdirSync('./gamemaps')
-  .filter((file: string) => file.endsWith('.json'));
+  .filter((file: string) => file.endsWith('.json'))
+  .filter(
+    (file: string) => demoMaps?.includes(path.basename(file, '.json')) ?? true,
+  );
 
 const GAMEMAPS_DIR = path.resolve('./gamemaps');
 // Not an actual output dir anymore - kept as the fixed anchor tileset image paths are computed relative to.
