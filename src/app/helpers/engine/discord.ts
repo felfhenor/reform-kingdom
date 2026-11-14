@@ -1,5 +1,6 @@
 import { caravanBrandName, caravanState } from '@helpers/caravan/caravan';
 import { getEntry } from '@helpers/content/content';
+import { isDemoBuild } from '@helpers/demo/demo';
 import { isInElectron } from '@helpers/engine/electron';
 import { activeTownNode, gamePlayView } from '@helpers/engine/ui';
 import { isGlobalEffectActive } from '@helpers/hero/global-effects';
@@ -36,6 +37,9 @@ export function discordSetStatus(status: DiscordPresenceOpts) {
   (window as any).discordRPCStatus = {
     ...status,
     details: discordMainStatus || status.details,
+    largeImageText: isDemoBuild()
+      ? 're:Form Kingdom Demo'
+      : status.largeImageText,
   };
 }
 

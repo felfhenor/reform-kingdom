@@ -5,11 +5,13 @@ import {
   HostListener,
   inject,
 } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
 import { BannerAnalyticsConsentComponent } from '@components/banner-analytics-consent/banner-analytics-consent.component';
 import { ScreenLoadingComponent } from '@components/screen-loading/screen-loading.component';
 import { TutorialOverlayComponent } from '@components/tutorial-overlay/tutorial-overlay.component';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
+import { isDemoBuild } from '@helpers/demo/demo';
 import { AnimationService } from '@services/animation.service';
 import { LoadingService } from '@services/loading.service';
 
@@ -29,6 +31,11 @@ import { LoadingService } from '@services/loading.service';
 export class AppComponent {
   private anim = inject(AnimationService);
   protected loadingService = inject(LoadingService);
+
+  constructor() {
+    // Electron's window title follows the page's.
+    if (isDemoBuild()) inject(Title).setTitle('re:Form Kingdom Demo');
+  }
 
   @HostListener('document:contextmenu')
   onContextMenu(): boolean {
