@@ -3,7 +3,10 @@ import {
   combatantHealthPercent,
   combatantIsDead,
 } from '@helpers/combat/combat-combatant-hp';
-import { ACHIEVEMENT_LAST_HERO_STANDING_HP_PERCENT } from '@helpers/config';
+import {
+  ACHIEVEMENT_GIANT_SLAYER_LEVEL_GAP,
+  ACHIEVEMENT_LAST_HERO_STANDING_HP_PERCENT,
+} from '@helpers/config';
 import type { AchievementMoment, Combat } from '@interfaces';
 
 function combatWonByLastHeroStanding(combat: Combat): boolean {
@@ -16,12 +19,23 @@ function combatWonByLastHeroStanding(combat: Combat): boolean {
   );
 }
 
+// Summons take their summoner's level, so only the monsters the fight began with count.
+function combatWonAgainstGiant(combat: Combat): boolean {
+  const strongest = Math.max(...combat.heroes.map((hero) => hero.level));
+  return combat.guardians.some(
+    (guardian) =>
+      !guardian.summonerId &&
+      guardian.level - strongest >= ACHIEVEMENT_GIANT_SLAYER_LEVEL_GAP,
+  );
+}
+
 export function combatVictoryMoments(combat: Combat): AchievementMoment[] {
   const moments: [AchievementMoment, boolean][] = [
     ['AmbushVictory', combatWonInAmbushRound(combat)],
     ['CoverDeathVictory', !!combat.heroDiedCovering],
     ['LastHeroStandingVictory', combatWonByLastHeroStanding(combat)],
     ['RetaliationKillVictory', !!combat.heroRetaliationKill],
+    ['GiantSlayerVictory', combatWonAgainstGiant(combat)],
   ];
   return moments.filter(([, isMet]) => isMet).map(([moment]) => moment);
 }

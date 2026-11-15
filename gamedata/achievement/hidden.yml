@@ -123,3 +123,12 @@
   condition:
     type: Moment
     moment: RetaliationKillVictory
+
+- id: e6c442ed-34dc-4894-b267-7433a2d5a52e
+  name: Giant Slayer
+  sprite: '0051'
+  description: Defeat a monster at least 10 levels above your strongest hero.
+  hidden: true
+  condition:
+    type: Moment
+    moment: GiantSlayerVictory

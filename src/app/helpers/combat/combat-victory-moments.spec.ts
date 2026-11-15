@@ -33,6 +33,23 @@ describe('combatVictoryMoments', () => {
     expect(won({ heroDiedCovering: true })).toEqual(['CoverDeathVictory']);
   });
 
+  it('marks a win over a monster 10+ levels above the strongest hero', () => {
+    const fightAt = (level: number, summonerId?: string) =>
+      won({
+        heroes: [
+          buildTestCombatant({ id: 'low', level: 1 }),
+          buildTestCombatant({ id: 'high', level: 20 }),
+        ],
+        guardians: [
+          buildTestCombatant({ isEnemy: true, hp: 0, level, summonerId }),
+        ],
+      });
+
+    expect(fightAt(30)).toEqual(['GiantSlayerVictory']);
+    expect(fightAt(29)).toEqual([]);
+    expect(fightAt(30, 'boss')).toEqual([]);
+  });
+
   it("marks a win after a hero's retaliation killed an enemy", () => {
     expect(won({ heroRetaliationKill: true })).toEqual([
       'RetaliationKillVictory',
