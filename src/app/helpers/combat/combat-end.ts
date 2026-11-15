@@ -294,6 +294,7 @@ function handleCombatVictory(combat: Combat): boolean {
   combatMessageLog(combat, 'Heroes have won the combat!');
   analyticsSendDesignEvent('Combat:Encounter:Win');
   if (combatWonInAmbushRound(combat)) achievementsMoment('AmbushVictory');
+  if (combat.heroDiedCovering) achievementsMoment('CoverDeathVictory');
 
   syncPartyHpFromCombat(combat.heroes);
   recordVictoryKills(combat);

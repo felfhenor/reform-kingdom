@@ -1,10 +1,13 @@
 import type { Combatant } from '@interfaces';
 import { describe, expect, it } from 'vitest';
 
-import { combatCoveringAlly } from '@helpers/combat/combat-cover';
+import {
+  combatCoveringAlly,
+  combatRecordCoverDeath,
+} from '@helpers/combat/combat-cover';
 import { ensureEquipmentSkillTechnique } from '@helpers/content/ensure-skill';
 import { defaultCombatStats } from '@helpers/defaults';
-import { buildTestCombatant } from '@/testing/builders';
+import { buildCombat, buildTestCombatant } from '@/testing/builders';
 
 const attack = ensureEquipmentSkillTechnique({ attributes: ['DamagesTarget'] });
 
@@ -120,5 +123,27 @@ describe('combatCoveringAlly', () => {
 
     expect(cover(party, 2)).toBeUndefined();
     expect(cover(party, 1, buff)).toBeUndefined();
+  });
+});
+
+describe('combatRecordCoverDeath', () => {
+  it('flags the fight once a covering hero falls', () => {
+    const fallen = hero('h', 0, { hp: 0 });
+    const combat = buildCombat({ heroes: [fallen] });
+
+    combatRecordCoverDeath(combat, fallen);
+
+    expect(combat.heroDiedCovering).toBe(true);
+  });
+
+  it('ignores a cover that survives, or one that is not a hero', () => {
+    const standing = hero('h');
+    const helper = hero('n', 0, { hp: 0 });
+    const combat = buildCombat({ heroes: [standing], helpers: [helper] });
+
+    combatRecordCoverDeath(combat, standing);
+    combatRecordCoverDeath(combat, helper);
+
+    expect(combat.heroDiedCovering).toBeUndefined();
   });
 });

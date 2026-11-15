@@ -96,3 +96,12 @@
   condition:
     type: Moment
     moment: AmbushVictory
+
+- id: 2cdba225-740d-47a3-8a2f-be0c810bafeb
+  name: Took One for the Team
+  sprite: '0047'
+  description: Win a fight after a hero dies covering an ally.
+  hidden: true
+  condition:
+    type: Moment
+    moment: CoverDeathVictory

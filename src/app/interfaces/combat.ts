@@ -263,6 +263,8 @@ export type Combat = {
   manualAction?: CombatManualAction;
   // Heroes skip the rest of the round, then escape if any survive it.
   manualFlee?: boolean;
+  // A hero fell to a hit they took covering an ally.
+  heroDiedCovering?: boolean;
 };
 
 export type CombatTurn = {

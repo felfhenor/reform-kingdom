@@ -4,7 +4,11 @@ import {
 } from '@helpers/combat/combat-combatant-hp';
 import { techniqueHasAttribute } from '@helpers/combat/combat-damage-amount';
 import { combatCanTakeTurn } from '@helpers/combat/combat-statuseffects';
-import type { Combatant, EquipmentSkillContentTechnique } from '@interfaces';
+import type {
+  Combat,
+  Combatant,
+  EquipmentSkillContentTechnique,
+} from '@interfaces';
 import { maxBy } from 'es-toolkit/compat';
 
 function combatCoverCandidates(
@@ -43,4 +47,10 @@ export function combatCoveringAlly(
     combatCoverCandidates(attacker, target, validTargets),
     combatantHealthPercent,
   );
+}
+
+export function combatRecordCoverDeath(combat: Combat, cover: Combatant): void {
+  if (combat.heroes.includes(cover) && combatantIsDead(cover)) {
+    combat.heroDiedCovering = true;
+  }
 }

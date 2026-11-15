@@ -26,7 +26,10 @@ import {
 } from '@helpers/combat/combat-combatant-hp';
 import { combatApplySkillToTarget } from '@helpers/combat/combat-damage';
 import { techniqueHasAttribute } from '@helpers/combat/combat-damage-amount';
-import { combatCoveringAlly } from '@helpers/combat/combat-cover';
+import {
+  combatCoveringAlly,
+  combatRecordCoverDeath,
+} from '@helpers/combat/combat-cover';
 import { combatantDamageEvents } from '@helpers/combat/combat-damage-events';
 import { combatCheckIfOver } from '@helpers/combat/combat-end';
 import { combatLog } from '@helpers/combat/combat-log';
@@ -579,11 +582,13 @@ describe('combatantTakeTurn targeting', () => {
     vi.mocked(combatGetTargetsForTechnique).mockReturnValue([target]);
     vi.mocked(combatCoveringAlly).mockReturnValueOnce(guard);
 
-    combatantTakeTurn(buildCombat(), caster());
+    const combat = buildCombat();
+    combatantTakeTurn(combat, caster());
 
     expect(combatApplySkillToTarget).toHaveBeenCalledOnce();
     expect(vi.mocked(combatApplySkillToTarget).mock.calls[0][2]).toBe(guard);
     expect(combatLog()[0].message).toContain('covers');
+    expect(combatRecordCoverDeath).toHaveBeenCalledWith(combat, guard);
   });
 
   it('emits a miss on the target instead of applying the technique when the miss roll succeeds', () => {

@@ -194,6 +194,15 @@ describe('combatCheckIfOver', () => {
       expect(gamestate().runStats.fightsWon).toBe(1);
     });
 
+    it('marks a win after a hero died covering an ally as a moment', () => {
+      endFight(fight({ rounds: 1, heroDiedCovering: true }));
+      expect(achievementsMoment).toHaveBeenCalledWith('CoverDeathVictory');
+
+      vi.mocked(achievementsMoment).mockClear();
+      endFight(fight({ rounds: 1 }));
+      expect(achievementsMoment).not.toHaveBeenCalled();
+    });
+
     it('marks a win in the ambush round as a moment, and not a later one', () => {
       endFight(fight());
       expect(achievementsMoment).toHaveBeenCalledWith('AmbushVictory');

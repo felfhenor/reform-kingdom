@@ -1,6 +1,9 @@
 import { combatAnalyzeTarget } from '@helpers/combat/combat-analyze';
 import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
-import { combatCoveringAlly } from '@helpers/combat/combat-cover';
+import {
+  combatCoveringAlly,
+  combatRecordCoverDeath,
+} from '@helpers/combat/combat-cover';
 import { combatApplySkillToTarget } from '@helpers/combat/combat-damage';
 import { techniqueHasAttribute } from '@helpers/combat/combat-damage-amount';
 import { combatantDamageEventEmit } from '@helpers/combat/combat-damage-events';
@@ -147,6 +150,8 @@ export function combatantUseSkill(
           capturedCreatorStats,
         );
       }
+
+      if (cover) combatRecordCoverDeath(combat, cover);
     });
   });
 }
