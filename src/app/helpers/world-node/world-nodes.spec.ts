@@ -359,7 +359,7 @@ describe('encounter-backed node accessors', () => {
             {
               kind: 'Collectible',
               requiredEdictId: 'iron-blood' as EdictId,
-              outputCollectibleId: 'vow' as CollectibleId,
+              output: { collectibleId: 'vow' as CollectibleId },
               costs: [],
             },
           ],

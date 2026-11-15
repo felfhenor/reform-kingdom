@@ -108,9 +108,9 @@ function sourcesAddTrades(
   entriesOf<ExchangeNodeContent>('exchangenode').forEach((node) =>
     node.exchanges.forEach((exchange) => {
       if (exchange.kind === 'Equipment')
-        addIfPresent(sources.equipment, exchange.outputEquipmentId);
+        addIfPresent(sources.equipment, exchange.output.equipmentId);
       else if (exchange.kind === 'Collectible')
-        addIfPresent(sources.collectibles, exchange.outputCollectibleId);
+        addIfPresent(sources.collectibles, exchange.output.collectibleId);
       else addIfPresent(sources.items, exchange.output.itemId);
     }),
   );

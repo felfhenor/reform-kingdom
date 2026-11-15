@@ -9,34 +9,54 @@ import type {
   EdictId,
   EquipmentId,
   ExchangeNodeCollectibleExchange,
+  ExchangeNodeCollectibleTarget,
   ExchangeNodeContent,
-  ExchangeNodeEquipmentExchange,
+  ExchangeNodeEquipmentTarget,
   ExchangeNodeExchange,
   ExchangeNodeId,
   ExchangeNodeItemExchange,
 } from '@interfaces';
 
 // Raw YAML may carry any variant's fields, so accept the union of every partial.
-type RawExchange = Partial<ExchangeNodeEquipmentExchange> &
-  Partial<Omit<ExchangeNodeItemExchange, 'kind'>> &
-  Partial<Omit<ExchangeNodeCollectibleExchange, 'kind'>>;
+type RawExchange = Omit<
+  Partial<ExchangeNodeItemExchange> & Partial<ExchangeNodeCollectibleExchange>,
+  'kind' | 'input' | 'output'
+> & {
+  kind?: ExchangeNodeExchange['kind'];
+  input?: Partial<
+    ExchangeNodeItemExchange['input'] & ExchangeNodeEquipmentTarget
+  >;
+  output?: Partial<
+    ExchangeNodeItemExchange['output'] &
+      ExchangeNodeEquipmentTarget &
+      ExchangeNodeCollectibleTarget
+  >;
+};
+
+function ensureEquipmentTarget(
+  target: Partial<ExchangeNodeEquipmentTarget> = {},
+): ExchangeNodeEquipmentTarget {
+  return { equipmentId: target.equipmentId ?? ('UNKNOWN' as EquipmentId) };
+}
 
 export function ensureExchangeNodeExchange(
   exchange: RawExchange = {},
 ): ExchangeNodeExchange {
   const costs = ensureArray(exchange.costs, ensureCostItem);
 
-  if ((exchange.kind as string) === 'Collectible') {
+  if (exchange.kind === 'Collectible') {
     return {
       kind: 'Collectible',
       requiredEdictId: exchange.requiredEdictId ?? ('UNKNOWN' as EdictId),
-      outputCollectibleId:
-        exchange.outputCollectibleId ?? ('UNKNOWN' as CollectibleId),
+      output: {
+        collectibleId:
+          exchange.output?.collectibleId ?? ('UNKNOWN' as CollectibleId),
+      },
       costs,
     };
   }
 
-  if ((exchange.kind as string) === 'Item') {
+  if (exchange.kind === 'Item') {
     return {
       kind: 'Item',
       input: ensureCostItem(exchange.input),
@@ -47,8 +67,8 @@ export function ensureExchangeNodeExchange(
 
   return {
     kind: 'Equipment',
-    inputEquipmentId: exchange.inputEquipmentId ?? ('UNKNOWN' as EquipmentId),
-    outputEquipmentId: exchange.outputEquipmentId ?? ('UNKNOWN' as EquipmentId),
+    input: ensureEquipmentTarget(exchange.input),
+    output: ensureEquipmentTarget(exchange.output),
     costs,
   };
 }

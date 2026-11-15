@@ -125,7 +125,7 @@ describe('remembrance discovery categories', () => {
           {
             kind: 'Collectible',
             requiredEdictId: 'edict' as EdictId,
-            outputCollectibleId: 'vow' as CollectibleId,
+            output: { collectibleId: 'vow' as CollectibleId },
             costs: [],
           },
         ],
@@ -227,8 +227,8 @@ describe('with a node type removed', () => {
         exchanges: [
           ensureExchangeNodeExchange({
             kind: 'Equipment',
-            inputEquipmentId: swordId,
-            outputEquipmentId: crownId,
+            input: { equipmentId: swordId },
+            output: { equipmentId: crownId },
           }),
           {
             kind: 'Item',

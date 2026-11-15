@@ -9,210 +9,240 @@
   exchanges:
     - kind: Collectible
       requiredEdictId: Edict of Craven Frailty
-      outputCollectibleId: Vow of Craven Frailty
+      output:
+        collectibleId: Vow of Craven Frailty
       costs:
         - itemId: Flax Flower
           required: 15
 
     - kind: Collectible
       requiredEdictId: Edict of Esurient Poverty
-      outputCollectibleId: Vow of Esurient Poverty
+      output:
+        collectibleId: Vow of Esurient Poverty
       costs:
         - itemId: Gold Coin
           required: 500
 
     - kind: Collectible
       requiredEdictId: Edict of Iron Blood
-      outputCollectibleId: Vow of Iron Blood
+      output:
+        collectibleId: Vow of Iron Blood
       costs:
         - itemId: Felrock
           required: 50
 
     - kind: Collectible
       requiredEdictId: Edict of Magic Wilds
-      outputCollectibleId: Vow of Magic Wilds
+      output:
+        collectibleId: Vow of Magic Wilds
       costs:
         - itemId: Wergen Wood
           required: 25
 
     - kind: Collectible
       requiredEdictId: Edict of Nature's Wrath
-      outputCollectibleId: Vow of Nature's Wrath
+      output:
+        collectibleId: Vow of Nature's Wrath
       costs:
         - itemId: Spirit Flesh
           required: 5
 
     - kind: Collectible
       requiredEdictId: Edict of Skillful Humility
-      outputCollectibleId: Vow of Skillful Humility
+      output:
+        collectibleId: Vow of Skillful Humility
       costs:
         - itemId: Copper Ore
           required: 25
 
     - kind: Collectible
       requiredEdictId: Edict of Artificial Scarcity
-      outputCollectibleId: Vow of Artificial Scarcity
+      output:
+        collectibleId: Vow of Artificial Scarcity
       costs:
         - itemId: Gold Coin
           required: 500
 
     - kind: Collectible
       requiredEdictId: Edict of Exogenous Support
-      outputCollectibleId: Vow of Exogenous Support
+      output:
+        collectibleId: Vow of Exogenous Support
       costs:
         - itemId: Crimson Lucre
           required: 500
 
     - kind: Collectible
       requiredEdictId: Edict of Fickle Curses
-      outputCollectibleId: Vow of Fickle Curses
+      output:
+        collectibleId: Vow of Fickle Curses
       costs:
         - itemId: Miremetal Ingot
           required: 25
 
     - kind: Collectible
       requiredEdictId: Edict of Golden Monopoly
-      outputCollectibleId: Vow of Golden Monopoly
+      output:
+        collectibleId: Vow of Golden Monopoly
       costs:
         - itemId: Malachite
           required: 10
 
     - kind: Collectible
       requiredEdictId: Edict of Impeccable Foresight
-      outputCollectibleId: Vow of Impeccable Foresight
+      output:
+        collectibleId: Vow of Impeccable Foresight
       costs:
         - itemId: Purple Slime Core
           required: 10
 
     - kind: Collectible
       requiredEdictId: Edict of Nomadic Departure
-      outputCollectibleId: Vow of Nomadic Departure
+      output:
+        collectibleId: Vow of Nomadic Departure
       costs:
         - itemId: Firmwater
           required: 25
 
     - kind: Collectible
       requiredEdictId: Edict of Reflective Mirrors
-      outputCollectibleId: Vow of Reflective Mirrors
+      output:
+        collectibleId: Vow of Reflective Mirrors
       costs:
         - itemId: Brightwisp Core
           required: 3
 
     - kind: Collectible
       requiredEdictId: Edict of True Devotion
-      outputCollectibleId: Vow of True Devotion
+      output:
+        collectibleId: Vow of True Devotion
       costs:
         - itemId: Ghost Peridot
           required: 15
 
     - kind: Collectible
       requiredEdictId: Edict of the Heated Forge
-      outputCollectibleId: Vow of the Heated Forge
+      output:
+        collectibleId: Vow of the Heated Forge
       costs:
         - itemId: Crimson Ingot
           required: 20
 
     - kind: Collectible
       requiredEdictId: Edict of the Starry Sky
-      outputCollectibleId: Vow of the Starry Sky
+      output:
+        collectibleId: Vow of the Starry Sky
       costs:
         - itemId: Star Fragment
           required: 3
 
     - kind: Collectible
       requiredEdictId: Edict of Calm Nature
-      outputCollectibleId: Vow of Calm Nature
+      output:
+        collectibleId: Vow of Calm Nature
       costs:
         - itemId: Wergen Stick
           required: 10
 
     - kind: Collectible
       requiredEdictId: Edict of Cold Steel
-      outputCollectibleId: Vow of Cold Steel
+      output:
+        collectibleId: Vow of Cold Steel
       costs:
         - itemId: Goblin Nail
           required: 10
 
     - kind: Collectible
       requiredEdictId: Edict of Eternal Blessings
-      outputCollectibleId: Vow of Eternal Blessings
+      output:
+        collectibleId: Vow of Eternal Blessings
       costs:
         - itemId: Spirit Flesh
           required: 10
 
     - kind: Collectible
       requiredEdictId: Edict of Fleet Feet
-      outputCollectibleId: Vow of Fleet Feet
+      output:
+        collectibleId: Vow of Fleet Feet
       costs:
         - itemId: Hawk Feather
           required: 10
 
     - kind: Collectible
       requiredEdictId: Edict of Hasty Hammers
-      outputCollectibleId: Vow of Hasty Hammers
+      output:
+        collectibleId: Vow of Hasty Hammers
       costs:
         - itemId: Copper Ingot
           required: 10
 
     - kind: Collectible
       requiredEdictId: Edict of Heroic Might
-      outputCollectibleId: Vow of Heroic Might
+      output:
+        collectibleId: Vow of Heroic Might
       costs:
         - itemId: Orc Bone
           required: 10
 
     - kind: Collectible
       requiredEdictId: Edict of Storied Development
-      outputCollectibleId: Vow of Storied Development
+      output:
+        collectibleId: Vow of Storied Development
       costs:
         - itemId: Crimson Ruby
           required: 10
 
     - kind: Collectible
       requiredEdictId: Edict of Swift Mending
-      outputCollectibleId: Vow of Swift Mending
+      output:
+        collectibleId: Vow of Swift Mending
       costs:
         - itemId: Gold Coin
           required: 500
 
     - kind: Collectible
       requiredEdictId: Edict of the Blessed Cornucopia
-      outputCollectibleId: Vow of the Blessed Cornucopia
+      output:
+        collectibleId: Vow of the Blessed Cornucopia
       costs:
         - itemId: Cactspine
           required: 10
 
     - kind: Collectible
       requiredEdictId: Edict of the Mercantile Winds
-      outputCollectibleId: Vow of the Mercantile Winds
+      output:
+        collectibleId: Vow of the Mercantile Winds
       costs:
         - itemId: Gold Coin
           required: 500
 
     - kind: Collectible
       requiredEdictId: Edict of the Taskmaster's Intervention
-      outputCollectibleId: Vow of the Taskmaster's Intervention
+      output:
+        collectibleId: Vow of the Taskmaster's Intervention
       costs:
         - itemId: Gold Coin
           required: 1
 
     - kind: Collectible
       requiredEdictId: Edict of the Warren Hunt
-      outputCollectibleId: Vow of the Warren Hunt
+      output:
+        collectibleId: Vow of the Warren Hunt
       costs:
         - itemId: Tattered Hide
           required: 15
 
     - kind: Collectible
       requiredEdictId: Edict of Sharp Unionization
-      outputCollectibleId: Vow of Sharp Unionization
+      output:
+        collectibleId: Vow of Sharp Unionization
       costs:
         - itemId: Weak Spider Silk
           required: 25
 
     - kind: Collectible
       requiredEdictId: Edict of Astral Abatement
-      outputCollectibleId: Vow of Astral Abatement
+      output:
+        collectibleId: Vow of Astral Abatement
       costs:
         - itemId: Gold Coin
           required: 500

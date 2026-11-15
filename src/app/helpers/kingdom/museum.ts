@@ -18,7 +18,6 @@ import type {
   EncounterRandomContent,
   EquipmentId,
   ExchangeNodeContent,
-  ExchangeNodeExchange,
   GatheringContent,
   ItemId,
   MonsterContent,
@@ -46,17 +45,6 @@ function matchesTarget(output: object, target: SourceTarget): boolean {
   return SOURCE_KEYS.some(
     (key) => wanted[key] !== undefined && fields[key] === wanted[key],
   );
-}
-
-// Exchanges name their output per kind - normalize to the shared field names.
-function exchangeOutput(exchange: ExchangeNodeExchange): SourceFields {
-  if (exchange.kind === 'Collectible') {
-    return { collectibleId: exchange.outputCollectibleId };
-  }
-
-  return exchange.kind === 'Item'
-    ? { itemId: exchange.output.itemId }
-    : { equipmentId: exchange.outputEquipmentId };
 }
 
 // Town-unique recipes are never on the player's craft list - credit the town whose shop sells the output instead.
@@ -205,7 +193,7 @@ function everyContentSource(target: SourceTarget): CollectibleSource[] {
       ...sourcesFrom(
         target,
         getEntriesByType<ExchangeNodeContent>('exchangenode'),
-        (exchange) => exchange.exchanges.map(exchangeOutput),
+        (node) => node.exchanges.map((exchange) => exchange.output),
         nodeSource,
       ),
       ...sourcesFrom(

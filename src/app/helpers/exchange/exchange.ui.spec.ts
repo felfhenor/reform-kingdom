@@ -36,8 +36,8 @@ describe('exchangeInputHints', () => {
     exchanges: [
       {
         kind: 'Equipment',
-        inputEquipmentId: demonSword.id,
-        outputEquipmentId: purifiedSword.id,
+        input: { equipmentId: demonSword.id },
+        output: { equipmentId: purifiedSword.id },
         costs: [],
       },
       coinExchange,

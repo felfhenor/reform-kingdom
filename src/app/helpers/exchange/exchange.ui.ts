@@ -68,7 +68,7 @@ export function exchangeRows(node: ExchangeNodeContent): ExchangeRow[] {
       const canAfford = exchangeCanAfford(state, exchange);
       if (exchange.kind === 'Collectible') {
         const collectible = getEntry<CollectibleContent>(
-          exchange.outputCollectibleId,
+          exchange.output.collectibleId,
         );
         if (!collectible) return [];
 
@@ -103,17 +103,17 @@ export function exchangeRows(node: ExchangeNodeContent): ExchangeRow[] {
       }
 
       const inputContent = getEntry<EquipmentContent>(
-        exchange.inputEquipmentId,
+        exchange.input.equipmentId,
       );
       const outputContent = getEntry<EquipmentContent>(
-        exchange.outputEquipmentId,
+        exchange.output.equipmentId,
       );
       if (!inputContent || !outputContent) return [];
 
       return exchangeArmoryCandidates(state, exchange).map((item) => {
         const outputItem = exchangedEquipmentItem(
           item,
-          exchange.outputEquipmentId,
+          exchange.output.equipmentId,
         );
 
         return {
@@ -150,7 +150,7 @@ export function exchangeHasOnlyEquippedInputs(
   return node.exchanges.some(
     (exchange) =>
       exchange.kind === 'Equipment' &&
-      equippedIds.has(exchange.inputEquipmentId) &&
+      equippedIds.has(exchange.input.equipmentId) &&
       !exchangeHasInput(state, exchange),
   );
 }
@@ -159,13 +159,13 @@ function exchangeInputHint(
   exchange: ExchangeNodeEquipmentExchange | ExchangeNodeItemExchange,
 ): ExchangeInputHint {
   const isEquipment = exchange.kind === 'Equipment';
-  const id = isEquipment ? exchange.inputEquipmentId : exchange.input.itemId;
+  const id = isEquipment ? exchange.input.equipmentId : exchange.input.itemId;
   const content = getEntry<EquipmentContent | ItemContent>(id);
 
   return {
     id,
     discovered: isEquipment
-      ? isEquipmentDiscovered(exchange.inputEquipmentId)
+      ? isEquipmentDiscovered(exchange.input.equipmentId)
       : isMaterialDiscovered(exchange.input.itemId),
     name: content?.name ?? 'UNKNOWN',
     spritesheet: isEquipment ? 'equipment' : 'item',
@@ -289,11 +289,11 @@ export async function exchangePerformCollectible(
   if (exchange?.kind !== 'Collectible') return true;
 
   const name =
-    getEntry<CollectibleContent>(exchange.outputCollectibleId)?.name ??
+    getEntry<CollectibleContent>(exchange.output.collectibleId)?.name ??
     'UNKNOWN';
   miscellaneousMessageLog(`${exchangeVerb(nodeName)}: received ${name}.`);
   exchangeAnalytics(nodeName, name);
-  void taskEventCollectibleGained(exchange.outputCollectibleId);
+  void taskEventCollectibleGained(exchange.output.collectibleId);
 
   return true;
 }

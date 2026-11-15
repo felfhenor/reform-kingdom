@@ -74,7 +74,7 @@ export function collectibleSourceMapBuild(): Map<
   getEntriesByType<ExchangeNodeContent>('exchangenode').forEach((node) => {
     node.exchanges.forEach((exchange) => {
       if (exchange.kind === 'Collectible') {
-        addSource(exchange.outputCollectibleId, {
+        addSource(exchange.output.collectibleId, {
           type: 'node',
           name: node.name,
         });

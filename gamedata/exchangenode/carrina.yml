@@ -70,8 +70,10 @@
 
   exchanges:
     - kind: Equipment
-      inputEquipmentId: Frigid Bolt
-      outputEquipmentId: Arrows of Fiore
+      input:
+        equipmentId: Frigid Bolt
+      output:
+        equipmentId: Arrows of Fiore
       costs:
         - itemId: Memory Flux
           required: 2
@@ -79,8 +81,10 @@
           required: 2
 
     - kind: Equipment
-      inputEquipmentId: Frostweave Coat
-      outputEquipmentId: Shroud of Lalal
+      input:
+        equipmentId: Frostweave Coat
+      output:
+        equipmentId: Shroud of Lalal
       costs:
         - itemId: Memory Flux
           required: 2
@@ -88,17 +92,10 @@
           required: 2
 
     - kind: Equipment
-      inputEquipmentId: Frostweave Cap
-      outputEquipmentId: Cowl of Gaius
-      costs:
-        - itemId: Memory Flux
-          required: 1
-        - itemId: Duskhall Flux
-          required: 1
-
-    - kind: Equipment
-      inputEquipmentId: Froststeel Helm
-      outputEquipmentId: Crown of the Larsian King
+      input:
+        equipmentId: Frostweave Cap
+      output:
+        equipmentId: Cowl of Gaius
       costs:
         - itemId: Memory Flux
           required: 1
@@ -106,8 +103,21 @@
           required: 1
 
     - kind: Equipment
-      inputEquipmentId: Froststeel Plate
-      outputEquipmentId: Hauberk of Dekar
+      input:
+        equipmentId: Froststeel Helm
+      output:
+        equipmentId: Crown of the Larsian King
+      costs:
+        - itemId: Memory Flux
+          required: 1
+        - itemId: Duskhall Flux
+          required: 1
+
+    - kind: Equipment
+      input:
+        equipmentId: Froststeel Plate
+      output:
+        equipmentId: Hauberk of Dekar
       costs:
         - itemId: Memory Flux
           required: 2
@@ -115,8 +125,10 @@
           required: 2
 
     - kind: Equipment
-      inputEquipmentId: Froststeel Recurve
-      outputEquipmentId: Greatbow of Sefirah
+      input:
+        equipmentId: Froststeel Recurve
+      output:
+        equipmentId: Greatbow of Sefirah
       costs:
         - itemId: Memory Flux
           required: 3
@@ -124,8 +136,10 @@
           required: 3
 
     - kind: Equipment
-      inputEquipmentId: Froststeel Diamondtip
-      outputEquipmentId: Baselard of Izchak
+      input:
+        equipmentId: Froststeel Diamondtip
+      output:
+        equipmentId: Baselard of Izchak
       costs:
         - itemId: Memory Flux
           required: 2
@@ -133,8 +147,10 @@
           required: 2
 
     - kind: Equipment
-      inputEquipmentId: Froststeel Dodger
-      outputEquipmentId: Stiletto of Culcula
+      input:
+        equipmentId: Froststeel Dodger
+      output:
+        equipmentId: Stiletto of Culcula
       costs:
         - itemId: Memory Flux
           required: 2
@@ -142,8 +158,10 @@
           required: 2
 
     - kind: Equipment
-      inputEquipmentId: Froststeel Club
-      outputEquipmentId: Mace of Medina
+      input:
+        equipmentId: Froststeel Club
+      output:
+        equipmentId: Mace of Medina
       costs:
         - itemId: Memory Flux
           required: 2
@@ -151,8 +169,10 @@
           required: 2
 
     - kind: Equipment
-      inputEquipmentId: Froststeel Tomb
-      outputEquipmentId: Aegis of the Founding Stone
+      input:
+        equipmentId: Froststeel Tomb
+      output:
+        equipmentId: Aegis of the Founding Stone
       costs:
         - itemId: Memory Flux
           required: 2
@@ -160,8 +180,10 @@
           required: 2
 
     - kind: Equipment
-      inputEquipmentId: Froststeel Tip
-      outputEquipmentId: Spear of Parcilyte
+      input:
+        equipmentId: Froststeel Tip
+      output:
+        equipmentId: Spear of Parcilyte
       costs:
         - itemId: Memory Flux
           required: 3
@@ -169,8 +191,10 @@
           required: 3
 
     - kind: Equipment
-      inputEquipmentId: Frigid Energizer
-      outputEquipmentId: Staff of the Cimmerians
+      input:
+        equipmentId: Frigid Energizer
+      output:
+        equipmentId: Staff of the Cimmerians
       costs:
         - itemId: Memory Flux
           required: 3
@@ -178,8 +202,10 @@
           required: 3
 
     - kind: Equipment
-      inputEquipmentId: Froststeel Cutter
-      outputEquipmentId: Sword of the Founder
+      input:
+        equipmentId: Froststeel Cutter
+      output:
+        equipmentId: Sword of the Founder
       costs:
         - itemId: Memory Flux
           required: 2
@@ -187,8 +213,10 @@
           required: 2
 
     - kind: Equipment
-      inputEquipmentId: Frigid Whip
-      outputEquipmentId: Whip of Welch
+      input:
+        equipmentId: Frigid Whip
+      output:
+        equipmentId: Whip of Welch
       costs:
         - itemId: Memory Flux
           required: 2
@@ -196,8 +224,10 @@
           required: 2
 
     - kind: Equipment
-      inputEquipmentId: Ornate Frost Gloves
-      outputEquipmentId: Gloves of Maxim
+      input:
+        equipmentId: Ornate Frost Gloves
+      output:
+        equipmentId: Gloves of Maxim
       costs:
         - itemId: Memory Flux
           required: 1
@@ -205,8 +235,10 @@
           required: 1
 
     - kind: Equipment
-      inputEquipmentId: Frostsoul Earrings
-      outputEquipmentId: Earrings of Elena
+      input:
+        equipmentId: Frostsoul Earrings
+      output:
+        equipmentId: Earrings of Elena
       costs:
         - itemId: Memory Flux
           required: 1
@@ -214,8 +246,10 @@
           required: 1
 
     - kind: Equipment
-      inputEquipmentId: Frostsoul Pendant
-      outputEquipmentId: Pendant of Bairan
+      input:
+        equipmentId: Frostsoul Pendant
+      output:
+        equipmentId: Pendant of Bairan
       costs:
         - itemId: Memory Flux
           required: 1
@@ -223,8 +257,10 @@
           required: 1
 
     - kind: Equipment
-      inputEquipmentId: Frostsoul Ring
-      outputEquipmentId: Ring of Renaud
+      input:
+        equipmentId: Frostsoul Ring
+      output:
+        equipmentId: Ring of Renaud
       costs:
         - itemId: Memory Flux
           required: 1
@@ -232,8 +268,10 @@
           required: 1
 
     - kind: Equipment
-      inputEquipmentId: Frostskin Legwings
-      outputEquipmentId: Legwings of Selan Rose
+      input:
+        equipmentId: Frostskin Legwings
+      output:
+        equipmentId: Legwings of Selan Rose
       costs:
         - itemId: Memory Flux
           required: 1

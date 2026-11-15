@@ -54,17 +54,17 @@ function exchangeProblems(
   const label = `exchange ${index + 1}`;
 
   if (exchange.kind === 'Equipment') {
-    if (!isEquipment(exchange.inputEquipmentId)) {
+    if (!isEquipment(exchange.input.equipmentId)) {
       problems.push(
-        `${label} takes unknown equipment "${exchange.inputEquipmentId}"`,
+        `${label} takes unknown equipment "${exchange.input.equipmentId}"`,
       );
     }
-    if (!isEquipment(exchange.outputEquipmentId)) {
+    if (!isEquipment(exchange.output.equipmentId)) {
       problems.push(
-        `${label} gives unknown equipment "${exchange.outputEquipmentId}"`,
+        `${label} gives unknown equipment "${exchange.output.equipmentId}"`,
       );
     }
-    if (exchange.inputEquipmentId === exchange.outputEquipmentId) {
+    if (exchange.input.equipmentId === exchange.output.equipmentId) {
       problems.push(`${label} exchanges an item for itself`);
     }
   } else if (exchange.kind === 'Collectible') {
@@ -73,9 +73,9 @@ function exchangeProblems(
         `${label} needs unknown edict "${exchange.requiredEdictId}"`,
       );
     }
-    if (!isCollectible(exchange.outputCollectibleId)) {
+    if (!isCollectible(exchange.output.collectibleId)) {
       problems.push(
-        `${label} gives unknown collectible "${exchange.outputCollectibleId}"`,
+        `${label} gives unknown collectible "${exchange.output.collectibleId}"`,
       );
     }
   } else {

@@ -7,99 +7,127 @@
 
   exchanges:
     - kind: Equipment
-      inputEquipmentId: Demonic Arrow
-      outputEquipmentId: Purified Piercer
+      input:
+        equipmentId: Demonic Arrow
+      output:
+        equipmentId: Purified Piercer
       costs:
         - itemId: Elven Purity Water
           required: 5
 
     - kind: Equipment
-      inputEquipmentId: Demonic Tunic
-      outputEquipmentId: Purified Plateshirt
+      input:
+        equipmentId: Demonic Tunic
+      output:
+        equipmentId: Purified Plateshirt
       costs:
         - itemId: Elven Purity Water
           required: 7
 
     - kind: Equipment
-      inputEquipmentId: Demonic Tophat
-      outputEquipmentId: Purified Platehat
+      input:
+        equipmentId: Demonic Tophat
+      output:
+        equipmentId: Purified Platehat
       costs:
         - itemId: Elven Purity Water
           required: 3
 
     - kind: Equipment
-      inputEquipmentId: Demonic Helm
-      outputEquipmentId: Purified Helm
+      input:
+        equipmentId: Demonic Helm
+      output:
+        equipmentId: Purified Helm
       costs:
         - itemId: Elven Purity Water
           required: 3
 
     - kind: Equipment
-      inputEquipmentId: Demonic Platemail
-      outputEquipmentId: Purified Platemail
+      input:
+        equipmentId: Demonic Platemail
+      output:
+        equipmentId: Purified Platemail
       costs:
         - itemId: Elven Purity Water
           required: 7
 
     - kind: Equipment
-      inputEquipmentId: Demonic Bow
-      outputEquipmentId: Purified Greatbow
+      input:
+        equipmentId: Demonic Bow
+      output:
+        equipmentId: Purified Greatbow
       costs:
         - itemId: Elven Purity Water
           required: 10
 
     - kind: Equipment
-      inputEquipmentId: Demonic Dagger
-      outputEquipmentId: Purified Baselard
+      input:
+        equipmentId: Demonic Dagger
+      output:
+        equipmentId: Purified Baselard
       costs:
         - itemId: Elven Purity Water
           required: 5
 
     - kind: Equipment
-      inputEquipmentId: Demonic Stiletto
-      outputEquipmentId: Purified Stiletto
+      input:
+        equipmentId: Demonic Stiletto
+      output:
+        equipmentId: Purified Stiletto
       costs:
         - itemId: Elven Purity Water
           required: 5
 
     - kind: Equipment
-      inputEquipmentId: Demonic Mace
-      outputEquipmentId: Purified Smasher
+      input:
+        equipmentId: Demonic Mace
+      output:
+        equipmentId: Purified Smasher
       costs:
         - itemId: Elven Purity Water
           required: 5
 
     - kind: Equipment
-      inputEquipmentId: Demonic Shield
-      outputEquipmentId: Purified Defender
+      input:
+        equipmentId: Demonic Shield
+      output:
+        equipmentId: Purified Defender
       costs:
         - itemId: Elven Purity Water
           required: 5
 
     - kind: Equipment
-      inputEquipmentId: Demonic Spear
-      outputEquipmentId: Purified Pike
+      input:
+        equipmentId: Demonic Spear
+      output:
+        equipmentId: Purified Pike
       costs:
         - itemId: Elven Purity Water
           required: 10
 
     - kind: Equipment
-      inputEquipmentId: Demonic Staff
-      outputEquipmentId: Purified Spellfocus
+      input:
+        equipmentId: Demonic Staff
+      output:
+        equipmentId: Purified Spellfocus
       costs:
         - itemId: Elven Purity Water
           required: 10
 
     - kind: Equipment
-      inputEquipmentId: Demonic Sword
-      outputEquipmentId: Purified Epee
+      input:
+        equipmentId: Demonic Sword
+      output:
+        equipmentId: Purified Epee
       costs:
         - itemId: Elven Purity Water
           required: 5
 
     - kind: Equipment
-      inputEquipmentId: Demonic Whip
-      outputEquipmentId: Purified Slashslicer
+      input:
+        equipmentId: Demonic Whip
+      output:
+        equipmentId: Purified Slashslicer
       costs:
         - itemId: Elven Purity Water
           required: 5

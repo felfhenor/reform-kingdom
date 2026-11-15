@@ -37,7 +37,7 @@ export function exchangeArmoryCandidates(
   exchange: ExchangeNodeEquipmentExchange,
 ): EquipmentItem[] {
   return state.armory.filter(
-    (item) => item.equipmentId === exchange.inputEquipmentId,
+    (item) => item.equipmentId === exchange.input.equipmentId,
   );
 }
 
@@ -91,7 +91,7 @@ export function exchangeIsCollectibleStocked(
 ): boolean {
   return (
     state.legacyClearedEdicts.includes(exchange.requiredEdictId) &&
-    !ledgerHas(state.collectibles, exchange.outputCollectibleId)
+    !ledgerHas(state.collectibles, exchange.output.collectibleId)
   );
 }
 
@@ -114,8 +114,8 @@ export function exchangeEdictRewardRequiredEdicts(): Map<
     node.exchanges.forEach((exchange) => {
       if (exchange.kind !== 'Collectible') return;
 
-      const edicts = required.get(exchange.outputCollectibleId) ?? [];
-      required.set(exchange.outputCollectibleId, [
+      const edicts = required.get(exchange.output.collectibleId) ?? [];
+      required.set(exchange.output.collectibleId, [
         ...edicts,
         exchange.requiredEdictId,
       ]);
@@ -174,15 +174,15 @@ export function applyEquipmentExchange(
   );
   const item = state.armory[armoryIndex];
   if (!item) return 'missing';
-  if (item.equipmentId !== exchange.inputEquipmentId) return 'invalid';
+  if (item.equipmentId !== exchange.input.equipmentId) return 'invalid';
   if (!exchangeCanAfford(state, exchange)) return 'unaffordable';
 
   state.armory[armoryIndex] = exchangedEquipmentItem(
     item,
-    exchange.outputEquipmentId,
+    exchange.output.equipmentId,
   );
   worldNodeSpendCost(state, exchange.costs);
-  ledgerMark(state.discoveredEquipment, exchange.outputEquipmentId);
+  ledgerMark(state.discoveredEquipment, exchange.output.equipmentId);
 
   return 'ok';
 }
@@ -219,7 +219,7 @@ export function applyCollectibleExchange(
   if (!exchangeCanAfford(state, exchange)) return 'unaffordable';
 
   worldNodeSpendCost(state, exchange.costs);
-  applyCollectibleGrant(state, exchange.outputCollectibleId, 1);
+  applyCollectibleGrant(state, exchange.output.collectibleId, 1);
 
   return 'ok';
 }

@@ -41,7 +41,7 @@ These need a `background`. These trade one thing the player owns, plus a list of
 
 Each exchange is one of two kinds:
 
-- `Equipment`: `inputEquipmentId` -> `outputEquipmentId`. Only unequipped (armory) gear qualifies. The base item is swapped.
+- `Equipment`: `input` (equipmentId) -> `output` (equipmentId). Only unequipped (armory) gear qualifies. The base item is swapped.
 - `Item`: `input` (itemId + required) -> `output` (itemId + quantity).
 
 Every exchange needs at least one cost.

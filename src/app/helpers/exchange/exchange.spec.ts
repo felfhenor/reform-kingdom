@@ -73,8 +73,8 @@ describe('exchange', () => {
     exchanges: [
       {
         kind: 'Equipment',
-        inputEquipmentId: demonSword.id,
-        outputEquipmentId: purifiedSword.id,
+        input: { equipmentId: demonSword.id },
+        output: { equipmentId: purifiedSword.id },
         costs: [{ itemId: water.id, required: 10 }],
       },
       {
@@ -102,7 +102,7 @@ describe('exchange', () => {
       {
         kind: 'Collectible',
         requiredEdictId: ironBloodId,
-        outputCollectibleId: vow.id,
+        output: { collectibleId: vow.id },
         costs: [{ itemId: water.id, required: 2 }],
       },
     ],

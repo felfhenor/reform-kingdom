@@ -9,11 +9,19 @@ import type { WorldNodeHideable } from '@interfaces/world-nodes';
 
 export type ExchangeNodeId = Branded<string, 'ExchangeNodeId'>;
 
+export type ExchangeNodeEquipmentTarget = {
+  equipmentId: EquipmentId;
+};
+
+export type ExchangeNodeCollectibleTarget = {
+  collectibleId: CollectibleId;
+};
+
 // Swaps the base of an unequipped armory item - affixes and infusions carry over untouched.
 export type ExchangeNodeEquipmentExchange = {
   kind: 'Equipment';
-  inputEquipmentId: EquipmentId;
-  outputEquipmentId: EquipmentId;
+  input: ExchangeNodeEquipmentTarget;
+  output: ExchangeNodeEquipmentTarget;
   costs: CostItem[];
 };
 
@@ -28,7 +36,7 @@ export type ExchangeNodeItemExchange = {
 export type ExchangeNodeCollectibleExchange = {
   kind: 'Collectible';
   requiredEdictId: EdictId;
-  outputCollectibleId: CollectibleId;
+  output: ExchangeNodeCollectibleTarget;
   costs: CostItem[];
 };
 
