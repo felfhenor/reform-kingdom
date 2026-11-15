@@ -4,6 +4,7 @@ export * from './character-equipment';
 export * from './character-equipment.ui';
 export * from './character-progress';
 export * from './character-reclass';
+export * from './global-effect-prune';
 export * from './global-effect-state';
 export * from './global-effects';
 export * from './hero-effect';

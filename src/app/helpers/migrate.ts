@@ -24,6 +24,7 @@ import {
   globalEffectSumsFor,
   recomputeGlobalEffectSums,
 } from '@helpers/hero/global-effect-state';
+import { pruneInvalidGlobalEffects } from '@helpers/hero/global-effect-prune';
 import { pruneInvalidPartyEquipment } from '@helpers/hero/party';
 import { stateRegaliaMigrate } from '@helpers/hero/regalia-state';
 import { characterSkillTreesMigrate } from '@helpers/hero/skill-tree';
@@ -165,6 +166,7 @@ export function migrateGameState() {
   const remappedState = {
     ...state,
     tradeskills: migrateTradeskillStateKeys(state.tradeskills ?? {}),
+    globalEffects: pruneInvalidGlobalEffects(state.globalEffects ?? []),
     visitedWorldNodes: { ...discoveredGatherNodes, ...state.visitedWorldNodes },
   };
   const newState = merge(defaultGameState(), remappedState);

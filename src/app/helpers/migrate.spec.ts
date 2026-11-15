@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { omit } from 'es-toolkit';
 
 import {
   ensureCollectible,
@@ -11,6 +12,7 @@ import {
 } from '@helpers/content/ensure-gathernode';
 import { ensureCaravan } from '@helpers/content/ensure-caravan';
 import { ensureEdict } from '@helpers/content/ensure-edict';
+import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
 import { ensureJob } from '@helpers/content/ensure-job';
 import { ensureMonster } from '@helpers/content/ensure-monster';
 import { ensureRecipe } from '@helpers/content/ensure-recipe';
@@ -52,6 +54,8 @@ import type {
   GameOptions,
   GameState,
   GatheringId,
+  GlobalEffect,
+  GlobalEffectId,
   GlobalEffectSums,
   ItemId,
   JobId,
@@ -668,6 +672,25 @@ describe('migrateGameState', () => {
     });
 
     expect(migrated.globalEffectSums.combatItemDropRateBoost).toBe(5);
+  });
+
+  it('loads an active effect saved before effects carried their own list', () => {
+    const autoMode = ensureGlobalEffect({
+      id: 'auto-mode' as GlobalEffectId,
+      name: 'Auto Mode',
+      effects: [{ effectType: 'GlobalGoldGainMultiplier', value: 10 }],
+    });
+    seedContent([autoMode]);
+
+    const migrated = migrate((save) => {
+      const legacy = omit(autoMode, ['effects']);
+      save.globalEffects = [
+        { ...legacy, startTick: 0, expiresAtTick: 1000 } as GlobalEffect,
+      ];
+    });
+
+    expect(migrated.globalEffects[0].effects).toEqual(autoMode.effects);
+    expect(migrated.globalEffectSums.goldGainMultiplierBonus).toBe(10);
   });
 
   it('drops world state tied to content that no longer exists', () => {
