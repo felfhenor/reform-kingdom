@@ -101,3 +101,12 @@
   condition:
     type: ClearEdicts
     kind: Challenge
+
+- id: ff0ddbe9-087f-43e7-be0e-e0c2fc79107b
+  name: Ye Olde RPG
+  sprite: '0049'
+  description: Defeat Fel while under the Edict of the Taskmaster's Intervention. Enjoy the classic RPG vibes!
+  condition:
+    type: CompleteRun
+    edictIds:
+      - Edict of the Taskmaster's Intervention
