@@ -1,10 +1,10 @@
 import { achievementsMoment } from '@helpers/achievement/achievement-moment';
-import { combatWonInAmbushRound } from '@helpers/combat/combat-ambush';
 import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
 import {
   combatantMessageToken,
   combatMessageLog,
 } from '@helpers/combat/combat-log';
+import { combatVictoryMoments } from '@helpers/combat/combat-victory-moments';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
 import { combatReset } from '@helpers/combat/combat-state';
 import { monsterXpReward, xpForOverLevel } from '@helpers/combat/monster';
@@ -293,8 +293,7 @@ function combatHasNextFight(combat: Combat): boolean {
 function handleCombatVictory(combat: Combat): boolean {
   combatMessageLog(combat, 'Heroes have won the combat!');
   analyticsSendDesignEvent('Combat:Encounter:Win');
-  if (combatWonInAmbushRound(combat)) achievementsMoment('AmbushVictory');
-  if (combat.heroDiedCovering) achievementsMoment('CoverDeathVictory');
+  combatVictoryMoments(combat).forEach((moment) => achievementsMoment(moment));
 
   syncPartyHpFromCombat(combat.heroes);
   recordVictoryKills(combat);

@@ -32,6 +32,7 @@ export const ACHIEVEMENT_MOMENTS = [
   'ShrineMemoriamPrayer',
   'AmbushVictory',
   'CoverDeathVictory',
+  'LastHeroStandingVictory',
 ] as const;
 
 export type AchievementMoment = (typeof ACHIEVEMENT_MOMENTS)[number];

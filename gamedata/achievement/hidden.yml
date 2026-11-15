@@ -105,3 +105,12 @@
   condition:
     type: Moment
     moment: CoverDeathVictory
+
+- id: d45e5050-d53e-4f52-ac9d-626da14964ad
+  name: Down to the Wire
+  sprite: '0048'
+  description: Win a fight with one hero left standing at 5% health or less.
+  hidden: true
+  condition:
+    type: Moment
+    moment: LastHeroStandingVictory

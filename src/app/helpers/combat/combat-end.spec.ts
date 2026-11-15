@@ -194,22 +194,13 @@ describe('combatCheckIfOver', () => {
       expect(gamestate().runStats.fightsWon).toBe(1);
     });
 
-    it('marks a win after a hero died covering an ally as a moment', () => {
-      endFight(fight({ rounds: 1, heroDiedCovering: true }));
-      expect(achievementsMoment).toHaveBeenCalledWith('CoverDeathVictory');
+    it('marks each moment the win earned', () => {
+      endFight(fight({ heroDiedCovering: true }));
 
-      vi.mocked(achievementsMoment).mockClear();
-      endFight(fight({ rounds: 1 }));
-      expect(achievementsMoment).not.toHaveBeenCalled();
-    });
-
-    it('marks a win in the ambush round as a moment, and not a later one', () => {
-      endFight(fight());
-      expect(achievementsMoment).toHaveBeenCalledWith('AmbushVictory');
-
-      vi.mocked(achievementsMoment).mockClear();
-      endFight(fight({ rounds: 1 }));
-      expect(achievementsMoment).not.toHaveBeenCalled();
+      expect(vi.mocked(achievementsMoment).mock.calls).toEqual([
+        ['AmbushVictory'],
+        ['CoverDeathVictory'],
+      ]);
     });
 
     it('counts an auto-won fight as a win without fighting it', () => {

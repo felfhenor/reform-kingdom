@@ -40,4 +40,5 @@ export * from './combat-statuseffects.ui';
 export * from './combat-summon';
 export * from './combat-targetting';
 export * from './combat-turn-queue';
+export * from './combat-victory-moments';
 export * from './monster';
