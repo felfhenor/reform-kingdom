@@ -159,6 +159,12 @@ export function equipmentItemAffixes(item: EquipmentItem): AffixContent[] {
     .filter((affix): affix is AffixContent => !!affix);
 }
 
+export function equipmentItemIsCursed(item: EquipmentItem): boolean {
+  return equipmentItemAffixes(item).some(
+    (affix) => affix.family === CURSE_AFFIX_FAMILY,
+  );
+}
+
 // Each affix can carry multiple effects.
 export function equipmentItemAffixEffects(item: EquipmentItem): AffixEffect[] {
   return equipmentItemAffixes(item).flatMap((affix) => affix.effects);

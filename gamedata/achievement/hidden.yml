@@ -132,3 +132,12 @@
   condition:
     type: Moment
     moment: GiantSlayerVictory
+
+- id: 6881bf6b-67ba-4bb8-a70b-1090822a33d2
+  name: Cursed but Effective
+  sprite: '0052'
+  description: Clear a mystical node while every hero wears at least one item of cursed gear.
+  hidden: true
+  condition:
+    type: Moment
+    moment: CursedRandomClearVictory

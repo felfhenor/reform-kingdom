@@ -35,6 +35,7 @@ export const ACHIEVEMENT_MOMENTS = [
   'LastHeroStandingVictory',
   'RetaliationKillVictory',
   'GiantSlayerVictory',
+  'CursedRandomClearVictory',
 ] as const;
 
 export type AchievementMoment = (typeof ACHIEVEMENT_MOMENTS)[number];

@@ -1,4 +1,5 @@
 import { SHRINE_PRAYER_COOLDOWN_TICKS } from '@helpers/config';
+import { equippedItems } from '@helpers/item/equipment';
 import {
   clockState,
   shrinesState,
@@ -30,9 +31,8 @@ export function shrinePrayerCooldownRemaining(): number {
 
 export function shrineMemoriamIsWorn(shrine: ShrineContent): boolean {
   return worldPartyState().some((hero) =>
-    Object.values(hero.equipment).some(
-      (item) =>
-        !!item && shrine.memoriamEquipmentIds.includes(item.equipmentId),
+    equippedItems(hero.equipment).some((item) =>
+      shrine.memoriamEquipmentIds.includes(item.equipmentId),
     ),
   );
 }

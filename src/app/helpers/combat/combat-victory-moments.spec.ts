@@ -1,8 +1,21 @@
 import { describe, expect, it } from 'vitest';
 
 import { combatVictoryMoments } from '@helpers/combat/combat-victory-moments';
-import type { Combat } from '@interfaces';
-import { buildCombat, buildTestCombatant } from '@/testing/builders';
+import { ensureAffix } from '@helpers/content/ensure-affix';
+import type {
+  AffixId,
+  Combat,
+  EncounterRandomId,
+  EquipmentId,
+} from '@interfaces';
+import {
+  buildCharacter,
+  buildCombat,
+  buildEquipmentItem,
+  buildTestCombatant,
+} from '@/testing/builders';
+import { seedContent } from '@/testing/content';
+import { seedGamestate } from '@/testing/gamestate';
 
 // Test combatants have 100 Health, so hp reads as a percentage.
 function won(overrides: Partial<Combat> = {}, ...heroHp: number[]) {
@@ -64,5 +77,60 @@ describe('combatVictoryMoments', () => {
     expect(wonWith(1)).toEqual([]);
     expect(wonWith(5, 5)).toEqual([]);
     expect(wonWith(6, 0)).toEqual([]);
+  });
+});
+
+describe('combatVictoryMoments for a cursed mystical clear', () => {
+  const curse = ensureAffix({ id: 'curse' as AffixId, family: 'Curse' });
+
+  function clearWith(
+    cursedHeroes: boolean[],
+    cursedDrops = false,
+    overrides: Partial<Combat> = {},
+  ) {
+    seedContent([curse]);
+    seedGamestate((state) => {
+      state.world.party = cursedHeroes.map((isCursed) => {
+        const hero = buildCharacter();
+        hero.equipment.Weapon = buildEquipmentItem('blade' as EquipmentId, {
+          affixIds: isCursed ? [curse.id] : [],
+        });
+        return hero;
+      });
+      state.globalEffectSums.cursedDrops = cursedDrops;
+      state.world.exploreRandom['ruins' as EncounterRandomId] = {
+        fights: [
+          { level: 1, monsters: [] },
+          { level: 1, monsters: [] },
+        ],
+        generatedAtTick: 0,
+        completedThisCycle: false,
+      };
+    });
+    return combatVictoryMoments(
+      buildCombat({
+        rounds: 1,
+        encounterRandomId: 'ruins' as EncounterRandomId,
+        fightIndex: 1,
+        guardians: [buildTestCombatant({ isEnemy: true, hp: 0 })],
+        ...overrides,
+      }),
+    );
+  }
+
+  it('marks the last fight of a mystical node won with every hero cursed', () => {
+    expect(clearWith([true, true])).toEqual(['CursedRandomClearVictory']);
+  });
+
+  it('needs every hero cursed, and curses not handed out by Fickle Curses', () => {
+    expect(clearWith([true, false])).toEqual([]);
+    expect(clearWith([true, true], true)).toEqual([]);
+  });
+
+  it("ignores a node's earlier fights, and fights that aren't a mystical node", () => {
+    expect(clearWith([true, true], false, { fightIndex: 0 })).toEqual([]);
+    expect(
+      clearWith([true, true], false, { encounterRandomId: undefined }),
+    ).toEqual([]);
   });
 });

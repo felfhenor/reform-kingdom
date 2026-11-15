@@ -15,6 +15,7 @@ import {
   equipmentItemAffixEffects,
   equipmentItemAffixes,
   equipmentItemDisplayName,
+  equipmentItemIsCursed,
   equipmentItemMiscAffixDescriptions,
   rollAffixIds,
   rollDropAffixIds,
@@ -441,6 +442,18 @@ describe('equipmentItemAffixes', () => {
     expect(
       equipmentItemAffixes(buildItem([strengthAffix.id, 'missing' as AffixId])),
     ).toEqual([strengthAffix]);
+  });
+});
+
+describe('equipmentItemIsCursed', () => {
+  it('holds once any affix is from the Curse family', () => {
+    const curse = ensureAffix({ id: 'curse' as AffixId, family: 'Curse' });
+    seedContent([curse, strengthAffix]);
+
+    expect(equipmentItemIsCursed(buildItem([strengthAffix.id, curse.id]))).toBe(
+      true,
+    );
+    expect(equipmentItemIsCursed(buildItem([strengthAffix.id]))).toBe(false);
   });
 });
 

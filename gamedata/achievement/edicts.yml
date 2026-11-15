@@ -9,7 +9,7 @@
 - id: bf0665f6-5abf-4492-bfc8-aed7bd268b7a
   name: The Founder's Decree
   sprite: '0001'
-  description: 'Defeat Fel with five or more non-boon edicts active.'
+  description: Defeat Fel with five or more non-boon edicts active.
   condition:
     type: CompleteRun
     minNonBoonEdicts: 5
