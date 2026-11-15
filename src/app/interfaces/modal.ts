@@ -1,4 +1,5 @@
 export type ModalId =
+  | 'achievements'
   | 'caravan-trade'
   | 'combat-orders'
   | 'hero-burst-skills'

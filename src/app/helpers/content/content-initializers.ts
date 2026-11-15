@@ -1,3 +1,4 @@
+import { ensureAchievement } from '@helpers/content/ensure-achievement';
 import { ensureAffix } from '@helpers/content/ensure-affix';
 import { ensureAstralProjector } from '@helpers/content/ensure-astralprojector';
 import {
@@ -48,6 +49,7 @@ import type { ContentType, IsContentItem } from '@interfaces';
 // eat my ass, typescript
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const initializers: Record<ContentType, (entry: any) => any> = {
+  achievement: ensureAchievement,
   affix: ensureAffix,
   astralprojector: ensureAstralProjector,
   caravan: ensureCaravan,

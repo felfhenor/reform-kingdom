@@ -39,6 +39,7 @@ import {
   debugResetVictoryCard,
   debugShowDemoEnd,
 } from '@helpers/debug/debug-story.ui';
+import { debugResetAchievements } from '@helpers/debug/debug-achievements.ui';
 import { debugResetTasks } from '@helpers/debug/debug-tasks.ui';
 import { isDemoBuild } from '@helpers/demo/demo';
 import { worldPartyState } from '@helpers/state-game';
@@ -212,6 +213,10 @@ export class PanelOptionsDebugComponent extends OptionsBaseComponent {
 
   public resetTasks(): void {
     debugResetTasks();
+  }
+
+  public resetAchievements(): void {
+    debugResetAchievements();
   }
 
   public resetIntroCrawl(): void {

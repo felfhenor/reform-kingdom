@@ -180,6 +180,36 @@ describe('legacyLoad', () => {
     expect(legacyLoad()).toEqual(stored);
   });
 
+  it('drops a bad achievement entry without losing the runs', () => {
+    const stored = {
+      ...legacyAddRun(defaultLegacy(), run('a', 'Completed')),
+      achievements: {
+        good: { unlockedAt: 1, runId: 'a' },
+        bad: { unlockedAt: 'soon' },
+      },
+    };
+    vi.mocked(localStorage.getItem).mockReturnValueOnce(JSON.stringify(stored));
+
+    const loaded = legacyLoad();
+    expect(loaded.runs).toHaveLength(1);
+    expect(loaded.achievements).toEqual({
+      good: { unlockedAt: 1, runId: 'a' },
+    });
+  });
+
+  it('reads an achievements section that is not an object as empty', () => {
+    const stored = legacyAddRun(defaultLegacy(), run('a', 'Completed'));
+    [null, [], 'nope'].forEach((achievements) => {
+      vi.mocked(localStorage.getItem).mockReturnValueOnce(
+        JSON.stringify({ ...stored, achievements }),
+      );
+
+      const loaded = legacyLoad();
+      expect(loaded.runs).toHaveLength(1);
+      expect(loaded.achievements).toEqual({});
+    });
+  });
+
   it('copies an unreadable value aside once, then starts fresh', () => {
     vi.mocked(localStorage.getItem).mockReturnValueOnce('{oops');
 

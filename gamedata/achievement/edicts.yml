@@ -1,0 +1,95 @@
+- id: b59da05c-565b-4f51-a958-c7deae7c11c3
+  name: The Founder's Request
+  sprite: '0000'
+  description: Defeat Fel with any edict active.
+  condition:
+    type: CompleteRun
+    minEdicts: 1
+
+- id: bf0665f6-5abf-4492-bfc8-aed7bd268b7a
+  name: The Founder's Decree
+  sprite: '0001'
+  description: 'Defeat Fel with five or more non-boon edicts active.'
+  condition:
+    type: CompleteRun
+    minNonBoonEdicts: 5
+
+- id: 326b7473-a899-469b-9e18-2b3b933a8c5f
+  name: The Founder's Challenge
+  sprite: '0002'
+  description: Defeat Fel under the Edict of Iron Blood.
+  condition:
+    type: CompleteRun
+    edictIds:
+      - Edict of Iron Blood
+
+- id: 7b8beff4-9d7e-41fa-a71e-7b2e9809deb8
+  name: Tough Market
+  sprite: '0003'
+  description: Defeat Fel with a single hero, utilizing the Edict of the Fretless.
+  condition:
+    type: CompleteRun
+    edictIds:
+      - Edict of the Fretless
+
+- id: 5fefdf1d-03d9-43ac-8320-f3eeb581ff41
+  name: Closed Borders
+  sprite: '0004'
+  description: Defeat Fel with no outposts, no exchanges and no gathering, utilizing the Edicts of Nomadic Departure, Exogenous Support, and Warren Hunt simultaneously.
+  condition:
+    type: CompleteRun
+    edictIds:
+      - Edict of Nomadic Departure
+      - Edict of Exogenous Support
+      - Edict of the Warren Hunt
+
+- id: 58a713f2-8f79-4147-bdc2-af3143014d15
+  name: Splintered
+  sprite: '0005'
+  description: Defeat Fel at 5 or more Fragments.
+  condition:
+    type: CompleteRun
+    minFragments: 5
+
+- id: b335a6a9-f36f-47c1-b35b-36f42ca02575
+  name: Fractured
+  sprite: '0006'
+  description: Defeat Fel at 15 or more Fragments.
+  condition:
+    type: CompleteRun
+    minFragments: 15
+
+- id: 0c3946dd-91a2-409f-a6da-3a424f1b26be
+  name: Shattered
+  sprite: '0007'
+  description: Defeat Fel at 25 or more Fragments.
+  condition:
+    type: CompleteRun
+    minFragments: 25
+
+- id: 910d5015-e556-4761-81dd-269352c25e59
+  name: Loyal Subject
+  sprite: '0008'
+  description: Defeat Fel in 5 runs with edicts.
+  condition:
+    type: CompleteRun
+    minEdicts: 1
+    count: 5
+
+- id: 5ef42355-9360-45dc-8d46-cf4d40a3eab3
+  name: Sworn to the Duchy
+  sprite: '0009'
+  description: Defeat Fel in 10 runs with edicts.
+  condition:
+    type: CompleteRun
+    minEdicts: 1
+    count: 10
+
+- id: 6e38d6a8-1d19-47d3-9a9f-1c1fa061cfc8
+  name: No Favors Needed
+  sprite: '0010'
+  description: Defeat Fel at 10 or more Fragments without a single boon.
+  condition:
+    type: CompleteRun
+    minFragments: 10
+    noBoons: true

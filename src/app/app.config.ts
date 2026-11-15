@@ -40,6 +40,7 @@ import { GamestateService } from '@services/gamestate.service';
 import { LoggerService, RollbarErrorHandler } from '@services/logger.service';
 import { MetaService } from '@services/meta.service';
 import { NotifyService } from '@services/notify.service';
+import { AchievementService } from '@services/achievement.service';
 import { TaskService } from '@services/task.service';
 import { SoundService } from '@services/sound.service';
 import { ThemeService } from '@services/theme.service';
@@ -152,6 +153,11 @@ export const appConfig: ApplicationConfig = {
       provide: ENVIRONMENT_INITIALIZER,
       multi: true,
       useValue: () => inject(TaskService).init(),
+    },
+    {
+      provide: ENVIRONMENT_INITIALIZER,
+      multi: true,
+      useValue: () => inject(AchievementService).init(),
     },
     {
       provide: ENVIRONMENT_INITIALIZER,

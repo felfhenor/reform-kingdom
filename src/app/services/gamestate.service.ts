@@ -7,6 +7,7 @@ import {
   signal,
   untracked,
 } from '@angular/core';
+import { achievementsCheckLegacy } from '@helpers/achievement/achievement-check.ui';
 import { GAMELOOP_INTERVAL_MS } from '@helpers/config';
 import { electronWindowOnSaveBeforeClose } from '@helpers/engine/electron-window.ui';
 import { notifyError } from '@helpers/engine/notify';
@@ -69,7 +70,7 @@ export class GamestateService {
     this.logger.info('GameState', 'Migrating gamestate...');
 
     await savefileLoad();
-    void savefileLegacySync();
+    void this.syncLegacy();
     migrateOptionsState();
 
     // The normal sync hook never runs on load, so regional buffs need re-deriving here.
@@ -78,6 +79,12 @@ export class GamestateService {
     this.logger.info('GameState', 'Gamestate loaded.');
     this.hasLoaded.set(true);
     isGameStateReady.set(true);
+  }
+
+  // Past runs earn achievements only once backups have refilled the Legacy; neither blocks loading.
+  private async syncLegacy() {
+    await savefileLegacySync();
+    achievementsCheckLegacy();
   }
 
   init() {

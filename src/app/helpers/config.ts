@@ -14,6 +14,14 @@ import type {
   StatusEffectTag,
 } from '@interfaces';
 
+// Achievement
+
+// One Trick ignores the basic Attack and needs enough uses that a hero who barely acted can't earn it.
+export const ACHIEVEMENT_ONE_TRICK_PERCENT = 95;
+export const ACHIEVEMENT_ONE_TRICK_MIN_USES = 100;
+export const ACHIEVEMENT_PACIFIST_HEALER_MIN_KILLS = 10;
+export const ACHIEVEMENT_JOB_MASTERY_LEVEL = 50;
+
 // Caravan
 
 export const ACTIVE_TRADE_COUNT = 4;

@@ -23,9 +23,11 @@ import type {
   EquipmentId,
   EquipmentItem,
   EquipmentSkill,
+  GameId,
   JobId,
   MonsterContent,
   RecipeId,
+  RunRecord,
   StatusEffect,
   TownCraftQueueEntry,
   TownNodeState,
@@ -181,5 +183,27 @@ export function buildStatusEffect(
     duration: overrides.duration ?? 1,
     creatorStats: overrides.creatorStats ?? defaultStats(),
     targetStats: overrides.targetStats ?? defaultStats(),
+  };
+}
+
+export function buildRunRecord(overrides: Partial<RunRecord> = {}): RunRecord {
+  return {
+    id: 'run' as GameId,
+    outcome: 'Completed',
+    startedAt: 0,
+    endedAt: 1,
+    ticks: 0,
+    party: [],
+    edicts: [],
+    fragments: 0,
+    multiplier: 1,
+    stats: {
+      kills: 0,
+      monstersKilled: 0,
+      mapsReached: 0,
+      townsVisited: 0,
+      completion: [],
+    },
+    ...overrides,
   };
 }

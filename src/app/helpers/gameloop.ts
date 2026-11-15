@@ -1,6 +1,7 @@
 import { LoggerTimer } from 'logger-timer';
 
 import { computed } from '@angular/core';
+import { achievementsCheckLive } from '@helpers/achievement/achievement-check';
 import { caravanProcessTick } from '@helpers/caravan/caravan-tick';
 import { combatDoCombatIteration } from '@helpers/combat/combat';
 import { commissionProcessTick } from '@helpers/commission/commission-tick';
@@ -59,6 +60,9 @@ export async function gameloop(totalTicks: number): Promise<void> {
   if (!isSetup()) return;
   if (!isGameStateReady()) return;
   if (!gameloopShouldRun()) return;
+
+  // Ahead of the pause guard so unlocks from menu actions land while paused; never mid-batch, when slices are half-written.
+  if (!isProcessingTicks) achievementsCheckLive();
 
   // Before the pause/story screen guards, so the presence still reflects those states.
   discordUpdateStatus();

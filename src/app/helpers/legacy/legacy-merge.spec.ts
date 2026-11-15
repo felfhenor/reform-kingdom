@@ -2,12 +2,19 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { defaultLegacy, LEGACY_STORAGE_KEY } from '@helpers/legacy/legacy';
 import {
+  legacyMergeAchievements,
   legacyMergeFrom,
   legacyMergeStates,
   legacyRunPreferred,
   legacyShouldSeedDisk,
 } from '@helpers/legacy/legacy-merge';
-import type { GameId, LegacyState, RunOutcome, RunRecord } from '@interfaces';
+import type {
+  AchievementUnlocks,
+  GameId,
+  LegacyState,
+  RunOutcome,
+  RunRecord,
+} from '@interfaces';
 
 function run(id: string, outcome: RunOutcome, endedAt = 1): RunRecord {
   return {
@@ -66,6 +73,23 @@ describe('legacyMergeStates', () => {
   });
 });
 
+describe('legacyMergeAchievements', () => {
+  const unlock = (unlockedAt: number) => ({
+    unlockedAt,
+    runId: 'run' as GameId,
+  });
+
+  it('keeps every unlock, at its earliest date, in base order', () => {
+    const merged = legacyMergeAchievements(
+      { b: unlock(5), a: unlock(3) } as AchievementUnlocks,
+      [{ a: unlock(1), c: unlock(9) } as AchievementUnlocks],
+    );
+
+    expect(merged).toEqual({ b: unlock(5), a: unlock(1), c: unlock(9) });
+    expect(Object.keys(merged)).toEqual(['b', 'a', 'c']);
+  });
+});
+
 describe('legacyMergeFrom', () => {
   it('treats missing sections as unchanged and bad or newer ones as invalid', () => {
     expect(legacyMergeFrom([])).toBe('unchanged');
@@ -87,6 +111,16 @@ describe('legacyMergeFrom', () => {
       LEGACY_STORAGE_KEY,
       JSON.stringify(legacyOf(run('a', 'Completed'), run('b', 'Completed'))),
     );
+  });
+
+  it('saves an import that only adds achievements', () => {
+    storeLegacy(legacyOf(run('a', 'Completed')));
+    const incoming = {
+      ...legacyOf(run('a', 'Completed')),
+      achievements: { x: { unlockedAt: 1, runId: 'a' } },
+    };
+
+    expect(legacyMergeFrom([incoming])).toBe('merged');
   });
 
   it('reports a blocked Legacy as unsaved instead of throwing', () => {
@@ -132,6 +166,17 @@ describe('legacyShouldSeedDisk', () => {
         stored,
       ),
     ).toBe(false);
+  });
+
+  it('seeds a disk copy that is missing achievements', () => {
+    const withUnlock = {
+      ...stored,
+      achievements: { x: { unlockedAt: 1, runId: 'a' as GameId } },
+    } as LegacyState;
+
+    expect(legacyShouldSeedDisk('unchanged', ok(stored), withUnlock)).toBe(
+      true,
+    );
   });
 
   it('has nothing to seed when no runs are stored', () => {

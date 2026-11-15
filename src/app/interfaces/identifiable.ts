@@ -1,4 +1,5 @@
 export type ContentType =
+  | 'achievement'
   | 'affix'
   | 'astralprojector'
   | 'caravan'

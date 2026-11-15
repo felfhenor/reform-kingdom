@@ -1,0 +1,32 @@
+@reference 'tailwindcss';
+
+:host {
+  @apply fixed top-16 left-0 right-0 z-[150] flex justify-center px-4 pointer-events-none;
+}
+
+.card-achievement {
+  @apply relative w-full max-w-md border-2;
+  border-color: rgb(251 191 36);
+  animation: card-achievement-enter 400ms ease-out;
+}
+
+.text-heading-gold {
+  color: rgb(251 191 36);
+}
+
+.shine {
+  @apply absolute inset-y-0 w-1/3;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgb(251 191 36 / 0.25),
+    transparent
+  );
+}
+
+@keyframes card-achievement-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}

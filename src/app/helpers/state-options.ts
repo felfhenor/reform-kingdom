@@ -53,6 +53,7 @@ export function defaultOptions(): GameOptions {
       Gather: true,
       Craft: true,
       Raid: true,
+      Achievement: true,
       Miscellaneous: true,
     },
   };

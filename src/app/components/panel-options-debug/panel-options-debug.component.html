@@ -517,6 +517,16 @@
         <button
           type="button"
           class="btn btn-error btn-outline btn-sm"
+          appAnalyticsClick="Options:Debug:ResetAchievements"
+          (click)="resetAchievements()"
+          appSfx="ui-error"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Reset Achievements
+        </button>
+        <button
+          type="button"
+          class="btn btn-error btn-outline btn-sm"
           appAnalyticsClick="Options:Debug:ResetIntroCrawl"
           (click)="resetIntroCrawl()"
           appSfx="ui-error"

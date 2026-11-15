@@ -1,3 +1,4 @@
+export * from './achievement';
 export * from './caravan';
 export * from './combat';
 export * from './commission';

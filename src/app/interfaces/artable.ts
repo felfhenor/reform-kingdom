@@ -11,6 +11,7 @@ export type HasAnimation = HasSprite & {
 };
 
 export type AtlasedImage =
+  | 'achievement'
   | 'collectible'
   | 'edict'
   | 'equipment'

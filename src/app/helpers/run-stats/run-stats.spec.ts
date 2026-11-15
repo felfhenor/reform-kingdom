@@ -16,6 +16,7 @@ import {
 } from '@helpers/run-stats/run-stats';
 import { gamestate, runStatsState, updateGamestate } from '@helpers/state-game';
 import type { CollectibleId, GameState, ItemId, RegionId } from '@interfaces';
+import { buildCharacter } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 import { inTick, seedGamestate } from '@/testing/gamestate';
 
@@ -88,6 +89,23 @@ describe('Fel defeated', () => {
     inTick(() => collectiblesAdd(memory.id));
 
     expect(gamestate().runStats.felDefeatedTick).toBe(50);
+  });
+
+  it('keeps the party as it stood at the first victory', () => {
+    seedContent([memory]);
+    seedGamestate((state) => {
+      state.world.party = [buildCharacter({ level: 40 })];
+    });
+
+    inTick(() => collectiblesAdd(memory.id));
+    write((state) => {
+      state.world.party[0].level = 60;
+    });
+    inTick(() => collectiblesAdd(memory.id));
+
+    expect(gamestate().runStats.felParty?.map((hero) => hero.level)).toEqual([
+      40,
+    ]);
   });
 
   it('stays untracked on a save that beat Fel before stats existed', () => {

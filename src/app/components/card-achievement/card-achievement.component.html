@@ -1,0 +1,27 @@
+@if (card(); as current) {
+  <div
+    #card
+    class="card-achievement card bg-base-100 shadow-xl"
+    (animate.leave)="onLeave($event)"
+  >
+    <div class="pointer-events-none absolute inset-0 overflow-hidden">
+      <div #shine class="shine"></div>
+    </div>
+
+    <div class="card-body flex-row items-center gap-4 p-4">
+      <app-atlas-image spritesheet="achievement" [assetName]="current.sprite" />
+
+      <div class="flex flex-col gap-2">
+        <span class="type-label text-heading-gold">{{ current.heading }}</span>
+        <h2 class="type-page-title">
+          @if (current.count) {
+            {{ current.count | number }} achievements unlocked
+          } @else {
+            {{ current.name }}
+          }
+        </h2>
+        <p class="type-flavor">{{ current.description }}</p>
+      </div>
+    </div>
+  </div>
+}

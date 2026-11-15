@@ -130,29 +130,6 @@
           <div class="h-full flex flex-col gap-4">
             <div class="card bg-base-100">
               <div class="card-body gap-4">
-                <div class="flex justify-between items-center gap-4">
-                  <h2 class="type-section-title">Edicts</h2>
-                  <span class="badge badge-data tabular-nums">
-                    {{ summary.fragments | number }} Fragments · score x{{
-                      summary.multiplier | number: '1.0-2'
-                    }}
-                  </span>
-                </div>
-
-                @for (entry of edicts(); track entry.id) {
-                  @if (entry.edict; as edict) {
-                    <app-row-edict [edict]="edict" />
-                  } @else {
-                    <p class="type-muted">Unknown edict</p>
-                  }
-                } @empty {
-                  <app-blank-slate>No edicts.</app-blank-slate>
-                }
-              </div>
-            </div>
-
-            <div class="card bg-base-100">
-              <div class="card-body gap-4">
                 <h2 class="type-section-title">Journey</h2>
 
                 @if (!hasRunTotals()) {
@@ -228,6 +205,29 @@
                     </div>
                   }
                 </div>
+              </div>
+            </div>
+
+            <div class="card bg-base-100 flex-1">
+              <div class="card-body gap-4">
+                <div class="flex justify-between items-center gap-4">
+                  <h2 class="type-section-title">Edicts</h2>
+                  <span class="badge badge-data tabular-nums">
+                    {{ summary.fragments | number }} Fragments · score x{{
+                      summary.multiplier | number: '1.0-2'
+                    }}
+                  </span>
+                </div>
+
+                @for (entry of edicts(); track entry.id) {
+                  @if (entry.edict; as edict) {
+                    <app-row-edict [edict]="edict" />
+                  } @else {
+                    <p class="type-muted">Unknown edict</p>
+                  }
+                } @empty {
+                  <app-blank-slate>No edicts.</app-blank-slate>
+                }
               </div>
             </div>
           </div>
@@ -333,6 +333,33 @@
                         {{ scored.total | number }}
                       </span>
                     </div>
+                  </div>
+                </div>
+              </div>
+            }
+
+            @if (achievements().length > 0) {
+              <div class="card bg-base-100">
+                <div class="card-body gap-4">
+                  <div class="flex justify-between items-center gap-4">
+                    <h2 class="type-section-title">Achievements Earned</h2>
+                    <span class="badge badge-data tabular-nums">
+                      {{ achievements().length | number }}
+                    </span>
+                  </div>
+
+                  <div class="flex flex-wrap gap-2">
+                    @for (achievement of achievements(); track achievement.id) {
+                      <app-tooltip-achievement
+                        #tooltip
+                        [achievement]="achievement"
+                      />
+                      <app-atlas-image
+                        spritesheet="achievement"
+                        [assetName]="achievement.sprite"
+                        [tp]="tooltip.template()"
+                      />
+                    }
                   </div>
                 </div>
               </div>

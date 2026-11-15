@@ -1,6 +1,8 @@
 import { getEntriesByType } from '@helpers/content/content';
 import { runStatsState, updateGamestate } from '@helpers/state-game';
 import { defaultHeroRunStats } from '@helpers/defaults';
+import { legacyRunHero } from '@helpers/legacy/legacy-hero';
+import { current, isDraft } from 'immer';
 import type {
   CharacterId,
   Combat,
@@ -26,9 +28,15 @@ export function runStatsRecordCraft(state: GameState): void {
   state.runStats.itemsCrafted += 1;
 }
 
-// Refights of Fel keep the first victory's tick.
+// Refights of Fel keep the first victory's tick and party. Copied off the draft so the party isn't shared with the live heroes.
 export function runStatsRecordFelDefeat(state: GameState): void {
-  state.runStats.felDefeatedTick ??= state.clock.numTicks;
+  if (state.runStats.felDefeatedTick !== undefined) return;
+
+  const snapshot = isDraft(state) ? current(state) : state;
+  state.runStats.felDefeatedTick = snapshot.clock.numTicks;
+  state.runStats.felParty = snapshot.world.party.map((hero) =>
+    legacyRunHero(hero, snapshot.runStats.heroes[hero.id]),
+  );
 }
 
 // Returns the region only when this clear is the one that sealed it; refights keep the first tick.

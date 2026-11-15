@@ -1,0 +1,76 @@
+<app-modal
+  modalId="achievements"
+  [showCloseButton]="true"
+  [allowEscToClose]="true"
+  [closeOnBackdropClick]="true"
+  widthClass="w-[90vw] max-w-[90vw] max-h-[90vh]"
+>
+  <span title>Achievements</span>
+
+  <div body class="flex flex-col gap-4">
+    <app-bar-progress
+      size="md"
+      [color]="unlocked() === total() ? 'success' : 'primary'"
+      [value]="unlocked()"
+      [max]="total()"
+    >
+      {{ unlocked() | number }}/{{ total() | number }}
+    </app-bar-progress>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
+      @for (tile of tiles(); track tile.achievement.id) {
+        <div
+          class="flex items-center gap-4 p-3 bg-base-200"
+          [class.opacity-50]="!tile.unlock"
+        >
+          @if (tile.isSecret) {
+            <app-icon-unknown />
+          } @else {
+            <app-atlas-image
+              spritesheet="achievement"
+              [assetName]="tile.achievement.sprite"
+              [class.grayscale]="!tile.unlock"
+            />
+          }
+
+          <div class="flex flex-col gap-2 flex-1 min-w-0">
+            <span class="type-entity-name">
+              {{ tile.isSecret ? '???' : tile.achievement.name }}
+            </span>
+            <span class="text-lighter">
+              {{ tile.isSecret ? 'Hidden' : tile.achievement.description }}
+            </span>
+
+            @if (tile.unlock; as unlock) {
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-xs text-lighter">
+                  Unlocked {{ unlock.unlockedAt | date: 'mediumDate' }}
+                </span>
+
+                @if (tile.hasRunSummary && canViewRuns()) {
+                  <button
+                    type="button"
+                    class="btn btn-neutral btn-xs"
+                    (click)="openRun(unlock.runId)"
+                    appSfx="ui-click"
+                    [sfxTrigger]="['click', 'hover']"
+                  >
+                    View Run
+                  </button>
+                }
+              </div>
+            } @else if (tile.progress; as progress) {
+              <app-bar-progress
+                size="sm"
+                [value]="progress.current"
+                [max]="progress.max"
+              >
+                {{ progress.current | number }}/{{ progress.max | number }}
+              </app-bar-progress>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</app-modal>

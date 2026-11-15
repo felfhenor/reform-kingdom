@@ -4,8 +4,11 @@ import {
   legacyIsValid,
   legacyLoad,
   legacySave,
+  legacyWithAchievements,
 } from '@helpers/legacy/legacy';
 import type {
+  AchievementUnlock,
+  AchievementUnlocks,
   LegacyMergeResult,
   LegacyState,
   RunRecord,
@@ -22,6 +25,33 @@ export function legacyRunPreferred(
   }
 
   return incoming.endedAt > mine.endedAt ? incoming : mine;
+}
+
+// Earliest unlock wins; keeps the base key order so an unchanged merge serializes identically.
+export function legacyMergeAchievements(
+  base: AchievementUnlocks,
+  incoming: AchievementUnlocks[],
+): AchievementUnlocks {
+  const merged = { ...base };
+  incoming
+    .flatMap((unlocks) => Object.entries(unlocks))
+    .forEach(([id, unlock]) => {
+      const mine: AchievementUnlock | undefined =
+        merged[id as keyof AchievementUnlocks];
+      if (!unlock || (mine && mine.unlockedAt <= unlock.unlockedAt)) return;
+      merged[id as keyof AchievementUnlocks] = unlock;
+    });
+
+  return merged;
+}
+
+// A missing section reads as empty, so an older Legacy compares equal to one with no unlocks yet.
+function legacyContentsEqual(a: LegacyState, b: LegacyState): boolean {
+  return (
+    JSON.stringify(a.runs) === JSON.stringify(b.runs) &&
+    JSON.stringify(a.achievements ?? {}) ===
+      JSON.stringify(b.achievements ?? {})
+  );
 }
 
 // Keeps the base order and appends new runs, so an unchanged merge serializes identically.
@@ -42,7 +72,14 @@ export function legacyMergeStates(
       runs[index] = legacyRunPreferred(runs[index], run);
     });
 
-  return { ...base, runs };
+  return {
+    ...base,
+    runs,
+    achievements: legacyMergeAchievements(
+      base.achievements ?? {},
+      incoming.map((state) => state.achievements ?? {}),
+    ),
+  };
 }
 
 // A newer build's Legacy may have a shape this one can't read, so it's skipped rather than half-merged.
@@ -52,16 +89,16 @@ function legacyIsMergeable(value: unknown): value is LegacyState {
 
 export function legacyMergeFrom(values: unknown[]): LegacyMergeResult {
   const present = values.filter((value) => value !== undefined);
-  const mergeable = present.filter(legacyIsMergeable);
+  const mergeable = present
+    .filter(legacyIsMergeable)
+    .map(legacyWithAchievements);
   if (mergeable.length === 0) {
     return present.length === 0 ? 'unchanged' : 'invalid';
   }
 
   const current = legacyLoad();
   const next = legacyMergeStates(current, mergeable);
-  if (JSON.stringify(next.runs) === JSON.stringify(current.runs)) {
-    return 'unchanged';
-  }
+  if (legacyContentsEqual(next, current)) return 'unchanged';
 
   try {
     legacySave(next);
@@ -78,11 +115,14 @@ export function legacyShouldSeedDisk(
   disk: SavefileDiskRead,
   stored: LegacyState,
 ): boolean {
-  if (result !== 'unchanged' || stored.runs.length === 0) return false;
+  const isEmpty =
+    stored.runs.length === 0 &&
+    Object.keys(stored.achievements ?? {}).length === 0;
+  if (result !== 'unchanged' || isEmpty) return false;
   if (disk.status === 'missing') return true;
   if (disk.status === 'unreadable' || !legacyIsMergeable(disk.value)) {
     return false;
   }
 
-  return JSON.stringify(disk.value.runs) !== JSON.stringify(stored.runs);
+  return !legacyContentsEqual(legacyWithAchievements(disk.value), stored);
 }

@@ -6,6 +6,7 @@ import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ButtonConnectComponent } from '@components/button-connect/button-connect.component';
 import { ButtonQuitComponent } from '@components/button-quit/button-quit.component';
+import { ButtonAchievementsComponent } from '@components/button-achievements/button-achievements.component';
 import { ButtonSettingsComponent } from '@components/button-settings/button-settings.component';
 import { ButtonUpdateComponent } from '@components/button-update/button-update.component';
 import { PanelDebugButtonsComponent } from '@components/panel-debug-buttons/panel-debug-buttons.component';
@@ -46,6 +47,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     ButtonUpdateComponent,
     ButtonQuitComponent,
     TeleportOutletDirective,
+    ButtonAchievementsComponent,
     ButtonSettingsComponent,
     PanelDebugButtonsComponent,
   ],

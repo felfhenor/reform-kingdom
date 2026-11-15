@@ -1,0 +1,80 @@
+- id: 6898bd28-483b-4099-b939-0fec3902a974
+  name: One Trick
+  sprite: '0035'
+  description: Defeat Fel with a hero who used one skill for nearly everything.
+  hidden: true
+  condition:
+    type: CompleteRun
+    heroFeat: OneTrick
+
+- id: c2c8ad90-e0bd-4734-9846-06591d363922
+  name: Pacifistish Healer
+  sprite: '0036'
+  description: Defeat Fel with a hero who healed more than they hurt.
+  hidden: true
+  condition:
+    type: CompleteRun
+    heroFeat: PacifistHealer
+
+- id: c1f918d1-4b9a-475e-9ba8-3358d7dc3b55
+  name: Kill the Queen
+  sprite: '0037'
+  description: Defeat the Spider Queen.
+  hidden: true
+  condition:
+    type: Defeat
+    monsterIds:
+      - Spider Queen
+
+- id: ecebb1a0-533e-44ed-a637-ad894afa370c
+  name: A Hidden Hero
+  sprite: '0038'
+  description: Defeat the Elf Captain.
+  hidden: true
+  condition:
+    type: Defeat
+    monsterIds:
+      - Elf Captain
+
+- id: 3c2ca6c3-0254-40c9-8d96-5f5044067eb9
+  name: Memories, Remembered
+  sprite: '0039'
+  description: Defeat Fel, the Forgetter.
+  hidden: true
+  condition:
+    type: Collect
+    collectibleIds:
+      - Memory of the Forgetter
+
+- id: 1d436ea6-cf5a-4aac-a54c-695f19b64dfa
+  name: I Remember
+  sprite: '0040'
+  description: Reach 100% Remembrance.
+  hidden: true
+  condition:
+    type: Reach
+    counter: Remembrance
+
+- id: b01a1eb2-974f-4ccd-b9a3-10d95a4fbff8
+  name: Speedrunner
+  sprite: '0041'
+  description: Defeat Fel within 400,000 ticks.
+  hidden: true
+  condition:
+    type: CompleteRun
+    maxFelTick: 400000
+
+- id: ae60d7a1-441e-4c56-bec3-fed121780702
+  name: Fragments of the Forgotten
+  sprite: '0042'
+  description: Recover the memory guarded in each of the six lands.
+  hidden: true
+  condition:
+    type: Collect
+    collectibleIds:
+      - Memory of the Makers
+      - Memory of the Lost Rulers
+      - Memory of the Guardians
+      - Memory of the Akroki
+      - Memory of the Fel
+      - Memory of the Cimmerians

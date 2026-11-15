@@ -1,3 +1,5 @@
+export * from './achievement';
+export * from './achievement.ui';
 export * from './artable';
 export * from './astral-projector';
 export * from './bestiary';
@@ -12,6 +14,7 @@ export * from './combat-log';
 export * from './combat-manual.ui';
 export * from './combat-order';
 export * from './commission-state';
+export * from './content-achievement';
 export * from './content-affix';
 export * from './content-astralprojector';
 export * from './content-caravan';

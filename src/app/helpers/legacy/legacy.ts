@@ -19,6 +19,8 @@ import {
   worldTownsState,
 } from '@helpers/state-game';
 import type {
+  AchievementUnlock,
+  AchievementUnlocks,
   GameId,
   LegacyState,
   RunOutcome,
@@ -36,7 +38,7 @@ export const LEGACY_VERSION = 1;
 let legacyWritesBlocked = false;
 
 export function defaultLegacy(): LegacyState {
-  return { version: LEGACY_VERSION, runs: [] };
+  return { version: LEGACY_VERSION, runs: [], achievements: {} };
 }
 
 // The optional per-hero fields are checked too, since the summary page reads into them.
@@ -58,6 +60,13 @@ function legacySealsAreValid(seals: unknown): boolean {
   );
 }
 
+function legacyFelPartyIsValid(party: unknown): boolean {
+  return (
+    party === undefined ||
+    (Array.isArray(party) && party.every(legacyHeroIsValid))
+  );
+}
+
 function legacyRunIsValid(run: RunRecord | null): boolean {
   return (
     typeof run?.id === 'string' &&
@@ -73,7 +82,8 @@ function legacyRunIsValid(run: RunRecord | null): boolean {
         typeof category?.current === 'number' &&
         typeof category.max === 'number',
     ) &&
-    legacySealsAreValid(run.stats.run?.seals)
+    legacySealsAreValid(run.stats.run?.seals) &&
+    legacyFelPartyIsValid(run.stats.run?.felParty)
   );
 }
 
@@ -84,6 +94,32 @@ export function legacyIsValid(value: unknown): value is LegacyState {
     Array.isArray(state.runs) &&
     state.runs.every(legacyRunIsValid)
   );
+}
+
+function legacyAchievementUnlockIsValid(unlock: unknown): boolean {
+  const entry = unlock as AchievementUnlock | null;
+  return (
+    isPlainObject(entry) &&
+    typeof entry?.unlockedAt === 'number' &&
+    typeof entry.runId === 'string'
+  );
+}
+
+// Checked apart from runs, so one bad entry is dropped instead of sending the whole Legacy to the corrupt copy.
+export function legacyAchievementsSanitize(value: unknown): AchievementUnlocks {
+  if (!isPlainObject(value)) return {};
+  return Object.fromEntries(
+    Object.entries(value as AchievementUnlocks).filter(([, unlock]) =>
+      legacyAchievementUnlockIsValid(unlock),
+    ),
+  );
+}
+
+export function legacyWithAchievements(state: LegacyState): LegacyState {
+  return {
+    ...state,
+    achievements: legacyAchievementsSanitize(state.achievements),
+  };
 }
 
 function legacyParse(raw: string): unknown {
@@ -101,7 +137,7 @@ export function legacyLoad(): LegacyState {
   if (raw === null) return defaultLegacy();
 
   const parsed = legacyParse(raw);
-  if (legacyIsValid(parsed)) return parsed;
+  if (legacyIsValid(parsed)) return legacyWithAchievements(parsed);
 
   try {
     localStorage.setItem(`${LEGACY_STORAGE_KEY}-corrupt-${Date.now()}`, raw);

@@ -3,7 +3,7 @@ import { sortBy } from 'es-toolkit/compat';
 import fs from 'fs-extra';
 import imagemin from 'imagemin';
 import webp from 'imagemin-webp';
-import { Jimp } from 'jimp';
+import { Jimp, ResizeStrategy } from 'jimp';
 import rec from 'recursive-readdir';
 
 fs.ensureDirSync('public/art/spritesheets');
@@ -84,6 +84,23 @@ const build = async () => {
         const fileName = files[i].replaceAll('\\', '/');
 
         const spriteRef = await Jimp.read(fileName);
+        if (
+          spriteRef.width !== spriteRef.height ||
+          spriteRef.width % 64 !== 0
+        ) {
+          throw new Error(
+            `${fileName} is ${spriteRef.width}x${spriteRef.height}; sprites must be square multiples of 64.`,
+          );
+        }
+
+        // High-res pixel art (e.g. 256px achievements) is shrunk to the 64px cell without smoothing its edges.
+        if (spriteRef.width > 64) {
+          spriteRef.resize({
+            w: 64,
+            h: 64,
+            mode: ResizeStrategy.NEAREST_NEIGHBOR,
+          });
+        }
 
         spritesheet.blit({ src: spriteRef, x, y });
 

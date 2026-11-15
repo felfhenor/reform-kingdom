@@ -1,3 +1,4 @@
+import { runAchievementsAnalysis } from '@helpers/debug/analysis-achievements';
 import { runCollectibleGatesAnalysis } from '@helpers/debug/analysis-collectiblegates';
 import { runCommissionRewardsAnalysis } from '@helpers/debug/analysis-commissionrewards';
 import { runCommissionUsageAnalysis } from '@helpers/debug/analysis-commissionusage';
@@ -238,6 +239,16 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     strict: true,
     inputKeys: [],
     run: runGatherDevelopmentLevelsAnalysis,
+  },
+  {
+    id: 'achievements',
+    title: 'Achievements',
+    description:
+      'Every achievement names real monsters and edicts, and no run achievement asks for edicts that block each other.',
+    category: 'World & Maps',
+    strict: true,
+    inputKeys: [],
+    run: runAchievementsAnalysis,
   },
   {
     id: 'shrines',

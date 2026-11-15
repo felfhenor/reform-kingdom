@@ -1,3 +1,4 @@
+export * from './analysis-achievements';
 export * from './analysis-affixes';
 export * from './analysis-collectiblegates';
 export * from './analysis-commissionrewards';
@@ -55,6 +56,7 @@ export * from './analysis-utils';
 export * from './analysis-workerreachability';
 export * from './analysis-workerstamina';
 export * from './debug';
+export * from './debug-achievements.ui';
 export * from './debug-story.ui';
 export * from './debug-tasks.ui';
 export * from './debug.ui';

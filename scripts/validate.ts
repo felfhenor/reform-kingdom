@@ -38,6 +38,7 @@ import { runJobAbilitiesAnalysis } from '@helpers/debug/analysis-jobabilities';
 import { runSkillTreesAnalysis } from '@helpers/debug/analysis-skilltrees';
 import { runJobStarterAnalysis } from '@helpers/debug/analysis-jobstarter';
 import { runMonsterDropsAnalysis } from '@helpers/debug/analysis-monsterdrops';
+import { runAchievementsAnalysis } from '@helpers/debug/analysis-achievements';
 import fs from 'fs-extra';
 import { DEMO_UNOBTAINABLE_FILE } from './demo-content';
 import { loadCompiledContentFromDisk } from './debug/load-compiled-content';
@@ -95,6 +96,7 @@ const ANALYSIS_CHECKS: Array<{ title: string; run: () => AnalysisRunResult }> =
     { title: 'validate:jobstarter', run: runJobStarterAnalysis },
     { title: 'validate:affixes', run: runAffixesAnalysis },
     { title: 'validate:monsterdrops', run: runMonsterDropsAnalysis },
+    { title: 'validate:achievements', run: runAchievementsAnalysis },
   ];
 
 const isDemo = process.argv.includes('--demo');

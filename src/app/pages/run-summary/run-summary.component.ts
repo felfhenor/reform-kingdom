@@ -7,15 +7,18 @@ import {
   input,
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { IconSpecComponent } from '@components/icon-spec/icon-spec.component';
 import { IconComponent } from '@components/icon/icon.component';
+import { TooltipAchievementComponent } from '@components/tooltip-achievement/tooltip-achievement.component';
 import { RowEdictComponent } from '@components/row-edict/row-edict.component';
 import { FadeInDirective } from '@directives/fade-in.directive';
 import { SFXDirective } from '@directives/sfx.directive';
+import { achievementsEarnedByRun } from '@helpers/achievement/achievement.ui';
 import { getEntry } from '@helpers/content/content';
 import { edictEntry } from '@helpers/edict/edict';
 import { ticksToDurationParts } from '@helpers/engine/timer.ui';
@@ -38,6 +41,7 @@ import {
 import { isSetup } from '@helpers/setup';
 import type { GameId, JobContent } from '@interfaces';
 import { PluralizePipe } from '@pipes/pluralize.pipe';
+import { TippyDirective } from '@ngneat/helipopper';
 
 function withSkill<T extends { skillFamily: string }>(used: T | undefined) {
   return used
@@ -49,6 +53,7 @@ function withSkill<T extends { skillFamily: string }>(used: T | undefined) {
   selector: 'app-run-summary',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    AtlasImageComponent,
     BarProgressComponent,
     BlankSlateComponent,
     DatePipe,
@@ -61,6 +66,8 @@ function withSkill<T extends { skillFamily: string }>(used: T | undefined) {
     RowEdictComponent,
     SFXDirective,
     IconComponent,
+    TippyDirective,
+    TooltipAchievementComponent,
   ],
   hostDirectives: [FadeInDirective],
   host: { class: 'block' },
@@ -72,6 +79,9 @@ export class RunSummaryComponent {
   public runId = input.required<string>();
 
   public run = computed(() => legacyRunById(this.runId() as GameId));
+  public achievements = computed(() =>
+    achievementsEarnedByRun(this.runId() as GameId),
+  );
   public outcomeTitle = computed(() => {
     const run = this.run();
     return run ? legacyRunOutcomeTitle(run.outcome) : '';

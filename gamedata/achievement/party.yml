@@ -1,0 +1,43 @@
+- id: a137b746-2a0d-4510-b1a9-6623ac51ee3f
+  name: Four of a Kind
+  sprite: '0011'
+  description: Defeat Fel with four heroes of the same job, either by utilizing the Edict of Reflective Mirrors, or not.
+  condition:
+    type: CompleteRun
+    minPartySize: 4
+    sameJob: true
+
+- id: 2881c7b2-7701-44e9-b71a-44678b442a1f
+  name: Form of Devotion
+  sprite: '0012'
+  description: Defeat Fel without any hero ever changing jobs, utilizing the Edict of True Devotion.
+  condition:
+    type: CompleteRun
+    noReclass: true
+    excludedEdictIds:
+      - Edict of True Devotion
+
+- id: 697a0477-9197-44fd-89c4-e80f4768eb82
+  name: Jack of Many Trades
+  sprite: '0013'
+  description: Raise one hero to level 50 in every job.
+  condition:
+    type: Reach
+    counter: JobsMastered
+
+- id: 49c87954-7f5c-4a38-af4c-00d646b4685e
+  name: No Healing Required
+  sprite: '0014'
+  description: Defeat Fel without a Healer ever in the party.
+  condition:
+    type: CompleteRun
+    excludedJobIds:
+      - Healer
+
+- id: d8b149e2-dbf4-41a8-8a09-bd6daf13363d
+  name: The Undying
+  sprite: '0015'
+  description: Defeat Fel without a single hero dying in their journey.
+  condition:
+    type: CompleteRun
+    noDeaths: true

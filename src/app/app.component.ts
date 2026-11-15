@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
+import { CardAchievementComponent } from '@components/card-achievement/card-achievement.component';
 import { BannerAnalyticsConsentComponent } from '@components/banner-analytics-consent/banner-analytics-consent.component';
 import { ScreenLoadingComponent } from '@components/screen-loading/screen-loading.component';
 import { TutorialOverlayComponent } from '@components/tutorial-overlay/tutorial-overlay.component';
@@ -24,6 +25,7 @@ import { LoadingService } from '@services/loading.service';
     TeleportOutletDirective,
     BannerAnalyticsConsentComponent,
     TutorialOverlayComponent,
+    CardAchievementComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',

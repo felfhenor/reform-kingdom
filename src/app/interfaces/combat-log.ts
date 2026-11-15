@@ -2,7 +2,13 @@ import type { AtlasedImage } from '@interfaces/artable';
 import type { CombatId } from '@interfaces/combat';
 
 export type AdventureLogEntryKind =
-  'Combat' | 'Travel' | 'Gather' | 'Craft' | 'Raid' | 'Miscellaneous';
+  | 'Combat'
+  | 'Travel'
+  | 'Gather'
+  | 'Craft'
+  | 'Raid'
+  | 'Achievement'
+  | 'Miscellaneous';
 
 // A combatant's HP snapshot at log time, keyed by id so `@@id@@` message
 // tokens can be swapped for a colored name (and `@@icon-id@@` tokens for its portrait).

@@ -4,6 +4,7 @@ import { isDemoBuild } from '@helpers/demo/demo';
 import { ButtonGlowComponent } from '@components/button-glow/button-glow.component';
 import { ButtonQuitComponent } from '@components/button-quit/button-quit.component';
 import { ButtonRunEndComponent } from '@components/button-run-end/button-run-end.component';
+import { ButtonAchievementsComponent } from '@components/button-achievements/button-achievements.component';
 import { ButtonSettingsComponent } from '@components/button-settings/button-settings.component';
 import { ButtonUpdateComponent } from '@components/button-update/button-update.component';
 import { IconComponent } from '@components/icon/icon.component';
@@ -84,6 +85,7 @@ import {
     ModalComponent,
     ButtonQuitComponent,
     ButtonRunEndComponent,
+    ButtonAchievementsComponent,
     ButtonSettingsComponent,
     ButtonGlowComponent,
     BarResourceComponent,

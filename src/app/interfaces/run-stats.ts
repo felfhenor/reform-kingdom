@@ -1,6 +1,7 @@
 import type { CharacterId } from '@interfaces/character';
 import type { CombatHpChange } from '@interfaces/combat';
 import type { RegionId } from '@interfaces/content-region';
+import type { RunRecordHero } from '@interfaces/legacy';
 
 export type RunStatsBiggestHit = {
   amount: number;
@@ -30,6 +31,8 @@ export type RunStatsTotals = {
   fightsLost: number;
   itemsCrafted: number;
   felDefeatedTick?: number;
+  // The party as Fel first fell; run achievements judge it, so changes made afterwards can't earn them.
+  felParty?: RunRecordHero[];
   // The tick each region was sealed on. Missing on runs recorded before seals were tracked.
   seals?: Partial<Record<RegionId, number>>;
   // Above 0 when the run started before seals were tracked, so regions sealed earlier only count from their next clear.

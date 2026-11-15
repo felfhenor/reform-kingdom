@@ -11,6 +11,9 @@
      to paint above routed page content. -->
 <ng-container [appTeleportOutlet]="'changelog-modal'"></ng-container>
 
+<!-- After the outlet, so it paints over routed pages and their modals. -->
+<app-card-achievement></app-card-achievement>
+
 @if (loadingService.isReady()) {
   <app-banner-analytics-consent></app-banner-analytics-consent>
 }

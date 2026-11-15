@@ -50,6 +50,7 @@ unobtainable:
 
 # Kept entries in these folders are stripped too once they need a stripped map, node or entry (they can't be finished).
 cascade:
+  - achievement
   - task
   - rumor
   - recipe

@@ -1,3 +1,4 @@
+import { achievementsCheckRun } from '@helpers/achievement/achievement-check';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { error } from '@helpers/engine/logging';
 import { notifyError } from '@helpers/engine/notify';
@@ -39,16 +40,19 @@ export function legacyRunOutcomeTitle(outcome: RunOutcome): string {
 export async function legacyEndRun(): Promise<GameId | undefined> {
   await waitForGameloopIdle();
 
+  let run: RunRecord;
   try {
-    const run = legacyRunFromGame(legacyRunOutcome());
+    run = legacyRunFromGame(legacyRunOutcome());
     legacyRecordRun(run);
     analyticsSendDesignEvent(`Legacy:EndRun:${run.outcome}`);
-    return run.id;
   } catch (e) {
     error('Legacy', 'Failed to record the run:', e);
     notifyError('Could not save this run to your Legacy, so it was not ended.');
     return undefined;
   }
+
+  achievementsCheckRun(run);
+  return run.id;
 }
 
 // Backups whose newest run is already in the Legacy were finished on purpose, not lost.

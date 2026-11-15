@@ -9,6 +9,7 @@ import {
   vi,
 } from 'vitest';
 
+vi.mock('@helpers/achievement/achievement-check');
 vi.mock('@helpers/caravan/caravan-tick');
 vi.mock('@helpers/combat/combat');
 vi.mock('@helpers/commission/commission-tick');
@@ -264,6 +265,9 @@ describe('gameloop', () => {
     );
     // A failed assertion mid-batch would otherwise leave the loop stuck for every later test.
     onTestFinished(() => releaseFirstYield());
+    // Frozen clock, so a slow run can't yield before the tick count does.
+    const now = vi.spyOn(performance, 'now').mockReturnValue(0);
+    onTestFinished(() => now.mockRestore());
 
     const firstRun = gameloop(TICKS_PER_YIELD * 2);
     await Promise.resolve();

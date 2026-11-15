@@ -1,3 +1,4 @@
+import type { AchievementUnlocks } from '@interfaces/achievement';
 import type { EdictId } from '@interfaces/content-edict';
 import type { JobId } from '@interfaces/content-job';
 import type { RemembranceCategory } from '@interfaces/remembrance';
@@ -50,9 +51,11 @@ export type RunRecord = {
   stats: RunRecordStats;
 };
 
+// `achievements` is optional so Legacies from builds before achievements stay version 1.
 export type LegacyState = {
   version: number;
   runs: RunRecord[];
+  achievements?: AchievementUnlocks;
 };
 
 export type LegacyMergeResult = 'merged' | 'unchanged' | 'invalid' | 'unsaved';
