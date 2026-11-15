@@ -24,6 +24,7 @@ export * from './analysis-nodelevels';
 export * from './analysis-nodenames';
 export * from './analysis-nodetypes';
 export * from './analysis-obtainability';
+export * from './analysis-obtainability-sources';
 export * from './analysis-outposts';
 export * from './analysis-recipeingredientorder';
 export * from './analysis-recipenames';

@@ -2,49 +2,18 @@
 // rewarded, gathered, crafted, traded, exchanged) or marked `unobtainable: true`.
 
 import { getEntriesByType } from '@helpers/content/content';
+import { obtainabilitySources } from '@helpers/debug/analysis-obtainability-sources';
 import type {
   AnalysisCheck,
   AnalysisRunResult,
-  CaravanTraderContent,
   CollectibleContent,
-  CommissionOfferContent,
-  DroppedReward,
-  EncounterContent,
-  EncounterRandomContent,
   EquipmentContent,
-  ExchangeNodeContent,
-  GatheringContent,
   ItemContent,
-  JobContent,
-  MonsterContent,
-  RecipeContent,
-  TaskContent,
-  TownContent,
   WorkerContent,
 } from '@interfaces';
 
 // Granted unconditionally by game code.
 const GUARANTEED_GRANT_NAMES = new Set<string>(['Founding Stone']);
-
-function addIfPresent(set: Set<string>, value?: string): void {
-  if (value) set.add(value);
-}
-
-function collectFromDroppedRewards(
-  rewards: DroppedReward[],
-  itemIds: Set<string>,
-  equipmentIds: Set<string>,
-  collectibleIds: Set<string>,
-  workerIds: Set<string>,
-): void {
-  rewards.forEach((reward) => {
-    if ('itemId' in reward) addIfPresent(itemIds, reward.itemId);
-    if ('equipmentId' in reward) addIfPresent(equipmentIds, reward.equipmentId);
-    if ('collectibleId' in reward)
-      addIfPresent(collectibleIds, reward.collectibleId);
-    if ('workerId' in reward) addIfPresent(workerIds, reward.workerId);
-  });
-}
 
 function checkCandidates(
   kind: string,
@@ -91,138 +60,29 @@ function checkCandidates(
 }
 
 export function runObtainabilityAnalysis(): AnalysisRunResult {
-  const items = getEntriesByType<ItemContent>('item');
-  const collectibles = getEntriesByType<CollectibleContent>('collectible');
-  const equipment = getEntriesByType<EquipmentContent>('equipment');
-  const monsters = getEntriesByType<MonsterContent>('monster');
-  const encounters = getEntriesByType<EncounterContent>('encounter');
-  const encounterRandoms =
-    getEntriesByType<EncounterRandomContent>('encounterrandom');
-  const gatherings = getEntriesByType<GatheringContent>('gathering');
-  const recipes = getEntriesByType<RecipeContent>('recipe');
-  const caravanTraders =
-    getEntriesByType<CaravanTraderContent>('caravantrader');
-  const workers = getEntriesByType<WorkerContent>('worker');
-  const towns = getEntriesByType<TownContent>('town');
-  const commissionOffers =
-    getEntriesByType<CommissionOfferContent>('commissionoffer');
-  const exchangeNodes = getEntriesByType<ExchangeNodeContent>('exchangenode');
-  const jobs = getEntriesByType<JobContent>('job');
-  const tasks = getEntriesByType<TaskContent>('task');
-
-  const obtainableItems = new Set<string>();
-  const obtainableEquipment = new Set<string>();
-  const obtainableCollectibles = new Set<string>();
-  const obtainableWorkers = new Set<string>();
-
-  jobs.forEach((job) =>
-    job.starterEquipmentIds.forEach((id) => obtainableEquipment.add(id)),
-  );
-
-  monsters.forEach((monster) =>
-    collectFromDroppedRewards(
-      monster.drops,
-      obtainableItems,
-      obtainableEquipment,
-      obtainableCollectibles,
-      obtainableWorkers,
-    ),
-  );
-
-  [...encounters, ...encounterRandoms].forEach((encounter) =>
-    collectFromDroppedRewards(
-      encounter.completionRewards,
-      obtainableItems,
-      obtainableEquipment,
-      obtainableCollectibles,
-      obtainableWorkers,
-    ),
-  );
-
-  towns.forEach((town) =>
-    collectFromDroppedRewards(
-      town.defense.rewards,
-      obtainableItems,
-      obtainableEquipment,
-      obtainableCollectibles,
-      obtainableWorkers,
-    ),
-  );
-
-  commissionOffers.forEach((offer) =>
-    collectFromDroppedRewards(
-      offer.rewards,
-      obtainableItems,
-      obtainableEquipment,
-      obtainableCollectibles,
-      obtainableWorkers,
-    ),
-  );
-
-  tasks.forEach((task) =>
-    task.rewards.forEach((reward) =>
-      addIfPresent(obtainableItems, reward.itemId),
-    ),
-  );
-
-  gatherings.forEach((gathering) => {
-    gathering.gatherResults.forEach((result) => {
-      result.items.forEach((item) =>
-        addIfPresent(obtainableItems, item.itemId),
-      );
-    });
-  });
-
-  recipes.forEach((recipe) => {
-    const result = recipe.result;
-    if ('itemId' in result) addIfPresent(obtainableItems, result.itemId);
-    if ('equipmentId' in result)
-      addIfPresent(obtainableEquipment, result.equipmentId);
-    if ('collectibleId' in result)
-      addIfPresent(obtainableCollectibles, result.collectibleId);
-  });
-
-  caravanTraders.forEach((trader) => {
-    trader.trades.forEach((trade) => {
-      if (trade.type !== 'sell') return;
-      addIfPresent(obtainableItems, trade.itemId);
-      addIfPresent(obtainableEquipment, trade.equipmentId);
-      addIfPresent(obtainableCollectibles, trade.collectibleId);
-    });
-
-    (trader.tokenTrades ?? []).forEach((trade) => {
-      addIfPresent(obtainableItems, trade.itemId);
-      addIfPresent(obtainableEquipment, trade.equipmentId);
-      addIfPresent(obtainableCollectibles, trade.collectibleId);
-    });
-  });
-
-  exchangeNodes.forEach((node) => {
-    node.exchanges.forEach((exchange) => {
-      if (exchange.kind === 'Equipment') {
-        addIfPresent(obtainableEquipment, exchange.outputEquipmentId);
-        return;
-      }
-      if (exchange.kind === 'Collectible') {
-        addIfPresent(obtainableCollectibles, exchange.outputCollectibleId);
-        return;
-      }
-      addIfPresent(obtainableItems, exchange.output.itemId);
-    });
-  });
-
-  // Town-referenced workers are obtainable by working for that town, not via drop/reward - no CaravanTrade-style pool exists for them.
-  towns.forEach((town) => {
-    town.gathering.workers.forEach((worker) =>
-      addIfPresent(obtainableWorkers, worker.workerId),
-    );
-  });
+  const sources = obtainabilitySources(getEntriesByType);
 
   const checks: AnalysisCheck[] = [
-    ...checkCandidates('Item', items, obtainableItems),
-    ...checkCandidates('Collectible', collectibles, obtainableCollectibles),
-    ...checkCandidates('Equipment', equipment, obtainableEquipment),
-    ...checkCandidates('Worker', workers, obtainableWorkers),
+    ...checkCandidates(
+      'Item',
+      getEntriesByType<ItemContent>('item'),
+      sources.items,
+    ),
+    ...checkCandidates(
+      'Collectible',
+      getEntriesByType<CollectibleContent>('collectible'),
+      sources.collectibles,
+    ),
+    ...checkCandidates(
+      'Equipment',
+      getEntriesByType<EquipmentContent>('equipment'),
+      sources.equipment,
+    ),
+    ...checkCandidates(
+      'Worker',
+      getEntriesByType<WorkerContent>('worker'),
+      sources.workers,
+    ),
   ];
 
   const failures = checks.filter((c) => c.status === 'fail').length;

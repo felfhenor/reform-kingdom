@@ -4,7 +4,7 @@ import type { JobContent } from '@interfaces/content-job';
 import type { EquipmentSkillContent } from '@interfaces/content-skill';
 import type { WorkerContent } from '@interfaces/content-worker';
 import type { EquipmentItemType } from '@interfaces/equipment';
-import type { IsContentItem } from '@interfaces/identifiable';
+import type { ContentType, IsContentItem } from '@interfaces/identifiable';
 import type { LevelRange } from '@interfaces/level-range';
 import type { SkillStatBonus } from '@interfaces/stat';
 import type { TiledObject } from '@interfaces/tiled-map';
@@ -201,3 +201,12 @@ export type SkillSourceKind =
 export type SkillSource = { kind: SkillSourceKind; name: string };
 
 export type SkillReference = { skillRef: string; source: SkillSource };
+
+export type ObtainabilitySources = {
+  items: Set<string>;
+  equipment: Set<string>;
+  collectibles: Set<string>;
+  workers: Set<string>;
+};
+
+export type ObtainabilityEntriesOf = <T>(type: ContentType) => T[];

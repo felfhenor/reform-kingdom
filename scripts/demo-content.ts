@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import fs from 'fs-extra';
 import * as yaml from 'js-yaml';
+import { obtainabilitySources } from '@helpers/debug/analysis-obtainability-sources';
 
 type Entry = any;
 type ContentRef = { folder: string; name: string };
@@ -84,6 +85,17 @@ const cascadeReason = (
   return ref ? `${ref.folder} ${ref.name}` : undefined;
 };
 
+const sourceNames = (list: Array<{ folder: string; entry: Entry }>) => {
+  const sources = obtainabilitySources((type) =>
+    list.filter(({ folder }) => folder === type).map(({ entry }) => entry),
+  );
+  return new Set([
+    ...sources.items,
+    ...sources.equipment,
+    ...sources.collectibles,
+  ]);
+};
+
 const printSection = (title: string, lines: string[]) => {
   if (lines.length === 0) return;
   console.info(`\n[Demo] ${title} (${lines.length}):`);
@@ -133,21 +145,26 @@ export const demoFilterContent = (
   gateNames.forEach((name) => stripped.get('collectible')?.delete(name));
 
   const cascaded: string[] = [];
+  // Removed only for naming an unobtainable item, so a source among them means that item shouldn't be listed.
+  const unobtainableOnly: Array<{ folder: string; entry: Entry }> = [];
   let changed = true;
   while (changed) {
     changed = false;
     keptEntries()
       .filter(({ folder }) => manifest.cascade.includes(folder))
       .forEach(({ folder, entry }) => {
+        const refs = refsOf(entry);
         const reason = cascadeReason(
           entry,
-          refsOf(entry),
+          refs,
           isUnavailable,
           manifest,
           nodeNames,
         );
         if (!reason) return;
 
+        if (!cascadeReason(entry, refs, isStrippedName, manifest, nodeNames))
+          unobtainableOnly.push({ folder, entry });
         markStripped(folder, entry);
         cascaded.push(`${folder} ${entry.name} (${reason})`);
         changed = true;
@@ -162,6 +179,19 @@ export const demoFilterContent = (
         const removed = (entry[field] ?? []).filter((element: Entry) =>
           elementRefs(element).some(isUnavailable),
         );
+        const prunedLists = Object.fromEntries(
+          manifest.prune[folder].map((list) => [list, []]),
+        );
+        removed
+          .filter(
+            (element: Entry) => !elementRefs(element).some(isStrippedName),
+          )
+          .forEach((element: Entry) =>
+            unobtainableOnly.push({
+              folder,
+              entry: { ...entry, ...prunedLists, [field]: [element] },
+            }),
+          );
         if (removed.length > 0) {
           entry[field] = entry[field].filter(
             (element: Entry) => !removed.includes(element),
@@ -223,6 +253,21 @@ export const demoFilterContent = (
     ...sealedNames,
   ]);
 
+  // A source that also costs another unobtainable item was rightly removed.
+  const lostSources = [
+    ...sourceNames(
+      unobtainableOnly.filter((source) =>
+        refsOf(source.entry)
+          .filter(isUnavailable)
+          .every((ref) => sourceNames([source]).has(ref.name)),
+      ),
+    ),
+  ].filter((name) => manifest.unobtainable.includes(name));
+  const keptSources = sourceNames(
+    keptEntries().filter(({ entry }) => !isSealed(entry)),
+  );
+  const openedGates = lockedGates.filter((name) => keptSources.has(name));
+
   const dangling = keptEntries().flatMap(({ folder, entry }) =>
     refsOf(entry)
       .filter(isStrippedName)
@@ -255,6 +300,14 @@ export const demoFilterContent = (
   printSection('Cascade-stripped (unfinishable in the demo)', cascaded);
   printSection('Pruned list entries', pruned);
   printSection('Orphan-stripped (nothing kept produces them)', orphaned);
+  printSection(
+    'Warning: unobtainable items a stripped demo source produces (remove them from unobtainable)',
+    lostSources,
+  );
+  printSection(
+    'Warning: gates treated as locked that kept content awards',
+    openedGates,
+  );
   printSection('Kept content referencing stripped content', dangling);
   printSection('Pinned content that was stripped', missingPinned);
   printSection(
