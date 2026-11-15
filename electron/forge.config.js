@@ -15,6 +15,8 @@ module.exports = {
     appCategoryType: 'public.app-category.games',
     icon: './icons/icon',
     win32metadata: {
+      // Squirrel names the Start Menu folder after it, so it can't fall back to the colon in `author`.
+      CompanyName: 'reForm Kingdom Team',
       FileDescription: displayName,
       ProductName: displayName,
     },
