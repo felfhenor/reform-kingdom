@@ -1,6 +1,6 @@
 import type { HasSprite } from '@interfaces/artable';
 import type { CollectibleId } from '@interfaces/content-collectible';
-import type { EdictId } from '@interfaces/content-edict';
+import type { EdictId, EdictKind } from '@interfaces/content-edict';
 import type { JobId } from '@interfaces/content-job';
 import type { MonsterId } from '@interfaces/content-monster';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
@@ -69,11 +69,18 @@ export type AchievementConditionCompleteRun = AchievementRunFilter & {
   count?: number;
 };
 
+// Every edict of the kind, each held in any Completed run.
+export type AchievementConditionClearEdicts = {
+  type: 'ClearEdicts';
+  kind: EdictKind;
+};
+
 export type AchievementCondition =
   | AchievementConditionReach
   | AchievementConditionDefeat
   | AchievementConditionCollect
-  | AchievementConditionCompleteRun;
+  | AchievementConditionCompleteRun
+  | AchievementConditionClearEdicts;
 
 export type AchievementContent = IsContentItem &
   HasDescription &

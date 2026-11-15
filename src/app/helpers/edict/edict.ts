@@ -6,21 +6,14 @@ import {
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import { edictsState } from '@helpers/state-game';
+import { EDICT_KINDS } from '@interfaces';
 import type {
   EdictContent,
   EdictId,
-  EdictKind,
   GameState,
   SeatBoonContent,
 } from '@interfaces';
 import { intersection, sortBy, sumBy, uniq } from 'es-toolkit/compat';
-
-const EDICT_KIND_ORDER: EdictKind[] = [
-  'PartySize',
-  'Challenge',
-  'Variant',
-  'Boon',
-];
 
 // getEntry also resolves names, so require the id itself to match.
 export function edictEntry(id: EdictId): EdictContent | undefined {
@@ -41,7 +34,7 @@ export function pruneInvalidEdicts(ids: EdictId[]): EdictId[] {
 
 export function edictsPickable(): EdictContent[] {
   return sortBy(getEntriesByType<EdictContent>('edict'), [
-    (edict) => EDICT_KIND_ORDER.indexOf(edict.kind),
+    (edict) => EDICT_KINDS.indexOf(edict.kind),
     (edict) => edict.name,
   ]);
 }

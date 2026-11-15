@@ -1,4 +1,5 @@
 import {
+  achievementIsJudgedOnRuns,
   achievementProgress,
   achievementsAll,
   achievementsLocked,
@@ -13,7 +14,7 @@ function achievementTileProgress(
 ): AchievementTile['progress'] {
   const { condition } = achievement;
   if (achievement.hidden || achievement.hideProgress) return undefined;
-  if (condition.type !== 'CompleteRun' && !hasSave) return undefined;
+  if (!achievementIsJudgedOnRuns(condition) && !hasSave) return undefined;
 
   const progress = achievementProgress(condition);
   return progress.max > 1 ? progress : undefined;

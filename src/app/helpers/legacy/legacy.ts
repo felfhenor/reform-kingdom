@@ -21,6 +21,7 @@ import {
 import type {
   AchievementUnlock,
   AchievementUnlocks,
+  EdictId,
   GameId,
   LegacyState,
   RunOutcome,
@@ -30,7 +31,7 @@ import type {
   RunStatsTotals,
 } from '@interfaces';
 import { isPlainObject, omit } from 'es-toolkit';
-import { sumBy } from 'es-toolkit/compat';
+import { sumBy, uniq } from 'es-toolkit/compat';
 
 export const LEGACY_STORAGE_KEY = 'legacy';
 export const LEGACY_VERSION = 1;
@@ -64,6 +65,14 @@ function legacyFelPartyIsValid(party: unknown): boolean {
   return (
     party === undefined ||
     (Array.isArray(party) && party.every(legacyHeroIsValid))
+  );
+}
+
+export function legacyRunsClearedEdictIds(runs: RunRecord[]): EdictId[] {
+  return uniq(
+    runs
+      .filter((run) => run.outcome === 'Completed')
+      .flatMap((run) => run.edicts),
   );
 }
 

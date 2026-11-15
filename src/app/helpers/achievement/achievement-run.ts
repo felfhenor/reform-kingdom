@@ -3,10 +3,13 @@ import {
   ACHIEVEMENT_ONE_TRICK_PERCENT,
   ACHIEVEMENT_PACIFIST_HEALER_MIN_KILLS,
 } from '@helpers/config';
-import { getEntry } from '@helpers/content/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { legacyRunsClearedEdictIds } from '@helpers/legacy/legacy';
 import type {
+  AchievementConditionClearEdicts,
   AchievementConditionCompleteRun,
   AchievementHeroFeat,
+  AchievementProgress,
   AchievementRunFilter,
   EdictContent,
   HeroRunStats,
@@ -143,4 +146,18 @@ export function achievementRunEarner(
     (run) => run.endedAt,
   );
   return matches[(condition.count ?? 1) - 1];
+}
+
+export function achievementEdictsCleared(
+  condition: AchievementConditionClearEdicts,
+  runs: RunRecord[],
+): AchievementProgress {
+  const cleared = legacyRunsClearedEdictIds(runs);
+  const edicts = getEntriesByType<EdictContent>('edict').filter(
+    (edict) => edict.kind === condition.kind,
+  );
+  return {
+    current: edicts.filter((edict) => cleared.includes(edict.id)).length,
+    max: edicts.length,
+  };
 }

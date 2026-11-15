@@ -93,3 +93,11 @@
     type: CompleteRun
     minFragments: 10
     noBoons: true
+
+- id: c0d8df60-cdc2-4b18-8aeb-857a6e45bae2
+  name: The Founder's Archive
+  sprite: '0043'
+  description: Defeat Fel under every challenge edict, across any number of runs.
+  condition:
+    type: ClearEdicts
+    kind: Challenge

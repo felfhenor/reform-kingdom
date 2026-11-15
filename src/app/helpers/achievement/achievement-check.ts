@@ -1,10 +1,10 @@
 import {
   achievementConditionSources,
+  achievementEarnerRun,
   achievementProgress,
   achievementProgressIsMet,
   achievementsLocked,
 } from '@helpers/achievement/achievement';
-import { achievementRunEarner } from '@helpers/achievement/achievement-run';
 import { achievementsUnlock } from '@helpers/achievement/achievement-unlock';
 import { error } from '@helpers/engine/logging';
 import { legacy, legacyRunFromGame } from '@helpers/legacy/legacy';
@@ -35,11 +35,7 @@ export function achievementsEarnedByRuns(
   runs: RunRecord[],
 ): AchievementUnlocked[] {
   return achievementsLocked().flatMap((achievement) => {
-    const { condition } = achievement;
-    const earner =
-      condition.type === 'CompleteRun'
-        ? achievementRunEarner(condition, runs)
-        : undefined;
+    const earner = achievementEarnerRun(achievement.condition, runs);
     return earner
       ? [
           {

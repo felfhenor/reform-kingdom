@@ -7,6 +7,7 @@ import {
   legacyRecordRun,
   legacyRunById,
   legacyRunFromGame,
+  legacyRunsClearedEdictIds,
 } from '@helpers/legacy/legacy';
 import { isFelDefeated, isRunLost } from '@helpers/lore/outro';
 import { waitForGameloopIdle } from '@helpers/savefile/savefile-load';
@@ -23,7 +24,7 @@ import type {
   RunStatRow,
   SavefileBackup,
 } from '@interfaces';
-import { maxBy, uniq } from 'es-toolkit/compat';
+import { maxBy } from 'es-toolkit/compat';
 
 // Beating Fel counts even if a later wipe ended the run.
 export function legacyRunOutcome(): RunOutcome {
@@ -66,11 +67,7 @@ export function legacyHasCompletedRun(): boolean {
 }
 
 export function legacyClearedEdictIds(): EdictId[] {
-  return uniq(
-    legacy()
-      .runs.filter((run) => run.outcome === 'Completed')
-      .flatMap((run) => run.edicts),
-  );
+  return legacyRunsClearedEdictIds(legacy().runs);
 }
 
 // Copied once at world setup, so the edict reward stock can't change mid-run.

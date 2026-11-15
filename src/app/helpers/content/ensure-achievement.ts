@@ -1,6 +1,7 @@
-import { ACHIEVEMENT_COUNTERS } from '@interfaces';
+import { ACHIEVEMENT_COUNTERS, EDICT_KINDS } from '@interfaces';
 import type {
   AchievementCondition,
+  AchievementConditionClearEdicts,
   AchievementConditionCollect,
   AchievementConditionCompleteRun,
   AchievementConditionDefeat,
@@ -26,6 +27,12 @@ export function ensureAchievementCondition(
     case 'CompleteRun': {
       const run = condition as Partial<AchievementConditionCompleteRun>;
       return { ...run, type: 'CompleteRun', count: run.count ?? 1 };
+    }
+    case 'ClearEdicts': {
+      const { kind } = condition as Partial<AchievementConditionClearEdicts>;
+      if (kind && EDICT_KINDS.includes(kind))
+        return { type: 'ClearEdicts', kind };
+      break;
     }
     case 'Collect': {
       const collectibleIds =

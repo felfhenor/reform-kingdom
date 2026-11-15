@@ -52,6 +52,12 @@ function conditionProblems(condition: AchievementCondition): string[] {
       );
     case 'CompleteRun':
       return runConditionProblems(condition);
+    case 'ClearEdicts':
+      return getEntriesByType<EdictContent>('edict').some(
+        (edict) => edict.kind === condition.kind,
+      )
+        ? []
+        : [`no ${condition.kind} edicts exist`];
     case 'Reach':
       return [];
   }

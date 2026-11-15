@@ -7,7 +7,15 @@ import type { HasDescription } from '@interfaces/traits';
 
 export type EdictId = Branded<string, 'EdictId'>;
 
-export type EdictKind = 'PartySize' | 'Challenge' | 'Variant' | 'Boon';
+// Also the order the setup page lists them in.
+export const EDICT_KINDS = [
+  'PartySize',
+  'Challenge',
+  'Variant',
+  'Boon',
+] as const;
+
+export type EdictKind = (typeof EDICT_KINDS)[number];
 
 export type EdictContent = IsContentItem &
   HasDescription &

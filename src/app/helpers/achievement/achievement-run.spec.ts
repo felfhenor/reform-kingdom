@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  achievementEdictsCleared,
   achievementRunEarner,
   achievementRunMatches,
 } from '@helpers/achievement/achievement-run';
@@ -274,5 +275,27 @@ describe('achievementRunEarner', () => {
 
     expect(achievementRunEarner(condition, runs)?.id).toBe('second');
     expect(achievementRunEarner(condition, runs.slice(0, 2))).toBeUndefined();
+  });
+});
+
+describe('achievementEdictsCleared', () => {
+  it('counts edicts of the kind held in any Completed run', () => {
+    const other = ensureEdict({
+      id: 'other' as EdictId,
+      name: 'Other',
+      kind: 'Challenge',
+    });
+    seedContent([boon, challenge, other]);
+    const runs = [
+      buildRunRecord({ edicts: [challenge.id, boon.id] }),
+      buildRunRecord({ edicts: [other.id], outcome: 'Lost' }),
+    ];
+
+    expect(
+      achievementEdictsCleared(
+        { type: 'ClearEdicts', kind: 'Challenge' },
+        runs,
+      ),
+    ).toEqual({ current: 1, max: 2 });
   });
 });
