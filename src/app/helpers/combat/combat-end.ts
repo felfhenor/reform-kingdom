@@ -1,3 +1,5 @@
+import { achievementsMoment } from '@helpers/achievement/achievement-moment';
+import { combatWonInAmbushRound } from '@helpers/combat/combat-ambush';
 import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
 import {
   combatantMessageToken,
@@ -291,6 +293,7 @@ function combatHasNextFight(combat: Combat): boolean {
 function handleCombatVictory(combat: Combat): boolean {
   combatMessageLog(combat, 'Heroes have won the combat!');
   analyticsSendDesignEvent('Combat:Encounter:Win');
+  if (combatWonInAmbushRound(combat)) achievementsMoment('AmbushVictory');
 
   syncPartyHpFromCombat(combat.heroes);
   recordVictoryKills(combat);

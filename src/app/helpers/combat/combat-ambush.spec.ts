@@ -6,9 +6,13 @@ vi.mock('@helpers/rng', async (importOriginal) => ({
   rngSucceedsChance: vi.fn(),
 }));
 
-import { combatRollAmbush } from '@helpers/combat/combat-ambush';
+import {
+  combatRollAmbush,
+  combatWonInAmbushRound,
+} from '@helpers/combat/combat-ambush';
 import { rngSucceedsChance } from '@helpers/rng';
-import type { Character } from '@interfaces';
+import type { Character, Combat } from '@interfaces';
+import { buildCombat, buildTestCombatant } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
 import { abilityJobContent, buildAbilityHero } from '@/testing/job-ability';
@@ -52,5 +56,25 @@ describe('combatRollAmbush', () => {
     vi.mocked(rngSucceedsChance).mockReturnValue(false);
 
     expect(combatRollAmbush()).toBeUndefined();
+  });
+});
+
+describe('combatWonInAmbushRound', () => {
+  const ambushFight = (overrides: Partial<Combat> = {}) =>
+    buildCombat({ guardians: [buildTestCombatant()], ...overrides });
+
+  it('holds mid-ambush, or once only the ambush round has ended', () => {
+    expect(
+      combatWonInAmbushRound(
+        ambushFight({ ambushedBy: 'Hero', turnQueue: [] }),
+      ),
+    ).toBe(true);
+    expect(combatWonInAmbushRound(ambushFight())).toBe(true);
+  });
+
+  it('fails once a counted round has begun or ended, or with nothing to fight', () => {
+    expect(combatWonInAmbushRound(ambushFight({ turnQueue: [] }))).toBe(false);
+    expect(combatWonInAmbushRound(ambushFight({ rounds: 1 }))).toBe(false);
+    expect(combatWonInAmbushRound(buildCombat())).toBe(false);
   });
 });

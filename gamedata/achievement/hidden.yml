@@ -87,3 +87,12 @@
   condition:
     type: Moment
     moment: ShrineMemoriamPrayer
+
+- id: 1033144f-10e0-4675-ae9e-69d9a543ead9
+  name: Didn't See Us Coming
+  sprite: '0046'
+  description: Win a fight in the ambush round.
+  hidden: true
+  condition:
+    type: Moment
+    moment: AmbushVictory

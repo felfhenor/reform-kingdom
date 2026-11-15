@@ -9,7 +9,9 @@ vi.mock('@helpers/hero/travel');
 vi.mock('@helpers/town/raid/town-raid-resolve');
 vi.mock('@helpers/task/task-progress');
 vi.mock('@helpers/engine/sfx');
+vi.mock('@helpers/achievement/achievement-moment');
 
+import { achievementsMoment } from '@helpers/achievement/achievement-moment';
 import { captureAnalyticsEvents } from '@/testing/analytics';
 import {
   buildCharacter,
@@ -190,6 +192,15 @@ describe('combatCheckIfOver', () => {
       expect(events).toContain('Combat:Encounter:Win');
       expect(gamestate().world.combat).toBeUndefined();
       expect(gamestate().runStats.fightsWon).toBe(1);
+    });
+
+    it('marks a win in the ambush round as a moment, and not a later one', () => {
+      endFight(fight());
+      expect(achievementsMoment).toHaveBeenCalledWith('AmbushVictory');
+
+      vi.mocked(achievementsMoment).mockClear();
+      endFight(fight({ rounds: 1 }));
+      expect(achievementsMoment).not.toHaveBeenCalled();
     });
 
     it('counts an auto-won fight as a win without fighting it', () => {
