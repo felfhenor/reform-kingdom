@@ -2,6 +2,7 @@ import { SHRINE_PRAYER_COOLDOWN_TICKS } from '@helpers/config';
 import {
   clockState,
   shrinesState,
+  worldPartyState,
   worldPrayerLastTickState,
 } from '@helpers/state-game';
 import type { ShrineContent, ShrineLevel } from '@interfaces';
@@ -25,4 +26,13 @@ export function shrinePrayerCooldownRemaining(): number {
 
   const elapsed = clockState().numTicks - lastTick;
   return Math.max(0, SHRINE_PRAYER_COOLDOWN_TICKS - elapsed);
+}
+
+export function shrineMemoriamIsWorn(shrine: ShrineContent): boolean {
+  return worldPartyState().some((hero) =>
+    Object.values(hero.equipment).some(
+      (item) =>
+        !!item && shrine.memoriamEquipmentIds.includes(item.equipmentId),
+    ),
+  );
 }

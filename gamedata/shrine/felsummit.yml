@@ -3,6 +3,8 @@
   description: A shrine dedicated to Lalal, the artificer. She was known for her ingenuitive and creative mind.
   background: ruins-portal
   legendName: Legend of the Artificer
+  memoriamEquipmentIds:
+    - Shroud of Lalal
 
   levels:
     - developTime: 300

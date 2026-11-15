@@ -6,11 +6,13 @@ import {
 } from '@helpers/content/ensure-shrine';
 import { SHRINE_PRAYER_COOLDOWN_TICKS } from '@helpers/config';
 import {
+  shrineMemoriamIsWorn,
   shrinePrayerCooldownRemaining,
   worldNodeShrineCurrentTier,
   worldNodeShrineLevel,
 } from '@helpers/world-node/world-node-shrine';
-import type { GameState, GlobalEffectId } from '@interfaces';
+import type { EquipmentId, GameState, GlobalEffectId } from '@interfaces';
+import { buildCharacter, buildEquipmentItem } from '@/testing/builders';
 import { seedGamestate } from '@/testing/gamestate';
 
 const node = "Founder's Shrine";
@@ -79,5 +81,32 @@ describe('shrinePrayerCooldownRemaining', () => {
 
     prayedAgo(SHRINE_PRAYER_COOLDOWN_TICKS + 50);
     expect(shrinePrayerCooldownRemaining()).toBe(0);
+  });
+});
+
+describe('shrineMemoriamIsWorn', () => {
+  const memoriamId = 'spear' as EquipmentId;
+  const champion = ensureShrine({ memoriamEquipmentIds: [memoriamId] });
+
+  function partyWearing(equipmentId: EquipmentId): void {
+    seedGamestate((state) => {
+      const hero = buildCharacter();
+      hero.equipment.Weapon = buildEquipmentItem(equipmentId);
+      state.world.party = [buildCharacter(), hero];
+    });
+  }
+
+  it("holds once any hero wears the shrine's memoriam", () => {
+    partyWearing(memoriamId);
+
+    expect(shrineMemoriamIsWorn(champion)).toBe(true);
+  });
+
+  it('fails for other gear, or a shrine with no memoriam', () => {
+    partyWearing('sword' as EquipmentId);
+    expect(shrineMemoriamIsWorn(champion)).toBe(false);
+
+    partyWearing(memoriamId);
+    expect(shrineMemoriamIsWorn(shrine)).toBe(false);
   });
 });

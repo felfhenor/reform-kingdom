@@ -1,3 +1,4 @@
+import type { EquipmentId } from '@interfaces/content-equipment';
 import type { GlobalEffectId } from '@interfaces/content-globaleffect';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { HasNodeBackground } from '@interfaces/node-background';
@@ -26,6 +27,8 @@ export type ShrineContent = IsContentItem &
     legendName: string;
     // Praying here also draws a Founder whisper hinting at something unfound.
     founderWhispers: boolean;
+    // The champion's memoriam gear, worn while praying here for an achievement.
+    memoriamEquipmentIds: EquipmentId[];
     // Level 0 = no investment (not prayable); level N (1..levels.length) grants
     // levels[N-1]'s buff, unlocked by paying levels[N-1].costs.
     levels: ShrineLevel[];

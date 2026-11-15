@@ -3,6 +3,8 @@
   description: A shrine dedicated to Culcula, the explorer. They were known for their extraordinary mobility.
   background: ruins-arches
   legendName: Legend of the Pioneer
+  memoriamEquipmentIds:
+    - Stiletto of Culcula
 
   levels:
     - developTime: 300

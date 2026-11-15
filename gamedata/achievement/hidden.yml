@@ -78,3 +78,12 @@
       - Memory of the Akroki
       - Memory of the Fel
       - Memory of the Cimmerians
+
+- id: cad0ab83-4d36-4d1e-849f-ee893f1b5545
+  name: Answered Prayers
+  sprite: '0045'
+  description: Pray at a shrine while a hero wears the memoriam of the champion it honors.
+  hidden: true
+  condition:
+    type: Moment
+    moment: ShrineMemoriamPrayer

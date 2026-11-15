@@ -27,7 +27,10 @@ export const ACHIEVEMENT_COUNTERS = [
 
 export type AchievementCounter = (typeof ACHIEVEMENT_COUNTERS)[number];
 
-export const ACHIEVEMENT_MOMENTS = ['CaravanTrade'] as const;
+export const ACHIEVEMENT_MOMENTS = [
+  'CaravanTrade',
+  'ShrineMemoriamPrayer',
+] as const;
 
 export type AchievementMoment = (typeof ACHIEVEMENT_MOMENTS)[number];
 

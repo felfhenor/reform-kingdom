@@ -1,3 +1,4 @@
+import { achievementsMoment } from '@helpers/achievement/achievement-moment';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import { ONE_YEAR_TICKS, SHRINE_PRAYER_COOLDOWN_TICKS } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
@@ -12,6 +13,7 @@ import { rumorWhisper } from '@helpers/rumor/rumor-whisper';
 import { globalEffectSumsState, updateGamestate } from '@helpers/state-game';
 import { isPartyAtNode } from '@helpers/world';
 import {
+  shrineMemoriamIsWorn,
   shrinePrayerCooldownRemaining,
   worldNodeShrineCurrentTier,
   worldNodeShrineLevel,
@@ -94,6 +96,7 @@ function shrinePrayAnnounce(shrine: ShrineContent, tier: ShrineLevel): void {
   }
 
   if (shrine.founderWhispers) rumorWhisper();
+  if (shrineMemoriamIsWorn(shrine)) achievementsMoment('ShrineMemoriamPrayer');
 
   analyticsSendDesignEvent(
     `World:Shrine:Pray:${analyticsSafeSegment(shrine.name)}`,

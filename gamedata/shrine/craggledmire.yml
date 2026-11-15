@@ -3,6 +3,8 @@
   description: A shrine dedicated to a war hero whose origins are lost to time. It's said that orcs come here to pray for battle spoils.
   background: arena-castle
   legendName: Legend of the Champion
+  memoriamEquipmentIds:
+    - Spear of Parcilyte
 
   levels:
     - developTime: 300

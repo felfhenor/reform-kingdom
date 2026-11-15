@@ -3,6 +3,8 @@
   description: A shrine dedicated to the Founder. It helps new adventurers and old ones alike to recognize their experiences and learn more from them.
   background: cave-shrine
   legendName: Legend of the Founder
+  memoriamEquipmentIds:
+    - Sword of the Founder
   founderWhispers: true
 
   levels:
@@ -95,6 +97,8 @@
   description: A shrine erected by local merchants. They say that praying here increases your wealth.
   background: castle-hall-carpet
   legendName: Legend of the Magnate
+  memoriamEquipmentIds:
+    - Baselard of Izchak
 
   levels:
     - developTime: 300
