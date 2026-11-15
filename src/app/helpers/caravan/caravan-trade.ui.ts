@@ -1,3 +1,4 @@
+import { achievementsMoment } from '@helpers/achievement/achievement-moment';
 import { caravanState } from '@helpers/caravan/caravan';
 import {
   caravanTradeMaxQuantity,
@@ -266,6 +267,7 @@ export async function caravanExecuteTrade(
   if (!executed) return false;
 
   caravanTradeLog(entry, trade, quantity, receipt);
+  achievementsMoment('CaravanTrade');
   const tradeName = caravanTradeName(trade);
   analyticsSendDesignEvent(
     tradeName
@@ -329,6 +331,7 @@ export async function caravanExecuteTokenTrade(
     [tradeGoodsLogPart(trade, 1)],
     [tradeGoodsLogPart({ itemId: traderTokenId() }, trade.tokenCost)],
   );
+  achievementsMoment('CaravanTrade');
   const tradeName = caravanTradeName(trade);
   analyticsSendDesignEvent(
     tradeName

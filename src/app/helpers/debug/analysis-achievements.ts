@@ -59,6 +59,7 @@ function conditionProblems(condition: AchievementCondition): string[] {
         ? []
         : [`no ${condition.kind} edicts exist`];
     case 'Reach':
+    case 'Moment':
       return [];
   }
 }

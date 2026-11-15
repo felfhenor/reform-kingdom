@@ -165,3 +165,11 @@
   condition:
     type: Reach
     counter: TasksCompleted
+
+- id: b62faa5f-ccba-4917-8ae4-70a596bf49d8
+  name: Capitalism, Ho!
+  sprite: '0044'
+  description: Make your first trade with a caravan.
+  condition:
+    type: Moment
+    moment: CaravanTrade

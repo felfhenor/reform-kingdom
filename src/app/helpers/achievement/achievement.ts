@@ -62,6 +62,8 @@ export function achievementProgress(
     }
     case 'ClearEdicts':
       return achievementEdictsCleared(condition, legacy().runs);
+    case 'Moment':
+      return { current: 0, max: 1 };
   }
 }
 
@@ -78,6 +80,7 @@ export function achievementConditionSources(
       return [achievementCollectiblesDiscovered];
     case 'CompleteRun':
     case 'ClearEdicts':
+    case 'Moment':
       return [];
   }
 }

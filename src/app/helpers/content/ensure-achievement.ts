@@ -1,10 +1,15 @@
-import { ACHIEVEMENT_COUNTERS, EDICT_KINDS } from '@interfaces';
+import {
+  ACHIEVEMENT_COUNTERS,
+  ACHIEVEMENT_MOMENTS,
+  EDICT_KINDS,
+} from '@interfaces';
 import type {
   AchievementCondition,
   AchievementConditionClearEdicts,
   AchievementConditionCollect,
   AchievementConditionCompleteRun,
   AchievementConditionDefeat,
+  AchievementConditionMoment,
   AchievementConditionReach,
   AchievementContent,
   AchievementId,
@@ -32,6 +37,13 @@ export function ensureAchievementCondition(
       const { kind } = condition as Partial<AchievementConditionClearEdicts>;
       if (kind && EDICT_KINDS.includes(kind))
         return { type: 'ClearEdicts', kind };
+      break;
+    }
+    case 'Moment': {
+      const { moment } = condition as Partial<AchievementConditionMoment>;
+      if (moment && ACHIEVEMENT_MOMENTS.includes(moment)) {
+        return { type: 'Moment', moment };
+      }
       break;
     }
     case 'Collect': {

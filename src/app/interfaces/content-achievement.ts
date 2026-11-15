@@ -27,6 +27,10 @@ export const ACHIEVEMENT_COUNTERS = [
 
 export type AchievementCounter = (typeof ACHIEVEMENT_COUNTERS)[number];
 
+export const ACHIEVEMENT_MOMENTS = ['CaravanTrade'] as const;
+
+export type AchievementMoment = (typeof ACHIEVEMENT_MOMENTS)[number];
+
 export type AchievementHeroFeat = 'OneTrick' | 'PacifistHealer';
 
 // Every set field must hold for a run to count.
@@ -75,12 +79,19 @@ export type AchievementConditionClearEdicts = {
   kind: EdictKind;
 };
 
+// Caught as it happens, so there's nothing in the save to catch up from.
+export type AchievementConditionMoment = {
+  type: 'Moment';
+  moment: AchievementMoment;
+};
+
 export type AchievementCondition =
   | AchievementConditionReach
   | AchievementConditionDefeat
   | AchievementConditionCollect
   | AchievementConditionCompleteRun
-  | AchievementConditionClearEdicts;
+  | AchievementConditionClearEdicts
+  | AchievementConditionMoment;
 
 export type AchievementContent = IsContentItem &
   HasDescription &

@@ -3,6 +3,7 @@ export * from './achievement-announce.ui';
 export * from './achievement-check';
 export * from './achievement-check.ui';
 export * from './achievement-counters';
+export * from './achievement-moment';
 export * from './achievement-run';
 export * from './achievement-unlock';
 export * from './achievement.ui';
