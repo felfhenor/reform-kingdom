@@ -33,6 +33,12 @@ describe('combatVictoryMoments', () => {
     expect(won({ heroDiedCovering: true })).toEqual(['CoverDeathVictory']);
   });
 
+  it("marks a win after a hero's retaliation killed an enemy", () => {
+    expect(won({ heroRetaliationKill: true })).toEqual([
+      'RetaliationKillVictory',
+    ]);
+  });
+
   it('marks a win with one hero left standing at 5% HP or less', () => {
     expect(wonWith(5, 0)).toEqual(['LastHeroStandingVictory']);
   });

@@ -493,6 +493,37 @@ describe('combatApplySkillToTarget damage reflect', () => {
   it('does not reflect a technique without CanBeReflected', () => {
     expect(hitReflectingTarget(['DamagesTarget']).hp).toBe(1000);
   });
+
+  it("flags the fight once a hero's reflected damage kills an enemy", () => {
+    const strike = (monsterHp: number) => {
+      const monster = buildCombatant({
+        id: 'monster-1',
+        isEnemy: true,
+        hp: monsterHp,
+        totalStats: { ...buildCombatant().totalStats!, Strength: 100 },
+      });
+      const hero = buildCombatant({
+        hp: 1000,
+        totalStats: { ...buildCombatant().totalStats!, Health: 1000 },
+        combatStats: { ...defaultCombatStats(), damageReflectPercent: 50 },
+      });
+      const combat = buildCombat({ heroes: [hero], guardians: [monster] });
+      combatApplySkillToTarget(
+        combat,
+        monster,
+        hero,
+        buildSkill(),
+        buildTechnique({
+          attributes: ['DamagesTarget', 'CanBeReflected'],
+          damageScaling: { ...buildTechnique().damageScaling, Strength: 1 },
+        }),
+      );
+      return combat.heroRetaliationKill;
+    };
+
+    expect(strike(50)).toBe(true);
+    expect(strike(51)).toBeUndefined();
+  });
 });
 
 describe('combatApplySkillToTarget block and dodge events', () => {

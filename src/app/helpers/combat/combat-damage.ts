@@ -224,6 +224,13 @@ function combatApplyRetaliation(
     `**${combatantMessageToken(combatant)}** took ${damage} damage in retaliation ${combatantStatusText(combatant)}!`,
     combatant,
   );
+  if (
+    combatant.isEnemy &&
+    combatantIsDead(combatant) &&
+    combat.heroes.includes(source)
+  ) {
+    combat.heroRetaliationKill = true;
+  }
 }
 
 export function combatApplySkillToTarget(

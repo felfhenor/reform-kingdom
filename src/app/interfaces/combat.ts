@@ -265,6 +265,8 @@ export type Combat = {
   manualFlee?: boolean;
   // A hero fell to a hit they took covering an ally.
   heroDiedCovering?: boolean;
+  // A hero's reflected damage killed an enemy.
+  heroRetaliationKill?: boolean;
 };
 
 export type CombatTurn = {

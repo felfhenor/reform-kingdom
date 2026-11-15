@@ -114,3 +114,12 @@
   condition:
     type: Moment
     moment: LastHeroStandingVictory
+
+- id: 1a31cb60-d61d-403c-a648-12330693f376
+  name: Return to Sender
+  sprite: '0050'
+  description: Win a fight after a hero's retaliation lands a killing blow.
+  hidden: true
+  condition:
+    type: Moment
+    moment: RetaliationKillVictory

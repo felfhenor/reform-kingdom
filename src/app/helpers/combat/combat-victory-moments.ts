@@ -21,6 +21,7 @@ export function combatVictoryMoments(combat: Combat): AchievementMoment[] {
     ['AmbushVictory', combatWonInAmbushRound(combat)],
     ['CoverDeathVictory', !!combat.heroDiedCovering],
     ['LastHeroStandingVictory', combatWonByLastHeroStanding(combat)],
+    ['RetaliationKillVictory', !!combat.heroRetaliationKill],
   ];
   return moments.filter(([, isMet]) => isMet).map(([moment]) => moment);
 }
