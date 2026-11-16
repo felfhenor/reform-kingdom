@@ -1,4 +1,4 @@
-const { ipcMain } = require('electron');
+const { app, ipcMain } = require('electron');
 const { coreLog } = require('./logging');
 
 // STEAM_APP_ID=480 tests against Valve's Spacewar sample; unset, a Steam launch supplies the ID itself.
@@ -6,13 +6,24 @@ const STEAM_APP_ID = Number(process.env.STEAM_APP_ID) || undefined;
 
 let client = undefined;
 
+// The overlay only redraws when the page does, so an idle screen would freeze it mid-animation.
+const repaintForOverlay = (win) => {
+  const timer = setInterval(() => {
+    if (win.isDestroyed()) return clearInterval(timer);
+    if (win.isVisible() && !win.isMinimized()) win.webContents.invalidate();
+  }, 1000 / 60);
+};
+
 // Must run before app ready: the overlay needs command-line switches that only apply at startup.
 const initSteam = () => {
   try {
     const steamworks = require('steamworks.js');
     client = steamworks.init(STEAM_APP_ID);
-    // Skips the per-frame repaint timer: Pixi already repaints while visible, and it would keep running while minimized.
+    // Its own repaint timer would keep running while minimized.
     steamworks.electronEnableSteamOverlay(true);
+    // Partial swaps only redraw what changed, leaving the closed overlay's bar burned into static screens.
+    app.commandLine.appendSwitch('ui-disable-partial-swap');
+    app.on('browser-window-created', (_event, win) => repaintForOverlay(win));
     coreLog().info(
       'Steam',
       `initialized app ${client.utils.getAppId()} as ${client.localplayer.getName()}`,

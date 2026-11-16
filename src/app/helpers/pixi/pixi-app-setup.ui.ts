@@ -18,7 +18,8 @@ export async function pixiAppInitialize(
     sharedTicker: true,
     resolution: 1,
     autoDensity: false,
-    preference: 'webgpu',
+    // The Steam overlay can't draw over a WebGPU canvas.
+    preference: 'webgl',
   });
 
   const canvas = app.canvas as HTMLCanvasElement;
