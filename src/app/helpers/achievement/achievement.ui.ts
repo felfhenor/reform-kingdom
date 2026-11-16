@@ -6,6 +6,7 @@ import {
 } from '@helpers/achievement/achievement';
 import { legacy, legacyRunById } from '@helpers/legacy/legacy';
 import type { AchievementContent, AchievementTile, GameId } from '@interfaces';
+import { sortBy } from 'es-toolkit/compat';
 
 // Live progress reads the current save, so it needs one; a bar out of 1 says nothing a locked tile doesn't.
 function achievementTileProgress(
@@ -36,15 +37,22 @@ function achievementTile(
   };
 }
 
+// Secrets go last, so their place in the alphabet can't hint at their names.
 export function achievementTiles(hasSave: boolean): AchievementTile[] {
-  return achievementsAll().map((achievement) =>
-    achievementTile(achievement, hasSave),
+  return sortBy(
+    achievementsAll().map((achievement) =>
+      achievementTile(achievement, hasSave),
+    ),
+    [(tile) => tile.isSecret, (tile) => tile.achievement.name],
   );
 }
 
 export function achievementsEarnedByRun(runId: GameId): AchievementContent[] {
-  return achievementsAll().filter(
-    (achievement) => legacy().achievements?.[achievement.id]?.runId === runId,
+  return sortBy(
+    achievementsAll().filter(
+      (achievement) => legacy().achievements?.[achievement.id]?.runId === runId,
+    ),
+    (achievement) => achievement.name,
   );
 }
 
