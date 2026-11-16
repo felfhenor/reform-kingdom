@@ -47,10 +47,18 @@ unobtainable:
   - Crimson Ruby
   - Felrock
   - Firmwater
+  # Named by achievements and shrines, which ship as they do in release
+  - Baselard of Izchak
+  - Memory of the Akroki
+  - Memory of the Cimmerians
+  - Memory of the Fel
+  - Memory of the Forgetter
+  - Memory of the Guardians
+  - Spear of Parcilyte
+  - Sword of the Founder
 
 # Kept entries in these folders are stripped too once they need a stripped map, node or entry (they can't be finished).
 cascade:
-  - achievement
   - task
   - rumor
   - recipe
