@@ -1,7 +1,7 @@
 - id: a137b746-2a0d-4510-b1a9-6623ac51ee3f
   name: Four of a Kind
   sprite: '0011'
-  description: Defeat Fel with four heroes of the same job, either by utilizing the Edict of Reflective Mirrors, or not.
+  description: Defeat Fel with four heroes in the same job.
   condition:
     type: CompleteRun
     minPartySize: 4
@@ -10,7 +10,7 @@
 - id: 2881c7b2-7701-44e9-b71a-44678b442a1f
   name: Form of Devotion
   sprite: '0012'
-  description: Defeat Fel without any hero ever changing jobs, utilizing the Edict of True Devotion.
+  description: Defeat Fel without any hero ever changing jobs, and without the Edict of True Devotion.
   condition:
     type: CompleteRun
     noReclass: true
@@ -37,7 +37,7 @@
 - id: d8b149e2-dbf4-41a8-8a09-bd6daf13363d
   name: The Undying
   sprite: '0015'
-  description: Defeat Fel without a single hero dying in their journey.
+  description: Defeat Fel without a single hero ever falling.
   condition:
     type: CompleteRun
     noDeaths: true

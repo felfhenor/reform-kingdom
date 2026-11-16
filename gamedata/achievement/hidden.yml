@@ -1,7 +1,7 @@
 - id: 6898bd28-483b-4099-b939-0fec3902a974
   name: One Trick
   sprite: '0035'
-  description: Defeat Fel with a hero who used one skill for nearly everything.
+  description: Defeat Fel with a hero who leaned on one skill for nearly every action.
   hidden: true
   condition:
     type: CompleteRun
@@ -10,7 +10,7 @@
 - id: c2c8ad90-e0bd-4734-9846-06591d363922
   name: Pacifistish Healer
   sprite: '0036'
-  description: Defeat Fel with a hero who healed more than they hurt.
+  description: Defeat Fel with a hero who healed more than they hurt, yet still landed a few kills.
   hidden: true
   condition:
     type: CompleteRun
@@ -58,7 +58,7 @@
 - id: b01a1eb2-974f-4ccd-b9a3-10d95a4fbff8
   name: Speedrunner
   sprite: '0041'
-  description: Defeat Fel within 400,000 ticks.
+  description: Defeat Fel in under 4 days and 15 hours of play.
   hidden: true
   condition:
     type: CompleteRun
@@ -91,7 +91,7 @@
 - id: 1033144f-10e0-4675-ae9e-69d9a543ead9
   name: Didn't See Us Coming
   sprite: '0046'
-  description: Win a fight in the ambush round.
+  description: Win a fight in the ambush round, before the enemy can act.
   hidden: true
   condition:
     type: Moment
@@ -100,7 +100,7 @@
 - id: 2cdba225-740d-47a3-8a2f-be0c810bafeb
   name: Took One for the Team
   sprite: '0047'
-  description: Win a fight after a hero dies covering an ally.
+  description: Win a fight after a hero falls covering an ally.
   hidden: true
   condition:
     type: Moment
@@ -118,7 +118,7 @@
 - id: 1a31cb60-d61d-403c-a648-12330693f376
   name: Return to Sender
   sprite: '0050'
-  description: Win a fight after a hero's retaliation lands a killing blow.
+  description: Win a fight where a hero's reflected damage lands the killing blow.
   hidden: true
   condition:
     type: Moment
@@ -136,7 +136,7 @@
 - id: 6881bf6b-67ba-4bb8-a70b-1090822a33d2
   name: Cursed but Effective
   sprite: '0052'
-  description: Clear a mystical node while every hero wears at least one item of cursed gear.
+  description: Clear a mystical node while every hero wears cursed gear.
   hidden: true
   condition:
     type: Moment

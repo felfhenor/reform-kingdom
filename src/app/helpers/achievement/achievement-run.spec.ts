@@ -109,7 +109,7 @@ describe('achievementRunMatches', () => {
     ).toBe(false);
   });
 
-  it('finds a one-trick hero, ignoring the basic Attack', () => {
+  it('finds a one-trick hero, Attack included', () => {
     const run = (skillUses: Record<string, number>) =>
       buildRunRecord({
         party: [hero('a', { skillUses })],
@@ -117,7 +117,7 @@ describe('achievementRunMatches', () => {
       });
 
     expect(
-      achievementRunMatches(run({ Attack: 500, Fire: 96, Ice: 4 }), {
+      achievementRunMatches(run({ Attack: 96, Fire: 4 }), {
         heroFeat: 'OneTrick',
       }),
     ).toBe(true);

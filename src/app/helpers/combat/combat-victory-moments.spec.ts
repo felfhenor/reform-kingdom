@@ -83,11 +83,7 @@ describe('combatVictoryMoments', () => {
 describe('combatVictoryMoments for a cursed mystical clear', () => {
   const curse = ensureAffix({ id: 'curse' as AffixId, family: 'Curse' });
 
-  function clearWith(
-    cursedHeroes: boolean[],
-    cursedDrops = false,
-    overrides: Partial<Combat> = {},
-  ) {
+  function clearWith(cursedHeroes: boolean[], overrides: Partial<Combat> = {}) {
     seedContent([curse]);
     seedGamestate((state) => {
       state.world.party = cursedHeroes.map((isCursed) => {
@@ -97,7 +93,6 @@ describe('combatVictoryMoments for a cursed mystical clear', () => {
         });
         return hero;
       });
-      state.globalEffectSums.cursedDrops = cursedDrops;
       state.world.exploreRandom['ruins' as EncounterRandomId] = {
         fights: [
           { level: 1, monsters: [] },
@@ -122,15 +117,14 @@ describe('combatVictoryMoments for a cursed mystical clear', () => {
     expect(clearWith([true, true])).toEqual(['CursedRandomClearVictory']);
   });
 
-  it('needs every hero cursed, and curses not handed out by Fickle Curses', () => {
+  it('needs every hero cursed', () => {
     expect(clearWith([true, false])).toEqual([]);
-    expect(clearWith([true, true], true)).toEqual([]);
   });
 
   it("ignores a node's earlier fights, and fights that aren't a mystical node", () => {
-    expect(clearWith([true, true], false, { fightIndex: 0 })).toEqual([]);
-    expect(
-      clearWith([true, true], false, { encounterRandomId: undefined }),
-    ).toEqual([]);
+    expect(clearWith([true, true], { fightIndex: 0 })).toEqual([]);
+    expect(clearWith([true, true], { encounterRandomId: undefined })).toEqual(
+      [],
+    );
   });
 });

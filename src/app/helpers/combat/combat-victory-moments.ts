@@ -10,7 +10,7 @@ import {
 import { encounterRandomNextFightIndex } from '@helpers/encounter/encounter-random-combat';
 import { equipmentItemIsCursed } from '@helpers/item/affix';
 import { equippedItems } from '@helpers/item/equipment';
-import { globalEffectSumsState, worldPartyState } from '@helpers/state-game';
+import { worldPartyState } from '@helpers/state-game';
 import type { AchievementMoment, Combat } from '@interfaces';
 
 function combatWonByLastHeroStanding(combat: Combat): boolean {
@@ -46,11 +46,9 @@ function partyAllCursed(): boolean {
   );
 }
 
-// Cursed drops (Fickle Curses) hand out the curses, so they don't count.
 function combatClearedRandomNodeCursed(combat: Combat): boolean {
   return (
     !!combat.encounterRandomId &&
-    !globalEffectSumsState().cursedDrops &&
     partyAllCursed() &&
     encounterRandomNextFightIndex(combat) === undefined
   );

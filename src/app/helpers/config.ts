@@ -16,7 +16,7 @@ import type {
 
 // Achievement
 
-// One Trick ignores the basic Attack and needs enough uses that a hero who barely acted can't earn it.
+// One Trick needs enough uses that a hero who barely acted can't earn it.
 export const ACHIEVEMENT_ONE_TRICK_PERCENT = 95;
 export const ACHIEVEMENT_ONE_TRICK_MIN_USES = 100;
 export const ACHIEVEMENT_PACIFIST_HEALER_MIN_KILLS = 10;

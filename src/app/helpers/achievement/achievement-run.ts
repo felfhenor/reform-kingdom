@@ -17,15 +17,11 @@ import type {
   RunRecord,
   RunRecordHero,
 } from '@interfaces';
-import { omit, uniq } from 'es-toolkit';
+import { uniq } from 'es-toolkit';
 import { sortBy, sum } from 'es-toolkit/compat';
 
-const ACHIEVEMENT_BASIC_ATTACK_FAMILY = 'Attack';
-
 function heroIsOneTrick(stats: HeroRunStats): boolean {
-  const uses = Object.values(
-    omit(stats.skillUses, [ACHIEVEMENT_BASIC_ATTACK_FAMILY]),
-  );
+  const uses = Object.values(stats.skillUses);
   const total = sum(uses);
   return (
     total >= ACHIEVEMENT_ONE_TRICK_MIN_USES &&

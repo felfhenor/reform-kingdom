@@ -1,7 +1,7 @@
 - id: 44ec6b5e-be70-4158-a826-0b677ea1c214
   name: Heroes of Copper
   sprite: '0016'
-  description: Get every hero to level 10.
+  description: Raise every hero to level 10.
   condition:
     type: Reach
     counter: PartyLevel
@@ -10,7 +10,7 @@
 - id: d9a97485-cee9-4354-8b7b-2ff5ab000b7a
   name: Miremetal Masters
   sprite: '0017'
-  description: Get every hero to level 20.
+  description: Raise every hero to level 20.
   condition:
     type: Reach
     counter: PartyLevel
@@ -19,7 +19,7 @@
 - id: e6703341-1fad-4670-b4e3-0d8d7617d014
   name: Crimson Champions
   sprite: '0018'
-  description: Get every hero to level 30.
+  description: Raise every hero to level 30.
   condition:
     type: Reach
     counter: PartyLevel
@@ -28,7 +28,7 @@
 - id: 2980a494-7ce8-43d6-a94c-80ba4731b0e9
   name: Demongold Defenders
   sprite: '0019'
-  description: Get every hero to level 40.
+  description: Raise every hero to level 40.
   condition:
     type: Reach
     counter: PartyLevel
@@ -37,7 +37,7 @@
 - id: 7741c2fe-68fa-4d11-89bc-f44c4cef40d3
   name: Felforged Heroes
   sprite: '0020'
-  description: Get every hero to level 50.
+  description: Raise every hero to level 50.
   condition:
     type: Reach
     counter: PartyLevel
@@ -46,7 +46,7 @@
 - id: 237de7c5-bf23-45f5-8dab-02ef8299401c
   name: Forgetter's Bane
   sprite: '0021'
-  description: Get every hero to level 60.
+  description: Raise every hero to level 60.
   condition:
     type: Reach
     counter: PartyLevel
@@ -55,7 +55,7 @@
 - id: b4a5619e-e279-4606-b66a-7fa6c89da3d9
   name: Deathchill Legends
   sprite: '0022'
-  description: Get every hero to level 70.
+  description: Raise every hero to level 70.
   condition:
     type: Reach
     counter: PartyLevel
@@ -119,7 +119,7 @@
 - id: 468e9417-3fab-4758-b5e0-49f5b199a555
   name: Faith and Devotion
   sprite: '0029'
-  description: Raise a shrine to its highest level and learn about the legend it was made for.
+  description: Raise a shrine to its highest level and hear its legend in full.
   condition:
     type: Reach
     counter: ShrinesMaxed
@@ -128,7 +128,7 @@
 - id: 3ef2b950-01c4-4cf3-aef1-f5a76b20f2cb
   name: Look Out!
   sprite: '0030'
-  description: Build every outpost to at least +1.
+  description: Repair every outpost.
   condition:
     type: Reach
     counter: OutpostsBuilt
@@ -153,7 +153,7 @@
 - id: e0b2ad49-45e7-4e2b-8161-ceee3ea425e8
   name: Every Memory Set
   sprite: '0033'
-  description: Seal every region in one run.
+  description: Seal the memory of every region in a single run.
   condition:
     type: Reach
     counter: RegionsSealed
@@ -169,7 +169,7 @@
 - id: b62faa5f-ccba-4917-8ae4-70a596bf49d8
   name: Capitalism, Ho!
   sprite: '0044'
-  description: Make your first trade with a caravan.
+  description: Trade with a caravan for the first time.
   condition:
     type: Moment
     moment: CaravanTrade

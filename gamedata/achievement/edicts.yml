@@ -9,7 +9,7 @@
 - id: bf0665f6-5abf-4492-bfc8-aed7bd268b7a
   name: The Founder's Decree
   sprite: '0001'
-  description: Defeat Fel with five or more non-boon edicts active.
+  description: Defeat Fel with 5 or more non-boon edicts active.
   condition:
     type: CompleteRun
     minNonBoonEdicts: 5
@@ -26,7 +26,7 @@
 - id: 7b8beff4-9d7e-41fa-a71e-7b2e9809deb8
   name: Tough Market
   sprite: '0003'
-  description: Defeat Fel with a single hero, utilizing the Edict of the Fretless.
+  description: Defeat Fel with a single hero, under the Edict of the Fretless.
   condition:
     type: CompleteRun
     edictIds:
@@ -35,7 +35,7 @@
 - id: 5fefdf1d-03d9-43ac-8320-f3eeb581ff41
   name: Closed Borders
   sprite: '0004'
-  description: Defeat Fel with no outposts, no exchanges and no gathering, utilizing the Edicts of Nomadic Departure, Exogenous Support, and Warren Hunt simultaneously.
+  description: Defeat Fel under the Edicts of Nomadic Departure, Exogenous Support and Warren Hunt, with no outposts, exchanges or gathering.
   condition:
     type: CompleteRun
     edictIds:
@@ -70,7 +70,7 @@
 - id: 910d5015-e556-4761-81dd-269352c25e59
   name: Loyal Subject
   sprite: '0008'
-  description: Defeat Fel in 5 runs with edicts.
+  description: Defeat Fel in 5 runs, each with an edict active.
   condition:
     type: CompleteRun
     minEdicts: 1
@@ -79,7 +79,7 @@
 - id: 5ef42355-9360-45dc-8d46-cf4d40a3eab3
   name: Sworn to the Duchy
   sprite: '0009'
-  description: Defeat Fel in 10 runs with edicts.
+  description: Defeat Fel in 10 runs, each with an edict active.
   condition:
     type: CompleteRun
     minEdicts: 1
@@ -97,7 +97,7 @@
 - id: c0d8df60-cdc2-4b18-8aeb-857a6e45bae2
   name: The Founder's Archive
   sprite: '0043'
-  description: Defeat Fel under every challenge edict, across any number of runs.
+  description: Defeat Fel under each challenge edict at least once.
   condition:
     type: ClearEdicts
     kind: Challenge
@@ -105,7 +105,7 @@
 - id: ff0ddbe9-087f-43e7-be0e-e0c2fc79107b
   name: Ye Olde RPG
   sprite: '0049'
-  description: Defeat Fel while under the Edict of the Taskmaster's Intervention. Enjoy the classic RPG vibes!
+  description: Defeat Fel under the Edict of the Taskmaster's Intervention. Enjoy the classic RPG vibes!
   condition:
     type: CompleteRun
     edictIds:
