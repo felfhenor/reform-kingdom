@@ -8,7 +8,10 @@ import {
   untracked,
 } from '@angular/core';
 import { achievementsCheckLegacy } from '@helpers/achievement/achievement-check.ui';
-import { GAMELOOP_INTERVAL_MS } from '@helpers/config';
+import {
+  GAMELOOP_INTERVAL_MS,
+  SAVEFILE_BACKUP_PERIODIC_MS,
+} from '@helpers/config';
 import { electronWindowOnSaveBeforeClose } from '@helpers/engine/electron-window.ui';
 import { notifyError } from '@helpers/engine/notify';
 import { steamAchievementsSync } from '@helpers/engine/steam';
@@ -16,7 +19,10 @@ import { isPageVisible } from '@helpers/engine/page-visibility';
 import { gameloop } from '@helpers/gameloop';
 import { migrateOptionsState } from '@helpers/migrate';
 import { savefileLoad } from '@helpers/savefile/savefile-load';
-import { savefileLegacySync } from '@helpers/savefile/savefile-load.ui';
+import {
+  savefileBackupPeriodic,
+  savefileLegacySync,
+} from '@helpers/savefile/savefile-load.ui';
 import {
   gamestate,
   hasGameStateLoaded,
@@ -27,6 +33,7 @@ import { getOption } from '@helpers/state-options';
 import { regionBuffsRefresh } from '@helpers/hero/region-buffs';
 import { ContentService } from '@services/content.service';
 import { LoggerService } from '@services/logger.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { interval } from 'rxjs';
 
 @Injectable({
@@ -93,6 +100,13 @@ export class GamestateService {
     this.doGameloop();
     this.saveWhenHidden();
     this.saveBeforeClose();
+    this.backUpPeriodically();
+  }
+
+  private backUpPeriodically() {
+    interval(SAVEFILE_BACKUP_PERIODIC_MS)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => void savefileBackupPeriodic());
   }
 
   // Minimizing or switching away may be the last chance to save, so don't wait for the next autosave.

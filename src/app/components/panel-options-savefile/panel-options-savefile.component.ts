@@ -18,7 +18,11 @@ import { ButtonSavefileImportDemoComponent } from '@components/button-savefile-i
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
-import { SAVEFILE_BACKUP_MAX } from '@helpers/config';
+import {
+  SAVEFILE_BACKUP_MAX,
+  SAVEFILE_BACKUP_PERIODIC_MAX,
+  SAVEFILE_BACKUP_PERIODIC_MS,
+} from '@helpers/config';
 import { isInElectron } from '@helpers/engine/electron';
 import { electronLogOpenFolder } from '@helpers/engine/electron-log.ui';
 import { notifyError } from '@helpers/engine/notify';
@@ -82,6 +86,8 @@ export class PanelOptionsSavefileComponent
   private resetBackupsSwal = viewChild<SwalComponent>('resetBackupsSwal');
 
   public readonly maxBackups = SAVEFILE_BACKUP_MAX;
+  public readonly maxPeriodicBackups = SAVEFILE_BACKUP_PERIODIC_MAX;
+  public readonly periodicBackupMinutes = SAVEFILE_BACKUP_PERIODIC_MS / 60_000;
 
   // Values are game ticks, which are seconds at normal speed.
   public readonly autosaveIntervalChoices: AutosaveIntervalChoice[] = [
@@ -122,6 +128,7 @@ export class PanelOptionsSavefileComponent
     load: 'Before loading',
     import: 'Before importing',
     restore: 'Before restoring',
+    periodic: 'During play',
   };
 
   ngOnInit() {

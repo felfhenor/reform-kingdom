@@ -14,6 +14,7 @@ import {
 } from '@helpers/legacy/legacy-merge';
 import {
   savefileBackupsRead,
+  savefileBackupStore,
   savefileBackupsWriteSource,
 } from '@helpers/savefile/savefile-backup-storage';
 import {
@@ -31,7 +32,11 @@ import {
   savefileIsWorthKeeping,
   savefileValidationErrors,
 } from '@helpers/savefile/savefile-validate';
-import { GAMESTATE_STORAGE_KEY } from '@helpers/state-game';
+import {
+  gamestate,
+  GAMESTATE_STORAGE_KEY,
+  isGameStateReady,
+} from '@helpers/state-game';
 import { setOption } from '@helpers/state-options';
 import type {
   GameState,
@@ -49,6 +54,12 @@ const LEGACY_MERGE_WARNINGS: Partial<Record<LegacyMergeResult, string>> = {
 function savefileMergeLegacy(section: unknown, verb: string): void {
   const warning = LEGACY_MERGE_WARNINGS[legacyMergeFrom([section])];
   if (warning) notifyWarning(`Your savefile was ${verb}, but ${warning}`);
+}
+
+// Not ready during a replace, and a failed load isn't the player's save, so neither may roll real backups out.
+export async function savefileBackupPeriodic(): Promise<void> {
+  if (!isGameStateReady() || savefileLoadStatus().state !== 'ok') return;
+  await savefileBackupStore(gamestate(), 'periodic');
 }
 
 // Refills a lost Legacy from the backups and the desktop copy, then brings the desktop copy up to date; never blocks loading.

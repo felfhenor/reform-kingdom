@@ -84,6 +84,16 @@ describe('savefile-backup-storage', () => {
     expect(backups.map((backup) => backup.numTicks)).toEqual([4, 3, 2]);
   });
 
+  it('keeps both backups when two stores overlap', async () => {
+    await Promise.all([
+      savefileBackupStore(setupState(1), 'periodic'),
+      savefileBackupStore(setupState(2), 'restore'),
+    ]);
+
+    const { backups } = await savefileBackupsRead();
+    expect(backups.map((backup) => backup.numTicks)).toEqual([2, 1]);
+  });
+
   it('mirrors each backup to disk and prunes disk to the kept set', async () => {
     const bridge = fakeBridge();
     installBridge(bridge);

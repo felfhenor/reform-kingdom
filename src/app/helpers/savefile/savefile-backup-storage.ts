@@ -1,4 +1,7 @@
-import { SAVEFILE_BACKUP_MAX } from '@helpers/config';
+import {
+  SAVEFILE_BACKUP_MAX,
+  SAVEFILE_BACKUP_PERIODIC_MAX,
+} from '@helpers/config';
 import { idbGet, idbIsAvailable, idbPut } from '@helpers/engine/idb';
 import { error, info } from '@helpers/engine/logging';
 import { legacyLoad } from '@helpers/legacy/legacy';
@@ -99,8 +102,20 @@ export async function savefileBackupsWriteSource(
   await bridge.savefileBackupPrune(keep.map((entry) => entry.id));
 }
 
+// Each store reads then rewrites the whole set, so overlapping stores would drop each other's backup.
+let storeQueue: Promise<unknown> = Promise.resolve();
+
+export function savefileBackupStore(
+  state: unknown,
+  reason: SavefileBackupReason,
+): Promise<boolean> {
+  const store = storeQueue.then(() => savefileBackupStoreNow(state, reason));
+  storeQueue = store.catch(() => undefined);
+  return store;
+}
+
 // Skipping a never-set-up or duplicate save counts as success; only a failed read or write resolves false.
-export async function savefileBackupStore(
+async function savefileBackupStoreNow(
   state: unknown,
   reason: SavefileBackupReason,
 ): Promise<boolean> {
@@ -108,10 +123,17 @@ export async function savefileBackupStore(
 
   const { backups: existing, unreadableSources } = await savefileBackupsRead();
   if (unreadableSources.length > 0) return false;
-  if (savefileBackupIsDuplicate(state, existing)) return true;
+  if (savefileBackupIsDuplicate(state, reason, existing)) return true;
 
-  const backup = savefileBackupCreate(state, reason, Date.now(), legacyLoad());
-  const keep = savefileBackupsAdd(existing, backup, SAVEFILE_BACKUP_MAX);
+  // Ids are timestamps, so back-to-back stores in the same millisecond would overwrite each other.
+  const now = Math.max(Date.now(), (existing[0]?.createdAt ?? 0) + 1);
+  const backup = savefileBackupCreate(state, reason, now, legacyLoad());
+  const keep = savefileBackupsAdd(
+    existing,
+    backup,
+    SAVEFILE_BACKUP_MAX,
+    SAVEFILE_BACKUP_PERIODIC_MAX,
+  );
 
   const results = await Promise.allSettled([
     savefileBackupsWriteSource('browser', keep),

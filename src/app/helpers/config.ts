@@ -129,6 +129,8 @@ export const GAME_SFX_MIN_INTERVAL_MS = 1000;
 // Savefile
 
 export const SAVEFILE_BACKUP_MAX = 3;
+export const SAVEFILE_BACKUP_PERIODIC_MAX = 5;
+export const SAVEFILE_BACKUP_PERIODIC_MS = 15 * 60 * 1000;
 export const SAVEFILE_READ_ATTEMPTS = 3;
 export const SAVEFILE_MIGRATE_ATTEMPTS = 3;
 export const SAVEFILE_RETRY_DELAY_MS = 250;

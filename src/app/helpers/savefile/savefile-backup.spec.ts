@@ -44,17 +44,30 @@ describe('savefileBackupIsDuplicate', () => {
   ];
 
   it('matches the same game at the same tick', () => {
-    expect(savefileBackupIsDuplicate(stateAtTick(50), existing)).toBe(true);
+    expect(savefileBackupIsDuplicate(stateAtTick(50), 'load', existing)).toBe(
+      true,
+    );
   });
 
   it('does not match later progress in the same game', () => {
-    expect(savefileBackupIsDuplicate(stateAtTick(51), existing)).toBe(false);
+    expect(savefileBackupIsDuplicate(stateAtTick(51), 'load', existing)).toBe(
+      false,
+    );
   });
 
   it('does not match a different game at the same tick', () => {
-    expect(savefileBackupIsDuplicate(stateAtTick(50, 'game-2'), existing)).toBe(
-      false,
-    );
+    expect(
+      savefileBackupIsDuplicate(stateAtTick(50, 'game-2'), 'load', existing),
+    ).toBe(false);
+  });
+
+  it('does not let a periodic copy stand in for a safety backup', () => {
+    const periodic = [
+      savefileBackupCreate(stateAtTick(50), 'periodic', 1000, defaultLegacy()),
+    ];
+    expect(
+      savefileBackupIsDuplicate(stateAtTick(50), 'restore', periodic),
+    ).toBe(false);
   });
 });
 
@@ -67,9 +80,34 @@ describe('savefileBackupsAdd', () => {
       backups,
       savefileBackupCreate(stateAtTick(4000), 'import', 4000, defaultLegacy()),
       3,
+      5,
     );
 
     expect(added.map((backup) => backup.createdAt)).toEqual([4000, 3000, 2000]);
+  });
+
+  it('never rolls safety backups out for periodic ones', () => {
+    const backups = [1000, 2000, 3000].map((at) =>
+      savefileBackupCreate(stateAtTick(at), 'periodic', at, defaultLegacy()),
+    );
+    backups.push(
+      savefileBackupCreate(stateAtTick(500), 'load', 500, defaultLegacy()),
+    );
+    const added = savefileBackupsAdd(
+      backups,
+      savefileBackupCreate(
+        stateAtTick(4000),
+        'periodic',
+        4000,
+        defaultLegacy(),
+      ),
+      3,
+      3,
+    );
+
+    expect(added.map((backup) => backup.createdAt)).toEqual([
+      4000, 3000, 2000, 500,
+    ]);
   });
 });
 

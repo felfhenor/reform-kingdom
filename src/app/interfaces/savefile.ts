@@ -1,7 +1,7 @@
 import type { LegacyState } from '@interfaces/legacy';
 import type { GameState } from '@interfaces/state-game';
 
-export type SavefileBackupReason = 'load' | 'import' | 'restore';
+export type SavefileBackupReason = 'load' | 'import' | 'restore' | 'periodic';
 
 export type SavefileBackup = {
   id: string;

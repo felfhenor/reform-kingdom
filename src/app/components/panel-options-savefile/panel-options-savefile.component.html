@@ -233,7 +233,9 @@
         <p>
           The last {{ maxBackups | number }} distinct versions of your savefile
           are backed up automatically before it is loaded, imported, or
-          restored.
+          restored. A backup is also taken every
+          {{ periodicBackupMinutes | number }} minutes of play, keeping the last
+          {{ maxPeriodicBackups | number }}.
           @if (writesToDisk) {
             Your savefile and its backups are also written to disk.
           }
