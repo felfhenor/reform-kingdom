@@ -2,17 +2,20 @@ import { describe, expect, it } from 'vitest';
 
 import { buildCharacter } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
-import { seedGamestate } from '@/testing/gamestate';
+import { COMBAT_ORDER_ROW_CAP } from '@helpers/config';
 import {
   combatOrderClauseUsesUnknownFamily,
-  combatOrderClauses,
+  combatOrderClausesAdd,
+  combatOrderClausesRemove,
+  combatOrderClausesReorder,
+  combatOrderClausesSetEnabled,
+  combatOrderClausesUpdate,
   combatOrdersFromJobDefaults,
   combatOrdersMostEnabled,
   combatOrdersWithJobDefaults,
 } from '@helpers/combat/combat-order';
 import { ensureJob } from '@helpers/content/ensure-job';
 import type {
-  CharacterId,
   CombatOrderClause,
   CombatOrderClauseId,
   JobDefaultCombatOrder,
@@ -27,17 +30,6 @@ const clause: CombatOrderClause = {
   condition: { type: 'Always' },
   action: { type: 'RandomSkill' },
 };
-
-describe('combatOrderClauses', () => {
-  it('reads a party members orders for a job, empty for another job or a missing hero', () => {
-    const hero = buildCharacter({ combatOrders: { [warrior]: [clause] } });
-    seedGamestate((state) => (state.world.party = [hero]));
-
-    expect(combatOrderClauses(hero.id, warrior)).toEqual([clause]);
-    expect(combatOrderClauses(hero.id, ranger)).toEqual([]);
-    expect(combatOrderClauses('missing' as CharacterId, warrior)).toEqual([]);
-  });
-});
 
 describe('combatOrdersMostEnabled', () => {
   it('takes the best single job across heroes, ignoring disabled clauses', () => {
@@ -122,5 +114,83 @@ describe('combatOrderClauseUsesUnknownFamily', () => {
     expect(
       combatOrderClauseUsesUnknownFamily(clause({ type: 'RandomSkill' }), []),
     ).toBe(false);
+  });
+});
+
+describe('combat order clause list edits', () => {
+  const second: CombatOrderClause = {
+    ...clause,
+    id: 'clause-2' as CombatOrderClauseId,
+  };
+  const ids = (clauses: CombatOrderClause[]) => clauses.map((c) => c.id);
+
+  it('adds an enabled clause with a fresh id at the front', () => {
+    const next = combatOrderClausesAdd(
+      [clause],
+      { type: 'SelfHasNoSummon' },
+      clause.action,
+    );
+
+    expect(next).toHaveLength(2);
+    expect(next[0]).toMatchObject({
+      enabled: true,
+      condition: { type: 'SelfHasNoSummon' },
+    });
+    expect(next[0].id).not.toBe(clause.id);
+    expect(next[1]).toBe(clause);
+  });
+
+  it('returns the same list when adding at the row cap', () => {
+    const full = Array.from({ length: COMBAT_ORDER_ROW_CAP }, (_, i) => ({
+      ...clause,
+      id: `c${i}` as CombatOrderClauseId,
+    }));
+
+    expect(combatOrderClausesAdd(full, clause.condition, clause.action)).toBe(
+      full,
+    );
+  });
+
+  it('updates condition and action in place, keeping id, enabled and position', () => {
+    const disabled = { ...second, enabled: false };
+    const next = combatOrderClausesUpdate(
+      [clause, disabled],
+      second.id,
+      { type: 'SelfHasNoSummon' },
+      clause.action,
+    );
+
+    expect(next[0]).toBe(clause);
+    expect(next[1]).toEqual({
+      ...disabled,
+      condition: { type: 'SelfHasNoSummon' },
+    });
+  });
+
+  it('removes by id', () => {
+    expect(ids(combatOrderClausesRemove([clause, second], clause.id))).toEqual([
+      second.id,
+    ]);
+  });
+
+  it('toggles only the matching clause', () => {
+    const next = combatOrderClausesSetEnabled(
+      [clause, second],
+      second.id,
+      false,
+    );
+
+    expect(next[0]).toBe(clause);
+    expect(next[1]).toEqual({ ...second, enabled: false });
+  });
+
+  it('moves a clause, ignoring an index past the end', () => {
+    const list = [clause, second];
+
+    expect(ids(combatOrderClausesReorder(list, 0, 1))).toEqual([
+      second.id,
+      clause.id,
+    ]);
+    expect(combatOrderClausesReorder(list, 5, 0)).toBe(list);
   });
 });

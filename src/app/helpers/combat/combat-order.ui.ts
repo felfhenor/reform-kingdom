@@ -1,9 +1,11 @@
 import {
-  combatOrderClauses,
+  combatOrderClausesAdd,
+  combatOrderClausesRemove,
+  combatOrderClausesReorder,
+  combatOrderClausesSetEnabled,
+  combatOrderClausesUpdate,
   combatOrdersMostEnabled,
 } from '@helpers/combat/combat-order';
-import { COMBAT_ORDER_ROW_CAP } from '@helpers/config';
-import { rngUuid } from '@helpers/rng';
 import { updateGamestate, worldPartyState } from '@helpers/state-game';
 import { taskEventCombatOrdersSet } from '@helpers/task/task-events';
 import type {
@@ -23,6 +25,14 @@ const COMPARATOR_SYMBOLS: Record<CombatOrderComparator, string> = {
   GreaterThanOrEqual: '>=',
   GreaterThan: '>',
 };
+
+export function combatOrderClauses(
+  characterId: CharacterId,
+  jobId: JobId,
+): CombatOrderClause[] {
+  const character = worldPartyState().find((c) => c.id === characterId);
+  return character?.combatOrders[jobId] ?? [];
+}
 
 function heroName(characterId: CharacterId): string {
   return (
@@ -99,19 +109,18 @@ export function combatOrderClauseSummary(clause: CombatOrderClause): string {
     : `${actionText} ${conditionText}`;
 }
 
-// Shared by every clause mutator below. `transform` returning `undefined` means "no change" -
-// the character is left untouched (same reference) rather than rebuilt with an identical list.
 async function updateCombatOrderClauses(
   characterId: CharacterId,
   jobId: JobId,
-  transform: (clauses: CombatOrderClause[]) => CombatOrderClause[] | undefined,
+  transform: (clauses: CombatOrderClause[]) => CombatOrderClause[],
 ): Promise<void> {
   await updateGamestate((state) => {
     const character = state.world.party.find((c) => c.id === characterId);
     if (!character) return state;
 
-    const clauses = transform(character.combatOrders[jobId] ?? []);
-    if (clauses) character.combatOrders[jobId] = clauses;
+    const current = character.combatOrders[jobId] ?? [];
+    const next = transform(current);
+    if (next !== current) character.combatOrders[jobId] = next;
 
     return state;
   });
@@ -124,28 +133,12 @@ export function combatOrderClauseAdd(
   jobId: JobId,
   condition: CombatOrderCondition,
   action: CombatOrderAction,
-): boolean {
-  if (combatOrderClauses(characterId, jobId).length >= COMBAT_ORDER_ROW_CAP) {
-    return false;
-  }
-
-  const clause: CombatOrderClause = {
-    id: rngUuid() as CombatOrderClauseId,
-    enabled: true,
-    condition,
-    action,
-  };
-
-  void updateCombatOrderClauses(characterId, jobId, (clauses) => [
-    clause,
-    ...clauses,
-  ]);
-
-  return true;
+): void {
+  void updateCombatOrderClauses(characterId, jobId, (clauses) =>
+    combatOrderClausesAdd(clauses, condition, action),
+  );
 }
 
-// Replaces a clause's condition/action in place, keeping its id/enabled and
-// its position in the priority list.
 export function combatOrderClauseUpdate(
   characterId: CharacterId,
   jobId: JobId,
@@ -154,9 +147,7 @@ export function combatOrderClauseUpdate(
   action: CombatOrderAction,
 ): void {
   void updateCombatOrderClauses(characterId, jobId, (clauses) =>
-    clauses.map((clause) =>
-      clause.id === clauseId ? { ...clause, condition, action } : clause,
-    ),
+    combatOrderClausesUpdate(clauses, clauseId, condition, action),
   );
 }
 
@@ -166,7 +157,7 @@ export function combatOrderClauseRemove(
   clauseId: CombatOrderClauseId,
 ): void {
   void updateCombatOrderClauses(characterId, jobId, (clauses) =>
-    clauses.filter((clause) => clause.id !== clauseId),
+    combatOrderClausesRemove(clauses, clauseId),
   );
 }
 
@@ -177,26 +168,17 @@ export function combatOrderClauseSetEnabled(
   enabled: boolean,
 ): void {
   void updateCombatOrderClauses(characterId, jobId, (clauses) =>
-    clauses.map((clause) =>
-      clause.id === clauseId ? { ...clause, enabled } : clause,
-    ),
+    combatOrderClausesSetEnabled(clauses, clauseId, enabled),
   );
 }
 
-// Rebuilds the clause list in a new order - the priority list is a simple
-// reorderable array, no separate priority field to keep in sync.
 export function combatOrderClauseReorder(
   characterId: CharacterId,
   jobId: JobId,
   previousIndex: number,
   newIndex: number,
 ): void {
-  void updateCombatOrderClauses(characterId, jobId, (clauses) => {
-    const reordered = [...clauses];
-    const [moved] = reordered.splice(previousIndex, 1);
-    if (!moved) return undefined;
-
-    reordered.splice(newIndex, 0, moved);
-    return reordered;
-  });
+  void updateCombatOrderClauses(characterId, jobId, (clauses) =>
+    combatOrderClausesReorder(clauses, previousIndex, newIndex),
+  );
 }

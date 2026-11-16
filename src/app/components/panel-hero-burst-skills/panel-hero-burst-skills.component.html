@@ -1,0 +1,46 @@
+@let combatant = heroCombatant();
+
+@for (skill of options(); track skill.id) {
+  <app-tooltip-skill-preview
+    #preview
+    [display]="skill"
+    [displayCombatant]="combatant"
+    [displayCharacterWeaponTypes]="equippedWeaponTypes()"
+  />
+
+  <button
+    appListRow
+    [listRowSelected]="skill.id === chosenId()"
+    [tp]="preview.template()"
+    [tpPlacement]="'left'"
+    (click)="chooseSkill(skill)"
+    appSfx="ui-click"
+    [sfxTrigger]="['click', 'hover']"
+  >
+    <app-slot-rarity-outline
+      class="shrink-0"
+      [entry]="skill"
+      spritesheet="skill"
+    />
+
+    <div class="flex flex-col min-w-0">
+      <span class="type-entity-name truncate text-{{ skill.rarity }}">
+        {{ skill.name }}
+      </span>
+
+      <span class="badge badge-sm badge-data">
+        {{ epCost(skill) | number }} EP
+      </span>
+    </div>
+
+    <div class="ml-auto mr-2 shrink-0 flex items-center gap-2">
+      <app-row-element-charges [block]="skill.elementCosts" />
+
+      @if (skill.id === chosenId()) {
+        <span class="badge badge-success">Chosen</span>
+      }
+    </div>
+  </button>
+} @empty {
+  <app-blank-slate>This hero hasn't learned any burst skills.</app-blank-slate>
+}
