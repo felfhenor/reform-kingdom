@@ -11,6 +11,7 @@ import { achievementsCheckLegacy } from '@helpers/achievement/achievement-check.
 import { GAMELOOP_INTERVAL_MS } from '@helpers/config';
 import { electronWindowOnSaveBeforeClose } from '@helpers/engine/electron-window.ui';
 import { notifyError } from '@helpers/engine/notify';
+import { steamAchievementsSync } from '@helpers/engine/steam';
 import { isPageVisible } from '@helpers/engine/page-visibility';
 import { gameloop } from '@helpers/gameloop';
 import { migrateOptionsState } from '@helpers/migrate';
@@ -85,6 +86,7 @@ export class GamestateService {
   private async syncLegacy() {
     await savefileLegacySync();
     achievementsCheckLegacy();
+    steamAchievementsSync();
   }
 
   init() {

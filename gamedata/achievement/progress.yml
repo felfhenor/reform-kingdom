@@ -1,5 +1,6 @@
 - id: 44ec6b5e-be70-4158-a826-0b677ea1c214
   name: Heroes of Copper
+  steamId: HEROES_OF_COPPER
   sprite: '0016'
   description: Raise every hero to level 10.
   condition:
@@ -9,6 +10,7 @@
 
 - id: d9a97485-cee9-4354-8b7b-2ff5ab000b7a
   name: Miremetal Masters
+  steamId: MIREMETAL_MASTERS
   sprite: '0017'
   description: Raise every hero to level 20.
   condition:
@@ -18,6 +20,7 @@
 
 - id: e6703341-1fad-4670-b4e3-0d8d7617d014
   name: Crimson Champions
+  steamId: CRIMSON_CHAMPIONS
   sprite: '0018'
   description: Raise every hero to level 30.
   condition:
@@ -27,6 +30,7 @@
 
 - id: 2980a494-7ce8-43d6-a94c-80ba4731b0e9
   name: Demongold Defenders
+  steamId: DEMONGOLD_DEFENDERS
   sprite: '0019'
   description: Raise every hero to level 40.
   condition:
@@ -36,6 +40,7 @@
 
 - id: 7741c2fe-68fa-4d11-89bc-f44c4cef40d3
   name: Felforged Heroes
+  steamId: FELFORGED_HEROES
   sprite: '0020'
   description: Raise every hero to level 50.
   condition:
@@ -45,6 +50,7 @@
 
 - id: 237de7c5-bf23-45f5-8dab-02ef8299401c
   name: Forgetter's Bane
+  steamId: FORGETTERS_BANE
   sprite: '0021'
   description: Raise every hero to level 60.
   condition:
@@ -54,6 +60,7 @@
 
 - id: b4a5619e-e279-4606-b66a-7fa6c89da3d9
   name: Deathchill Legends
+  steamId: DEATHCHILL_LEGENDS
   sprite: '0022'
   description: Raise every hero to level 70.
   condition:
@@ -63,6 +70,7 @@
 
 - id: 940b8ff1-7644-451a-921d-29fdaf203031
   name: Beyond the Duchy
+  steamId: BEYOND_THE_DUCHY
   sprite: '0023'
   description: Enter a region beyond the Duchy.
   hideProgress: true
@@ -73,6 +81,7 @@
 
 - id: 9391d3e3-1943-464a-a7ba-202bb49290f5
   name: Many Hands
+  steamId: MANY_HANDS
   sprite: '0024'
   description: Rescue your first worker.
   condition:
@@ -82,6 +91,7 @@
 
 - id: 61edc5da-990f-4f46-9465-d59e23a90ae9
   name: Honored Guest
+  steamId: HONORED_GUEST
   sprite: '0025'
   description: Become Honored in a town.
   condition:
@@ -91,6 +101,7 @@
 
 - id: 56ff6046-0b7a-4365-87e8-22beafb0123a
   name: Formed Memory
+  steamId: FORMED_MEMORY
   sprite: '0026'
   description: Seal the memory of your first region.
   condition:
@@ -100,6 +111,7 @@
 
 - id: 97f71021-92e7-40b8-b68c-37957fe8a5cc
   name: Know Thy Enemy
+  steamId: KNOW_THY_ENEMY
   sprite: '0027'
   description: Analyze 25 monsters.
   condition:
@@ -109,6 +121,7 @@
 
 - id: 308830ee-e595-4e4d-9143-d5b2dbbc1f64
   name: Mystical Matters
+  steamId: MYSTICAL_MATTERS
   sprite: '0028'
   description: Find your first piece of Mystical equipment.
   condition:
@@ -118,6 +131,7 @@
 
 - id: 468e9417-3fab-4758-b5e0-49f5b199a555
   name: Faith and Devotion
+  steamId: FAITH_AND_DEVOTION
   sprite: '0029'
   description: Raise a shrine to its highest level and hear its legend in full.
   condition:
@@ -127,6 +141,7 @@
 
 - id: 3ef2b950-01c4-4cf3-aef1-f5a76b20f2cb
   name: Look Out!
+  steamId: LOOK_OUT
   sprite: '0030'
   description: Repair every outpost.
   condition:
@@ -135,6 +150,7 @@
 
 - id: 24f00830-a385-4089-a2ab-541b687aa381
   name: Grandcrafter
+  steamId: GRANDCRAFTER
   sprite: '0031'
   description: Raise a tradeskill to level 30.
   condition:
@@ -144,6 +160,7 @@
 
 - id: 0ca683ae-83ce-4e7d-af6d-767100a99ca4
   name: Renowned
+  steamId: RENOWNED
   sprite: '0032'
   description: Become Renowned in every town.
   condition:
@@ -152,6 +169,7 @@
 
 - id: e0b2ad49-45e7-4e2b-8161-ceee3ea425e8
   name: Every Memory Set
+  steamId: EVERY_MEMORY_SET
   sprite: '0033'
   description: Seal the memory of every region in a single run.
   condition:
@@ -160,6 +178,7 @@
 
 - id: 73cdfa4e-8f92-48f4-8426-2f4f1b041cde
   name: The Founder's Will
+  steamId: THE_FOUNDERS_WILL
   sprite: '0034'
   description: Complete every task.
   condition:
@@ -168,6 +187,7 @@
 
 - id: b62faa5f-ccba-4917-8ae4-70a596bf49d8
   name: Capitalism, Ho!
+  steamId: CAPITALISM_HO
   sprite: '0044'
   description: Trade with a caravan for the first time.
   condition:

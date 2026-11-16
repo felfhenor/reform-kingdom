@@ -50,8 +50,11 @@ const {
   watchWindowState,
   windowRestorableBounds,
 } = require('./window-settings');
+const { initSteam, registerSteamHandlers } = require('./steam');
 const config = new Config();
 coreLog().info('Session', `config ${config.path}`);
+
+if (hasInstanceLock && !isSquirrelEvent) initSteam();
 
 const showDevTools = process.argv.includes('--dev');
 
@@ -168,6 +171,7 @@ app.on('ready', () => {
   registerSavefileBackupHandlers();
   registerSavefileStoreHandlers();
   registerWindowSettingsHandlers(() => mainWindow);
+  registerSteamHandlers();
   createWindow();
 });
 

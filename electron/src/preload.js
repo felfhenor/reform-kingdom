@@ -16,6 +16,10 @@ contextBridge.exposeInMainWorld('reformElectron', {
   savefileBackupReadAll: () => ipcRenderer.invoke('savefile-backup:read-all'),
   savefileBackupPrune: (keepIds) =>
     ipcRenderer.invoke('savefile-backup:prune', keepIds),
+  steamAchievementsActivate: (names) =>
+    ipcRenderer.invoke('steam:achievements-activate', names),
+  steamAchievementClear: (name) =>
+    ipcRenderer.invoke('steam:achievement-clear', name),
   windowGet: () => ipcRenderer.invoke('window:get'),
   windowSetFullscreen: (fullscreen) =>
     ipcRenderer.invoke('window:set-fullscreen', fullscreen),

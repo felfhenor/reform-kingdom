@@ -64,8 +64,25 @@ function conditionProblems(condition: AchievementCondition): string[] {
   }
 }
 
-function checkAchievement(achievement: AchievementContent): AnalysisCheck {
-  const problems = conditionProblems(achievement.condition);
+function steamIdProblems(steamId: string, steamIds: string[]): string[] {
+  if (!/^[A-Z0-9_]+$/.test(steamId))
+    return [
+      `steamId "${steamId}" must be uppercase letters, digits and underscores`,
+    ];
+
+  return steamIds.filter((id) => id === steamId).length > 1
+    ? [`steamId "${steamId}" is used by another achievement`]
+    : [];
+}
+
+function checkAchievement(
+  achievement: AchievementContent,
+  steamIds: string[],
+): AnalysisCheck {
+  const problems = [
+    ...conditionProblems(achievement.condition),
+    ...steamIdProblems(achievement.steamId, steamIds),
+  ];
   return {
     id: `achievements:${achievement.id}`,
     label: achievement.name,
@@ -78,15 +95,18 @@ function checkAchievement(achievement: AchievementContent): AnalysisCheck {
 }
 
 export function runAchievementsAnalysis(): AnalysisRunResult {
-  const checks =
-    getEntriesByType<AchievementContent>('achievement').map(checkAchievement);
+  const achievements = getEntriesByType<AchievementContent>('achievement');
+  const steamIds = achievements.map(({ steamId }) => steamId);
+  const checks = achievements.map((achievement) =>
+    checkAchievement(achievement, steamIds),
+  );
   const failures = checks.filter((check) => check.status === 'fail').length;
 
   return {
     checks,
     summary:
       failures === 0
-        ? `Every achievement (${checks.length} checked) names real content and a legal edict combination.`
-        : `${failures} of ${checks.length} achievement(s) can never be earned.`,
+        ? `Every achievement (${checks.length} checked) names real content, a legal edict combination and a unique steamId.`
+        : `${failures} of ${checks.length} achievement(s) can never be earned or synced to Steam.`,
   };
 }

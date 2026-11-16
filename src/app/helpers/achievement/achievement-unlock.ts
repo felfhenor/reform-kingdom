@@ -1,4 +1,5 @@
 import { error } from '@helpers/engine/logging';
+import { steamAchievementsSync } from '@helpers/engine/steam';
 import { legacy, legacyLoad, legacySave } from '@helpers/legacy/legacy';
 import { legacyMergeAchievements } from '@helpers/legacy/legacy-merge';
 import type {
@@ -43,7 +44,6 @@ function achievementsSave(
   return fresh;
 }
 
-// Every unlock goes through here, so a store sync (e.g. Steam) has one place to hook in.
 export function achievementsUnlock(
   earned: AchievementUnlocked[],
   isCatchUp = false,
@@ -55,8 +55,10 @@ export function achievementsUnlock(
 
   try {
     const unlocked = achievementsSave(candidates);
-    if (unlocked.length > 0)
-      achievementsAnnounced.next({ unlocked, isCatchUp });
+    if (unlocked.length === 0) return;
+
+    achievementsAnnounced.next({ unlocked, isCatchUp });
+    steamAchievementsSync();
   } catch (e) {
     achievementWritesFailed = true;
     error('Achievement', 'Could not save unlocked achievements:', e);

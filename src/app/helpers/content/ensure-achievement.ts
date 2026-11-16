@@ -72,6 +72,7 @@ export function ensureAchievement(
     __type: 'achievement',
     description: achievement.description ?? 'UNKNOWN',
     sprite: achievement.sprite ?? '0000',
+    steamId: achievement.steamId ?? '',
     hidden: achievement.hidden ?? false,
     hideProgress: achievement.hideProgress ?? false,
     condition: ensureAchievementCondition(achievement.condition),

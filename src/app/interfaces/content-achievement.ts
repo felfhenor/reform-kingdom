@@ -108,6 +108,8 @@ export type AchievementContent = IsContentItem &
     id: AchievementId;
     __type: 'achievement';
 
+    // The achievement's API name on Steam; it can't be renamed once published there.
+    steamId: string;
     hidden: boolean;
     // For a count that reads as a yes/no milestone, where a bar would only show 1/2.
     hideProgress?: boolean;

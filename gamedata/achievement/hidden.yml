@@ -1,5 +1,6 @@
 - id: 6898bd28-483b-4099-b939-0fec3902a974
   name: One Trick
+  steamId: ONE_TRICK
   sprite: '0035'
   description: Defeat Fel with a hero who leaned on one skill for nearly every action.
   hidden: true
@@ -9,6 +10,7 @@
 
 - id: c2c8ad90-e0bd-4734-9846-06591d363922
   name: Pacifistish Healer
+  steamId: PACIFISTISH_HEALER
   sprite: '0036'
   description: Defeat Fel with a hero who healed more than they hurt, yet still landed a few kills.
   hidden: true
@@ -18,6 +20,7 @@
 
 - id: c1f918d1-4b9a-475e-9ba8-3358d7dc3b55
   name: Kill the Queen
+  steamId: KILL_THE_QUEEN
   sprite: '0037'
   description: Defeat the Spider Queen.
   hidden: true
@@ -28,6 +31,7 @@
 
 - id: ecebb1a0-533e-44ed-a637-ad894afa370c
   name: A Hidden Hero
+  steamId: A_HIDDEN_HERO
   sprite: '0038'
   description: Defeat the Elf Captain.
   hidden: true
@@ -38,6 +42,7 @@
 
 - id: 3c2ca6c3-0254-40c9-8d96-5f5044067eb9
   name: Memories, Remembered
+  steamId: MEMORIES_REMEMBERED
   sprite: '0039'
   description: Defeat Fel, the Forgetter.
   hidden: true
@@ -48,6 +53,7 @@
 
 - id: 1d436ea6-cf5a-4aac-a54c-695f19b64dfa
   name: I Remember
+  steamId: I_REMEMBER
   sprite: '0040'
   description: Reach 100% Remembrance.
   hidden: true
@@ -57,6 +63,7 @@
 
 - id: b01a1eb2-974f-4ccd-b9a3-10d95a4fbff8
   name: Speedrunner
+  steamId: SPEEDRUNNER
   sprite: '0041'
   description: Defeat Fel in under 4 days and 15 hours of play.
   hidden: true
@@ -66,6 +73,7 @@
 
 - id: ae60d7a1-441e-4c56-bec3-fed121780702
   name: Fragments of the Forgotten
+  steamId: FRAGMENTS_OF_THE_FORGOTTEN
   sprite: '0042'
   description: Recover the memory guarded in each of the six lands.
   hidden: true
@@ -81,6 +89,7 @@
 
 - id: cad0ab83-4d36-4d1e-849f-ee893f1b5545
   name: Answered Prayers
+  steamId: ANSWERED_PRAYERS
   sprite: '0045'
   description: Pray at a shrine while a hero wears the memoriam of the champion it honors.
   hidden: true
@@ -90,6 +99,7 @@
 
 - id: 1033144f-10e0-4675-ae9e-69d9a543ead9
   name: Didn't See Us Coming
+  steamId: DIDNT_SEE_US_COMING
   sprite: '0046'
   description: Win a fight in the ambush round, before the enemy can act.
   hidden: true
@@ -99,6 +109,7 @@
 
 - id: 2cdba225-740d-47a3-8a2f-be0c810bafeb
   name: Took One for the Team
+  steamId: TOOK_ONE_FOR_THE_TEAM
   sprite: '0047'
   description: Win a fight after a hero falls covering an ally.
   hidden: true
@@ -108,6 +119,7 @@
 
 - id: d45e5050-d53e-4f52-ac9d-626da14964ad
   name: Down to the Wire
+  steamId: DOWN_TO_THE_WIRE
   sprite: '0048'
   description: Win a fight with one hero left standing at 5% health or less.
   hidden: true
@@ -117,6 +129,7 @@
 
 - id: 1a31cb60-d61d-403c-a648-12330693f376
   name: Return to Sender
+  steamId: RETURN_TO_SENDER
   sprite: '0050'
   description: Win a fight where a hero's reflected damage lands the killing blow.
   hidden: true
@@ -126,6 +139,7 @@
 
 - id: e6c442ed-34dc-4894-b267-7433a2d5a52e
   name: Giant Slayer
+  steamId: GIANT_SLAYER
   sprite: '0051'
   description: Defeat a monster at least 10 levels above your strongest hero.
   hidden: true
@@ -135,6 +149,7 @@
 
 - id: 6881bf6b-67ba-4bb8-a70b-1090822a33d2
   name: Cursed but Effective
+  steamId: CURSED_BUT_EFFECTIVE
   sprite: '0052'
   description: Clear a mystical node while every hero wears cursed gear.
   hidden: true
