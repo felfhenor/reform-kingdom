@@ -17,15 +17,26 @@ import type {
   RunRecord,
   RunRecordHero,
 } from '@interfaces';
-import { uniq } from 'es-toolkit';
+import { omit, uniq } from 'es-toolkit';
 import { sortBy, sum } from 'es-toolkit/compat';
 
-function heroIsOneTrick(stats: HeroRunStats): boolean {
-  const uses = Object.values(stats.skillUses);
+const ACHIEVEMENT_BASIC_ATTACK_FAMILY = 'Attack';
+
+function usesAreOneTrick(uses: number[]): boolean {
   const total = sum(uses);
   return (
     total >= ACHIEVEMENT_ONE_TRICK_MIN_USES &&
     (Math.max(...uses) / total) * 100 >= ACHIEVEMENT_ONE_TRICK_PERCENT
+  );
+}
+
+// Attack is every hero's fallback, so any other skill is judged on its share of the non-Attack uses.
+function heroIsOneTrick(stats: HeroRunStats): boolean {
+  return (
+    usesAreOneTrick(Object.values(stats.skillUses)) ||
+    usesAreOneTrick(
+      Object.values(omit(stats.skillUses, [ACHIEVEMENT_BASIC_ATTACK_FAMILY])),
+    )
   );
 }
 

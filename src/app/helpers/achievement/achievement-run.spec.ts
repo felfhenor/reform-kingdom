@@ -109,26 +109,21 @@ describe('achievementRunMatches', () => {
     ).toBe(false);
   });
 
-  it('finds a one-trick hero, Attack included', () => {
+  it('finds a one-trick hero, judging other skills apart from the fallback Attack', () => {
     const run = (skillUses: Record<string, number>) =>
       buildRunRecord({
         party: [hero('a', { skillUses })],
         stats: trackedStats,
       });
 
-    expect(
-      achievementRunMatches(run({ Attack: 96, Fire: 4 }), {
-        heroFeat: 'OneTrick',
-      }),
-    ).toBe(true);
-    expect(
-      achievementRunMatches(run({ Fire: 90, Ice: 10 }), {
-        heroFeat: 'OneTrick',
-      }),
-    ).toBe(false);
-    expect(
-      achievementRunMatches(run({ Fire: 20 }), { heroFeat: 'OneTrick' }),
-    ).toBe(false);
+    const isOneTrick = (skillUses: Record<string, number>) =>
+      achievementRunMatches(run(skillUses), { heroFeat: 'OneTrick' });
+
+    expect(isOneTrick({ Attack: 96, Fire: 4 })).toBe(true);
+    expect(isOneTrick({ Attack: 500, Fire: 96, Ice: 4 })).toBe(true);
+    expect(isOneTrick({ Attack: 60, Fire: 30, Ice: 10 })).toBe(false);
+    expect(isOneTrick({ Fire: 90, Ice: 10 })).toBe(false);
+    expect(isOneTrick({ Fire: 20 })).toBe(false);
   });
 
   it('finds a pacifist healer who still took lives', () => {
