@@ -1,0 +1,48 @@
+<div class="dropdown dropdown-end" [class.dropdown-open]="isOpen()">
+  <div class="join">
+    <button
+      type="button"
+      class="btn btn-sm join-item tabular-nums"
+      [class]="colorClass()"
+      (click)="clickMain()"
+      appSfx="ui-click"
+      [sfxTrigger]="['click', 'hover']"
+    >
+      {{ label() }}
+    </button>
+    <button
+      type="button"
+      class="btn btn-sm join-item px-2"
+      [class]="colorClass()"
+      [attr.aria-label]="menuAriaLabel()"
+      [attr.aria-expanded]="isOpen()"
+      aria-haspopup="true"
+      (click)="toggle()"
+      appSfx="ui-click"
+      [sfxTrigger]="['click', 'hover']"
+    >
+      <app-icon name="tablerChevronDown" />
+    </button>
+  </div>
+  @if (isOpen()) {
+    <ul
+      class="dropdown-content menu bg-base-200 z-20 w-40 p-2 shadow-xl"
+      (animate.enter)="onMenuEnter($event)"
+      (animate.leave)="onMenuLeave($event)"
+    >
+      @for (option of options(); track option.value) {
+        <li>
+          <button
+            type="button"
+            class="tabular-nums"
+            (click)="pick(option.value)"
+            appSfx="ui-click"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            {{ option.label }}
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</div>
