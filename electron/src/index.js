@@ -1,4 +1,4 @@
-const { app, screen, shell, BrowserWindow } = require('electron');
+const { app, screen, session, shell, BrowserWindow } = require('electron');
 const path = require('path');
 const url = require('url');
 
@@ -24,6 +24,12 @@ if (!app.isPackaged && process.env.REFORM_DEMO === '1') {
     path.join(app.getPath('appData'), 'reformkingdom-demo'),
   );
 }
+
+// The game never uses location, but Chromium's Windows provider can still raise an OS location prompt for a few players.
+app.commandLine.appendSwitch(
+  'disable-features',
+  'WinSystemLocationPermission,WinrtGeolocationImplementation',
+);
 
 // A second copy would tick and save the same game alongside this one.
 const hasInstanceLock = app.requestSingleInstanceLock();
@@ -165,6 +171,12 @@ const createWindow = () => {
 // Some APIs can only be used after this event occurs.
 app.on('ready', () => {
   logReadyDiagnostics();
+  session.defaultSession.setPermissionRequestHandler((_wc, permission, cb) =>
+    cb(permission !== 'geolocation'),
+  );
+  session.defaultSession.setPermissionCheckHandler(
+    (_wc, permission) => permission !== 'geolocation',
+  );
   registerLogHandlers((sender) => {
     if (sender === mainWindow?.webContents) onGameLogAttached();
   });
