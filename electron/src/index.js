@@ -169,8 +169,14 @@ const createWindow = () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', () => {
+app.on('ready', async () => {
   logReadyDiagnostics();
+  // Older builds registered the web service worker on file://, which 504s every launch after the first.
+  await session.defaultSession
+    .clearStorageData({ storages: ['serviceworkers', 'cachestorage'] })
+    .catch((e) =>
+      coreLog().warn('Session', 'Could not clear service workers', e),
+    );
   session.defaultSession.setPermissionRequestHandler((_wc, permission, cb) =>
     cb(permission !== 'geolocation'),
   );

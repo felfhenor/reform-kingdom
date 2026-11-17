@@ -19,6 +19,7 @@ import {
 import { provideServiceWorker } from '@angular/service-worker';
 
 import { provideHttpClient } from '@angular/common/http';
+import { isInElectron } from '@helpers/engine/electron';
 import { error } from '@helpers/engine/logging';
 
 import { provideNgIconsConfig } from '@ng-icons/core';
@@ -59,7 +60,8 @@ export const appConfig: ApplicationConfig = {
       multi: true,
     },
     provideServiceWorker('ngsw-worker.js', {
-      enabled: !isDevMode(),
+      // On file:// the worker can't fetch index.html, so later launches get a 504 white screen.
+      enabled: !isDevMode() && !isInElectron(),
       registrationStrategy: 'registerWhenStable:30000',
     }),
     provideHttpClient(),
