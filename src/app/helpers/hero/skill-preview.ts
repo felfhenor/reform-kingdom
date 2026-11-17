@@ -198,6 +198,6 @@ export function skillDescriptionWithPreview(
   if (skill.techniques.length === 0) return skill.description;
 
   return combatFormatMessage(skill.description, {
-    value: skillDescriptionValue(combatant, skill),
+    value: skillDescriptionValue(combatant, skill).toLocaleString(),
   });
 }
