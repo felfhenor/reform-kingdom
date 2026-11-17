@@ -35,7 +35,9 @@
     }
 
     @if (t.accuracy < 100) {
-      <span class="text-lighter">({{ t.accuracy | number }}% to hit)</span>
+      <span class="text-lighter text-warning">
+        ({{ t.accuracy | number }}% chance to hit)
+      </span>
     }
   </div>
 
