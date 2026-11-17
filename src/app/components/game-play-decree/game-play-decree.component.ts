@@ -64,6 +64,7 @@ import {
 import { rewardKey } from '@helpers/world-node/world-node-rewards';
 import { combatAutomationLockedReason } from '@helpers/combat/combat-manual.ui';
 import {
+  isWorldNodeTypeRemoved,
   worldNodeByName,
   worldNodeTown,
 } from '@helpers/world-node/world-nodes';
@@ -214,7 +215,11 @@ export class GamePlayDecreeComponent {
     return worldNodeTown(home)?.name ?? home.nodeName;
   });
 
-  public readonly clauseTypeOptions = CLAUSE_TYPE_OPTIONS;
+  public readonly clauseTypeOptions = isWorldNodeTypeRemoved('GatherNode')
+    ? CLAUSE_TYPE_OPTIONS.filter(
+        (option) => clauseTypeOf(option.value) !== 'GatherMaterial',
+      )
+    : CLAUSE_TYPE_OPTIONS;
   public readonly riskToleranceOptions = RISK_TOLERANCE_OPTIONS;
 
   public materialOptions = computed<MaterialOption[]>(() => {
@@ -250,7 +255,11 @@ export class GamePlayDecreeComponent {
     return materialId ? gatherNodeFarmOptionsFor(materialId) : [];
   });
 
-  public draftFormType = signal<ClauseFormType>('GatherMaterial');
+  public draftFormType = signal<ClauseFormType>(
+    this.clauseTypeOptions.some((option) => option.value === 'GatherMaterial')
+      ? 'GatherMaterial'
+      : this.clauseTypeOptions[0].value,
+  );
   public draftType = computed(() => clauseTypeOf(this.draftFormType()));
   public isGatherByMaterial = computed(
     () => this.draftFormType() === 'GatherMaterial',
