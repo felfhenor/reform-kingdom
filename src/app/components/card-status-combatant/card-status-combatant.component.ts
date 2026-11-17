@@ -64,6 +64,8 @@ export class CardStatusCombatantComponent {
   // Reserving the line keeps cards from growing when a tag appears.
   public reserveElementTag = input<boolean>(false);
   public elementTag = input<ElementVerdict>();
+  // Matches combatEventScopeRun's keyPrefix, so a simulated fight's events reach its own cards.
+  public eventKeyPrefix = input<string>('');
 
   public damageNumbersByCombatant = this.playback.damageNumbersByCombatant;
   public skillCastByCombatant = this.playback.skillCastByCombatant;

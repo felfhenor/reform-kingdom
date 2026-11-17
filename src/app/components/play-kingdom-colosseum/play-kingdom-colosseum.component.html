@@ -1,0 +1,695 @@
+<app-card-page heightProfile="full">
+  <span header>Colosseum</span>
+
+  <app-button-kingdom-back pageactions />
+
+  <div pageactionssecondary class="flex items-center gap-2">
+    @if (isReview()) {
+      <button
+        type="button"
+        class="btn btn-sm btn-neutral btn-outline"
+        (click)="backToSetup()"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        Back to Setup
+      </button>
+      <button
+        type="button"
+        class="btn btn-sm btn-primary"
+        (click)="fightAgain()"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        Fight Again
+      </button>
+    } @else if (isWatching()) {
+      <div class="join">
+        <button
+          type="button"
+          class="btn btn-sm btn-neutral join-item"
+          [class.btn-outline]="!fight.isPaused()"
+          [attr.aria-label]="fight.isPaused() ? 'Resume' : 'Pause'"
+          [tp]="fight.isPaused() ? 'Resume' : 'Pause'"
+          (click)="fight.isPaused.set(!fight.isPaused())"
+          appSfx="ui-click"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          <app-icon
+            [name]="fight.isPaused() ? 'gamePlayButton' : 'gamePauseButton'"
+          />
+        </button>
+        @for (speed of speeds; track speed) {
+          <button
+            type="button"
+            class="btn btn-sm btn-neutral join-item tabular-nums"
+            [class.btn-outline]="fight.speed() !== speed"
+            (click)="fight.speed.set(speed)"
+            appSfx="ui-click"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            {{ speed | number }}x
+          </button>
+        }
+      </div>
+      <button
+        type="button"
+        class="btn btn-sm btn-neutral"
+        (click)="fight.skipToEnd()"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        Skip to End
+      </button>
+      <button
+        type="button"
+        class="btn btn-sm btn-error btn-outline"
+        (click)="backToSetup()"
+        appSfx="ui-error"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        Stop
+      </button>
+    } @else if (isViewingResults()) {
+      @if (!batchRunning()) {
+        <button
+          type="button"
+          class="btn btn-sm btn-neutral btn-outline"
+          (click)="backToSetup()"
+          appSfx="ui-click"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Back to Setup
+        </button>
+        <app-button-split
+          [label]="simulateLabel"
+          [options]="simulateOptions"
+          menuAriaLabel="Choose how many fights to simulate"
+          (main)="simulate(defaultSimulateCount)"
+          (picked)="simulate($event)"
+        />
+      }
+    } @else {
+      <app-button-split
+        [label]="simulateLabel"
+        [options]="simulateOptions"
+        menuAriaLabel="Choose how many fights to simulate"
+        (main)="simulate(defaultSimulateCount)"
+        (picked)="simulate($event)"
+      />
+      <app-button-split
+        label="Fight"
+        color="primary"
+        [options]="fightOptions"
+        menuAriaLabel="Choose how to fight"
+        (main)="watch('auto')"
+        (picked)="watch($event)"
+      />
+    }
+
+    <app-icon
+      name="gameHelp"
+      size="inline"
+      class="text-lighter"
+      [tp]="help"
+      [tpPlacement]="'left'"
+    />
+  </div>
+
+  <ng-template #help>
+    <p>
+      These aren't your real heroes, and these aren't real fights. The Colosseum
+      copies your party so you can try out jobs, gear, skill trees and combat
+      orders.
+    </p>
+    <p class="mt-2">
+      Heroes use their real level in each job. Changing a hero's job here gives
+      them the skill tree, orders and gear they have in that job.
+    </p>
+    <p class="mt-2">
+      Fight lets you watch one run, in Auto or Turn-based. Simulate runs many
+      fights instantly.
+    </p>
+  </ng-template>
+
+  @if (isWatching()) {
+    <div class="flex justify-center h-full min-h-0">
+      <app-panel-combat-scene
+        #scene
+        class="w-full max-h-full"
+        [liveCombat]="fight.combat()"
+        [log]="simLog()"
+        [paused]="fight.isPaused()"
+        [eventKeyPrefix]="eventKeyPrefix"
+        (confirmed)="fight.confirm(scene.combat(), $event)"
+      >
+        @if (fight.combat()?.simulation?.manual && !scene.isReview()) {
+          <button
+            sceneActions
+            type="button"
+            class="btn btn-error cursor-pointer"
+            [disabled]="scene.isResolving()"
+            (click)="fight.confirm(scene.combat(), undefined, true)"
+            appSfx="ui-error"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            Flee
+          </button>
+        }
+      </app-panel-combat-scene>
+    </div>
+  } @else if (isViewingResults()) {
+    <div class="flex flex-col gap-4 h-full min-h-0">
+      @if (batchRunning()) {
+        <div class="flex flex-col gap-4 items-center justify-center flex-1">
+          <span class="type-section-title">
+            Simulating {{ batchEncounterName() }}
+          </span>
+          <div class="w-1/2">
+            <app-bar-progress
+              color="primary"
+              [value]="batchDone()"
+              [max]="batchTotal()"
+              [shimmer]="true"
+            >
+              {{ batchDone() | number }}/{{ batchTotal() | number }}
+            </app-bar-progress>
+          </div>
+          <button
+            type="button"
+            class="btn btn-sm btn-neutral btn-outline"
+            (click)="cancelSimulate()"
+            appSfx="ui-error"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            Cancel
+          </button>
+        </div>
+      } @else if (summary().runs === 0) {
+        <app-blank-slate>Simulate fights to see results here.</app-blank-slate>
+      } @else {
+        @let result = summary();
+        <div class="flex flex-col gap-4 overflow-y-auto min-h-0">
+          @let location = batchLocation();
+          <div class="card shadow-sm relative">
+            @if (location?.background; as bg) {
+              <div
+                class="location-banner absolute inset-x-0 top-0 h-28 overflow-hidden pointer-events-none"
+              >
+                <app-backdrop-node
+                  class="absolute inset-0"
+                  [background]="bg.background"
+                  [filter]="bg.backgroundFilter ?? 'None'"
+                  align="top"
+                />
+              </div>
+            }
+            <div class="card-body relative p-3 gap-2">
+              <div
+                class="flex justify-between items-center gap-4"
+                [class.location-text]="!!location?.background"
+              >
+                <div class="flex items-center gap-2">
+                  @if (location?.node; as node) {
+                    <app-sprite-node
+                      [entry]="node"
+                      [framed]="!location?.background"
+                      [class.location-drop-shadow]="!!location?.background"
+                    />
+                  }
+                  <h2 class="type-section-title">
+                    {{ batchEncounterName() }}
+                    @if (location; as loc) {
+                      <span
+                        class="badge badge-sm tabular-nums badge-difficulty-{{
+                          loc.tier
+                        }}"
+                      >
+                        Lv. {{ loc.encounter.levelRange.min | number }}-{{
+                          loc.encounter.levelRange.max | number
+                        }}
+                      </span>
+                    }
+                    <span class="badge badge-sm badge-data tabular-nums">
+                      {{ result.runs | number }} runs
+                    </span>
+                  </h2>
+                </div>
+                <span class="text-2xl font-bold tabular-nums">
+                  {{ result.winRate | percent }} win rate
+                </span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                @for (stat of batchStats(); track stat.label) {
+                  <div class="flex justify-between gap-2">
+                    <span class="text-lighter flex items-center gap-2">
+                      <app-icon [name]="stat.icon" size="inline" />
+                      {{ stat.label }}
+                    </span>
+                    <span class="tabular-nums">{{ stat.value }}</span>
+                  </div>
+                }
+              </div>
+
+              <div class="flex flex-col gap-2">
+                @for (losses of result.lossesByFight; track $index) {
+                  <div class="flex items-center gap-4 text-sm">
+                    <span class="w-20 shrink-0">
+                      Fight {{ $index + 1 | number }}
+                    </span>
+                    <app-bar-progress
+                      class="flex-1"
+                      color="error"
+                      [value]="losses"
+                      [max]="result.runs"
+                    >
+                      {{ losses | number }} losses
+                    </app-bar-progress>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            @for (averages of result.heroes; track averages.characterId) {
+              @let simHero = batchHeroes()[$index];
+              @if (simHero) {
+                <div class="flex flex-col gap-4 p-4 bg-base-200">
+                  <div class="flex items-center gap-4">
+                    <app-icon-job [job]="jobOf(simHero)" />
+                    <div class="flex flex-col min-w-0">
+                      <span class="type-entity-name">
+                        {{ simHero.name }}
+                      </span>
+                      <span class="type-muted">
+                        <app-label-job [character]="simHero" />
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                    <div class="flex justify-between gap-2">
+                      <span class="text-lighter flex items-center gap-2">
+                        <app-icon name="gameDeadlyStrike" size="inline" />
+                        Avg. damage
+                      </span>
+                      <span class="tabular-nums">
+                        {{ averages.damageDealt | number: '1.0-0' }}
+                      </span>
+                    </div>
+                    <div class="flex justify-between gap-2">
+                      <span class="text-lighter flex items-center gap-2">
+                        <app-icon name="gameCaduceus" size="inline" />
+                        Avg. healing
+                      </span>
+                      <span class="tabular-nums">
+                        {{ averages.healing | number: '1.0-0' }}
+                      </span>
+                    </div>
+                    <div class="flex justify-between gap-2">
+                      <span class="text-lighter flex items-center gap-2">
+                        <app-icon name="gameHumanTarget" size="inline" />
+                        Avg. kills
+                      </span>
+                      <span class="tabular-nums">
+                        {{ averages.kills | number: '1.0-1' }}
+                      </span>
+                    </div>
+                    <div class="flex justify-between gap-2">
+                      <span class="text-lighter flex items-center gap-2">
+                        <app-icon name="gameBrokenHeart" size="inline" />
+                        Avg. deaths
+                      </span>
+                      <span class="tabular-nums">
+                        {{ averages.deaths | number: '1.0-1' }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    @let enc = encounter();
+    <div class="grid grid-cols-[380px_minmax(0,1fr)] gap-4 h-full min-h-0">
+      <div class="flex flex-col gap-2 min-h-0">
+        <span class="type-section-title">Location</span>
+
+        <div
+          class="flex flex-col gap-2 overflow-y-auto max-h-[360px] shrink-0 p-2 bg-base-200"
+        >
+          @for (row of encounterRows(); track row.encounter.id) {
+            <button
+              type="button"
+              appListRow
+              class="relative overflow-hidden"
+              [listRowSelected]="enc?.id === row.encounter.id"
+              (click)="pickEncounter(row.encounter.id)"
+              appSfx="ui-click"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              @if (row.background; as bg) {
+                <app-backdrop-node
+                  class="absolute inset-0"
+                  [background]="bg.background"
+                  [filter]="bg.backgroundFilter ?? 'None'"
+                />
+              }
+              @if (row.node; as node) {
+                <app-sprite-node
+                  class="relative"
+                  [entry]="node"
+                  [framed]="!row.background"
+                  [class.location-drop-shadow]="!!row.background"
+                />
+              }
+              <div
+                class="relative flex flex-col gap-2 min-w-0 py-2"
+                [class.location-text]="!!row.background"
+              >
+                <span class="type-entity-name truncate">
+                  {{ row.encounter.name }}
+                </span>
+                <span class="flex gap-2">
+                  <span
+                    class="badge badge-sm w-20 whitespace-nowrap tabular-nums badge-difficulty-{{
+                      row.tier
+                    }}"
+                  >
+                    Lv. {{ row.encounter.levelRange.min | number }}-{{
+                      row.encounter.levelRange.max | number
+                    }}
+                  </span>
+                  <span
+                    class="badge badge-sm badge-data w-20 whitespace-nowrap tabular-nums"
+                  >
+                    {{ row.encounter.fights.length | number }} fights
+                  </span>
+                </span>
+              </div>
+            </button>
+          } @empty {
+            <app-blank-slate>Visit a location to fight there.</app-blank-slate>
+          }
+        </div>
+
+        @if (enc) {
+          <span class="type-section-title">Fights</span>
+          <div
+            class="flex flex-col gap-2 overflow-y-auto min-h-0 p-2 bg-base-200"
+          >
+            <button
+              type="button"
+              appListRow
+              [listRowSelected]="fightIndex() === undefined"
+              (click)="pickFight(undefined)"
+              appSfx="ui-click"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              <app-slot-icon-blank class="shrink-0">
+                <app-icon name="gameCrossedSwords" size="nav" />
+              </app-slot-icon-blank>
+              <span class="type-entity-name">All Fights</span>
+            </button>
+
+            @for (monsters of fights(); track $index; let i = $index) {
+              <button
+                type="button"
+                appListRow
+                [listRowSelected]="fightIndex() === i"
+                (click)="pickFight(i)"
+                appSfx="ui-click"
+                [sfxTrigger]="['click', 'hover']"
+              >
+                @if (monsters[0]; as lead) {
+                  <app-tooltip-monster-preview
+                    #leadPreview
+                    [monster]="lead"
+                    [level]="enc.levelRange.max"
+                  />
+                  <app-slot-icon-blank
+                    class="shrink-0"
+                    [tp]="leadPreview.template()"
+                  >
+                    <app-atlas-animation
+                      spritesheet="monster"
+                      [assetName]="lead.sprite"
+                      [frames]="lead.frames"
+                    />
+                  </app-slot-icon-blank>
+                }
+                <div class="flex flex-col gap-2 min-w-0 py-2">
+                  <span class="type-entity-name">
+                    Fight {{ i + 1 | number }}
+                  </span>
+                  <div class="flex flex-wrap gap-2">
+                    @for (m of monsters.slice(1); track $index) {
+                      <app-tooltip-monster-preview
+                        #preview
+                        [monster]="m"
+                        [level]="enc.levelRange.max"
+                      />
+                      <app-slot-icon-blank
+                        class="zoom-row"
+                        [tp]="preview.template()"
+                      >
+                        <app-atlas-animation
+                          spritesheet="monster"
+                          [assetName]="m.sprite"
+                          [frames]="m.frames"
+                        />
+                      </app-slot-icon-blank>
+                    }
+                  </div>
+                </div>
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="flex flex-col gap-4 min-h-0">
+        @if (restoredDropped().length > 0) {
+          <span class="badge badge-warning">
+            Last setup restored. Removed since:
+            {{ restoredDropped().join(', ') }}.
+          </span>
+        }
+
+        @let char = hero();
+        <div class="flex items-center gap-2">
+          <app-tabs-hero
+            [party]="party()"
+            [selectedId]="char.id"
+            (selected)="pickHero($event)"
+          />
+          <span class="flex-1"></span>
+          <button
+            type="button"
+            class="btn btn-sm btn-neutral btn-outline"
+            [disabled]="setup().heroes.length === 0"
+            (click)="resetAll()"
+            appSfx="ui-error"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            Reset All
+          </button>
+        </div>
+
+        <div class="flex items-center gap-4 shrink-0">
+          <app-icon-job [job]="heroJob()" />
+          <div class="type-entity-heading flex gap-2 items-center flex-1">
+            {{ char.name }}
+            <app-label-job
+              class="type-muted font-normal"
+              [character]="char"
+              [long]="true"
+            />
+            @if (isHeroEdited()) {
+              <span class="badge badge-sm badge-data">Edited</span>
+            }
+          </div>
+          <button
+            type="button"
+            class="btn btn-sm btn-neutral btn-outline"
+            [disabled]="!isHeroEdited()"
+            (click)="resetHero()"
+            appSfx="ui-error"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            Reset
+          </button>
+        </div>
+
+        <div role="tablist" class="tabs tabs-box shrink-0">
+          @for (t of heroTabs; track t.id) {
+            <button
+              type="button"
+              role="tab"
+              class="tab"
+              [class.tab-active]="heroTab() === t.id"
+              [attr.aria-selected]="heroTab() === t.id"
+              (click)="heroTab.set(t.id)"
+              appSfx="ui-click"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              {{ t.label }}
+            </button>
+          }
+        </div>
+
+        <div class="flex-1 min-h-0 overflow-y-auto">
+          @switch (heroTab()) {
+            @case ('job') {
+              <div class="flex flex-col gap-2">
+                @for (job of jobs(); track job.id) {
+                  <button
+                    type="button"
+                    appListRow
+                    [listRowSelected]="job.id === char.jobId"
+                    (click)="pickJob(job.id)"
+                    appSfx="ui-click"
+                    [sfxTrigger]="['click', 'hover']"
+                  >
+                    <app-slot-icon-blank class="shrink-0">
+                      <app-icon-job [job]="job" />
+                    </app-slot-icon-blank>
+                    <div class="flex flex-col min-w-0">
+                      <span class="type-entity-name truncate">
+                        {{ job.name }}
+                      </span>
+                      <span class="type-meta">
+                        Lv. {{ jobLevel(job.id) | number }}
+                      </span>
+                    </div>
+                    @if (job.id === char.jobId) {
+                      <span class="ml-auto mr-2 shrink-0 badge badge-success">
+                        Chosen
+                      </span>
+                    }
+                  </button>
+                }
+              </div>
+            }
+
+            @case ('gear') {
+              <div class="grid grid-cols-[160px_minmax(0,1fr)] gap-4">
+                <div class="flex flex-col gap-2">
+                  @for (slot of gearSlots(); track slot) {
+                    <app-slot-equipment
+                      class="min-h-[66px] max-w-[66px]"
+                      [slot]="slot"
+                      [equippedItem]="char.equipment[slot]"
+                      [isSelected]="gearSlot() === slot"
+                      [showUnequipHint]="true"
+                      (slotClick)="gearSlot.set(slot)"
+                      (contextmenu)="$event.preventDefault(); unequip(slot)"
+                    />
+                  }
+                </div>
+                <div class="flex flex-col gap-2">
+                  <span class="type-section-title">{{ gearSlot() }}</span>
+                  @for (row of gearPicker(); track row.entry.item.id) {
+                    <div class="relative">
+                      <app-card-equipment-item
+                        [equipment]="row.entry.content"
+                        [equipmentItem]="row.entry.item"
+                        [equippedItem]="char.equipment[gearSlot()]"
+                        [disabled]="!!row.owner && !row.isOwn"
+                        (equip)="equip(row.entry.item)"
+                      />
+                      @if (row.isOwn) {
+                        <span
+                          class="absolute top-1 right-1 badge badge-sm badge-success"
+                        >
+                          Equipped
+                        </span>
+                      } @else if (row.owner; as owner) {
+                        <span
+                          class="absolute top-1 right-1 badge badge-sm badge-data"
+                        >
+                          On {{ owner.name }}
+                        </span>
+                      }
+                    </div>
+                  } @empty {
+                    <app-blank-slate>
+                      No equippable items available for this slot.
+                    </app-blank-slate>
+                  }
+                </div>
+              </div>
+            }
+
+            @case ('tree') {
+              @if (heroJob(); as job) {
+                <div
+                  class="grid grid-cols-[minmax(0,1fr)_260px] gap-4 h-full min-h-0"
+                >
+                  <app-panel-heroes-skill-tree-grid
+                    [job]="job"
+                    [heroLevel]="char.level"
+                    [states]="treeStates()"
+                    [ranks]="treeRanks()"
+                    [selectedId]="selectedNodeId()"
+                    (selected)="selectedNodeId.set($event)"
+                    (learnRequested)="learn($event)"
+                    (unlearnRequested)="unlearn($event)"
+                  />
+                  <div class="flex flex-col gap-2">
+                    <span class="badge badge-sm badge-data tabular-nums w-full">
+                      {{ treeSp() | number }} SP remaining
+                    </span>
+                    <app-panel-heroes-skill-tree-detail
+                      [node]="selectedNode()"
+                      [states]="treeStates()"
+                      [rank]="selectedRank()"
+                      [job]="job"
+                      [character]="char"
+                      (learn)="learn($event)"
+                      (unlearn)="unlearn($event)"
+                    />
+                  </div>
+                </div>
+              }
+            }
+
+            @case ('orders') {
+              <app-panel-hero-combat-orders
+                [character]="char"
+                [party]="party()"
+                [clauses]="clauses()"
+                (add)="addOrder($event)"
+                (update)="updateOrder($event)"
+                (remove)="removeOrder($event)"
+                (reorder)="reorderOrder($event)"
+                (toggleEnabled)="toggleOrder($event)"
+              />
+            }
+
+            @case ('burst') {
+              <app-panel-hero-burst-skills
+                [character]="char"
+                (choose)="chooseBurst($event)"
+              />
+            }
+
+            @default {
+              <div
+                class="grid grid-cols-[300px_minmax(0,1fr)] gap-4 h-full min-h-0"
+              >
+                <app-panel-hero-equipment-stats [character]="char" />
+                <app-panel-hero-equipment-skills [character]="char" />
+              </div>
+            }
+          }
+        </div>
+      </div>
+    </div>
+  }
+</app-card-page>

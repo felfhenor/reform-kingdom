@@ -8,6 +8,7 @@ export * from './caravan-state.ui';
 export * from './difficulty-tier';
 export * from './character';
 export * from './collectible-source';
+export * from './colosseum';
 export * from './combat';
 export * from './node-background';
 export * from './combat-log';

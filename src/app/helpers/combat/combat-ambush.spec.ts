@@ -51,6 +51,14 @@ describe('combatRollAmbush', () => {
     ).toEqual([10, 20]);
   });
 
+  it('rolls a given party instead of the world one', () => {
+    seedParty([buildAbilityHero('Warrior', 30)]);
+    vi.mocked(rngSucceedsChance).mockReturnValue(true);
+
+    const sim = [buildAbilityHero('Ranger', 1, {}, { name: 'Sim' })];
+    expect(combatRollAmbush(sim)).toBe('Sim');
+  });
+
   it('is undefined when every roll fails', () => {
     seedParty([buildAbilityHero('Ranger', 1)]);
     vi.mocked(rngSucceedsChance).mockReturnValue(false);

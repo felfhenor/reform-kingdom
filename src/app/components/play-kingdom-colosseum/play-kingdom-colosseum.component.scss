@@ -1,0 +1,15 @@
+// Matches the world map node panel's banner, so text and sprites stay legible over a location's backdrop.
+.location-text {
+  text-shadow:
+    0 1px 2px #000,
+    0 0 6px rgb(0 0 0 / 0.8);
+}
+
+.location-drop-shadow {
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.8));
+}
+
+// Same fade as the map node panel's banner.
+.location-banner {
+  mask-image: linear-gradient(to bottom, #000 35%, transparent);
+}

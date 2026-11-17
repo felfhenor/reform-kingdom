@@ -1,6 +1,10 @@
+import { signal } from '@angular/core';
 import { pluralize } from '@boringnode/pluralize';
 import { recipeStylizedName } from '@helpers/crafting/recipes';
-import { COMBAT_LOG_PERSIST_DELAY_MS } from '@helpers/config';
+import {
+  COMBAT_LOG_MAX_ENTRIES,
+  COMBAT_LOG_PERSIST_DELAY_MS,
+} from '@helpers/config';
 import { localStorageSignal } from '@helpers/engine/signal';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { rngUuid } from '@helpers/rng';
@@ -28,6 +32,9 @@ export const combatLog = localStorageSignal<CombatLog[]>(
   { persistDelayMs: COMBAT_LOG_PERSIST_DELAY_MS },
 );
 
+// Colosseum fights log here so the adventure log never sees them.
+export const combatSimulationLog = signal<CombatLog[]>([]);
+
 export function resetCombatLog() {
   combatLog.set([]);
 }
@@ -45,7 +52,9 @@ export function endCombatLogCommits() {
   const batch = pendingCombatLogMessages;
   pendingCombatLogMessages = null;
 
-  combatLog.update((logs) => [...batch, ...logs].slice(0, 500));
+  combatLog.update((logs) =>
+    [...batch, ...logs].slice(0, COMBAT_LOG_MAX_ENTRIES),
+  );
 }
 
 function pushLogEntry(unstampedEntry: CombatLog): void {
@@ -56,7 +65,7 @@ function pushLogEntry(unstampedEntry: CombatLog): void {
     return;
   }
 
-  combatLog.update((logs) => [entry, ...logs].slice(0, 500));
+  combatLog.update((logs) => [entry, ...logs].slice(0, COMBAT_LOG_MAX_ENTRIES));
 }
 
 export function combatFormatMessage(template: string, props: unknown): string {
@@ -79,6 +88,8 @@ export function combatMessageLog(
   actor?: Combatant,
   icons?: CombatLogIcon | CombatLogIcon[],
 ): void {
+  if (combat.simulation?.quiet) return;
+
   const combatants = [
     ...(combat.heroes ?? []),
     ...(combat.helpers ?? []),
@@ -92,7 +103,7 @@ export function combatMessageLog(
     spritesheet: (combatant.monsterId ? 'monster' : 'job') as AtlasedImage,
   }));
 
-  pushLogEntry({
+  const entry: CombatLog = {
     kind: 'Combat',
     combatId: combat.id,
     messageId: rngUuid(),
@@ -103,7 +114,16 @@ export function combatMessageLog(
     sprite: actor?.sprite,
     combatants,
     itemIcons: logIconList(icons),
-  });
+  };
+
+  if (combat.simulation) {
+    combatSimulationLog.update((logs) =>
+      [entry, ...logs].slice(0, COMBAT_LOG_MAX_ENTRIES),
+    );
+    return;
+  }
+
+  pushLogEntry(entry);
 }
 
 export function combatantStatusText(combatant: Combatant): string {

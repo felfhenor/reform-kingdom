@@ -33,6 +33,13 @@ export const URGENCY_WARNING_MIN_TICKS = 300; // 5 minutes
 // Combat
 
 export const COMBAT_ORDER_ROW_CAP = 10;
+export const COLOSSEUM_UNLOCK_LEVEL = 10;
+// A Colosseum fight still going after this many rounds can't be won (e.g. heals out-pacing damage).
+export const COLOSSEUM_MAX_ROUNDS = 200;
+// Whole simulated runs between UI yields; small enough that one chunk stays under a frame.
+export const COLOSSEUM_BATCH_CHUNK_RUNS = 5;
+// A watched Colosseum fight's pace at 1x; a manual fight plays one turn per step.
+export const COLOSSEUM_LIVE_STEP_MS = 1000;
 export const SKILL_MAX_ALLY_TARGETS = 4;
 export const COMBAT_ELEMENT_CHARGES_PER_ELEMENT = 2;
 // How long a resolved manual turn stays on screen so its damage numbers play out.
@@ -145,6 +152,7 @@ export const TICKS_PER_YIELD = 100;
 export const GAMELOOP_YIELD_BUDGET_MS = 12;
 // The adventure log is written to localStorage at most this often, not on every message - serializing 500 entries per line was a large share of tick time.
 export const COMBAT_LOG_PERSIST_DELAY_MS = 2000;
+export const COMBAT_LOG_MAX_ENTRIES = 500;
 
 export const ADVENTURE_LOG_OVERLAY_MAX_LINES = 15;
 // Ticks, not wall-clock time, so lines don't expire while the game is paused.

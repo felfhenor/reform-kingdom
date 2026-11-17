@@ -79,7 +79,7 @@ export function isCombatOver(combat: Combat): boolean {
   return allHeroesDead || allGuardiansDead;
 }
 
-function didHeroesWin(combat: Combat): boolean {
+export function didHeroesWin(combat: Combat): boolean {
   return combat.guardians.every((guardian) => combatantIsDead(guardian));
 }
 

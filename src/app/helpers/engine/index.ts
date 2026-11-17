@@ -11,6 +11,7 @@ export * from './electron-log';
 export * from './electron-log.ui';
 export * from './electron-window.ui';
 export * from './embed';
+export * from './feature-reveal';
 export * from './font.ui';
 export * from './gather-vfx';
 export * from './hero-level-up-vfx';

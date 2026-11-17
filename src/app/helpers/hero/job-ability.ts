@@ -180,6 +180,18 @@ export function jobAbilityValue(type: JobAbilityType): number {
   return partyJobAbilityValues()[type] ?? 0;
 }
 
+// Uncached, for a party that isn't the world's (e.g. Colosseum sim heroes).
+export function jobAbilityEntriesFor(
+  party: Character[],
+  type: JobAbilityType,
+): { character: Character; value: number }[] {
+  return party.flatMap((character) =>
+    characterJobAbilities(character)
+      .filter(({ ability }) => ability.type === type)
+      .map(({ value }) => ({ character, value })),
+  );
+}
+
 // One entry per party member who has an ability of `type`, at their current rank.
 export function jobAbilityEntries(
   type: JobAbilityType,

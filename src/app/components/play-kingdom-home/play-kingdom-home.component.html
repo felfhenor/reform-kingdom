@@ -363,6 +363,22 @@
             </button>
           }
 
+          @if (isFeatureAvailable('colosseum')) {
+            <button
+              class="btn btn-neutral btn-sm"
+              (click)="openSubview('colosseum')"
+              appSfx="ui-click"
+              [sfxOffset]="4"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              <app-icon-kingdom
+                [name]="nav.colosseum.icon"
+                class="zoom-inline"
+              />
+              {{ nav.colosseum.label }}
+            </button>
+          }
+
           @if (canReclass()) {
             <app-slot-button-container
               [disabled]="!isAtKingdomCurrently()"

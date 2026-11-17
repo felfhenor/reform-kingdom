@@ -16,6 +16,15 @@ export function runStatsCombatBegin(): void {
   pending = {};
 }
 
+// For simulated fights: hands back the round's stats without committing them.
+export function runStatsCombatTake(): Partial<
+  Record<CharacterId, HeroRunStats>
+> {
+  const taken = pending;
+  pending = {};
+  return taken;
+}
+
 function partyHeroId(
   combat: Combat,
   combatant: Combatant,

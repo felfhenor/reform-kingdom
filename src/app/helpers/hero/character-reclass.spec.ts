@@ -11,6 +11,7 @@ import { characterJobLevel } from '@helpers/hero/job';
 import {
   characterReclass,
   characterReclassCost,
+  characterReclassedTo,
   charactersReclass,
 } from '@helpers/hero/character-reclass';
 import {
@@ -526,5 +527,27 @@ describe('regalias', () => {
 
     expect(reclassed(0).equipment.Weapon?.id).toBe(spear.id);
     expect(reclassed(1).equipment.Weapon?.id).toBe(sword.id);
+  });
+});
+
+describe('characterReclassedTo', () => {
+  it('swaps job progress, seeds the tree and orders, and writes nothing', () => {
+    const jala = hero('Jala', {
+      level: 12,
+      jobProgress: {
+        [warriorId]: { level: 7, xp: { current: 3, maximum: 50 } },
+      },
+    });
+    seedWorld([jala]);
+
+    const copy = characterReclassedTo(jala, warriorId);
+
+    expect(copy.jobId).toBe(warriorId);
+    expect(copy.level).toBe(7);
+    expect(copy.jobProgress[explorerId]?.level).toBe(12);
+    expect(copy.skillTreeNodes[warriorId]).toContain(warriorStrikeNodeId);
+    expect(copy.combatOrders[warriorId]).toBeDefined();
+    expect(copy.equipment).toBe(jala.equipment);
+    expect(worldPartyState()[0]).toEqual(jala);
   });
 });

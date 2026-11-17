@@ -25,19 +25,25 @@ export function partyXpGainAmount(amount: number): number {
   return Math.round(amount * xpGainMultiplier());
 }
 
+export function partyHpFromCombat(
+  party: Character[],
+  heroes: Combatant[],
+): Character[] {
+  return party.map((character) => {
+    const combatant = heroes.find((hero) => hero.id === character.id);
+    if (!combatant) return character;
+
+    return {
+      ...character,
+      hp: clamp(combatant.hp, 0, character.stats.Health),
+      ep: clamp(combatant.ep, 0, character.stats.Energy),
+    };
+  });
+}
+
 export function syncPartyHpFromCombat(heroes: Combatant[]): void {
   updateGamestate((state) => {
-    state.world.party = state.world.party.map((character) => {
-      const combatant = heroes.find((hero) => hero.id === character.id);
-      if (!combatant) return character;
-
-      return {
-        ...character,
-        hp: clamp(combatant.hp, 0, character.stats.Health),
-        ep: clamp(combatant.ep, 0, character.stats.Energy),
-      };
-    });
-
+    state.world.party = partyHpFromCombat(state.world.party, heroes);
     return state;
   });
 }

@@ -19,6 +19,7 @@ export function combatAnalyzeTarget(
   technique: EquipmentSkillContentTechnique,
 ): void {
   if (!techniqueHasAttribute(technique, 'Analyzes')) return;
+  if (combat.simulation) return;
   if (caster.isEnemy || !target.isEnemy || !target.monsterId) return;
 
   const monsterId = target.monsterId as MonsterId;

@@ -19,6 +19,7 @@ import {
   healingTicksForLevel,
   healPartyToFull,
   partyGainXp,
+  partyHpFromCombat,
   partyXpGainAmount,
   retrofitPartyXp,
   syncPartyHpFromCombat,
@@ -309,5 +310,20 @@ describe('syncPartyHpFromCombat / healPartyToFull', () => {
       hp: jala.stats.Health,
       ep: jala.stats.Energy,
     });
+  });
+});
+
+describe('partyHpFromCombat', () => {
+  it('copies combat HP and EP onto matching heroes, clamped to their stats', () => {
+    const hero = buildCharacter({ name: 'Jala' });
+    const other = buildCharacter({ name: 'Bo' });
+    const [synced, untouched] = partyHpFromCombat(
+      [hero, other],
+      [buildHeroCombatant(hero, { hp: -5, ep: hero.stats.Energy + 50 })],
+    );
+
+    expect(synced.hp).toBe(0);
+    expect(synced.ep).toBe(hero.stats.Energy);
+    expect(untouched).toBe(other);
   });
 });

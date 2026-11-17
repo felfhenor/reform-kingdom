@@ -280,6 +280,22 @@ export function combatManualActiveHero(combat: Combat): Combatant | undefined {
 }
 
 // Only lands on the turn it was planned for, so a late double-click can't order the next one.
+export function combatManualApply(
+  combat: Combat,
+  planned: Combat,
+  action?: CombatManualAction,
+  flee = false,
+): void {
+  if (
+    !combatManualAwaitingOrders(combat) ||
+    combatManualTurnKey(combat) !== combatManualTurnKey(planned)
+  ) {
+    return;
+  }
+  combat.manualAction = action;
+  if (flee) combat.manualFlee = true;
+}
+
 export function combatManualConfirm(
   planned: Combat,
   action?: CombatManualAction,
@@ -287,14 +303,7 @@ export function combatManualConfirm(
 ): void {
   updateGamestate((state) => {
     const combat = state.world.combat;
-    if (
-      combat &&
-      combatManualAwaitingOrders(combat) &&
-      combatManualTurnKey(combat) === combatManualTurnKey(planned)
-    ) {
-      combat.manualAction = action;
-      if (flee) combat.manualFlee = true;
-    }
+    if (combat) combatManualApply(combat, planned, action, flee);
     return state;
   });
   analyticsSendDesignEvent(

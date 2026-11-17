@@ -20,6 +20,7 @@ import { defaultHeroRunStats, defaultStats } from '@helpers/defaults';
 import {
   runStatsCombatBegin,
   runStatsCombatFlush,
+  runStatsCombatTake,
   runStatsCreditHeroId,
   runStatsMergeHero,
   runStatsRecordHit,
@@ -245,5 +246,16 @@ describe('runStatsMergeHero', () => {
     });
     expect(into.kills).toBe(2);
     expect(into.skillUses).toEqual({ Fire: 1 });
+  });
+});
+
+describe('runStatsCombatTake', () => {
+  it('hands back the round without committing it, and clears it', () => {
+    const { combat, hero, enemy } = setup();
+    runStatsRecordHit(combat, hero, enemy, hit(12));
+
+    expect(runStatsCombatTake()[heroId]?.damageDealt).toBe(12);
+    expect(runStatsCombatTake()).toEqual({});
+    expect(gamestate().runStats.heroes[heroId]).toBeUndefined();
   });
 });

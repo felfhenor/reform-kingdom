@@ -1,6 +1,8 @@
 import { hasAnyCommission } from '@helpers/commission/commission-tick.ui';
+import { COLOSSEUM_UNLOCK_LEVEL } from '@helpers/config';
 import { getEntriesByType } from '@helpers/content/content';
 import { edictsActive } from '@helpers/edict/edict';
+import { isRevealedAtLevel } from '@helpers/engine/feature-reveal';
 import { kingdomSubviewForTradeskill } from '@helpers/engine/ui';
 import { isInfusionUnlocked } from '@helpers/item/infusion';
 import { isReforgeUnlocked } from '@helpers/item/reforge';
@@ -71,6 +73,12 @@ export const KINGDOM_FEATURE_NAV: Record<
     icon: 'edicts',
     group: 'actions',
     isAvailable: () => edictsActive().length > 0,
+  },
+  colosseum: {
+    label: 'Colosseum',
+    icon: 'colosseum',
+    group: 'actions',
+    isAvailable: () => isRevealedAtLevel(COLOSSEUM_UNLOCK_LEVEL),
   },
 };
 

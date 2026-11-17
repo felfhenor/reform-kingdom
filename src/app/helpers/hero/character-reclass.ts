@@ -71,6 +71,20 @@ function characterJobProgressSwap(
   return { jobProgress, level, xp };
 }
 
+// The hero as they'd be in `jobId`: that job's saved progress, tree and orders. Gear and stats are left to the caller.
+export function characterReclassedTo(
+  character: Character,
+  jobId: JobId,
+): Character {
+  return {
+    ...character,
+    jobId,
+    ...characterJobProgressSwap(character, jobId),
+    ...characterSkillTreeSeeded(character, jobId),
+    combatOrders: combatOrdersWithJobDefaults(character.combatOrders, jobId),
+  };
+}
+
 // No displacement bookkeeping needed since every target slot starts empty.
 function applyOptimizationWinners(
   armory: EquipmentItem[],
@@ -107,15 +121,7 @@ function reclassCharacterStart(
   applyMaterialDelta(state, goldId, -cost);
   stateCharacterUnequipForRegalia(state, characterId);
 
-  const { jobProgress, level, xp } = characterJobProgressSwap(character, jobId);
-  Object.assign(character, { jobId, jobProgress, level, xp });
-  const seeded = characterSkillTreeSeeded(character, jobId);
-  character.skillTreeNodes[jobId] = seeded.skillTreeNodes[jobId];
-  character.skillTreeVersions[jobId] = seeded.skillTreeVersions[jobId];
-  character.combatOrders = combatOrdersWithJobDefaults(
-    character.combatOrders,
-    jobId,
-  );
+  Object.assign(character, characterReclassedTo(character, jobId));
   return true;
 }
 

@@ -46,6 +46,10 @@ export function combatIsManual(): boolean {
   );
 }
 
+export function combatIsManualFor(combat: Combat): boolean {
+  return combat.simulation ? combat.simulation.manual : combatIsManual();
+}
+
 export function combatantTakesOrders(
   combat: Combat,
   combatant: Combatant,
@@ -53,7 +57,7 @@ export function combatantTakesOrders(
   return (
     !combatant.summonerId &&
     combat.heroes.includes(combatant) &&
-    combatIsManual()
+    combatIsManualFor(combat)
   );
 }
 
@@ -97,7 +101,7 @@ export function combatManualAwaitingOrders(combat: Combat): boolean {
     !!combat.turnQueue?.[0]?.awaitingOrders &&
     !combat.manualAction &&
     !combat.manualFlee &&
-    combatIsManual()
+    combatIsManualFor(combat)
   );
 }
 

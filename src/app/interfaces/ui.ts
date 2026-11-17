@@ -16,6 +16,11 @@ export type ProgressBarSize = 'default' | 'sm' | 'md';
 
 export type BlankSlateSize = 'inline' | 'page';
 
+export interface SplitButtonOption<T> {
+  value: T;
+  label: string;
+}
+
 export type GamePlayView =
   'world' | 'kingdom' | 'adventurelog' | 'heroes' | 'decree' | 'town';
 
@@ -35,7 +40,8 @@ export type KingdomSubview =
   | 'tradeskill-jewelcrafting'
   | 'tradeskill-tailoring'
   | 'tradeskill-woodworking'
-  | 'workers';
+  | 'workers'
+  | 'colosseum';
 
 export type KingdomFeatureSubview = Exclude<
   KingdomSubview,

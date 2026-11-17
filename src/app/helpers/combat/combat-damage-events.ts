@@ -1,4 +1,8 @@
 import { signal } from '@angular/core';
+import {
+  combatEventKey,
+  combatEventsMuted,
+} from '@helpers/combat/combat-event-scope';
 import { isPageVisible } from '@helpers/engine/page-visibility';
 import { rngUuid } from '@helpers/rng';
 import type { CombatantDamageEvent, DamageEventVariant } from '@interfaces';
@@ -11,10 +15,15 @@ export function combatantDamageEventEmit(
   amount: number,
   variant?: DamageEventVariant,
 ): void {
-  if (!isPageVisible()) return;
+  if (!isPageVisible() || combatEventsMuted()) return;
 
   combatantDamageEvents.update((events) => [
     ...events,
-    { id: rngUuid(), combatantId, amount, variant },
+    {
+      id: rngUuid(),
+      combatantId: combatEventKey(combatantId),
+      amount,
+      variant,
+    },
   ]);
 }

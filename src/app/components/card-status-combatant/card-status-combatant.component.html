@@ -29,7 +29,8 @@
   [class.expanded]="isExpanded"
   [class.dead]="data.isDead"
 >
-  @let damageNumbers = damageNumbersByCombatant().get(data.combatantId);
+  @let damageNumbers =
+    damageNumbersByCombatant().get(eventKeyPrefix() + data.combatantId);
   @if (damageNumbers && damageNumbers.length > 0) {
     <!-- Spans the full card width so each number's left jitter is relative to the card at any expand state. -->
     <div
@@ -123,7 +124,9 @@
         <!-- Always rendered (fixed height) so a skill flashing in/out never reflows the name/subtitle above it. -->
         <span class="flex items-center h-[16px]">
           @for (
-            skillCast of skillCastByCombatant().get(data.combatantId) ?? [];
+            skillCast of skillCastByCombatant().get(
+              eventKeyPrefix() + data.combatantId
+            ) ?? [];
             track skillCast.id
           ) {
             <span class="skill-cast">

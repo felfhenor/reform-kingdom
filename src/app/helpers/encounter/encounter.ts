@@ -5,6 +5,7 @@ import { getEntry } from '@helpers/content/content';
 import { rngNumberRange } from '@helpers/rng';
 import { updateGamestate, worldPartyState } from '@helpers/state-game';
 import type {
+  Character,
   Combat,
   EncounterContent,
   EncounterId,
@@ -16,6 +17,7 @@ export function encounterCreateFightCombat(
   encounterId: EncounterId,
   fightIndex: number,
   locationName: string,
+  party: Character[] = worldPartyState(),
 ): Combat | undefined {
   const encounter = getEntry<EncounterContent>(encounterId);
   if (!encounter) return undefined;
@@ -33,12 +35,7 @@ export function encounterCreateFightCombat(
   );
 
   return {
-    ...combatCreateForEncounter(
-      worldPartyState(),
-      monsters,
-      encounterLevel,
-      locationName,
-    ),
+    ...combatCreateForEncounter(party, monsters, encounterLevel, locationName),
     encounterId,
     fightIndex,
   };

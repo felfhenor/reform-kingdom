@@ -267,6 +267,19 @@ export type Combat = {
   heroDiedCovering?: boolean;
   // A hero's reflected damage killed an enemy.
   heroRetaliationKill?: boolean;
+  // Set on Colosseum fights, which never touch world state.
+  simulation?: CombatSimulation;
+};
+
+export type CombatEventScope = {
+  keyPrefix: string;
+  muted: boolean;
+};
+
+export type CombatSimulation = {
+  manual: boolean;
+  // Batch runs skip logging and status-card events entirely.
+  quiet: boolean;
 };
 
 export type CombatTurn = {

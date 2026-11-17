@@ -4,6 +4,7 @@ import {
   characterJobAbilities,
   characterJobAbilityValue,
   jobAbilityEntries,
+  jobAbilityEntriesFor,
   jobAbilityHighest,
   jobAbilityStacks,
   jobAbilityValue,
@@ -274,5 +275,18 @@ describe('jobAbilityHighest', () => {
     seedParty([buildAbilityHero('Plain', 30)]);
 
     expect(jobAbilityHighest('Intimidation')).toBeUndefined();
+  });
+});
+
+describe('jobAbilityEntriesFor', () => {
+  it('reads the given party rather than the world one', () => {
+    seedContent([...warrior, ...plain]);
+    seedParty([buildAbilityHero('Plain', 30)]);
+    const sim = buildAbilityHero('Warrior', 25);
+
+    expect(jobAbilityEntriesFor([sim], 'Intimidation')).toEqual([
+      { character: sim, value: -12 },
+    ]);
+    expect(jobAbilityEntries('Intimidation')).toEqual([]);
   });
 });

@@ -52,7 +52,7 @@ export function achievementCards({
       heading: 'Achievements',
       name: '',
       count: cards.length,
-      description: `You have earned: ${cards.map((c) => c.name).join(',')}`,
+      description: `You have earned: ${cards.map((c) => c.name).join(', ')}`,
     },
   ];
 }

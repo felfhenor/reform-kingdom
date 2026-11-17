@@ -1,5 +1,6 @@
 export * from './achievement';
 export * from './caravan';
+export * from './colosseum';
 export * from './combat';
 export * from './commission';
 export * from './config';

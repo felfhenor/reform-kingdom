@@ -11,7 +11,7 @@ import {
 } from '@helpers/combat/combat-log';
 import {
   combatantTakesOrders,
-  combatIsManual,
+  combatIsManualFor,
   combatManualAwaitingOrders,
   combatManualEscaped,
   combatManualNeedsOrders,
@@ -259,9 +259,7 @@ export function combatDoCombatIteration(): void {
   beginCombatLogCommits();
   runStatsCombatBegin();
 
-  const escaped = combatIsManual()
-    ? combatDoManualStep(combat)
-    : combatDoRound(combat);
+  const escaped = combatStep(combat);
   if (escaped) combatMessageLog(combat, 'The party escaped!');
   gamestateFreezeSubtree(combat);
   updateGamestate((state) => {
@@ -271,9 +269,17 @@ export function combatDoCombatIteration(): void {
   });
 
   // Manual fights end on the next tick so the overlay can show the killing blow's state first.
-  if (!escaped && !combatIsManual()) combatCheckIfOver(combat);
+  if (!escaped && !combatIsManualFor(combat)) combatCheckIfOver(combat);
 
   endCombatLogCommits();
+}
+
+// Plays one tick of a fight in place and returns whether the party escaped; a manual hero awaiting orders holds it.
+export function combatStep(combat: Combat): boolean {
+  if (combatManualAwaitingOrders(combat)) return false;
+  return combatIsManualFor(combat)
+    ? combatDoManualStep(combat)
+    : combatDoRound(combat);
 }
 
 // Picks up where a manual fight left a round half-played.

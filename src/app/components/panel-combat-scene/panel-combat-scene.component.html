@@ -1,0 +1,270 @@
+@if (combat(); as fight) {
+  <div class="absolute inset-0 overflow-hidden">
+    @if (backdrop(); as bd) {
+      <!-- Only the combat review eases its dim off; a node panel swapping tints would flash. -->
+      <app-backdrop-node
+        class="absolute inset-0 transition-[filter] duration-[600ms]"
+        [background]="bd.background"
+        [filter]="bd.backgroundFilter ?? 'None'"
+        [clear]="isReview()"
+      />
+    }
+    <div class="combat-vignette"></div>
+  </div>
+
+  <div class="card-body relative flex flex-col gap-2 p-4">
+    <ng-content select="[sceneHelp]" />
+
+    <h2 class="type-page-title combat-text-shadow justify-center text-center">
+      {{ title() }}
+    </h2>
+    <p class="type-flavor combat-text-shadow text-center tabular-nums">
+      @if (isReview()) {
+        {{ isVictory() ? 'Victory' : 'Combat over' }}
+      } @else {
+        Round {{ fight.rounds + 1 | number }}
+      }
+    </p>
+
+    <div class="flex gap-4 h-[736px] shrink-0">
+      <div class="flex flex-col gap-2 w-[856px] shrink-0">
+        <!-- Padding keeps the hover glow inside the clip, which hard-cuts a long order. -->
+        @if (!isReview()) {
+          <div
+            class="glass flex items-center h-[72px] pr-3 shrink-0 overflow-hidden"
+            [class.turn-bar-instant]="isMotionReduced()"
+            appListReflow
+          >
+            @for (slot of turnOrder(); track slot.key; let first = $first) {
+              <div
+                class="flex items-center shrink-0"
+                (animate.leave)="onTurnSlotLeave($event)"
+              >
+                <span
+                  class="turn-slot-connector h-px shrink-0 bg-base-content/40"
+                  [class.turn-slot-connector-hidden]="first"
+                ></span>
+                @if (slot.kind === 'divider') {
+                  <span
+                    class="type-meta text-lighter whitespace-nowrap tabular-nums px-2"
+                  >
+                    Round {{ slot.round | number }}
+                  </span>
+                } @else {
+                  <div
+                    class="turn-slot shrink-0 border"
+                    [class.turn-slot-leader]="first"
+                    [class.border-error]="slot.isEnemy"
+                    [class.border-base-content/40]="!slot.isEnemy"
+                    [class.ring-2]="hoveredId() === slot.id"
+                    [class.ring-warning]="hoveredId() === slot.id"
+                    [class.shadow-[0_0_8px_var(--color-warning)]]="
+                      hoveredId() === slot.id
+                    "
+                    [tp]="slot.name"
+                  >
+                    <app-slot-icon-blank class="zoom-row block">
+                      <app-atlas-image
+                        [spritesheet]="slot.icon.spritesheet"
+                        [assetName]="slot.icon.sprite"
+                      />
+                    </app-slot-icon-blank>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        <div
+          class="flex flex-wrap justify-center content-start gap-4 h-[300px] shrink-0"
+        >
+          @if (!isReview()) {
+            @for (enemy of fight.guardians; track enemy.id) {
+              @let targetable = targetableIds().has(enemy.id);
+              <button
+                type="button"
+                class="p-1 border-2"
+                [class.border-warning]="targetable"
+                [class.cursor-pointer]="targetable"
+                [class.border-transparent]="!targetable"
+                [class.cursor-default]="!targetable"
+                [class.opacity-50]="!!pendingOption() && !targetable"
+                (click)="clickCombatant(enemy)"
+                (mouseenter)="hoveredId.set(enemy.id)"
+                (mouseleave)="hoveredId.set(undefined)"
+                appSfx="ui-click"
+                [sfxTrigger]="['click', 'hover']"
+              >
+                <app-card-status-combatant
+                  [entry]="cardFor(enemy)"
+                  [expanded]="true"
+                  [effectsBelow]="true"
+                  [eventKeyPrefix]="eventKeyPrefix()"
+                  [reserveElementTag]="true"
+                  [elementTag]="enemyElementTags().get(enemy.id)"
+                />
+              </button>
+            }
+          }
+        </div>
+
+        <div
+          class="flex flex-wrap justify-center content-start gap-4 h-[348px] shrink-0"
+        >
+          @for (ally of allies(); track ally.id) {
+            @let targetable = targetableIds().has(ally.id);
+            <button
+              type="button"
+              class="p-1 border-2 text-left"
+              [class.border-warning]="targetable"
+              [class.border-primary]="!targetable && activeHero() === ally"
+              [class.border-transparent]="!targetable && activeHero() !== ally"
+              [class.cursor-pointer]="targetable"
+              [class.cursor-default]="!targetable"
+              [disabled]="isResolving() || isReview()"
+              (click)="clickCombatant(ally)"
+              (mouseenter)="hoveredId.set(ally.id)"
+              (mouseleave)="hoveredId.set(undefined)"
+              appSfx="ui-click"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              <app-card-status-combatant
+                [entry]="cardFor(ally)"
+                [expanded]="true"
+                [effectsBelow]="true"
+                [eventKeyPrefix]="eventKeyPrefix()"
+              />
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2 flex-1 min-w-0">
+        <div
+          #logBox
+          class="glass-scrim min-h-0 overflow-y-auto px-3 py-2 text-sm select-text"
+          [class.h-[328px]]="!isReview()"
+          [class.flex-1]="isReview()"
+        >
+          @for (entry of logEntries(); track entry.messageId) {
+            <div class="leading-5">
+              <app-adventure-log-message [entry]="entry" />
+            </div>
+          }
+        </div>
+
+        @if (!isReview()) {
+          <div class="flex items-center gap-2 h-8 shrink-0">
+            <span
+              class="type-label combat-text-shadow flex-1 truncate"
+              [class.invisible]="isResolving()"
+            >
+              {{ activeHero()?.name }}
+            </span>
+            <app-status-element-pool
+              [combat]="fight"
+              [expanded]="true"
+              [horizontal]="true"
+            />
+          </div>
+
+          <div
+            class="glass grid grid-cols-2 gap-2 content-start h-[352px] p-2 shrink-0 overflow-y-auto"
+          >
+            @if (!isResolving() && activeHero(); as hero) {
+              @for (option of skillOptions(); track option.skill.id) {
+                <app-tooltip-skill-preview
+                  #preview
+                  [display]="option.skill"
+                  [displayCombatant]="hero"
+                />
+                <button
+                  type="button"
+                  class="flex items-center gap-2 h-12 px-2 bg-black/30 border border-white/15 hover:border-primary text-left"
+                  [class.border-primary]="pendingSkillId() === option.skill.id"
+                  [class.border-info]="previousSkillId() === option.skill.id"
+                  [class.bg-primary]="pendingSkillId() === option.skill.id"
+                  [class.text-primary-content]="
+                    pendingSkillId() === option.skill.id
+                  "
+                  [class.cursor-pointer]="!option.disabledReason"
+                  [class.cursor-not-allowed]="!!option.disabledReason"
+                  [class.opacity-50]="!!option.disabledReason"
+                  [tp]="preview.template()"
+                  [tpPlacement]="'top'"
+                  (click)="pickSkill(option)"
+                  (mouseenter)="hoveredSkillId.set(option.skill.id)"
+                  (mouseleave)="hoveredSkillId.set(undefined)"
+                  appSfx="ui-click"
+                  [sfxTrigger]="['click', 'hover']"
+                >
+                  <app-atlas-image
+                    class="zoom-row shrink-0"
+                    spritesheet="skill"
+                    [assetName]="option.skill.sprite"
+                  />
+                  <span class="flex flex-col flex-1 min-w-0">
+                    <span class="font-semibold whitespace-nowrap truncate">
+                      {{ option.skill.name }}
+                    </span>
+                    @if (option.disabledReason; as reason) {
+                      <span class="type-meta text-error truncate">
+                        {{ reason }}
+                      </span>
+                    } @else {
+                      <span class="type-meta flex items-center gap-2 truncate">
+                        <app-icon name="gameTargeted" size="inline" />
+                        @if (option.targetCount === undefined) {
+                          Self
+                        } @else {
+                          {{ option.targetCount | number }}
+                        }
+                        @switch (skillElementHints().get(option.skill.id)) {
+                          @case ('Weak') {
+                            <span
+                              class="badge badge-xs badge-difficulty-Easy"
+                              (animate.enter)="onTagEnter($event)"
+                              (animate.leave)="onSlotLeave($event)"
+                            >
+                              WEAK
+                            </span>
+                          }
+                          @case ('Resist') {
+                            <span
+                              class="badge badge-xs badge-difficulty-Hard"
+                              (animate.enter)="onTagEnter($event)"
+                              (animate.leave)="onSlotLeave($event)"
+                            >
+                              RESIST
+                            </span>
+                          }
+                        }
+                      </span>
+                    }
+                  </span>
+                  @if (option.epCost > 0) {
+                    <span class="text-xs whitespace-nowrap shrink-0 text-ep">
+                      {{ option.epCost | number }} EP
+                    </span>
+                  }
+                </button>
+              }
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2 h-12 shrink-0">
+      @let current = status();
+      <div class="alert py-2 w-1/2 min-w-0" [class]="current.tone">
+        <span class="truncate">{{ current.text }}</span>
+        <ng-content select="[sceneStatusAction]" />
+      </div>
+
+      <span class="flex-1"></span>
+      <ng-content select="[sceneActions]" />
+    </div>
+  </div>
+}

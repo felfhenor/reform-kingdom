@@ -1,4 +1,8 @@
 import { signal } from '@angular/core';
+import {
+  combatEventKey,
+  combatEventsMuted,
+} from '@helpers/combat/combat-event-scope';
 import { isPageVisible } from '@helpers/engine/page-visibility';
 import { rngUuid } from '@helpers/rng';
 import type { CombatantSkillCastEvent } from '@interfaces';
@@ -12,10 +16,15 @@ export function combatantSkillCastEventEmit(
   skillName: string,
   skillSprite: string,
 ): void {
-  if (!isPageVisible()) return;
+  if (!isPageVisible() || combatEventsMuted()) return;
 
   combatantSkillCastEvents.update((events) => [
     ...events,
-    { id: rngUuid(), combatantId, skillName, skillSprite },
+    {
+      id: rngUuid(),
+      combatantId: combatEventKey(combatantId),
+      skillName,
+      skillSprite,
+    },
   ]);
 }
