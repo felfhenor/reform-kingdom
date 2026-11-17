@@ -41,6 +41,7 @@ import { AnimationService } from '@services/animation.service';
 
           @if (helpers().length > 0) {
             <app-status-encounter-combatants
+              [class]="poolInset()"
               [combatants]="helpers()"
               [expanded]="isExpanded()"
             ></app-status-encounter-combatants>
@@ -48,6 +49,7 @@ import { AnimationService } from '@services/animation.service';
 
           @if (guardians().length > 0) {
             <app-status-encounter-combatants
+              [class]="poolInset()"
               [combatants]="guardians()"
               [expanded]="isExpanded()"
               [slideIn]="true"
@@ -83,6 +85,9 @@ export class StatusEncounterComponent {
   public isExpanded = computed(
     () => getOption('partyViewAlwaysExpand') || this.isHovered(),
   );
+
+  // Pool width (2 charges + gap) plus the hero row's gap-4, so enemy cards line up with hero cards.
+  public poolInset = computed(() => (this.isExpanded() ? 'pl-20' : 'pl-16'));
 
   public anim = inject(AnimationService);
 
