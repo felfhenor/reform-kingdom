@@ -23,19 +23,19 @@ import { SFXDirective } from '@directives/sfx.directive';
 import { TutorialTargetDirective } from '@directives/tutorial-target.directive';
 import { getEntry } from '@helpers/content/content';
 import { formatDuration } from '@helpers/engine/timer';
+import { travelTicksRemaining } from '@helpers/hero/travel-progress';
 import { goldCoinId } from '@helpers/item/materials';
 import { discoveredWorkersState, workersState } from '@helpers/state-game';
 import { isWorkerCombatNode } from '@helpers/worker/worker-combat';
 import { workerCraftRemainingTicks } from '@helpers/worker/worker-crafting.ui';
 import {
+  kingdomWorkerStatsForLevel,
   workerIsReadyToLevelUp,
   workerLevelUpCost,
-  kingdomWorkerStatsForLevel,
   workerStatsForLevel,
 } from '@helpers/worker/worker-progression';
 import { workerLevelUp } from '@helpers/worker/worker-progression.ui';
 import { workerRecall } from '@helpers/worker/worker-travel';
-import { travelTicksRemaining } from '@helpers/hero/travel-progress';
 import {
   isWorldNodeTypeRemoved,
   kingdomNodeGet,
@@ -131,7 +131,9 @@ export class PlayKingdomWorkersComponent {
     Math.floor(this.selectedStats()?.capacity ?? 0),
   );
 
-  public stamina = computed(() => this.selectedStats()?.stamina ?? 0);
+  public stamina = computed(() =>
+    Math.floor(this.selectedStats()?.stamina ?? 0),
+  );
 
   public statusLabel = computed(() => {
     const entry = this.selectedEntry();
