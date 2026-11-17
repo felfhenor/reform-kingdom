@@ -28,53 +28,52 @@
 
     <div class="flex gap-4 h-[736px] shrink-0">
       <div class="flex flex-col gap-2 w-[856px] shrink-0">
-        <!-- Padding keeps the hover glow inside the clip, which hard-cuts a long order. -->
-        @if (!isReview()) {
-          <div
-            class="glass flex items-center h-[72px] pr-3 shrink-0 overflow-hidden"
-            [class.turn-bar-instant]="isMotionReduced()"
-            appListReflow
-          >
-            @for (slot of turnOrder(); track slot.key; let first = $first) {
-              <div
-                class="flex items-center shrink-0"
-                (animate.leave)="onTurnSlotLeave($event)"
-              >
+        <!-- Padding keeps the hover glow inside the clip, which hard-cuts a long order; only hidden in review, since removal lets slot leave animations shift the party. -->
+        <div
+          class="glass flex items-center h-[72px] pr-3 shrink-0 overflow-hidden"
+          [class.invisible]="isReview()"
+          [class.turn-bar-instant]="isMotionReduced()"
+          appListReflow
+        >
+          @for (slot of turnOrder(); track slot.key; let first = $first) {
+            <div
+              class="flex items-center shrink-0"
+              (animate.leave)="onTurnSlotLeave($event)"
+            >
+              <span
+                class="turn-slot-connector h-px shrink-0 bg-base-content/40"
+                [class.turn-slot-connector-hidden]="first"
+              ></span>
+              @if (slot.kind === 'divider') {
                 <span
-                  class="turn-slot-connector h-px shrink-0 bg-base-content/40"
-                  [class.turn-slot-connector-hidden]="first"
-                ></span>
-                @if (slot.kind === 'divider') {
-                  <span
-                    class="type-meta text-lighter whitespace-nowrap tabular-nums px-2"
-                  >
-                    Round {{ slot.round | number }}
-                  </span>
-                } @else {
-                  <div
-                    class="turn-slot shrink-0 border"
-                    [class.turn-slot-leader]="first"
-                    [class.border-error]="slot.isEnemy"
-                    [class.border-base-content/40]="!slot.isEnemy"
-                    [class.ring-2]="hoveredId() === slot.id"
-                    [class.ring-warning]="hoveredId() === slot.id"
-                    [class.shadow-[0_0_8px_var(--color-warning)]]="
-                      hoveredId() === slot.id
-                    "
-                    [tp]="slot.name"
-                  >
-                    <app-slot-icon-blank class="zoom-row block">
-                      <app-atlas-image
-                        [spritesheet]="slot.icon.spritesheet"
-                        [assetName]="slot.icon.sprite"
-                      />
-                    </app-slot-icon-blank>
-                  </div>
-                }
-              </div>
-            }
-          </div>
-        }
+                  class="type-meta text-lighter whitespace-nowrap tabular-nums px-2"
+                >
+                  Round {{ slot.round | number }}
+                </span>
+              } @else {
+                <div
+                  class="turn-slot shrink-0 border"
+                  [class.turn-slot-leader]="first"
+                  [class.border-error]="slot.isEnemy"
+                  [class.border-base-content/40]="!slot.isEnemy"
+                  [class.ring-2]="hoveredId() === slot.id"
+                  [class.ring-warning]="hoveredId() === slot.id"
+                  [class.shadow-[0_0_8px_var(--color-warning)]]="
+                    hoveredId() === slot.id
+                  "
+                  [tp]="slot.name"
+                >
+                  <app-slot-icon-blank class="zoom-row block">
+                    <app-atlas-image
+                      [spritesheet]="slot.icon.spritesheet"
+                      [assetName]="slot.icon.sprite"
+                    />
+                  </app-slot-icon-blank>
+                </div>
+              }
+            </div>
+          }
+        </div>
 
         <div
           class="flex flex-wrap justify-center content-start gap-4 h-[300px] shrink-0"
@@ -86,6 +85,7 @@
                 type="button"
                 class="p-1 border-2"
                 [class.border-warning]="targetable"
+                [class.target-ring]="targetable"
                 [class.cursor-pointer]="targetable"
                 [class.border-transparent]="!targetable"
                 [class.cursor-default]="!targetable"
@@ -118,6 +118,7 @@
               type="button"
               class="p-1 border-2 text-left"
               [class.border-warning]="targetable"
+              [class.target-ring]="targetable"
               [class.border-primary]="!targetable && activeHero() === ally"
               [class.border-transparent]="!targetable && activeHero() !== ally"
               [class.cursor-pointer]="targetable"
@@ -181,9 +182,13 @@
                 />
                 <button
                   type="button"
-                  class="flex items-center gap-2 h-12 px-2 bg-black/30 border border-white/15 hover:border-primary text-left"
+                  class="flex items-center gap-2 h-12 px-2 bg-black/30 border hover:border-primary text-left"
                   [class.border-primary]="pendingSkillId() === option.skill.id"
                   [class.border-info]="previousSkillId() === option.skill.id"
+                  [class.border-white/15]="
+                    pendingSkillId() !== option.skill.id &&
+                    previousSkillId() !== option.skill.id
+                  "
                   [class.bg-primary]="pendingSkillId() === option.skill.id"
                   [class.text-primary-content]="
                     pendingSkillId() === option.skill.id
@@ -258,8 +263,12 @@
 
     <div class="flex items-center gap-2 h-12 shrink-0">
       @let current = status();
-      <div class="alert py-2 w-1/2 min-w-0" [class]="current.tone">
-        <span class="truncate">{{ current.text }}</span>
+      <div
+        class="alert py-2 w-1/2 min-w-0"
+        [class]="current?.tone"
+        [class.invisible]="!current"
+      >
+        <span class="truncate">{{ current?.text }}</span>
         <ng-content select="[sceneStatusAction]" />
       </div>
 

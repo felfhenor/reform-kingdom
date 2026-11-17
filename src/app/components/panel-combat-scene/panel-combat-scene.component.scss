@@ -71,3 +71,8 @@
     0 1px 2px #000,
     0 0 6px rgb(0 0 0 / 0.8);
 }
+
+// A dark halo keeps the yellow target border readable on light backdrops like sand.
+.target-ring {
+  box-shadow: 0 0 0 2px rgb(0 0 0 / 0.85);
+}

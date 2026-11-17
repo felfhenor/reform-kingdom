@@ -291,7 +291,12 @@ function combatDoRound(combat: Combat): boolean {
 
 // One turn per tick so each lands on screen; the skipped turns of the dead ride along with the next.
 function combatDoManualStep(combat: Combat): boolean {
-  const queue = (combat.turnQueue ??= combatBeginRound(combat));
+  // Opening a round takes its own tick, so the new order is on screen before anyone acts.
+  if (!combat.turnQueue) {
+    combat.turnQueue = combatBeginRound(combat);
+    return false;
+  }
+  const queue = combat.turnQueue;
   let outcome: CombatQueuedTurnOutcome = 'skipped';
   while (outcome === 'skipped' && queue.length > 0) {
     outcome = combatTakeQueuedTurn(combat, queue);

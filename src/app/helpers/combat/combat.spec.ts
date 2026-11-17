@@ -195,8 +195,12 @@ describe('combatDoCombatIteration', () => {
 
     const casters = () => combatantSkillCastEvents().map((e) => e.combatantId);
 
-    it('plays one turn per tick', () => {
+    it('opens a round on its own tick, then plays one turn per tick', () => {
       manualFight({ guardians: [foe('fast', 10), foe('slow')] });
+
+      inTick(combatDoCombatIteration);
+      expect(casters()).toEqual([]);
+      expect(worldCombatState()?.turnQueue).toHaveLength(2);
 
       inTick(combatDoCombatIteration);
       expect(casters()).toEqual(['fast']);
@@ -220,6 +224,7 @@ describe('combatDoCombatIteration', () => {
       manualFight({ heroes: [caster()] });
 
       inTick(combatDoCombatIteration);
+      inTick(combatDoCombatIteration);
       const waiting = worldCombatState();
       expect(waiting?.turnQueue?.[0]).toMatchObject({ awaitingOrders: true });
 
@@ -239,6 +244,7 @@ describe('combatDoCombatIteration', () => {
       manualFight({ heroes: [caster()] });
 
       inTick(combatDoCombatIteration);
+      inTick(combatDoCombatIteration);
       order();
       inTick(combatDoCombatIteration);
       expect(worldCombatState()?.turnQueue).toEqual([
@@ -256,6 +262,7 @@ describe('combatDoCombatIteration', () => {
       vi.mocked(combatantIsDead).mockImplementation((c) => c.id === 'dead');
       manualFight({ guardians: [foe('dead', 10), foe('alive')] });
 
+      inTick(combatDoCombatIteration);
       inTick(combatDoCombatIteration);
       expect(casters()).toEqual(['alive']);
       expect(worldCombatState()).toMatchObject({ rounds: 1 });

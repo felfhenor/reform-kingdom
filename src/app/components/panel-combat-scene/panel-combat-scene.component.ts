@@ -40,7 +40,8 @@ import {
   COMBAT_MANUAL_TURN_HOLD_MS,
 } from '@helpers/config';
 import { isMotionReduced } from '@helpers/engine/motion';
-import { playGameSFX } from '@helpers/engine/sfx';
+import { modalHasAnyOpen } from '@helpers/engine/modal-stack';
+import { playGameSFX, playSFX } from '@helpers/engine/sfx';
 import { combatNodeBackground } from '@helpers/world-node/world-node-background.ui';
 import type {
   Combat,
@@ -220,9 +221,7 @@ export class PanelCombatSceneComponent {
     if (this.paused()) {
       return { tone: 'alert-warning', text: 'The game is paused.' };
     }
-    if (this.isResolving() || !hero) {
-      return { tone: 'alert-info', text: 'Resolving...' };
-    }
+    if (this.isResolving() || !hero) return undefined;
     if (option) {
       return {
         tone: 'alert-info',
@@ -243,11 +242,12 @@ export class PanelCombatSceneComponent {
 
     let holdTimer: ReturnType<typeof setTimeout> | undefined;
     inject(DestroyRef).onDestroy(() => clearTimeout(holdTimer));
-    const hold = (then: () => void) => {
+    // Lands on the latest state, so ticks arriving mid-hold neither restart it nor get skipped past.
+    const hold = () => {
       clearTimeout(holdTimer);
       this.isSettling.set(true);
       holdTimer = setTimeout(() => {
-        then();
+        this.shownCombat.set(this.latestLive);
         this.isSettling.set(false);
       }, COMBAT_MANUAL_TURN_HOLD_MS);
     };
@@ -266,15 +266,15 @@ export class PanelCombatSceneComponent {
             shown &&
             combatManualTurnKey(live) !== combatManualTurnKey(shown)
           ) {
-            hold(() => {});
+            hold();
           }
           if (live) this.shownCombat.set(live);
           return;
         }
         // A new fight or the end of this one waits until the last turn's numbers have played.
-        if (live?.id !== shown.id)
-          hold(() => this.shownCombat.set(live ?? this.latestLive ?? shown));
-        else this.shownCombat.set(live);
+        if (live?.id !== shown.id) {
+          if (!this.isSettling()) hold();
+        } else this.shownCombat.set(live);
       });
     });
 
@@ -323,17 +323,20 @@ export class PanelCombatSceneComponent {
     }
   }
 
-  private submit(hero: Combatant, action: CombatManualAction): void {
-    if (this.isResolving()) return;
+  private submit(hero: Combatant, action: CombatManualAction): boolean {
+    if (this.isResolving()) return false;
     this.pendingSkillId.set(undefined);
     this.previousOrders.update((orders) => ({ ...orders, [hero.id]: action }));
     this.confirmed.emit(action);
+    return true;
   }
 
   public repeatLastOrder(event: KeyboardEvent): void {
-    if (this.isReview() || this.isResolving() || this.paused()) return;
+    if (this.isReview() || modalHasAnyOpen()) return;
     if (document.querySelector('.swal2-container')) return;
+    // Swallowed even when idle, or it would click whichever button has focus.
     event.preventDefault();
+    if (this.isResolving() || this.paused()) return;
     const sinceLastStep = Date.now() - this.lastEnterStepAt;
     if (event.repeat && sinceLastStep < COMBAT_MANUAL_REPEAT_DELAY_MS) return;
     this.lastEnterStepAt = Date.now();
@@ -344,7 +347,7 @@ export class PanelCombatSceneComponent {
       hero && previous
         ? combatManualRepeatAction(this.combat(), hero, previous)
         : undefined;
-    if (hero && action) this.submit(hero, action);
+    if (hero && action && this.submit(hero, action)) playSFX('ui-click', 1);
   }
 
   public clearPreviousOrders(): void {
