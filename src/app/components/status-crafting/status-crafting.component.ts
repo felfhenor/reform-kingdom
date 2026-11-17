@@ -31,7 +31,7 @@ import { getOption } from '@helpers/state-options';
   `,
   styles: `
     :host {
-      display: block;
+      display: contents;
       pointer-events: none;
     }
   `,

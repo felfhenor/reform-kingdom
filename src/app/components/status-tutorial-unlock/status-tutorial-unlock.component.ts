@@ -29,7 +29,7 @@ import { tutorialsPendingEntries } from '@helpers/tutorial/tutorial-engine.ui';
   `,
   styles: `
     :host {
-      display: block;
+      display: contents;
       pointer-events: none;
     }
   `,

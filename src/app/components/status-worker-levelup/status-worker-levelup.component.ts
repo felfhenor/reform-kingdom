@@ -29,7 +29,7 @@ import { workersLevelUpStatusEntries } from '@helpers/worker/worker-progression.
   `,
   styles: `
     :host {
-      display: block;
+      display: contents;
       pointer-events: none;
     }
   `,
