@@ -17,7 +17,7 @@
     "build:copy:demo": "rimraf browser && cpy ../dist/reformkingdom-demo/browser/ .",
     "build:demo": "npm run build:copy:demo && npm run build:replacebasehref && npm run build:replaceimgrefs && npm run build:createicons",
     "build:replacebasehref": "replace-in-file \"\\\"/\\\"\" \"\\\"./\\\"\" browser/index.html",
-    "build:replaceimgrefs": "replace-in-file \"/url\\(\\//gm\" \"url(./\" browser/*.css",
+    "build:replaceimgrefs": "replace-in-file \"/url\\(\\//gm\" \"url(./\" browser/*.css,browser/*.js",
     "prepackage": "npm run build",
     "package": "electron-forge package",
     "premake": "npm run build",

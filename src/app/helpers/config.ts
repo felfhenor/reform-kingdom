@@ -108,12 +108,12 @@ export const LOG_FILE_MAX_ENTRY_LENGTH = 20000;
 export const GAMELOOP_SLOW_TICK_WARN_MS = 50;
 // Slow batches in between are counted rather than logged, so a struggling machine doesn't flood the log.
 export const GAMELOOP_SLOW_TICK_WARN_COOLDOWN_MS = 60000;
-// Images only stylesheets reference; decoded during loading so nothing paints untextured after it. Paths match the CSS exactly.
+// Images only stylesheets reference; decoded during loading so nothing paints untextured after it. Base-relative so they resolve like the CSS under file: too.
 export const LOADING_PRELOAD_IMAGES = [
-  '/asset/texture-bg.png',
-  '/asset/texture-button.png',
-  '/asset/splash-game.png',
-  '/asset/splash-dark.png',
+  'asset/texture-bg.png',
+  'asset/texture-button.png',
+  'asset/splash-game.png',
+  'asset/splash-dark.png',
 ];
 // One CSS font shorthand per @font-face in font.scss, so each face is fetched during loading.
 export const LOADING_PRELOAD_FONTS = [
