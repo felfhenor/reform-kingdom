@@ -442,7 +442,7 @@
     Agility: 10
 
   statsPerLevel:
-    Health: 90
+    Health: 120
     Energy: 6
     Luck: 0.3
     Intelligence: 0.5
@@ -519,7 +519,7 @@
     Agility: 15
 
   statsPerLevel:
-    Health: 90
+    Health: 176
     Energy: 5
     Luck: 0.3
     Intelligence: 0.5
@@ -577,7 +577,7 @@
       weight: 1
 
   baseStats:
-    Health: 1200
+    Health: 2500
     Energy: 350
     Luck: 10
     Intelligence: 18
@@ -587,7 +587,7 @@
     Agility: 15
 
   statsPerLevel:
-    Health: 72
+    Health: 250
     Energy: 6
     Luck: 0.35
     Intelligence: 0.6
