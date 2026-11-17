@@ -25,7 +25,7 @@ import { AnimationService } from '@services/animation.service';
   },
   template: `
     @if (displayedEffects().length > 0) {
-      <ul class="flex gap-2 items-center p-2 bg-transparent">
+      <ul class="flex gap-2 items-center p-2 bg-transparent mt-2">
         @for (effect of displayedEffects(); track effect.id) {
           <app-tooltip-global-effect
             #effectTooltip

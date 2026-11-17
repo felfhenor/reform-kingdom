@@ -191,7 +191,7 @@ const NODE_STATUS_UPDATE_INTERVAL_MS = 150;
         </div>
         <!-- In flow under the effect bar, since the bar's height depends on whether any effects are active. -->
         <app-adventure-log-overlay
-          class="mx-2 mt-2 w-[32rem] max-w-[calc(100%-2rem)]"
+          class="ms-4 mr-2 mt-2 w-[32rem] max-w-[calc(100%-2rem)]"
         ></app-adventure-log-overlay>
       </div>
       <app-panel-map-node></app-panel-map-node>
