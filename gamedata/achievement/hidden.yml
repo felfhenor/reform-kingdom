@@ -65,11 +65,11 @@
   name: Speedrunner
   steamId: SPEEDRUNNER
   sprite: '0041'
-  description: Defeat Fel in under 4 days and 15 hours of play.
+  description: Defeat Fel in under 3 hours of play.
   hidden: true
   condition:
     type: CompleteRun
-    maxFelTick: 400000
+    maxFelTick: 10800
 
 - id: ae60d7a1-441e-4c56-bec3-fed121780702
   name: Fragments of the Forgotten
