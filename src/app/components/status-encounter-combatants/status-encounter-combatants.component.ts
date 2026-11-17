@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { CardStatusCombatantComponent } from '@components/card-status-combatant/card-status-combatant.component';
 import { combatantHealthBar } from '@helpers/combat/combat-combatant-hp.ui';
+import { combatantChargingSkillPreviews } from '@helpers/combat/combat-skill-delay.ui';
 import { combatantStatusEffectPreviews } from '@helpers/combat/combat-statuseffects.ui';
 import { getEntry } from '@helpers/content/content';
 import type { Combatant, MonsterContent, StatusCardEntry } from '@interfaces';
@@ -52,6 +53,7 @@ export class StatusEncounterCombatantsComponent {
         ),
       ],
       statusEffects: combatantStatusEffectPreviews(combatant),
+      chargingSkills: combatantChargingSkillPreviews(combatant),
     })),
   );
 

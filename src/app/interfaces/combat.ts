@@ -172,6 +172,8 @@ export type CombatantDelayedSkill = Omit<
   'matchingCombatants'
 > & {
   turnsRemaining: number;
+  // Optional so mid-combat saves still load.
+  id?: string;
 };
 
 export type Combatant = HasAnimation & {

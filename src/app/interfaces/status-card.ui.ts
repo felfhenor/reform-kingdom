@@ -1,6 +1,7 @@
 import type { AtlasedImage } from '@interfaces/artable';
 import type { Combatant } from '@interfaces/combat';
 import type { MonsterContent } from '@interfaces/content-monster';
+import type { EquipmentSkill } from '@interfaces/content-skill';
 import type { SkillTreeNodeContent } from '@interfaces/content-skilltreenode';
 import type { StatusEffectPreview } from '@interfaces/statuseffect-preview.ui';
 
@@ -31,4 +32,12 @@ export type StatusCardEntry = {
   bars: StatusCardBar[];
   // Only set while the combatant is in a fight.
   statusEffects?: StatusEffectPreview[];
+  chargingSkills?: ChargingSkillPreview[];
+};
+
+export type ChargingSkillPreview = {
+  id: string;
+  skill: EquipmentSkill;
+  turnsRemaining: number;
+  caster: Combatant;
 };

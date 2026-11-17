@@ -1,0 +1,32 @@
+@let c = charging();
+
+<app-tooltip-skill-preview
+  #preview
+  [display]="c.skill"
+  [displayCombatant]="c.caster"
+  [footer]="footer"
+/>
+
+<ng-template #footer>
+  <div class="type-meta mt-2">
+    Fires in {{ c.turnsRemaining | number }}
+    {{ c.turnsRemaining === 1 ? 'turn' : 'turns' }}
+  </div>
+</ng-template>
+
+<div
+  class="relative flex bg-black/60 border border-dashed border-base-content"
+  [tp]="preview.template()"
+  [tpPlacement]="'top'"
+>
+  <app-atlas-image
+    class="zoom-inline"
+    spritesheet="skill"
+    [assetName]="c.skill.sprite"
+  />
+  <span
+    class="absolute -right-0.5 -bottom-0.5 font-bold text-white leading-none pointer-events-none text-xs text-shadow-black tabular-nums"
+  >
+    {{ c.turnsRemaining | number }}
+  </span>
+</div>

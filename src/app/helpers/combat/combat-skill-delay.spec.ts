@@ -49,6 +49,17 @@ describe('combatantAdvanceDelayedSkills', () => {
 });
 
 describe('combatantQueueDelayedSkill', () => {
+  it('gives each cast of the same skill its own id', () => {
+    const combatant = buildTestCombatant();
+    const skill = delayed('a', 2);
+    combatantQueueDelayedSkill(combatant, skill);
+    combatantQueueDelayedSkill(combatant, skill);
+
+    const [first, second] = combatant.delayedSkills ?? [];
+    expect(first.id).toEqual(expect.any(String));
+    expect(first.id).not.toBe(second.id);
+  });
+
   it('keeps a plain target override but drops a Matching* one', () => {
     const combatant = buildTestCombatant();
     const skill = delayed('a', 1);

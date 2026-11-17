@@ -16,6 +16,13 @@
         (animate.leave)="onStatusEffectLeave($event)"
       />
     }
+    @for (charging of data.chargingSkills ?? []; track charging.id) {
+      <app-icon-skill-charging
+        [charging]="charging"
+        (animate.enter)="onStatusEffectEnter($event)"
+        (animate.leave)="onStatusEffectLeave($event)"
+      />
+    }
   </div>
 </ng-template>
 

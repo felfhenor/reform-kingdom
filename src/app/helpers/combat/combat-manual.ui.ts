@@ -10,6 +10,7 @@ import {
 import { skillElementVerdict } from '@helpers/combat/combat-element-verdict';
 import { combatantSkillOnCooldown } from '@helpers/combat/combat-skill-cooldown';
 import { combatCombatantSkillEpCost } from '@helpers/combat/combat-stats';
+import { combatantChargingSkillPreviews } from '@helpers/combat/combat-skill-delay.ui';
 import { combatantStatusEffectPreviews } from '@helpers/combat/combat-statuseffects.ui';
 import {
   combatantSkills,
@@ -120,6 +121,7 @@ export function combatManualStatusCard(c: Combatant): StatusCardEntry {
     isDead: c.hp <= 0,
     bars: combatManualBars(c),
     statusEffects: combatantStatusEffectPreviews(c),
+    chargingSkills: combatantChargingSkillPreviews(c),
   };
 }
 

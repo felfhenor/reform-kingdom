@@ -12,6 +12,7 @@ import { IconSpecComponent } from '@components/icon-spec/icon-spec.component';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
+import { IconSkillChargingComponent } from '@components/icon-skill-charging/icon-skill-charging.component';
 import { IconStatusEffectComponent } from '@components/icon-statuseffect/icon-statuseffect.component';
 import { TextNumberTweenComponent } from '@components/text-number-tween/text-number-tween.component';
 import { TooltipMonsterPreviewComponent } from '@components/tooltip-monster-preview/tooltip-monster-preview.component';
@@ -43,6 +44,7 @@ const COLLAPSED_X_JITTER_PERCENT = 18;
     AtlasImageComponent,
     BarProgressComponent,
     IconStatusEffectComponent,
+    IconSkillChargingComponent,
     UpperCasePipe,
     NgTemplateOutlet,
     TippyDirective,

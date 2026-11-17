@@ -4,6 +4,7 @@ import type {
   CombatOrderPick,
   EquipmentSkill,
 } from '@interfaces';
+import { rngUuid } from '@helpers/rng';
 
 // Matching* overrides can't be replayed without their cast-time matches.
 export function combatantQueueDelayedSkill(
@@ -17,6 +18,7 @@ export function combatantQueueDelayedSkill(
 
   combatant.delayedSkills ??= [];
   combatant.delayedSkills.push({
+    id: rngUuid(),
     skill,
     turnsRemaining: skill.delay,
     targetMode: keepsTargetMode ? targetMode : undefined,

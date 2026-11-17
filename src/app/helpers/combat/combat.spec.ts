@@ -794,7 +794,7 @@ describe('combatantTakeTurn delayed skills', () => {
 
     expect(combatant.skillUses['charged' as EquipmentSkillId]).toBe(1);
     expect(combatant.delayedSkills).toEqual([
-      { skill: charged, turnsRemaining: 2 },
+      { id: expect.any(String), skill: charged, turnsRemaining: 2 },
     ]);
     expect(combatApplySkillToTarget).not.toHaveBeenCalled();
   });

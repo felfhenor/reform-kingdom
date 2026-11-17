@@ -28,6 +28,7 @@ export * from './combat-order.ui';
 export * from './combat-rewards';
 export * from './combat-skill-cooldown';
 export * from './combat-skill-delay';
+export * from './combat-skill-delay.ui';
 export * from './combat-skill-elements';
 export * from './combat-skill-events';
 export * from './combat-skill-events.ui';

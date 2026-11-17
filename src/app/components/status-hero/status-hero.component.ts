@@ -10,6 +10,7 @@ import { characterSpecNode } from '@helpers/hero/skill-tree';
 import { CardStatusCombatantComponent } from '@components/card-status-combatant/card-status-combatant.component';
 import { combatantDamageEventEmit } from '@helpers/combat/combat-damage-events';
 import { combatantHealthBar } from '@helpers/combat/combat-combatant-hp.ui';
+import { combatantChargingSkillPreviews } from '@helpers/combat/combat-skill-delay.ui';
 import { combatantStatusEffectPreviews } from '@helpers/combat/combat-statuseffects.ui';
 import { getEntry } from '@helpers/content/content';
 import { isPageVisible } from '@helpers/engine/page-visibility';
@@ -92,6 +93,7 @@ export class StatusHeroComponent {
           },
         ],
         statusEffects: live ? combatantStatusEffectPreviews(live) : undefined,
+        chargingSkills: live ? combatantChargingSkillPreviews(live) : undefined,
       };
     });
   });
