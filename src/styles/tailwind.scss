@@ -145,7 +145,15 @@ body {
 }
 
 @utility type-hint {
-  @apply text-xs text-lighter border-l-2 border-base-content/35 pl-2;
+  @apply text-xs text-lighter;
+
+  &::before {
+    content: '[';
+  }
+
+  &::after {
+    content: ']';
+  }
 }
 
 @utility type-flavor {
