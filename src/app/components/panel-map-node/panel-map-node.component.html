@@ -74,7 +74,8 @@
             !isOutpostNode() &&
             !isTrainerNode() &&
             !exchangeNode() &&
-            !isGateNode()
+            !isGateNode() &&
+            levelLabel() !== '-'
           ) {
             <div class="badge" [class]="levelBadgeClass()">
               Lv. {{ levelLabel() }}
