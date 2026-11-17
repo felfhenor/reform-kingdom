@@ -1,10 +1,10 @@
 import { signal } from '@angular/core';
 import { pluralize } from '@boringnode/pluralize';
-import { recipeStylizedName } from '@helpers/crafting/recipes';
 import {
   COMBAT_LOG_MAX_ENTRIES,
   COMBAT_LOG_PERSIST_DELAY_MS,
 } from '@helpers/config';
+import { recipeStylizedName } from '@helpers/crafting/recipes';
 import { localStorageSignal } from '@helpers/engine/signal';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { rngUuid } from '@helpers/rng';
@@ -128,8 +128,8 @@ export function combatMessageLog(
 
 export function combatantStatusText(combatant: Combatant): string {
   const shield = combatant.shield ?? 0;
-  const shieldText = shield > 0 ? ` [${shield} shield]` : '';
-  const whole = (value: number) => Math.floor(value);
+  const shieldText = shield > 0 ? ` [${shield.toLocaleString()} shield]` : '';
+  const whole = (value: number) => Math.floor(value).toLocaleString();
   return `[${whole(combatant.hp)}/${whole(combatant.totalStats.Health)} HP]${shieldText} [${whole(combatant.ep)}/${whole(combatant.totalStats.Energy)} EP]`;
 }
 
