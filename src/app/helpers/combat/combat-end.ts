@@ -4,9 +4,9 @@ import {
   combatantMessageToken,
   combatMessageLog,
 } from '@helpers/combat/combat-log';
-import { combatVictoryMoments } from '@helpers/combat/combat-victory-moments';
 import { grantResolvedDrops } from '@helpers/combat/combat-rewards';
 import { combatReset } from '@helpers/combat/combat-state';
+import { combatVictoryMoments } from '@helpers/combat/combat-victory-moments';
 import { monsterXpReward, xpForOverLevel } from '@helpers/combat/monster';
 import { commissionRecordMonsterKill } from '@helpers/commission/commission-kill-progress';
 import { getEntry } from '@helpers/content/content';
@@ -140,7 +140,10 @@ function logVictoryXp(combat: Combat, gains: CharacterXpGain[]): void {
 
   const amounts = new Set(gains.map(({ xp }) => xp));
   if (gains.length === combat.heroes.length && amounts.size === 1) {
-    combatMessageLog(combat, `The party gained ${gains[0].xp} XP!`);
+    combatMessageLog(
+      combat,
+      `The party gained ${gains[0].xp.toLocaleString()} XP!`,
+    );
     return;
   }
 
