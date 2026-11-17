@@ -38,6 +38,15 @@ export function combatantAdvanceDelayedSkills(
   return pending.filter((entry) => entry.turnsRemaining <= 0);
 }
 
+export function combatantSkillCharging(
+  combatant: Combatant,
+  skill: EquipmentSkill,
+): boolean {
+  return (combatant.delayedSkills ?? []).some(
+    (entry) => entry.skill.id === skill.id,
+  );
+}
+
 export function combatantClearDelayedSkills(combatant: Combatant): void {
   combatant.delayedSkills = [];
 }

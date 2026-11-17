@@ -6,6 +6,7 @@ import {
   combatGetTargetsFromPriorityList,
   combatSkillHasValidTargetsForMode,
 } from '@helpers/combat/combat-targetting';
+import { combatantQueueDelayedSkill } from '@helpers/combat/combat-skill-delay';
 import type {
   CharacterId,
   CombatTargetModeContext,
@@ -116,6 +117,14 @@ describe('combatAvailableSkillsForCombatant', () => {
       skillRefs: [skill],
       skillCooldowns: { ['burst' as EquipmentSkillId]: 1 },
     });
+
+    expect(combatAvailableSkillsForCombatant(combat, combatant)).toEqual([]);
+  });
+
+  it('excludes a skill that is still charging', () => {
+    const skill = buildEquipmentSkill({ delay: 2 });
+    const combatant = buildTestCombatant({ skillRefs: [skill] });
+    combatantQueueDelayedSkill(combatant, skill);
 
     expect(combatAvailableSkillsForCombatant(combat, combatant)).toEqual([]);
   });

@@ -4,6 +4,7 @@ import {
   combatantAdvanceDelayedSkills,
   combatantClearDelayedSkills,
   combatantQueueDelayedSkill,
+  combatantSkillCharging,
 } from '@helpers/combat/combat-skill-delay';
 import { ensureSkill } from '@helpers/content/ensure-skill';
 import type { CombatantDelayedSkill, EquipmentSkillId } from '@interfaces';
@@ -86,5 +87,20 @@ describe('combatantClearDelayedSkills', () => {
     combatantClearDelayedSkills(combatant);
 
     expect(combatantAdvanceDelayedSkills(combatant)).toEqual([]);
+  });
+});
+
+describe('combatantSkillCharging', () => {
+  it('is true only until the queued skill releases', () => {
+    const combatant = buildTestCombatant();
+    const skill = delayed('a', 1);
+    expect(combatantSkillCharging(combatant, skill)).toBe(false);
+
+    combatantQueueDelayedSkill(combatant, skill);
+    expect(combatantSkillCharging(combatant, skill)).toBe(true);
+    expect(combatantSkillCharging(combatant, delayed('b', 1))).toBe(false);
+
+    combatantAdvanceDelayedSkills(combatant);
+    expect(combatantSkillCharging(combatant, skill)).toBe(false);
   });
 });

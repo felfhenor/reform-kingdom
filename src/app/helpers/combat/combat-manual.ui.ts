@@ -10,6 +10,7 @@ import {
 import { skillElementVerdict } from '@helpers/combat/combat-element-verdict';
 import { combatantSkillOnCooldown } from '@helpers/combat/combat-skill-cooldown';
 import { combatCombatantSkillEpCost } from '@helpers/combat/combat-stats';
+import { combatantSkillCharging } from '@helpers/combat/combat-skill-delay';
 import { combatantChargingSkillPreviews } from '@helpers/combat/combat-skill-delay.ui';
 import { combatantStatusEffectPreviews } from '@helpers/combat/combat-statuseffects.ui';
 import {
@@ -235,6 +236,7 @@ function combatManualDisabledReason(
   if (combatManualSkillUsable(combat, hero, skill)) return undefined;
   if (hero.ep < combatCombatantSkillEpCost(hero, skill)) return 'Not enough EP';
   if (combatantSkillOnCooldown(hero, skill)) return 'Cooling down';
+  if (combatantSkillCharging(hero, skill)) return 'Charging';
   const hasTargets = skillOwnTechniques(skill).some(
     (tech) => unconfusedPool(combat, hero, skill, tech).length > 0,
   );

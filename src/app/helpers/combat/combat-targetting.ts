@@ -8,6 +8,7 @@ import {
 } from '@helpers/combat/combat-element-pool';
 import { skillOwnTechniques } from '@helpers/hero/skill-modifier';
 import { combatantSkillOnCooldown } from '@helpers/combat/combat-skill-cooldown';
+import { combatantSkillCharging } from '@helpers/combat/combat-skill-delay';
 import { combatantHasActiveStatusEffect } from '@helpers/combat/combat-statuseffects';
 import { combatantHasLivingSummon } from '@helpers/combat/combat-summon';
 import { getEntry } from '@helpers/content/content';
@@ -55,7 +56,8 @@ export function combatAvailableSkillsForCombatant(
         (combatant.skillUses[skill.id] ?? 0) < skillUses(skill)) &&
       combatant.ep >= combatCombatantSkillEpCost(combatant, skill) &&
       elementPoolCanPay(pool, skillElementCosts(skill)) &&
-      !combatantSkillOnCooldown(combatant, skill),
+      !combatantSkillOnCooldown(combatant, skill) &&
+      !combatantSkillCharging(combatant, skill),
   );
 }
 
