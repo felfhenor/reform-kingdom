@@ -1,7 +1,7 @@
-import { getEntriesByType } from '@helpers/content/content';
 import { runStatsState, updateGamestate } from '@helpers/state-game';
 import { defaultHeroRunStats } from '@helpers/defaults';
 import { legacyRunHero } from '@helpers/legacy/legacy-hero';
+import { regionSealedBy } from '@helpers/lore/region-intro';
 import { current, isDraft } from 'immer';
 import type {
   CharacterId,
@@ -43,9 +43,7 @@ export function runStatsRecordFelDefeat(state: GameState): void {
 export function runStatsRecordSeal(
   encounterId: EncounterId,
 ): RegionContent | undefined {
-  const region = getEntriesByType<RegionContent>('region').find(
-    (entry) => entry.seal.sealEncounterId === encounterId,
-  );
+  const region = regionSealedBy(encounterId);
   if (!region || runStatsState().seals[region.id] !== undefined) {
     return undefined;
   }

@@ -28,6 +28,13 @@ export function regionIsSealed(mapName: string): boolean {
   return !region || runStatsState().seals[region.id] !== undefined;
 }
 
+export function regionSealTime(mapName: string): number {
+  const region = regionForMap(mapName);
+  if (!region) return -1;
+
+  return runStatsState().seals[region.id] ?? 0;
+}
+
 export function combatAutomationAllowedAt(mapName: string): boolean {
   return (
     !globalEffectSumsState().requireSealForDecreeAutomation ||

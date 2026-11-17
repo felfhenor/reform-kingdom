@@ -1,6 +1,32 @@
 @let encounters = encounterCount();
 @let monsterCountValue = monsterCount();
 @let rewards = rewardProgress();
+@let sealRegionValue = sealRegion();
+
+@if (sealRegionValue) {
+  <div
+    class="badge"
+    [class.badge-warning]="!isSealed()"
+    [class.badge-success]="isSealed()"
+    [tp]="sealTooltip"
+    [tpPlacement]="'top'"
+  >
+    {{ isSealed() ? 'Sealed' : 'Seal' }}
+  </div>
+
+  <ng-template #sealTooltip>
+    <div class="p-2 max-w-[300px]">
+      @if (isSealed()) {
+        The memory of {{ sealRegionValue.name }} has been sealed! It took
+        {{ sealTicksTime() }} to seal it.
+      } @else {
+        The first time this location is cleared, it seals the memory of
+        {{ sealRegionValue.name }}. The sooner it's sealed, the more it scores
+        at the end of the run.
+      }
+    </div>
+  </ng-template>
+}
 
 @if (encounters) {
   <div class="badge badge-data">{{ encounters }} Encounters</div>

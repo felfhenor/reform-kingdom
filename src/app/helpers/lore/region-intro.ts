@@ -1,11 +1,19 @@
 import { getEntriesByType } from '@helpers/content/content';
 import { ledgerHas } from '@helpers/engine/ledger';
 import { regionIntrosState } from '@helpers/state-game';
-import type { RegionContent } from '@interfaces';
+import type { EncounterId, RegionContent } from '@interfaces';
 
 export function regionForMap(mapName: string): RegionContent | undefined {
   return getEntriesByType<RegionContent>('region').find(
     (region) => region.mapName === mapName,
+  );
+}
+
+export function regionSealedBy(
+  encounterId: EncounterId,
+): RegionContent | undefined {
+  return getEntriesByType<RegionContent>('region').find(
+    (region) => region.seal.sealEncounterId === encounterId,
   );
 }
 

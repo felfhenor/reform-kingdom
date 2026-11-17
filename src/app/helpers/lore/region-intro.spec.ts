@@ -6,8 +6,9 @@ import {
   regionForMap,
   regionIntroPending,
   regionNameForMap,
+  regionSealedBy,
 } from '@helpers/lore/region-intro';
-import type { RegionId } from '@interfaces';
+import type { EncounterId, RegionId } from '@interfaces';
 import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
 
@@ -18,6 +19,7 @@ function seedRegions(): void {
       name: 'Craggled Mire',
       mapName: 'CraggledMire',
       description: 'A swamp.',
+      seal: { sealEncounterId: 'mire-boss' as EncounterId, parTicks: 100 },
     }),
     ensureRegion({
       id: 'blank' as RegionId,
@@ -33,6 +35,17 @@ describe('regionForMap', () => {
 
     expect(regionForMap('CraggledMire')?.name).toBe('Craggled Mire');
     expect(regionForMap('Craggled Mire')).toBeUndefined();
+  });
+});
+
+describe('regionSealedBy', () => {
+  it('finds the region its seal encounter belongs to', () => {
+    seedRegions();
+
+    expect(regionSealedBy('mire-boss' as EncounterId)?.name).toBe(
+      'Craggled Mire',
+    );
+    expect(regionSealedBy('other' as EncounterId)).toBeUndefined();
   });
 });
 
