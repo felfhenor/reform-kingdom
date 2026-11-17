@@ -19,7 +19,7 @@ import { AnimationService } from '@services/animation.service';
     @let edicts = activeEdicts();
     @if (edicts.length > 0) {
       <ng-template #edictsTooltip>
-        <div class="p-2 max-w-[400px]">
+        <div class="p-2 max-w-[400px] select-none">
           <div class="flex justify-between items-center gap-4 mb-2">
             <span class="type-entity-name">Edicts</span>
           </div>
@@ -41,7 +41,7 @@ import { AnimationService } from '@services/animation.service';
       </ng-template>
 
       <div
-        class="w-16 h-16 ms-4 mt-4 flex items-center justify-center border border-current"
+        class="w-16 h-16 ms-4 mt-4 flex items-center justify-center border border-current select-none"
         [tp]="edictsTooltip"
         [tpPlacement]="'bottom'"
         [attr.aria-label]="'Edicts'"

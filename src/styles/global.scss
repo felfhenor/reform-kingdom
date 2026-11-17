@@ -95,3 +95,9 @@ app-game {
 .list-row::after {
   --border: 0;
 }
+
+.btn,
+.badge,
+.tab {
+  @apply select-none;
+}
