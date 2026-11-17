@@ -354,7 +354,10 @@
                   [max]="1"
                   [step]="0.05"
                   [value]="getOption('sfxVolume')"
-                  (change)="setOption('sfxVolume', sfxVolume.valueAsNumber)"
+                  (change)="
+                    setOption('sfxVolume', sfxVolume.valueAsNumber);
+                    playSampleSFX()
+                  "
                   class="range"
                 />
                 <span class="ml-2">

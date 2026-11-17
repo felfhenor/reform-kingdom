@@ -10,6 +10,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '@components/icon/icon.component';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
+import { playSFX } from '@helpers/engine';
 import { isInElectron } from '@helpers/engine/electron';
 import {
   electronWindowOnChange,
@@ -122,5 +123,9 @@ export class PanelOptionsUIComponent extends OptionsBaseComponent {
       ...kinds,
       [kind]: !kinds[kind],
     });
+  }
+
+  public playSampleSFX() {
+    playSFX('ui-click', 0);
   }
 }
