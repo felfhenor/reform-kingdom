@@ -7,12 +7,12 @@ import { hostBinding } from 'ngxtension/host-binding';
 })
 export class DisableOutsideElectronDirective {
   public disabled = hostBinding(
-    'class.disabled',
+    'class.hidden',
     computed(() => (isInElectron() ? undefined : true)),
   );
 
   public disabledAttr = hostBinding(
-    'attr.disabled',
+    'attr.hidden',
     computed(() => (isInElectron() ? undefined : true)),
   );
 }
