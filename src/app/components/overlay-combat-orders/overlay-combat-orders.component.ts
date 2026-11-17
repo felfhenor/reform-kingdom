@@ -61,6 +61,8 @@ export class OverlayCombatOrdersComponent {
     const unblock = hotkeysBlockOutside(host);
     combatManualOverlayOpen.set(true);
     inject(DestroyRef).onDestroy(() => {
+      // A remount (e.g. after a story screen preempts the review) has no fight left to show, only the backdrop.
+      combatManualOverlayOpen.set(false);
       unblock();
       window.removeEventListener('keydown', onEnter, { capture: true });
       fadeIn.pause();
