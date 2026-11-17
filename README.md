@@ -26,6 +26,8 @@
 - Admurins Items Mega Pack - item icons
 - Oryx Ultimate Fantasy - sprite sheets for characters and enemies
 - CraftPix - manual combat background images
+- UI & Menus Sound FX Pack - SFX
+- Fantasy Game UI Sounds - SFX
 
 ## Useful Scripts
 

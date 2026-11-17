@@ -1,5 +1,7 @@
 import type { Combatant, EquipmentSkill } from '@interfaces';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@helpers/engine/sfx');
 
 import {
   combatantHealthPercent,
@@ -8,6 +10,8 @@ import {
   combatCombatantTakeEnergyDamage,
 } from '@helpers/combat/combat-combatant-hp';
 import { combatantDamageEvents } from '@helpers/combat/combat-damage-events';
+import { combatEventScopeRun } from '@helpers/combat/combat-event-scope';
+import { playGameSFX } from '@helpers/engine/sfx';
 import { defaultStats } from '@helpers/defaults';
 import { buildTestCombatant } from '@/testing/builders';
 
@@ -49,6 +53,7 @@ describe('combatantHealthPercent', () => {
 describe('combatCombatantTakeDamage', () => {
   beforeEach(() => {
     combatantDamageEvents.set([]);
+    vi.mocked(playGameSFX).mockClear();
   });
 
   it('clamps hp between 0 and max health', () => {
@@ -151,6 +156,33 @@ describe('combatCombatantTakeDamage', () => {
       { amount: -10, variant: 'shield' },
       { amount: -50, variant: 'critical' },
     ]);
+  });
+
+  it('plays death-monster when an enemy dies', () => {
+    combatCombatantTakeDamage(buildCombatant(10, true), 25);
+
+    expect(playGameSFX).toHaveBeenCalledExactlyOnceWith('death-monster');
+  });
+
+  it('plays death when a hero dies', () => {
+    combatCombatantTakeDamage(buildCombatant(10), 25);
+
+    expect(playGameSFX).toHaveBeenCalledExactlyOnceWith('death');
+  });
+
+  it('plays no death sound for a non-lethal hit or an already-dead target', () => {
+    combatCombatantTakeDamage(buildCombatant(100, true), 25);
+    combatCombatantTakeDamage(buildCombatant(0, true), 25);
+
+    expect(playGameSFX).not.toHaveBeenCalled();
+  });
+
+  it('plays no death sound in a muted event scope', () => {
+    combatEventScopeRun({ keyPrefix: 'sim-', muted: true }, () =>
+      combatCombatantTakeDamage(buildCombatant(10, true), 25),
+    );
+
+    expect(playGameSFX).not.toHaveBeenCalled();
   });
 
   it('heals HP without touching the shield', () => {

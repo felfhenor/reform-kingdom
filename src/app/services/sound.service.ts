@@ -8,6 +8,7 @@ import { zip } from 'es-toolkit/compat';
 const soundsToLoad: Record<SFX, string> = {
   'ui-click': './audio/sfx/ui-click.mp3',
   death: './audio/sfx/death.mp3',
+  'death-monster': './audio/sfx/death-monster.mp3',
   'item-get-major': './audio/sfx/item-get-major.mp3',
   'item-get-minor': './audio/sfx/item-get-minor.mp3',
   'ui-error': './audio/sfx/ui-error.mp3',
@@ -20,6 +21,7 @@ const soundsToLoad: Record<SFX, string> = {
 const soundVolumeMixing: Record<SFX, number> = {
   'ui-click': 0.5,
   death: 1,
+  'death-monster': 1,
   'item-get-major': 1,
   'item-get-minor': 0.5,
   'ui-error': 1.5,

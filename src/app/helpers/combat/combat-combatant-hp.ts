@@ -1,5 +1,7 @@
 import { combatantDamageEventEmit } from '@helpers/combat/combat-damage-events';
+import { combatEventsMuted } from '@helpers/combat/combat-event-scope';
 import { combatantClearDelayedSkills } from '@helpers/combat/combat-skill-delay';
+import { playGameSFX } from '@helpers/engine/sfx';
 import type {
   CombatHpChange,
   Combatant,
@@ -41,11 +43,15 @@ export function combatCombatantTakeDamage(
     );
   }
 
-  return {
-    hpDelta: hpBefore - combatant.hp,
-    absorbed,
-    died: hpBefore > 0 && combatantIsDead(combatant),
-  };
+  const died = hpBefore > 0 && combatantIsDead(combatant);
+  if (died) combatantPlayDeathSFX(combatant);
+
+  return { hpDelta: hpBefore - combatant.hp, absorbed, died };
+}
+
+function combatantPlayDeathSFX(combatant: Combatant): void {
+  if (combatEventsMuted()) return;
+  playGameSFX(combatant.isEnemy ? 'death-monster' : 'death');
 }
 
 // The shield drains first; whatever it can't hold bleeds through to HP.
