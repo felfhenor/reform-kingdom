@@ -19,7 +19,7 @@ export default defineConfig({
       exclude: excludedFilesFromTesting,
       enabled: true,
     },
-    include: ['src/app/helpers/**/*.spec.ts'],
+    include: ['src/app/helpers/**/*.spec.ts', 'src/app/ff/**/*.spec.ts'],
     exclude: excludedFilesFromTesting,
     environment: 'jsdom',
     setupFiles: ['src/test-setup.ts'],

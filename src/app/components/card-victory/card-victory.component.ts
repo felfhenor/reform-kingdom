@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { ButtonRunEndComponent } from '@components/button-run-end/button-run-end.component';
 import { SFXDirective } from '@directives/sfx.directive';
+import { gamepadBlockBehindOverlay } from '@helpers/engine/gamepad.ui';
 import { hotkeysBlockOutside } from '@helpers/engine/hotkeys.ui';
 import { victoryPopupDismiss } from '@helpers/lore/outro.ui';
 import { AnimationService } from '@services/animation.service';
@@ -35,6 +36,7 @@ export class CardVictoryComponent {
     afterNextRender(() => this.continueButton().nativeElement.focus());
 
     const unblock = hotkeysBlockOutside(host);
+    gamepadBlockBehindOverlay();
     inject(DestroyRef).onDestroy(() => {
       unblock();
       fadeIn.pause();

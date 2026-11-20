@@ -9,6 +9,11 @@ import {
   signal,
 } from '@angular/core';
 import { SFXDirective } from '@directives/sfx.directive';
+import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
+import {
+  GAMEPAD_PRIORITY,
+  gamepadBlockBehindOverlay,
+} from '@helpers/engine/gamepad.ui';
 import { modalHasAnyOpen, modalIsOpen } from '@helpers/engine/modal-stack';
 import { isGameloopPaused } from '@helpers/gameloop';
 import { setOption } from '@helpers/state-options';
@@ -66,6 +71,20 @@ export class ScreenTitleCrawlComponent {
 
     window.addEventListener('keydown', onKeydown, { capture: true });
     window.addEventListener('keyup', onKeyup, { capture: true });
+    gamepadBlockBehindOverlay();
+    ffGamepadOn(
+      'confirm',
+      () => {
+        if (modalHasAnyOpen()) return false;
+
+        this.startSkipHold();
+        return true;
+      },
+      {
+        priority: GAMEPAD_PRIORITY.overlay,
+        onRelease: () => this.cancelSkipHold(),
+      },
+    );
     inject(DestroyRef).onDestroy(() => {
       window.removeEventListener('keydown', onKeydown, { capture: true });
       window.removeEventListener('keyup', onKeyup, { capture: true });

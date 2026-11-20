@@ -1,6 +1,14 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  inject,
+  input,
+} from '@angular/core';
 import { IconComponent } from '@components/icon/icon.component';
 import { SFXDirective } from '@directives/sfx.directive';
+import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
+import { GAMEPAD_PRIORITY } from '@helpers/engine/gamepad.ui';
 import { hotkeyMatches } from '@helpers/engine/hotkeys.ui';
 import { kingdomSubviewClear } from '@helpers/engine/ui';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -31,6 +39,13 @@ export class ButtonKingdomBackComponent {
 
   // Subviews outside the Kingdom tab (e.g. the Heroes regalia page) pass their own exit.
   public onBack = input<() => void>(kingdomSubviewClear);
+
+  constructor() {
+    ffGamepadOn('back', () => this.back(), {
+      priority: GAMEPAD_PRIORITY.page,
+      element: inject<ElementRef<HTMLElement>>(ElementRef).nativeElement,
+    });
+  }
 
   public back(): void {
     this.onBack()();

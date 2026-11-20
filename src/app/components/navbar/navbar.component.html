@@ -80,7 +80,7 @@
           [hotkeys]="'5'"
           (hotkey)="hotkeyMatches($event, '5') && changeGamePlayView('decree')"
           isGlobal
-          [appHideUntilLevel]="5"
+          [appHideUntilLevel]="decreeRevealLevel"
           appTutorialTarget="nav-decree"
         >
           <input

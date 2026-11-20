@@ -11,6 +11,9 @@ import {
 import type { Event } from '@angular/router';
 import { NavigationEnd, Router } from '@angular/router';
 import { SFXDirective } from '@directives/sfx.directive';
+import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
+import type { FFGamepadAction } from '@ff/interfaces/ff-input';
+import { GAMEPAD_PRIORITY } from '@helpers/engine/gamepad.ui';
 import { gameloopShouldRun } from '@helpers/gameloop';
 import {
   activeTutorialStepView,
@@ -143,6 +146,42 @@ export class TutorialOverlayComponent {
       );
       onCleanup(() => clearTimeout(timeoutId));
     });
+
+    this.bindGamepad();
+  }
+
+  private bindGamepad(): void {
+    const handlers: Array<[FFGamepadAction, () => void]> = [
+      ['confirm', () => this.next()],
+      ['back', () => this.dismissFromGamepad()],
+      ['context', () => this.ignoreFromGamepad()],
+      ['tabPrev', () => undefined],
+      ['tabNext', () => undefined],
+      ['pause', () => undefined],
+    ];
+
+    handlers.forEach(([action, handler]) =>
+      ffGamepadOn(
+        action,
+        () => {
+          if (!this.isReadyToRender()) return false;
+
+          handler();
+          return true;
+        },
+        { priority: GAMEPAD_PRIORITY.tutorial },
+      ),
+    );
+  }
+
+  private dismissFromGamepad(): void {
+    if (this.stepView()?.totalSteps === 1) this.next();
+    else this.skip();
+  }
+
+  private ignoreFromGamepad(): void {
+    if (this.stepView()?.tutorial.trigger.kind !== 'losing-streak') return;
+    this.ignore();
   }
 
   public onBackdropEnter(event: AnimationCallbackEvent): void {

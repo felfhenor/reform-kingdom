@@ -28,6 +28,7 @@
       "@pipes/*": ["./src/app/pipes/*"],
       "@routes/*": ["./src/app/routes/*"],
       "@helpers/*": ["./src/app/helpers/*"],
+      "@ff/*": ["./src/app/ff/*"],
       "@interfaces/*": ["./src/app/interfaces/*"],
       "@helpers": ["./src/app/helpers/index.ts"],
       "@interfaces": ["./src/app/interfaces/index.ts"],

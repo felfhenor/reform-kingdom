@@ -12,9 +12,13 @@ import { BannerAnalyticsConsentComponent } from '@components/banner-analytics-co
 import { ScreenLoadingComponent } from '@components/screen-loading/screen-loading.component';
 import { TutorialOverlayComponent } from '@components/tutorial-overlay/tutorial-overlay.component';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
+import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
 import { isDemoBuild } from '@helpers/demo/demo';
+import { GAMEPAD_PRIORITY, gamepadSwalClick } from '@helpers/engine/gamepad.ui';
+import { modalCloseTop, modalHasAnyOpen } from '@helpers/engine/modal-stack';
 import { AnimationService } from '@services/animation.service';
 import { LoadingService } from '@services/loading.service';
+import { SweetAlert2LoaderService } from '@sweetalert2/ngx-sweetalert2';
 
 @Component({
   selector: 'app-root',
@@ -37,6 +41,30 @@ export class AppComponent {
   constructor() {
     // Electron's window title follows the page's.
     if (isDemoBuild()) inject(Title).setTitle('re:Form Kingdom Demo');
+
+    this.bindGamepadDialogs();
+  }
+
+  private bindGamepadDialogs(): void {
+    const swalLoader = inject(SweetAlert2LoaderService);
+    const dialog = { priority: GAMEPAD_PRIORITY.dialog };
+
+    ffGamepadOn(
+      'confirm',
+      () => gamepadSwalClick(swalLoader, 'confirm'),
+      dialog,
+    );
+    ffGamepadOn('back', () => gamepadSwalClick(swalLoader, 'cancel'), dialog);
+    ffGamepadOn(
+      'back',
+      () => {
+        if (!modalHasAnyOpen()) return false;
+
+        modalCloseTop();
+        return true;
+      },
+      { priority: GAMEPAD_PRIORITY.modal },
+    );
   }
 
   @HostListener('document:contextmenu')

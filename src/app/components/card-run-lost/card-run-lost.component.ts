@@ -7,6 +7,7 @@ import {
   inject,
 } from '@angular/core';
 import { ButtonRunEndComponent } from '@components/button-run-end/button-run-end.component';
+import { gamepadBlockBehindOverlay } from '@helpers/engine/gamepad.ui';
 import { hotkeysBlockOutside } from '@helpers/engine/hotkeys.ui';
 import { closeAllMenus } from '@helpers/engine/ui';
 import { saveGameState } from '@helpers/state-game';
@@ -24,6 +25,7 @@ export class CardRunLostComponent {
     const host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
     const fadeIn = inject(AnimationService).fadeIn(host, 600);
     const unblock = hotkeysBlockOutside(host);
+    gamepadBlockBehindOverlay();
 
     // The held gameloop never autosaves again, so a reload would otherwise undo the loss.
     void saveGameState();

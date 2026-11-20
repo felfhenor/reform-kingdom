@@ -17,6 +17,7 @@ import {
   combatManualFlee,
   combatManualOverlayOpen,
 } from '@helpers/combat/combat-manual.ui';
+import { gamepadBlockBehindOverlay } from '@helpers/engine/gamepad.ui';
 import { hotkeysBlockOutside } from '@helpers/engine/hotkeys.ui';
 import { isGameloopPaused } from '@helpers/gameloop';
 import { worldCombatState } from '@helpers/state-game';
@@ -59,6 +60,7 @@ export class OverlayCombatOrdersComponent {
     };
     window.addEventListener('keydown', onEnter, { capture: true });
     const unblock = hotkeysBlockOutside(host);
+    gamepadBlockBehindOverlay();
     combatManualOverlayOpen.set(true);
     inject(DestroyRef).onDestroy(() => {
       // A remount (e.g. after a story screen preempts the review) has no fight left to show, only the backdrop.

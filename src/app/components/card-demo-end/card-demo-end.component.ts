@@ -11,6 +11,7 @@ import {
 import { ButtonWishlistComponent } from '@components/button-wishlist/button-wishlist.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { demoEndDismiss } from '@helpers/demo/demo.ui';
+import { gamepadBlockBehindOverlay } from '@helpers/engine/gamepad.ui';
 import { hotkeysBlockOutside } from '@helpers/engine/hotkeys.ui';
 import { AnimationService } from '@services/animation.service';
 
@@ -35,6 +36,7 @@ export class CardDemoEndComponent {
     afterNextRender(() => this.continueButton().nativeElement.focus());
 
     const unblock = hotkeysBlockOutside(host);
+    gamepadBlockBehindOverlay();
     inject(DestroyRef).onDestroy(() => {
       unblock();
       fadeIn.pause();

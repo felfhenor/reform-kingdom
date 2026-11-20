@@ -20,6 +20,14 @@ import { RequireNotSetupDirective } from '@directives/no-setup.directive';
 import { RequireSetupDirective } from '@directives/require-setup.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { TutorialTargetDirective } from '@directives/tutorial-target.directive';
+import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
+import { DECREE_REVEAL_LEVEL } from '@helpers/config';
+import { isRevealedAtLevel } from '@helpers/engine/feature-reveal';
+import { GAMEPAD_PRIORITY } from '@helpers/engine/gamepad.ui';
+import {
+  gamePlayViewsCyclable,
+  gamePlayViewStep,
+} from '@helpers/engine/gameplay-view-cycle.ui';
 import { hotkeyMatches } from '@helpers/engine/hotkeys.ui';
 import {
   modalClose,
@@ -116,6 +124,35 @@ export class NavbarComponent {
   private wasPausedBeforeOpeningMenu = signal<boolean>(false);
 
   public leaveSwal = viewChild<SwalComponent>('leaveSwal');
+
+  protected readonly decreeRevealLevel = DECREE_REVEAL_LEVEL;
+
+  private readonly viewOpeners: Record<GamePlayView, () => void> = {
+    world: () => this.changeGamePlayView('world'),
+    town: () => this.openCurrentTown(),
+    kingdom: () => this.setKingdomPlayView(),
+    heroes: () => this.setHeroesPlayView(),
+    adventurelog: () => this.changeGamePlayView('adventurelog'),
+    decree: () => this.changeGamePlayView('decree'),
+  };
+
+  constructor() {
+    ffGamepadOn('tabPrev', () => this.cycleGamePlayView(-1));
+    ffGamepadOn('tabNext', () => this.cycleGamePlayView(1));
+    ffGamepadOn('menu', () => this.togglePauseMenu());
+    ffGamepadOn('pause', () => {
+      if (!isSetup()) return false;
+
+      this.togglePause();
+      return true;
+    });
+    ffGamepadOn('back', () => this.closePauseMenuIfTopmost(), {
+      priority: GAMEPAD_PRIORITY.pauseMenu,
+    });
+    ffGamepadOn('back', () => this.leaveSetup(), {
+      priority: GAMEPAD_PRIORITY.page,
+    });
+  }
 
   public isPaused = computed(() => getOption('gameloopPaused'));
   public isFelDefeated = computed(() => isFelDefeated());
@@ -243,10 +280,7 @@ export class NavbarComponent {
 
   // Pause menu is special-cased (resuming has side effects); with nothing open, ESC opens the pause menu instead.
   public closeAllMenus() {
-    if (modalIsTopmost('pause-menu')) {
-      this.closePauseMenu();
-      return;
-    }
+    if (this.closePauseMenuIfTopmost()) return;
 
     if (modalHasAnyOpen()) {
       modalCloseTop();
@@ -254,6 +288,39 @@ export class NavbarComponent {
     }
 
     this.openPauseMenu();
+  }
+
+  private closePauseMenuIfTopmost(): boolean {
+    if (!modalIsTopmost('pause-menu')) return false;
+
+    this.closePauseMenu();
+    return true;
+  }
+
+  private togglePauseMenu(): boolean {
+    if (!isSetup()) return false;
+
+    if (this.closePauseMenuIfTopmost()) return true;
+    if (!modalHasAnyOpen()) this.openPauseMenu();
+    return true;
+  }
+
+  private leaveSetup(): boolean {
+    if (isSetup()) return false;
+
+    void this.leaveSwal()?.fire();
+    return true;
+  }
+
+  private cycleGamePlayView(direction: 1 | -1): boolean {
+    if (!isSetup() || modalHasAnyOpen()) return false;
+
+    const views = gamePlayViewsCyclable(
+      !!this.currentTownEntry(),
+      isRevealedAtLevel(DECREE_REVEAL_LEVEL),
+    );
+    this.viewOpeners[gamePlayViewStep(views, gamePlayView(), direction)]();
+    return true;
   }
 
   public toggleAutoMode(): void {

@@ -13,6 +13,8 @@ export * from './electron-window.ui';
 export * from './embed';
 export * from './feature-reveal';
 export * from './font.ui';
+export * from './gamepad.ui';
+export * from './gameplay-view-cycle.ui';
 export * from './gather-vfx';
 export * from './hero-level-up-vfx';
 export * from './hotkeys.ui';
