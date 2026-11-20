@@ -1,11 +1,11 @@
-<div role="tablist" class="tabs tabs-box">
+<div role="tablist" class="tabs tabs-box flex-nowrap">
   @for (character of party(); track character.id) {
     @let job = jobFor(character.jobId);
 
     <button
       type="button"
       role="tab"
-      class="tab gap-2"
+      class="tab w-64 min-w-0 gap-2"
       [class.tab-active]="character.id === selectedId()"
       [class.font-bold]="character.id === selectedId()"
       (click)="selected.emit(character.id)"
@@ -15,11 +15,15 @@
     >
       <div class="hero-tab-icon">
         <app-icon-job [job]="job" />
+        <app-badge-skill-points [character]="character" dot />
       </div>
-      {{ character.name }}
-      <app-label-job class="text-lighter" [character]="character" />
-
-      <app-badge-skill-points [character]="character" />
+      <span class="truncate min-w-0 flex-1 text-left" [tp]="character.name">
+        {{ character.name }}
+      </span>
+      <app-label-job
+        class="text-lighter shrink-0 tabular-nums"
+        [character]="character"
+      />
     </button>
   }
 </div>

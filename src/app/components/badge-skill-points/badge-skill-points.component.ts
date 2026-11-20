@@ -1,5 +1,6 @@
 import type { AnimationCallbackEvent } from '@angular/core';
 import {
+  booleanAttribute,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -7,6 +8,7 @@ import {
   input,
 } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
+import { TippyDirective } from '@ngneat/helipopper';
 import { characterSkillTreeAvailableSp } from '@helpers/hero/skill-tree';
 import { AnimationService } from '@services/animation.service';
 import type { Character } from '@interfaces';
@@ -15,24 +17,37 @@ import type { Character } from '@interfaces';
 @Component({
   selector: 'app-badge-skill-points',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, TippyDirective],
   host: { class: 'contents' },
   template: `
     @let sp = freeSp();
     @if (sp > 0) {
-      <span
-        class="badge badge-sm badge-attention tabular-nums"
-        (animate.enter)="onEnter($event)"
-        (animate.leave)="onLeave($event)"
-      >
-        {{ sp | number }} SP
-      </span>
+      @if (dot()) {
+        <span
+          class="absolute inset-0"
+          [tp]="(sp | number) + ' SP available'"
+          (animate.enter)="onEnter($event)"
+          (animate.leave)="onLeave($event)"
+        >
+          <i class="status-dot text-attention"></i>
+        </span>
+      } @else {
+        <span
+          class="badge badge-sm badge-attention tabular-nums"
+          (animate.enter)="onEnter($event)"
+          (animate.leave)="onLeave($event)"
+        >
+          {{ sp | number }} SP
+        </span>
+      }
     }
   `,
 })
 export class BadgeSkillPointsComponent {
   private anim = inject(AnimationService);
   public character = input.required<Character>();
+  // Corner dot over a relative parent instead of the full badge.
+  public dot = input(false, { transform: booleanAttribute });
 
   public freeSp = computed(() => {
     const character = this.character();

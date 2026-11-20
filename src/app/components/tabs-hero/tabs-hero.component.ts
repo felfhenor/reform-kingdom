@@ -8,17 +8,20 @@ import { BadgeSkillPointsComponent } from '@components/badge-skill-points/badge-
 import { IconJobComponent } from '@components/icon-job/icon-job.component';
 import { LabelJobComponent } from '@components/label-job/label-job.component';
 import { SFXDirective } from '@directives/sfx.directive';
+import { TippyDirective } from '@ngneat/helipopper';
 import { getEntry } from '@helpers/content/content';
 import type { Character, CharacterId, JobContent, JobId } from '@interfaces';
 
 @Component({
   selector: 'app-tabs-hero',
+  host: { class: 'block min-w-0' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     BadgeSkillPointsComponent,
     IconJobComponent,
     LabelJobComponent,
     SFXDirective,
+    TippyDirective,
   ],
   templateUrl: './tabs-hero.component.html',
   styleUrl: './tabs-hero.component.scss',
