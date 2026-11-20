@@ -253,6 +253,7 @@ export function ensureTown(town: TownContentInput): Required<TownContent> {
     invisibleUntilCollectibleIdsFound:
       town.invisibleUntilCollectibleIdsFound ?? [],
     ...ensureNodeBackground(town),
+    frames: town.frames ?? 0,
     scaleType: town.scaleType ?? 'Outpost',
     level: town.level ?? 1,
     materialThresholds: ensureArray(

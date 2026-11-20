@@ -117,6 +117,8 @@ export type BackdropStar = {
   phase: number;
 };
 
+export type PixiNodeAnimationUpdate = (nowMs: number) => void;
+
 // x/y are fractions of the node's tile; y counts up from its bottom edge.
 export type NodeSparkleMoteState = {
   x: number;

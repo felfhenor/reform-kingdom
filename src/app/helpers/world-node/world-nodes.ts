@@ -25,6 +25,7 @@ import type {
   TiledObject,
   TownContent,
   TrainerContent,
+  WorldNodeDisplayContent,
   WorldNodeEntry,
   WorldNodeLookup,
   WorldNodeNameMap,
@@ -186,6 +187,25 @@ export function worldNodeOverride(
 ): NodeOverrideContent | undefined {
   const content = getEntry<NodeOverrideContent>(entry.nodeName);
   return content?.__type === 'nodeoverride' ? content : undefined;
+}
+
+// The content that decides how a node looks; an override wins over the node's own content.
+export function worldNodeDisplayContent(
+  entry: WorldNodeEntry,
+): WorldNodeDisplayContent | undefined {
+  return (
+    worldNodeOverride(entry) ??
+    worldNodeEncounter(entry) ??
+    worldNodeEncounterRandom(entry) ??
+    worldNodeGathering(entry) ??
+    worldNodeExchange(entry) ??
+    worldNodeTown(entry) ??
+    worldNodeCaravan(entry) ??
+    worldNodeShrine(entry) ??
+    worldNodeOutpost(entry) ??
+    worldNodeTrainer(entry) ??
+    worldNodeCollectibleGate(entry)
+  );
 }
 
 // Only one content type ever matches a given node, so this `??` chain is safe.

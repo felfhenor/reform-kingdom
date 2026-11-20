@@ -5,7 +5,10 @@ import type { CostItem, ItemQuantity } from '@interfaces/cost';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { HasNodeBackground } from '@interfaces/node-background';
 import type { HasDescription } from '@interfaces/traits';
-import type { WorldNodeHideable } from '@interfaces/world-nodes';
+import type {
+  WorldNodeAnimatable,
+  WorldNodeHideable,
+} from '@interfaces/world-nodes';
 
 export type ExchangeNodeId = Branded<string, 'ExchangeNodeId'>;
 
@@ -48,7 +51,8 @@ export type ExchangeNodeExchange =
 export type ExchangeNodeContent = IsContentItem &
   HasDescription &
   WorldNodeHideable &
-  HasNodeBackground & {
+  HasNodeBackground &
+  WorldNodeAnimatable & {
     id: ExchangeNodeId;
     __type: 'exchangenode';
 

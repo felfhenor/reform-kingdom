@@ -83,6 +83,7 @@ export function ensureExchangeNode(
     description: node.description ?? 'UNKNOWN',
     hidden: node.hidden ?? false,
     ...ensureNodeBackground(node),
+    frames: node.frames ?? 0,
     invisibleUntilCollectibleIdsFound:
       node.invisibleUntilCollectibleIdsFound ?? [],
     emptyText: node.emptyText ?? 'Nothing here can be exchanged.',

@@ -96,6 +96,7 @@
   name: Shrine of Izchak
   description: A shrine erected by local merchants. They say that praying here increases your wealth.
   background: castle-hall-carpet
+  frames: 2
   legendName: Legend of the Magnate
   memoriamEquipmentIds:
     - Baselard of Izchak

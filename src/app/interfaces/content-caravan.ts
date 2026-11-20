@@ -3,7 +3,10 @@ import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { LevelRange } from '@interfaces/level-range';
 import type { HasNodeBackground } from '@interfaces/node-background';
 import type { HasDescription } from '@interfaces/traits';
-import type { WorldNodeHideable } from '@interfaces/world-nodes';
+import type {
+  WorldNodeAnimatable,
+  WorldNodeHideable,
+} from '@interfaces/world-nodes';
 
 export type CaravanId = Branded<string, 'CaravanId'>;
 
@@ -23,7 +26,8 @@ export type CommissionOfferSlot = {
 export type CaravanContent = IsContentItem &
   HasDescription &
   WorldNodeHideable &
-  HasNodeBackground & {
+  HasNodeBackground &
+  WorldNodeAnimatable & {
     id: CaravanId;
     __type: 'caravan';
 

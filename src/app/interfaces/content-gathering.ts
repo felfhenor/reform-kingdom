@@ -5,6 +5,7 @@ import type { LevelRange } from '@interfaces/level-range';
 import type { HasNodeBackground } from '@interfaces/node-background';
 import type { HasDescription } from '@interfaces/traits';
 import type {
+  WorldNodeAnimatable,
   WorldNodeDevelopable,
   WorldNodeHideable,
 } from '@interfaces/world-nodes';
@@ -28,7 +29,8 @@ export type GatheringContent = IsContentItem &
   HasDescription &
   WorldNodeHideable &
   WorldNodeDevelopable &
-  HasNodeBackground & {
+  HasNodeBackground &
+  WorldNodeAnimatable & {
     id: GatheringId;
     __type: 'gathering';
 

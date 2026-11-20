@@ -31,6 +31,7 @@ export function ensureShrine(
     description: shrine.description ?? 'UNKNOWN',
     hidden: shrine.hidden ?? false,
     ...ensureNodeBackground(shrine),
+    frames: shrine.frames ?? 0,
     invisibleUntilCollectibleIdsFound:
       shrine.invisibleUntilCollectibleIdsFound ?? [],
     legendName: shrine.legendName ?? 'Legend of the Shrine',

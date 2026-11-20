@@ -2,6 +2,7 @@
   name: Gorm
   description: A demon magician more sagely than the average demon. To some, he was called Gorm the Lesser, but they don't say that anymore.
   background: ruins-portal
+  frames: 2
 
   trainerTeachingIds:
     - 'Burst: Prismatic Burst V'

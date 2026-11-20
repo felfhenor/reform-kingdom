@@ -50,6 +50,7 @@ export function ensureEncounter(
     invisibleUntilCollectibleIdsFound:
       encounter.invisibleUntilCollectibleIdsFound ?? [],
     ...ensureNodeBackground(encounter),
+    frames: encounter.frames ?? 0,
   };
 }
 
@@ -87,5 +88,6 @@ export function ensureEncounterRandom(
     invisibleUntilCollectibleIdsFound:
       encounter.invisibleUntilCollectibleIdsFound ?? [],
     ...ensureNodeBackground(encounter),
+    frames: encounter.frames ?? 0,
   };
 }

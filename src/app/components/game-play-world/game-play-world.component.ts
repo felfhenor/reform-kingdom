@@ -74,6 +74,7 @@ import {
 import { pixiTiledMapRender } from '@helpers/pixi/pixi-map-render';
 import { pixiNodeForgottenSet } from '@helpers/pixi/pixi-node-forgotten.ui';
 import { pixiNodeRevealCreate } from '@helpers/pixi/pixi-node-reveal.ui';
+import { pixiNodeAnimationsCreate } from '@helpers/pixi/pixi-node-animation.ui';
 import { pixiNodeSparklesCreate } from '@helpers/pixi/pixi-node-sparkle.ui';
 import {
   partyFollowerCatchUpPosition,
@@ -125,6 +126,7 @@ import type {
   GlobalEffectId,
   JobContent,
   PartyPositionSample,
+  PixiNodeAnimationUpdate,
   TiledMap,
   TiledObject,
   TravelGlideState,
@@ -309,6 +311,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     string,
     { container: Container; update: (nowMs: number) => void }
   >();
+  private nodeAnimations: PixiNodeAnimationUpdate[] = [];
   // Icon textures persist across map transitions.
   private floatingTextIconTextures = new Map<string, Texture>();
   private pendingFloatingTextTextureLoads = new Map<string, GatherVfxEvent[]>();
@@ -523,6 +526,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.activeFloatingTexts = [];
     this.activeNodeReveals = [];
     this.nodeSparkles.clear();
+    this.nodeAnimations = [];
 
     this.app = undefined;
     this.map = undefined;
@@ -620,6 +624,10 @@ export class GamePlayWorldComponent implements OnDestroy {
     );
     this.nodeWrappers = renderedMap.nodeWrappers;
     this.nodeStatusIcons = renderedMap.nodeStatusIcons;
+    this.nodeAnimations = pixiNodeAnimationsCreate(
+      renderedMap.nodeWrappers,
+      textures,
+    );
 
     const backdrop = pixiBackdropShardsCreate(map, mapName, textures);
     if (backdrop) containers.backdropContainer.addChild(backdrop.container);
@@ -676,6 +684,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.updateFloatingTexts();
       this.updateNodeReveals();
       this.updateNodeSparkles();
+      this.updateNodeAnimations();
     };
     this.app.ticker.add(this.visualPositionTicker);
 
@@ -1452,6 +1461,11 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.nodeSparkles.forEach((sparkles) => {
       if (sparkles.container.visible) sparkles.update(now);
     });
+  }
+
+  private updateNodeAnimations(): void {
+    const now = performance.now();
+    this.nodeAnimations.forEach((update) => update(now));
   }
 
   private spawnFloatingText(event: GatherVfxEvent, now: number): void {

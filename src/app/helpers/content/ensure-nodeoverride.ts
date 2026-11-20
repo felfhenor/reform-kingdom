@@ -11,6 +11,7 @@ export function ensureNodeOverride(
     description: override.description ?? 'UNKNOWN',
     hidden: override.hidden ?? false,
     ...ensureNodeBackground(override),
+    frames: override.frames ?? 0,
     invisibleUntilCollectibleIdsFound:
       override.invisibleUntilCollectibleIdsFound ?? [],
   };

@@ -2,6 +2,7 @@ import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { HasNodeBackground } from '@interfaces/node-background';
 import type { HasDescription } from '@interfaces/traits';
 import type {
+  WorldNodeAnimatable,
   WorldNodeDevelopable,
   WorldNodeEntry,
   WorldNodeHideable,
@@ -14,7 +15,8 @@ export type OutpostContent = IsContentItem &
   HasDescription &
   WorldNodeHideable &
   WorldNodeDevelopable &
-  HasNodeBackground & {
+  HasNodeBackground &
+  WorldNodeAnimatable & {
     id: OutpostId;
     __type: 'outpost';
   };

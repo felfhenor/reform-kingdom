@@ -16,7 +16,10 @@ import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { LevelRange } from '@interfaces/level-range';
 import type { StatBlock } from '@interfaces/stat';
 import type { HasDescription } from '@interfaces/traits';
-import type { WorldNodeHideable } from '@interfaces/world-nodes';
+import type {
+  WorldNodeAnimatable,
+  WorldNodeHideable,
+} from '@interfaces/world-nodes';
 
 export type TownId = Branded<string, 'TownId'>;
 
@@ -150,7 +153,8 @@ export type TownDefenseConfig = {
 export type TownContent = IsContentItem &
   HasDescription &
   WorldNodeHideable &
-  HasNodeBackground & {
+  HasNodeBackground &
+  WorldNodeAnimatable & {
     id: TownId;
     __type: 'town';
 

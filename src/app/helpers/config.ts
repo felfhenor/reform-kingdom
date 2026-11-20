@@ -374,6 +374,8 @@ export const NODE_REVEAL_POP_MS = 450;
 export const NODE_REVEAL_OVERSHOOT = 1.70158;
 export const NODE_REVEAL_RING_RADIUS_TILES = 1.5;
 export const NODE_FORGOTTEN_ALPHA = 0.4;
+// One full loop of an animated node's frames, however many it has.
+export const NODE_ANIMATION_CYCLE_MS = 1000;
 export const NODE_SPARKLE_MOTE_COUNT = 6;
 export const NODE_SPARKLE_MOTE_SIZE_PX = 3;
 export const NODE_SPARKLE_PERIOD_MS = 4800;

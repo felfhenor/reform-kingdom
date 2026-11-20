@@ -2,6 +2,7 @@
   name: Orcwell Trading Group - Craggled Mire
   description: The Craggled Mire branch of the Orcwell Trading Group traders.
   background: swamp-tusks
+  frames: 2
 
   traderResetTime: 3600
 

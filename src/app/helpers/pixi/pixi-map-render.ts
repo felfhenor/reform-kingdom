@@ -29,8 +29,8 @@ import {
 export const NODE_SPRITE_LABEL = 'node-sprite';
 
 // Looked up by label, not index: effects (e.g. the reveal ring) insert children ahead of it.
-export function pixiNodeSprite(wrapper: Container): Container | null {
-  return wrapper.getChildByLabel(NODE_SPRITE_LABEL);
+export function pixiNodeSprite(wrapper: Container): Sprite | null {
+  return wrapper.getChildByLabel(NODE_SPRITE_LABEL) as Sprite | null;
 }
 
 export type PixiTiledMapRenderResult = {

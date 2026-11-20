@@ -4,6 +4,7 @@ import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { HasNodeBackground } from '@interfaces/node-background';
 import type { HasDescription } from '@interfaces/traits';
 import type {
+  WorldNodeAnimatable,
   WorldNodeDevelopmentLevel,
   WorldNodeHideable,
 } from '@interfaces/world-nodes';
@@ -20,7 +21,8 @@ export type ShrineLevel = WorldNodeDevelopmentLevel & {
 export type ShrineContent = IsContentItem &
   HasDescription &
   WorldNodeHideable &
-  HasNodeBackground & {
+  HasNodeBackground &
+  WorldNodeAnimatable & {
     id: ShrineId;
     __type: 'shrine';
 

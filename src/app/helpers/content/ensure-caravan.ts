@@ -50,6 +50,7 @@ export function ensureCaravan(
       caravan.startingCommissionOfferId ?? ('UNKNOWN' as CommissionOfferId),
     hidden: caravan.hidden ?? false,
     ...ensureNodeBackground(caravan),
+    frames: caravan.frames ?? 0,
     invisibleUntilCollectibleIdsFound:
       caravan.invisibleUntilCollectibleIdsFound ?? [],
   };

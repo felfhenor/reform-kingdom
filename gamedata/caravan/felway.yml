@@ -2,6 +2,7 @@
   name: Fel Smugglers - Felway
   description: A band of Fel who move goods between the Fel and the Duchy. They'll trade with anyone who has the coin they need.
   background: castle-gate
+  frames: 2
 
   traderResetTime: 3600
 

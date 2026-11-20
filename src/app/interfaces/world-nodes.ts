@@ -6,6 +6,7 @@ import type { ShrineContent } from '@interfaces/content-shrine';
 import type { CostItem } from '@interfaces/cost';
 import type { DifficultyTier } from '@interfaces/difficulty-tier';
 import type { RewardIdentity } from '@interfaces/droppable';
+import type { HasNodeBackground } from '@interfaces/node-background';
 import type { TiledObject } from '@interfaces/tiled-map';
 
 export type WorldNodeHideable = {
@@ -15,6 +16,13 @@ export type WorldNodeHideable = {
   // Node is fully unrendered/unclickable/unnavigable until every listed collectible has been found.
   invisibleUntilCollectibleIdsFound?: CollectibleId[];
 };
+
+export type WorldNodeAnimatable = {
+  // Consecutive tileset tiles the world map cycles through from the placed one; omit for a static node.
+  frames?: number;
+};
+
+export type WorldNodeDisplayContent = HasNodeBackground & WorldNodeAnimatable;
 
 export type WorldNodeDevelopmentLevel = {
   costs: CostItem[];

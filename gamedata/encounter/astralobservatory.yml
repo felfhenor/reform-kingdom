@@ -41,6 +41,7 @@
   name: Pulvis Oblitus
   description: A forgotten desert, rebuilt through Fel's memory of the sands. The land forgot how to grow plantlife, and in time, it may forget itself.
   background: desert-ruins
+  frames: 4
   backgroundFilter: Astral
   levelRange:
     min: 60
@@ -81,6 +82,7 @@
   name: Arbor Oblitus
   description: A forgotten forest, rebuilt through Fel's memory of the woodland. Here, the trees forget being cut down. They forget growing. Soon, Fel will try to make them forget sprouting, too.
   background: forest-magic
+  frames: 4
   backgroundFilter: Astral
   levelRange:
     min: 60

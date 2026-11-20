@@ -5,7 +5,10 @@ import type { DroppedReward } from '@interfaces/droppable';
 import type { Branded, IsContentItem } from '@interfaces/identifiable';
 import type { LevelRange } from '@interfaces/level-range';
 import type { HasDescription } from '@interfaces/traits';
-import type { WorldNodeHideable } from '@interfaces/world-nodes';
+import type {
+  WorldNodeAnimatable,
+  WorldNodeHideable,
+} from '@interfaces/world-nodes';
 
 export type EncounterRandomId = Branded<string, 'EncounterRandomId'>;
 
@@ -17,7 +20,8 @@ export type EncounterRandomPoolMonster = {
 export type EncounterRandomContent = IsContentItem &
   HasDescription &
   WorldNodeHideable &
-  HasNodeBackground & {
+  HasNodeBackground &
+  WorldNodeAnimatable & {
     id: EncounterRandomId;
     __type: 'encounterrandom';
 

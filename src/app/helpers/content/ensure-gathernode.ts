@@ -33,6 +33,7 @@ export function ensureGathering(
     gatherResults: ensureArray(gathering.gatherResults, ensureGatherResult),
     hidden: gathering.hidden ?? false,
     ...ensureNodeBackground(gathering),
+    frames: gathering.frames ?? 0,
     invisibleUntilCollectibleIdsFound:
       gathering.invisibleUntilCollectibleIdsFound ?? [],
     workerLevelRange: gathering.workerLevelRange ?? { min: 1, max: 99 },

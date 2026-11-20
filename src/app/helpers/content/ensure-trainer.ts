@@ -31,6 +31,7 @@ export function ensureTrainer(
     description: trainer.description ?? 'UNKNOWN',
     hidden: trainer.hidden ?? false,
     ...ensureNodeBackground(trainer),
+    frames: trainer.frames ?? 0,
     invisibleUntilCollectibleIdsFound:
       trainer.invisibleUntilCollectibleIdsFound ?? [],
     trainerTeachingIds: trainer.trainerTeachingIds ?? [],

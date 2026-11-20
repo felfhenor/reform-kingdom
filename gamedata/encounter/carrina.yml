@@ -446,6 +446,7 @@
   name: Elven River Camp
   description: A camp by the Carrina river, inhabited by elves. They don't take kindly to non-elves approaching.
   background: forest-waterfall
+  frames: 2
 
   levelRange:
     min: 13

@@ -15,6 +15,7 @@ export function ensureOutpost(
     description: outpost.description ?? 'UNKNOWN',
     hidden: outpost.hidden ?? false,
     ...ensureNodeBackground(outpost),
+    frames: outpost.frames ?? 0,
     invisibleUntilCollectibleIdsFound:
       outpost.invisibleUntilCollectibleIdsFound ?? [],
     levels: ensureArray(outpost.levels, ensureWorldNodeDevelopmentLevel),

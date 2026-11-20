@@ -2,6 +2,7 @@
   name: Bairan Faust
   description: An intermediate-level trainer that's often found training by an oasis.
   background: desert-shore
+  frames: 2
 
   trainerTeachingIds:
     - 'Magical: Desert Survival'

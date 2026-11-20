@@ -11,6 +11,7 @@ export function ensureCollectibleGate(
     description: gate.description ?? 'UNKNOWN',
     hidden: gate.hidden ?? false,
     ...ensureNodeBackground(gate),
+    frames: gate.frames ?? 0,
     invisibleUntilCollectibleIdsFound:
       gate.invisibleUntilCollectibleIdsFound ?? [],
     requiredCollectibleIds: gate.requiredCollectibleIds ?? [],

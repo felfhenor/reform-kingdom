@@ -2,6 +2,7 @@
   name: Founder's Blessed - Astral Observatory
   description: A Blessed of the Founder. They go where they're needed most, and offer what's needed when it's needed most.
   background: sky-temple
+  frames: 2
 
   traderResetTime: 3600
 

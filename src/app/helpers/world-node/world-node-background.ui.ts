@@ -3,17 +3,9 @@ import { getEntry } from '@helpers/content/content';
 import { isOutpostBuilt } from '@helpers/world-node/world-node-outpost';
 import { worldNodeShrineLevel } from '@helpers/world-node/world-node-shrine';
 import {
-  worldNodeCaravan,
-  worldNodeCollectibleGate,
-  worldNodeEncounter,
-  worldNodeEncounterRandom,
-  worldNodeExchange,
-  worldNodeGathering,
+  worldNodeDisplayContent,
   worldNodeOutpost,
-  worldNodeOverride,
   worldNodeShrine,
-  worldNodeTown,
-  worldNodeTrainer,
 } from '@helpers/world-node/world-nodes';
 import type {
   Combat,
@@ -57,18 +49,7 @@ function isWorldNodeUnbuilt(entry: WorldNodeEntry): boolean {
 export function worldNodeBackground(
   entry: WorldNodeEntry,
 ): HasNodeBackground | undefined {
-  const content =
-    worldNodeOverride(entry) ??
-    worldNodeEncounter(entry) ??
-    worldNodeEncounterRandom(entry) ??
-    worldNodeGathering(entry) ??
-    worldNodeExchange(entry) ??
-    worldNodeTown(entry) ??
-    worldNodeCaravan(entry) ??
-    worldNodeShrine(entry) ??
-    worldNodeOutpost(entry) ??
-    worldNodeTrainer(entry) ??
-    worldNodeCollectibleGate(entry);
+  const content = worldNodeDisplayContent(entry);
   if (!content) return undefined;
 
   return isWorldNodeUnbuilt(entry)
