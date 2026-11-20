@@ -56,10 +56,14 @@ export async function legacyEndRun(): Promise<GameId | undefined> {
   return run.id;
 }
 
-// Backups whose newest run is already in the Legacy were finished on purpose, not lost.
+// A run ended since the newest backup explains the missing save, even if that backup's game was replaced rather than ended.
 export function legacyHasUnfinishedBackup(backups: SavefileBackup[]): boolean {
   const newest = backups[0];
-  return !!newest && !legacyRunById(newest.gameId as GameId);
+  return (
+    !!newest &&
+    !legacyRunById(newest.gameId as GameId) &&
+    !legacy().runs.some((run) => run.endedAt > newest.createdAt)
+  );
 }
 
 export function legacyHasCompletedRun(): boolean {
