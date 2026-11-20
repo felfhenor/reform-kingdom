@@ -374,6 +374,16 @@ export const NODE_REVEAL_POP_MS = 450;
 export const NODE_REVEAL_OVERSHOOT = 1.70158;
 export const NODE_REVEAL_RING_RADIUS_TILES = 1.5;
 export const NODE_FORGOTTEN_ALPHA = 0.4;
+export const NODE_SPARKLE_MOTE_COUNT = 6;
+export const NODE_SPARKLE_MOTE_SIZE_PX = 3;
+export const NODE_SPARKLE_PERIOD_MS = 4800;
+export const NODE_SPARKLE_ALPHA_MAX = 0.45;
+export const NODE_SPARKLE_COLOR = 0xfef3c7;
+// Tile fractions: motes spawn in the lower-middle band and drift up by RISE over one period.
+export const NODE_SPARKLE_SPAWN_MIN = 0.15;
+export const NODE_SPARKLE_SPAWN_RANGE = 0.4;
+export const NODE_SPARKLE_RISE = 0.3;
+export const NODE_SPARKLE_INSET = 0.12;
 export const INDICATOR_PROGRESS_BAR_HEIGHT = 6;
 export const INDICATOR_PROGRESS_BAR_OFFSET_Y = -60;
 export const NODE_STATUS_ICON_RADIUS = 7;

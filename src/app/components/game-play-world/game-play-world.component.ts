@@ -74,6 +74,7 @@ import {
 import { pixiTiledMapRender } from '@helpers/pixi/pixi-map-render';
 import { pixiNodeForgottenSet } from '@helpers/pixi/pixi-node-forgotten.ui';
 import { pixiNodeRevealCreate } from '@helpers/pixi/pixi-node-reveal.ui';
+import { pixiNodeSparklesCreate } from '@helpers/pixi/pixi-node-sparkle.ui';
 import {
   partyFollowerCatchUpPosition,
   partyFollowerCatchUpStart,
@@ -111,6 +112,7 @@ import {
   isWorldNodeVisible,
   worldNodeByName,
 } from '@helpers/world-node/world-nodes';
+import { isWorldNodeUncleared } from '@helpers/world-node/world-node-uncleared';
 import { worldNodeDiscoverIfHidden } from '@helpers/world-node/world-nodes.ui';
 import { isPlayerAtLocation } from '@helpers/world.ui';
 import type {
@@ -302,6 +304,11 @@ export class GamePlayWorldComponent implements OnDestroy {
     update: (elapsedMs: number) => boolean;
     spawnedAt: number;
   }> = [];
+  // Made on a node's first uncleared check and only hidden after, since clearing is one-way.
+  private nodeSparkles = new Map<
+    string,
+    { container: Container; update: (nowMs: number) => void }
+  >();
   // Icon textures persist across map transitions.
   private floatingTextIconTextures = new Map<string, Texture>();
   private pendingFloatingTextTextureLoads = new Map<string, GatherVfxEvent[]>();
@@ -502,6 +509,9 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.partyFollowerTokens.forEach((token) =>
       token.destroy({ children: true }),
     );
+    this.nodeSparkles.forEach((sparkles) =>
+      sparkles.container.destroy({ children: true }),
+    );
     this.app?.destroy(true, { children: true, texture: true });
 
     // Queued/active floating text is map-scoped (positions reference nodes on the map being torn down) -
@@ -512,6 +522,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.pendingFloatingTextTextureLoads.clear();
     this.activeFloatingTexts = [];
     this.activeNodeReveals = [];
+    this.nodeSparkles.clear();
 
     this.app = undefined;
     this.map = undefined;
@@ -664,6 +675,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.updateWorkerIndicators();
       this.updateFloatingTexts();
       this.updateNodeReveals();
+      this.updateNodeSparkles();
     };
     this.app.ticker.add(this.visualPositionTicker);
 
@@ -711,7 +723,30 @@ export class GamePlayWorldComponent implements OnDestroy {
       wrapper.visible = unlocked || forgotten;
       wrapper.eventMode = unlocked ? 'static' : 'none';
       pixiNodeForgottenSet(wrapper, forgotten);
+      this.setNodeSparklesVisible(
+        wrapper,
+        nodeName,
+        isWorldNodeUncleared(entry),
+      );
     });
+  }
+
+  private setNodeSparklesVisible(
+    wrapper: Container,
+    nodeName: string,
+    visible: boolean,
+  ): void {
+    const existing = this.nodeSparkles.get(nodeName);
+    if (existing) {
+      existing.container.visible = visible;
+      return;
+    }
+
+    if (!visible) return;
+    this.nodeSparkles.set(
+      nodeName,
+      pixiNodeSparklesCreate(wrapper, this.nodeSparkles.size + 1),
+    );
   }
 
   private resolveNodeLabel(
@@ -1410,6 +1445,13 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.activeNodeReveals = this.activeNodeReveals.filter((reveal) =>
       reveal.update(now - reveal.spawnedAt),
     );
+  }
+
+  private updateNodeSparkles(): void {
+    const now = performance.now();
+    this.nodeSparkles.forEach((sparkles) => {
+      if (sparkles.container.visible) sparkles.update(now);
+    });
   }
 
   private spawnFloatingText(event: GatherVfxEvent, now: number): void {

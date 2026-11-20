@@ -10,6 +10,8 @@ export * from './pixi-map-render';
 export * from './pixi-node-forgotten.ui';
 export * from './pixi-node-reveal';
 export * from './pixi-node-reveal.ui';
+export * from './pixi-node-sparkle';
+export * from './pixi-node-sparkle.ui';
 export * from './pixi-party-formation.ui';
 export * from './pixi-terrain-noise';
 export * from './pixi-texture-loader';

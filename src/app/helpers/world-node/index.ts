@@ -30,6 +30,7 @@ export * from './world-node-shrine';
 export * from './world-node-shrine.ui';
 export * from './world-node-status';
 export * from './world-node-status.ui';
+export * from './world-node-uncleared';
 export * from './world-node-visit';
 export * from './world-nodes';
 export * from './world-nodes.ui';

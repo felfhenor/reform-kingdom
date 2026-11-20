@@ -116,3 +116,10 @@ export type BackdropStar = {
   radiusPx: number;
   phase: number;
 };
+
+// x/y are fractions of the node's tile; y counts up from its bottom edge.
+export type NodeSparkleMoteState = {
+  x: number;
+  y: number;
+  alpha: number;
+};
