@@ -59,6 +59,8 @@ export class FFFocusService {
   private activeScope?: HTMLElement;
   private activeRoot?: HTMLElement;
   private nextOrder = 0;
+  private focusOnChangeHeld = false;
+  private nextFrameId?: number;
 
   constructor() {
     const unregisters = [
@@ -82,6 +84,8 @@ export class FFFocusService {
     inject(DestroyRef).onDestroy(() => {
       unregisters.forEach((unregister) => unregister());
       document.removeEventListener('focusin', this.remember);
+      if (this.nextFrameId !== undefined)
+        cancelAnimationFrame(this.nextFrameId);
     });
   }
 
@@ -116,6 +120,29 @@ export class FFFocusService {
 
     this.focus(target);
     return true;
+  }
+
+  // Lets a caller that places focus itself (e.g. LT/RT hero cycling) stop ffFocusOnChange lists grabbing it.
+  public holdFocusOnChange(): void {
+    this.focusOnChangeHeld = true;
+  }
+
+  public releaseFocusOnChange(): void {
+    this.focusOnChangeHeld = false;
+  }
+
+  public isFocusOnChangeHeld(): boolean {
+    return this.focusOnChangeHeld;
+  }
+
+  // For callers whose own element may be destroyed by the change they just made (e.g. a re-rendered tablist).
+  public focusNextFrame(find: () => HTMLElement | undefined): void {
+    if (this.nextFrameId !== undefined) cancelAnimationFrame(this.nextFrameId);
+    this.nextFrameId = requestAnimationFrame(() => {
+      this.nextFrameId = undefined;
+      const target = find();
+      if (target) this.focusElement(target);
+    });
   }
 
   public isFocusable(element: HTMLElement): boolean {

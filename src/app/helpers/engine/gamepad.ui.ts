@@ -39,6 +39,18 @@ export function gamepadSwalClick(
   loader: SweetAlert2LoaderService,
   button: 'confirm' | 'cancel',
 ): void {
+  // A presses whichever swal button the D-pad focused, so a focused Cancel never confirms.
+  const focused = document.activeElement;
+  const popup = gamepadSwalPopup();
+  if (
+    button === 'confirm' &&
+    focused instanceof HTMLButtonElement &&
+    popup?.contains(focused)
+  ) {
+    focused.click();
+    return;
+  }
+
   void loader.swal.then((swal) =>
     button === 'confirm' ? swal.clickConfirm() : swal.clickCancel(),
   );
@@ -83,13 +95,15 @@ const SWAL_BUTTON_ACTIONS: Array<[string, FFGamepadAction]> = [
 
 // Swal renders its own buttons, so glyphs are added to its DOM directly.
 function gamepadDecorateSwal(input: FFInputService): void {
+  // Read before any early return, so the effect re-runs when either changes.
+  const mode = input.mode();
+  const family = input.family();
   document
     .querySelectorAll('.ff-swal-glyph')
     .forEach((glyph) => glyph.remove());
   const popup = gamepadSwalPopup();
-  if (!popup || input.mode() !== 'gamepad') return;
+  if (!popup || mode !== 'gamepad') return;
 
-  const family = input.family();
   SWAL_BUTTON_ACTIONS.forEach(([selector, action]) => {
     const button = popup.querySelector<HTMLElement>(selector);
     const glyph = ffCreateGlyphElement(family, ffActionMap(family)[action]);
@@ -107,7 +121,11 @@ export function gamepadBindSwal(): void {
   effect(decorate);
 
   // Swal appends its container to <body>, then fills it, so decorate on the next frame.
-  const observer = new MutationObserver(() => requestAnimationFrame(decorate));
+  let frameId: number | undefined;
+  const observer = new MutationObserver(() => {
+    if (frameId !== undefined) cancelAnimationFrame(frameId);
+    frameId = requestAnimationFrame(decorate);
+  });
   observer.observe(document.body, { childList: true });
 
   const unregister = inject(FFFocusService).registerScope(
@@ -115,10 +133,17 @@ export function gamepadBindSwal(): void {
     gamepadSwalPopup,
   );
   inject(DestroyRef).onDestroy(() => {
+    if (frameId !== undefined) cancelAnimationFrame(frameId);
     observer.disconnect();
     unregister();
   });
 }
+
+// Hero pickers are tab strips (aria-selected) or list rows (aria-current); tabs win, since a page can hold other selected rows.
+const SELECTED_HERO_SELECTORS = [
+  '[role="tab"][aria-selected="true"]',
+  '[aria-current="true"]',
+];
 
 // Injection context only; LT/RT step through the party while the calling component is visible.
 export function gamepadBindHeroCycle(
@@ -130,11 +155,12 @@ export function gamepadBindHeroCycle(
   const element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   const injector = inject(Injector);
   const focus = inject(FFFocusService);
-  const focusSelectedTab = () => {
-    const tab = element.querySelector<HTMLElement>(
-      '[role="tab"][aria-selected="true"]',
-    );
-    if (tab) focus.focusElement(tab);
+  const focusSelectedHero = () => {
+    focus.releaseFocusOnChange();
+    const hero = SELECTED_HERO_SELECTORS.map((selector) =>
+      element.querySelector<HTMLElement>(selector),
+    ).find(Boolean);
+    if (hero) focus.focusElement(hero);
   };
   const options = {
     element,
@@ -145,10 +171,14 @@ export function gamepadBindHeroCycle(
     const id = currentId();
     if (!id) return;
 
+    // Focus follows the hero picker, not into lists keyed on the hero (ffFocusOnChange).
+    focus.holdFocusOnChange();
     select(cycleStep(partyIds(), id, direction));
-    afterNextRender(focusSelectedTab, { injector });
+    afterNextRender(focusSelectedHero, { injector });
   };
 
   ffGamepadOn('subPrev', () => step(-1), options);
   ffGamepadOn('subNext', () => step(1), options);
+  // If the host dies before its afterNextRender, the hold would otherwise never release.
+  inject(DestroyRef).onDestroy(() => focus.releaseFocusOnChange());
 }

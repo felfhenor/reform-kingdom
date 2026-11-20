@@ -44,11 +44,10 @@ export class FFTriggerTabsDirective {
     const next = tabs[(current + direction + tabs.length) % tabs.length];
     next.click();
     // A tab switch may re-render the whole tablist, so find the selected tab again afterwards.
-    requestAnimationFrame(() => {
-      const selected = [
-        ...document.querySelectorAll<HTMLElement>(SELECTED_TAB_SELECTOR),
-      ].find((tab) => tab.checkVisibility({ visibilityProperty: true }));
-      if (selected) this.focus.focusElement(selected);
-    });
+    this.focus.focusNextFrame(() =>
+      [...document.querySelectorAll<HTMLElement>(SELECTED_TAB_SELECTOR)].find(
+        (tab) => tab.checkVisibility({ visibilityProperty: true }),
+      ),
+    );
   }
 }

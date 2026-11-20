@@ -6,9 +6,11 @@
   <div class="flex flex-col gap-2 h-full overflow-y-auto pb-2">
     @for (row of rows(); track row.content.id) {
       <div
+        #spellRow
         class="flex items-center gap-4 p-2 bg-base-200 min-h-24 shrink-0 lg:min-h-0"
       >
-        <div class="w-16 h-16 relative flex-shrink-0">
+        <!-- Focusable so rows with nothing castable stay reachable by controller. -->
+        <div tabindex="0" class="w-16 h-16 relative flex-shrink-0">
           @if (row.effect) {
             <app-slot-rarity-outline
               [entry]="row.effect"
@@ -57,9 +59,11 @@
             [disabled]="!row.castable"
             (click)="$event.shiftKey || onCastClick(row.content)"
             (click.shift)="onCastClick(row.content, true)"
-            appSfx="ui-click"
-            [sfxOffset]="$index"
-            [sfxTrigger]="['click', 'hover']"
+            ffButton="ui-click"
+            [ffSoundOffset]="$index"
+            ffPadAction="context"
+            ffPadLabel="Cast"
+            [ffPadWithin]="spellRow"
           >
             Cast
           </button>

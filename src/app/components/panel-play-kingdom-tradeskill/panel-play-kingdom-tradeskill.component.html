@@ -127,6 +127,7 @@
         @let full = isQueueFullForRecipe(entry.recipe.id);
 
         <div
+          #recipeRow
           class="flex items-center gap-2 p-2 bg-base-200 min-h-[72px] max-h-[72px]"
           [class.opacity-50]="uncraftable"
         >
@@ -138,6 +139,7 @@
 
           <div
             #recipeIcon
+            tabindex="0"
             class="w-16 h-16 relative flex-shrink-0 overflow-hidden"
             [tp]="entry.resultContent ? preview.template() : undefined"
             [tpPlacement]="'top'"
@@ -336,9 +338,11 @@
                 class="btn btn-xs btn-primary"
                 [disabled]="uncraftable || full"
                 (click)="craft(entry.recipe.id, entry.maxQueueable, recipeIcon)"
-                appSfx="ui-success"
-                [sfxOffset]="$index"
-                [sfxTrigger]="['click', 'hover']"
+                ffButton="ui-success"
+                [ffSoundOffset]="$index"
+                ffPadAction="context"
+                ffPadLabel="Craft"
+                [ffPadWithin]="recipeRow"
               >
                 Craft
               </button>

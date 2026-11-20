@@ -51,7 +51,9 @@ export class FFFocusOnChangeDirective {
   }
 
   private enter(): void {
-    if (this.ffInput.mode() !== 'gamepad') return;
+    if (this.ffInput.mode() !== 'gamepad' || this.focus.isFocusOnChangeHeld()) {
+      return;
+    }
 
     const active = document.activeElement;
     this.previous =

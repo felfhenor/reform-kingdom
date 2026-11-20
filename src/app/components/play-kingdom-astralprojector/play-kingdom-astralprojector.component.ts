@@ -8,19 +8,19 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { SlotRequirementComponent } from '@components/slot-requirement/slot-requirement.component';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
-import { SFXDirective } from '@directives/sfx.directive';
+import { SlotRequirementComponent } from '@components/slot-requirement/slot-requirement.component';
+import { FFButtonComponent } from '@ff/components/button/button.component';
 import { getEntry } from '@helpers/content/content';
+import { notifySuccess } from '@helpers/engine/notify';
+import { formatDuration } from '@helpers/engine/timer';
 import {
   globalEffectDescription,
   globalEffectEffectsScaled,
 } from '@helpers/hero/global-effect-state';
-import { notifySuccess } from '@helpers/engine/notify';
-import { formatDuration } from '@helpers/engine/timer';
 import {
   astralProjectorDuration,
   astralProjectorSpellToBeOverwritten,
@@ -56,13 +56,13 @@ type AstralProjectorRowViewModel = {
   selector: 'app-play-kingdom-astralprojector',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFButtonComponent,
     SlotRequirementComponent,
     BlankSlateComponent,
     ButtonKingdomBackComponent,
     CardPageComponent,
     SweetAlert2Module,
     SlotRarityOutlineComponent,
-    SFXDirective,
   ],
   templateUrl: './play-kingdom-astralprojector.component.html',
 })
