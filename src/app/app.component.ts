@@ -13,6 +13,7 @@ import { ScreenLoadingComponent } from '@components/screen-loading/screen-loadin
 import { TutorialOverlayComponent } from '@components/tutorial-overlay/tutorial-overlay.component';
 import { FFBarPromptsComponent } from '@ff/components/bar-prompts/bar-prompts.component';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
+import { FFFocusService } from '@ff/focus/ff-focus.service';
 import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
 import { isDemoBuild } from '@helpers/demo/demo';
 import {
@@ -48,6 +49,7 @@ export class AppComponent {
     // Electron's window title follows the page's.
     if (isDemoBuild()) inject(Title).setTitle('re:Form Kingdom Demo');
 
+    inject(FFFocusService);
     this.bindGamepadDialogs();
   }
 

@@ -5,6 +5,7 @@
     <button
       type="button"
       role="tab"
+      [attr.aria-selected]="character.id === selectedId()"
       class="tab w-64 min-w-0 gap-2"
       [class.tab-active]="character.id === selectedId()"
       [class.font-bold]="character.id === selectedId()"

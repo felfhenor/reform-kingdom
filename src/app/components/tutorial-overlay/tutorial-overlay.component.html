@@ -50,6 +50,7 @@
 
       <div
         class="tutorial-callout"
+        [ffFocusScope]="gamepadPriority"
         (animate.enter)="onCalloutEnter($event)"
         [class.callout-centered]="!position"
         [style.top.px]="position?.top"

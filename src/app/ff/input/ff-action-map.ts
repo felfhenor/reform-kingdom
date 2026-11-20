@@ -1,8 +1,11 @@
 import type {
   FFActionMap,
   FFControllerFamily,
+  FFDirection,
   FFGamepadAction,
 } from '@ff/interfaces/ff-input';
+
+export const FF_DIRECTIONS: FFDirection[] = ['up', 'down', 'left', 'right'];
 
 // W3C "standard" Gamepad mapping indices, by physical position.
 export const FF_STANDARD_BUTTON = {

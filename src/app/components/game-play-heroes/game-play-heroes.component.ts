@@ -13,6 +13,7 @@ import {
   heroesSelectedCharacterId,
   heroesSubview,
 } from '@helpers/engine/ui';
+import { gamepadBindHeroCycle } from '@helpers/engine/gamepad.ui';
 import { optimizeCharacterEquipment } from '@helpers/hero/character-equipment';
 import { canModifyEquipment } from '@helpers/item/equipment';
 import { worldPartyState } from '@helpers/state-game';
@@ -51,6 +52,13 @@ export class GamePlayHeroesComponent {
   public selectedCharacterId = computed(() => this.selectedCharacter()?.id);
 
   public equipmentModifiable = computed(() => canModifyEquipment());
+
+  constructor() {
+    gamepadBindHeroCycle(
+      () => this.selectedCharacterId(),
+      (id) => this.selectCharacter(id),
+    );
+  }
 
   public selectCharacter(characterId: CharacterId): void {
     heroesSelectCharacter(characterId);

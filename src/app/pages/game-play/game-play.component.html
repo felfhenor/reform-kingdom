@@ -6,12 +6,14 @@
     size for the Pixi canvas - intact while hidden, unlike `hidden`.
   -->
   <app-game-play-world
+    ffFocusMemory
     class="absolute inset-0"
     [class.invisible]="activeGamePlayView() !== 'world'"
   ></app-game-play-world>
 
   @defer (when activeGamePlayView() === 'kingdom'; prefetch on idle) {
     <app-game-play-kingdom
+      ffFocusMemory
       class="view-panel ui-scaled"
       [class.hidden]="activeGamePlayView() !== 'kingdom'"
     ></app-game-play-kingdom>
@@ -23,6 +25,7 @@
 
   @defer (when activeGamePlayView() === 'heroes'; prefetch on idle) {
     <app-game-play-heroes
+      ffFocusMemory
       class="view-panel ui-scaled"
       [class.hidden]="activeGamePlayView() !== 'heroes'"
     ></app-game-play-heroes>
@@ -34,6 +37,7 @@
 
   @defer (when activeGamePlayView() === 'adventurelog'; prefetch on idle) {
     <app-play-adventurelog
+      ffFocusMemory
       class="view-panel ui-scaled"
       [class.hidden]="activeGamePlayView() !== 'adventurelog'"
     ></app-play-adventurelog>
@@ -45,6 +49,7 @@
 
   @defer (when activeGamePlayView() === 'decree'; prefetch on idle) {
     <app-game-play-decree
+      ffFocusMemory
       class="view-panel ui-scaled"
       [class.hidden]="activeGamePlayView() !== 'decree'"
     ></app-game-play-decree>
@@ -56,6 +61,7 @@
 
   @defer (when activeGamePlayView() === 'town'; prefetch on idle) {
     <app-game-play-town
+      ffFocusMemory
       class="view-panel ui-scaled"
       [class.hidden]="activeGamePlayView() !== 'town'"
     ></app-game-play-town>

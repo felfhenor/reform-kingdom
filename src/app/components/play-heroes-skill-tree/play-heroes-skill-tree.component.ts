@@ -50,6 +50,7 @@ import type {
   SkillTreeNodeContent,
   SkillTreeNodeId,
 } from '@interfaces';
+import { gamepadBindHeroCycle } from '@helpers/engine/gamepad.ui';
 import { TippyDirective } from '@ngneat/helipopper';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
@@ -156,6 +157,11 @@ export class PlayHeroesSkillTreeComponent {
   });
 
   constructor() {
+    gamepadBindHeroCycle(
+      () => this.character()?.id,
+      (id) => this.selectHero(id),
+    );
+
     effect(() =>
       navigationLeaveGuard.set(
         this.staged().length > 0

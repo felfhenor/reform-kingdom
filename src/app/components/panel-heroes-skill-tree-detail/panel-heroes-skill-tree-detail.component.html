@@ -131,8 +131,9 @@
         (animate.enter)="onEnter($event)"
         (animate.leave)="onLeave($event)"
         (click)="learn.emit(info.node.id)"
-        appSfx="ui-success"
-        [sfxTrigger]="['click', 'hover']"
+        ffButton="ui-success"
+        ffPadAction="context"
+        ffPadLabel="Learn"
       >
         @if (multiRank && nodeRank) {
           Learn ({{ nodeRank.rank + 1 | number }}/{{
@@ -151,8 +152,9 @@
         (animate.enter)="onEnter($event)"
         (animate.leave)="onLeave($event)"
         (click)="unlearn.emit(info.node.id)"
-        appSfx="ui-click"
-        [sfxTrigger]="['click', 'hover']"
+        ffButton="ui-click"
+        ffPadAction="details"
+        ffPadLabel="Unlearn"
       >
         Unlearn
       </button>

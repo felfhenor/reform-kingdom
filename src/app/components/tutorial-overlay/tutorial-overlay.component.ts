@@ -11,6 +11,7 @@ import {
 import type { Event } from '@angular/router';
 import { NavigationEnd, Router } from '@angular/router';
 import { FFButtonComponent } from '@ff/components/button/button.component';
+import { FFFocusScopeDirective } from '@ff/focus/ff-focus-scope.directive';
 import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
 import type { FFGamepadAction } from '@ff/interfaces/ff-input';
 import { GAMEPAD_PRIORITY } from '@helpers/engine/gamepad.ui';
@@ -44,12 +45,16 @@ const BLOCKED_ACTIONS: FFGamepadAction[] = [
   'tabNext',
   'pause',
   'recenter',
+  'subPrev',
+  'subNext',
+  'context',
+  'details',
 ];
 
 @Component({
   selector: 'app-tutorial-overlay',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FFButtonComponent],
+  imports: [FFButtonComponent, FFFocusScopeDirective],
   host: {
     '(window:resize)': 'bumpResizeTick()',
     '(window:scroll)': 'bumpResizeTick()',

@@ -28,6 +28,12 @@ $ff-glyph-families:
   font-synthesis: none;
 }
 
+html.ff-input-gamepad :focus {
+  outline: 2px solid color-mix(in oklab, var(--color-primary) 70%, white);
+  // Inset, so a scroll or overflow-hidden parent can't clip one side.
+  outline-offset: -2px;
+}
+
 html.ff-input-gamepad {
   &,
   * {

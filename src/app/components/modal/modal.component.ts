@@ -9,12 +9,14 @@ import {
   viewChild,
 } from '@angular/core';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
+import { FFFocusScopeDirective } from '@ff/focus/ff-focus-scope.directive';
+import { GAMEPAD_PRIORITY } from '@helpers/engine/gamepad.ui';
 import { modalClose, modalIsOpen } from '@helpers/engine/modal-stack';
 import type { ModalId } from '@interfaces';
 
 @Component({
   selector: 'app-modal',
-  imports: [ButtonCloseComponent, NgClass],
+  imports: [ButtonCloseComponent, NgClass, FFFocusScopeDirective],
   templateUrl: './modal.component.html',
   styleUrl: './modal.component.scss',
 })
@@ -31,6 +33,8 @@ export class ModalComponent {
   public modal = viewChild<ElementRef<HTMLDialogElement>>('modal');
 
   // Content stays mounted while closing (stack is the source of truth), so it doesn't tear down mid-transition.
+  protected readonly focusPriority = GAMEPAD_PRIORITY.modal;
+
   public isOpen = computed(() => modalIsOpen(this.modalId()));
 
   constructor() {

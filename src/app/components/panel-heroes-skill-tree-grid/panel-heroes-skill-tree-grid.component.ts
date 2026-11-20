@@ -16,6 +16,7 @@ import {
 } from '@angular/core';
 import { IconItemPreviewComponent } from '@components/icon-item-preview/icon-item-preview.component';
 import { SFXDirective } from '@directives/sfx.directive';
+import { FFInputService } from '@ff/input/ff-input.service';
 import {
   SKILL_TREE_COLUMN_GAP,
   SKILL_TREE_NODE_SIZE,
@@ -65,6 +66,7 @@ export class PanelHeroesSkillTreeGridComponent {
   public ranks = input.required<Map<SkillTreeNodeId, SkillTreeNodeRank>>();
   public selectedId = input<SkillTreeNodeId>();
   public selected = output<SkillTreeNodeId>();
+  private readonly ffInput = inject(FFInputService);
   public learnRequested = output<SkillTreeNodeId>();
   public unlearnRequested = output<SkillTreeNodeId>();
 
@@ -121,6 +123,11 @@ export class PanelHeroesSkillTreeGridComponent {
       });
     });
     this.boxes.set(boxes);
+  }
+
+  // Controller focus previews the node, so the detail panel's X/Y buttons act on what's focused.
+  public onNodeFocus(id: SkillTreeNodeId): void {
+    if (this.ffInput.mode() === 'gamepad') this.selected.emit(id);
   }
 
   public stateOf(id: SkillTreeNodeId): SkillTreeNodeState {

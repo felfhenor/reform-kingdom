@@ -1,3 +1,4 @@
+import { FFFocusMemoryDirective } from '@ff/focus/ff-focus-memory.directive';
 import { Component, computed } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
@@ -27,6 +28,7 @@ import { getOption } from '@helpers/state-options';
     GamePlayTownComponent,
     IconComponent,
     PageBlankComponent,
+    FFFocusMemoryDirective,
   ],
   templateUrl: './game-play.component.html',
   styleUrl: './game-play.component.scss',

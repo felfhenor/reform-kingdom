@@ -19,12 +19,8 @@ export function gamePlayViewsCyclable(
   );
 }
 
-export function gamePlayViewStep(
-  views: GamePlayView[],
-  current: GamePlayView,
-  direction: 1 | -1,
-): GamePlayView {
-  const index = views.indexOf(current);
-  if (index === -1) return views[0];
-  return views[(index + direction + views.length) % views.length];
+export function cycleStep<T>(items: T[], current: T, direction: 1 | -1): T {
+  const index = items.indexOf(current);
+  if (index === -1) return items[0];
+  return items[(index + direction + items.length) % items.length];
 }

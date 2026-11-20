@@ -71,6 +71,7 @@ import type {
   RegaliaMissingReason,
   JobContent,
 } from '@interfaces';
+import { gamepadBindHeroCycle } from '@helpers/engine/gamepad.ui';
 import { TippyDirective } from '@ngneat/helipopper';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
@@ -215,6 +216,13 @@ export class PlayHeroesRegaliaComponent {
   });
 
   public equipmentModifiable = computed(() => canModifyEquipment());
+
+  constructor() {
+    gamepadBindHeroCycle(
+      () => this.selectedCharacter()?.id,
+      (id) => this.selectCharacter(id),
+    );
+  }
 
   public selectCharacter(characterId: CharacterId): void {
     heroesSelectCharacter(characterId);

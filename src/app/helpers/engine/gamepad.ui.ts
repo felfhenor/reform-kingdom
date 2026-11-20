@@ -1,5 +1,11 @@
+import { afterNextRender, ElementRef, inject, Injector } from '@angular/core';
+import { FFFocusService } from '@ff/focus/ff-focus.service';
 import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
 import type { FFGamepadAction } from '@ff/interfaces/ff-input';
+import { cycleStep } from '@helpers/engine/gameplay-view-cycle.ui';
+import { modalHasAnyOpen } from '@helpers/engine/modal-stack';
+import { worldPartyState } from '@helpers/state-game';
+import type { CharacterId } from '@interfaces';
 import type { SweetAlert2LoaderService } from '@sweetalert2/ngx-sweetalert2';
 
 export const GAMEPAD_PRIORITY = {
@@ -31,6 +37,10 @@ const OVERLAY_BLOCKED_ACTIONS: FFGamepadAction[] = [
   'tabNext',
   'pause',
   'recenter',
+  'subPrev',
+  'subNext',
+  'context',
+  'details',
   'back',
 ];
 
@@ -39,4 +49,36 @@ export function gamepadBlockBehindOverlay(): void {
   OVERLAY_BLOCKED_ACTIONS.forEach((action) =>
     ffGamepadOn(action, () => true, { priority: GAMEPAD_PRIORITY.overlay }),
   );
+}
+
+// Injection context only; LT/RT step through the party while the calling component is visible.
+export function gamepadBindHeroCycle(
+  currentId: () => CharacterId | undefined,
+  select: (characterId: CharacterId) => void,
+): void {
+  const element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+  const injector = inject(Injector);
+  const focus = inject(FFFocusService);
+  const focusSelectedTab = () => {
+    const tab = element.querySelector<HTMLElement>(
+      '[role="tab"][aria-selected="true"]',
+    );
+    if (tab) focus.focusElement(tab);
+  };
+  const options = {
+    element,
+    enabled: () => worldPartyState().length > 1 && !modalHasAnyOpen(),
+    label: 'Switch Hero',
+  };
+  const step = (direction: 1 | -1) => {
+    const id = currentId();
+    const ids = worldPartyState().map((character) => character.id);
+    if (!id) return;
+
+    select(cycleStep(ids, id, direction));
+    afterNextRender(focusSelectedTab, { injector });
+  };
+
+  ffGamepadOn('subPrev', () => step(-1), options);
+  ffGamepadOn('subNext', () => step(1), options);
 }

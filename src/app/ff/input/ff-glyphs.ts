@@ -1,9 +1,9 @@
 import type { FFControllerFamily, FFGlyph } from '@ff/interfaces/ff-input';
 
 const UNITS_PER_EM = 2048;
-const FONT_ASCENT = 1365;
-// Descents range 0-58 across the fonts; under a pixel at our size.
-const FONT_DESCENT = 24;
+// OS/2 typo metrics, shared by all six fonts; they set USE_TYPO_METRICS, so browsers lay out with these, not hhea.
+const FONT_ASCENT = 1638;
+const FONT_DESCENT = 410;
 // Glyphs sit on the baseline at differing heights; this line-height offset centers one in its half-em box.
 const CENTERING_OFFSET_EM =
   (FONT_ASCENT - FONT_DESCENT - UNITS_PER_EM / 2) / UNITS_PER_EM;

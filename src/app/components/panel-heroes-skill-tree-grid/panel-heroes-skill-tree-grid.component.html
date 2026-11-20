@@ -24,6 +24,7 @@
     (click)="selected.emit(node.id)"
     (dblclick)="learnRequested.emit(node.id)"
     (contextmenu)="unlearnRequested.emit(node.id)"
+    (focus)="onNodeFocus(node.id)"
     appSfx="ui-click"
     [sfxTrigger]="['click', 'hover']"
   >

@@ -28,7 +28,7 @@ import { isRevealedAtLevel } from '@helpers/engine/feature-reveal';
 import { GAMEPAD_PRIORITY } from '@helpers/engine/gamepad.ui';
 import {
   gamePlayViewsCyclable,
-  gamePlayViewStep,
+  cycleStep,
 } from '@helpers/engine/gameplay-view-cycle.ui';
 import {
   modalClose,
@@ -315,7 +315,7 @@ export class NavbarComponent {
       !!this.currentTownEntry(),
       isRevealedAtLevel(DECREE_REVEAL_LEVEL),
     );
-    this.viewOpeners[gamePlayViewStep(views, gamePlayView(), direction)]();
+    this.viewOpeners[cycleStep(views, gamePlayView(), direction)]();
   }
 
   public toggleAutoMode(): void {

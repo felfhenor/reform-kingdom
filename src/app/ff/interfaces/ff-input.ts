@@ -20,10 +20,28 @@ export type FFGamepadAction =
   | 'pause'
   | 'menu'
   | 'recenter'
-  | 'up'
-  | 'down'
-  | 'left'
-  | 'right';
+  | FFDirection;
+
+export type FFDirection = 'up' | 'down' | 'left' | 'right';
+
+export type FFAxis = 'x' | 'y';
+
+export interface FFRect {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+}
+
+export interface FFFocusScopeRegistration {
+  priority: number;
+  order: number;
+  resolve: () => HTMLElement | null;
+}
+
+export interface FFFocusEdgeDetail {
+  direction: FFDirection;
+}
 
 export type FFActionMap = Record<FFGamepadAction, number>;
 

@@ -16,7 +16,7 @@ import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats
 import { RowSkillModifierComponent } from '@components/row-skill-modifier/row-skill-modifier.component';
 import { RowStatSummaryComponent } from '@components/row-stat-summary/row-stat-summary.component';
 import { TooltipSkillPreviewComponent } from '@components/tooltip-skill-preview/tooltip-skill-preview.component';
-import { SFXDirective } from '@directives/sfx.directive';
+import { FFButtonComponent } from '@ff/components/button/button.component';
 import { combatantFromCharacter } from '@helpers/combat/combat-create';
 import { SKILL_TREE_NODE_SIZE } from '@helpers/config';
 import { skillEpCost } from '@helpers/hero/skill';
@@ -61,7 +61,7 @@ import { AnimationService } from '@services/animation.service';
     RowItemStatsComponent,
     RowSkillModifierComponent,
     RowStatSummaryComponent,
-    SFXDirective,
+    FFButtonComponent,
     DetailSkillPreviewComponent,
     NgTemplateOutlet,
     TooltipSkillPreviewComponent,

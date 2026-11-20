@@ -3,7 +3,11 @@ import {
   ffActionDispatch,
   ffActivePrompts,
 } from '@ff/input/ff-action-dispatch';
-import { ffActionForButton, ffActionMap } from '@ff/input/ff-action-map';
+import {
+  FF_DIRECTIONS,
+  ffActionForButton,
+  ffActionMap,
+} from '@ff/input/ff-action-map';
 import { ffControllerFamily } from '@ff/input/ff-controller-family';
 import {
   ffAxesActive,
@@ -11,6 +15,8 @@ import {
   ffButtonsJustReleased,
   ffGamepadMayTakeInput,
   ffGamepadSnapshot,
+  ffHeldDirection,
+  ffRepeatFires,
 } from '@ff/input/ff-gamepad';
 import { FF_CONTROLLER_FAMILY_RESOLVER } from '@ff/input/ff-tokens';
 import type {
@@ -18,6 +24,7 @@ import type {
   FFActionHandlerOptions,
   FFActionRegistration,
   FFControllerFamily,
+  FFDirection,
   FFGamepadAction,
   FFGamepadSnapshot,
   FFInputMode,
@@ -30,6 +37,8 @@ const MOUSE_MOVE_THRESHOLD = 3;
 const GAMEPAD_TAKEOVER_MS = 250;
 const PROMPT_REFRESH_MS = 200;
 const FAMILY_RESOLVE_RETRY_MS = 2000;
+const DIRECTION_REPEAT_DELAY_MS = 400;
+const DIRECTION_REPEAT_INTERVAL_MS = 120;
 
 const PROMPT_ACTION_ORDER: FFGamepadAction[] = [
   'confirm',
@@ -72,6 +81,10 @@ export class FFInputService {
   private resolvedFamilies = new Map<number, FFControllerFamily>();
   private lastFamilyResolveAt = new Map<number, number>();
   private lastPromptRefreshAt = 0;
+  private refreshListeners: Array<() => void> = [];
+  private heldDirection?: FFDirection;
+  private heldDirectionSince = 0;
+  private heldDirectionFires = 0;
 
   constructor() {
     const listeners: Array<[string, EventListener]> = [
@@ -127,6 +140,16 @@ export class FFInputService {
     };
   }
 
+  // Runs on the prompt cadence while in gamepad mode, for state that isn't reactive (DOM visibility).
+  public onRefresh(listener: () => void): () => void {
+    this.refreshListeners = [...this.refreshListeners, listener];
+    return () => {
+      this.refreshListeners = this.refreshListeners.filter(
+        (existing) => existing !== listener,
+      );
+    };
+  }
+
   private startPolling = (): void => {
     if (this.frameId !== undefined) return;
     this.frameId = requestAnimationFrame(this.poll);
@@ -172,6 +195,7 @@ export class FFInputService {
     if (now - this.lastPromptRefreshAt < PROMPT_REFRESH_MS) return;
 
     this.lastPromptRefreshAt = now;
+    this.refreshListeners.forEach((listener) => listener());
     this.promptsSignal.set(
       ffActivePrompts(this.registrations, PROMPT_ACTION_ORDER, isElementActive),
     );
@@ -190,15 +214,22 @@ export class FFInputService {
 
     const hasInput =
       pressed.length > 0 || ffAxesActive(snapshot.axes, MODE_SWITCH_DEADZONE);
-    if (!hasInput) return;
+    if (hasInput && this.takeInput(gamepad, now)) {
+      this.pressButtons(gamepad.index, pressed);
+    }
+    if (gamepad.index === this.activeGamepadIndex) {
+      this.repeatDirection(snapshot, now);
+    }
+  }
 
+  private takeInput(gamepad: Gamepad, now: number): boolean {
     const mayTakeInput = ffGamepadMayTakeInput(
       this.activeGamepadIndex,
       gamepad.index,
       now - this.lastInputAt,
       GAMEPAD_TAKEOVER_MS,
     );
-    if (!mayTakeInput) return;
+    if (!mayTakeInput) return false;
 
     this.resolveFamily(gamepad, now);
     this.activeGamepadIndex = gamepad.index;
@@ -209,11 +240,47 @@ export class FFInputService {
         ffControllerFamily(gamepad.id),
     );
 
+    return true;
+  }
+
+  // Directions are dispatched by repeatDirection instead, so holding them repeats.
+  private pressButtons(gamepadIndex: number, pressed: number[]): void {
     const actionMap = ffActionMap(this.familySignal());
     pressed.forEach((button) => {
       const action = ffActionForButton(actionMap, button);
-      if (action) this.pressButton(gamepad.index, button, action);
+      if (!action || FF_DIRECTIONS.includes(action as FFDirection)) return;
+      this.pressButton(gamepadIndex, button, action);
     });
+  }
+
+  private repeatDirection(snapshot: FFGamepadSnapshot, now: number): void {
+    const direction = ffHeldDirection(
+      snapshot,
+      ffActionMap(this.familySignal()),
+      MODE_SWITCH_DEADZONE,
+    );
+    if (direction !== this.heldDirection) {
+      this.heldDirection = direction;
+      this.heldDirectionSince = now;
+      this.heldDirectionFires = 0;
+    }
+    if (!direction) return;
+
+    const owed = ffRepeatFires(
+      now - this.heldDirectionSince,
+      DIRECTION_REPEAT_DELAY_MS,
+      DIRECTION_REPEAT_INTERVAL_MS,
+    );
+    if (this.heldDirectionFires >= owed) return;
+
+    this.heldDirectionFires += 1;
+    this.lastInputAt = now;
+    this.dispatch(direction);
+  }
+
+  private dispatch(action: FFGamepadAction): FFActionRegistration | undefined {
+    this.lastPromptRefreshAt = 0;
+    return ffActionDispatch(this.registrations, action, isElementActive);
   }
 
   private pressButton(
@@ -221,12 +288,7 @@ export class FFInputService {
     button: number,
     action: FFGamepadAction,
   ): void {
-    const handledBy = ffActionDispatch(
-      this.registrations,
-      action,
-      isElementActive,
-    );
-    this.lastPromptRefreshAt = 0;
+    const handledBy = this.dispatch(action);
     if (!handledBy?.onRelease) return;
     this.heldButtonHandlers.set(`${gamepadIndex}:${button}`, handledBy);
   }

@@ -1,4 +1,9 @@
-import type { FFGamepadSnapshot } from '@ff/interfaces/ff-input';
+import { FF_DIRECTIONS } from '@ff/input/ff-action-map';
+import type {
+  FFActionMap,
+  FFDirection,
+  FFGamepadSnapshot,
+} from '@ff/interfaces/ff-input';
 
 const ANALOG_PRESS_THRESHOLD = 0.5;
 
@@ -51,4 +56,37 @@ export function ffGamepadMayTakeInput(
     activeIndex === index ||
     msSinceActiveInput >= takeoverMs
   );
+}
+
+export function ffStickDirection(
+  x: number,
+  y: number,
+  deadzone: number,
+): FFDirection | undefined {
+  if (Math.max(Math.abs(x), Math.abs(y)) <= deadzone) return undefined;
+  if (Math.abs(x) > Math.abs(y)) return x > 0 ? 'right' : 'left';
+  return y > 0 ? 'down' : 'up';
+}
+
+export function ffHeldDirection(
+  snapshot: FFGamepadSnapshot,
+  actionMap: FFActionMap,
+  deadzone: number,
+): FFDirection | undefined {
+  const dpad = FF_DIRECTIONS.find(
+    (direction) => snapshot.buttons[actionMap[direction]],
+  );
+  return (
+    dpad ??
+    ffStickDirection(snapshot.axes[0] ?? 0, snapshot.axes[1] ?? 0, deadzone)
+  );
+}
+
+// Total fires owed for a hold of heldMs: one on press, then one per interval after the delay.
+export function ffRepeatFires(
+  heldMs: number,
+  delayMs: number,
+  intervalMs: number,
+): number {
+  return heldMs < delayMs ? 1 : 2 + Math.floor((heldMs - delayMs) / intervalMs);
 }
