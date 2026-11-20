@@ -8,7 +8,9 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { SFXDirective } from '@directives/sfx.directive';
+import { FFButtonComponent } from '@ff/components/button/button.component';
+import { FFInputPromptComponent } from '@ff/components/input-prompt/input-prompt.component';
+import { FFInputService } from '@ff/input/ff-input.service';
 import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
 import {
   GAMEPAD_PRIORITY,
@@ -24,7 +26,7 @@ const SKIP_HOLD_MS = 1000;
 @Component({
   selector: 'app-screen-title-crawl',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SFXDirective],
+  imports: [FFButtonComponent, FFInputPromptComponent],
   templateUrl: './screen-title-crawl.component.html',
   styleUrl: './screen-title-crawl.component.scss',
   host: {
@@ -44,6 +46,8 @@ export class ScreenTitleCrawlComponent {
   public isPaused = computed(() => isGameloopPaused() || modalHasAnyOpen());
   public isFadingOut = signal(false);
   public skipProgress = signal(0);
+  private readonly ffInput = inject(FFInputService);
+  protected isGamepadMode = computed(() => this.ffInput.mode() === 'gamepad');
 
   private holdStartedAt?: number;
   private holdFrame?: number;
@@ -72,19 +76,12 @@ export class ScreenTitleCrawlComponent {
     window.addEventListener('keydown', onKeydown, { capture: true });
     window.addEventListener('keyup', onKeyup, { capture: true });
     gamepadBlockBehindOverlay();
-    ffGamepadOn(
-      'confirm',
-      () => {
-        if (modalHasAnyOpen()) return false;
-
-        this.startSkipHold();
-        return true;
-      },
-      {
-        priority: GAMEPAD_PRIORITY.overlay,
-        onRelease: () => this.cancelSkipHold(),
-      },
-    );
+    ffGamepadOn('confirm', () => this.startSkipHold(), {
+      priority: GAMEPAD_PRIORITY.overlay,
+      enabled: () => !modalHasAnyOpen(),
+      label: 'Hold to Skip',
+      onRelease: () => this.cancelSkipHold(),
+    });
     inject(DestroyRef).onDestroy(() => {
       window.removeEventListener('keydown', onKeydown, { capture: true });
       window.removeEventListener('keyup', onKeyup, { capture: true });

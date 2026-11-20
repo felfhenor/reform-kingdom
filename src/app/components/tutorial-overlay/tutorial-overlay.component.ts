@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import type { Event } from '@angular/router';
 import { NavigationEnd, Router } from '@angular/router';
-import { SFXDirective } from '@directives/sfx.directive';
+import { FFButtonComponent } from '@ff/components/button/button.component';
 import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
 import type { FFGamepadAction } from '@ff/interfaces/ff-input';
 import { GAMEPAD_PRIORITY } from '@helpers/engine/gamepad.ui';
@@ -39,10 +39,17 @@ const CALLOUT_GAP = 12;
 // Every step (not just the first) waits this long before rendering - a target's position can be measured before its page/layout has fully settled, and nothing else re-measures it later.
 const STEP_SETTLE_DELAY_MS = 250;
 
+const BLOCKED_ACTIONS: FFGamepadAction[] = [
+  'tabPrev',
+  'tabNext',
+  'pause',
+  'recenter',
+];
+
 @Component({
   selector: 'app-tutorial-overlay',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SFXDirective],
+  imports: [FFButtonComponent],
   host: {
     '(window:resize)': 'bumpResizeTick()',
     '(window:scroll)': 'bumpResizeTick()',
@@ -151,38 +158,29 @@ export class TutorialOverlayComponent {
   }
 
   private bindGamepad(): void {
-    const handlers: Array<[FFGamepadAction, () => void]> = [
-      ['confirm', () => this.next()],
-      ['back', () => this.dismissFromGamepad()],
-      ['context', () => this.ignoreFromGamepad()],
-      ['tabPrev', () => undefined],
-      ['tabNext', () => undefined],
-      ['pause', () => undefined],
-    ];
-
-    handlers.forEach(([action, handler]) =>
-      ffGamepadOn(
-        action,
-        () => {
-          if (!this.isReadyToRender()) return false;
-
-          handler();
-          return true;
-        },
-        { priority: GAMEPAD_PRIORITY.tutorial },
-      ),
+    const whileShown = {
+      priority: GAMEPAD_PRIORITY.tutorial,
+      enabled: () => this.isReadyToRender(),
+    };
+    BLOCKED_ACTIONS.forEach((action) =>
+      ffGamepadOn(action, () => undefined, whileShown),
     );
+
+    // Single-step tutorials have no Skip button, so B closes them instead.
+    ffGamepadOn('back', () => this.next(), {
+      ...whileShown,
+      enabled: () =>
+        this.isReadyToRender() && this.stepView()?.totalSteps === 1,
+      label: 'Close',
+    });
   }
 
-  private dismissFromGamepad(): void {
-    if (this.stepView()?.totalSteps === 1) this.next();
-    else this.skip();
-  }
+  protected readonly gamepadPriority = GAMEPAD_PRIORITY.tutorial;
 
-  private ignoreFromGamepad(): void {
-    if (this.stepView()?.tutorial.trigger.kind !== 'losing-streak') return;
-    this.ignore();
-  }
+  protected nextLabel = computed(() => {
+    const view = this.stepView();
+    return view?.stepIndex === (view?.totalSteps ?? 0) - 1 ? 'Done' : 'Next';
+  });
 
   public onBackdropEnter(event: AnimationCallbackEvent): void {
     this.anim.fadeIn(event.target, 220);

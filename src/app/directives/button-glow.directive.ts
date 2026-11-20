@@ -1,21 +1,18 @@
 import {
   afterRenderEffect,
-  Component,
+  Directive,
   ElementRef,
   inject,
   input,
 } from '@angular/core';
 
-@Component({
-  selector: 'app-button-glow, [appButtonGlow]',
-  imports: [],
-  templateUrl: './button-glow.component.html',
-  styleUrl: './button-glow.component.scss',
+@Directive({
+  selector: '[appButtonGlow]',
   host: {
     '[class.button-glow-active]': 'buttonGlowActive()',
   },
 })
-export class ButtonGlowComponent {
+export class ButtonGlowDirective {
   public buttonGlowActive = input<boolean>(true);
 
   constructor() {
@@ -30,7 +27,7 @@ export class ButtonGlowComponent {
         .filter(
           (anim) =>
             anim instanceof CSSAnimation &&
-            anim.animationName.endsWith('app-button-glow-pulse'),
+            anim.animationName === 'app-button-glow-pulse',
         )
         .forEach((anim) => (anim.startTime = 0));
     });

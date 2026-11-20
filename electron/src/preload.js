@@ -20,6 +20,7 @@ contextBridge.exposeInMainWorld('reformElectron', {
     ipcRenderer.invoke('steam:achievements-activate', names),
   steamAchievementClear: (name) =>
     ipcRenderer.invoke('steam:achievement-clear', name),
+  steamInputType: () => ipcRenderer.invoke('steam:input-type'),
   windowGet: () => ipcRenderer.invoke('window:get'),
   windowSetFullscreen: (fullscreen) =>
     ipcRenderer.invoke('window:set-fullscreen', fullscreen),

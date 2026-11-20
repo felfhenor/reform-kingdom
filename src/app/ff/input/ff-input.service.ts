@@ -1,5 +1,8 @@
 import { DestroyRef, effect, inject, Injectable, signal } from '@angular/core';
-import { ffActionDispatch } from '@ff/input/ff-action-dispatch';
+import {
+  ffActionDispatch,
+  ffActivePrompts,
+} from '@ff/input/ff-action-dispatch';
 import { ffActionForButton, ffActionMap } from '@ff/input/ff-action-map';
 import { ffControllerFamily } from '@ff/input/ff-controller-family';
 import {
@@ -9,6 +12,7 @@ import {
   ffGamepadMayTakeInput,
   ffGamepadSnapshot,
 } from '@ff/input/ff-gamepad';
+import { FF_CONTROLLER_FAMILY_RESOLVER } from '@ff/input/ff-tokens';
 import type {
   FFActionHandler,
   FFActionHandlerOptions,
@@ -17,20 +21,46 @@ import type {
   FFGamepadAction,
   FFGamepadSnapshot,
   FFInputMode,
+  FFPrompt,
 } from '@ff/interfaces/ff-input';
 
 const MODE_SWITCH_DEADZONE = 0.5;
 // Browsers send zero-movement mousemoves when the DOM under the cursor changes.
 const MOUSE_MOVE_THRESHOLD = 3;
 const GAMEPAD_TAKEOVER_MS = 250;
+const PROMPT_REFRESH_MS = 200;
+const FAMILY_RESOLVE_RETRY_MS = 2000;
+
+const PROMPT_ACTION_ORDER: FFGamepadAction[] = [
+  'confirm',
+  'back',
+  'context',
+  'details',
+  'tabPrev',
+  'tabNext',
+  'subPrev',
+  'subNext',
+  'recenter',
+  'pause',
+  'menu',
+];
+
+function isElementActive(element: HTMLElement): boolean {
+  return element.checkVisibility({ visibilityProperty: true });
+}
 
 @Injectable({ providedIn: 'root' })
 export class FFInputService {
   private readonly modeSignal = signal<FFInputMode>('kbm');
   private readonly familySignal = signal<FFControllerFamily>('xbox');
+  private readonly promptsSignal = signal<FFPrompt[]>([]);
+  private readonly familyResolver = inject(FF_CONTROLLER_FAMILY_RESOLVER, {
+    optional: true,
+  });
 
   public readonly mode = this.modeSignal.asReadonly();
   public readonly family = this.familySignal.asReadonly();
+  public readonly prompts = this.promptsSignal.asReadonly();
 
   private registrations: FFActionRegistration[] = [];
   private nextOrder = 0;
@@ -39,6 +69,9 @@ export class FFInputService {
   private activeGamepadIndex?: number;
   private lastInputAt = 0;
   private heldButtonHandlers = new Map<string, FFActionRegistration>();
+  private resolvedFamilies = new Map<number, FFControllerFamily>();
+  private lastFamilyResolveAt = new Map<number, number>();
+  private lastPromptRefreshAt = 0;
 
   constructor() {
     const listeners: Array<[string, EventListener]> = [
@@ -60,7 +93,10 @@ export class FFInputService {
     });
 
     effect(() => {
-      document.documentElement.dataset['inputMode'] = this.mode();
+      document.documentElement.classList.toggle(
+        'ff-input-gamepad',
+        this.mode() === 'gamepad',
+      );
     });
 
     // Pads connected before this service existed won't re-fire gamepadconnected.
@@ -73,12 +109,11 @@ export class FFInputService {
     options: FFActionHandlerOptions = {},
   ): () => void {
     const registration: FFActionRegistration = {
+      ...options,
       action,
       handler,
       priority: options.priority ?? 0,
       order: this.nextOrder++,
-      element: options.element,
-      onRelease: options.onRelease,
     };
     this.registrations = [...this.registrations, registration];
 
@@ -105,6 +140,8 @@ export class FFInputService {
   private forgetGamepad = (event: GamepadEvent): void => {
     const previous = this.previousSnapshots.get(event.gamepad.index);
     this.previousSnapshots.delete(event.gamepad.index);
+    this.resolvedFamilies.delete(event.gamepad.index);
+    this.lastFamilyResolveAt.delete(event.gamepad.index);
     this.releaseButtons(
       event.gamepad.index,
       ffButtonsJustReleased(previous, { buttons: [], axes: [] }),
@@ -126,8 +163,19 @@ export class FFInputService {
 
     const now = performance.now();
     gamepads.forEach((gamepad) => this.pollGamepad(gamepad, now));
+    this.refreshPrompts(now);
     this.frameId = requestAnimationFrame(this.poll);
   };
+
+  private refreshPrompts(now: number): void {
+    if (this.mode() !== 'gamepad') return;
+    if (now - this.lastPromptRefreshAt < PROMPT_REFRESH_MS) return;
+
+    this.lastPromptRefreshAt = now;
+    this.promptsSignal.set(
+      ffActivePrompts(this.registrations, PROMPT_ACTION_ORDER, isElementActive),
+    );
+  }
 
   private pollGamepad(gamepad: Gamepad, now: number): void {
     const snapshot = ffGamepadSnapshot(gamepad);
@@ -152,10 +200,14 @@ export class FFInputService {
     );
     if (!mayTakeInput) return;
 
+    this.resolveFamily(gamepad, now);
     this.activeGamepadIndex = gamepad.index;
     this.lastInputAt = now;
     this.modeSignal.set('gamepad');
-    this.familySignal.set(ffControllerFamily(gamepad.id));
+    this.familySignal.set(
+      this.resolvedFamilies.get(gamepad.index) ??
+        ffControllerFamily(gamepad.id),
+    );
 
     const actionMap = ffActionMap(this.familySignal());
     pressed.forEach((button) => {
@@ -169,9 +221,12 @@ export class FFInputService {
     button: number,
     action: FFGamepadAction,
   ): void {
-    const handledBy = ffActionDispatch(this.registrations, action, (element) =>
-      element.checkVisibility({ visibilityProperty: true }),
+    const handledBy = ffActionDispatch(
+      this.registrations,
+      action,
+      isElementActive,
     );
+    this.lastPromptRefreshAt = 0;
     if (!handledBy?.onRelease) return;
     this.heldButtonHandlers.set(`${gamepadIndex}:${button}`, handledBy);
   }
@@ -183,6 +238,32 @@ export class FFInputService {
       this.heldButtonHandlers.delete(key);
       held?.onRelease?.();
     });
+  }
+
+  // Retries until resolved, since a platform resolver may not see the pad yet.
+  private resolveFamily(gamepad: Gamepad, now: number): void {
+    if (!this.familyResolver || this.resolvedFamilies.has(gamepad.index))
+      return;
+
+    const lastAttempt = this.lastFamilyResolveAt.get(gamepad.index);
+    if (
+      lastAttempt !== undefined &&
+      now - lastAttempt < FAMILY_RESOLVE_RETRY_MS
+    ) {
+      return;
+    }
+
+    this.lastFamilyResolveAt.set(gamepad.index, now);
+    void this.familyResolver()
+      .then((family) => {
+        if (!family) return;
+
+        this.resolvedFamilies.set(gamepad.index, family);
+        if (this.activeGamepadIndex === gamepad.index) {
+          this.familySignal.set(family);
+        }
+      })
+      .catch(() => undefined);
   }
 
   private useKeyboardMouse = (): void => {

@@ -6,7 +6,7 @@ import {
   input,
 } from '@angular/core';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
-import { ButtonGlowComponent } from '@components/button-glow/button-glow.component';
+import { ButtonGlowDirective } from '@directives/button-glow.directive';
 import { IconComponent } from '@components/icon/icon.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
@@ -45,7 +45,7 @@ import { skillEpCost } from '@helpers/hero/skill';
     SlotRarityOutlineComponent,
     TooltipSkillPreviewComponent,
     TooltipJobAbilityComponent,
-    ButtonGlowComponent,
+    ButtonGlowDirective,
     SlotIconBlankComponent,
     SFXDirective,
     TutorialTargetDirective,

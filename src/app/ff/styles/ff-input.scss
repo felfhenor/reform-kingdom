@@ -1,0 +1,36 @@
+$ff-glyph-families:
+  xbox, playstation, switch, switch2, steam-controller, steam-deck;
+
+@each $family in $ff-glyph-families {
+  @font-face {
+    font-family: 'ff-glyph-#{$family}';
+    src: url('../../../../public/font/input/#{$family}.woff2') format('woff2');
+    font-display: block;
+  }
+
+  .ff-glyph-#{$family} {
+    font-family: 'ff-glyph-#{$family}';
+  }
+}
+
+// Kenney glyphs fill half an em, so 2.25rem renders an 18px glyph.
+.ff-glyph {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 0.5em;
+  height: 0.5em;
+  overflow: visible;
+  font-size: 2.25rem;
+  text-align: center;
+  vertical-align: middle;
+  // Synthetic bold from a bold parent (e.g. .btn) fills in the glyph cutouts.
+  font-weight: normal;
+  font-synthesis: none;
+}
+
+html.ff-input-gamepad {
+  &,
+  * {
+    cursor: none !important;
+  }
+}

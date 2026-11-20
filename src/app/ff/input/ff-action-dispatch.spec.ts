@@ -1,4 +1,7 @@
-import { ffActionDispatch } from '@ff/input/ff-action-dispatch';
+import {
+  ffActionDispatch,
+  ffActivePrompts,
+} from '@ff/input/ff-action-dispatch';
 import type { FFActionRegistration } from '@ff/interfaces/ff-input';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -53,5 +56,63 @@ describe('ffActionDispatch', () => {
     ).toBeUndefined();
     expect(hidden.handler).not.toHaveBeenCalled();
     expect(other.handler).not.toHaveBeenCalled();
+  });
+
+  it('skips disabled handlers', () => {
+    const disabled = registration({ priority: 10, enabled: () => false });
+    const fallback = registration({ handler: vi.fn() });
+    expect(ffActionDispatch([disabled, fallback], 'back', alwaysActive)).toBe(
+      fallback,
+    );
+    expect(disabled.handler).not.toHaveBeenCalled();
+  });
+});
+
+describe('ffActivePrompts', () => {
+  it('labels each action from its top handler without running it', () => {
+    const confirm = registration({ action: 'confirm', label: 'Next' });
+    const back = registration({ label: () => 'Skip' });
+    const prompts = ffActivePrompts(
+      [confirm, back],
+      ['confirm', 'back'],
+      alwaysActive,
+    );
+    expect(prompts).toEqual([
+      { actions: ['confirm'], label: 'Next' },
+      { actions: ['back'], label: 'Skip' },
+    ]);
+    expect(confirm.handler).not.toHaveBeenCalled();
+  });
+
+  it('hides prompts behind an unlabeled blocker', () => {
+    const page = registration({ label: 'Back' });
+    const blocker = registration({ priority: 10 });
+    expect(ffActivePrompts([page, blocker], ['back'], alwaysActive)).toEqual(
+      [],
+    );
+  });
+
+  it('merges actions that share a label even when not adjacent', () => {
+    const back = registration({ label: 'Resume' });
+    const pause = registration({ action: 'pause', label: 'Pause' });
+    const menu = registration({ action: 'menu', label: 'Resume' });
+    expect(
+      ffActivePrompts(
+        [back, pause, menu],
+        ['back', 'pause', 'menu'],
+        alwaysActive,
+      ),
+    ).toEqual([
+      { actions: ['back', 'menu'], label: 'Resume' },
+      { actions: ['pause'], label: 'Pause' },
+    ]);
+  });
+
+  it('merges actions that share a label', () => {
+    const prev = registration({ action: 'tabPrev', label: 'Switch View' });
+    const next = registration({ action: 'tabNext', label: 'Switch View' });
+    expect(
+      ffActivePrompts([prev, next], ['tabPrev', 'tabNext'], alwaysActive),
+    ).toEqual([{ actions: ['tabPrev', 'tabNext'], label: 'Switch View' }]);
   });
 });

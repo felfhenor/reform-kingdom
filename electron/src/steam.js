@@ -24,6 +24,7 @@ const initSteam = () => {
     // Partial swaps only redraw what changed, leaving the closed overlay's bar burned into static screens.
     app.commandLine.appendSwitch('ui-disable-partial-swap');
     app.on('browser-window-created', (_event, win) => repaintForOverlay(win));
+    initSteamInput();
     coreLog().info(
       'Steam',
       `initialized app ${client.utils.getAppId()} as ${client.localplayer.getName()}`,
@@ -32,6 +33,24 @@ const initSteam = () => {
     // Expected whenever the Steam client isn't running, so it's info rather than an error.
     coreLog().info('Steam', 'not connected', e.message);
   }
+};
+
+// Up front, since Steam needs a few frames after Init before it lists any controllers; kept apart so a failure can't skip the overlay setup.
+const initSteamInput = () => {
+  try {
+    client.input.init();
+  } catch (e) {
+    coreLog().warn('Steam', 'input init failed', e.message);
+  }
+};
+
+// Steam Input's virtual pad hides the physical controller from the browser; the Deck's built-in pad can report Unknown.
+const steamInputType = () => {
+  const type = client.input.getControllers()[0]?.getType();
+  if (type && type !== 'Unknown') return type;
+  return client.utils.isSteamRunningOnSteamDeck()
+    ? 'SteamDeckController'
+    : undefined;
 };
 
 const isAchievementName = (name) =>
@@ -55,6 +74,17 @@ const registerSteamHandlers = () => {
     if (failed.length > 0)
       coreLog().warn('Steam', 'achievements not activated', failed);
     return activated;
+  });
+
+  ipcMain.handle('steam:input-type', () => {
+    if (!client) return undefined;
+
+    try {
+      return steamInputType();
+    } catch (e) {
+      coreLog().warn('Steam', 'input type unavailable', e.message);
+      return undefined;
+    }
   });
 
   ipcMain.handle('steam:achievement-clear', (_event, name) => {

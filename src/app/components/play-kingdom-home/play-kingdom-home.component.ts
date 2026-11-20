@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
 import { TextNumberTweenComponent } from '@components/text-number-tween/text-number-tween.component';
-import { ButtonGlowComponent } from '@components/button-glow/button-glow.component';
+import { ButtonGlowDirective } from '@directives/button-glow.directive';
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { SlotButtonContainerComponent } from '@components/slot-button-container/slot-button-container.component';
 import { IconKingdomComponent } from '@components/icon-kingdom/icon-kingdom.component';
@@ -73,7 +73,7 @@ import { clamp, sortBy } from 'es-toolkit/compat';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AtlasImageComponent,
-    ButtonGlowComponent,
+    ButtonGlowDirective,
     CardPageComponent,
     DecimalPipe,
     IconKingdomComponent,

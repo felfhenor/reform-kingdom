@@ -11,27 +11,26 @@ export const GAMEPAD_PRIORITY = {
   page: 0,
 } as const;
 
+// A closing swal keeps its container until the hide animation ends.
+export function gamepadSwalShown(): boolean {
+  return !!document.querySelector('.swal2-container:not(.swal2-backdrop-hide)');
+}
+
 // A visible swal means the lazy library is already loaded, so the click lands immediately.
 export function gamepadSwalClick(
   loader: SweetAlert2LoaderService,
   button: 'confirm' | 'cancel',
-): boolean {
-  // A closing swal keeps its container until the hide animation ends.
-  const isShown = !!document.querySelector(
-    '.swal2-container:not(.swal2-backdrop-hide)',
-  );
-  if (!isShown) return false;
-
+): void {
   void loader.swal.then((swal) =>
     button === 'confirm' ? swal.clickConfirm() : swal.clickCancel(),
   );
-  return true;
 }
 
 const OVERLAY_BLOCKED_ACTIONS: FFGamepadAction[] = [
   'tabPrev',
   'tabNext',
   'pause',
+  'recenter',
   'back',
 ];
 

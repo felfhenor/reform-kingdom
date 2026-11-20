@@ -1,18 +1,17 @@
 <div class="navbar bg-base-100 relative flex py-0">
   <div class="navbar-start flex-1">
     <ul class="menu menu-horizontal py-0 px-1">
-      <li class="flex gap-1 flex-row" appRequireSetup>
+      <li class="flex gap-1 flex-row items-center" appRequireSetup>
+        <ff-input-prompt action="tabPrev" />
+
         <button
           class="btn btn-sm btn-neutral btn-outline"
           [class.here]="activeGamePlayView() === 'world'"
           tp="World [1]"
           (click)="changeGamePlayView('world')"
-          appSfx="ui-click"
-          [sfxOffset]="0"
-          [sfxTrigger]="['click', 'hover']"
-          [hotkeys]="'1'"
-          (hotkey)="hotkeyMatches($event, '1') && changeGamePlayView('world')"
-          isGlobal
+          ffButton="ui-click"
+          [ffSoundOffset]="0"
+          ffHotkey="1"
           appTutorialTarget="nav-world"
         >
           World
@@ -23,12 +22,9 @@
           [class.here]="activeGamePlayView() === 'kingdom'"
           tp="Kingdom [2]"
           (click)="setKingdomPlayView()"
-          appSfx="ui-click"
-          [sfxOffset]="1"
-          [sfxTrigger]="['click', 'hover']"
-          [hotkeys]="'2'"
-          (hotkey)="hotkeyMatches($event, '2') && setKingdomPlayView()"
-          isGlobal
+          ffButton="ui-click"
+          [ffSoundOffset]="1"
+          ffHotkey="2"
           appTutorialTarget="nav-kingdom"
         >
           Kingdom
@@ -39,12 +35,9 @@
           [class.here]="activeGamePlayView() === 'heroes'"
           tp="Heroes [3]"
           (click)="setHeroesPlayView()"
-          appSfx="ui-click"
-          [sfxOffset]="3"
-          [sfxTrigger]="['click', 'hover']"
-          [hotkeys]="'3'"
-          (hotkey)="hotkeyMatches($event, '3') && setHeroesPlayView()"
-          isGlobal
+          ffButton="ui-click"
+          [ffSoundOffset]="3"
+          ffHotkey="3"
           appTutorialTarget="nav-heroes"
         >
           Heroes
@@ -55,14 +48,9 @@
           [class.here]="activeGamePlayView() === 'adventurelog'"
           tp="Adventure Log [4]"
           (click)="changeGamePlayView('adventurelog')"
-          appSfx="ui-click"
-          [sfxOffset]="2"
-          [sfxTrigger]="['click', 'hover']"
-          [hotkeys]="'4'"
-          (hotkey)="
-            hotkeyMatches($event, '4') && changeGamePlayView('adventurelog')
-          "
-          isGlobal
+          ffButton="ui-click"
+          [ffSoundOffset]="2"
+          ffHotkey="4"
           appTutorialTarget="nav-adventurelog"
         >
           Adventure Log
@@ -74,12 +62,9 @@
           [tp]="decreeTooltip"
           (click)="changeGamePlayView('decree')"
           (contextmenu)="toggleAutoMode()"
-          appSfx="ui-click"
-          [sfxOffset]="4"
-          [sfxTrigger]="['click', 'hover']"
-          [hotkeys]="'5'"
-          (hotkey)="hotkeyMatches($event, '5') && changeGamePlayView('decree')"
-          isGlobal
+          ffButton="ui-click"
+          [ffSoundOffset]="4"
+          ffHotkey="5"
           [appHideUntilLevel]="decreeRevealLevel"
           appTutorialTarget="nav-decree"
         >
@@ -92,6 +77,8 @@
 
           Decree
         </button>
+
+        <ff-input-prompt action="tabNext" />
 
         <ng-template #decreeTooltip>
           @let activeId = activeClauseId();
@@ -129,12 +116,9 @@
             class="btn btn-sm btn-neutral"
             [tp]="panel.name + ' [' + panel.hotkey + ']'"
             (click)="panel.clickCb()"
-            [hotkeys]="panel.hotkey"
-            (hotkey)="hotkeyMatches($event, panel.hotkey) && panel.clickCb()"
-            isGlobal
-            appSfx="ui-click"
-            [sfxOffset]="$index"
-            [sfxTrigger]="['click', 'hover']"
+            [ffHotkey]="panel.hotkey"
+            ffButton="ui-click"
+            [ffSoundOffset]="$index"
           >
             <app-icon [name]="panel.icon" size="nav"></app-icon>
           </button>
@@ -147,12 +131,9 @@
           appButtonGlow
           [tp]="currentTownName() + ' [T]'"
           (click)="openCurrentTown()"
-          appSfx="ui-click"
-          [sfxOffset]="5"
-          [sfxTrigger]="['click', 'hover']"
-          [hotkeys]="'T'"
-          (hotkey)="hotkeyMatches($event, 'T') && openCurrentTown()"
-          isGlobal
+          ffButton="ui-click"
+          [ffSoundOffset]="5"
+          ffHotkey="T"
         >
           <app-icon name="gameVillage" size="nav"></app-icon>
         </button>
@@ -165,12 +146,9 @@
             appButtonGlow
             tp="Trade with the Caravan [T]"
             (click)="openCaravanTrade()"
-            appSfx="ui-click"
-            [sfxTrigger]="['click', 'hover']"
-            [hotkeys]="'t'"
-            [hotkeysOptions]="noPreventDefault"
-            (hotkey)="hotkeyMatches($event, 't') && openCaravanTrade()"
-            isGlobal
+            ffButton="ui-click"
+            ffHotkey="t"
+            [ffHotkeyPreventDefault]="false"
           >
             <app-icon name="gameSwapBag" size="nav"></app-icon>
           </button>
@@ -184,12 +162,9 @@
             appButtonGlow
             tp="Visit the Trainer [T]"
             (click)="openCurrentTrainer()"
-            appSfx="ui-click"
-            [sfxTrigger]="['click', 'hover']"
-            [hotkeys]="'t'"
-            [hotkeysOptions]="noPreventDefault"
-            (hotkey)="hotkeyMatches($event, 't') && openCurrentTrainer()"
-            isGlobal
+            ffButton="ui-click"
+            ffHotkey="t"
+            [ffHotkeyPreventDefault]="false"
           >
             <app-icon name="gameClassicalKnowledge" size="nav"></app-icon>
           </button>
@@ -202,13 +177,13 @@
             class="btn btn-sm btn-neutral"
             tp="Recenter on Hero [R]"
             (click)="recenterCamera()"
-            appSfx="ui-click"
-            [sfxOffset]="panelConfigs.length + 3"
-            [sfxTrigger]="['click', 'hover']"
-            [hotkeys]="'r'"
-            [hotkeysOptions]="noPreventDefault"
-            (hotkey)="hotkeyMatches($event, 'r') && recenterCamera()"
-            isGlobal
+            ffButton="ui-click"
+            [ffSoundOffset]="panelConfigs.length + 3"
+            ffHotkey="r"
+            ffPadAction="recenter"
+            [ffPadEnabled]="!anyModalOpen()"
+            ffPadLabel="Recenter"
+            [ffHotkeyPreventDefault]="false"
           >
             <app-icon name="tablerFocus" size="nav"></app-icon>
           </button>
@@ -221,17 +196,19 @@
         </li>
       }
 
-      <li class="action-button" appRequireSetup>
+      <!-- Hidden rather than removed in controller mode so the keyboard hotkey stays registered; a style binding since appRequireSetup owns class.hidden. -->
+      <li
+        class="action-button"
+        appRequireSetup
+        [style.display]="isGamepadMode() ? 'none' : null"
+      >
         <button
           class="btn btn-sm btn-neutral"
           [tp]="isPaused() ? 'Resume Game [SPACE]' : 'Pause Game [SPACE]'"
           (click)="togglePause()"
-          appSfx="ui-click"
-          [sfxOffset]="panelConfigs.length + 2"
-          [sfxTrigger]="['click', 'hover']"
-          [hotkeys]="'SPACE'"
-          (hotkey)="hotkeyMatches($event, 'SPACE') && togglePause()"
-          isGlobal
+          ffButton="ui-click"
+          [ffSoundOffset]="panelConfigs.length + 2"
+          ffHotkey="SPACE"
         >
           <app-icon
             [name]="isPaused() ? 'gamePlayButton' : 'gamePauseButton'"
@@ -240,34 +217,36 @@
         </button>
       </li>
 
-      <li class="action-button" appRequireNotSetup>
+      <li
+        class="action-button"
+        appRequireNotSetup
+        [style.display]="isGamepadMode() ? 'none' : null"
+      >
         <button
           type="button"
           class="btn btn-sm btn-neutral btn-outline"
           [swal]="leaveSwal"
           [tp]="'Go Back [Q]'"
-          appSfx="ui-error"
-          [sfxOffset]="panelConfigs.length + 1"
-          [sfxTrigger]="['click', 'hover']"
-          [hotkeys]="'q'"
-          (hotkey)="hotkeyMatches($event, 'q') && leaveSwal.fire()"
-          isGlobal
+          ffButton="ui-error"
+          [ffSoundOffset]="panelConfigs.length + 1"
+          ffHotkey="q"
         >
           <app-icon name="gameExitDoor" size="nav"></app-icon>
         </button>
       </li>
 
-      <li class="action-button" appRequireSetup>
+      <li
+        class="action-button"
+        appRequireSetup
+        [style.display]="isGamepadMode() ? 'none' : null"
+      >
         <button
           class="btn btn-sm btn-neutral"
           [tp]="'Open Menu [ESC]'"
           (click)="closeAllMenus()"
-          appSfx="ui-click"
-          [sfxOffset]="panelConfigs.length + 2"
-          [sfxTrigger]="['click', 'hover']"
-          [hotkeys]="'ESCAPE'"
-          (hotkey)="hotkeyMatches($event, 'ESCAPE') && closeAllMenus()"
-          isGlobal
+          ffButton="ui-click"
+          [ffSoundOffset]="panelConfigs.length + 2"
+          ffHotkey="ESCAPE"
         >
           <app-icon [name]="'tablerSettings'" size="nav"></app-icon>
         </button>
@@ -302,9 +281,8 @@
       type="button"
       class="btn btn-primary"
       (click)="closePauseMenu()"
-      appSfx="ui-click"
-      [sfxOffset]="0"
-      [sfxTrigger]="['click', 'hover']"
+      ffButton="ui-click"
+      [ffSoundOffset]="0"
     >
       Resume
     </button>
@@ -319,9 +297,8 @@
       type="button"
       class="btn btn-neutral"
       [swal]="leaveSwal"
-      appSfx="ui-error"
-      [sfxOffset]="2"
-      [sfxTrigger]="['click', 'hover']"
+      ffButton="ui-error"
+      [ffSoundOffset]="2"
     >
       Quit to Main Menu
     </button>

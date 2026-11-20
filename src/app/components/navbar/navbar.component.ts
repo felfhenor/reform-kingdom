@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { isDemoBuild } from '@helpers/demo/demo';
-import { ButtonGlowComponent } from '@components/button-glow/button-glow.component';
+import { ButtonGlowDirective } from '@directives/button-glow.directive';
 import { ButtonQuitComponent } from '@components/button-quit/button-quit.component';
 import { ButtonRunEndComponent } from '@components/button-run-end/button-run-end.component';
 import { ButtonAchievementsComponent } from '@components/button-achievements/button-achievements.component';
@@ -18,9 +18,11 @@ import { ModalComponent } from '@components/modal/modal.component';
 import { HideUntilLevelDirective } from '@directives/hide-until-level.directive';
 import { RequireNotSetupDirective } from '@directives/no-setup.directive';
 import { RequireSetupDirective } from '@directives/require-setup.directive';
-import { SFXDirective } from '@directives/sfx.directive';
+import { FFButtonComponent } from '@ff/components/button/button.component';
+import { FFInputPromptComponent } from '@ff/components/input-prompt/input-prompt.component';
 import { TutorialTargetDirective } from '@directives/tutorial-target.directive';
 import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
+import { FFInputService } from '@ff/input/ff-input.service';
 import { DECREE_REVEAL_LEVEL } from '@helpers/config';
 import { isRevealedAtLevel } from '@helpers/engine/feature-reveal';
 import { GAMEPAD_PRIORITY } from '@helpers/engine/gamepad.ui';
@@ -28,7 +30,6 @@ import {
   gamePlayViewsCyclable,
   gamePlayViewStep,
 } from '@helpers/engine/gameplay-view-cycle.ui';
-import { hotkeyMatches } from '@helpers/engine/hotkeys.ui';
 import {
   modalClose,
   modalCloseTop,
@@ -64,7 +65,6 @@ import {
 } from '@helpers/world-node/world-nodes';
 import type { GamePlayView, Icon } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
-import { HotkeysDirective } from '@ngneat/hotkeys';
 import { MetaService } from '@services/meta.service';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
@@ -86,16 +86,16 @@ import {
     RequireSetupDirective,
     IconComponent,
     SweetAlert2Module,
-    SFXDirective,
+    FFButtonComponent,
+    FFInputPromptComponent,
     ButtonUpdateComponent,
-    HotkeysDirective,
     RequireNotSetupDirective,
     ModalComponent,
     ButtonQuitComponent,
     ButtonRunEndComponent,
     ButtonAchievementsComponent,
     ButtonSettingsComponent,
-    ButtonGlowComponent,
+    ButtonGlowDirective,
     BarResourceComponent,
     ModalCaravanTradeComponent,
     ModalTasksComponent,
@@ -112,18 +112,16 @@ import {
 })
 export class NavbarComponent {
   public meta = inject(MetaService);
+  private ffInput = inject(FFInputService);
   public readonly isDemo = isDemoBuild();
   public router = inject(Router);
-
-  protected hotkeyMatches = hotkeyMatches;
-
-  // "t"/"r" fire unfiltered on every keydown - don't also eat other keys' defaults.
-  protected readonly noPreventDefault = { preventDefault: false };
 
   public showPauseMenu = computed(() => modalIsOpen('pause-menu'));
   private wasPausedBeforeOpeningMenu = signal<boolean>(false);
 
-  public leaveSwal = viewChild<SwalComponent>('leaveSwal');
+  private leaveSwal = viewChild<SwalComponent>('leaveSwal');
+  protected anyModalOpen = computed(() => modalHasAnyOpen());
+  protected isGamepadMode = computed(() => this.ffInput.mode() === 'gamepad');
 
   protected readonly decreeRevealLevel = DECREE_REVEAL_LEVEL;
 
@@ -137,20 +135,30 @@ export class NavbarComponent {
   };
 
   constructor() {
-    ffGamepadOn('tabPrev', () => this.cycleGamePlayView(-1));
-    ffGamepadOn('tabNext', () => this.cycleGamePlayView(1));
-    ffGamepadOn('menu', () => this.togglePauseMenu());
-    ffGamepadOn('pause', () => {
-      if (!isSetup()) return false;
-
-      this.togglePause();
-      return true;
+    const viewCycle = {
+      enabled: () => isSetup() && !modalHasAnyOpen(),
+      label: 'Switch View',
+    };
+    ffGamepadOn('tabPrev', () => this.cycleGamePlayView(-1), viewCycle);
+    ffGamepadOn('tabNext', () => this.cycleGamePlayView(1), viewCycle);
+    ffGamepadOn('menu', () => this.togglePauseMenu(), {
+      enabled: () =>
+        isSetup() && (modalIsTopmost('pause-menu') || !modalHasAnyOpen()),
+      label: () => (modalIsTopmost('pause-menu') ? 'Resume' : 'Menu'),
     });
-    ffGamepadOn('back', () => this.closePauseMenuIfTopmost(), {
-      priority: GAMEPAD_PRIORITY.pauseMenu,
+    ffGamepadOn('pause', () => this.togglePause(), {
+      enabled: () => isSetup() && !modalHasAnyOpen(),
+      label: () => (this.isPaused() ? 'Resume' : 'Pause'),
     });
-    ffGamepadOn('back', () => this.leaveSetup(), {
+    ffGamepadOn('back', () => void this.leaveSwal()?.fire(), {
       priority: GAMEPAD_PRIORITY.page,
+      enabled: () => !isSetup(),
+      label: 'Back',
+    });
+    ffGamepadOn('back', () => this.closePauseMenu(), {
+      priority: GAMEPAD_PRIORITY.pauseMenu,
+      enabled: () => modalIsTopmost('pause-menu'),
+      label: 'Resume',
     });
   }
 
@@ -297,30 +305,17 @@ export class NavbarComponent {
     return true;
   }
 
-  private togglePauseMenu(): boolean {
-    if (!isSetup()) return false;
-
-    if (this.closePauseMenuIfTopmost()) return true;
-    if (!modalHasAnyOpen()) this.openPauseMenu();
-    return true;
+  private togglePauseMenu(): void {
+    if (this.closePauseMenuIfTopmost()) return;
+    this.openPauseMenu();
   }
 
-  private leaveSetup(): boolean {
-    if (isSetup()) return false;
-
-    void this.leaveSwal()?.fire();
-    return true;
-  }
-
-  private cycleGamePlayView(direction: 1 | -1): boolean {
-    if (!isSetup() || modalHasAnyOpen()) return false;
-
+  private cycleGamePlayView(direction: 1 | -1): void {
     const views = gamePlayViewsCyclable(
       !!this.currentTownEntry(),
       isRevealedAtLevel(DECREE_REVEAL_LEVEL),
     );
     this.viewOpeners[gamePlayViewStep(views, gamePlayView(), direction)]();
-    return true;
   }
 
   public toggleAutoMode(): void {

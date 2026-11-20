@@ -4,7 +4,7 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { ButtonGlowComponent } from '@components/button-glow/button-glow.component';
+import { ButtonGlowDirective } from '@directives/button-glow.directive';
 import { IconComponent } from '@components/icon/icon.component';
 import type { GameElement } from '@interfaces';
 import { GameElementIcon } from '@interfaces';
@@ -12,7 +12,7 @@ import { GameElementIcon } from '@interfaces';
 @Component({
   selector: 'app-icon-element-charge',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ButtonGlowComponent, IconComponent],
+  imports: [ButtonGlowDirective, IconComponent],
   template: `
     <span
       class="flex items-center justify-center border-2 leading-none"

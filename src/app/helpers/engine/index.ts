@@ -12,6 +12,7 @@ export * from './electron-log.ui';
 export * from './electron-window.ui';
 export * from './embed';
 export * from './feature-reveal';
+export * from './ff-bridge.ui';
 export * from './font.ui';
 export * from './gamepad.ui';
 export * from './gameplay-view-cycle.ui';

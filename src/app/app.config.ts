@@ -1,3 +1,11 @@
+import {
+  FF_BUTTON_FEEDBACK,
+  FF_CONTROLLER_FAMILY_RESOLVER,
+} from '@ff/input/ff-tokens';
+import {
+  ffButtonFeedbackSfx,
+  ffSteamControllerFamily,
+} from '@helpers/engine/ff-bridge.ui';
 import type { ApplicationConfig } from '@angular/core';
 import {
   APP_INITIALIZER,
@@ -54,6 +62,11 @@ import { provideToastr } from 'ngx-toastr';
 export const appConfig: ApplicationConfig = {
   providers: [
     NG_EVENT_PLUGINS,
+    { provide: FF_BUTTON_FEEDBACK, useValue: ffButtonFeedbackSfx },
+    {
+      provide: FF_CONTROLLER_FAMILY_RESOLVER,
+      useValue: ffSteamControllerFamily,
+    },
     {
       provide: EVENT_MANAGER_PLUGINS,
       useClass: ClickModifiersPlugin,

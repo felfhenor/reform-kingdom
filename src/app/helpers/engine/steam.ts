@@ -13,6 +13,10 @@ export async function steamAchievementsActivate(
   return (await steamBridge()?.steamAchievementsActivate?.(names)) ?? [];
 }
 
+export async function steamInputType(): Promise<string | undefined> {
+  return await steamBridge()?.steamInputType?.();
+}
+
 export async function steamAchievementClear(name: string): Promise<boolean> {
   return (await steamBridge()?.steamAchievementClear?.(name)) ?? false;
 }

@@ -11,10 +11,15 @@ import { CardAchievementComponent } from '@components/card-achievement/card-achi
 import { BannerAnalyticsConsentComponent } from '@components/banner-analytics-consent/banner-analytics-consent.component';
 import { ScreenLoadingComponent } from '@components/screen-loading/screen-loading.component';
 import { TutorialOverlayComponent } from '@components/tutorial-overlay/tutorial-overlay.component';
+import { FFBarPromptsComponent } from '@ff/components/bar-prompts/bar-prompts.component';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
 import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
 import { isDemoBuild } from '@helpers/demo/demo';
-import { GAMEPAD_PRIORITY, gamepadSwalClick } from '@helpers/engine/gamepad.ui';
+import {
+  GAMEPAD_PRIORITY,
+  gamepadSwalClick,
+  gamepadSwalShown,
+} from '@helpers/engine/gamepad.ui';
 import { modalCloseTop, modalHasAnyOpen } from '@helpers/engine/modal-stack';
 import { AnimationService } from '@services/animation.service';
 import { LoadingService } from '@services/loading.service';
@@ -30,6 +35,7 @@ import { SweetAlert2LoaderService } from '@sweetalert2/ngx-sweetalert2';
     BannerAnalyticsConsentComponent,
     TutorialOverlayComponent,
     CardAchievementComponent,
+    FFBarPromptsComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -47,24 +53,24 @@ export class AppComponent {
 
   private bindGamepadDialogs(): void {
     const swalLoader = inject(SweetAlert2LoaderService);
-    const dialog = { priority: GAMEPAD_PRIORITY.dialog };
+    const dialog = {
+      priority: GAMEPAD_PRIORITY.dialog,
+      enabled: gamepadSwalShown,
+    };
 
-    ffGamepadOn(
-      'confirm',
-      () => gamepadSwalClick(swalLoader, 'confirm'),
-      dialog,
-    );
-    ffGamepadOn('back', () => gamepadSwalClick(swalLoader, 'cancel'), dialog);
-    ffGamepadOn(
-      'back',
-      () => {
-        if (!modalHasAnyOpen()) return false;
-
-        modalCloseTop();
-        return true;
-      },
-      { priority: GAMEPAD_PRIORITY.modal },
-    );
+    ffGamepadOn('confirm', () => gamepadSwalClick(swalLoader, 'confirm'), {
+      ...dialog,
+      label: 'Confirm',
+    });
+    ffGamepadOn('back', () => gamepadSwalClick(swalLoader, 'cancel'), {
+      ...dialog,
+      label: 'Cancel',
+    });
+    ffGamepadOn('back', modalCloseTop, {
+      priority: GAMEPAD_PRIORITY.modal,
+      enabled: modalHasAnyOpen,
+      label: 'Close',
+    });
   }
 
   @HostListener('document:contextmenu')

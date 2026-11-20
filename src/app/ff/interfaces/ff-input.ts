@@ -35,17 +35,39 @@ export interface FFGamepadSnapshot {
 // Return false to pass the action on to the next handler.
 export type FFActionHandler = () => boolean | void;
 
+export interface FFGlyph {
+  text: string;
+  lineHeightEm: number;
+}
+
+export type FFPromptLabel = string | (() => string);
+
 export interface FFActionHandlerOptions {
   priority?: number;
   element?: HTMLElement;
   onRelease?: () => void;
+  // Read by the prompt bar too, so it must be side-effect free.
+  enabled?: () => boolean;
+  label?: FFPromptLabel;
 }
 
-export interface FFActionRegistration {
+export interface FFActionRegistration extends FFActionHandlerOptions {
   action: FFGamepadAction;
   handler: FFActionHandler;
   priority: number;
   order: number;
-  element?: HTMLElement;
-  onRelease?: () => void;
 }
+
+export interface FFPrompt {
+  actions: FFGamepadAction[];
+  label: string;
+}
+
+export interface FFButtonFeedback {
+  click: (sound: string, offset: number) => void;
+  hover: (offset: number) => void;
+}
+
+export type FFControllerFamilyResolver = () => Promise<
+  FFControllerFamily | undefined
+>;

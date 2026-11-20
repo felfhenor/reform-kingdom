@@ -1,6 +1,7 @@
+// Fixed, so hiding the buttons in controller mode doesn't collapse it.
 .navbar {
-  min-height: 2rem;
-  max-height: 40px;
+  height: 40px;
+  min-height: 40px;
 }
 
 .navbar-start,

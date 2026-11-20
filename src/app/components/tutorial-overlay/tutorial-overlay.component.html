@@ -69,8 +69,10 @@
                 type="button"
                 class="btn btn-xs btn-neutral"
                 (click)="ignore()"
-                appSfx="ui-error"
-                [sfxTrigger]="['click', 'hover']"
+                ffButton="ui-error"
+                ffPadAction="context"
+                [ffPadPriority]="gamepadPriority"
+                ffPadLabel="Ignore"
               >
                 Ignore This
               </button>
@@ -81,8 +83,10 @@
                 type="button"
                 class="btn btn-xs btn-neutral"
                 (click)="skip()"
-                appSfx="ui-click"
-                [sfxTrigger]="['click', 'hover']"
+                ffButton="ui-click"
+                ffPadAction="back"
+                [ffPadPriority]="gamepadPriority"
+                ffPadLabel="Skip"
               >
                 Skip
               </button>
@@ -92,10 +96,12 @@
               type="button"
               class="btn btn-xs btn-primary"
               (click)="next()"
-              appSfx="ui-success"
-              [sfxTrigger]="['click', 'hover']"
+              ffButton="ui-success"
+              ffPadAction="confirm"
+              [ffPadPriority]="gamepadPriority"
+              [ffPadLabel]="nextLabel()"
             >
-              {{ view.stepIndex + 1 === view.totalSteps ? 'Done' : 'Next' }}
+              {{ nextLabel() }}
             </button>
           </div>
         </div>

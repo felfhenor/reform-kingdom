@@ -28,6 +28,7 @@
 - CraftPix - manual combat background images
 - UI & Menus Sound FX Pack - SFX
 - Fantasy Game UI Sounds - SFX
+- Kenney Input Prompts - controller button glyphs
 
 ## Useful Scripts
 

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { ButtonGlowComponent } from '@components/button-glow/button-glow.component';
+import { ButtonGlowDirective } from '@directives/button-glow.directive';
 import { CardStatusBubbleComponent } from '@components/card-status-bubble/card-status-bubble.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { SFXDirective } from '@directives/sfx.directive';
@@ -10,7 +10,7 @@ import type { TutorialUnlockStatusEntry } from '@interfaces';
   selector: 'app-card-status-tutorial-unlock',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    ButtonGlowComponent,
+    ButtonGlowDirective,
     CardStatusBubbleComponent,
     IconComponent,
     SFXDirective,

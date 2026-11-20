@@ -7,7 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { ButtonGlowComponent } from '@components/button-glow/button-glow.component';
+import { ButtonGlowDirective } from '@directives/button-glow.directive';
 import { IconComponent } from '@components/icon/icon.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { closeAllMenus } from '@helpers/engine/ui';
@@ -21,7 +21,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   selector: 'app-button-run-end',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    ButtonGlowComponent,
+    ButtonGlowDirective,
     IconComponent,
     SFXDirective,
     SweetAlert2Module,
