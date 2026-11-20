@@ -54,10 +54,6 @@ const PROMPT_ACTION_ORDER: FFGamepadAction[] = [
   'menu',
 ];
 
-function isElementActive(element: HTMLElement): boolean {
-  return element.checkVisibility({ visibilityProperty: true });
-}
-
 @Injectable({ providedIn: 'root' })
 export class FFInputService {
   private readonly modeSignal = signal<FFInputMode>('kbm');
@@ -82,6 +78,7 @@ export class FFInputService {
   private lastFamilyResolveAt = new Map<number, number>();
   private lastPromptRefreshAt = 0;
   private refreshListeners: Array<() => void> = [];
+  private elementFilter?: (element: HTMLElement) => boolean;
   private heldDirection?: FFDirection;
   private heldDirectionSince = 0;
   private heldDirectionFires = 0;
@@ -140,6 +137,20 @@ export class FFInputService {
     };
   }
 
+  // Lets focus scoping (modals, dialogs, tutorials) silence element-bound handlers underneath.
+  public setElementFilter(
+    filter: (element: HTMLElement) => boolean,
+  ): () => void {
+    this.elementFilter = filter;
+    return () => {
+      if (this.elementFilter === filter) this.elementFilter = undefined;
+    };
+  }
+
+  private isElementActive = (element: HTMLElement): boolean =>
+    element.checkVisibility({ visibilityProperty: true }) &&
+    (this.elementFilter?.(element) ?? true);
+
   // Runs on the prompt cadence while in gamepad mode, for state that isn't reactive (DOM visibility).
   public onRefresh(listener: () => void): () => void {
     this.refreshListeners = [...this.refreshListeners, listener];
@@ -197,7 +208,11 @@ export class FFInputService {
     this.lastPromptRefreshAt = now;
     this.refreshListeners.forEach((listener) => listener());
     this.promptsSignal.set(
-      ffActivePrompts(this.registrations, PROMPT_ACTION_ORDER, isElementActive),
+      ffActivePrompts(
+        this.registrations,
+        PROMPT_ACTION_ORDER,
+        this.isElementActive,
+      ),
     );
   }
 
@@ -280,7 +295,7 @@ export class FFInputService {
 
   private dispatch(action: FFGamepadAction): FFActionRegistration | undefined {
     this.lastPromptRefreshAt = 0;
-    return ffActionDispatch(this.registrations, action, isElementActive);
+    return ffActionDispatch(this.registrations, action, this.isElementActive);
   }
 
   private pressButton(

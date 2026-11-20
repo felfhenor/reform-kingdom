@@ -28,7 +28,10 @@
             <ng-content select="[titleActions]"></ng-content>
 
             @if (showCloseButton()) {
-              <app-button-close (click)="closeModal()"></app-button-close>
+              <app-button-close
+                [showBackPrompt]="isTopmost()"
+                (click)="closeModal()"
+              ></app-button-close>
             }
           </div>
         </div>

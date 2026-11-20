@@ -14,7 +14,7 @@ import { RowAffixEffectsComponent } from '@components/row-affix-effects/row-affi
 import { RowCurrencyCostComponent } from '@components/row-currency-cost/row-currency-cost.component';
 import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { SlotButtonContainerComponent } from '@components/slot-button-container/slot-button-container.component';
-import { SFXDirective } from '@directives/sfx.directive';
+import { FFButtonComponent } from '@ff/components/button/button.component';
 import { TeleportToDirective } from '@directives/teleport.to.directive';
 import { equipmentItemAffixDisplays } from '@helpers/item/affix-display.ui';
 import { equipmentItemSlotCount } from '@helpers/item/infusion';
@@ -39,7 +39,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     RowAffixEffectsComponent,
     RowCurrencyCostComponent,
     RowInfusedMaterialsComponent,
-    SFXDirective,
+    FFButtonComponent,
     SlotButtonContainerComponent,
     SweetAlert2Module,
     TeleportToDirective,

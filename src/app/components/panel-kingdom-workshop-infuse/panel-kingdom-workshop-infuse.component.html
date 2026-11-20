@@ -13,8 +13,9 @@
     <button
       class="btn btn-primary btn-sm"
       [disabled]="!selected || !canAffordMaterial(selected.item.id)"
-      appSfx="ui-click"
-      [sfxTrigger]="['click', 'hover']"
+      ffButton="ui-click"
+      ffPadAction="context"
+      ffPadLabel="Infuse"
       (click)="$event.shiftKey || requestInfuse(selected, $event)"
       (click.shift)="requestInfuse(selected, $event, true)"
     >
@@ -27,11 +28,16 @@
   </app-slot-button-container>
 </ng-container>
 
-<app-detail-item-preview class="shrink-0" [display]="display()">
+<app-detail-item-preview
+  class="shrink-0"
+  [display]="display()"
+  [ffFocusOnChange]="currentItem.id"
+  [ffFocusOnCreate]="true"
+>
   @if (slotCount() > 0) {
     <div
       class="type-hint my-2 mt-4"
-      [textContent]="'Click a slot to choose what to infuse into it.'"
+      [textContent]="'Select a slot to choose what to infuse into it.'"
     ></div>
 
     <app-row-infused-materials
@@ -55,6 +61,8 @@
         <div
           class="flex flex-col gap-2 pr-2 flex-1 min-h-0 overflow-y-auto"
           appListReflow
+          [ffFocusOnChange]="slotIndex"
+          [ffFocusOnCreate]="true"
         >
           @for (entry of materials; track entry.item.id) {
             @let cost = materialCost(entry.item.id);

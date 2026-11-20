@@ -43,7 +43,7 @@
       </ng-template>
 
       <div class="flex flex-col gap-2 h-full min-h-0 pl-2">
-        <div role="tablist" class="tabs tabs-box shrink-0">
+        <div role="tablist" ffTriggerTabs class="tabs tabs-box shrink-0">
           @for (option of tabs(); track option.id) {
             @let active = tab?.id === option.id;
 
@@ -52,6 +52,7 @@
               role="tab"
               class="tab flex gap-2 items-center"
               [class.tab-active]="active"
+              [attr.aria-selected]="active"
               [class.font-bold]="active"
               [appTutorialTarget]="option.tutorialTarget"
               (click)="activeTab.set(option)"

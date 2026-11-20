@@ -36,13 +36,17 @@
         type="button"
         class="btn btn-sm btn-neutral btn-outline"
         (click)="toggleSellMode()"
-        appSfx="ui-error"
-        [sfxTrigger]="['click', 'hover']"
+        ffButton="ui-error"
+        ffPadAction="back"
+        [ffPadPriority]="sellCancelPriority"
+        ffPadLabel="Cancel"
       >
         Cancel
       </button>
 
-      <span class="type-hint">Shift-click to select multiple items.</span>
+      <span class="type-hint ff-kbm-only">
+        Shift-click to select multiple items.
+      </span>
 
       <swal
         #sellSwal

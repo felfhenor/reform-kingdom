@@ -1,3 +1,4 @@
+import { FFFocusOnChangeDirective } from '@ff/focus/ff-focus-on-change.directive';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -20,6 +21,7 @@ import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.compone
 import { TextNumberTweenComponent } from '@components/text-number-tween/text-number-tween.component';
 import { ListRowDirective } from '@directives/list-row.directive';
 import { SFXDirective } from '@directives/sfx.directive';
+import { FFButtonComponent } from '@ff/components/button/button.component';
 import { TutorialTargetDirective } from '@directives/tutorial-target.directive';
 import { getEntry } from '@helpers/content/content';
 import { formatDuration } from '@helpers/engine/timer';
@@ -69,6 +71,7 @@ type EntryStatusDisplay = {
   selector: 'app-play-kingdom-workers',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFFocusOnChangeDirective,
     BlankSlateComponent,
     CardPageComponent,
     ButtonKingdomBackComponent,
@@ -82,6 +85,7 @@ type EntryStatusDisplay = {
     SlotIconBlankComponent,
     ListRowDirective,
     SFXDirective,
+    FFButtonComponent,
     TutorialTargetDirective,
     RowCurrencyCostComponent,
     PanelKingdomWorkersAssignmentNodeComponent,

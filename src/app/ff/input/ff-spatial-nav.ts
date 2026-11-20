@@ -10,6 +10,8 @@ const DIRECTION_AXES: Record<FFDirection, { axis: FFAxis; sign: 1 | -1 }> = {
 // Sideways drift costs more than distance, so rows and columns win over diagonals.
 const CROSS_AXIS_WEIGHT = 2;
 const CROSS_CENTER_WEIGHT = 0.1;
+// Candidates must start past the current edge; overlapping ones (e.g. a navbar above a side rail) aren't "ahead".
+const EDGE_TOLERANCE = 2;
 
 function ffSpan(rect: FFRect, axis: FFAxis): [number, number] {
   return axis === 'x' ? [rect.left, rect.right] : [rect.top, rect.bottom];
@@ -37,9 +39,10 @@ function ffDirectionalScore(
   const [toStart, toEnd] = ffSpan(to, axis);
 
   const ahead =
-    (ffSpanCenter([toStart, toEnd]) - ffSpanCenter([fromStart, fromEnd])) *
-    sign;
-  if (ahead <= 0) return undefined;
+    sign > 0
+      ? toStart >= fromEnd - EDGE_TOLERANCE
+      : toEnd <= fromStart + EDGE_TOLERANCE;
+  if (!ahead) return undefined;
 
   const distance = Math.max(
     0,
@@ -67,5 +70,22 @@ export function ffNearestInDirection(
         : best;
     },
     { index: -1, score: Infinity },
+  ).index;
+}
+
+function ffCenterDistance(a: FFRect, b: FFRect): number {
+  const dx = (a.left + a.right - b.left - b.right) / 2;
+  const dy = (a.top + a.bottom - b.top - b.bottom) / 2;
+  return Math.hypot(dx, dy);
+}
+
+// Any direction: where focus recovers to when the focused element disappears or disables.
+export function ffNearestTo(from: FFRect, candidates: FFRect[]): number {
+  return candidates.reduce(
+    (best, candidate, index) => {
+      const distance = ffCenterDistance(from, candidate);
+      return distance < best.distance ? { index, distance } : best;
+    },
+    { index: -1, distance: Infinity },
   ).index;
 }

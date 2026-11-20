@@ -543,7 +543,7 @@
           }
         </div>
 
-        <div class="flex-1 min-h-0 overflow-y-auto">
+        <div class="flex-1 min-h-0 overflow-y-auto" [ffFocusOnChange]="char.id">
           @switch (heroTab()) {
             @case ('job') {
               <div class="flex flex-col gap-2">
@@ -592,7 +592,7 @@
                     />
                   }
                 </div>
-                <div class="flex flex-col gap-2">
+                <div class="flex flex-col gap-2" [ffFocusOnChange]="gearSlot()">
                   <span class="type-section-title">{{ gearSlot() }}</span>
                   @for (row of gearPicker(); track row.entry.item.id) {
                     <div class="relative">

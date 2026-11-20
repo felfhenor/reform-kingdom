@@ -1,3 +1,4 @@
+import { FFFocusOnChangeDirective } from '@ff/focus/ff-focus-on-change.directive';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -26,6 +27,7 @@ import type { BestiaryEntry, MonsterId } from '@interfaces';
   selector: 'app-play-kingdom-bestiary',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFFocusOnChangeDirective,
     BlankSlateComponent,
     AtlasAnimationComponent,
     DetailBestiaryMonsterComponent,

@@ -13,8 +13,9 @@
       [disabled]="!canReforge()"
       (click)="$event.shiftKey || requestReforge()"
       (click.shift)="requestReforge(true)"
-      appSfx="ui-click"
-      [sfxTrigger]="['click', 'hover']"
+      ffButton="ui-click"
+      ffPadAction="context"
+      ffPadLabel="Reforge"
     >
       Reforge
       @if (reforgeCost.length > 0) {

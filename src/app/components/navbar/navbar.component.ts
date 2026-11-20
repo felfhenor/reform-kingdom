@@ -20,6 +20,7 @@ import { RequireNotSetupDirective } from '@directives/no-setup.directive';
 import { RequireSetupDirective } from '@directives/require-setup.directive';
 import { FFButtonComponent } from '@ff/components/button/button.component';
 import { FFInputPromptComponent } from '@ff/components/input-prompt/input-prompt.component';
+import { FFFocusSkipDirective } from '@ff/focus/ff-focus-skip.directive';
 import { TutorialTargetDirective } from '@directives/tutorial-target.directive';
 import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
 import { FFInputService } from '@ff/input/ff-input.service';
@@ -88,6 +89,7 @@ import {
     SweetAlert2Module,
     FFButtonComponent,
     FFInputPromptComponent,
+    FFFocusSkipDirective,
     ButtonUpdateComponent,
     RequireNotSetupDirective,
     ModalComponent,

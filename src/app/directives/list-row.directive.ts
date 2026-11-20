@@ -13,6 +13,7 @@ import {
     class:
       'btn btn-outline btn-neutral h-auto w-full justify-start gap-2 ps-0 normal-case font-normal text-sm text-start text-neutral-content aria-disabled:pointer-events-auto aria-disabled:cursor-not-allowed aria-disabled:opacity-50',
     '[class.btn-active]': 'listRowSelected()',
+    '[attr.aria-current]': 'listRowSelected() || null',
     '[attr.aria-disabled]': 'disabled() || null',
   },
 })

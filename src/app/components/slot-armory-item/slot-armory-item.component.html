@@ -21,7 +21,7 @@
   <!-- Sell mode: unselected items dim and selected ones get a heavier outline, so the total traces back to its items. -->
   <button
     type="button"
-    class="relative w-[64px] h-[64px] transition-opacity cursor-pointer select-none"
+    class="relative w-[64px] h-[64px] transition-opacity cursor-pointer select-none ff-focus-outset"
     [class.opacity-50]="!selected()"
     [class.outline-4]="selected()"
     [tp]="preview.template()"
@@ -37,6 +37,7 @@
   </button>
 } @else {
   <div
+    tabindex="0"
     class="relative w-[64px] h-[64px] cursor-default transition-opacity"
     [tp]="preview.template()"
     [tpPlacement]="'top'"

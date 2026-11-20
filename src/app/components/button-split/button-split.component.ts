@@ -9,9 +9,13 @@ import {
   input,
   output,
   signal,
+  viewChild,
 } from '@angular/core';
 import { IconComponent } from '@components/icon/icon.component';
 import { SFXDirective } from '@directives/sfx.directive';
+import { FFFocusService } from '@ff/focus/ff-focus.service';
+import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
+import { GAMEPAD_PRIORITY } from '@helpers/engine/gamepad.ui';
 import type { SplitButtonOption } from '@interfaces';
 import { AnimationService } from '@services/animation.service';
 
@@ -23,6 +27,9 @@ import { AnimationService } from '@services/animation.service';
 })
 export class ButtonSplitComponent<T> {
   private anim = inject(AnimationService);
+  private focus = inject(FFFocusService);
+  private toggleButton =
+    viewChild<ElementRef<HTMLButtonElement>>('toggleButton');
 
   public label = input.required<string>();
   public color = input<'primary' | 'neutral'>('neutral');
@@ -48,6 +55,14 @@ export class ButtonSplitComponent<T> {
       event.stopImmediatePropagation();
       this.isOpen.set(false);
     };
+    // The open menu sits over everything, so B closes it before any modal or page back.
+    ffGamepadOn('back', () => this.closeFromGamepad(), {
+      element: host,
+      priority: GAMEPAD_PRIORITY.popover,
+      enabled: () => this.isOpen(),
+      label: 'Close',
+    });
+
     document.addEventListener('pointerdown', onPointerDown, { capture: true });
     window.addEventListener('keydown', onKeydown, { capture: true });
     inject(DestroyRef).onDestroy(() => {
@@ -72,6 +87,12 @@ export class ButtonSplitComponent<T> {
   protected clickMain(): void {
     this.isOpen.set(false);
     this.main.emit();
+  }
+
+  private closeFromGamepad(): void {
+    this.isOpen.set(false);
+    const toggle = this.toggleButton()?.nativeElement;
+    if (toggle) this.focus.focusElement(toggle);
   }
 
   protected toggle(): void {

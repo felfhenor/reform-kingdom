@@ -12,7 +12,7 @@ import { FFInputService } from '@ff/input/ff-input.service';
         class="fixed bottom-2 left-1/2 -translate-x-1/2 z-[210] flex gap-6 px-3 py-1 pointer-events-none bg-base-100/90 border border-base-300 text-xs"
       >
         @for (prompt of input.prompts(); track prompt.label) {
-          <span class="inline-flex items-center gap-2">
+          <span class="inline-flex items-center gap-2 whitespace-nowrap">
             @for (action of prompt.actions; track action) {
               <ff-input-prompt [action]="action" />
             }

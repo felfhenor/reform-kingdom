@@ -1,3 +1,5 @@
+import { FFButtonComponent } from '@ff/components/button/button.component';
+import { GAMEPAD_PRIORITY } from '@helpers/engine/gamepad.ui';
 import { DecimalPipe, formatNumber } from '@angular/common';
 import type { AnimationCallbackEvent } from '@angular/core';
 import {
@@ -45,6 +47,7 @@ import { sum } from 'es-toolkit/compat';
   selector: 'app-play-kingdom-armory',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFButtonComponent,
     SlotArmoryItemComponent,
     SlotButtonContainerComponent,
     CurrencyCostComponent,
@@ -119,6 +122,8 @@ export class PlayKingdomArmoryComponent {
   }
 
   public sellMode = signal(false);
+  // Above the page's own back, so B leaves sell mode before leaving the armory.
+  protected readonly sellCancelPriority = GAMEPAD_PRIORITY.pageMode;
   public selectedIds = signal<Set<EquipmentItemId>>(new Set());
   private lastSelectedId = signal<EquipmentItemId | undefined>(undefined);
 

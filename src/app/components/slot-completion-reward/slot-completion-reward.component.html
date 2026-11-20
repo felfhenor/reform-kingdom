@@ -9,7 +9,7 @@
     }
   </app-tooltip-item-preview>
 
-  <div [tp]="preview.template()" [tpPlacement]="'top'">
+  <div tabindex="0" [tp]="preview.template()" [tpPlacement]="'top'">
     <app-slot-rarity-outline
       [entry]="contentEntry"
       [spritesheet]="spritesheet()"
@@ -31,7 +31,7 @@
     </app-slot-rarity-outline>
   </div>
 } @else {
-  <div [tp]="unknownTooltip()" [tpPlacement]="'top'">
+  <div tabindex="0" [tp]="unknownTooltip()" [tpPlacement]="'top'">
     <app-icon-unknown />
   </div>
 }

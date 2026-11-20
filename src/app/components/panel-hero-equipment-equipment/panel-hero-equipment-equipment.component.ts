@@ -1,3 +1,4 @@
+import { FFFocusOnChangeDirective } from '@ff/focus/ff-focus-on-change.directive';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import {
   ChangeDetectionStrategy,
@@ -45,6 +46,7 @@ const PAPERDOLL_ROWS: EquipmentSlot[][] = [
   selector: 'app-panel-hero-equipment-equipment',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFFocusOnChangeDirective,
     BlankSlateComponent,
     SlotEquipmentComponent,
     CardEquipmentItemComponent,

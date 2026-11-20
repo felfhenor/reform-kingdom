@@ -32,6 +32,21 @@ html.ff-input-gamepad :focus {
   outline: 2px solid color-mix(in oklab, var(--color-primary) 70%, white);
   // Inset, so a scroll or overflow-hidden parent can't clip one side.
   outline-offset: -2px;
+
+  // Item art fills these boxes and would cover an inset ring; white plus a glow stays visible on every rarity color.
+  &[tabindex]:not(button),
+  &.ff-focus-outset {
+    outline-color: white;
+    outline-offset: 2px;
+    box-shadow: 0 0 10px 3px rgb(255 255 255 / 45%);
+    filter: brightness(1.2);
+  }
+}
+
+// Hints tied to one input method, e.g. "Shift-click" or "Press X".
+html.ff-input-gamepad .ff-kbm-only,
+html:not(.ff-input-gamepad) .ff-gamepad-only {
+  display: none !important;
 }
 
 html.ff-input-gamepad {

@@ -1,9 +1,14 @@
+import { FFButtonComponent } from '@ff/components/button/button.component';
+import { FFFocusService } from '@ff/focus/ff-focus.service';
+import type { FFFocusEdgeDetail } from '@ff/interfaces/ff-input';
 import type { ElementRef, OnDestroy } from '@angular/core';
 import {
   ChangeDetectionStrategy,
   Component,
   afterNextRender,
   computed,
+  inject,
+  Injector,
   input,
   signal,
   viewChild,
@@ -13,7 +18,6 @@ import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/butt
 import { CardPageComponent } from '@components/card-page/card-page.component';
 import { IconComponent } from '@components/icon/icon.component';
 import { ListReflowDirective } from '@directives/list-reflow.directive';
-import { SFXDirective } from '@directives/sfx.directive';
 
 // 64px cell + 16px gap; p-2 padding (16) cancels the missing trailing gap.
 const CELL_FOOTPRINT_PX = 80;
@@ -22,12 +26,12 @@ const CELL_FOOTPRINT_PX = 80;
   selector: 'app-page-paged-grid',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFButtonComponent,
     BlankSlateComponent,
     CardPageComponent,
     ButtonKingdomBackComponent,
     IconComponent,
     ListReflowDirective,
-    SFXDirective,
   ],
   templateUrl: './page-paged-grid.component.html',
   styleUrl: './page-paged-grid.component.scss',
@@ -66,8 +70,36 @@ export class PagePagedGridComponent<T> implements OnDestroy {
     return this.filteredEntries().slice(start, start + this.itemsPerPage());
   });
 
+  private readonly injector = inject(Injector);
+  private readonly focus = inject(FFFocusService);
+
   constructor() {
     afterNextRender(() => this.observeGridSize());
+  }
+
+  // D-pad past the grid's left/right edge turns the page, landing on the facing edge of the new one.
+  public onFocusEdge(event: Event): void {
+    const { direction } = (event as CustomEvent<FFFocusEdgeDetail>).detail;
+    if (direction === 'right' && this.page() < this.totalPages() - 1) {
+      event.preventDefault();
+      this.nextPage();
+      this.focusGridEdge('first');
+    }
+    if (direction === 'left' && this.page() > 0) {
+      event.preventDefault();
+      this.prevPage();
+      this.focusGridEdge('last');
+    }
+  }
+
+  private focusGridEdge(edge: 'first' | 'last'): void {
+    afterNextRender(
+      () => {
+        const grid = this.gridContainer()?.nativeElement;
+        if (grid) this.focus.focusEdgeOf(grid, edge);
+      },
+      { injector: this.injector },
+    );
   }
 
   ngOnDestroy(): void {

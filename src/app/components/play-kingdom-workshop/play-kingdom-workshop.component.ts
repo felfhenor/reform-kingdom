@@ -1,3 +1,4 @@
+import { FFTriggerTabsDirective } from '@ff/focus/ff-trigger-tabs.directive';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -57,6 +58,7 @@ const WORKSHOP_TABS: WorkshopTabOption[] = [
   selector: 'app-play-kingdom-workshop',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFTriggerTabsDirective,
     BlankSlateComponent,
     ButtonKingdomBackComponent,
     CardPageComponent,

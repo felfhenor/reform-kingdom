@@ -4,7 +4,11 @@ import {
   ffButtonsJustReleased,
   ffGamepadMayTakeInput,
   ffGamepadSnapshot,
+  ffHeldDirection,
+  ffRepeatFires,
+  ffStickDirection,
 } from '@ff/input/ff-gamepad';
+import { FF_STANDARD_BUTTON, ffActionMap } from '@ff/input/ff-action-map';
 import { describe, expect, it } from 'vitest';
 
 function button(pressed: boolean, value = pressed ? 1 : 0): GamepadButton {
@@ -72,5 +76,39 @@ describe('ffGamepadMayTakeInput', () => {
   it('blocks a second pad until the active one goes quiet', () => {
     expect(ffGamepadMayTakeInput(0, 1, 100, 250)).toBe(false);
     expect(ffGamepadMayTakeInput(0, 1, 250, 250)).toBe(true);
+  });
+});
+
+describe('ffStickDirection', () => {
+  it('picks the dominant axis past the deadzone', () => {
+    expect(ffStickDirection(0.9, 0.2, 0.5)).toBe('right');
+    expect(ffStickDirection(-0.1, -0.8, 0.5)).toBe('up');
+    expect(ffStickDirection(0.3, 0.3, 0.5)).toBeUndefined();
+  });
+});
+
+describe('ffHeldDirection', () => {
+  it('prefers the d-pad over the stick', () => {
+    const buttons: boolean[] = [];
+    buttons[FF_STANDARD_BUTTON.left] = true;
+    expect(
+      ffHeldDirection({ buttons, axes: [0.9, 0] }, ffActionMap('xbox'), 0.5),
+    ).toBe('left');
+    expect(
+      ffHeldDirection(
+        { buttons: [], axes: [0, 0.9] },
+        ffActionMap('xbox'),
+        0.5,
+      ),
+    ).toBe('down');
+  });
+});
+
+describe('ffRepeatFires', () => {
+  it('fires once, then repeats on an interval after the delay', () => {
+    expect(ffRepeatFires(0, 400, 120)).toBe(1);
+    expect(ffRepeatFires(399, 400, 120)).toBe(1);
+    expect(ffRepeatFires(400, 400, 120)).toBe(2);
+    expect(ffRepeatFires(640, 400, 120)).toBe(4);
   });
 });

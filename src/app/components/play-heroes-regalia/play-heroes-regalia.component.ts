@@ -1,3 +1,4 @@
+import { FFFocusOnChangeDirective } from '@ff/focus/ff-focus-on-change.directive';
 import { DecimalPipe, formatNumber, NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -80,6 +81,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   selector: 'app-play-heroes-regalia',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFFocusOnChangeDirective,
     IconSpecComponent,
     BlankSlateComponent,
     ButtonKingdomBackComponent,

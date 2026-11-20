@@ -34,9 +34,9 @@
               aria-label="Previous page"
               [disabled]="page() === 0"
               (click)="prevPage()"
-              appSfx="ui-click"
-              [sfxOffset]="0"
-              [sfxTrigger]="['click', 'hover']"
+              ffButton="ui-click"
+              ffPadAction="subPrev"
+              ffPadLabel="Page"
             >
               <app-icon name="tablerChevronLeft" size="row" />
             </button>
@@ -51,9 +51,9 @@
               aria-label="Next page"
               [disabled]="page() >= totalPages() - 1"
               (click)="nextPage()"
-              appSfx="ui-click"
-              [sfxOffset]="0"
-              [sfxTrigger]="['click', 'hover']"
+              ffButton="ui-click"
+              ffPadAction="subNext"
+              ffPadLabel="Page"
             >
               <app-icon name="tablerChevronRight" size="row" />
             </button>
@@ -71,8 +71,9 @@
     }
 
     <div
-      class="flex-1 grid content-start justify-items-center overflow-hidden grid-cols-[repeat(auto-fill,64px)] auto-rows-[64px] gap-4 p-2"
+      class="ff-focus-zone flex-1 grid content-start justify-items-center overflow-hidden grid-cols-[repeat(auto-fill,64px)] auto-rows-[64px] gap-4 p-2"
       #gridContainer
+      (ffFocusEdge)="onFocusEdge($event)"
       appListReflow
       [appListReflowEnabled]="reflow()"
     >

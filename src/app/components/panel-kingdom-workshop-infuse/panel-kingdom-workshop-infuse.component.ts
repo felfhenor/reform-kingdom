@@ -1,3 +1,4 @@
+import { FFFocusOnChangeDirective } from '@ff/focus/ff-focus-on-change.directive';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -22,6 +23,7 @@ import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot
 import { ListReflowDirective } from '@directives/list-reflow.directive';
 import { ListRowDirective } from '@directives/list-row.directive';
 import { SFXDirective } from '@directives/sfx.directive';
+import { FFButtonComponent } from '@ff/components/button/button.component';
 import { TeleportToDirective } from '@directives/teleport.to.directive';
 import { getEntry } from '@helpers/content/content';
 import { isInfusionMaterial } from '@helpers/item/equipment-bonus';
@@ -53,6 +55,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   selector: 'app-panel-kingdom-workshop-infuse',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFFocusOnChangeDirective,
     BlankSlateComponent,
     ListReflowDirective,
     SlotButtonContainerComponent,
@@ -66,6 +69,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     SlotRarityOutlineComponent,
     ListRowDirective,
     SFXDirective,
+    FFButtonComponent,
     TeleportToDirective,
     RowCurrencyCostComponent,
   ],

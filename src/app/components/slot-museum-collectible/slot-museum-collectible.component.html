@@ -3,6 +3,7 @@
 
 @if (known) {
   <div
+    tabindex="0"
     class="relative w-[64px] h-[64px] cursor-default"
     [class.opacity-50]="!e.discovered"
     [tp]="tooltip"
@@ -13,7 +14,7 @@
     </app-slot-rarity-outline>
   </div>
 } @else {
-  <div [tp]="tooltip" [tpPlacement]="'top'" class="opacity-50">
+  <div tabindex="0" [tp]="tooltip" [tpPlacement]="'top'" class="opacity-50">
     <app-icon-unknown />
   </div>
 }

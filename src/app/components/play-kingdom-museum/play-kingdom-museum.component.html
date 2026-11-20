@@ -12,7 +12,7 @@
     >
       <span header>Museum</span>
 
-      <div before-toolbar role="tablist" class="tabs tabs-box">
+      <div before-toolbar role="tablist" ffTriggerTabs class="tabs tabs-box">
         <ng-container *ngTemplateOutlet="tabs"></ng-container>
       </div>
 
@@ -36,7 +36,7 @@
     >
       <span header>Museum</span>
 
-      <div before-toolbar role="tablist" class="tabs tabs-box">
+      <div before-toolbar role="tablist" ffTriggerTabs class="tabs tabs-box">
         <ng-container *ngTemplateOutlet="tabs"></ng-container>
       </div>
 
@@ -60,7 +60,7 @@
     >
       <span header>Museum</span>
 
-      <div before-toolbar role="tablist" class="tabs tabs-box">
+      <div before-toolbar role="tablist" ffTriggerTabs class="tabs tabs-box">
         <ng-container *ngTemplateOutlet="tabs"></ng-container>
       </div>
 
@@ -81,7 +81,7 @@
     >
       <span header>Museum</span>
 
-      <div before-toolbar role="tablist" class="tabs tabs-box">
+      <div before-toolbar role="tablist" ffTriggerTabs class="tabs tabs-box">
         <ng-container *ngTemplateOutlet="tabs"></ng-container>
       </div>
 
@@ -98,6 +98,7 @@
     role="tab"
     class="tab gap-2"
     [class.tab-active]="tab === 'collectibles'"
+    [attr.aria-selected]="tab === 'collectibles'"
     (click)="setTab('collectibles')"
     appSfx="ui-click"
     [sfxTrigger]="['click', 'hover']"
@@ -113,6 +114,7 @@
     role="tab"
     class="tab gap-2"
     [class.tab-active]="tab === 'recipes'"
+    [attr.aria-selected]="tab === 'recipes'"
     (click)="setTab('recipes')"
     appSfx="ui-click"
     [sfxTrigger]="['click', 'hover']"
@@ -129,6 +131,7 @@
       role="tab"
       class="tab gap-2"
       [class.tab-active]="tab === 'items'"
+      [attr.aria-selected]="tab === 'items'"
       (click)="setTab('items')"
       appSfx="ui-click"
       [sfxTrigger]="['click', 'hover']"
@@ -144,6 +147,7 @@
       role="tab"
       class="tab gap-2"
       [class.tab-active]="tab === 'equipment'"
+      [attr.aria-selected]="tab === 'equipment'"
       (click)="setTab('equipment')"
       appSfx="ui-click"
       [sfxTrigger]="['click', 'hover']"

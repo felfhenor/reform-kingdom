@@ -1,10 +1,11 @@
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { FF_DIRECTIONS } from '@ff/input/ff-action-map';
 import { FFInputService } from '@ff/input/ff-input.service';
-import { ffNearestInDirection } from '@ff/input/ff-spatial-nav';
+import { ffNearestInDirection, ffNearestTo } from '@ff/input/ff-spatial-nav';
 import { FF_BUTTON_FEEDBACK } from '@ff/input/ff-tokens';
 import type {
   FFDirection,
+  FFRect,
   FFFocusEdgeDetail,
   FFFocusScopeRegistration,
 } from '@ff/interfaces/ff-input';
@@ -24,12 +25,20 @@ const FOCUSABLE_SELECTOR = [
   '[tabindex]:not([tabindex="-1"])',
 ].join(',');
 
+// Where focus lands when there's nothing remembered: the current section or selected tab, if any.
+const CURRENT_SELECTOR =
+  '[aria-current]:not([aria-current="false"]), [aria-selected="true"]';
+
 function isActive(element: HTMLElement): boolean {
   return (
     element.isConnected &&
     element.checkVisibility({ visibilityProperty: true }) &&
     !element.closest('[inert]')
   );
+}
+
+function isFocusable(element: HTMLElement): boolean {
+  return element.matches(FOCUSABLE_SELECTOR) && isActive(element);
 }
 
 function hasSize(element: HTMLElement): boolean {
@@ -45,6 +54,7 @@ export class FFFocusService {
   private scopes: FFFocusScopeRegistration[] = [];
   private memoryRoots: HTMLElement[] = [];
   private remembered = new WeakMap<HTMLElement, HTMLElement>();
+  private rememberedRects = new WeakMap<HTMLElement, FFRect>();
   private openers = new WeakMap<HTMLElement, HTMLElement>();
   private activeScope?: HTMLElement;
   private activeRoot?: HTMLElement;
@@ -63,6 +73,9 @@ export class FFFocusService {
         label: 'Select',
       }),
       this.input.onRefresh(() => this.syncScope()),
+      this.input.setElementFilter((element) =>
+        this.topScope().contains(element),
+      ),
     ];
     document.addEventListener('focusin', this.remember);
 
@@ -96,6 +109,19 @@ export class FFFocusService {
     if (this.input.mode() === 'gamepad') this.focus(element);
   }
 
+  // The container's current/selected entry, else its first; false when it has nothing to focus yet.
+  public focusLanding(container: HTMLElement): boolean {
+    const target = this.landingIn(container);
+    if (!target) return false;
+
+    this.focus(target);
+    return true;
+  }
+
+  public isFocusable(element: HTMLElement): boolean {
+    return isFocusable(element);
+  }
+
   public focusEdgeOf(container: HTMLElement, edge: 'first' | 'last'): void {
     const focusables = this.focusables(container);
     const target = edge === 'first' ? focusables[0] : focusables.at(-1);
@@ -117,7 +143,12 @@ export class FFFocusService {
   private focusables(container: HTMLElement): HTMLElement[] {
     return [
       ...container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
-    ].filter((element) => isActive(element) && hasSize(element));
+    ].filter(
+      (element) =>
+        isActive(element) &&
+        hasSize(element) &&
+        !element.closest('.ff-focus-skip'),
+    );
   }
 
   private focusedIn(scope: HTMLElement): HTMLElement | undefined {
@@ -125,7 +156,7 @@ export class FFFocusService {
     if (!(active instanceof HTMLElement) || active === document.body) {
       return undefined;
     }
-    return scope.contains(active) && isActive(active) ? active : undefined;
+    return scope.contains(active) && isFocusable(active) ? active : undefined;
   }
 
   private focusedInScope(): HTMLElement | undefined {
@@ -138,6 +169,7 @@ export class FFFocusService {
       .at(-1);
   }
 
+  // Inside a zone (e.g. a paged grid), its own edge gets first say before focus leaves it.
   private move(direction: FFDirection): void {
     const scope = this.topScope();
     const current = this.focusedIn(scope);
@@ -146,20 +178,41 @@ export class FFFocusService {
       return;
     }
 
-    const candidates = this.focusables(scope).filter((el) => el !== current);
+    const zone = current.closest<HTMLElement>('.ff-focus-zone');
+    if (zone && scope.contains(zone)) {
+      if (this.focusNearest(current, zone, direction)) return;
+      if (this.dispatchEdge(current, direction)) return;
+    }
+
+    if (this.focusNearest(current, scope, direction)) return;
+    if (!zone) this.dispatchEdge(current, direction);
+  }
+
+  private focusNearest(
+    current: HTMLElement,
+    container: HTMLElement,
+    direction: FFDirection,
+  ): boolean {
+    const candidates = this.focusables(container).filter(
+      (el) => el !== current,
+    );
     const index = ffNearestInDirection(
       current.getBoundingClientRect(),
       candidates.map((candidate) => candidate.getBoundingClientRect()),
       direction,
     );
-    if (index !== -1) {
-      this.focus(candidates[index]);
-      return;
-    }
+    if (index === -1) return false;
 
-    current.dispatchEvent(
+    this.focus(candidates[index]);
+    return true;
+  }
+
+  // True when a listener handled the edge (by cancelling the event).
+  private dispatchEdge(current: HTMLElement, direction: FFDirection): boolean {
+    return !current.dispatchEvent(
       new CustomEvent<FFFocusEdgeDetail>(FF_FOCUS_EDGE_EVENT, {
         bubbles: true,
+        cancelable: true,
         detail: { direction },
       }),
     );
@@ -168,15 +221,39 @@ export class FFFocusService {
   private focusInitial(scope: HTMLElement): void {
     const root = this.activeRootIn(scope);
     const remembered = root ? this.remembered.get(root) : undefined;
+    const lastRect = root ? this.rememberedRects.get(root) : undefined;
     const target =
-      remembered && isActive(remembered) && scope.contains(remembered)
+      remembered && isFocusable(remembered) && scope.contains(remembered)
         ? remembered
-        : (this.focusables(root ?? scope)[0] ?? this.focusables(scope)[0]);
+        : (this.landingIn(root ?? scope, lastRect) ??
+          this.landingIn(scope, lastRect));
     if (target) this.focus(target);
   }
 
+  // Prefers a "current" element (selected row, active section), nearest to where focus was lost if known.
+  private landingIn(
+    container: HTMLElement,
+    lastRect?: FFRect,
+  ): HTMLElement | undefined {
+    const focusables = this.focusables(container);
+    const currents = focusables.filter((el) => el.matches(CURRENT_SELECTOR));
+    const pool = currents.length > 0 ? currents : focusables;
+    if (!lastRect) return pool[0];
+
+    const index = ffNearestTo(
+      lastRect,
+      pool.map((element) => element.getBoundingClientRect()),
+    );
+    return pool[index];
+  }
+
+  // Only reacts when focus actually lands, so a refused focus (e.g. a just-disabled button) can't retry-click every refresh.
   private focus(element: HTMLElement): void {
+    if (document.activeElement === element) return;
+
     element.focus({ preventScroll: true });
+    if (document.activeElement !== element) return;
+
     element.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     this.feedback?.hover(0);
   }
@@ -185,9 +262,13 @@ export class FFFocusService {
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
 
+    const rect = target.getBoundingClientRect();
     this.memoryRoots
       .filter((root) => root.contains(target))
-      .forEach((root) => this.remembered.set(root, target));
+      .forEach((root) => {
+        this.remembered.set(root, target);
+        this.rememberedRects.set(root, rect);
+      });
   };
 
   // Opening a scope remembers what had focus, closing one hands it back; an unfocused scope gets its remembered/first element.
@@ -213,7 +294,9 @@ export class FFFocusService {
 
   private restoreOpener(closed: HTMLElement, scope: HTMLElement): boolean {
     const opener = this.openers.get(closed);
-    if (!opener || !isActive(opener) || !scope.contains(opener)) return false;
+    if (!opener || !isFocusable(opener) || !scope.contains(opener)) {
+      return false;
+    }
 
     this.focus(opener);
     return true;

@@ -14,6 +14,7 @@
       type="button"
       class="btn btn-sm join-item px-2"
       [class]="colorClass()"
+      #toggleButton
       [attr.aria-label]="menuAriaLabel()"
       [attr.aria-expanded]="isOpen()"
       aria-haspopup="true"

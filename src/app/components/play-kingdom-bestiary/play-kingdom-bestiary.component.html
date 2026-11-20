@@ -76,7 +76,10 @@
         </div>
       </div>
 
-      <div class="flex-1 overflow-y-auto min-h-0">
+      <div
+        class="flex-1 overflow-y-auto min-h-0"
+        [ffFocusOnChange]="selectedEntry()?.monster?.id"
+      >
         @if (selectedEntry(); as entry) {
           <app-detail-bestiary-monster [entry]="entry" />
         } @else {

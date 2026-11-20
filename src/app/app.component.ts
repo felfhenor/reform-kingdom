@@ -18,6 +18,7 @@ import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
 import { isDemoBuild } from '@helpers/demo/demo';
 import {
   GAMEPAD_PRIORITY,
+  gamepadBindSwal,
   gamepadSwalClick,
   gamepadSwalShown,
 } from '@helpers/engine/gamepad.ui';
@@ -51,6 +52,7 @@ export class AppComponent {
 
     inject(FFFocusService);
     this.bindGamepadDialogs();
+    gamepadBindSwal();
   }
 
   private bindGamepadDialogs(): void {

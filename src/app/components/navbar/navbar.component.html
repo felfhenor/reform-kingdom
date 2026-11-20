@@ -1,4 +1,4 @@
-<div class="navbar bg-base-100 relative flex py-0">
+<div class="navbar bg-base-100 relative flex py-0" ffFocusSkip>
   <div class="navbar-start flex-1">
     <ul class="menu menu-horizontal py-0 px-1">
       <li class="flex gap-1 flex-row items-center" appRequireSetup>
@@ -84,7 +84,9 @@
           @let activeId = activeClauseId();
           <div class="flex flex-col gap-2 p-2 max-w-[400px]">
             <span class="font-semibold">Decree [5]</span>
-            <span class="my-2 type-hint">Right click to toggle auto-mode</span>
+            <span class="my-2 type-hint ff-kbm-only">
+              Right click to toggle auto-mode
+            </span>
             @for (clause of enabledClauses(); track clause.id) {
               <span
                 class="text-xs"

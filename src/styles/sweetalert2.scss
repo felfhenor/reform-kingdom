@@ -101,3 +101,10 @@ div:where(.swal2-container) div:where(.swal2-validation-message)::before {
 .swal2-actions {
   gap: 4px;
 }
+
+// Swal sets an inline display on its buttons, which breaks .btn's flex row; restore it so the glyph centers on the label.
+.swal2-actions button:has(.ff-swal-glyph) {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0.5rem;
+}

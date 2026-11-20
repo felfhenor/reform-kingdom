@@ -11,7 +11,11 @@ import {
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
 import { FFFocusScopeDirective } from '@ff/focus/ff-focus-scope.directive';
 import { GAMEPAD_PRIORITY } from '@helpers/engine/gamepad.ui';
-import { modalClose, modalIsOpen } from '@helpers/engine/modal-stack';
+import {
+  modalClose,
+  modalIsOpen,
+  modalIsTopmost,
+} from '@helpers/engine/modal-stack';
 import type { ModalId } from '@interfaces';
 
 @Component({
@@ -34,6 +38,8 @@ export class ModalComponent {
 
   // Content stays mounted while closing (stack is the source of truth), so it doesn't tear down mid-transition.
   protected readonly focusPriority = GAMEPAD_PRIORITY.modal;
+
+  protected isTopmost = computed(() => modalIsTopmost(this.modalId()));
 
   public isOpen = computed(() => modalIsOpen(this.modalId()));
 

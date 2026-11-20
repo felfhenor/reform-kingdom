@@ -1,3 +1,4 @@
+import { FFInputService } from '@ff/input/ff-input.service';
 import { DecimalPipe } from '@angular/common';
 import type { AnimationCallbackEvent } from '@angular/core';
 import {
@@ -53,6 +54,8 @@ export class DetailBestiaryMonsterComponent {
   public entry = input.required<BestiaryEntry>();
 
   public selectedLevel = signal(1);
+  private readonly ffInput = inject(FFInputService);
+  protected isGamepadMode = computed(() => this.ffInput.mode() === 'gamepad');
 
   private lastMonsterId?: MonsterId;
 

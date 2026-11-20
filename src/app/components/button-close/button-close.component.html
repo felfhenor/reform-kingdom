@@ -3,5 +3,9 @@
   appSfx="ui-error"
   [sfxTrigger]="['click', 'hover']"
 >
-  <app-icon name="tablerX"></app-icon>
+  @if (showBackPrompt() && isGamepadMode()) {
+    <ff-input-prompt action="back" />
+  } @else {
+    <app-icon name="tablerX"></app-icon>
+  }
 </button>

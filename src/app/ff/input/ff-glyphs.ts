@@ -133,3 +133,19 @@ export function ffGlyph(
     lineHeightEm: inkHeight / UNITS_PER_EM - CENTERING_OFFSET_EM,
   };
 }
+
+// For DOM the app doesn't render itself (e.g. third-party dialogs); templates use <ff-input-prompt>.
+export function ffCreateGlyphElement(
+  family: FFControllerFamily,
+  button: number,
+): HTMLElement | undefined {
+  const glyph = ffGlyph(family, button);
+  if (!glyph) return undefined;
+
+  const element = document.createElement('span');
+  element.className = `ff-glyph ff-glyph-${family}`;
+  element.style.lineHeight = `${glyph.lineHeightEm}em`;
+  element.textContent = glyph.text;
+  element.setAttribute('aria-hidden', 'true');
+  return element;
+}

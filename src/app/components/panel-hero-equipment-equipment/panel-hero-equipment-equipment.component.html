@@ -51,7 +51,11 @@
       }
     </div>
 
-    <div class="flex flex-1 h-full !overflow-x-hidden mb-4 gap-2 flex-col">
+    <div
+      class="flex flex-1 h-full !overflow-x-hidden mb-4 gap-2 flex-col"
+      [ffFocusOnChange]="selected"
+      [ffFocusOnCreate]="true"
+    >
       @for (entry of items; track $index) {
         <app-slot-button-container
           [disabled]="!modifiable"

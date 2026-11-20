@@ -1,3 +1,5 @@
+import { FFFocusOnChangeDirective } from '@ff/focus/ff-focus-on-change.directive';
+import { gamepadBindHeroCycle } from '@helpers/engine/gamepad.ui';
 import { DecimalPipe, formatNumber, PercentPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -131,6 +133,7 @@ const HERO_TABS: { id: ColosseumHeroTab; label: string }[] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [ColosseumFightService],
   imports: [
+    FFFocusOnChangeDirective,
     AtlasAnimationComponent,
     BackdropNodeComponent,
     BarProgressComponent,
@@ -294,6 +297,11 @@ export class PlayKingdomColosseumComponent {
   );
 
   constructor() {
+    gamepadBindHeroCycle(
+      () => this.hero()?.id,
+      (id) => this.pickHero(id),
+      () => this.party().map((character) => character.id),
+    );
     inject(DestroyRef).onDestroy(() => (this.batchCancelled = true));
     const report = colosseumSetupPrune(
       colosseumSetup(),

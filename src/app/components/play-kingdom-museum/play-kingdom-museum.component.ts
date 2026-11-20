@@ -1,3 +1,4 @@
+import { FFTriggerTabsDirective } from '@ff/focus/ff-trigger-tabs.directive';
 import { NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -40,6 +41,7 @@ import {
   selector: 'app-play-kingdom-museum',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFTriggerTabsDirective,
     SlotMuseumCollectibleComponent,
     SlotMuseumRecipeComponent,
     PagePagedGridComponent,
