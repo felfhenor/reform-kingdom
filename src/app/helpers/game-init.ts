@@ -20,7 +20,7 @@ import { setOption } from '@helpers/state-options';
 import { setWorld } from '@helpers/world';
 import { worldNodeDevelopmentApplyStartingLevels } from '@helpers/world-node/world-node-development-state';
 import { applyOutpostBuffRefresh } from '@helpers/world-node/world-node-outpost-buff';
-import { worldNodeAt } from '@helpers/world-node/world-nodes';
+import { kingdomNodeGet, worldNodeAt } from '@helpers/world-node/world-nodes';
 import { worldgenGenerateWorld } from '@helpers/worldgen';
 
 export async function gameStart(): Promise<void> {
@@ -31,6 +31,15 @@ export async function gameStart(): Promise<void> {
 
   setWorld(world);
   await updateGamestate((state) => {
+    const kingdom = kingdomNodeGet();
+    if (kingdom) {
+      state.world.currentLocation = {
+        mapName: kingdom.mapName,
+        x: kingdom.x,
+        y: kingdom.y,
+      };
+    }
+
     grantStartingGold(state);
     applyEdictStartingItems(state);
     worldNodeDevelopmentApplyStartingLevels(state);

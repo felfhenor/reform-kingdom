@@ -49,8 +49,8 @@ export function defaultGameState(): GameState {
       party: [],
       currentLocation: {
         mapName: 'Carrina',
-        x: 29,
-        y: 27,
+        x: 0,
+        y: 0,
       },
       travel: defaultTravelState(),
       gathering: defaultGatheringState(),
