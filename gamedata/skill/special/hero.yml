@@ -25,7 +25,7 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Intelligence: 1.2
+        Intelligence: 3
 
       statusEffects:
         - statusEffectId: Burning
@@ -62,8 +62,8 @@
         - behavior: NotZeroHealth
         - behavior: NotMaxHealth
       damageScaling:
-        Intelligence: 1.5
-        Vitality: 0.75
+        Intelligence: 3.75
+        Vitality: 1.9
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** cast **{{ skill.name }}** on **{{ target.name }}** for {{ absdamage }} healing {{ targetStatus }}.'
@@ -95,8 +95,8 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Strength: 0.8
-        Resistance: 1
+        Strength: 2
+        Resistance: 2.5
 
       statusEffects:
         - statusEffectId: Trembling
@@ -132,8 +132,8 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Agility: 0.5
-        Intelligence: 0.25
+        Agility: 1.25
+        Intelligence: 0.65
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
@@ -145,8 +145,8 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Agility: 0.5
-        Intelligence: 0.25
+        Agility: 1.25
+        Intelligence: 0.65
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
@@ -158,8 +158,8 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Agility: 0.5
-        Intelligence: 0.25
+        Agility: 1.25
+        Intelligence: 0.65
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
@@ -171,8 +171,8 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Agility: 0.5
-        Intelligence: 0.25
+        Agility: 1.25
+        Intelligence: 0.65
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'

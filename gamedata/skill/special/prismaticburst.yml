@@ -29,8 +29,8 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Intelligence: 0.2
-        Strength: 0.2
+        Intelligence: 0.5
+        Strength: 0.5
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
@@ -42,8 +42,8 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Intelligence: 0.2
-        Strength: 0.2
+        Intelligence: 0.5
+        Strength: 0.5
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
@@ -55,8 +55,8 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Intelligence: 0.2
-        Strength: 0.2
+        Intelligence: 0.5
+        Strength: 0.5
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
@@ -68,8 +68,8 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Intelligence: 0.2
-        Strength: 0.2
+        Intelligence: 0.5
+        Strength: 0.5
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
@@ -105,8 +105,8 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Intelligence: 0.4
-        Strength: 0.4
+        Intelligence: 1
+        Strength: 1
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
@@ -118,8 +118,8 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Intelligence: 0.4
-        Strength: 0.4
+        Intelligence: 1
+        Strength: 1
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
@@ -131,8 +131,8 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Intelligence: 0.4
-        Strength: 0.4
+        Intelligence: 1
+        Strength: 1
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
@@ -144,8 +144,8 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Intelligence: 0.4
-        Strength: 0.4
+        Intelligence: 1
+        Strength: 1
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
@@ -181,8 +181,8 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Intelligence: 0.6
-        Strength: 0.6
+        Intelligence: 1.5
+        Strength: 1.5
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
@@ -194,8 +194,8 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Intelligence: 0.6
-        Strength: 0.6
+        Intelligence: 1.5
+        Strength: 1.5
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
@@ -207,8 +207,8 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Intelligence: 0.6
-        Strength: 0.6
+        Intelligence: 1.5
+        Strength: 1.5
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
@@ -220,8 +220,8 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Intelligence: 0.6
-        Strength: 0.6
+        Intelligence: 1.5
+        Strength: 1.5
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
@@ -257,8 +257,8 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Intelligence: 0.8
-        Strength: 0.8
+        Intelligence: 2
+        Strength: 2
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
@@ -270,8 +270,8 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Intelligence: 0.8
-        Strength: 0.8
+        Intelligence: 2
+        Strength: 2
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
@@ -283,8 +283,8 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Intelligence: 0.8
-        Strength: 0.8
+        Intelligence: 2
+        Strength: 2
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
@@ -296,8 +296,8 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Intelligence: 0.8
-        Strength: 0.8
+        Intelligence: 2
+        Strength: 2
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
@@ -333,8 +333,8 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Intelligence: 1
-        Strength: 1
+        Intelligence: 2.5
+        Strength: 2.5
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
@@ -346,8 +346,8 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Intelligence: 1
-        Strength: 1
+        Intelligence: 2.5
+        Strength: 2.5
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
@@ -359,8 +359,8 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Intelligence: 1
-        Strength: 1
+        Intelligence: 2.5
+        Strength: 2.5
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
@@ -372,8 +372,8 @@
       targetBehaviors:
         - behavior: NotZeroHealth
       damageScaling:
-        Intelligence: 1
-        Strength: 1
+        Intelligence: 2.5
+        Strength: 2.5
       statusEffects: []
 
       combatMessage: '**{{ combatant.name }}** uses **{{ skill.name }}** on **{{ target.name }}** for {{ damageText }} {{ targetStatus }}.'
