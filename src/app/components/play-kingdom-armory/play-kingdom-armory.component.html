@@ -22,8 +22,9 @@
         [disabled]="count === 0"
         (click)="$event.shiftKey || sellSwal.fire()"
         (click.shift)="confirmSell()"
-        appSfx="ui-success"
-        [sfxTrigger]="['click', 'hover']"
+        ffButton="ui-success"
+        ffPadAction="context"
+        ffPadLabel="Sell"
       >
         Sell {{ count | number }} {{ count === 1 ? 'item' : 'items' }}
         <app-currency-cost
@@ -62,8 +63,9 @@
         type="button"
         class="btn btn-sm btn-neutral"
         (click)="toggleSellMode()"
-        appSfx="ui-click"
-        [sfxTrigger]="['click', 'hover']"
+        ffButton="ui-click"
+        ffPadAction="context"
+        ffPadLabel="Sell Mode"
       >
         Enter Sell Mode
       </button>
@@ -73,8 +75,9 @@
         class="btn btn-sm btn-neutral"
         [class.btn-outline]="!lootFilterActive()"
         (click)="openLootFilters()"
-        appSfx="ui-click"
-        [sfxTrigger]="['click', 'hover']"
+        ffButton="ui-click"
+        ffPadAction="details"
+        ffPadLabel="Auto Sell"
       >
         Auto Sell
       </button>

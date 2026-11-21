@@ -144,7 +144,8 @@
         </button>
       }
 
-      @if (showCaravanTradeButton()) {
+      <!-- Trade and Trainer open popups over the map, so they only appear there; Town has its own tab. -->
+      @if (showCaravanTradeButton() && activeGamePlayView() === 'world') {
         <li class="action-button" appRequireSetup>
           <button
             class="btn btn-sm btn-neutral"
@@ -163,7 +164,7 @@
         </li>
       }
 
-      @if (currentTrainerEntry()) {
+      @if (currentTrainerEntry() && activeGamePlayView() === 'world') {
         <li class="action-button" appRequireSetup>
           <button
             class="btn btn-sm btn-neutral"
