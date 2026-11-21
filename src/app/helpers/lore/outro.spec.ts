@@ -14,12 +14,14 @@ const forgetterId = 'memory-of-the-forgetter' as CollectibleId;
 
 function seedFelDefeated(
   meta: { outroCrawlSeen?: boolean; victoryPopupSeen?: boolean } = {},
+  skipStoryCrawls = false,
 ): void {
   seedContent([
     ensureCollectible({ id: forgetterId, name: 'Memory of the Forgetter' }),
   ]);
   seedGamestate((state) => {
     state.collectibles[forgetterId] = { quantity: 1, foundAt: 1000 };
+    state.globalEffectSums.skipStoryCrawls = skipStoryCrawls;
     Object.assign(state.meta, meta);
   });
 }
@@ -63,6 +65,24 @@ describe('isVictoryPopupPending', () => {
     seedFelDefeated({ outroCrawlSeen: true, victoryPopupSeen: true });
     expect(isVictoryPopupPending()).toBe(false);
   });
+
+  it('opens straight after Fel falls when story crawls are skipped', () => {
+    seedFelDefeated({}, true);
+    expect(isOutroCrawlPending()).toBe(false);
+    expect(isVictoryPopupPending()).toBe(true);
+
+    seedFelDefeated({ victoryPopupSeen: true }, true);
+    expect(isVictoryPopupPending()).toBe(false);
+  });
+
+  it('waits for Fel even when story crawls are skipped', () => {
+    seedContent([
+      ensureCollectible({ id: forgetterId, name: 'Memory of the Forgetter' }),
+    ]);
+    seedGamestate((state) => (state.globalEffectSums.skipStoryCrawls = true));
+
+    expect(isVictoryPopupPending()).toBe(false);
+  });
 });
 
 describe('isStoryScreenPending', () => {
@@ -77,6 +97,14 @@ describe('isStoryScreenPending', () => {
     expect(isStoryScreenPending()).toBe(true);
 
     seedFelDefeated({ outroCrawlSeen: true, victoryPopupSeen: true });
+    expect(isStoryScreenPending()).toBe(false);
+  });
+
+  it('ignores a queued title crawl while story crawls are skipped', () => {
+    seedGamestate((state) => {
+      state.meta.titleCrawlPending = true;
+      state.globalEffectSums.skipStoryCrawls = true;
+    });
     expect(isStoryScreenPending()).toBe(false);
   });
 

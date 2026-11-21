@@ -1,0 +1,13 @@
+// Hard on/off steps, like an alarm clock that lost power, rather than a soft pulse.
+.run-timer-paused {
+  animation: run-timer-blink 2s steps(1, end) infinite;
+}
+
+@keyframes run-timer-blink {
+  0% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 0;
+  }
+}

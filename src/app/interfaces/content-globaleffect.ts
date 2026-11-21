@@ -249,6 +249,23 @@ export type GlobalEffectEffectJobAbilitiesStack = {
   effectType: 'GlobalJobAbilitiesStack';
 };
 
+export type GlobalEffectEffectShowRunTimer = {
+  effectType: 'GlobalShowRunTimer';
+};
+
+export type GlobalEffectEffectSkipRegionIntros = {
+  effectType: 'GlobalSkipRegionIntros';
+};
+
+export type GlobalEffectEffectSkipTutorials = {
+  effectType: 'GlobalSkipTutorials';
+};
+
+// The title and outro crawls; the victory popup still shows.
+export type GlobalEffectEffectSkipStoryCrawls = {
+  effectType: 'GlobalSkipStoryCrawls';
+};
+
 // Every node of `nodeType` is removed from the map for the run, and remembrance stops counting what only it gives.
 export type GlobalEffectEffectWorldNodeTypeRemoved = {
   effectType: 'GlobalWorldNodeTypeRemoved';
@@ -363,6 +380,10 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectRequireSealForDecreeAutomation
   | GlobalEffectEffectPartySharesClass
   | GlobalEffectEffectJobAbilitiesStack
+  | GlobalEffectEffectShowRunTimer
+  | GlobalEffectEffectSkipRegionIntros
+  | GlobalEffectEffectSkipTutorials
+  | GlobalEffectEffectSkipStoryCrawls
   | GlobalEffectEffectWorldNodeTypeRemoved
   | GlobalEffectEffectWorldNodeStartingLevel
   | GlobalEffectEffectCommissionReputationBoost

@@ -13,6 +13,7 @@ import {
   clockState,
   discoveredMapsState,
   gamestate,
+  globalEffectSumsState,
   metaState,
   runStatsState,
   worldPartyState,
@@ -241,5 +242,6 @@ export function legacyRunFromGame(
     party: legacyRunParty(),
     ...legacyRunEdicts(),
     stats: legacyRunStats(),
+    timed: globalEffectSumsState().showRunTimer,
   };
 }

@@ -325,3 +325,12 @@
   effects:
     - effectType: GlobalGoldGainMultiplier
       value: 0.1
+
+- id: ec2b4f0f-9d61-4e44-801f-fa7e460d845b
+  name: Vow of Speed Running
+  rarity: Mystical
+  description: A vow to enjoy breaking personal records, and seek out opportunities to get better whilst doing so.
+  sprite: '0117'
+
+  effects:
+    - effectType: GlobalShowRunTimer

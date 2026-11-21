@@ -3,7 +3,7 @@ import {
   isCollectibleDiscovered,
 } from '@helpers/item/collectibles';
 import { isTitleCrawlPending } from '@helpers/lore/title-crawl';
-import { metaState } from '@helpers/state-game';
+import { globalEffectSumsState, metaState } from '@helpers/state-game';
 
 export function isFelDefeated(): boolean {
   const finalId = finalCollectibleId();
@@ -11,12 +11,20 @@ export function isFelDefeated(): boolean {
 }
 
 export function isOutroCrawlPending(): boolean {
-  return !metaState().outroCrawlSeen && isFelDefeated();
+  return (
+    !metaState().outroCrawlSeen &&
+    !globalEffectSumsState().skipStoryCrawls &&
+    isFelDefeated()
+  );
 }
 
 export function isVictoryPopupPending(): boolean {
   const meta = metaState();
-  return meta.outroCrawlSeen && !meta.victoryPopupSeen;
+  if (meta.victoryPopupSeen) return false;
+  return (
+    meta.outroCrawlSeen ||
+    (globalEffectSumsState().skipStoryCrawls && isFelDefeated())
+  );
 }
 
 export function isRunLost(): boolean {

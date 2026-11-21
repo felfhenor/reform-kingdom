@@ -1,5 +1,7 @@
-import { metaState } from '@helpers/state-game';
+import { globalEffectSumsState, metaState } from '@helpers/state-game';
 
 export function isTitleCrawlPending(): boolean {
-  return metaState().titleCrawlPending;
+  return (
+    metaState().titleCrawlPending && !globalEffectSumsState().skipStoryCrawls
+  );
 }

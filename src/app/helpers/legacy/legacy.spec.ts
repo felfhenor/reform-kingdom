@@ -75,6 +75,15 @@ describe('legacyRunFromGame', () => {
       stats: { kills: 5, monstersKilled: 2, mapsReached: 1, townsVisited: 1 },
     });
     expect(record.stats.completion.length).toBeGreaterThan(0);
+    expect(record.timed).toBe(false);
+  });
+
+  it('marks runs that showed a timer', () => {
+    seedGamestate((draft) => {
+      draft.globalEffectSums.showRunTimer = true;
+    });
+
+    expect(legacyRunFromGame('Completed').timed).toBe(true);
   });
 });
 

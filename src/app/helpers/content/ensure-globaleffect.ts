@@ -164,7 +164,11 @@ export function ensureGlobalEffectEffect(
     effect.effectType === 'GlobalManualCombat' ||
     effect.effectType === 'GlobalRequireSealForDecreeAutomation' ||
     effect.effectType === 'GlobalPartySharesClass' ||
-    effect.effectType === 'GlobalJobAbilitiesStack'
+    effect.effectType === 'GlobalJobAbilitiesStack' ||
+    effect.effectType === 'GlobalShowRunTimer' ||
+    effect.effectType === 'GlobalSkipRegionIntros' ||
+    effect.effectType === 'GlobalSkipTutorials' ||
+    effect.effectType === 'GlobalSkipStoryCrawls'
   ) {
     return { effectType: effect.effectType };
   }

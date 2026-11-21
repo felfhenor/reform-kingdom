@@ -21,6 +21,11 @@
     animation: none;
   }
 
+  .run-timer-paused {
+    animation: none;
+    opacity: 0.5;
+  }
+
   .spot-outline,
   .tutorial-callout,
   .turn-slot,

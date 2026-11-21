@@ -49,6 +49,8 @@ export type RunRecord = {
   fragments: number;
   multiplier: number;
   stats: RunRecordStats;
+  // Whether the run showed a timer, so only those runs compete for a personal best.
+  timed?: boolean;
 };
 
 // `achievements` is optional so Legacies from builds before achievements stay version 1.

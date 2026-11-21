@@ -20,6 +20,10 @@ export function ticksToDurationParts(ticks: number): DurationPart[] {
   return parts.length === 0 ? [{ value: 0, unit: 'second' }] : parts;
 }
 
+export function formatDurationDelta(ticks: number): string {
+  return `${ticks < 0 ? '-' : '+'}${formatDuration(Math.abs(ticks))}`;
+}
+
 // Fits a collapsed status bubble's badge: mm:ss under an hour, whole hours beyond.
 export function formatDurationBadge(ticks: number): string {
   const hours = Math.floor(Math.max(0, ticks) / 3600);

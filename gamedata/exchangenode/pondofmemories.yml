@@ -254,3 +254,11 @@
       costs:
         - itemId: Gold Ore
           required: 15
+
+    - kind: Collectible
+      requiredEdictId: Edict of Speed Running
+      output:
+        collectibleId: Vow of Speed Running
+      costs:
+        - itemId: Gold Coin
+          required: 1

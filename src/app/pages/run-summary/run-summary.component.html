@@ -21,7 +21,24 @@
             </p>
           </div>
 
-          <div class="flex flex-col items-end"></div>
+          <div class="flex flex-col items-end gap-2">
+            @if (timedResult(); as timed) {
+              <span class="type-meta">Final time</span>
+              <span class="type-page-title tabular-nums">{{ timed.time }}</span>
+              @if (timed.isPersonalBest) {
+                <span class="badge badge-success">Personal best</span>
+              }
+              @if (timed.delta) {
+                <span
+                  class="tabular-nums"
+                  [class.text-success]="timed.isPersonalBest"
+                  [class.text-error]="!timed.isPersonalBest"
+                >
+                  {{ timed.delta }} vs previous best
+                </span>
+              }
+            }
+          </div>
         </div>
       </div>
 

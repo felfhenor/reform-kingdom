@@ -128,6 +128,14 @@ export function globalEffectEffectDescription(
       return 'Every hero shares one class';
     case 'GlobalJobAbilitiesStack':
       return 'Party job abilities stack';
+    case 'GlobalShowRunTimer':
+      return 'A run timer is shown';
+    case 'GlobalSkipRegionIntros':
+      return 'Region introductions are skipped';
+    case 'GlobalSkipTutorials':
+      return 'Tutorials are skipped';
+    case 'GlobalSkipStoryCrawls':
+      return 'Story crawls are skipped';
     case 'GlobalWorldNodeTypeRemoved':
       return `${WORLD_NODE_TYPE_LABELS[effect.nodeType]} are gone`;
     case 'GlobalWorldNodeStartingLevel':
@@ -306,6 +314,18 @@ function accumulateGlobalEffectEffect(
       return;
     case 'GlobalJobAbilitiesStack':
       sums.jobAbilitiesStack = true;
+      return;
+    case 'GlobalShowRunTimer':
+      sums.showRunTimer = true;
+      return;
+    case 'GlobalSkipRegionIntros':
+      sums.skipRegionIntros = true;
+      return;
+    case 'GlobalSkipTutorials':
+      sums.skipTutorials = true;
+      return;
+    case 'GlobalSkipStoryCrawls':
+      sums.skipStoryCrawls = true;
       return;
     case 'GlobalWorldNodeTypeRemoved':
       sums.removedWorldNodeTypes[effect.nodeType] = true;

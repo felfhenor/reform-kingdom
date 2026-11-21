@@ -21,7 +21,11 @@ import { SFXDirective } from '@directives/sfx.directive';
 import { achievementsEarnedByRun } from '@helpers/achievement/achievement.ui';
 import { getEntry } from '@helpers/content/content';
 import { edictEntry } from '@helpers/edict/edict';
-import { ticksToDurationParts } from '@helpers/engine/timer.ui';
+import { formatDuration } from '@helpers/engine/timer';
+import {
+  formatDurationDelta,
+  ticksToDurationParts,
+} from '@helpers/engine/timer.ui';
 import { skillFamilyEntry } from '@helpers/hero/skill';
 import { legacyRunById } from '@helpers/legacy/legacy';
 import {
@@ -29,6 +33,7 @@ import {
   legacyUnsealedRegions,
 } from '@helpers/legacy/legacy-score.ui';
 import {
+  legacyBestTimedRun,
   legacyHeroMostUsedSkill,
   legacyHeroStatRows,
   legacyRunAwards,
@@ -91,6 +96,20 @@ export class RunSummaryComponent {
   public playTime = computed(() =>
     ticksToDurationParts(this.run()?.ticks ?? 0),
   );
+
+  public timedResult = computed(() => {
+    const run = this.run();
+    if (run?.outcome !== 'Completed' || run.timed !== true) return undefined;
+
+    const previousBest = legacyBestTimedRun(run.endedAt);
+    return {
+      time: formatDuration(run.ticks),
+      isPersonalBest: !previousBest || run.ticks < previousBest.ticks,
+      delta: previousBest
+        ? formatDurationDelta(run.ticks - previousBest.ticks)
+        : undefined,
+    };
+  });
 
   private awards = computed(() => {
     const run = this.run();

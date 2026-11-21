@@ -80,4 +80,13 @@ describe('regionIntroPending', () => {
     expect(regionIntroPending('Blank')).toBeUndefined();
     expect(regionIntroPending('Nowhere')).toBeUndefined();
   });
+
+  it('never returns a region while intros are skipped', () => {
+    seedRegions();
+    seedGamestate((state) => {
+      state.globalEffectSums.skipRegionIntros = true;
+    });
+
+    expect(regionIntroPending('CraggledMire')).toBeUndefined();
+  });
 });

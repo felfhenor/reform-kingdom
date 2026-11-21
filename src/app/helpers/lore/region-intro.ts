@@ -1,6 +1,6 @@
 import { getEntriesByType } from '@helpers/content/content';
 import { ledgerHas } from '@helpers/engine/ledger';
-import { regionIntrosState } from '@helpers/state-game';
+import { globalEffectSumsState, regionIntrosState } from '@helpers/state-game';
 import type { EncounterId, RegionContent } from '@interfaces';
 
 export function regionForMap(mapName: string): RegionContent | undefined {
@@ -27,6 +27,7 @@ export function isRegionIntroSeen(mapName: string): boolean {
 }
 
 export function regionIntroPending(mapName: string): RegionContent | undefined {
+  if (globalEffectSumsState().skipRegionIntros) return undefined;
   if (isRegionIntroSeen(mapName)) return undefined;
 
   const region = regionForMap(mapName);

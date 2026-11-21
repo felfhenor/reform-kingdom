@@ -1,0 +1,48 @@
+@if (isShown()) {
+  <span
+    class="font-bold tabular-nums"
+    [tp]="splitsTooltip"
+    [tpTrigger]="'click'"
+    [tpPlacement]="'bottom'"
+    (animate.enter)="onEnter($event)"
+    (animate.leave)="onLeave($event)"
+  >
+    <span [class.run-timer-paused]="isPaused()">{{ time() }}</span>
+  </span>
+}
+
+<ng-template #splitsTooltip>
+  <table class="table table-xs max-w-[400px]">
+    <tbody>
+      @for (split of splits(); track split.key) {
+        <tr class="text-sm">
+          <td>{{ split.name }}</td>
+          <td class="text-right tabular-nums">{{ split.time }}</td>
+          <td
+            class="text-right tabular-nums"
+            [class.text-success]="split.isAhead"
+            [class.text-error]="!!split.delta && !split.isAhead"
+          >
+            {{ split.delta }}
+          </td>
+        </tr>
+      } @empty {
+        <tr class="text-sm">
+          <td class="text-lighter" colspan="3">No splits yet.</td>
+        </tr>
+      }
+
+      @let best = bestTime();
+      @if (best) {
+        <tr>
+          <td colspan="3"><hr /></td>
+        </tr>
+        <tr class="text-sm">
+          <td>Personal best</td>
+          <td class="text-right tabular-nums">{{ best }}</td>
+          <td></td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</ng-template>

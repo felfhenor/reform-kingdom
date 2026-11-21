@@ -44,6 +44,10 @@ export type GlobalEffectSums = {
   requireSealForDecreeAutomation: boolean;
   partySharesClass: boolean;
   jobAbilitiesStack: boolean;
+  showRunTimer: boolean;
+  skipRegionIntros: boolean;
+  skipTutorials: boolean;
+  skipStoryCrawls: boolean;
   // Sparse - only removed node types have an entry.
   removedWorldNodeTypes: Partial<Record<WorldNodeType, boolean>>;
   // Sparse - only node types with a starting level have an entry.

@@ -149,7 +149,8 @@ export async function gameloop(totalTicks: number): Promise<void> {
 
     const currentTick = timerTicksElapsed();
     const nextSaveTick = timerLastSaveTick() + getOption('autosaveInterval');
-    if (currentTick >= nextSaveTick) {
+    // A story screen holds the loop, so whatever opened it (Fel's fall) would otherwise wait unsaved behind it.
+    if (currentTick >= nextSaveTick || isStoryScreenPending()) {
       updateGamestate((state) => {
         state.clock.lastSaveTick = currentTick;
         return state;

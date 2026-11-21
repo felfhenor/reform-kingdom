@@ -1,6 +1,12 @@
 import type { RegionContent } from '@interfaces/content-region';
 import type { HeroRunStats } from '@interfaces/run-stats';
 
+export type RunSplit = {
+  key: string;
+  name: string;
+  tick: number;
+};
+
 export type RunStatRow = {
   label: string;
   value: number;

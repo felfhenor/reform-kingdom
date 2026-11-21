@@ -13,6 +13,7 @@ import { regionIntroPending } from '@helpers/lore/region-intro';
 import { isStoryScreenPending } from '@helpers/lore/outro';
 import { getOption, setOption } from '@helpers/state-options';
 import {
+  globalEffectSumsState,
   isGameStateReady,
   worldCurrentLocationState,
 } from '@helpers/state-game';
@@ -44,6 +45,7 @@ const tutorialTargetRegistryVersion = signal(0);
 // Cheap ledger check first, so a seen tutorial's (possibly expensive) trigger predicate is never re-evaluated; always in catalog order for deterministic playback.
 export function tutorialsPending(): TutorialDefinition[] {
   if (!isGameStateReady()) return [];
+  if (globalEffectSumsState().skipTutorials) return [];
 
   const unseen = TUTORIAL_CATALOG.filter(
     (t) =>

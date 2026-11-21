@@ -191,3 +191,15 @@
       nodeType: GatherNode
     - effectType: GlobalMonstersDropRegionGathering
       value: 50
+
+- id: b776d798-2c80-4414-bba9-01e9da72630a
+  name: Edict of Speed Running
+  sprite: '0034'
+  description: Race yourself or others to get the best run you can. There is a timer in-game, built-in splits, and personal best tracking. Gotta go fast!
+  kind: Variant
+  fragments: 0
+  effects:
+    - effectType: GlobalShowRunTimer
+    - effectType: GlobalSkipRegionIntros
+    - effectType: GlobalSkipTutorials
+    - effectType: GlobalSkipStoryCrawls

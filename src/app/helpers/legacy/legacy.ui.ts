@@ -24,7 +24,7 @@ import type {
   RunStatRow,
   SavefileBackup,
 } from '@interfaces';
-import { maxBy } from 'es-toolkit/compat';
+import { maxBy, minBy } from 'es-toolkit/compat';
 
 // Beating Fel counts even if a later wipe ended the run.
 export function legacyRunOutcome(): RunOutcome {
@@ -68,6 +68,21 @@ export function legacyHasUnfinishedBackup(backups: SavefileBackup[]): boolean {
 
 export function legacyHasCompletedRun(): boolean {
   return legacy().runs.some((run) => run.outcome === 'Completed');
+}
+
+// Only runs that ended before `endedBefore`, so a reopened summary compares against the best as it stood then.
+export function legacyBestTimedRun(
+  endedBefore = Infinity,
+): RunRecord | undefined {
+  return minBy(
+    legacy().runs.filter(
+      (run) =>
+        run.outcome === 'Completed' &&
+        run.timed === true &&
+        run.endedAt < endedBefore,
+    ),
+    (run) => run.ticks,
+  );
 }
 
 export function legacyClearedEdictIds(): EdictId[] {

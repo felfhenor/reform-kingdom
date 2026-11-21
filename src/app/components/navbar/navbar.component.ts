@@ -71,6 +71,7 @@ import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 import { BarResourceComponent } from '@components/bar-resource/bar-resource.component';
+import { StatusRunTimerComponent } from '@components/status-run-timer/status-run-timer.component';
 import { PanelDebugButtonsComponent } from '@components/panel-debug-buttons/panel-debug-buttons.component';
 import {
   autoModeIsEnabled,
@@ -84,6 +85,7 @@ import {
   selector: 'app-navbar',
   imports: [
     TippyDirective,
+    StatusRunTimerComponent,
     RequireSetupDirective,
     IconComponent,
     SweetAlert2Module,
