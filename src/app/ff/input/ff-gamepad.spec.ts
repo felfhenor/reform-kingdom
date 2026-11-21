@@ -7,6 +7,7 @@ import {
   ffHeldDirection,
   ffRepeatFires,
   ffStickDirection,
+  ffStickVector,
 } from '@ff/input/ff-gamepad';
 import { FF_STANDARD_BUTTON, ffActionMap } from '@ff/input/ff-action-map';
 import { describe, expect, it } from 'vitest';
@@ -101,6 +102,33 @@ describe('ffHeldDirection', () => {
         0.5,
       ),
     ).toBe('down');
+  });
+
+  it('ignores the stick when it is claimed', () => {
+    expect(
+      ffHeldDirection(
+        { buttons: [], axes: [0, 0.9] },
+        ffActionMap('xbox'),
+        0.5,
+        false,
+      ),
+    ).toBeUndefined();
+  });
+});
+
+describe('ffStickVector', () => {
+  it('is zero inside the deadzone', () => {
+    expect(ffStickVector(0.1, 0.1, 0.2)).toEqual({ x: 0, y: 0 });
+  });
+
+  it('reaches full length at full tilt', () => {
+    const v = ffStickVector(1, 0, 0.2);
+    expect(v.x).toBeCloseTo(1);
+    expect(v.y).toBe(0);
+  });
+
+  it('starts from zero at the deadzone edge', () => {
+    expect(ffStickVector(0, 0.6, 0.2).y).toBeCloseTo(0.5);
   });
 });
 

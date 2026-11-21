@@ -1,3 +1,5 @@
+import type { FFGamepadAction } from '@ff/interfaces/ff-input';
+import { FFButtonComponent } from '@ff/components/button/button.component';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -5,7 +7,6 @@ import {
   input,
 } from '@angular/core';
 import { RowCurrencyCostComponent } from '@components/row-currency-cost/row-currency-cost.component';
-import { SFXDirective } from '@directives/sfx.directive';
 import { formatDuration } from '@helpers/engine/timer';
 import { isPartyAtNode } from '@helpers/world';
 import { worldNodeCanAffordCost } from '@helpers/world-node/world-node-cost';
@@ -25,11 +26,13 @@ import type { WorldNodeEntry } from '@interfaces';
 @Component({
   selector: 'app-button-world-node-develop',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SFXDirective, RowCurrencyCostComponent],
+  imports: [FFButtonComponent, RowCurrencyCostComponent],
   templateUrl: './button-world-node-develop.component.html',
   styleUrl: './button-world-node-develop.component.scss',
 })
 export class ButtonWorldNodeDevelopComponent {
+  // Shrines keep X for praying, so their develop moves to Y.
+  public padAction = input<FFGamepadAction>('context');
   public entry = input.required<WorldNodeEntry>();
   public subject = input('location');
 

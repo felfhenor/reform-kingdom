@@ -16,6 +16,7 @@ import {
   ffGamepadMayTakeInput,
   ffGamepadSnapshot,
   ffHeldDirection,
+  ffStickVector,
   ffRepeatFires,
 } from '@ff/input/ff-gamepad';
 import { FF_CONTROLLER_FAMILY_RESOLVER } from '@ff/input/ff-tokens';
@@ -32,6 +33,8 @@ import type {
 } from '@ff/interfaces/ff-input';
 
 const MODE_SWITCH_DEADZONE = 0.5;
+// Lower than the mode switch, so analog movement (e.g. map panning) responds to gentle tilts.
+const STICK_DEADZONE = 0.2;
 // Browsers send zero-movement mousemoves when the DOM under the cursor changes.
 const MOUSE_MOVE_THRESHOLD = 3;
 const GAMEPAD_TAKEOVER_MS = 250;
@@ -84,6 +87,7 @@ export class FFInputService {
   private refreshListeners: Array<() => void> = [];
   private elementFilter?: (element: HTMLElement) => boolean;
   private heldDirection?: FFDirection;
+  private leftStickClaims = 0;
   private heldDirectionSince = 0;
   private heldDirectionFires = 0;
 
@@ -141,6 +145,25 @@ export class FFInputService {
     };
   }
 
+  // While claimed, the left stick stops driving directions so the claimer can read it as analog input.
+  public claimLeftStick(): () => void {
+    this.leftStickClaims += 1;
+    let released = false;
+    return () => {
+      if (released) return;
+      released = true;
+      this.leftStickClaims -= 1;
+    };
+  }
+
+  // The active pad's left stick past a deadzone, scaled to 0..1.
+  public leftStick(): { x: number; y: number } {
+    const index = this.activeGamepadIndex;
+    const axes =
+      index === undefined ? undefined : this.previousSnapshots.get(index)?.axes;
+    return ffStickVector(axes?.[0] ?? 0, axes?.[1] ?? 0, STICK_DEADZONE);
+  }
+
   // How long the current D-pad/stick direction has been held, for controls that accelerate.
   public heldDirectionMs(): number {
     return this.heldDirection ? performance.now() - this.heldDirectionSince : 0;
@@ -156,7 +179,8 @@ export class FFInputService {
     };
   }
 
-  private isElementActive = (element: HTMLElement): boolean =>
+  // Visible and inside the top focus scope; also lets non-handler code (e.g. analog input) defer to overlays.
+  public isElementActive = (element: HTMLElement): boolean =>
     element.checkVisibility({ visibilityProperty: true }) &&
     (this.elementFilter?.(element) ?? true);
 
@@ -282,6 +306,7 @@ export class FFInputService {
       snapshot,
       ffActionMap(this.familySignal()),
       MODE_SWITCH_DEADZONE,
+      this.leftStickClaims === 0,
     );
     if (direction !== this.heldDirection) {
       this.heldDirection = direction;

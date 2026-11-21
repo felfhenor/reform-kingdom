@@ -27,8 +27,9 @@
       class="btn btn-sm btn-primary"
       [disabled]="!canOpenTeleport()"
       (click)="teleport.emit()"
-      appSfx="ui-click"
-      [sfxTrigger]="['click', 'hover']"
+      ffButton="ui-click"
+      ffPadAction="context"
+      ffPadLabel="Teleport"
     >
       Teleport
     </button>
@@ -48,8 +49,9 @@
     class="btn btn-sm btn-neutral"
     [disabled]="!canSetHome()"
     (click)="setHome.emit()"
-    appSfx="ui-success"
-    [sfxTrigger]="['click', 'hover']"
+    ffButton="ui-success"
+    ffPadAction="details"
+    ffPadLabel="Set Home"
   >
     @if (isHome()) {
       This outpost is your home

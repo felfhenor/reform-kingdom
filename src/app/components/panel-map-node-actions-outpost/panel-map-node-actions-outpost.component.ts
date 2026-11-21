@@ -1,3 +1,4 @@
+import { FFButtonComponent } from '@ff/components/button/button.component';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -7,7 +8,6 @@ import {
   output,
 } from '@angular/core';
 import { ButtonWorldNodeDevelopComponent } from '@components/button-world-node-develop/button-world-node-develop.component';
-import { SFXDirective } from '@directives/sfx.directive';
 import {
   OUTPOST_DEATH_PENALTY_REDUCTION_PER_LEVEL,
   OUTPOST_TELEPORT_LEVEL,
@@ -25,7 +25,7 @@ import type { WorldNodeEntry } from '@interfaces';
 @Component({
   selector: 'app-panel-map-node-actions-outpost',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DecimalPipe, SFXDirective, ButtonWorldNodeDevelopComponent],
+  imports: [FFButtonComponent, DecimalPipe, ButtonWorldNodeDevelopComponent],
   templateUrl: './panel-map-node-actions-outpost.component.html',
   styleUrl: './panel-map-node-actions-outpost.component.scss',
 })

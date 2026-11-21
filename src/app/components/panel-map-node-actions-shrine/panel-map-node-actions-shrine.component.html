@@ -1,5 +1,9 @@
 <div class="flex flex-col gap-2">
-  <app-button-world-node-develop [entry]="entry()" subject="shrine" />
+  <app-button-world-node-develop
+    [entry]="entry()"
+    subject="shrine"
+    padAction="details"
+  />
 
   @let buff = currentBuff();
   @if (buff) {
@@ -12,8 +16,9 @@
         class="btn btn-sm btn-neutral"
         [disabled]="!canPray()"
         (click)="doPray()"
-        appSfx="ui-success"
-        [sfxTrigger]="['click', 'hover']"
+        ffButton="ui-success"
+        ffPadAction="context"
+        ffPadLabel="Pray"
       >
         Pray for
         <app-atlas-image

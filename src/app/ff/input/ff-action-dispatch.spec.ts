@@ -69,6 +69,23 @@ describe('ffActionDispatch', () => {
 });
 
 describe('ffActivePrompts', () => {
+  it('collapses all four directions into one d-pad glyph', () => {
+    const moves = (['up', 'down', 'left', 'right'] as const).map((action) =>
+      registration({ action, label: 'Move' }),
+    );
+    expect(
+      ffActivePrompts(moves, ['up', 'down', 'left', 'right'], alwaysActive),
+    ).toEqual([{ actions: ['dpad'], label: 'Move' }]);
+  });
+
+  it('keeps a partial set of directions as-is', () => {
+    const left = registration({ action: 'left', label: 'Adjust' });
+    const right = registration({ action: 'right', label: 'Adjust' });
+    expect(
+      ffActivePrompts([left, right], ['left', 'right'], alwaysActive),
+    ).toEqual([{ actions: ['left', 'right'], label: 'Adjust' }]);
+  });
+
   it('labels each action from its top handler without running it', () => {
     const confirm = registration({ action: 'confirm', label: 'Next' });
     const back = registration({ label: () => 'Skip' });

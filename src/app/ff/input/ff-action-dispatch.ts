@@ -1,5 +1,7 @@
+import { FF_DIRECTIONS } from '@ff/input/ff-action-map';
 import type {
   FFActionRegistration,
+  FFDirection,
   FFGamepadAction,
   FFPrompt,
 } from '@ff/interfaces/ff-input';
@@ -46,14 +48,32 @@ export function ffActivePrompts(
   actions: FFGamepadAction[],
   isElementActive: (element: HTMLElement) => boolean,
 ): FFPrompt[] {
-  return actions.reduce<FFPrompt[]>((prompts, action) => {
-    const top = ffActionCandidates(registrations, action, isElementActive)[0];
-    const label = ffRegistrationLabel(top);
-    if (!label) return prompts;
+  return actions
+    .reduce<FFPrompt[]>((prompts, action) => {
+      const top = ffActionCandidates(registrations, action, isElementActive)[0];
+      const label = ffRegistrationLabel(top);
+      if (!label) return prompts;
 
-    const existing = prompts.find((prompt) => prompt.label === label);
-    if (existing) existing.actions.push(action);
-    else prompts.push({ actions: [action], label });
-    return prompts;
-  }, []);
+      const existing = prompts.find((prompt) => prompt.label === label);
+      if (existing) existing.actions.push(action);
+      else prompts.push({ actions: [action], label });
+      return prompts;
+    }, [])
+    .map(ffCollapseDirections);
+}
+
+// Four arrow glyphs in a row read as noise; one all-directions D-pad says the same thing.
+function ffCollapseDirections(prompt: FFPrompt): FFPrompt {
+  const isDirection = (action: FFGamepadAction) =>
+    FF_DIRECTIONS.includes(action as FFDirection);
+  if (!FF_DIRECTIONS.every((direction) => prompt.actions.includes(direction)))
+    return prompt;
+
+  return {
+    ...prompt,
+    actions: [
+      ...prompt.actions.filter((action) => !isDirection(action)),
+      'dpad',
+    ],
+  };
 }

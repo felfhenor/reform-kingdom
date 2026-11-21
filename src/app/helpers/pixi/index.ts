@@ -6,6 +6,7 @@ export * from './pixi-floating-text';
 export * from './pixi-frame-rate.ui';
 export * from './pixi-grid.ui';
 export * from './pixi-indicators';
+export * from './pixi-map-cursor.ui';
 export * from './pixi-map-render';
 export * from './pixi-node-animation';
 export * from './pixi-node-animation.ui';

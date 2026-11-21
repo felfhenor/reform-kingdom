@@ -1,10 +1,10 @@
+import { FFButtonComponent } from '@ff/components/button/button.component';
 import { ChangeDetectionStrategy, Component, output } from '@angular/core';
-import { SFXDirective } from '@directives/sfx.directive';
 
 @Component({
   selector: 'app-panel-map-node-actions-town',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SFXDirective],
+  imports: [FFButtonComponent],
   templateUrl: './panel-map-node-actions-town.component.html',
   styleUrl: './panel-map-node-actions-town.component.scss',
 })

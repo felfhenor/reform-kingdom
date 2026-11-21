@@ -1,23 +1,24 @@
+import { FFButtonComponent } from '@ff/components/button/button.component';
 import {
   ChangeDetectionStrategy,
   Component,
   input,
   output,
 } from '@angular/core';
-import { SFXDirective } from '@directives/sfx.directive';
 import type { ExchangeNodeContent } from '@interfaces/content-exchangenode';
 
 @Component({
   selector: 'app-panel-map-node-actions-exchange',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SFXDirective],
+  imports: [FFButtonComponent],
   template: `
     <button
       type="button"
       class="btn btn-block btn-sm btn-primary"
       (click)="open.emit()"
-      appSfx="ui-click"
-      [sfxTrigger]="['click', 'hover']"
+      ffButton="ui-click"
+      ffPadAction="context"
+      ffPadLabel="Open"
     >
       {{ node().actionLabel }}
     </button>

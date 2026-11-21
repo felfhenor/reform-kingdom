@@ -1,4 +1,14 @@
-import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { FFPadActionDirective } from '@ff/controls/ff-pad-action.directive';
+import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
+import { GAMEPAD_PRIORITY } from '@helpers/engine/gamepad.ui';
+import { FFButtonComponent } from '@ff/components/button/button.component';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  ElementRef,
+  inject,
+} from '@angular/core';
 import { BarTownReputationComponent } from '@components/bar-town-reputation/bar-town-reputation.component';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
 import { ButtonWishlistComponent } from '@components/button-wishlist/button-wishlist.component';
@@ -22,7 +32,6 @@ import { PanelMapNodeStatusGatherComponent } from '@components/panel-map-node-st
 import { SlotCompletionRewardComponent } from '@components/slot-completion-reward/slot-completion-reward.component';
 import { SlotGatherMaterialComponent } from '@components/slot-gather-material/slot-gather-material.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
-import { SFXDirective } from '@directives/sfx.directive';
 import { caravanBrandName } from '@helpers/caravan/caravan';
 import { teleportIsDemoLocked } from '@helpers/demo/demo';
 import {
@@ -95,6 +104,8 @@ import { sortBy } from 'es-toolkit/compat';
   selector: 'app-panel-map-node',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFButtonComponent,
+    FFPadActionDirective,
     BackdropNodeComponent,
     TippyDirective,
     BarTownReputationComponent,
@@ -119,7 +130,6 @@ import { sortBy } from 'es-toolkit/compat';
     PanelMapNodeStatusEncounterComponent,
     PanelMapNodeStatusGatherComponent,
     SpriteNodeComponent,
-    SFXDirective,
   ],
   templateUrl: './panel-map-node.component.html',
   styleUrl: './panel-map-node.component.scss',
@@ -427,6 +437,16 @@ export class PanelMapNodeComponent {
 
     void homeNodeSet(entry);
     notifySuccess(`${entry.nodeName} is now your home.`);
+  }
+
+  constructor() {
+    // Element-bound: the world (and this panel) stays mounted but invisible under other views.
+    ffGamepadOn('back', () => this.close(), {
+      element: inject<ElementRef<HTMLElement>>(ElementRef).nativeElement,
+      priority: GAMEPAD_PRIORITY.pageMode,
+      enabled: () => !!this.node(),
+      label: 'Close',
+    });
   }
 
   public close(): void {

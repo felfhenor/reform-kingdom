@@ -11,7 +11,9 @@ export type FFControllerFamily =
   | 'steam-controller'
   | 'steam-deck';
 
+// 'dpad' is prompt-only: it stands for all four directions at once and is never pressed.
 export type FFGamepadAction =
+  | 'dpad'
   | 'confirm'
   | 'back'
   | 'context'

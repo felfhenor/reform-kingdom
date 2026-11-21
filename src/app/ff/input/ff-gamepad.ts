@@ -68,18 +68,35 @@ export function ffStickDirection(
   return y > 0 ? 'down' : 'up';
 }
 
+// A claimed left stick (e.g. panning a map) leaves directions to the D-pad alone.
 export function ffHeldDirection(
   snapshot: FFGamepadSnapshot,
   actionMap: FFActionMap,
   deadzone: number,
+  useStick = true,
 ): FFDirection | undefined {
   const dpad = FF_DIRECTIONS.find(
     (direction) => snapshot.buttons[actionMap[direction]],
   );
-  return (
-    dpad ??
-    ffStickDirection(snapshot.axes[0] ?? 0, snapshot.axes[1] ?? 0, deadzone)
+  if (dpad || !useStick) return dpad;
+  return ffStickDirection(
+    snapshot.axes[0] ?? 0,
+    snapshot.axes[1] ?? 0,
+    deadzone,
   );
+}
+
+// Radial deadzone, rescaled so movement starts from 0 at its edge and reaches 1 at full tilt.
+export function ffStickVector(
+  x: number,
+  y: number,
+  deadzone: number,
+): { x: number; y: number } {
+  const length = Math.hypot(x, y);
+  if (length <= deadzone) return { x: 0, y: 0 };
+
+  const scale = Math.min(1, (length - deadzone) / (1 - deadzone)) / length;
+  return { x: x * scale, y: y * scale };
 }
 
 // Total fires owed for a hold of heldMs: one on press, then one per interval after the delay.

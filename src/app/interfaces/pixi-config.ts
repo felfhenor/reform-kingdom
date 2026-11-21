@@ -18,6 +18,13 @@ export type WorldCameraRequest = {
   target?: CameraPosition;
 };
 
+// A node the controller map cursor can land on, in tile coordinates.
+export type MapCursorNode = {
+  name: string;
+  x: number;
+  y: number;
+};
+
 export type CameraBounds = {
   minX: number;
   maxX: number;

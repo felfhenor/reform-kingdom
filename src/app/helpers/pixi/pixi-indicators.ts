@@ -242,3 +242,27 @@ export function pixiIndicatorNodeSelectionCreate(tileSize: number): Graphics {
 
   return graphics;
 }
+
+// Corner brackets around a tile, so the controller cursor reads apart from the solid selection box.
+export function pixiIndicatorMapCursorCreate(tileSize: number): Graphics {
+  const arm = Math.round(tileSize / 3);
+  const lo = -3;
+  const hi = tileSize + 3;
+  const graphics = new Graphics()
+    .moveTo(lo, lo + arm)
+    .lineTo(lo, lo)
+    .lineTo(lo + arm, lo)
+    .moveTo(hi - arm, lo)
+    .lineTo(hi, lo)
+    .lineTo(hi, lo + arm)
+    .moveTo(hi, hi - arm)
+    .lineTo(hi, hi)
+    .lineTo(hi - arm, hi)
+    .moveTo(lo + arm, hi)
+    .lineTo(lo, hi)
+    .lineTo(lo, hi - arm)
+    .stroke({ width: 3, color: 0xffffff, alignment: 0.5 });
+
+  graphics.visible = false;
+  return graphics;
+}

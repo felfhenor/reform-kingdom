@@ -5,8 +5,9 @@
   class="btn btn-sm btn-primary tabular-nums"
   [disabled]="!canDevelop()"
   (click)="develop()"
-  appSfx="ui-click"
-  [sfxTrigger]="['click', 'hover']"
+  ffButton="ui-click"
+  [ffPadAction]="padAction()"
+  ffPadLabel="Develop"
 >
   @if (isMaxLevel()) {
     This {{ subject() }} is fully developed

@@ -1,8 +1,15 @@
+import { FFInputService } from '@ff/input/ff-input.service';
+import { FF_DIRECTIONS } from '@ff/input/ff-action-map';
+import type { FFDirection } from '@ff/interfaces/ff-input';
+import { GAMEPAD_PRIORITY } from '@helpers/engine/gamepad.ui';
+import { modalHasAnyOpen } from '@helpers/engine/modal-stack';
 import type { ElementRef, OnDestroy } from '@angular/core';
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   computed,
+  DestroyRef,
   effect,
   inject,
   signal,
@@ -20,6 +27,9 @@ import { StatusTaskListComponent } from '@components/status-task-list/status-tas
 import { StatusTutorialUnlockComponent } from '@components/status-tutorial-unlock/status-tutorial-unlock.component';
 import { StatusWorkerLevelupComponent } from '@components/status-worker-levelup/status-worker-levelup.component';
 import {
+  MAP_CURSOR_MAX_FRAME_MS,
+  MAP_CURSOR_REACH_TILES,
+  MAP_CURSOR_TILES_PER_SECOND,
   PARTY_FORMATION_CATCHUP_MS,
   PARTY_FORMATION_FOLLOW_DELAY_MS,
   PARTY_FORMATION_HISTORY_MAX_AGE_MS,
@@ -30,6 +40,7 @@ import { getEntry } from '@helpers/content/content';
 import { uiTextFontFamily, uiTextLetterSpacing } from '@helpers/engine/font.ui';
 import { gatherVfx$ } from '@helpers/engine/gather-vfx';
 import {
+  gamePlayView,
   isWorldCameraPanned,
   kingdomSubview,
   mapNodeDeselect,
@@ -64,6 +75,7 @@ import { pixiFloatingTextCreate } from '@helpers/pixi/pixi-floating-text';
 import { pixiMapMaxFps } from '@helpers/pixi/pixi-frame-rate.ui';
 import { pixiGridOverlayCreate } from '@helpers/pixi/pixi-grid.ui';
 import {
+  pixiIndicatorMapCursorCreate,
   pixiIndicatorNodeSelectionCreate,
   pixiIndicatorNodeStatusUpdate,
   pixiIndicatorPlayerAtLocationCreate,
@@ -71,6 +83,11 @@ import {
   pixiIndicatorProgressBarCreate,
   pixiNodeLabelColor,
 } from '@helpers/pixi/pixi-indicators';
+import {
+  mapCursorJump,
+  mapCursorMove,
+  mapCursorTarget,
+} from '@helpers/pixi/pixi-map-cursor.ui';
 import { pixiTiledMapRender } from '@helpers/pixi/pixi-map-render';
 import { pixiNodeForgottenSet } from '@helpers/pixi/pixi-node-forgotten.ui';
 import { pixiNodeRevealCreate } from '@helpers/pixi/pixi-node-reveal.ui';
@@ -135,6 +152,7 @@ import type {
   WorkerId,
   WorldNodeLabelInfo,
   WorldNodeStatusInfo,
+  MapCursorNode,
 } from '@interfaces';
 import { ContentService } from '@services/content.service';
 import { clamp, maxBy, sumBy } from 'es-toolkit/compat';
@@ -285,6 +303,13 @@ export class GamePlayWorldComponent implements OnDestroy {
   };
   private nodeSelectionContainer?: Container;
   private nodeSelectionIndicator?: Graphics;
+  private readonly ffInput = inject(FFInputService);
+  // Controller cursor in tile coordinates; undefined until the pad drives the map.
+  private mapCursor?: CameraPosition;
+  private mapCursorAt?: MapCursorNode;
+  private mapCursorIndicator?: Graphics;
+  private mapCursorFrameAt = 0;
+  private releaseLeftStick?: () => void;
   private nodeLabels?: Map<string, Text>;
   private nodeWrappers?: Map<string, Container>;
   private nodeStatusIcons?: Map<string, Graphics>;
@@ -385,8 +410,17 @@ export class GamePlayWorldComponent implements OnDestroy {
       untracked(() =>
         request?.target
           ? this.focusCamera(request.target)
-          : this.recenterCamera(),
+          : this.recenterOnParty(),
       );
+    });
+
+    const destroyRef = inject(DestroyRef);
+    afterNextRender(() => {
+      const unregisters = this.registerMapCursorActions();
+      destroyRef.onDestroy(() => {
+        unregisters.forEach((unregister) => unregister());
+        this.releaseLeftStick?.();
+      });
     });
 
     // Subscribed once so it survives map transitions; queued events are dropped
@@ -502,6 +536,10 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.gatherProgressContainer?.removeChildren();
     this.encounterProgressContainer?.removeChildren();
     this.nodeSelectionContainer?.removeChildren();
+    this.mapCursorIndicator?.destroy();
+    this.mapCursorIndicator = undefined;
+    this.mapCursor = undefined;
+    this.mapCursorAt = undefined;
     // Destroyed individually (not via removeChildren + app.destroy's cascade) - each Text's canvas
     // texture would otherwise leak, since app.destroy only cascades into children still attached to it.
     this.activeFloatingTexts.forEach((entry) =>
@@ -644,6 +682,8 @@ export class GamePlayWorldComponent implements OnDestroy {
       map.tilewidth,
     );
     this.nodeSelectionContainer.addChild(this.nodeSelectionIndicator);
+    this.mapCursorIndicator = pixiIndicatorMapCursorCreate(map.tilewidth);
+    this.nodeSelectionContainer.addChild(this.mapCursorIndicator);
 
     this.gatherProgressBar = pixiIndicatorProgressBarCreate(
       map.tilewidth,
@@ -677,6 +717,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.updateGatherProgressIndicator();
       this.updateEncounterProgressIndicator();
       this.maybeUpdateNodeStatus(performance.now());
+      this.updateMapCursor(performance.now());
       this.positionCamera();
       this.updateBackdrop();
       this.renderPartyFollowerIndicators();
@@ -692,7 +733,11 @@ export class GamePlayWorldComponent implements OnDestroy {
   }
 
   private onNodeClick(object: TiledObject, clickCount: number): void {
-    const entry = worldNodeByName(object.name);
+    this.selectNode(object.name, clickCount);
+  }
+
+  private selectNode(nodeName: string, clickCount: number): void {
+    const entry = worldNodeByName(nodeName);
     if (!entry) return;
     if (!isWorldNodeCollectibleGateMet(entry)) return;
 
@@ -893,6 +938,12 @@ export class GamePlayWorldComponent implements OnDestroy {
     );
 
     this.positionCamera();
+  }
+
+  // An explicit recenter also brings the controller cursor home.
+  private recenterOnParty(): void {
+    this.mapCursor = undefined;
+    this.recenterCamera();
   }
 
   public recenterCamera(): void {
@@ -1241,6 +1292,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     );
 
     this.positionNodeSelectionIndicator(camera);
+    this.positionMapCursorIndicator(camera);
     this.lastCamera = camera;
   }
 
@@ -1257,6 +1309,153 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.app.screen.width / zoom,
       this.app.screen.height / zoom,
     );
+  }
+
+  // Directions and A drive the map cursor only while nothing (modal, menu, popup) sits over the map.
+  private isMapCursorDriving(): boolean {
+    return (
+      this.ffInput.mode() === 'gamepad' &&
+      gamePlayView() === 'world' &&
+      !!this.map &&
+      !this.isMapLoading() &&
+      !modalHasAnyOpen() &&
+      this.isMapInTopScope()
+    );
+  }
+
+  private isMapInTopScope(): boolean {
+    const element = this.pixiContainer()?.nativeElement;
+    return !!element && this.ffInput.isElementActive(element);
+  }
+
+  private registerMapCursorActions(): (() => void)[] {
+    const element = this.pixiContainer()?.nativeElement;
+    const options = {
+      element,
+      priority: GAMEPAD_PRIORITY.pageMode,
+      enabled: () => this.isMapCursorDriving(),
+    };
+    return [
+      ...FF_DIRECTIONS.map((direction) =>
+        this.ffInput.register(direction, () => this.jumpMapCursor(direction), {
+          ...options,
+          label: 'Move',
+        }),
+      ),
+      // Selecting only; on the already-selected node A falls through to the panel's Travel.
+      this.ffInput.register('confirm', () => this.selectMapCursorTarget(), {
+        ...options,
+        enabled: () =>
+          this.isMapCursorDriving() &&
+          this.mapCursorAt?.name !== selectedMapNode()?.nodeName,
+        label: () => (this.mapCursorAt ? 'Select' : ''),
+      }),
+      // Below the panel's buttons: an A with nothing to do mustn't click whichever HUD button holds focus.
+      this.ffInput.register('confirm', () => undefined, {
+        ...options,
+        priority: GAMEPAD_PRIORITY.global,
+      }),
+    ];
+  }
+
+  // Over empty ground A does nothing, rather than travelling to a node that may be off-screen.
+  private selectMapCursorTarget(): void {
+    if (this.mapCursorAt) this.selectNode(this.mapCursorAt.name, 1);
+  }
+
+  // Where the camera is looking, so the cursor starts on screen after a recenter or mouse use.
+  private mapViewCenter(): CameraPosition {
+    return {
+      x: this.lastCamera.x + this.viewportTiles.widthTiles / 2,
+      y: this.lastCamera.y + this.viewportTiles.heightTiles / 2,
+    };
+  }
+
+  private mapCursorNodes(): MapCursorNode[] {
+    return [...(this.nodeWrappers ?? [])]
+      .filter(
+        ([, wrapper]) => wrapper.visible && wrapper.eventMode === 'static',
+      )
+      .map(([name]) => worldNodeByName(name))
+      .filter((entry) => !!entry)
+      .map((entry) => ({ name: entry.nodeName, x: entry.x, y: entry.y }));
+  }
+
+  private updateMapCursor(now: number): void {
+    const deltaMs = Math.min(
+      now - this.mapCursorFrameAt,
+      MAP_CURSOR_MAX_FRAME_MS,
+    );
+    this.mapCursorFrameAt = now;
+    const driving = this.isMapCursorDriving();
+    this.claimLeftStick(driving);
+    if (!driving) {
+      if (this.ffInput.mode() !== 'gamepad') this.mapCursor = undefined;
+      return;
+    }
+
+    const cursor = this.mapCursor ?? this.mapViewCenter();
+    const stick = this.ffInput.leftStick();
+    const moving = stick.x !== 0 || stick.y !== 0;
+    this.mapCursor =
+      moving && this.map
+        ? mapCursorMove(cursor, stick, deltaMs, MAP_CURSOR_TILES_PER_SECOND, {
+            x: this.map.width,
+            y: this.map.height,
+          })
+        : cursor;
+    this.mapCursorAt = mapCursorTarget(
+      this.mapCursor,
+      this.mapCursorNodes(),
+      MAP_CURSOR_REACH_TILES,
+    );
+    if (moving) this.focusCamera(this.mapCursor);
+  }
+
+  private claimLeftStick(claim: boolean): void {
+    if (claim && !this.releaseLeftStick) {
+      this.releaseLeftStick = this.ffInput.claimLeftStick();
+    } else if (!claim && this.releaseLeftStick) {
+      this.releaseLeftStick();
+      this.releaseLeftStick = undefined;
+    }
+  }
+
+  private jumpMapCursor(direction: FFDirection): void {
+    if (!this.map) return;
+
+    const from = this.mapCursorAt ?? this.mapCursor;
+    if (!from) return;
+
+    const next = mapCursorJump(
+      from,
+      this.mapCursorNodes(),
+      direction,
+      this.map.tilewidth,
+    );
+    if (!next) return;
+
+    this.mapCursor = { x: next.x, y: next.y };
+    this.mapCursorAt = next;
+    this.focusCamera(this.mapCursor);
+  }
+
+  // Snaps onto the targeted node, so it's clear what A will pick.
+  private positionMapCursorIndicator(camera: CameraPosition): void {
+    if (!this.mapCursorIndicator || !this.map) return;
+
+    const at = this.mapCursorAt ?? this.mapCursor;
+    this.mapCursorIndicator.visible = !!at && this.isMapCursorDriving();
+    if (!at) return;
+
+    const screenPosition = tileToScreenPosition(
+      at.x,
+      at.y,
+      camera,
+      this.map.tilewidth,
+      this.map.tileheight,
+    );
+    this.mapCursorIndicator.position.set(screenPosition.x, screenPosition.y);
   }
 
   private positionNodeSelectionIndicator(camera: CameraPosition): void {

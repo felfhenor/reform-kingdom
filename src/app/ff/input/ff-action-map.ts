@@ -27,6 +27,9 @@ export const FF_STANDARD_BUTTON = {
   right: 15,
 } as const;
 
+// Not a physical button: outside the standard range, so no press ever maps to it.
+export const FF_DPAD_ALL_BUTTON = 99;
+
 const B = FF_STANDARD_BUTTON;
 
 const DEFAULT_ACTION_MAP: FFActionMap = {
@@ -45,6 +48,7 @@ const DEFAULT_ACTION_MAP: FFActionMap = {
   down: B.down,
   left: B.left,
   right: B.right,
+  dpad: FF_DPAD_ALL_BUTTON,
 };
 
 // Nintendo prints A/B and X/Y on the opposite face buttons; actions follow the label.

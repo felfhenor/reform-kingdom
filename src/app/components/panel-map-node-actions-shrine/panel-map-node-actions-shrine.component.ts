@@ -1,3 +1,4 @@
+import { FFButtonComponent } from '@ff/components/button/button.component';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -8,7 +9,6 @@ import {
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { ButtonWorldNodeDevelopComponent } from '@components/button-world-node-develop/button-world-node-develop.component';
 import { TooltipGlobalEffectComponent } from '@components/tooltip-global-effect/tooltip-global-effect.component';
-import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
 import { formatDuration } from '@helpers/engine/timer';
 import { globalEffectEffectsScaled } from '@helpers/hero/global-effect-state';
@@ -26,9 +26,9 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-panel-map-node-actions-shrine',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFButtonComponent,
     AtlasImageComponent,
     ButtonWorldNodeDevelopComponent,
-    SFXDirective,
     TippyDirective,
     TooltipGlobalEffectComponent,
   ],

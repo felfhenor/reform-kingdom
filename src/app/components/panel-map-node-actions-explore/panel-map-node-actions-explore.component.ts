@@ -1,3 +1,4 @@
+import { FFButtonComponent } from '@ff/components/button/button.component';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -5,7 +6,6 @@ import {
   input,
   output,
 } from '@angular/core';
-import { SFXDirective } from '@directives/sfx.directive';
 import { worldCombatState } from '@helpers/state-game';
 import { worldNodeExploreRandomIsAvailable } from '@helpers/world-node/world-node-encounter';
 import { worldNodeEncounterRandom } from '@helpers/world-node/world-nodes';
@@ -14,7 +14,7 @@ import type { WorldNodeEntry } from '@interfaces';
 @Component({
   selector: 'app-panel-map-node-actions-explore',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SFXDirective],
+  imports: [FFButtonComponent],
   templateUrl: './panel-map-node-actions-explore.component.html',
   styleUrl: './panel-map-node-actions-explore.component.scss',
 })

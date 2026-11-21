@@ -393,6 +393,11 @@ export const INDICATOR_PROGRESS_BAR_OFFSET_Y = -60;
 export const NODE_STATUS_ICON_RADIUS = 7;
 // Still fast enough for node timers and the 150ms status refresh to read as live.
 export const MAP_UNFOCUSED_MAX_FPS = 10;
+// Controller map cursor: full-tilt pan speed, and how close a node must be for the reticle to snap onto it.
+export const MAP_CURSOR_TILES_PER_SECOND = 12;
+export const MAP_CURSOR_REACH_TILES = 1.5;
+// Caps one frame's cursor step, so a long gap (first frame, map load, hidden tab) can't fling it across the map.
+export const MAP_CURSOR_MAX_FRAME_MS = 100;
 // World px per noise pixel - matches the terrain art's chunky pixel size so the overlay reads as pixel art.
 export const TERRAIN_NOISE_CELL_PX = 2;
 // Noise pixels per cluster-noise lattice unit; larger = broader patches of speckles.

@@ -1,3 +1,4 @@
+import { FF_DPAD_ALL_BUTTON } from '@ff/input/ff-action-map';
 import type { FFControllerFamily, FFGlyph } from '@ff/interfaces/ff-input';
 
 const UNITS_PER_EM = 2048;
@@ -120,11 +121,24 @@ const GLYPHS: Record<FFControllerFamily, Array<[number, number]>> = {
   ],
 };
 
+// The all-directions D-pad, which has no button index of its own.
+const DPAD_ALL_GLYPHS: Record<FFControllerFamily, [number, number]> = {
+  xbox: [0xe023, 983],
+  playstation: [0xe056, 983],
+  switch: [0xe032, 983],
+  switch2: [0xe038, 983],
+  'steam-controller': [0xe03b, 983],
+  'steam-deck': [0xe022, 983],
+};
+
 export function ffGlyph(
   family: FFControllerFamily,
   button: number,
 ): FFGlyph | undefined {
-  const glyph = GLYPHS[family][button];
+  const glyph =
+    button === FF_DPAD_ALL_BUTTON
+      ? DPAD_ALL_GLYPHS[family]
+      : GLYPHS[family][button];
   if (!glyph) return undefined;
 
   const [codePoint, inkHeight] = glyph;
