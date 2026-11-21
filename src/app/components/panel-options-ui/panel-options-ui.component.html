@@ -173,6 +173,7 @@
             <label class="label label-option">
               <span class="label-text">Display Mode</span>
               <ng-select
+                ffSelect
                 [items]="displayModeChoices"
                 bindLabel="label"
                 bindValue="value"
@@ -196,6 +197,7 @@
               <label class="label label-option">
                 <span class="label-text">Window Size</span>
                 <ng-select
+                  ffSelect
                   [items]="windowSizeChoices()"
                   bindLabel="label"
                   bindValue="id"
@@ -235,6 +237,7 @@
               />
             </span>
             <ng-select
+              ffSelect
               [items]="mapFrameRateChoices"
               bindLabel="label"
               bindValue="value"
@@ -285,6 +288,7 @@
               <input
                 #masterVolume
                 type="range"
+                ffStepper
                 [min]="0"
                 [max]="1"
                 [step]="0.05"
@@ -317,6 +321,7 @@
                 <input
                   #bgmVolume
                   type="range"
+                  ffStepper
                   [min]="0"
                   [max]="1"
                   [step]="0.05"
@@ -350,6 +355,7 @@
                 <input
                   #sfxVolume
                   type="range"
+                  ffStepper
                   [min]="0"
                   [max]="1"
                   [step]="0.05"

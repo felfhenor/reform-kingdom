@@ -52,6 +52,8 @@ const PROMPT_ACTION_ORDER: FFGamepadAction[] = [
   'recenter',
   'pause',
   'menu',
+  'left',
+  'right',
 ];
 
 @Injectable({ providedIn: 'root' })
@@ -135,6 +137,11 @@ export class FFInputService {
         if (held === registration) this.heldButtonHandlers.delete(key);
       });
     };
+  }
+
+  // How long the current D-pad/stick direction has been held, for controls that accelerate.
+  public heldDirectionMs(): number {
+    return this.heldDirection ? performance.now() - this.heldDirectionSince : 0;
   }
 
   // Lets focus scoping (modals, dialogs, tutorials) silence element-bound handlers underneath.

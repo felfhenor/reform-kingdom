@@ -1,3 +1,4 @@
+import { FFSelectDirective } from '@ff/controls/ff-select.directive';
 import { FFInputService } from '@ff/input/ff-input.service';
 import { DecimalPipe } from '@angular/common';
 import type { AnimationCallbackEvent } from '@angular/core';
@@ -37,6 +38,7 @@ type LevelOption = { value: number; label: string };
   selector: 'app-detail-bestiary-monster',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFSelectDirective,
     DecimalPipe,
     DetailMonsterSummaryComponent,
     RowBestiarySkillComponent,

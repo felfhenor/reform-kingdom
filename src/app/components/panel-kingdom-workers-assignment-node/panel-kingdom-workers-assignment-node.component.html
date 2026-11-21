@@ -47,6 +47,7 @@
 
   <div class="flex flex-row gap-2">
     <ng-select
+      ffSelect
       class="w-full"
       [items]="nodeOptions()"
       bindLabel="nodeName"
@@ -132,6 +133,7 @@
 
     @if (displayedNodeName()) {
       <ng-select
+        ffSelect
         class="w-full"
         [items]="itemOptions()"
         bindLabel="name"

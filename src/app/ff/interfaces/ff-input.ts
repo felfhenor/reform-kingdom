@@ -1,3 +1,6 @@
+import type { TemplateRef } from '@angular/core';
+import type { NgOption } from '@ng-select/ng-select';
+
 export type FFInputMode = 'kbm' | 'gamepad';
 
 export type FFControllerFamily =
@@ -89,3 +92,29 @@ export interface FFButtonFeedback {
 export type FFControllerFamilyResolver = () => Promise<
   FFControllerFamily | undefined
 >;
+
+export interface FFSelectOptionGroup {
+  header?: NgOption;
+  items: NgOption[];
+}
+
+export interface FFSelectPopupRequest {
+  title?: string;
+  options: NgOption[];
+  optionTemplate?: TemplateRef<unknown>;
+  optgroupTemplate?: TemplateRef<unknown>;
+  pick: (option: NgOption) => void;
+  clear?: { label: string; run: () => void };
+}
+
+export interface FFNumberBounds {
+  min?: number;
+  max?: number;
+  step: number;
+}
+
+export interface FFNumberPopupRequest extends FFNumberBounds {
+  title?: string;
+  value: number;
+  commit: (value: number) => void;
+}

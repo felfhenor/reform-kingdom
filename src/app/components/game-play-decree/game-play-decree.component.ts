@@ -1,3 +1,5 @@
+import { FFStepperDirective } from '@ff/controls/ff-stepper.directive';
+import { FFSelectDirective } from '@ff/controls/ff-select.directive';
 import type { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { DecimalPipe } from '@angular/common';
@@ -169,6 +171,8 @@ function materialOptionsFor(ids: MaterialId[]): MaterialOption[] {
   selector: 'app-game-play-decree',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFStepperDirective,
+    FFSelectDirective,
     CardPageComponent,
     ListReflowDirective,
     ListReflowDragDirective,

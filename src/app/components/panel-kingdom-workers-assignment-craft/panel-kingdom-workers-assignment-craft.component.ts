@@ -1,3 +1,4 @@
+import { FFSelectDirective } from '@ff/controls/ff-select.directive';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -58,6 +59,7 @@ type RecipeOption = {
   selector: 'app-panel-kingdom-workers-assignment-craft',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFSelectDirective,
     AtlasImageComponent,
     DecimalPipe,
     IconComponent,

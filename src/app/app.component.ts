@@ -12,6 +12,9 @@ import { BannerAnalyticsConsentComponent } from '@components/banner-analytics-co
 import { ScreenLoadingComponent } from '@components/screen-loading/screen-loading.component';
 import { TutorialOverlayComponent } from '@components/tutorial-overlay/tutorial-overlay.component';
 import { FFBarPromptsComponent } from '@ff/components/bar-prompts/bar-prompts.component';
+import { FFSelectPopupComponent } from '@ff/controls/select-popup.component';
+import { FFNumberPopupComponent } from '@ff/controls/number-popup.component';
+import { ButtonCloseComponent } from '@components/button-close/button-close.component';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
 import { FFFocusService } from '@ff/focus/ff-focus.service';
 import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
@@ -38,6 +41,9 @@ import { SweetAlert2LoaderService } from '@sweetalert2/ngx-sweetalert2';
     TutorialOverlayComponent,
     CardAchievementComponent,
     FFBarPromptsComponent,
+    FFSelectPopupComponent,
+    FFNumberPopupComponent,
+    ButtonCloseComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -54,6 +60,8 @@ export class AppComponent {
     this.bindGamepadDialogs();
     gamepadBindSwal();
   }
+
+  protected readonly selectPopupPriority = GAMEPAD_PRIORITY.popover;
 
   private bindGamepadDialogs(): void {
     const swalLoader = inject(SweetAlert2LoaderService);

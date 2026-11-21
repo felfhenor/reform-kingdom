@@ -1,3 +1,4 @@
+import { FFSelectDirective } from '@ff/controls/ff-select.directive';
 import { DatePipe, DecimalPipe, formatNumber } from '@angular/common';
 import type { OnInit } from '@angular/core';
 import {
@@ -59,6 +60,7 @@ type AutosaveIntervalChoice = { label: string; value: number };
 @Component({
   selector: 'app-panel-options-savefile',
   imports: [
+    FFSelectDirective,
     SweetAlert2Module,
     DatePipe,
     DecimalPipe,

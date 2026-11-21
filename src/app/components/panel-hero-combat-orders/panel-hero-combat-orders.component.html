@@ -12,6 +12,7 @@
       <div class="flex flex-row flex-wrap items-center gap-2">
         <span class="type-meta min-w-[50px]">When</span>
         <ng-select
+          ffSelect="Condition"
           class="w-56"
           [items]="conditionTypeOptions"
           bindLabel="label"
@@ -26,6 +27,7 @@
           draftConditionType() === 'SelfEnergyPercent'
         ) {
           <ng-select
+            ffSelect="Comparison"
             class="w-24"
             [items]="comparatorOptions"
             bindLabel="label"
@@ -37,6 +39,7 @@
 
           <input
             type="number"
+            ffStepper="Percent"
             min="0"
             max="100"
             class="input input-bordered input-sm w-24"
@@ -49,6 +52,7 @@
         @if (draftHealthCountSide(); as side) {
           <span class="type-meta">{{ side }}</span>
           <ng-select
+            ffSelect="Direction"
             class="w-28"
             [items]="healthDirectionOptions"
             bindLabel="label"
@@ -60,6 +64,7 @@
 
           <input
             type="number"
+            ffStepper="Health Percent"
             min="0"
             max="100"
             class="input input-bordered input-sm w-20"
@@ -69,6 +74,7 @@
           <span class="type-meta">% HP</span>
 
           <ng-select
+            ffSelect="Comparison"
             class="w-24"
             [items]="comparatorOptions"
             bindLabel="label"
@@ -80,6 +86,7 @@
 
           <input
             type="number"
+            ffStepper="Hero Count"
             min="0"
             class="input input-bordered input-sm w-20"
             [value]="draftCount()"
@@ -89,6 +96,7 @@
 
         @if (draftConditionType() === 'SpecificHeroHealthPercent') {
           <ng-select
+            ffSelect
             class="w-48"
             [items]="heroOptions()"
             bindLabel="name"
@@ -119,6 +127,7 @@
           </ng-select>
 
           <ng-select
+            ffSelect="Comparison"
             class="w-24"
             [items]="comparatorOptions"
             bindLabel="label"
@@ -130,6 +139,7 @@
 
           <input
             type="number"
+            ffStepper="Percent"
             min="0"
             max="100"
             class="input input-bordered input-sm w-24"
@@ -141,6 +151,7 @@
 
         @if (draftConditionType() === 'EnemyCount') {
           <ng-select
+            ffSelect="Comparison"
             class="w-24"
             [items]="comparatorOptions"
             bindLabel="label"
@@ -152,6 +163,7 @@
 
           <input
             type="number"
+            ffStepper="Enemy Count"
             min="0"
             class="input input-bordered input-sm w-20"
             [value]="draftCount()"
@@ -161,6 +173,7 @@
 
         @if (draftConditionType() === 'ElementCount') {
           <ng-select
+            ffSelect="Element"
             class="w-32"
             [items]="elementOptions"
             bindLabel="label"
@@ -193,6 +206,7 @@
           </ng-select>
 
           <ng-select
+            ffSelect="Comparison"
             class="w-24"
             [items]="comparatorOptions"
             bindLabel="label"
@@ -204,6 +218,7 @@
 
           <input
             type="number"
+            ffStepper="Count"
             min="0"
             [max]="maxElementCharges"
             class="input input-bordered input-sm w-20"
@@ -217,6 +232,7 @@
         <span class="type-meta min-w-[50px]">Use</span>
 
         <ng-select
+          ffSelect
           class="w-56"
           [items]="familyOptions()"
           bindLabel="label"
@@ -254,6 +270,7 @@
         </ng-select>
 
         <ng-select
+          ffSelect="Target"
           class="w-56"
           [items]="targetModeOptions()"
           bindLabel="label"
@@ -265,6 +282,7 @@
 
         @if (draftTargetMode() === 'SpecificHero') {
           <ng-select
+            ffSelect
             class="w-48"
             [items]="heroOptions()"
             bindLabel="name"

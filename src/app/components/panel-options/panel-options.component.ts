@@ -1,3 +1,4 @@
+import { FFTriggerTabsDirective } from '@ff/focus/ff-trigger-tabs.directive';
 import { Component, computed } from '@angular/core';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
@@ -17,6 +18,7 @@ import type { OptionsTab, OptionsTabLink } from '@interfaces';
 @Component({
   selector: 'app-panel-options',
   imports: [
+    FFTriggerTabsDirective,
     CardPageComponent,
     ButtonConnectComponent,
     AnalyticsClickDirective,

@@ -43,6 +43,28 @@ html.ff-input-gamepad :focus {
   }
 }
 
+// ng-select's focusable is a tiny inner input, so ring the whole control instead.
+html.ff-input-gamepad .ff-select:focus-within {
+  outline: 2px solid color-mix(in oklab, var(--color-primary) 70%, white);
+  outline-offset: 2px;
+
+  :focus {
+    outline: none;
+  }
+}
+
+// Option templates are built for one-line dropdown rows; in a narrow popup tile their text wraps, so center
+// every row instead of letting sprites stretch to the wrapped height.
+.ff-select-tile .flex:not(.flex-col) {
+  align-items: center;
+}
+
+// ...and never let icons give up width to a long name or badge.
+.ff-select-tile
+  :is(.zoom-row, app-slot-icon-blank, app-sprite-node, app-atlas-image) {
+  flex-shrink: 0;
+}
+
 // Hints tied to one input method, e.g. "Shift-click" or "Press X".
 html.ff-input-gamepad .ff-kbm-only,
 html:not(.ff-input-gamepad) .ff-gamepad-only {

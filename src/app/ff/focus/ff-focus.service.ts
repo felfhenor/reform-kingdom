@@ -41,8 +41,13 @@ function isFocusable(element: HTMLElement): boolean {
   return element.matches(FOCUSABLE_SELECTOR) && isActive(element);
 }
 
+// Some controls focus a hidden inner element (a non-searchable ng-select's zero-width input); measure the control instead.
+function rectOf(element: HTMLElement): DOMRect {
+  return (element.closest('.ff-focus-host') ?? element).getBoundingClientRect();
+}
+
 function hasSize(element: HTMLElement): boolean {
-  const rect = element.getBoundingClientRect();
+  const rect = rectOf(element);
   return rect.width > 0 && rect.height > 0;
 }
 
@@ -224,8 +229,8 @@ export class FFFocusService {
       (el) => el !== current,
     );
     const index = ffNearestInDirection(
-      current.getBoundingClientRect(),
-      candidates.map((candidate) => candidate.getBoundingClientRect()),
+      rectOf(current),
+      candidates.map((candidate) => rectOf(candidate)),
       direction,
     );
     if (index === -1) return false;
@@ -269,7 +274,7 @@ export class FFFocusService {
 
     const index = ffNearestTo(
       lastRect,
-      pool.map((element) => element.getBoundingClientRect()),
+      pool.map((element) => rectOf(element)),
     );
     return pool[index];
   }
@@ -289,7 +294,7 @@ export class FFFocusService {
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
 
-    const rect = target.getBoundingClientRect();
+    const rect = rectOf(target);
     this.memoryRoots
       .filter((root) => root.contains(target))
       .forEach((root) => {

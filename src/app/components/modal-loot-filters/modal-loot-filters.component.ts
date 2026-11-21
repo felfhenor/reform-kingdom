@@ -1,3 +1,5 @@
+import { FFStepperDirective } from '@ff/controls/ff-stepper.directive';
+import { FFSelectDirective } from '@ff/controls/ff-select.directive';
 import type { AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
@@ -57,6 +59,8 @@ const RARITIES: DropRarity[] = [
   selector: 'app-modal-loot-filters',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFStepperDirective,
+    FFSelectDirective,
     ModalComponent,
     ModalCloseDirective,
     SFXDirective,

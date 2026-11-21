@@ -1,3 +1,5 @@
+import { FFButtonComponent } from '@ff/components/button/button.component';
+import { FFSelectDirective } from '@ff/controls/ff-select.directive';
 import { DecimalPipe } from '@angular/common';
 import type { AnimationCallbackEvent, OnInit } from '@angular/core';
 import {
@@ -113,6 +115,8 @@ const heroPickSchema = schema<HeroPick>((hero) => {
   selector: 'app-game-setup-world',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFButtonComponent,
+    FFSelectDirective,
     SweetAlert2Module,
     SFXDirective,
     IconJobComponent,

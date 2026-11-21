@@ -4,6 +4,7 @@
   <app-detail-monster-summary [entry]="e" [level]="selectedLevel()">
     @if (!isGamepadMode()) {
       <ng-select
+        ffSelect
         summary-corner
         class="w-28"
         [items]="levelOptions()"

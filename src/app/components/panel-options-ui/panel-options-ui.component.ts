@@ -1,3 +1,5 @@
+import { FFStepperDirective } from '@ff/controls/ff-stepper.directive';
+import { FFSelectDirective } from '@ff/controls/ff-select.directive';
 import { DecimalPipe } from '@angular/common';
 import {
   Component,
@@ -35,6 +37,8 @@ type DisplayModeChoice = { label: string; value: WindowDisplayMode };
 @Component({
   selector: 'app-panel-options-ui',
   imports: [
+    FFStepperDirective,
+    FFSelectDirective,
     DecimalPipe,
     FormsModule,
     IconComponent,

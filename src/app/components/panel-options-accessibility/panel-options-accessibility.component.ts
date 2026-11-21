@@ -1,3 +1,4 @@
+import { FFSelectDirective } from '@ff/controls/ff-select.directive';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -19,7 +20,13 @@ type MotionChoice = { label: string; value: MotionPreference };
 @Component({
   selector: 'app-panel-options-accessibility',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, IconComponent, TippyDirective, NgSelectComponent],
+  imports: [
+    FFSelectDirective,
+    FormsModule,
+    IconComponent,
+    TippyDirective,
+    NgSelectComponent,
+  ],
   templateUrl: './panel-options-accessibility.component.html',
   styleUrl: './panel-options-accessibility.component.scss',
 })

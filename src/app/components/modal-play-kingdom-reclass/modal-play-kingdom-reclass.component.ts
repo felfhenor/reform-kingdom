@@ -1,3 +1,4 @@
+import { FFSelectDirective } from '@ff/controls/ff-select.directive';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -66,6 +67,7 @@ const reclassPickSchema = schema<ReclassPick>((pick) => {
   selector: 'app-modal-play-kingdom-reclass',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFSelectDirective,
     LabelJobComponent,
     ModalComponent,
     IconJobComponent,

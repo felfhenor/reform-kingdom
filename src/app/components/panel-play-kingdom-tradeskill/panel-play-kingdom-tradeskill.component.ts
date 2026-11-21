@@ -1,3 +1,4 @@
+import { FFStepperDirective } from '@ff/controls/ff-stepper.directive';
 import { FFButtonComponent } from '@ff/components/button/button.component';
 import { DecimalPipe, formatNumber } from '@angular/common';
 import {
@@ -69,6 +70,7 @@ import { chunk, clamp } from 'es-toolkit/compat';
   selector: 'app-panel-play-kingdom-tradeskill',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFStepperDirective,
     FFButtonComponent,
     AtlasImageComponent,
     ListReflowDirective,

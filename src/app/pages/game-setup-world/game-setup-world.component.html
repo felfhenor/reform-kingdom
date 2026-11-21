@@ -45,6 +45,7 @@
                     />
 
                     <ng-select
+                      ffSelect="Job"
                       class="flex-1"
                       [items]="unlockedJobs()"
                       bindLabel="name"
@@ -178,8 +179,9 @@
         class="btn btn-primary"
         [disabled]="partyForm().invalid() || partyBreaksSharedClass()"
         (click)="createWorld()"
-        appSfx="ui-click"
-        [sfxTrigger]="['click', 'hover']"
+        ffButton="ui-click"
+        ffPadAction="menu"
+        ffPadLabel="Start Game"
       >
         Start Game
       </button>

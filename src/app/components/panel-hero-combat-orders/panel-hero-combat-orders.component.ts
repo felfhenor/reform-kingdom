@@ -1,3 +1,5 @@
+import { FFStepperDirective } from '@ff/controls/ff-stepper.directive';
+import { FFSelectDirective } from '@ff/controls/ff-select.directive';
 import type { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import type { AnimationCallbackEvent } from '@angular/core';
@@ -111,6 +113,8 @@ const DEFAULT_DRAFT_HEALTH_DIRECTION: CombatOrderHealthDirection = 'Below';
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex flex-col gap-4' },
   imports: [
+    FFStepperDirective,
+    FFSelectDirective,
     BlankSlateComponent,
     ListReflowDirective,
     ListReflowDragDirective,

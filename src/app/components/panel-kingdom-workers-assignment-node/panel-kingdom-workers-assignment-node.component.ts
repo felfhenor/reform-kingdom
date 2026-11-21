@@ -1,3 +1,4 @@
+import { FFSelectDirective } from '@ff/controls/ff-select.directive';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -40,6 +41,7 @@ import { DecimalPipe } from '@angular/common';
   selector: 'app-panel-kingdom-workers-assignment-node',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFSelectDirective,
     DecimalPipe,
     FormsModule,
     IconComponent,

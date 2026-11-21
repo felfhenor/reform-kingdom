@@ -60,6 +60,7 @@
       <div class="type-label mb-2">Minimum Item Level to Keep</div>
       <input
         type="number"
+        ffStepper
         min="1"
         class="input input-bordered input-sm w-24"
         [value]="filters().minimumItemLevel"
@@ -95,6 +96,7 @@
 
       <div class="flex items-center gap-2">
         <ng-select
+          ffSelect
           class="flex-1"
           [items]="exceptionOptions()"
           bindLabel="name"

@@ -21,3 +21,18 @@
 <app-tutorial-overlay></app-tutorial-overlay>
 
 <ff-bar-prompts />
+<ff-number-popup #numberPopup [priority]="selectPopupPriority">
+  <app-button-close
+    close
+    [showBackPrompt]="true"
+    (click)="numberPopup.cancel()"
+  />
+</ff-number-popup>
+
+<ff-select-popup #selectPopup [priority]="selectPopupPriority">
+  <app-button-close
+    close
+    [showBackPrompt]="true"
+    (click)="selectPopup.cancel()"
+  />
+</ff-select-popup>
