@@ -62,7 +62,8 @@ export class PlayKingdomBestiaryComponent {
     const selectedId = this.selectedMonsterId();
 
     return (
-      filtered.find((entry) => entry.monster.id === selectedId) ?? filtered[0]
+      filtered.find((entry) => entry.monster.id === selectedId) ??
+      filtered.at(0)
     );
   });
 

@@ -122,7 +122,7 @@ export class PlayKingdomWorkersComponent {
   public selectedEntry = computed(() => {
     const entries = this.entries();
     const selectedId = this.selectedWorkerId();
-    return entries.find((e) => e.id === selectedId) ?? entries[0];
+    return entries.find((e) => e.id === selectedId) ?? entries.at(0);
   });
 
   public selectedStats = computed(() => {
