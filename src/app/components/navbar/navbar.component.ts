@@ -126,6 +126,8 @@ export class NavbarComponent {
   protected isGamepadMode = computed(() => this.ffInput.mode() === 'gamepad');
 
   protected readonly decreeRevealLevel = DECREE_REVEAL_LEVEL;
+  // Below page-level bindings, so a screen's own Y (e.g. skill tree Unlearn) still wins.
+  protected readonly nodeActionPriority = GAMEPAD_PRIORITY.global;
 
   private readonly viewOpeners: Record<GamePlayView, () => void> = {
     world: () => this.changeGamePlayView('world'),

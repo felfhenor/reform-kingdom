@@ -136,6 +136,9 @@
           ffButton="ui-click"
           [ffSoundOffset]="5"
           ffHotkey="T"
+          ffPadAction="details"
+          [ffPadPriority]="nodeActionPriority"
+          ffPadLabel="Enter Town"
         >
           <app-icon name="gameVillage" size="nav"></app-icon>
         </button>
@@ -151,6 +154,9 @@
             ffButton="ui-click"
             ffHotkey="t"
             [ffHotkeyPreventDefault]="false"
+            ffPadAction="details"
+            [ffPadPriority]="nodeActionPriority"
+            ffPadLabel="Trade"
           >
             <app-icon name="gameSwapBag" size="nav"></app-icon>
           </button>
@@ -167,6 +173,9 @@
             ffButton="ui-click"
             ffHotkey="t"
             [ffHotkeyPreventDefault]="false"
+            ffPadAction="details"
+            [ffPadPriority]="nodeActionPriority"
+            ffPadLabel="Visit Trainer"
           >
             <app-icon name="gameClassicalKnowledge" size="nav"></app-icon>
           </button>
@@ -192,7 +201,7 @@
         </li>
       }
 
-      @if (isFelDefeated()) {
+      @if (isFelDefeated() && !isGamepadMode()) {
         <li class="action-button" appRequireSetup>
           <app-button-run-end class="p-0 gap-0" [compact]="true" />
         </li>
@@ -290,6 +299,11 @@
     </button>
 
     <app-panel-debug-buttons></app-panel-debug-buttons>
+
+    <!-- Controller mode hides the navbar copy, so the pause menu carries it too. -->
+    @if (isFelDefeated()) {
+      <app-button-run-end class="w-full" [block]="true" />
+    }
 
     <app-button-achievements></app-button-achievements>
 

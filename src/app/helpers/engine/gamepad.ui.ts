@@ -27,6 +27,7 @@ export const GAMEPAD_PRIORITY = {
   overlay: 100,
   pageMode: 10,
   page: 0,
+  global: -50,
 } as const;
 
 // A closing swal keeps its container until the hide animation ends.

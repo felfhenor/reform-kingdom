@@ -33,6 +33,7 @@ export class ButtonRunEndComponent {
   private router = inject(Router);
 
   public compact = input(false);
+  public block = input(false);
 
   public isFinished = computed(() => legacyRunOutcome() === 'Completed');
   public isLost = computed(() => legacyRunOutcome() === 'Lost');

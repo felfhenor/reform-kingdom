@@ -19,6 +19,7 @@
   <button
     type="button"
     class="btn btn-error"
+    [class.btn-block]="block()"
     [disabled]="isBusy()"
     (click)="endRun()"
     appSfx="ui-error"
@@ -30,6 +31,7 @@
   <button
     type="button"
     class="btn"
+    [class.btn-block]="block()"
     [class.btn-primary]="finished"
     [class.btn-error]="!finished"
     [class.btn-outline]="!finished"
