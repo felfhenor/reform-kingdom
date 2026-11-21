@@ -1,6 +1,7 @@
 import {
   FF_BUTTON_FEEDBACK,
   FF_CONTROLLER_FAMILY_RESOLVER,
+  FF_TEXT_KEYBOARD,
 } from '@ff/input/ff-tokens';
 import {
   ffButtonFeedbackSfx,
@@ -29,6 +30,7 @@ import { provideServiceWorker } from '@angular/service-worker';
 import { provideHttpClient } from '@angular/common/http';
 import { isInElectron } from '@helpers/engine/electron';
 import { error } from '@helpers/engine/logging';
+import { steamCanShowKeyboard, steamShowKeyboard } from '@helpers/engine/steam';
 
 import { provideNgIconsConfig } from '@ng-icons/core';
 import { NgSelectConfig } from '@ng-select/ng-select';
@@ -66,6 +68,10 @@ export const appConfig: ApplicationConfig = {
     {
       provide: FF_CONTROLLER_FAMILY_RESOLVER,
       useValue: ffSteamControllerFamily,
+    },
+    {
+      provide: FF_TEXT_KEYBOARD,
+      useFactory: () => (steamCanShowKeyboard() ? steamShowKeyboard : null),
     },
     {
       provide: EVENT_MANAGER_PLUGINS,

@@ -1,13 +1,21 @@
+import { FFFocusMemoryDirective } from '@ff/focus/ff-focus-memory.directive';
+import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
+import { FFFocusService } from '@ff/focus/ff-focus.service';
+import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
+import { GAMEPAD_PRIORITY } from '@helpers/engine/gamepad.ui';
 import { DecimalPipe } from '@angular/common';
-import type { AnimationCallbackEvent, ElementRef } from '@angular/core';
+import type { AnimationCallbackEvent } from '@angular/core';
 import {
+  afterNextRender,
   afterRenderEffect,
   ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
   effect,
+  ElementRef,
   inject,
+  Injector,
   input,
   output,
   signal,
@@ -74,6 +82,8 @@ import { AnimationService } from '@services/animation.service';
   ],
   templateUrl: './panel-combat-scene.component.html',
   styleUrl: './panel-combat-scene.component.scss',
+  // Focus lost mid-turn (a skill list emptying, a target dying) lands back inside the scene, not on the page's rail.
+  hostDirectives: [FFFocusMemoryDirective],
   host: {
     class: 'card relative bg-base-100 shadow-xl',
     '[class.hidden]': '!shownCombat()',
@@ -149,6 +159,10 @@ export class PanelCombatSceneComponent {
   });
 
   private logBox = viewChild<ElementRef<HTMLElement>>('logBox');
+  private skillGrid = viewChild<ElementRef<HTMLElement>>('skillGrid');
+  private readonly host =
+    inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+  private readonly focus = inject(FFFocusService);
 
   public isEscaped = computed(() =>
     this.logEntries().some((e) => e.message === 'The party escaped!'),
@@ -303,6 +317,51 @@ export class PanelCombatSceneComponent {
       turnKey();
       this.pendingSkillId.set(undefined);
     });
+
+    // Each hero turn starts in the skill list, on the skill used last if any.
+    const turnReady = computed(() => (this.isResolving() ? '' : turnKey()));
+    const injector = inject(Injector);
+    effect(() => {
+      if (!turnReady()) return;
+      // After render, since the skill list only exists once the turn is shown.
+      afterNextRender(
+        () => {
+          const landing = this.skillLanding();
+          if (landing) this.focus.focusElement(landing);
+        },
+        { injector },
+      );
+    });
+    ffGamepadOn('back', () => this.cancelPick(), {
+      priority: GAMEPAD_PRIORITY.popover,
+      enabled: () => !!this.pendingSkillId(),
+      label: 'Cancel',
+    });
+  }
+
+  private skillLanding(): HTMLElement | undefined {
+    const grid = this.skillGrid()?.nativeElement;
+    return (
+      grid?.querySelector<HTMLElement>('[aria-current="true"]') ??
+      grid?.querySelector<HTMLElement>('button') ??
+      undefined
+    );
+  }
+
+  private idleFocus(): HTMLElement | undefined {
+    return (
+      this.host.querySelector<HTMLElement>(
+        '.scene-combatant:not(.ff-focus-skip):not([disabled])',
+      ) ?? undefined
+    );
+  }
+
+  private cancelPick(): void {
+    const picked = this.skillGrid()?.nativeElement.querySelector<HTMLElement>(
+      '[aria-pressed="true"]',
+    );
+    this.pendingSkillId.set(undefined);
+    this.focus.focusNextFrame(() => picked ?? this.skillLanding());
   }
 
   public pickSkill(option: CombatManualSkillOption): void {
@@ -313,6 +372,16 @@ export class PanelCombatSceneComponent {
       return;
     }
     this.pendingSkillId.set(option.skill.id);
+    this.focus.focusNextFrame(
+      () => this.host.querySelector<HTMLElement>('.target-ring') ?? undefined,
+    );
+  }
+
+  // The fallen have nothing left to inspect, so they don't take focus or preview.
+  public isDead = combatantIsDead;
+
+  public hover(c: Combatant): void {
+    if (!combatantIsDead(c)) this.hoveredId.set(c.id);
   }
 
   public clickCombatant(c: Combatant): void {
@@ -328,6 +397,8 @@ export class PanelCombatSceneComponent {
     this.pendingSkillId.set(undefined);
     this.previousOrders.update((orders) => ({ ...orders, [hero.id]: action }));
     this.confirmed.emit(action);
+    // The skill list empties while the turn resolves; parked on an enemy, a stray A does nothing instead of hitting the side rail.
+    this.focus.focusNextFrame(() => this.idleFocus());
     return true;
   }
 

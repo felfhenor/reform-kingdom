@@ -34,7 +34,7 @@ html.ff-input-gamepad :focus {
   outline-offset: -2px;
 
   // Item art fills these boxes and would cover an inset ring; white plus a glow stays visible on every rarity color.
-  &[tabindex]:not(button),
+  &[tabindex]:not(button, .ff-focus-row),
   &.ff-focus-outset {
     outline-color: white;
     outline-offset: 2px;
@@ -76,4 +76,26 @@ html.ff-input-gamepad {
   * {
     cursor: none !important;
   }
+}
+
+// A row lifted by controller grab mode; inset because these lists scroll and clip anything outside the row.
+.ff-reorder-grabbed {
+  outline: 2px solid white;
+  outline-offset: -2px;
+  box-shadow: inset 0 0 12px 2px rgb(255 255 255 / 35%);
+  position: relative;
+  z-index: 1;
+}
+
+// Rows sit in scrolling lists, so their ring stays inside the row.
+html.ff-input-gamepad .ff-focus-row:focus {
+  outline-color: white;
+  outline-offset: -2px;
+  box-shadow: inset 0 0 12px 2px rgb(255 255 255 / 25%);
+  filter: none;
+}
+
+// Row glyphs keep their space on every row but only show on the focused one.
+.ff-focus-row:not(:focus-within) .ff-row-glyph {
+  visibility: hidden;
 }

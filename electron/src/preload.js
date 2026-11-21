@@ -21,6 +21,8 @@ contextBridge.exposeInMainWorld('reformElectron', {
   steamAchievementClear: (name) =>
     ipcRenderer.invoke('steam:achievement-clear', name),
   steamInputType: () => ipcRenderer.invoke('steam:input-type'),
+  steamShowKeyboard: (x, y, width, height) =>
+    ipcRenderer.invoke('steam:show-keyboard', x, y, width, height),
   windowGet: () => ipcRenderer.invoke('window:get'),
   windowSetFullscreen: (fullscreen) =>
     ipcRenderer.invoke('window:set-fullscreen', fullscreen),

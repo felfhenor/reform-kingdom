@@ -1,3 +1,6 @@
+import { FFPadActionDirective } from '@ff/controls/ff-pad-action.directive';
+import { FFInputPromptComponent } from '@ff/components/input-prompt/input-prompt.component';
+import { FFButtonComponent } from '@ff/components/button/button.component';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -36,6 +39,9 @@ import { AnimationService } from '@services/animation.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex items-center gap-2 flex-1 min-w-0' },
   imports: [
+    FFPadActionDirective,
+    FFInputPromptComponent,
+    FFButtonComponent,
     AtlasImageComponent,
     IconComponent,
     TippyDirective,

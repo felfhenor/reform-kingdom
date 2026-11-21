@@ -1,3 +1,14 @@
+import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { FFInputService } from '@ff/input/ff-input.service';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+import { FFInputPromptComponent } from '@ff/components/input-prompt/input-prompt.component';
+import { FFFocusRowDirective } from '@ff/focus/ff-focus-row.directive';
+import {
+  GAMEPAD_PRIORITY,
+  gamepadConfirmFirst,
+} from '@helpers/engine/gamepad.ui';
+import { FFReorderItemDirective } from '@ff/controls/ff-reorder-item.directive';
+import { FFReorderListDirective } from '@ff/controls/ff-reorder-list.directive';
 import { FFStepperDirective } from '@ff/controls/ff-stepper.directive';
 import { FFSelectDirective } from '@ff/controls/ff-select.directive';
 import type { CdkDragDrop } from '@angular/cdk/drag-drop';
@@ -6,6 +17,7 @@ import type { AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
   Component,
+  viewChild,
   computed,
   effect,
   inject,
@@ -113,6 +125,11 @@ const DEFAULT_DRAFT_HEALTH_DIRECTION: CombatOrderHealthDirection = 'Below';
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex flex-col gap-4' },
   imports: [
+    SweetAlert2Module,
+    FFInputPromptComponent,
+    FFFocusRowDirective,
+    FFReorderItemDirective,
+    FFReorderListDirective,
     FFStepperDirective,
     FFSelectDirective,
     BlankSlateComponent,
@@ -133,6 +150,8 @@ const DEFAULT_DRAFT_HEALTH_DIRECTION: CombatOrderHealthDirection = 'Below';
   templateUrl: './panel-hero-combat-orders.component.html',
 })
 export class PanelHeroCombatOrdersComponent {
+  // A grab can happen inside a modal, so it must outrank its B close.
+  public readonly reorderPriority = GAMEPAD_PRIORITY.popover;
   private anim = inject(AnimationService);
 
   public character = input.required<Character>();
@@ -208,6 +227,8 @@ export class PanelHeroCombatOrdersComponent {
     }));
   });
 
+  private readonly ffInput = inject(FFInputService);
+  private removeSwal = viewChild<SwalComponent>('removeSwal');
   public editingClauseId = signal<CombatOrderClauseId | undefined>(undefined);
   public isEditing = computed(() => !!this.editingClauseId());
 
@@ -401,6 +422,17 @@ export class PanelHeroCombatOrdersComponent {
   public removeClause(clauseId: CombatOrderClauseId): void {
     if (this.editingClauseId() === clauseId) this.cancelEditClause();
     this.remove.emit(clauseId);
+  }
+
+  public requestRemoveEditing(): void {
+    gamepadConfirmFirst(this.ffInput.mode(), this.removeSwal(), () =>
+      this.removeEditing(),
+    );
+  }
+
+  public removeEditing(): void {
+    const clauseId = this.editingClauseId();
+    if (clauseId) this.removeClause(clauseId);
   }
 
   public onDrop(event: CdkDragDrop<CombatOrderClause[]>): void {

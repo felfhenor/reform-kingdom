@@ -1,3 +1,4 @@
+import type { FFRect } from '@ff/interfaces/ff-input';
 import { getEntry } from '@helpers/content/content';
 import { error } from '@helpers/engine/logging';
 import { legacy } from '@helpers/legacy/legacy';
@@ -15,6 +16,23 @@ export async function steamAchievementsActivate(
 
 export async function steamInputType(): Promise<string | undefined> {
   return await steamBridge()?.steamInputType?.();
+}
+
+export function steamCanShowKeyboard(): boolean {
+  return !!steamBridge()?.steamShowKeyboard;
+}
+
+// Steam positions the keyboard in device pixels, so CSS px are scaled by zoom and DPI.
+export async function steamShowKeyboard(field: FFRect): Promise<boolean> {
+  const scale = window.devicePixelRatio;
+  return (
+    (await steamBridge()?.steamShowKeyboard?.(
+      field.left * scale,
+      field.top * scale,
+      (field.right - field.left) * scale,
+      (field.bottom - field.top) * scale,
+    )) ?? false
+  );
 }
 
 export async function steamAchievementClear(name: string): Promise<boolean> {

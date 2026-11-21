@@ -10,6 +10,8 @@ import {
   signal,
   untracked,
 } from '@angular/core';
+import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
+import { GAMEPAD_PRIORITY } from '@helpers/engine/gamepad.ui';
 import { modalHasAnyOpen } from '@helpers/engine/modal-stack';
 import { gamePlayView } from '@helpers/engine/ui';
 import { regionIntroPending } from '@helpers/lore/region-intro';
@@ -85,6 +87,11 @@ export class CardRegionIntroComponent {
       event.stopImmediatePropagation();
       this.dismiss();
     };
+    ffGamepadOn('back', () => this.dismiss(), {
+      priority: GAMEPAD_PRIORITY.overlay,
+      enabled: () => !!this.region() && !this.isDismissing,
+      label: 'Dismiss',
+    });
     const onVisibilityChange = () => this.isPageShown.set(!document.hidden);
 
     window.addEventListener('keydown', onKeydown, { capture: true });

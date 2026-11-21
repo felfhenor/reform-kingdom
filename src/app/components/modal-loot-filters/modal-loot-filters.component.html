@@ -25,6 +25,7 @@
               type="checkbox"
               [checked]="filters().sellFromSources[source]"
               class="checkbox checkbox-xs"
+              tabindex="-1"
             />
             {{ source }}
           </button>
@@ -48,6 +49,7 @@
               type="checkbox"
               [checked]="!filters().keepRarities[rarity]"
               class="checkbox checkbox-xs"
+              tabindex="-1"
             />
 
             {{ rarity }}
@@ -84,6 +86,7 @@
               type="checkbox"
               [checked]="!filters().keepEquipmentTypes[type]"
               class="checkbox checkbox-xs"
+              tabindex="-1"
             />
             {{ type }}
           </button>

@@ -20,6 +20,7 @@
     </label>
 
     <input
+      ffKeyboard
       type="text"
       placeholder="Search by item or material..."
       class="input input-sm input-bordered search-bar"
@@ -127,7 +128,7 @@
         @let full = isQueueFullForRecipe(entry.recipe.id);
 
         <div
-          #recipeRow
+          ffFocusRow
           class="flex items-center gap-2 p-2 bg-base-200 min-h-[72px] max-h-[72px]"
           [class.opacity-50]="uncraftable"
         >
@@ -140,7 +141,7 @@
           <div
             #recipeIcon
             tabindex="0"
-            class="w-16 h-16 relative flex-shrink-0 overflow-hidden"
+            class="w-16 h-16 relative flex-shrink-0 overflow-hidden ff-focus-tip"
             [tp]="entry.resultContent ? preview.template() : undefined"
             [tpPlacement]="'top'"
           >
@@ -242,9 +243,10 @@
             </span>
 
             <div class="flex gap-2 items-center">
+              <ff-input-prompt action="confirm" class="ff-row-glyph" />
               <div class="join">
                 <button
-                  class="btn btn-xs btn-neutral"
+                  class="btn btn-xs btn-neutral ff-kbm-only"
                   [disabled]="uncraftable || full || quantity === 1"
                   (click)="
                     stepQuantity(entry.recipe.id, entry.maxQueueable, -10)
@@ -257,7 +259,7 @@
                 </button>
 
                 <button
-                  class="btn btn-xs btn-neutral"
+                  class="btn btn-xs btn-neutral ff-kbm-only"
                   [disabled]="uncraftable || full || quantity === 1"
                   (click)="
                     stepQuantity(entry.recipe.id, entry.maxQueueable, -1)
@@ -272,7 +274,7 @@
                 <input
                   #input
                   type="number"
-                  ffStepper
+                  ffStepper="Quantity"
                   class="input input-xs w-16"
                   min="1"
                   [max]="entry.maxQueueable"
@@ -288,7 +290,7 @@
                 />
 
                 <button
-                  class="btn btn-xs btn-neutral"
+                  class="btn btn-xs btn-neutral ff-kbm-only"
                   [disabled]="
                     uncraftable || full || quantity === entry.maxQueueable
                   "
@@ -301,7 +303,7 @@
                 </button>
 
                 <button
-                  class="btn btn-xs btn-neutral"
+                  class="btn btn-xs btn-neutral ff-kbm-only"
                   [disabled]="
                     uncraftable || full || quantity === entry.maxQueueable
                   "
@@ -327,9 +329,10 @@
                       entry.maxQueueable
                     )
                   "
-                  appSfx="ui-click"
-                  [sfxOffset]="4"
-                  [sfxTrigger]="['click', 'hover']"
+                  ffButton="ui-click"
+                  [ffSoundOffset]="4"
+                  ffPadAction="details"
+                  ffPadLabel="Max"
                 >
                   Max
                 </button>
@@ -343,7 +346,6 @@
                 [ffSoundOffset]="$index"
                 ffPadAction="context"
                 ffPadLabel="Craft"
-                [ffPadWithin]="recipeRow"
               >
                 Craft
               </button>

@@ -326,6 +326,14 @@
             >
               Cancel
             </button>
+            <button
+              class="btn btn-sm btn-error btn-outline"
+              (click)="requestRemoveEditing()"
+              appSfx="ui-error"
+              [sfxTrigger]="['click', 'hover']"
+            >
+              Remove
+            </button>
           }
 
           @if (draftType() === 'LevelUpParty') {
@@ -371,6 +379,9 @@
           appListReflow
           [cdkDropListSortPredicate]="canDropAt"
           (cdkDropListDropped)="onDrop($event)"
+          [ffReorderMin]="pinnedClauseCount()"
+          [ffReorderPriority]="reorderPriority"
+          (ffReorderList)="reorder($event)"
         >
           @for (clause of clauses(); track clause.id) {
             @let isActiveClause = clause.id === activeClauseId();
@@ -379,6 +390,9 @@
             <li
               cdkDrag
               [cdkDragDisabled]="isPinned"
+              ffReorderItem
+              ffFocusRow
+              [ffReorderItemDisabled]="isPinned"
               [cdkDragScale]="uiScale()"
               appListReflowDrag
               class="flex flex-row items-center gap-2 p-2 mx-1 bg-base-200"
@@ -404,7 +418,11 @@
                   cdkDragHandle
                   name="tablerGripVertical"
                   size="row"
-                  class="cursor-move text-lighter shrink-0"
+                  class="cursor-move text-lighter shrink-0 ff-kbm-only"
+                />
+                <ff-input-prompt
+                  action="context"
+                  class="ff-row-glyph ff-gamepad-only"
                 />
               }
 
@@ -426,3 +444,13 @@
     </div>
   </div>
 </app-card-page>
+
+<swal
+  #removeSwal
+  title="Remove this clause?"
+  icon="warning"
+  [showCancelButton]="true"
+  confirmButtonText="Yes, remove it"
+  cancelButtonText="No, keep it"
+  (confirm)="removeEditing()"
+></swal>

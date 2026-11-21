@@ -2,6 +2,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  ElementRef,
+  inject,
   input,
   output,
 } from '@angular/core';
@@ -11,6 +13,7 @@ import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
 import { SFXDirective } from '@directives/sfx.directive';
+import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
 import { getEntry } from '@helpers/content/content';
 import {
   defaultCombatStats,
@@ -46,6 +49,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   ],
   templateUrl: './slot-equipment.component.html',
   styleUrl: './slot-equipment.component.scss',
+  host: { '(contextmenu)': 'requestUnequip($event)' },
 })
 export class SlotEquipmentComponent {
   public slot = input.required<EquipmentSlot>();
@@ -54,6 +58,24 @@ export class SlotEquipmentComponent {
   public showUnequipHint = input<boolean>(false);
 
   public slotClick = output<void>();
+  public unequip = output<void>();
+
+  constructor() {
+    const host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+    ffGamepadOn('details', () => this.unequip.emit(), {
+      element: host,
+      enabled: () =>
+        this.showUnequipHint() &&
+        !!this.equippedItem() &&
+        host.contains(document.activeElement),
+      label: 'Unequip',
+    });
+  }
+
+  public requestUnequip(event: Event): void {
+    event.preventDefault();
+    this.unequip.emit();
+  }
 
   public equippedContent = computed(() => {
     const equipmentId = this.equippedItem()?.equipmentId;

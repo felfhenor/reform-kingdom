@@ -87,6 +87,19 @@ const registerSteamHandlers = () => {
     }
   });
 
+  ipcMain.handle('steam:show-keyboard', (_event, x, y, width, height) => {
+    const box = [x, y, width, height];
+    if (!client || !box.every(Number.isFinite)) return false;
+
+    // 0 = single line; the keyboard types into whichever field has focus.
+    return client.utils
+      .showFloatingGamepadTextInput(0, ...box.map(Math.round))
+      .catch((e) => {
+        coreLog().warn('Steam', 'keyboard unavailable', e.message);
+        return false;
+      });
+  });
+
   ipcMain.handle('steam:achievement-clear', (_event, name) => {
     if (!client || !isAchievementName(name)) return false;
 

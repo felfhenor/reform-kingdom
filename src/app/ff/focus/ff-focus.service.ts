@@ -179,7 +179,8 @@ export class FFFocusService {
       (element) =>
         isActive(element) &&
         hasSize(element) &&
-        !element.closest('.ff-focus-skip'),
+        !element.closest('.ff-focus-skip') &&
+        !element.parentElement?.closest('.ff-focus-row'),
     );
   }
 

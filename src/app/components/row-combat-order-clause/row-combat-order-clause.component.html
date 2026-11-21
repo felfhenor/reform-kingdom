@@ -59,20 +59,23 @@
 
 @if (!readOnly()) {
   <label class="label cursor-pointer label-checkbox">
+    <ff-input-prompt action="confirm" class="ff-row-glyph" />
     <input
       type="checkbox"
       [checked]="clause().enabled"
       class="checkbox checkbox-sm"
       (click)="toggleEnabled.emit()"
+      ffPadAction="confirm"
+      ffPadLabel="Toggle"
     />
   </label>
 
   <button
     class="btn btn-xs btn-neutral"
     (click)="edit.emit()"
-    appSfx="ui-click"
-    [sfxOffset]="0"
-    [sfxTrigger]="['click', 'hover']"
+    ffButton="ui-click"
+    ffPadAction="details"
+    ffPadLabel="Edit"
   >
     Edit
   </button>

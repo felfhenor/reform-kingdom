@@ -332,6 +332,14 @@
           >
             Cancel
           </button>
+          <button
+            class="btn btn-sm btn-error btn-outline"
+            (click)="requestRemoveEditing()"
+            appSfx="ui-error"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            Remove
+          </button>
         }
       </div>
     </div>
@@ -358,11 +366,15 @@
         class="flex flex-col gap-2 max-h-96 overflow-y-auto py-1"
         appListReflow
         (cdkDropListDropped)="onDrop($event)"
+        [ffReorderPriority]="reorderPriority"
+        (ffReorderList)="reorder.emit($event)"
       >
         @for (clause of clauses(); track clause.id) {
           <li
             cdkDrag
             appListReflowDrag
+            ffReorderItem
+            ffFocusRow
             class="flex flex-row items-center gap-2 p-2 bg-base-200"
             [class.outline-2]="editingClauseId() === clause.id"
             [class.outline-base-content]="editingClauseId() === clause.id"
@@ -372,7 +384,11 @@
               cdkDragHandle
               name="tablerGripVertical"
               size="row"
-              class="cursor-move text-lighter shrink-0"
+              class="cursor-move text-lighter shrink-0 ff-kbm-only"
+            />
+            <ff-input-prompt
+              action="context"
+              class="ff-row-glyph ff-gamepad-only"
             />
 
             <app-row-combat-order-clause
@@ -399,3 +415,13 @@
     </div>
   </div>
 }
+
+<swal
+  #removeSwal
+  title="Remove this clause?"
+  icon="warning"
+  [showCancelButton]="true"
+  confirmButtonText="Yes, remove it"
+  cancelButtonText="No, keep it"
+  (confirm)="removeEditing()"
+></swal>

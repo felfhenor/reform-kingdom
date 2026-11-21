@@ -54,6 +54,8 @@ const PROMPT_ACTION_ORDER: FFGamepadAction[] = [
   'menu',
   'left',
   'right',
+  'up',
+  'down',
 ];
 
 @Injectable({ providedIn: 'root' })

@@ -1,3 +1,6 @@
+import { FFInputPromptComponent } from '@ff/components/input-prompt/input-prompt.component';
+import { FFFocusRowDirective } from '@ff/focus/ff-focus-row.directive';
+import { FFKeyboardDirective } from '@ff/controls/ff-keyboard.directive';
 import { FFStepperDirective } from '@ff/controls/ff-stepper.directive';
 import { FFButtonComponent } from '@ff/components/button/button.component';
 import { DecimalPipe, formatNumber } from '@angular/common';
@@ -70,6 +73,9 @@ import { chunk, clamp } from 'es-toolkit/compat';
   selector: 'app-panel-play-kingdom-tradeskill',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFInputPromptComponent,
+    FFFocusRowDirective,
+    FFKeyboardDirective,
     FFStepperDirective,
     FFButtonComponent,
     AtlasImageComponent,

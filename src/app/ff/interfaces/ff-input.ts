@@ -107,6 +107,21 @@ export interface FFSelectPopupRequest {
   clear?: { label: string; run: () => void };
 }
 
+export interface FFReorderGrab {
+  item: unknown;
+  from: number;
+  at: number;
+  focused?: HTMLElement;
+}
+
+export interface FFReorderMove {
+  fromIndex: number;
+  toIndex: number;
+}
+
+// Opens a platform on-screen keyboard over the given text field; false when none could be shown.
+export type FFTextKeyboard = (field: FFRect) => Promise<boolean>;
+
 export interface FFNumberBounds {
   min?: number;
   max?: number;

@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   effect,
   ElementRef,
   inject,
@@ -8,6 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { FFInputPromptComponent } from '@ff/components/input-prompt/input-prompt.component';
+import { FFFocusRowDirective } from '@ff/focus/ff-focus-row.directive';
 import { ffHotkeyMatches } from '@ff/input/ff-hotkeys';
 import { FFInputService } from '@ff/input/ff-input.service';
 import { FF_BUTTON_FEEDBACK } from '@ff/input/ff-tokens';
@@ -28,7 +30,7 @@ import { HotkeysService } from '@ngneat/hotkeys';
       <!-- Row-scoped glyphs keep their space when hidden, so every row's button stays the same width. -->
       <ff-input-prompt
         [action]="action"
-        [class.invisible]="!!ffPadWithin() && !withinFocused()"
+        [class.invisible]="!!within() && !withinFocused()"
       />
     }
     <ng-content />
@@ -40,6 +42,7 @@ export class FFButtonComponent {
   private readonly feedback = inject(FF_BUTTON_FEEDBACK, { optional: true });
   private readonly hotkeys = inject(HotkeysService);
   private readonly inputService = inject(FFInputService);
+  private readonly row = inject(FFFocusRowDirective, { optional: true });
 
   public ffButton = input<string>('');
   public ffSoundOffset = input<number>(0);
@@ -52,12 +55,15 @@ export class FFButtonComponent {
   // For per-row actions in a list: only the row holding controller focus answers the press.
   public ffPadWithin = input<HTMLElement>();
 
+  // Inside an ffFocusRow, the row is the scope unless one is given.
+  protected within = computed(() => this.ffPadWithin() ?? this.row?.element);
+
   // Focus isn't reactive, so the row's focusin/focusout drive whether its glyph shows.
   protected withinFocused = signal(false);
 
   constructor() {
     effect((onCleanup) => {
-      const within = this.ffPadWithin();
+      const within = this.within();
       if (!within) return;
 
       const sync = () =>
@@ -122,7 +128,7 @@ export class FFButtonComponent {
   }
 
   private focusWithin(): boolean {
-    const within = this.ffPadWithin();
+    const within = this.within();
     return !within || within.contains(document.activeElement);
   }
 

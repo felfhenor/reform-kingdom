@@ -21,6 +21,7 @@ import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
 import { isDemoBuild } from '@helpers/demo/demo';
 import {
   GAMEPAD_PRIORITY,
+  gamepadBindFocusTips,
   gamepadBindSwal,
   gamepadSwalClick,
   gamepadSwalShown,
@@ -59,6 +60,7 @@ export class AppComponent {
     inject(FFFocusService);
     this.bindGamepadDialogs();
     gamepadBindSwal();
+    gamepadBindFocusTips();
   }
 
   protected readonly selectPopupPriority = GAMEPAD_PRIORITY.popover;

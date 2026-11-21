@@ -1,3 +1,10 @@
+import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { FFInputService } from '@ff/input/ff-input.service';
+import { gamepadConfirmFirst } from '@helpers/engine/gamepad.ui';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+import { FFPadActionDirective } from '@ff/controls/ff-pad-action.directive';
+import { FFInputPromptComponent } from '@ff/components/input-prompt/input-prompt.component';
+import { FFButtonComponent } from '@ff/components/button/button.component';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -9,11 +16,11 @@ import {
   input,
   output,
   untracked,
+  viewChild,
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
 import { IconComponent } from '@components/icon/icon.component';
-import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
 import { farmNodeRewardQuantity } from '@helpers/decree/decree-farm-node';
 import { farmNodeActiveWarning } from '@helpers/decree/decree-farm-node.ui';
@@ -41,10 +48,13 @@ const EDITABLE_CLAUSE_TYPES: DecreeClause['type'][] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex items-center gap-2 flex-1 min-w-0' },
   imports: [
+    SweetAlert2Module,
+    FFPadActionDirective,
+    FFInputPromptComponent,
+    FFButtonComponent,
     AtlasImageComponent,
     SlotIconBlankComponent,
     TippyDirective,
-    SFXDirective,
     DecimalPipe,
     IconComponent,
   ],
@@ -91,6 +101,15 @@ export class RowDecreeClauseComponent {
   public isEditable = computed(() =>
     EDITABLE_CLAUSE_TYPES.includes(this.clause().type),
   );
+
+  private readonly ffInput = inject(FFInputService);
+  private removeSwal = viewChild<SwalComponent>('removeSwal');
+
+  public requestRemove(): void {
+    gamepadConfirmFirst(this.ffInput.mode(), this.removeSwal(), () =>
+      this.remove.emit(),
+    );
+  }
 
   // Only GatherMaterial (its material) and FarmNode (its reward) have a
   // specific icon to show - the other clause types have nothing to display.

@@ -1,3 +1,15 @@
+import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { FFInputService } from '@ff/input/ff-input.service';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+import { FFInputPromptComponent } from '@ff/components/input-prompt/input-prompt.component';
+import { FFFocusRowDirective } from '@ff/focus/ff-focus-row.directive';
+import type { FFReorderMove } from '@ff/interfaces/ff-input';
+import {
+  GAMEPAD_PRIORITY,
+  gamepadConfirmFirst,
+} from '@helpers/engine/gamepad.ui';
+import { FFReorderItemDirective } from '@ff/controls/ff-reorder-item.directive';
+import { FFReorderListDirective } from '@ff/controls/ff-reorder-list.directive';
 import { FFStepperDirective } from '@ff/controls/ff-stepper.directive';
 import { FFSelectDirective } from '@ff/controls/ff-select.directive';
 import type { CdkDragDrop } from '@angular/cdk/drag-drop';
@@ -7,6 +19,7 @@ import type { AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
   Component,
+  viewChild,
   computed,
   inject,
   signal,
@@ -171,6 +184,11 @@ function materialOptionsFor(ids: MaterialId[]): MaterialOption[] {
   selector: 'app-game-play-decree',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    SweetAlert2Module,
+    FFInputPromptComponent,
+    FFFocusRowDirective,
+    FFReorderItemDirective,
+    FFReorderListDirective,
     FFStepperDirective,
     FFSelectDirective,
     CardPageComponent,
@@ -192,6 +210,7 @@ function materialOptionsFor(ids: MaterialId[]): MaterialOption[] {
   templateUrl: './game-play-decree.component.html',
 })
 export class GamePlayDecreeComponent {
+  public readonly reorderPriority = GAMEPAD_PRIORITY.popover;
   private anim = inject(AnimationService);
 
   public uiScale = uiScaleCurrent;
@@ -299,6 +318,8 @@ export class GamePlayDecreeComponent {
     this.rewardOptions().find((option) => option.key === this.draftRewardKey()),
   );
 
+  private readonly ffInput = inject(FFInputService);
+  private removeSwal = viewChild<SwalComponent>('removeSwal');
   public editingClauseId = signal<DecreeClauseId | undefined>(undefined);
   public isEditing = computed(() => !!this.editingClauseId());
 
@@ -448,6 +469,17 @@ export class GamePlayDecreeComponent {
     decreeClauseRemove(clauseId);
   }
 
+  public requestRemoveEditing(): void {
+    gamepadConfirmFirst(this.ffInput.mode(), this.removeSwal(), () =>
+      this.removeEditing(),
+    );
+  }
+
+  public removeEditing(): void {
+    const clauseId = this.editingClauseId();
+    if (clauseId) this.removeClause(clauseId);
+  }
+
   public isAutoFarmClause = isAutoFarmClause;
 
   public canDropAt = (index: number): boolean =>
@@ -455,6 +487,10 @@ export class GamePlayDecreeComponent {
 
   public onDrop(event: CdkDragDrop<DecreeClause[]>): void {
     decreeClauseReorder(event.previousIndex, event.currentIndex);
+  }
+
+  public reorder(move: FFReorderMove): void {
+    decreeClauseReorder(move.fromIndex, move.toIndex);
   }
 
   public onClauseLeave(event: AnimationCallbackEvent): void {

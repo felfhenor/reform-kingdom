@@ -6,6 +6,7 @@ import {
   input,
 } from '@angular/core';
 import { ffNearestControlLabel } from '@ff/controls/ff-control-label';
+import { FFFocusRowDirective } from '@ff/focus/ff-focus-row.directive';
 import { FFNumberPopupService } from '@ff/controls/ff-number-popup.service';
 import { ffTitleCase } from '@ff/controls/ff-select-title';
 import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
@@ -31,10 +32,15 @@ export class FFStepperDirective {
   public ffStepper = input<string>('');
 
   constructor() {
+    const host = this.host;
+    const row = inject(FFFocusRowDirective, { optional: true })?.element;
     ffGamepadOn('confirm', () => this.openPopup(), {
-      element: this.host,
+      element: row ?? host,
       enabled: () =>
-        document.activeElement === this.host && !this.host.disabled,
+        !host.disabled &&
+        (row
+          ? row.contains(document.activeElement)
+          : document.activeElement === host),
       label: 'Edit',
     });
     inject(DestroyRef).onDestroy(() => {

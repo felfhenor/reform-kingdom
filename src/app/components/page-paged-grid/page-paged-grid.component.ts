@@ -1,3 +1,4 @@
+import { FFKeyboardDirective } from '@ff/controls/ff-keyboard.directive';
 import { FFButtonComponent } from '@ff/components/button/button.component';
 import { FFFocusService } from '@ff/focus/ff-focus.service';
 import type { FFFocusEdgeDetail } from '@ff/interfaces/ff-input';
@@ -26,6 +27,7 @@ const CELL_FOOTPRINT_PX = 80;
   selector: 'app-page-paged-grid',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFKeyboardDirective,
     FFButtonComponent,
     BlankSlateComponent,
     CardPageComponent,

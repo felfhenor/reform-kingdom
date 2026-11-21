@@ -51,11 +51,14 @@
 
 @if (clause().type !== 'AutoFarmNode') {
   <label class="label cursor-pointer label-checkbox">
+    <ff-input-prompt action="confirm" class="ff-row-glyph" />
     <input
       type="checkbox"
       [checked]="clause().enabled"
       class="checkbox checkbox-sm"
       (click)="toggleEnabled.emit()"
+      ffPadAction="confirm"
+      ffPadLabel="Toggle"
     />
   </label>
 }
@@ -64,20 +67,32 @@
   <button
     class="btn btn-xs btn-neutral"
     (click)="edit.emit()"
-    appSfx="ui-click"
-    [sfxOffset]="0"
-    [sfxTrigger]="['click', 'hover']"
+    ffButton="ui-click"
+    ffPadAction="details"
+    ffPadLabel="Edit"
   >
     Edit
   </button>
 }
 
+<!-- Rows with nothing to edit put Remove on Y instead. -->
 <button
   class="btn btn-xs btn-error btn-outline"
-  (click)="remove.emit()"
-  appSfx="ui-error"
-  [sfxOffset]="1"
-  [sfxTrigger]="['click', 'hover']"
+  (click)="requestRemove()"
+  ffButton="ui-error"
+  [ffSoundOffset]="1"
+  [ffPadAction]="isEditable() ? undefined : 'details'"
+  ffPadLabel="Remove"
 >
   Remove
 </button>
+
+<swal
+  #removeSwal
+  title="Remove this clause?"
+  icon="warning"
+  [showCancelButton]="true"
+  confirmButtonText="Yes, remove it"
+  cancelButtonText="No, keep it"
+  (confirm)="remove.emit()"
+></swal>

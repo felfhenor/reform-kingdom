@@ -1,3 +1,4 @@
+import { FFKeyboardDirective } from '@ff/controls/ff-keyboard.directive';
 import type { AnimationCallbackEvent, ElementRef } from '@angular/core';
 import {
   afterRenderEffect,
@@ -27,6 +28,7 @@ import { TimeagoPipe } from 'ngx-timeago';
   selector: 'app-play-adventurelog',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFKeyboardDirective,
     AdventureLogMessageComponent,
     BlankSlateComponent,
     CardPageComponent,

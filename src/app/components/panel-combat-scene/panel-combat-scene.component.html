@@ -83,16 +83,20 @@
               @let targetable = targetableIds().has(enemy.id);
               <button
                 type="button"
-                class="p-1 border-2"
+                class="scene-combatant p-1 border-2"
                 [class.border-warning]="targetable"
                 [class.target-ring]="targetable"
                 [class.cursor-pointer]="targetable"
                 [class.border-transparent]="!targetable"
                 [class.cursor-default]="!targetable"
                 [class.opacity-50]="!!pendingOption() && !targetable"
+                [class.ff-focus-skip]="isDead(enemy)"
+                [attr.tabindex]="isDead(enemy) ? -1 : null"
                 (click)="clickCombatant(enemy)"
-                (mouseenter)="hoveredId.set(enemy.id)"
+                (mouseenter)="hover(enemy)"
+                (focus)="hover(enemy)"
                 (mouseleave)="hoveredId.set(undefined)"
+                (blur)="hoveredId.set(undefined)"
                 appSfx="ui-click"
                 [sfxTrigger]="['click', 'hover']"
               >
@@ -116,7 +120,7 @@
             @let targetable = targetableIds().has(ally.id);
             <button
               type="button"
-              class="p-1 border-2 text-left"
+              class="scene-combatant p-1 border-2 text-left"
               [class.border-warning]="targetable"
               [class.target-ring]="targetable"
               [class.border-primary]="!targetable && activeHero() === ally"
@@ -124,9 +128,13 @@
               [class.cursor-pointer]="targetable"
               [class.cursor-default]="!targetable"
               [disabled]="isResolving() || isReview()"
+              [class.ff-focus-skip]="isDead(ally)"
+              [attr.tabindex]="isDead(ally) ? -1 : null"
               (click)="clickCombatant(ally)"
-              (mouseenter)="hoveredId.set(ally.id)"
+              (mouseenter)="hover(ally)"
+              (focus)="hover(ally)"
               (mouseleave)="hoveredId.set(undefined)"
+              (blur)="hoveredId.set(undefined)"
               appSfx="ui-click"
               [sfxTrigger]="['click', 'hover']"
             >
@@ -171,6 +179,7 @@
           </div>
 
           <div
+            #skillGrid
             class="glass grid grid-cols-2 gap-2 content-start h-[352px] p-2 shrink-0 overflow-y-auto"
           >
             @if (!isResolving() && activeHero(); as hero) {
@@ -190,6 +199,10 @@
                     previousSkillId() !== option.skill.id
                   "
                   [class.bg-primary]="pendingSkillId() === option.skill.id"
+                  [attr.aria-pressed]="pendingSkillId() === option.skill.id"
+                  [attr.aria-current]="
+                    previousSkillId() === option.skill.id ? 'true' : null
+                  "
                   [class.text-primary-content]="
                     pendingSkillId() === option.skill.id
                   "
@@ -200,7 +213,9 @@
                   [tpPlacement]="'top'"
                   (click)="pickSkill(option)"
                   (mouseenter)="hoveredSkillId.set(option.skill.id)"
+                  (focus)="hoveredSkillId.set(option.skill.id)"
                   (mouseleave)="hoveredSkillId.set(undefined)"
+                  (blur)="hoveredSkillId.set(undefined)"
                   appSfx="ui-click"
                   [sfxTrigger]="['click', 'hover']"
                 >

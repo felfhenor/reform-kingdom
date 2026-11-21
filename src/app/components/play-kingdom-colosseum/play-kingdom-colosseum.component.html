@@ -588,7 +588,7 @@
                       [isSelected]="gearSlot() === slot"
                       [showUnequipHint]="true"
                       (slotClick)="gearSlot.set(slot)"
-                      (contextmenu)="$event.preventDefault(); unequip(slot)"
+                      (unequip)="unequip(slot)"
                     />
                   }
                 </div>

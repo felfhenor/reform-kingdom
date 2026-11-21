@@ -11,12 +11,16 @@ import { ffCreateGlyphElement } from '@ff/input/ff-glyphs';
 import { FFInputService } from '@ff/input/ff-input.service';
 import { FFFocusService } from '@ff/focus/ff-focus.service';
 import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
-import type { FFGamepadAction } from '@ff/interfaces/ff-input';
+import type { FFGamepadAction, FFInputMode } from '@ff/interfaces/ff-input';
 import { cycleStep } from '@helpers/engine/gameplay-view-cycle.ui';
 import { modalHasAnyOpen } from '@helpers/engine/modal-stack';
 import { worldPartyState } from '@helpers/state-game';
 import type { CharacterId } from '@interfaces';
-import type { SweetAlert2LoaderService } from '@sweetalert2/ngx-sweetalert2';
+import type {
+  SwalComponent,
+  SweetAlert2LoaderService,
+} from '@sweetalert2/ngx-sweetalert2';
+import type { Instance, ReferenceElement } from 'tippy.js';
 
 export const GAMEPAD_PRIORITY = {
   dialog: 300,
@@ -182,4 +186,51 @@ export function gamepadBindHeroCycle(
   ffGamepadOn('subNext', () => step(1), options);
   // If the host dies before its afterNextRender, the hold would otherwise never release.
   inject(DestroyRef).onDestroy(() => focus.releaseFocusOnChange());
+}
+
+// A tip anchored inside a focusable (e.g. a slot's item art) never gets focus itself, so it opts in with .ff-focus-tip.
+function gamepadInnerTip(element: Element): Instance | undefined {
+  const anchor = element.querySelector<ReferenceElement>('.ff-focus-tip');
+  return anchor?._tippy;
+}
+
+// Injection context only.
+export function gamepadBindFocusTips(): void {
+  const ffInput = inject(FFInputService);
+  let shown: Instance | undefined;
+  const hide = () => {
+    if (shown && !shown.state.isDestroyed) shown.hide();
+    shown = undefined;
+  };
+  effect(() => {
+    if (ffInput.mode() !== 'gamepad') hide();
+  });
+  const onFocusIn = (event: FocusEvent) => {
+    hide();
+    if (ffInput.mode() !== 'gamepad' || !(event.target instanceof Element))
+      return;
+
+    shown = gamepadInnerTip(event.target);
+    shown?.show();
+  };
+
+  document.addEventListener('focusin', onFocusIn);
+  document.addEventListener('focusout', hide);
+  inject(DestroyRef).onDestroy(() => {
+    document.removeEventListener('focusin', onFocusIn);
+    document.removeEventListener('focusout', hide);
+  });
+}
+
+// A pad press is easier to misfire than a click, so destructive pad actions confirm first; the swal's (confirm) runs the action.
+export function gamepadConfirmFirst(
+  mode: FFInputMode,
+  swal: SwalComponent | undefined,
+  run: () => void,
+): void {
+  if (mode === 'gamepad' && swal) {
+    void swal.fire();
+    return;
+  }
+  run();
 }
