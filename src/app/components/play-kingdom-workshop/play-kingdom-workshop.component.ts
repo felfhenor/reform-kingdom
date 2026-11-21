@@ -14,6 +14,7 @@ import { IconComponent } from '@components/icon/icon.component';
 import { PanelEquipmentPickerComponent } from '@components/panel-equipment-picker/panel-equipment-picker.component';
 import { PanelKingdomWorkshopInfuseComponent } from '@components/panel-kingdom-workshop-infuse/panel-kingdom-workshop-infuse.component';
 import { PanelKingdomWorkshopReforgeComponent } from '@components/panel-kingdom-workshop-reforge/panel-kingdom-workshop-reforge.component';
+import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/row-infused-materials.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
 import { TutorialTargetDirective } from '@directives/tutorial-target.directive';
@@ -67,6 +68,7 @@ const WORKSHOP_TABS: WorkshopTabOption[] = [
     PanelKingdomWorkshopInfuseComponent,
     PanelKingdomWorkshopReforgeComponent,
     PluralizePipe,
+    RowInfusedMaterialsComponent,
     SFXDirective,
     TeleportOutletDirective,
     TutorialTargetDirective,
@@ -115,10 +117,6 @@ export class PlayKingdomWorkshopComponent {
   public modifiable = computed(
     () => this.selectedSource() === 'armory' || canModifyEquipment(),
   );
-
-  public filledSlotCount(item: EquipmentItem): number {
-    return item.infusedItemIds.filter(Boolean).length;
-  }
 
   public slotCountFor(item: EquipmentItem): number {
     return equipmentItemSlotCount(item);

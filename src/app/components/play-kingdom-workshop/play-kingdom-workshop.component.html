@@ -33,10 +33,11 @@
             <span class="type-muted">Common gear cannot be reforged</span>
           }
         } @else if (enabled) {
-          {{ filledSlotCount(sourceItem) | number }}/{{
-            slotCountFor(sourceItem) | number
-          }}
-          infusion slots used
+          <app-row-infused-materials
+            class="block mt-1"
+            [infusedItemIds]="sourceItem.infusedItemIds"
+            [maxSlots]="slotCountFor(sourceItem)"
+          />
         } @else {
           <span class="type-muted">No infusion slots</span>
         }
