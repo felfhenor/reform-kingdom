@@ -1,3 +1,4 @@
+import { PATHFINDING_HOP_TREE_CACHE_MAX } from '@helpers/config';
 import { travelPathBaseTotalTicks } from '@helpers/hero/travel-cost-base';
 import { discoveredCollectibleCount } from '@helpers/item/collectibles';
 import { allMaps } from '@helpers/maps';
@@ -193,8 +194,33 @@ let cachedMapsRef: ReturnType<typeof allMaps> | undefined;
 let cachedDiscoveredCollectibleCount: number | undefined;
 let cachedOutpostTeleportKey: string | undefined;
 const pathFromCache = new Map<string, TravelStep[] | undefined>();
-// Every destination from one origin shares the same hop chains; only the latest is kept so a moving origin can't grow it.
-let cachedHopTree: { key: string; tree: TravelRouteHopTree } | undefined;
+// Every destination from one origin shares the same hop chains; capped so a moving origin can't grow it.
+const hopTreeCache = new Map<string, TravelRouteHopTree>();
+
+function cachedRouteHopTree(
+  key: string,
+  build: () => TravelRouteHopTree,
+): TravelRouteHopTree {
+  const cached = hopTreeCache.get(key);
+  if (cached) {
+    // Re-insert so eviction drops the least recently used tree.
+    hopTreeCache.delete(key);
+    hopTreeCache.set(key, cached);
+    return cached;
+  }
+
+  const oldestKey = hopTreeCache.keys().next().value;
+  if (
+    hopTreeCache.size >= PATHFINDING_HOP_TREE_CACHE_MAX &&
+    oldestKey !== undefined
+  ) {
+    hopTreeCache.delete(oldestKey);
+  }
+
+  const tree = build();
+  hopTreeCache.set(key, tree);
+  return tree;
+}
 
 function pathFromCacheKey(
   location: CurrentLocation,
@@ -231,7 +257,7 @@ export function travelPathFrom(
     cachedDiscoveredCollectibleCount = currentDiscoveredCollectibleCount;
     cachedOutpostTeleportKey = currentOutpostTeleportKey;
     pathFromCache.clear();
-    cachedHopTree = undefined;
+    hopTreeCache.clear();
   }
 
   const key = pathFromCacheKey(
@@ -311,21 +337,15 @@ function computeTravelPathFrom(
     passThroughNodes,
     outpostRouting,
   );
-  if (cachedHopTree?.key !== treeKey) {
-    cachedHopTree = {
-      key: treeKey,
-      tree: routeHopTree(
-        location,
-        [
-          ...teleportNodeEdges(ignoreCollectibleGate),
-          ...outpostEdges(outposts),
-        ],
-        passThroughNodes,
-      ),
-    };
-  }
+  const tree = cachedRouteHopTree(treeKey, () =>
+    routeHopTree(
+      location,
+      [...teleportNodeEdges(ignoreCollectibleGate), ...outpostEdges(outposts)],
+      passThroughNodes,
+    ),
+  );
 
-  return travelPathViaHops(cachedHopTree.tree, destination, passThroughNodes);
+  return travelPathViaHops(tree, destination, passThroughNodes);
 }
 
 export function travelPathTo(

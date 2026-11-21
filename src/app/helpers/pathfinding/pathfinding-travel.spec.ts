@@ -41,6 +41,10 @@ const standAt = (location: CurrentLocation) =>
   seedGamestate((state) => (state.world.currentLocation = location));
 
 const carrina = (x: number, y: number) => ({ mapName: 'Carrina', x, y });
+const carrinaMove = (x: number, y: number) => ({
+  kind: 'Move',
+  ...carrina(x, y),
+});
 
 const node = (
   name: string,
@@ -369,6 +373,32 @@ describe('travelPathTo', () => {
       { kind: 'Move', mapName: 'CraggledMire', x: 0, y: 1 },
       { kind: 'Move', mapName: 'CraggledMire', x: 0, y: 2 },
     ]);
+  });
+
+  it('gives each origin its own hop routes when lookups from two origins interleave', () => {
+    seedWorldNodes(
+      [
+        teleportOut('To Mire', 'Carrina', 2, 'mire-from-carrina'),
+        teleportIn('From Carrina', 'CraggledMire', 0, 'mire-from-carrina'),
+        node('Swampfields', 'CraggledMire', 2, 0),
+        node('Miremetal Mines', 'CraggledMire', 0, 2),
+      ],
+      [],
+      { Carrina: fiveByFive, CraggledMire: fiveByFive },
+    );
+
+    expect(travelPathFrom(carrina(0, 0), 'Swampfields')?.[0]).toEqual(
+      carrinaMove(1, 0),
+    );
+    expect(travelPathFrom(carrina(4, 0), 'Swampfields')?.[0]).toEqual(
+      carrinaMove(3, 0),
+    );
+    expect(travelPathFrom(carrina(0, 0), 'Miremetal Mines')?.[0]).toEqual(
+      carrinaMove(1, 0),
+    );
+    expect(travelPathFrom(carrina(4, 0), 'Miremetal Mines')?.[0]).toEqual(
+      carrinaMove(3, 0),
+    );
   });
 
   it('picks the cheaper of two competing teleport routes, not just the first one found', () => {

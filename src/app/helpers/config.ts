@@ -360,6 +360,8 @@ export const ON_PATH_MOVE_COST = 1;
 export const OFF_PATH_MOVE_COST = 4;
 // Dwarfs any real walk, so a pass-through route only crosses a node when no route around it exists.
 export const NODE_PASS_THROUGH_MOVE_COST = 100_000;
+// Hop trees kept at once; callers interleave origins and pass-through fallbacks, and each rebuild costs ~50ms.
+export const PATHFINDING_HOP_TREE_CACHE_MAX = 8;
 
 // Pixi
 
