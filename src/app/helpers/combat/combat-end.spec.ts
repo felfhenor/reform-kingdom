@@ -1,3 +1,4 @@
+import { sortBy } from 'es-toolkit/compat';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@helpers/decree/auto-mode-state');
@@ -90,6 +91,9 @@ const goblin = ensureMonster({
 const items = [
   ensureItem({ id: oreId, name: 'Ore' }),
   ensureItem({ id: 'gold-coin' as ItemId, name: 'Gold Coin' }),
+  ensureItem({ id: 'crimson-lucre' as ItemId, name: 'Crimson Lucre' }),
+  ensureItem({ id: 'trader-scrip' as ItemId, name: 'Trader Scrip' }),
+  ensureItem({ id: 'duskhall-flux' as ItemId, name: 'Duskhall Flux' }),
 ];
 
 function encounter(overrides: Partial<EncounterContent> = {}) {
@@ -632,6 +636,55 @@ describe('combatCheckIfOver', () => {
       expect(travelBeginDeathsDoor).not.toHaveBeenCalled();
       expect(gamestate().meta.runLost).toBe(true);
       expect(events).toContain('Combat:Encounter:RunLost');
+    });
+
+    it('empties the currency stock before Deaths Door when a wipe loses currency', () => {
+      const combat = lost();
+      seedGamestate((state) => {
+        state.world.combat = combat;
+        state.globalEffectSums.wipeCurrencyLossPercent = 100;
+        state.materials['gold-coin' as ItemId] = { quantity: 50, foundAt: 1 };
+        state.materials['crimson-lucre' as ItemId] = {
+          quantity: 5,
+          foundAt: 1,
+        };
+        state.materials[oreId] = { quantity: 7, foundAt: 1 };
+      });
+
+      inTick(() => combatCheckIfOver(combat));
+
+      expect(gamestate().materials['gold-coin' as ItemId]).toBeUndefined();
+      expect(gamestate().materials['crimson-lucre' as ItemId]).toBeUndefined();
+      expect(gamestate().materials[oreId]?.quantity).toBe(7);
+      expect(travelBeginDeathsDoor).toHaveBeenCalled();
+    });
+
+    it('lets the crows take materials before Deaths Door when a wipe loses materials', () => {
+      const combat = lost();
+      seedGamestate((state) => {
+        state.world.combat = combat;
+        state.globalEffectSums.wipeMaterialPercent = 50;
+        state.globalEffectSums.wipeMaterialSelectionPercent = 50;
+        state.materials['gold-coin' as ItemId] = { quantity: 50, foundAt: 1 };
+        state.materials[oreId] = { quantity: 8, foundAt: 1 };
+        state.materials['bark' as ItemId] = { quantity: 8, foundAt: 1 };
+        state.materials['crimson-lucre' as ItemId] = {
+          quantity: 8,
+          foundAt: 1,
+        };
+      });
+
+      inTick(() => combatCheckIfOver(combat));
+
+      expect(gamestate().materials['gold-coin' as ItemId]?.quantity).toBe(50);
+      expect(gamestate().materials['crimson-lucre' as ItemId]?.quantity).toBe(
+        8,
+      );
+      const commons = [oreId, 'bark' as ItemId].map(
+        (id) => gamestate().materials[id]?.quantity,
+      );
+      expect(sortBy(commons)).toEqual([4, 8]);
+      expect(travelBeginDeathsDoor).toHaveBeenCalled();
     });
   });
 });

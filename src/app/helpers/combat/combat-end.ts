@@ -33,6 +33,7 @@ import {
 } from '@helpers/hero/character-progress';
 import { travelBeginDeathsDoor } from '@helpers/hero/travel';
 import { combatDropChanceBonus, rollDroppedRewards } from '@helpers/item/loot';
+import { loseCurrency, loseRandomMaterials } from '@helpers/item/materials';
 import { monsterRecordKill } from '@helpers/kingdom/bestiary';
 import { founderWhisperLog } from '@helpers/lore/founder-whisper';
 import {
@@ -347,6 +348,37 @@ function combatEndRunOnWipe(): void {
   analyticsSendDesignEvent('Combat:Encounter:RunLost');
 }
 
+function combatApplyWipeLosses(combat: Combat): void {
+  const sums = globalEffectSumsState();
+  const losesCurrency = sums.wipeCurrencyLossPercent > 0;
+  const losesMaterials =
+    sums.wipeMaterialPercent > 0 && sums.wipeMaterialSelectionPercent > 0;
+  if (!losesCurrency && !losesMaterials) return;
+
+  let currencyLost = 0;
+  let materialsLost = 0;
+  updateGamestate((state) => {
+    if (losesCurrency) {
+      currencyLost = loseCurrency(state, sums.wipeCurrencyLossPercent);
+    }
+    if (losesMaterials) {
+      materialsLost = loseRandomMaterials(
+        state,
+        sums.wipeMaterialPercent,
+        sums.wipeMaterialSelectionPercent,
+      );
+    }
+    return state;
+  });
+
+  if (currencyLost > 0) {
+    combatMessageLog(combat, 'Your heroes lose all their coins!');
+  }
+  if (materialsLost > 0) {
+    combatMessageLog(combat, 'Crows pick through your items!');
+  }
+}
+
 export function combatHandleDefeat(combat: Combat): void {
   combatMessageLog(combat, 'Heroes have lost the combat!');
   analyticsSendDesignEvent('Combat:Encounter:Loss');
@@ -361,6 +393,8 @@ export function combatHandleDefeat(combat: Combat): void {
     combatEndRunOnWipe();
     return;
   }
+
+  combatApplyWipeLosses(combat);
 
   travelBeginDeathsDoor();
 

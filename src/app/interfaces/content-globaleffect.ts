@@ -155,6 +155,19 @@ export type GlobalEffectEffectWipeEndsRun = {
   effectType: 'GlobalWipeEndsRun';
 };
 
+// Whole percent of the Gold Coin and Crimson Lucre stock a party wipe loses.
+export type GlobalEffectEffectWipeLosesCurrency = {
+  effectType: 'GlobalWipeLosesCurrency';
+  value: number;
+};
+
+// A party wipe picks `materialSelectionPercent`% of held material types and loses `materialPercent`% of each; currencies and reagents are spared.
+export type GlobalEffectEffectWipeLosesMaterials = {
+  effectType: 'GlobalWipeLosesMaterials';
+  materialPercent: number;
+  materialSelectionPercent: number;
+};
+
 // Deaths Door revives the party where it fell instead of recalling it home.
 export type GlobalEffectEffectReviveInPlace = {
   effectType: 'GlobalReviveInPlace';
@@ -329,6 +342,8 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectShrineBuffsPermanent
   | GlobalEffectEffectEnemyExtraSkills
   | GlobalEffectEffectWipeEndsRun
+  | GlobalEffectEffectWipeLosesCurrency
+  | GlobalEffectEffectWipeLosesMaterials
   | GlobalEffectEffectReviveInPlace
   | GlobalEffectEffectWorkerCraftSpeedPercent
   | GlobalEffectEffectWorkerGatherSpeedPercent

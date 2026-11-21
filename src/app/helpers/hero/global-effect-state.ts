@@ -84,6 +84,10 @@ export function globalEffectEffectDescription(
       return 'Shrine buffs never expire';
     case 'GlobalWipeEndsRun':
       return 'Dying is game over';
+    case 'GlobalWipeLosesCurrency':
+      return `Dying loses ${effect.value}% of Gold Coin and Crimson Lucre`;
+    case 'GlobalWipeLosesMaterials':
+      return `Dying loses ${effect.materialPercent}% of each of ${effect.materialSelectionPercent}% of your material stacks`;
     case 'GlobalReviveInPlace':
       return 'The fallen party revives where it fell';
     case 'WorkerCraftSpeedPercent':
@@ -238,6 +242,13 @@ function accumulateGlobalEffectEffect(
       return;
     case 'GlobalWipeEndsRun':
       sums.wipeEndsRun = true;
+      return;
+    case 'GlobalWipeLosesCurrency':
+      sums.wipeCurrencyLossPercent += effect.value;
+      return;
+    case 'GlobalWipeLosesMaterials':
+      sums.wipeMaterialPercent += effect.materialPercent;
+      sums.wipeMaterialSelectionPercent += effect.materialSelectionPercent;
       return;
     case 'GlobalReviveInPlace':
       sums.reviveInPlace = true;

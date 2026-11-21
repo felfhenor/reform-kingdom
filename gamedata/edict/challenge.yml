@@ -75,5 +75,21 @@
   fragments: 8
   groups:
     - Death
+    - Wipe
   effects:
     - effectType: GlobalWipeEndsRun
+
+- id: 2e547bf5-ebf9-4e59-8273-9b82cc3ddd67
+  name: Edict of Scavenging Crows
+  sprite: '0033'
+  description: Falling in combat will cost all of your common currencies, and half of a random half of your materials.
+  kind: Challenge
+  fragments: 4
+  groups:
+    - Wipe
+  effects:
+    - effectType: GlobalWipeLosesCurrency
+      value: 100
+    - effectType: GlobalWipeLosesMaterials
+      materialPercent: 50
+      materialSelectionPercent: 50

@@ -23,6 +23,7 @@ export * from './kingdom';
 export * from './legacy';
 export * from './lore';
 export * from './maps';
+export * from './math';
 export * from './migrate';
 export * from './noise';
 export * from './pathfinding';

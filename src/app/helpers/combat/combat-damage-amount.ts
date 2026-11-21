@@ -7,6 +7,7 @@ import { combatDamageMitigationRoll } from '@helpers/combat/combat-damage-mitiga
 import { elementalDamageMultiplier } from '@helpers/combat/combat-element';
 import { combatCombatantCombatStatValue } from '@helpers/combat/combat-stats';
 import { getEntry } from '@helpers/content/content';
+import { percentOf } from '@helpers/math';
 import type {
   Combat,
   CombatHpChange,
@@ -195,7 +196,7 @@ export function combatReflectedDamage(
     return 0;
   }
 
-  return Math.floor((damage * reflectPercent) / 100);
+  return percentOf(damage, reflectPercent);
 }
 
 export function combatDealTechniqueDamage(

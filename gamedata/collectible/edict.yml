@@ -315,3 +315,13 @@
   effects:
     - effectType: GlobalAstralProjectorMaterialBoost
       value: -0.25
+
+- id: f05c61a6-523c-47e4-9464-b992d0d4d3c4
+  name: Vow of Scavenging Crows
+  rarity: Mystical
+  description: A vow to be cautious with currency, lest it disappear at the most inconvenient of times.
+  sprite: '0116'
+
+  effects:
+    - effectType: GlobalGoldGainMultiplier
+      value: 0.1

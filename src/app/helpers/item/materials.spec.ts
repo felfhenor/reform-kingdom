@@ -12,10 +12,13 @@ import {
   grantStartingGold,
   hasTraderTokens,
   isMaterialDiscovered,
+  loseCurrency,
+  loseRandomMaterials,
   removeMaterial,
   scaledMaterialCost,
   spendGold,
 } from '@helpers/item/materials';
+import { rngSeeded } from '@helpers/rng';
 import { gamestate } from '@helpers/state-game';
 import type { GameState, ItemId } from '@interfaces';
 import { seedContent } from '@/testing/content';
@@ -23,12 +26,18 @@ import { inTick, seedGamestate } from '@/testing/gamestate';
 
 const goldId = 'gold-coin' as ItemId;
 const scripId = 'trader-scrip' as ItemId;
+const lucreId = 'crimson-lucre' as ItemId;
+const fluxId = 'memory-flux' as ItemId;
+const reagentId = 'duskhall-flux' as ItemId;
 const oreId = 'ore' as ItemId;
 
 beforeEach(() => {
   seedContent([
     ensureItem({ id: goldId, name: 'Gold Coin' }),
     ensureItem({ id: scripId, name: 'Trader Scrip' }),
+    ensureItem({ id: lucreId, name: 'Crimson Lucre' }),
+    ensureItem({ id: fluxId, name: 'Memory Flux' }),
+    ensureItem({ id: reagentId, name: 'Duskhall Flux' }),
     ensureItem({ id: oreId, name: 'Ore' }),
   ]);
   vi.spyOn(Date, 'now').mockReturnValue(5000);
@@ -161,6 +170,28 @@ describe('gold and trader scrip', () => {
     expect(hasTraderTokens(5)).toBe(true);
     expect(hasTraderTokens(6)).toBe(false);
   });
+
+  it('loses every Gold Coin and Crimson Lucre but nothing else', () => {
+    const state = stateWithOre(5);
+    gainGold(state, 10);
+    applyMaterialDelta(state, lucreId, 3);
+
+    loseCurrency(state, 100);
+
+    expect(state.materials[goldId]).toBeUndefined();
+    expect(state.materials[lucreId]).toBeUndefined();
+    expect(state.materials[oreId]?.quantity).toBe(5);
+  });
+
+  it('loses a partial share of currency rounded down, and reports the total lost', () => {
+    const state = defaultGameState();
+    gainGold(state, 5);
+    applyMaterialDelta(state, lucreId, 3);
+
+    expect(loseCurrency(state, 50)).toBe(3);
+    expect(state.materials[goldId]?.quantity).toBe(3);
+    expect(state.materials[lucreId]?.quantity).toBe(2);
+  });
 });
 
 describe('scaledMaterialCost', () => {
@@ -173,5 +204,55 @@ describe('scaledMaterialCost', () => {
   it('never drops below 1, even past -100%', () => {
     expect(scaledMaterialCost(1, -0.5)).toBe(1);
     expect(scaledMaterialCost(10, -2)).toBe(1);
+  });
+});
+
+describe('loseRandomMaterials', () => {
+  const protectedIds = [goldId, lucreId, scripId, fluxId, reagentId];
+  const commonIds = ['a', 'b', 'c', 'd'] as ItemId[];
+
+  function stocked(quantity: number): GameState {
+    const state = defaultGameState();
+    for (const id of [...protectedIds, ...commonIds]) {
+      applyMaterialDelta(state, id, quantity);
+    }
+    return state;
+  }
+
+  it('halves a random half of the unprotected stacks', () => {
+    const state = stocked(10);
+
+    loseRandomMaterials(state, 50, 50, rngSeeded('crows'));
+
+    const quantities = commonIds.map((id) => state.materials[id]?.quantity);
+    expect(quantities.filter((q) => q === 5)).toHaveLength(2);
+    expect(quantities.filter((q) => q === 10)).toHaveLength(2);
+    for (const id of protectedIds) {
+      expect(state.materials[id]?.quantity).toBe(10);
+    }
+  });
+
+  it('never takes the last of a stack of 1', () => {
+    const state = stocked(1);
+
+    loseRandomMaterials(state, 50, 50, rngSeeded('crows'));
+
+    for (const id of commonIds) expect(state.materials[id]?.quantity).toBe(1);
+  });
+
+  it('rounds the number of picked stacks down', () => {
+    const state = defaultGameState();
+    for (const id of ['a', 'b', 'c'] as ItemId[]) {
+      applyMaterialDelta(state, id, 10);
+    }
+
+    expect(loseRandomMaterials(state, 50, 50, rngSeeded('crows'))).toBe(5);
+  });
+
+  it('picks nothing from a single unprotected stack at 50%', () => {
+    const state = stocked(10);
+    for (const id of commonIds.slice(1)) delete state.materials[id];
+
+    expect(loseRandomMaterials(state, 50, 50, rngSeeded('crows'))).toBe(0);
   });
 });

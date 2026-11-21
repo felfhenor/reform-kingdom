@@ -33,6 +33,7 @@ import type {
   GlobalEffectEffectSkillPointsPerLevel,
   GlobalEffectEffectTradeskillQueueSizeBoost,
   GlobalEffectEffectWipeEndsRun,
+  GlobalEffectEffectWipeLosesMaterials,
   GlobalEffectEffectWorldNodeStartingLevel,
   GlobalEffectEffectWorldNodeTypeRemoved,
   GlobalEffectEffectXPGainMultiplier,
@@ -61,6 +62,7 @@ export function ensureGlobalEffectEffect(
     Partial<GlobalEffectEffectCraftTimeMultiplier> &
     Partial<GlobalEffectEffectSkillPointsPerLevel> &
     Partial<GlobalEffectEffectWipeEndsRun> &
+    Partial<GlobalEffectEffectWipeLosesMaterials> &
     Partial<GlobalEffectEffectGoldGainMultiplier> &
     Partial<GlobalEffectEffectDebuffResistance> &
     Partial<GlobalEffectEffectDebuffResistanceTag> &
@@ -192,6 +194,18 @@ export function ensureGlobalEffectEffect(
 
   if (effect.effectType === 'GlobalWipeEndsRun') {
     return { effectType: 'GlobalWipeEndsRun' };
+  }
+
+  if (effect.effectType === 'GlobalWipeLosesCurrency') {
+    return { effectType: 'GlobalWipeLosesCurrency', value: effect.value ?? 0 };
+  }
+
+  if (effect.effectType === 'GlobalWipeLosesMaterials') {
+    return {
+      effectType: 'GlobalWipeLosesMaterials',
+      materialPercent: effect.materialPercent ?? 0,
+      materialSelectionPercent: effect.materialSelectionPercent ?? 0,
+    };
   }
 
   if (effect.effectType === 'GlobalReviveInPlace') {

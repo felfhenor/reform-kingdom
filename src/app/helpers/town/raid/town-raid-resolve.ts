@@ -20,6 +20,7 @@ import {
 import { formatDuration, timerTicksElapsed } from '@helpers/engine/timer';
 import { resolveRewardDisplay } from '@helpers/item/item-preview';
 import { combatDropChanceBonus, rollDroppedRewards } from '@helpers/item/loot';
+import { percentOf } from '@helpers/math';
 import { rngNumberRange, rngShuffle } from '@helpers/rng';
 import {
   updateGamestate,
@@ -102,9 +103,7 @@ function stealTownStock(
 
   const maxSlots = Math.max(
     1,
-    Math.floor(
-      townShopItemCap(townId) * (RAID_LOSS_STOCK_MAX_STEAL_PERCENT / 100),
-    ),
+    percentOf(townShopItemCap(townId), RAID_LOSS_STOCK_MAX_STEAL_PERCENT),
   );
   const stolenCount = Math.min(stock.length, rngNumberRange(1, maxSlots));
   const stolenEntries = rngShuffle(stock).slice(0, stolenCount);
@@ -147,8 +146,9 @@ function stealTownMaterials(
 
   return (Object.keys(materials) as ItemId[])
     .map((itemId) => {
-      const stolen = Math.floor(
-        (materials[itemId] ?? 0) * (RAID_LOSS_MATERIAL_STEAL_PERCENT / 100),
+      const stolen = percentOf(
+        materials[itemId] ?? 0,
+        RAID_LOSS_MATERIAL_STEAL_PERCENT,
       );
       if (stolen <= 0) return undefined;
 

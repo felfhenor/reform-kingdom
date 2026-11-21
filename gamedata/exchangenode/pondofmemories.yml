@@ -246,3 +246,11 @@
       costs:
         - itemId: Gold Coin
           required: 500
+
+    - kind: Collectible
+      requiredEdictId: Edict of Scavenging Crows
+      output:
+        collectibleId: Vow of Scavenging Crows
+      costs:
+        - itemId: Gold Ore
+          required: 15

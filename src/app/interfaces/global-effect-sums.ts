@@ -22,6 +22,9 @@ export type GlobalEffectSums = {
   shrineBuffsPermanent: boolean;
   enemyExtraSkills: number;
   wipeEndsRun: boolean;
+  wipeCurrencyLossPercent: number;
+  wipeMaterialPercent: number;
+  wipeMaterialSelectionPercent: number;
   reviveInPlace: boolean;
   workerCraftSpeedPercent: number;
   workerGatherSpeedPercent: number;

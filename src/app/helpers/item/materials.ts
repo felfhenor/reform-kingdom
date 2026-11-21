@@ -9,12 +9,16 @@ import {
 } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
+import { percentOf } from '@helpers/math';
+import { rngDefault, rngShuffle } from '@helpers/rng';
 import {
   discoveredMaterialsState,
   materialsState,
   updateGamestate,
 } from '@helpers/state-game';
 import type { GameState, ItemContent, ItemId, MaterialId } from '@interfaces';
+import { sumBy } from 'es-toolkit/compat';
+import type { PRNG } from 'seedrandom';
 
 export function goldCoinId(): ItemId {
   return getEntry<ItemContent>(GOLD_COIN_NAME)!.id;
@@ -139,6 +143,50 @@ export function gainGold(state: GameState, amount: number): void {
 
 export function spendGold(state: GameState, amount: number): void {
   applyMaterialDelta(state, goldCoinId(), -amount);
+}
+
+function loseMaterialPercent(
+  state: GameState,
+  id: ItemId,
+  percent: number,
+): number {
+  const lost = percentOf(state.materials[id]?.quantity ?? 0, percent);
+  applyMaterialDelta(state, id, -lost);
+  return lost;
+}
+
+export function loseCurrency(state: GameState, percent: number): number {
+  return sumBy([goldCoinId(), crimsonLucreId()], (id) =>
+    loseMaterialPercent(state, id, percent),
+  );
+}
+
+function wipeProtectedMaterialIds(): Set<ItemId | undefined> {
+  return new Set([
+    goldCoinId(),
+    crimsonLucreId(),
+    traderTokenId(),
+    memoryFluxId(),
+    reforgeReagentId(),
+  ]);
+}
+
+export function loseRandomMaterials(
+  state: GameState,
+  materialPercent: number,
+  materialSelectionPercent: number,
+  rng: PRNG = rngDefault(),
+): number {
+  const protectedIds = wipeProtectedMaterialIds();
+  const candidates = (Object.keys(state.materials) as ItemId[]).filter(
+    (id) => !protectedIds.has(id),
+  );
+  const picked = rngShuffle(candidates, rng).slice(
+    0,
+    percentOf(candidates.length, materialSelectionPercent),
+  );
+
+  return sumBy(picked, (id) => loseMaterialPercent(state, id, materialPercent));
 }
 
 export function hasGold(amount: number): boolean {
