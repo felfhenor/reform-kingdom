@@ -58,6 +58,12 @@ export interface FFGamepadSnapshot {
 // Return false to pass the action on to the next handler.
 export type FFActionHandler = () => boolean | void;
 
+// A font glyph and its ink height in font units, used to center it vertically.
+export interface FFGlyphCode {
+  code: number;
+  inkHeight: number;
+}
+
 export interface FFGlyph {
   text: string;
   lineHeightEm: number;
