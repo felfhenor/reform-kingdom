@@ -34,6 +34,7 @@ import { AnimationService } from '@services/animation.service';
           />
 
           <li
+            tabindex="0"
             class="global-effect-box text-sm tooltip tooltip-bottom"
             [tp]="effectTooltip.template()"
             [tpPlacement]="'bottom'"

@@ -1,3 +1,4 @@
+import { FFFocusService } from '@ff/focus/ff-focus.service';
 import { FFInputService } from '@ff/input/ff-input.service';
 import { FF_DIRECTIONS } from '@ff/input/ff-action-map';
 import type { FFDirection } from '@ff/interfaces/ff-input';
@@ -12,6 +13,7 @@ import {
   DestroyRef,
   effect,
   inject,
+  Injector,
   signal,
   untracked,
   viewChild,
@@ -29,6 +31,7 @@ import { StatusWorkerLevelupComponent } from '@components/status-worker-levelup/
 import {
   MAP_CURSOR_MAX_FRAME_MS,
   MAP_CURSOR_REACH_TILES,
+  MAP_CURSOR_SECRET_REACH_TILES,
   MAP_CURSOR_TILES_PER_SECOND,
   PARTY_FORMATION_CATCHUP_MS,
   PARTY_FORMATION_FOLLOW_DELAY_MS,
@@ -197,7 +200,7 @@ const NODE_STATUS_UPDATE_INTERVAL_MS = 150;
     }
     <div class="fade-overlay" [class.fade-active]="fadeVisible()"></div>
     <div class="death-overlay" [class.death-active]="isPartyDead()"></div>
-    <div class="hud-frame ui-scaled">
+    <div #hudFrame class="hud-frame ui-scaled">
       <div
         class="absolute top-0 left-0 right-0 flex flex-col pointer-events-none z-[11]"
       >
@@ -239,6 +242,9 @@ export class GamePlayWorldComponent implements OnDestroy {
 
   private pixiContainer =
     viewChild<ElementRef<HTMLDivElement>>('pixiContainer');
+  private hudFrame = viewChild<ElementRef<HTMLDivElement>>('hudFrame');
+  // Controller focus is on the HUD widgets (L3), not the map cursor.
+  private hudMode = signal(false);
 
   private cameraOffset = signal<CameraPosition>({ x: 0, y: 0 });
 
@@ -304,6 +310,8 @@ export class GamePlayWorldComponent implements OnDestroy {
   private nodeSelectionContainer?: Container;
   private nodeSelectionIndicator?: Graphics;
   private readonly ffInput = inject(FFInputService);
+  private readonly focus = inject(FFFocusService);
+  private readonly injector = inject(Injector);
   // Controller cursor in tile coordinates; undefined until the pad drives the map.
   private mapCursor?: CameraPosition;
   private mapCursorAt?: MapCursorNode;
@@ -415,8 +423,20 @@ export class GamePlayWorldComponent implements OnDestroy {
     });
 
     const destroyRef = inject(DestroyRef);
+    const focus = inject(FFFocusService);
+    effect(() => {
+      const leftMap =
+        this.ffInput.mode() !== 'gamepad' || gamePlayView() !== 'world';
+      if (leftMap) untracked(() => this.hudMode.set(false));
+    });
     afterNextRender(() => {
-      const unregisters = this.registerMapCursorActions();
+      const unregisters = [
+        ...this.registerMapCursorActions(),
+        ...this.registerHudActions(),
+        focus.registerScope(GAMEPAD_PRIORITY.page, () =>
+          this.hudMode() ? (this.hudFrame()?.nativeElement ?? null) : null,
+        ),
+      ];
       destroyRef.onDestroy(() => {
         unregisters.forEach((unregister) => unregister());
         this.releaseLeftStick?.();
@@ -1358,6 +1378,68 @@ export class GamePlayWorldComponent implements OnDestroy {
     ];
   }
 
+  // L3 swaps the D-pad between the map cursor and the HUD widgets; B also leaves the HUD.
+  private registerHudActions(): (() => void)[] {
+    const inHud = {
+      priority: GAMEPAD_PRIORITY.pageMode,
+      enabled: () => this.hudMode() && this.canToggleHud(),
+    };
+    return [
+      // Above the node panel's own pad buttons, so A presses what's focused rather than Travel.
+      this.ffInput.register('confirm', () => this.clickFocusedHudElement(), {
+        ...inHud,
+        label: 'Select',
+      }),
+      ...(['context', 'details'] as const).map((action) =>
+        this.ffInput.register(action, () => undefined, inHud),
+      ),
+      this.ffInput.register('zone', () => this.setHudMode(!this.hudMode()), {
+        priority: GAMEPAD_PRIORITY.pageMode,
+        enabled: () => this.canToggleHud(),
+        label: () => (this.hudMode() ? 'Map' : 'HUD'),
+      }),
+      this.ffInput.register('back', () => this.setHudMode(false), {
+        priority: GAMEPAD_PRIORITY.pageMode,
+        enabled: () => this.hudMode() && this.canToggleHud(),
+        label: 'Map',
+      }),
+    ];
+  }
+
+  // Only from whichever of the two holds the top focus scope, so a dialog over either keeps L3.
+  private canToggleHud(): boolean {
+    if (this.ffInput.mode() !== 'gamepad' || gamePlayView() !== 'world') {
+      return false;
+    }
+
+    const hud = this.hudFrame()?.nativeElement;
+    return this.hudMode()
+      ? !!hud && this.ffInput.isElementActive(hud)
+      : this.isMapCursorDriving();
+  }
+
+  private clickFocusedHudElement(): void {
+    const active = document.activeElement;
+    const hud = this.hudFrame()?.nativeElement;
+    if (active instanceof HTMLElement && hud?.contains(active)) active.click();
+  }
+
+  private setHudMode(on: boolean): void {
+    const hud = this.hudFrame()?.nativeElement;
+    if (!hud) return;
+
+    this.hudMode.set(on);
+    if (on) {
+      afterNextRender(() => this.focus.focusLanding(hud), {
+        injector: this.injector,
+      });
+      return;
+    }
+
+    const active = document.activeElement;
+    if (active instanceof HTMLElement && hud.contains(active)) active.blur();
+  }
+
   // Over empty ground A does nothing, rather than travelling to a node that may be off-screen.
   private selectMapCursorTarget(): void {
     if (this.mapCursorAt) this.selectNode(this.mapCursorAt.name, 1);
@@ -1378,7 +1460,14 @@ export class GamePlayWorldComponent implements OnDestroy {
       )
       .map(([name]) => worldNodeByName(name))
       .filter((entry) => !!entry)
-      .map((entry) => ({ name: entry.nodeName, x: entry.x, y: entry.y }));
+      .map((entry) => ({
+        name: entry.nodeName,
+        x: entry.x,
+        y: entry.y,
+        reachTiles: isWorldNodeVisible(entry)
+          ? undefined
+          : MAP_CURSOR_SECRET_REACH_TILES,
+      }));
   }
 
   private updateMapCursor(now: number): void {
@@ -1427,12 +1516,11 @@ export class GamePlayWorldComponent implements OnDestroy {
     const from = this.mapCursorAt ?? this.mapCursor;
     if (!from) return;
 
-    const next = mapCursorJump(
-      from,
-      this.mapCursorNodes(),
-      direction,
-      this.map.tilewidth,
+    // Secrets are skipped, or hopping would reveal them; they're only found by aiming the stick.
+    const revealed = this.mapCursorNodes().filter(
+      (node) => node.reachTiles === undefined,
     );
+    const next = mapCursorJump(from, revealed, direction, this.map.tilewidth);
     if (!next) return;
 
     this.mapCursor = { x: next.x, y: next.y };

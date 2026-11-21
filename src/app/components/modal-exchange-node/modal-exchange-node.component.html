@@ -10,7 +10,10 @@
   <div body class="flex flex-col gap-2 max-h-[60vh] overflow-y-auto pr-2">
     @if (node(); as nodeContent) {
       @for (row of rows(); track rowTrack(row)) {
-        <div class="flex flex-wrap items-center gap-3 bg-base-200 p-2">
+        <div
+          ffFocusRow
+          class="flex flex-wrap items-center gap-3 bg-base-200 p-2"
+        >
           @if (row.kind === 'Equipment') {
             <app-slot-armory-item
               class="zoom-row"
@@ -49,7 +52,7 @@
           } @else if (row.kind === 'Collectible') {
             <app-tooltip-item-preview #preview [display]="row.display" />
             <div
-              class="flex min-w-0 flex-[2] items-center gap-4 cursor-default"
+              class="ff-focus-tip flex min-w-0 flex-[2] items-center gap-4 cursor-default"
               [tp]="preview.template()"
               [tpPlacement]="'top'"
             >
@@ -119,8 +122,9 @@
             class="btn btn-xs btn-primary flex-1"
             [disabled]="!isAtNode() || !row.canAfford"
             (click)="perform(row)"
-            appSfx="ui-success"
-            [sfxTrigger]="['click', 'hover']"
+            ffButton="ui-success"
+            ffPadAction="confirm"
+            [ffPadLabel]="nodeContent.actionLabel"
           >
             {{ nodeContent.actionLabel }}
             <app-row-currency-cost

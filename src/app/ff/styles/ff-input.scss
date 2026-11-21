@@ -99,3 +99,12 @@ html.ff-input-gamepad .ff-focus-row:focus {
 .ff-focus-row:not(:focus-within) .ff-row-glyph {
   visibility: hidden;
 }
+
+// Room the fixed prompt bar takes at the bottom of the screen, for layouts pinned to the bottom edge.
+:root {
+  --ff-prompt-bar-clearance: 0px;
+}
+
+html.ff-input-gamepad {
+  --ff-prompt-bar-clearance: 2.5rem;
+}

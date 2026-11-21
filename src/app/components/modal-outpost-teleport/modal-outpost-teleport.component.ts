@@ -1,8 +1,9 @@
+import { FFFocusRowDirective } from '@ff/focus/ff-focus-row.directive';
+import { FFButtonComponent } from '@ff/components/button/button.component';
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { ModalComponent } from '@components/modal/modal.component';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
-import { SFXDirective } from '@directives/sfx.directive';
 import { OUTPOST_TELEPORT_LEVEL } from '@helpers/config';
 import { modalClose } from '@helpers/engine/modal-stack';
 import { activeOutpostTeleportNode } from '@helpers/engine/ui';
@@ -15,7 +16,13 @@ import type { OutpostTeleportRow } from '@interfaces';
 @Component({
   selector: 'app-modal-outpost-teleport',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DecimalPipe, ModalComponent, SFXDirective, SpriteNodeComponent],
+  imports: [
+    FFFocusRowDirective,
+    FFButtonComponent,
+    DecimalPipe,
+    ModalComponent,
+    SpriteNodeComponent,
+  ],
   templateUrl: './modal-outpost-teleport.component.html',
 })
 export class ModalOutpostTeleportComponent {

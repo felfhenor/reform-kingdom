@@ -41,6 +41,7 @@ import { AnimationService } from '@services/animation.service';
       </ng-template>
 
       <div
+        tabindex="0"
         class="w-16 h-16 ms-4 mt-4 flex items-center justify-center border border-current select-none"
         [tp]="edictsTooltip"
         [tpPlacement]="'bottom'"

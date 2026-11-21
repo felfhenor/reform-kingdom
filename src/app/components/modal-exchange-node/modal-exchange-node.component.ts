@@ -1,3 +1,5 @@
+import { FFFocusRowDirective } from '@ff/focus/ff-focus-row.directive';
+import { FFButtonComponent } from '@ff/components/button/button.component';
 import { formatNumber } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -16,7 +18,6 @@ import { SlotArmoryItemComponent } from '@components/slot-armory-item/slot-armor
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { SlotRequirementComponent } from '@components/slot-requirement/slot-requirement.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
-import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content';
 import { activeExchangeNode } from '@helpers/engine/ui';
 import {
@@ -37,6 +38,8 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-modal-exchange-node',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFFocusRowDirective,
+    FFButtonComponent,
     AtlasImageComponent,
     BlankSlateComponent,
     DetailCollectibleEffectsComponent,
@@ -44,7 +47,6 @@ import { TippyDirective } from '@ngneat/helipopper';
     RowCurrencyCostComponent,
     SlotArmoryItemComponent,
     SlotRarityOutlineComponent,
-    SFXDirective,
     TippyDirective,
     TooltipItemPreviewComponent,
     IconComponent,

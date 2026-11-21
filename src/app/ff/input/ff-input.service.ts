@@ -53,6 +53,7 @@ const PROMPT_ACTION_ORDER: FFGamepadAction[] = [
   'subPrev',
   'subNext',
   'recenter',
+  'zone',
   'pause',
   'menu',
   'left',

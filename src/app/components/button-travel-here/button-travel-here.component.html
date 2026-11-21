@@ -10,8 +10,9 @@
     class="btn btn-xs btn-neutral"
     [disabled]="!canTravel()"
     (click)="travel()"
-    appSfx="ui-click"
-    [sfxTrigger]="['click', 'hover']"
+    ffButton="ui-click"
+    [ffPadAction]="padAction()"
+    ffPadLabel="Travel Here"
   >
     Travel Here
   </button>

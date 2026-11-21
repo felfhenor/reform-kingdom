@@ -396,6 +396,7 @@ export const MAP_UNFOCUSED_MAX_FPS = 10;
 // Controller map cursor: full-tilt pan speed, and how close a node must be for the reticle to snap onto it.
 export const MAP_CURSOR_TILES_PER_SECOND = 12;
 export const MAP_CURSOR_REACH_TILES = 1.5;
+export const MAP_CURSOR_SECRET_REACH_TILES = 0.5;
 // Caps one frame's cursor step, so a long gap (first frame, map load, hidden tab) can't fling it across the map.
 export const MAP_CURSOR_MAX_FRAME_MS = 100;
 // World px per noise pixel - matches the terrain art's chunky pixel size so the overlay reads as pixel art.

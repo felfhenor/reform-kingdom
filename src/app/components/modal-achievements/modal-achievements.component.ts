@@ -1,3 +1,5 @@
+import { FFFocusRowDirective } from '@ff/focus/ff-focus-row.directive';
+import { FFButtonComponent } from '@ff/components/button/button.component';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -10,7 +12,6 @@ import { AtlasImageComponent } from '@components/atlas-image/atlas-image.compone
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
 import { ModalComponent } from '@components/modal/modal.component';
-import { SFXDirective } from '@directives/sfx.directive';
 import { achievementsAll } from '@helpers/achievement/achievement';
 import {
   achievementTiles,
@@ -24,13 +25,14 @@ import type { GameId } from '@interfaces';
   selector: 'app-modal-achievements',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFFocusRowDirective,
+    FFButtonComponent,
     AtlasImageComponent,
     BarProgressComponent,
     DatePipe,
     DecimalPipe,
     IconUnknownComponent,
     ModalComponent,
-    SFXDirective,
   ],
   templateUrl: './modal-achievements.component.html',
 })

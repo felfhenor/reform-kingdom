@@ -9,7 +9,6 @@ import {
   untracked,
 } from '@angular/core';
 import { FFFocusService } from '@ff/focus/ff-focus.service';
-import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
 import { FFInputService } from '@ff/input/ff-input.service';
 
 // Above page-level back, so B walks back up a pick chain before leaving the page.
@@ -24,6 +23,8 @@ export class FFFocusOnChangeDirective {
   public ffFocusOnChange = input<unknown>();
   // For lists that only appear once the pick is made, so their first render counts as the change.
   public ffFocusOnCreate = input<boolean>(false);
+  // Raise inside a modal, so B steps back out of the list before it closes the modal.
+  public ffFocusOnChangePriority = input<number>(STEP_BACK_PRIORITY);
 
   private readonly host =
     inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
@@ -42,11 +43,15 @@ export class FFFocusOnChangeDirective {
       untracked(() => this.enter());
     });
 
-    ffGamepadOn('back', () => this.stepBack(), {
-      element: this.host,
-      priority: STEP_BACK_PRIORITY,
-      enabled: () => this.canStepBack(),
-      label: 'Back',
+    // Re-registered when the priority input arrives; inputs aren't set in the constructor.
+    effect((onCleanup) => {
+      const unregister = this.ffInput.register('back', () => this.stepBack(), {
+        element: this.host,
+        priority: this.ffFocusOnChangePriority(),
+        enabled: () => this.canStepBack(),
+        label: 'Back',
+      });
+      onCleanup(unregister);
     });
   }
 

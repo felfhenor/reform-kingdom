@@ -24,7 +24,9 @@ export function mapCursorTarget(
   reachTiles: number,
 ): MapCursorNode | undefined {
   const inReach = nodes.filter(
-    (node) => Math.hypot(node.x - cursor.x, node.y - cursor.y) <= reachTiles,
+    (node) =>
+      Math.hypot(node.x - cursor.x, node.y - cursor.y) <=
+      (node.reachTiles ?? reachTiles),
   );
   return minBy(inReach, (node) =>
     Math.hypot(node.x - cursor.x, node.y - cursor.y),

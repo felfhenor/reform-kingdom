@@ -25,6 +25,7 @@ export type FFGamepadAction =
   | 'pause'
   | 'menu'
   | 'recenter'
+  | 'zone'
   | FFDirection;
 
 export type FFDirection = 'up' | 'down' | 'left' | 'right';

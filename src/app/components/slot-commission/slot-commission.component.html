@@ -1,6 +1,6 @@
 @let r = row();
 
-<div class="flex items-center gap-2 p-4 bg-base-200">
+<div ffFocusRow class="flex items-center gap-2 p-4 bg-base-200">
   <div class="flex flex-col flex-1 min-w-0 gap-2">
     @if (isInLocationModal()) {
       <div class="font-semibold">Active Commission</div>
@@ -59,6 +59,7 @@
       <div class="flex gap-2">
         @if (!isInLocationModal() && !r.isPartyHere) {
           <app-button-travel-here
+            padAction="context"
             [nodeName]="r.nodeName"
             [canTravel]="r.canTravel"
             [etaSeconds]="r.travelEtaSeconds"
@@ -70,9 +71,10 @@
           class="btn btn-xs btn-primary"
           [disabled]="!r.canFulfill || !r.isPartyHere"
           (click)="doTurnIn()"
-          appSfx="ui-click"
-          [sfxOffset]="1"
-          [sfxTrigger]="['click', 'hover']"
+          ffButton="ui-click"
+          [ffSoundOffset]="1"
+          ffPadAction="confirm"
+          ffPadLabel="Turn In"
         >
           Turn In Commission
         </button>

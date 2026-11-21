@@ -17,6 +17,7 @@
 
 <button
   appListRow
+  class="py-0.5"
   [disabled]="entry.soldOut || entry.maxQuantity === 0 || hasEnoughGoldToBuy()"
   [tp]="item ? preview.template() : undefined"
   [tpPlacement]="'top'"

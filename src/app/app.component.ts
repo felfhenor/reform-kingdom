@@ -22,14 +22,11 @@ import { isDemoBuild } from '@helpers/demo/demo';
 import {
   GAMEPAD_PRIORITY,
   gamepadBindFocusTips,
-  gamepadBindSwal,
-  gamepadSwalClick,
-  gamepadSwalShown,
 } from '@helpers/engine/gamepad.ui';
+import { gamepadBindSwal } from '@helpers/engine/gamepad-swal.ui';
 import { modalCloseTop, modalHasAnyOpen } from '@helpers/engine/modal-stack';
 import { AnimationService } from '@services/animation.service';
 import { LoadingService } from '@services/loading.service';
-import { SweetAlert2LoaderService } from '@sweetalert2/ngx-sweetalert2';
 
 @Component({
   selector: 'app-root',
@@ -66,20 +63,6 @@ export class AppComponent {
   protected readonly selectPopupPriority = GAMEPAD_PRIORITY.popover;
 
   private bindGamepadDialogs(): void {
-    const swalLoader = inject(SweetAlert2LoaderService);
-    const dialog = {
-      priority: GAMEPAD_PRIORITY.dialog,
-      enabled: gamepadSwalShown,
-    };
-
-    ffGamepadOn('confirm', () => gamepadSwalClick(swalLoader, 'confirm'), {
-      ...dialog,
-      label: 'Confirm',
-    });
-    ffGamepadOn('back', () => gamepadSwalClick(swalLoader, 'cancel'), {
-      ...dialog,
-      label: 'Cancel',
-    });
     ffGamepadOn('back', modalCloseTop, {
       priority: GAMEPAD_PRIORITY.modal,
       enabled: modalHasAnyOpen,

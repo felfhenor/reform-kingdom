@@ -17,6 +17,8 @@ import { workersLevelUpStatusEntries } from '@helpers/worker/worker-progression.
         class="flex gap-2 pointer-events-auto"
         (mouseenter)="setHovered(true)"
         (mouseleave)="setHovered(false)"
+        (focusin)="setHovered(true)"
+        (focusout)="setHovered(false)"
       >
         @for (entry of entries(); track entry.workerId) {
           <app-card-status-worker-levelup

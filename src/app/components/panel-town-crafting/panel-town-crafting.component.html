@@ -5,6 +5,7 @@
     <div class="flex flex-wrap gap-2">
       @for (row of tradeskillLevelRows(); track row.tradeskillId) {
         <div
+          tabindex="0"
           class="relative w-16 h-16 shrink-0"
           [tp]="tradeskillTooltip(row)"
           [tpPlacement]="'top'"
@@ -57,6 +58,7 @@
           />
 
           <div
+            tabindex="0"
             class="relative w-16 h-16 shrink-0"
             [tp]="preview.template()"
             [tpPlacement]="'top'"

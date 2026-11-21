@@ -1,3 +1,7 @@
+import { GAMEPAD_PRIORITY } from '@helpers/engine/gamepad.ui';
+import { FFFocusOnChangeDirective } from '@ff/focus/ff-focus-on-change.directive';
+import { FFFocusRowDirective } from '@ff/focus/ff-focus-row.directive';
+import { FFButtonComponent } from '@ff/components/button/button.component';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -31,6 +35,9 @@ import type {
   selector: 'app-modal-trainer-visit',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFFocusOnChangeDirective,
+    FFFocusRowDirective,
+    FFButtonComponent,
     LabelJobComponent,
     IconJobComponent,
     ModalComponent,
@@ -44,6 +51,8 @@ import type {
   templateUrl: './modal-trainer-visit.component.html',
 })
 export class ModalTrainerVisitComponent {
+  // Above the modal's own B close, so B leaves the teachings list first.
+  protected readonly stepBackPriority = GAMEPAD_PRIORITY.modal + 1;
   public trainer = computed(() => {
     const entry = activeTrainerNode();
     return entry ? worldNodeTrainer(entry) : undefined;
@@ -84,8 +93,12 @@ export class ModalTrainerVisitComponent {
     return getEntry<JobContent>(character.jobId);
   }
 
+  // Counts picks, not changes, so A on the hero already shown still moves focus into the teachings.
+  protected heroPicks = signal(0);
+
   public selectCharacter(character: Character): void {
     this.selectedCharacterId.set(character.id);
+    this.heroPicks.update((picks) => picks + 1);
   }
 
   public canTrain(row: TrainerTeachingRow): boolean {

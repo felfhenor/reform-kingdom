@@ -48,6 +48,7 @@
 
 // A class, not utilities: it must beat the host's own `:host { pointer-events: none }`.
 .encounter-status-layer {
-  @apply absolute bottom-4 right-4 pointer-events-auto;
+  @apply absolute right-4 pointer-events-auto;
+  bottom: calc(1rem + var(--ff-prompt-bar-clearance));
   z-index: 20;
 }

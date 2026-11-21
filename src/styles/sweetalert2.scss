@@ -108,3 +108,9 @@ div:where(.swal2-container) div:where(.swal2-validation-message)::before {
   align-items: center;
   gap: 0.5rem;
 }
+
+// Pad buttons map to fixed dialog buttons (A/B/X), so a focus ring on one would only mislead.
+html.ff-input-gamepad .swal2-popup :focus {
+  outline: none;
+  box-shadow: none;
+}

@@ -14,6 +14,7 @@ export * from './embed';
 export * from './feature-reveal';
 export * from './ff-bridge.ui';
 export * from './font.ui';
+export * from './gamepad-swal.ui';
 export * from './gamepad.ui';
 export * from './gameplay-view-cycle.ui';
 export * from './gather-vfx';

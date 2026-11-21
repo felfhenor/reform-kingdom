@@ -19,6 +19,8 @@ import { getOption } from '@helpers/state-options';
         class="flex gap-2 pointer-events-auto"
         (mouseenter)="setHovered(true)"
         (mouseleave)="setHovered(false)"
+        (focusin)="setHovered(true)"
+        (focusout)="setHovered(false)"
       >
         @for (entry of entries(); track entry.tradeskillId) {
           <app-card-status-crafting

@@ -13,6 +13,8 @@ import type { FFGamepadAction } from '@ff/interfaces/ff-input';
 @Component({
   selector: 'ff-input-prompt',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // Gone, not just empty, without a glyph: an empty flex item would still take up a gap.
+  host: { '[class.hidden]': '!glyph()' },
   template: `
     @if (glyph(); as glyph) {
       <span

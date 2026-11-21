@@ -15,7 +15,7 @@
 
   <div body class="flex flex-col gap-2 max-h-[60vh] overflow-y-auto pr-2">
     @for (row of rows(); track row.entry.nodeName) {
-      <div class="flex items-center gap-3 p-3 bg-base-200">
+      <div ffFocusRow class="flex items-center gap-3 p-3 bg-base-200">
         <app-sprite-node [entry]="row.entry" />
 
         <div class="flex flex-col flex-1 min-w-0">
@@ -37,9 +37,10 @@
           class="btn btn-sm btn-primary"
           [disabled]="!row.canTeleport"
           (click)="teleport(row)"
-          appSfx="ui-success"
-          [sfxOffset]="$index"
-          [sfxTrigger]="['click', 'hover']"
+          ffButton="ui-success"
+          [ffSoundOffset]="$index"
+          ffPadAction="confirm"
+          ffPadLabel="Teleport"
         >
           Teleport
         </button>

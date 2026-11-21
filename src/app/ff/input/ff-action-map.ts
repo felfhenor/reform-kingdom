@@ -44,6 +44,8 @@ const DEFAULT_ACTION_MAP: FFActionMap = {
   pause: B.select,
   menu: B.start,
   recenter: B.r3,
+  // Swaps which area of a screen the D-pad drives (e.g. a map vs its HUD).
+  zone: B.l3,
   up: B.up,
   down: B.down,
   left: B.left,

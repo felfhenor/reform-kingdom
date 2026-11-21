@@ -6,6 +6,7 @@
   [badge]="'Lv. ' + (data.level | number)"
   [dimmed]="!data.affordable"
   (click)="goToWorker()"
+  tabindex="0"
 >
   <div bubbleIcon class="zoom-row">
     <app-atlas-animation

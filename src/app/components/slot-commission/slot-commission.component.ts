@@ -1,3 +1,5 @@
+import { FFButtonComponent } from '@ff/components/button/button.component';
+import { FFFocusRowDirective } from '@ff/focus/ff-focus-row.directive';
 import { DecimalPipe, formatNumber } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -11,7 +13,6 @@ import {
 import { ButtonTravelHereComponent } from '@components/button-travel-here/button-travel-here.component';
 import { SlotCompletionRewardComponent } from '@components/slot-completion-reward/slot-completion-reward.component';
 import { SlotRequirementComponent } from '@components/slot-requirement/slot-requirement.component';
-import { SFXDirective } from '@directives/sfx.directive';
 import { commissionRarity } from '@helpers/commission/commission-requirement.ui';
 import { commissionDisplayName } from '@helpers/commission/commission-turn-in';
 import { getEntry } from '@helpers/content';
@@ -38,7 +39,8 @@ import type {
     SlotRequirementComponent,
     DecimalPipe,
     SlotCompletionRewardComponent,
-    SFXDirective,
+    FFButtonComponent,
+    FFFocusRowDirective,
   ],
   templateUrl: './slot-commission.component.html',
 })

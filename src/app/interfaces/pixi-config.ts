@@ -23,6 +23,8 @@ export type MapCursorNode = {
   name: string;
   x: number;
   y: number;
+  // Undiscovered secrets only catch a cursor that's right on them, so the reticle can't give them away.
+  reachTiles?: number;
 };
 
 export type CameraBounds = {

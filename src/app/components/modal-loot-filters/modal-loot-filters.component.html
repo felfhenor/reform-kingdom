@@ -1,5 +1,6 @@
 <app-modal
   modalId="loot-filters"
+  [showCloseButton]="true"
   [allowEscToClose]="true"
   [closeOnBackdropClick]="true"
   widthClass="max-w-2xl"
@@ -178,17 +179,5 @@
         </div>
       }
     </div>
-  </div>
-
-  <div actions>
-    <button
-      type="button"
-      class="btn btn-neutral"
-      appModalClose
-      appSfx="ui-click"
-      [sfxTrigger]="['click', 'hover']"
-    >
-      Close
-    </button>
   </div>
 </app-modal>

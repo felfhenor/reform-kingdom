@@ -20,6 +20,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
       @for (tile of tiles(); track tile.achievement.id) {
         <div
+          ffFocusRow
           class="flex items-center gap-4 p-3 bg-base-200"
           [class.opacity-50]="!tile.unlock"
         >
@@ -52,8 +53,9 @@
                     type="button"
                     class="btn btn-neutral btn-xs"
                     (click)="openRun(unlock.runId)"
-                    appSfx="ui-click"
-                    [sfxTrigger]="['click', 'hover']"
+                    ffButton="ui-click"
+                    ffPadAction="confirm"
+                    ffPadLabel="View Run"
                   >
                     View Run
                   </button>

@@ -14,7 +14,6 @@ import { DetailItemPreviewComponent } from '@components/detail-item-preview/deta
 import { ModalComponent } from '@components/modal/modal.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { ListReflowDirective } from '@directives/list-reflow.directive';
-import { ModalCloseDirective } from '@directives/modal-close.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { allEquipmentItemTypes } from '@helpers/item/equipment-types';
 import { itemPreviewDisplay } from '@helpers/item/item-preview';
@@ -62,7 +61,6 @@ const RARITIES: DropRarity[] = [
     FFStepperDirective,
     FFSelectDirective,
     ModalComponent,
-    ModalCloseDirective,
     SFXDirective,
     FormsModule,
     NgSelectComponent,
