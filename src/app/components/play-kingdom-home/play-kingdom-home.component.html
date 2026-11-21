@@ -17,7 +17,7 @@
             @let count = materialCount();
             <app-icon-kingdom [name]="nav.storage.icon" class="zoom-tile" />
             <span class="text-base font-bold">{{ nav.storage.label }}</span>
-            <span class="type-meta">
+            <span class="type-meta text-shadow-black">
               {{ count }}
               {{ 'material' | pluralize: count > 1 }} stored
             </span>
@@ -60,7 +60,7 @@
                 {{ nav.astralprojector.label }}
               </span>
 
-              <span class="type-meta">
+              <span class="type-meta text-shadow-black">
                 {{ spellCount | number }}
                 {{ 'spell' | pluralize: spellCount > 1 }} learned
               </span>
@@ -175,11 +175,11 @@
               @let levelUpReady = workerLevelUpReadyCount();
               <app-icon-kingdom [name]="nav.workers.icon" class="zoom-tile" />
               <span class="text-base font-bold">{{ nav.workers.label }}</span>
-              <span class="type-meta">
+              <span class="type-meta text-shadow-black">
                 {{ workerBusyCount() }}/{{ workerTotalCount() }} workers busy
               </span>
               @if (levelUpReady > 0) {
-                <span class="type-meta">
+                <span class="type-meta text-shadow-black">
                   {{ levelUpReady }}
                   {{ 'worker' | pluralize: levelUpReady > 1 }} ready to level up
                 </span>
@@ -242,7 +242,7 @@
                   {{ tradeskill.totalRemainingLabel }}
                 </app-bar-progress>
               } @else {
-                <div class="relative w-full h-4 type-meta">
+                <div class="relative w-full h-4 type-meta text-shadow-black">
                   Not currently crafting
                 </div>
               }
