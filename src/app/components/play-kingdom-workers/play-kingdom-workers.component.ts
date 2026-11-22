@@ -180,7 +180,7 @@ export class PlayKingdomWorkersComponent {
         return { label: 'At the Duchy', locationEntry: kingdomNodeGet() };
       case 'Crafting':
         return {
-          label: status.materialsHeld ? 'Crafting...' : 'Waiting for materials',
+          label: status.materialsHeld ? 'Crafting...' : 'Waiting for Materials',
           locationEntry: kingdomNodeGet(),
         };
       case 'TravelingTo': {

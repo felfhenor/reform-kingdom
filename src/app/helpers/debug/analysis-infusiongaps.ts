@@ -118,7 +118,7 @@ function duplicateChecks(items: ItemContent[]): AnalysisCheck[] {
     .filter(([, names]) => names.length > 1)
     .map(([key, names]): AnalysisCheck => ({
       id: `infusion-duplicate:${key}`,
-      label: 'Infusion duplicate',
+      label: 'Infusion Duplicate',
       status: 'warning',
       message: `Items ${names.join(', ')} all grant the exact same infusion stat block (${key.split('|').join(', ')}) - one of these is a pointless duplicate.`,
     }));

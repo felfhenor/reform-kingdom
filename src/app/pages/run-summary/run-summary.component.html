@@ -23,10 +23,10 @@
 
           <div class="flex flex-col items-end gap-2">
             @if (timedResult(); as timed) {
-              <span class="type-meta">Final time</span>
+              <span class="type-meta">Final Time</span>
               <span class="type-page-title tabular-nums">{{ timed.time }}</span>
               @if (timed.isPersonalBest) {
-                <span class="badge badge-success">Personal best</span>
+                <span class="badge badge-success">Personal Best</span>
               }
               @if (timed.delta) {
                 <span
@@ -56,7 +56,7 @@
                       <span class="type-entity-name">{{ hero.name }}</span>
                       <span class="type-muted inline-flex items-center gap-2">
                         Lv. {{ hero.level | number }}
-                        {{ hero.job?.name ?? 'Unknown job' }}
+                        {{ hero.job?.name ?? 'Unknown Job' }}
                         <app-icon-spec
                           class="pb-1"
                           [spec]="hero.snapshot?.specialization"
@@ -90,7 +90,7 @@
                       }
 
                       <div class="flex justify-between gap-2 sm:col-span-2">
-                        <span class="text-lighter">Biggest hit</span>
+                        <span class="text-lighter">Biggest Hit</span>
                         <span class="inline-flex items-center gap-2">
                           @if (hero.biggestHit; as biggest) {
                             <ng-container
@@ -107,7 +107,7 @@
                       </div>
 
                       <div class="flex justify-between gap-2 sm:col-span-2">
-                        <span class="text-lighter">Most used skill</span>
+                        <span class="text-lighter">Most Used Skill</span>
                         <span class="inline-flex items-center gap-2">
                           @if (hero.mostUsed; as mostUsed) {
                             <ng-container
@@ -179,7 +179,7 @@
 
                   @if (felDefeatedAt(); as felParts) {
                     <div class="flex justify-between gap-2 sm:col-span-2">
-                      <span class="text-lighter">Fel defeated at</span>
+                      <span class="text-lighter">Fel Defeated at</span>
                       <span class="tabular-nums text-right">
                         <ng-container
                           [ngTemplateOutlet]="duration"
@@ -189,7 +189,7 @@
                     </div>
                   } @else if (isFelTickUntracked()) {
                     <div class="flex justify-between gap-2 sm:col-span-2">
-                      <span class="text-lighter">Fel defeated at</span>
+                      <span class="text-lighter">Fel Defeated at</span>
                       <span class="text-lighter">Not tracked for this run</span>
                     </div>
                   }
@@ -240,7 +240,7 @@
                   @if (entry.edict; as edict) {
                     <app-row-edict [edict]="edict" />
                   } @else {
-                    <p class="type-muted">Unknown edict</p>
+                    <p class="type-muted">Unknown Edict</p>
                   }
                 } @empty {
                   <app-blank-slate>No edicts.</app-blank-slate>
@@ -308,7 +308,7 @@
                     @for (region of unsealedRegions(); track region.id) {
                       <div class="flex justify-between gap-4 text-lighter">
                         <span>{{ region.name }}</span>
-                        <span>Not sealed</span>
+                        <span>Not Sealed</span>
                       </div>
                     }
 
@@ -333,19 +333,19 @@
                     <div class="divider my-0"></div>
 
                     <div class="flex justify-between gap-4">
-                      <span class="text-lighter">Base score</span>
+                      <span class="text-lighter">Base Score</span>
                       <span class="tabular-nums">
                         {{ scored.base | number }}
                       </span>
                     </div>
                     <div class="flex justify-between gap-4">
-                      <span class="text-lighter">Edict multiplier</span>
+                      <span class="text-lighter">Edict Multiplier</span>
                       <span class="tabular-nums">
                         x{{ scored.multiplier | number: '1.0-2' }}
                       </span>
                     </div>
                     <div class="flex justify-between gap-4 font-semibold">
-                      <span>Final score</span>
+                      <span>Final Score</span>
                       <span class="tabular-nums">
                         {{ scored.total | number }}
                       </span>

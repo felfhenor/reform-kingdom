@@ -33,7 +33,7 @@ export function runWorkerStaminaAnalysis(): AnalysisRunResult {
   ]);
 
   const table: AnalysisTable = {
-    title: 'Gather node stamina distance',
+    title: 'Gather Node Stamina Distance',
     columns: ['Node', 'Map', 'Stamina Req'],
     rows: sorted.map((e) => ({
       Node: e.name,
@@ -47,7 +47,7 @@ export function runWorkerStaminaAnalysis(): AnalysisRunResult {
   if (!kingdom) {
     checks.push({
       id: 'kingdom',
-      label: 'Kingdom node',
+      label: 'Kingdom Node',
       status: 'fail',
       message: 'No Kingdom node found on any map - cannot compute distances.',
     });
@@ -57,7 +57,7 @@ export function runWorkerStaminaAnalysis(): AnalysisRunResult {
   if (kingdom && unroutable.length > 0) {
     checks.push({
       id: 'unroutable',
-      label: 'Unroutable nodes',
+      label: 'Unroutable Nodes',
       status: 'warning',
       message: `${unroutable.length} gather node(s) have no path from the Kingdom: ${unroutable
         .map((e) => e.name)
@@ -66,7 +66,7 @@ export function runWorkerStaminaAnalysis(): AnalysisRunResult {
   } else if (kingdom) {
     checks.push({
       id: 'unroutable',
-      label: 'Unroutable nodes',
+      label: 'Unroutable Nodes',
       status: 'pass',
       message: 'Every gather node has a path from the Kingdom.',
     });

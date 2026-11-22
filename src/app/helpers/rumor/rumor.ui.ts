@@ -55,7 +55,7 @@ function rumorSourceLabel(rumor: RumorContent): string {
   );
   return regionNames.length > 0
     ? `From: ${UNMET_TRADER_NAME} in ${regionNames.join(', ')}`
-    : 'Source unknown';
+    : 'Source Unknown';
 }
 
 function rumorCatalogRow(rumor: RumorContent): RumorCatalogRowViewModel {

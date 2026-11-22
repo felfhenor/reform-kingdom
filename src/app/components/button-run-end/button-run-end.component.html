@@ -6,7 +6,7 @@
     type="button"
     class="btn btn-sm btn-neutral"
     appButtonGlow
-    tp="Finish this run"
+    tp="Finish This Run"
     [disabled]="isBusy()"
     [swal]="endSwal"
     appSfx="ui-success"
@@ -46,7 +46,7 @@
 
 <swal
   #endSwal
-  [title]="finished ? 'Finish this run?' : 'Abandon this run?'"
+  [title]="finished ? 'Finish This Run?' : 'Abandon This Run?'"
   [text]="
     finished
       ? 'This run is added to your Legacy as completed, and your savefile is reset so you can start a new one.'

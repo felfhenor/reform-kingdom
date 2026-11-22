@@ -108,9 +108,9 @@ export function runGearHomesAnalysis(): AnalysisRunResult {
   return {
     checks,
     tables: [
-      { title: 'Gear by home map', columns: ['name', 'map', 'level'], rows },
+      { title: 'Gear by Home Map', columns: ['name', 'map', 'level'], rows },
       {
-        title: 'Crafted-only materials by home map',
+        title: 'Crafted-Only Materials by Home Map',
         columns: ['name', 'map', 'level', 'demand', 'perDrop'],
         rows: materials,
       },

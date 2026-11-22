@@ -129,7 +129,7 @@ export class RunSummaryComponent {
         .filter((award) => award.heroIndex === index)
         .map((award) => award.label),
       jobsUsedText: (hero.snapshot?.jobsUsed ?? [])
-        .map((jobId) => getEntry<JobContent>(jobId)?.name ?? 'Unknown job')
+        .map((jobId) => getEntry<JobContent>(jobId)?.name ?? 'Unknown Job')
         .join(', '),
     })),
   );
@@ -143,16 +143,16 @@ export class RunSummaryComponent {
     if (!stats) return [];
 
     return [
-      { label: 'Monsters defeated', value: stats.kills },
-      { label: 'Monster types defeated', value: stats.monstersKilled },
-      { label: 'Maps reached', value: stats.mapsReached },
-      { label: 'Towns visited', value: stats.townsVisited },
+      { label: 'Monsters Defeated', value: stats.kills },
+      { label: 'Monster Types Defeated', value: stats.monstersKilled },
+      { label: 'Maps Reached', value: stats.mapsReached },
+      { label: 'Towns Visited', value: stats.townsVisited },
       ...(stats.run
         ? [
-            { label: 'Gold earned', value: stats.run.goldEarned },
-            { label: 'Fights won', value: stats.run.fightsWon },
-            { label: 'Fights lost', value: stats.run.fightsLost },
-            { label: 'Items crafted', value: stats.run.itemsCrafted },
+            { label: 'Gold Earned', value: stats.run.goldEarned },
+            { label: 'Fights Won', value: stats.run.fightsWon },
+            { label: 'Fights Lost', value: stats.run.fightsLost },
+            { label: 'Items Crafted', value: stats.run.itemsCrafted },
           ]
         : []),
     ];

@@ -130,7 +130,7 @@
 
               <div class="flex flex-col min-w-0">
                 <span class="type-entity-name truncate">Create Regalia</span>
-                <span class="type-meta">Save current loadout</span>
+                <span class="type-meta">Save Current Loadout</span>
               </div>
             </button>
           }
@@ -161,7 +161,7 @@
                 <app-slot-icon-blank>
                   <app-icon name="tablerExclamationCircle" size="nav" />
                 </app-slot-icon-blank>
-                <span class="type-meta">Item missing</span>
+                <span class="type-meta">Item Missing</span>
               }
 
               @if (reason) {
@@ -292,7 +292,7 @@
 
 <swal
   #renameSwal
-  title="Rename regalia"
+  title="Rename Regalia"
   input="text"
   confirmButtonText="Rename"
   cancelButtonText="Cancel"
@@ -300,16 +300,16 @@
 
 <swal
   #equipSwal
-  title="Replace this skill tree?"
+  title="Replace This Skill Tree?"
   icon="warning"
   [showCancelButton]="true"
-  confirmButtonText="Equip anyway"
+  confirmButtonText="Equip Anyway"
   cancelButtonText="Cancel"
 ></swal>
 
 <swal
   #removeSwal
-  title="Remove this regalia?"
+  title="Remove This Regalia?"
   text="Gear the hero is wearing stays equipped. Stored gear only this regalia uses returns to the armory."
   icon="warning"
   confirmButtonText="Yes, remove it"

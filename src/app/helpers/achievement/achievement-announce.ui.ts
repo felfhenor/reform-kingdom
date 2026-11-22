@@ -25,7 +25,7 @@ export function achievementsAnnounceLog({
     if (!isCatchUp) {
       desktopNotify({
         category: 'Achievements',
-        title: 'Achievement unlocked',
+        title: 'Achievement Unlocked',
         body: achievement.name,
       });
     }

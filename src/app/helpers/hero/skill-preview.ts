@@ -119,7 +119,7 @@ function skillTechniqueStatusPreviews(
   return technique.statusEffects.map((application) => ({
     name:
       getEntry<StatusEffectContent>(application.statusEffectId)?.name ??
-      'Unknown effect',
+      'Unknown Effect',
     chance: skillTechniqueStatusEffectChance(skill, application),
     duration: skillTechniqueStatusEffectDuration(skill, application),
   }));

@@ -304,16 +304,16 @@ export function runHeroStatsAnalysis(
           Type: type,
           Elements: (technique.elements ?? []).join(', ') || '-',
           Targets: technique.targets,
-          'Min value': isValued
+          'Min Value': isValued
             ? Math.floor(techniqueRawValue(min, technique))
             : '-',
-          'Mid value': isValued
+          'Mid Value': isValued
             ? Math.floor(techniqueRawValue(mid, technique))
             : '-',
-          'Max value': isValued
+          'Max Value': isValued
             ? Math.floor(techniqueRawValue(max, technique))
             : '-',
-          'Status effects':
+          'Status Effects':
             (technique.statusEffects ?? [])
               .map(
                 (effect) =>
@@ -350,16 +350,16 @@ export function runHeroStatsAnalysis(
       rows: maxRows,
     },
     {
-      title: 'Skill damage/healing estimates (raw, pre-mitigation)',
+      title: 'Skill Damage/Healing Estimates (Raw, Pre-Mitigation)',
       columns: [
         'Skill',
         'Type',
         'Elements',
         'Targets',
-        'Min value',
-        'Mid value',
-        'Max value',
-        'Status effects',
+        'Min Value',
+        'Mid Value',
+        'Max Value',
+        'Status Effects',
       ],
       rows: skillRows,
     },

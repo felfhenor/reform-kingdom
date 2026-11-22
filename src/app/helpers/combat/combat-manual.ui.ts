@@ -221,7 +221,7 @@ function combatManualAutoTargetLabel(
     tech.targetType === 'Allies'
       ? 'Party'
       : tech.targetType === 'Enemies'
-        ? 'All enemies'
+        ? 'All Enemies'
         : 'Everyone';
   return base.length < skillTechniqueNumTargets(skill, tech)
     ? `${group} (auto)`
@@ -234,13 +234,13 @@ function combatManualDisabledReason(
   skill: EquipmentSkill,
 ): string | undefined {
   if (combatManualSkillUsable(combat, hero, skill)) return undefined;
-  if (hero.ep < combatCombatantSkillEpCost(hero, skill)) return 'Not enough EP';
-  if (combatantSkillOnCooldown(hero, skill)) return 'Cooling down';
+  if (hero.ep < combatCombatantSkillEpCost(hero, skill)) return 'Not Enough EP';
+  if (combatantSkillOnCooldown(hero, skill)) return 'Cooling Down';
   if (combatantSkillCharging(hero, skill)) return 'Charging';
   const hasTargets = skillOwnTechniques(skill).some(
     (tech) => unconfusedPool(combat, hero, skill, tech).length > 0,
   );
-  return hasTargets ? 'Unavailable' : 'No valid targets';
+  return hasTargets ? 'Unavailable' : 'No Valid Targets';
 }
 
 export function combatManualSkillOptions(

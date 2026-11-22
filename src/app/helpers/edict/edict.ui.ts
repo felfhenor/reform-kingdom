@@ -8,14 +8,14 @@ import { updateGamestate } from '@helpers/state-game';
 import type { EdictContent, EdictId, EdictKind } from '@interfaces';
 
 const EDICT_KIND_LABELS: Record<EdictKind, string> = {
-  PartySize: 'Party size',
+  PartySize: 'Party Size',
   Challenge: 'Challenge',
   Variant: 'Variant',
   Boon: 'Boon',
 };
 
 const EDICT_KIND_GROUP_LABELS: Record<EdictKind, string> = {
-  PartySize: 'Party size',
+  PartySize: 'Party Size',
   Challenge: 'Challenges',
   Variant: 'Variants',
   Boon: 'Boons',

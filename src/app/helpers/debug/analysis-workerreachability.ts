@@ -207,7 +207,7 @@ function nodeReachabilityCheck(
   if (unreachable.length === 0) {
     return {
       id: 'unreachable',
-      label: 'Node reachability',
+      label: 'Node Reachability',
       status: 'pass',
       message: 'Every gather node is reachable by at least one worker.',
     };
@@ -215,7 +215,7 @@ function nodeReachabilityCheck(
 
   return {
     id: 'unreachable',
-    label: 'Node reachability',
+    label: 'Node Reachability',
     status: 'fail',
     message: `${unreachable.length} node(s) are unreachable by every worker, even with every outpost at +5: ${unreachable.join(', ')}`,
   };
@@ -235,7 +235,7 @@ function outpostOnlyNodesCheck(
 
   return {
     id: 'outpost-only-nodes',
-    label: 'Outpost-dependent nodes',
+    label: 'Outpost-Dependent Nodes',
     status: outpostOnly.length === 0 ? 'pass' : 'info',
     message:
       outpostOnly.length === 0
@@ -251,7 +251,7 @@ function levelingGapCheck(
   if (gaps.length === 0) {
     return {
       id: 'leveling-gaps',
-      label: 'Worker leveling coverage',
+      label: 'Worker Leveling Coverage',
       status: 'pass',
       message: `Every worker can level all the way to the content-wide cap (Lv. ${idealCap}), given every outpost at +5.`,
     };
@@ -259,7 +259,7 @@ function levelingGapCheck(
 
   return {
     id: 'leveling-gaps',
-    label: 'Worker leveling coverage',
+    label: 'Worker Leveling Coverage',
     status: 'warning',
     message: `${gaps.length} worker(s) stall before the content-wide level cap (Lv. ${idealCap}) even with every outpost at +5 - see the leveling gaps tables: ${gaps
       .map((gap) => `${gap.workerName} (stuck at Lv.${gap.stuckAtLevel})`)
@@ -276,7 +276,7 @@ function outpostLevelingCheck(
 
   return {
     id: 'outpost-leveling',
-    label: 'Outpost-dependent leveling',
+    label: 'Outpost-Dependent Leveling',
     status: boosted.length === 0 ? 'pass' : 'info',
     message:
       boosted.length === 0
@@ -294,7 +294,7 @@ function reachabilityTable(
   entries: WorkerReachabilityCheckEntry[],
 ): AnalysisTable {
   return {
-    title: 'Worker node reachability',
+    title: 'Worker Node Reachability',
     columns: [
       'Worker',
       'Node',
@@ -383,7 +383,7 @@ export function runWorkerReachabilityAnalysis(): AnalysisRunResult {
   if (!kingdom) {
     checks.unshift({
       id: 'kingdom',
-      label: 'Kingdom node',
+      label: 'Kingdom Node',
       status: 'fail',
       message: 'No Kingdom node found on any map - cannot compute distances.',
     });

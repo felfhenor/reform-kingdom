@@ -316,7 +316,7 @@ export function runMaterialUtilizationAnalysis(
   );
 
   const table: AnalysisTable = {
-    title: 'Material utilization',
+    title: 'Material Utilization',
     columns: rows[0] ? Object.keys(rows[0]) : ['Material', 'Rarity', 'Score'],
     rows,
   };

@@ -4,7 +4,7 @@ import type { AnalysisInputDef } from '@interfaces';
 // Shared across every script that reads it - one value, applied everywhere it's supported.
 export const GAP_INPUT: AnalysisInputDef = {
   key: 'gap',
-  label: 'Gap window size',
+  label: 'Gap Window Size',
   type: 'number',
   defaultValue: 4,
   min: 1,
@@ -21,28 +21,28 @@ export const LEVEL_INPUT: AnalysisInputDef = {
 
 export const EXPANDED_INPUT: AnalysisInputDef = {
   key: 'expanded',
-  label: 'Expanded detail',
+  label: 'Expanded Detail',
   type: 'boolean',
   defaultValue: false,
 };
 
 export const CLASS_FILTER_INPUT: AnalysisInputDef = {
   key: 'classFilter',
-  label: 'Class filter',
+  label: 'Class Filter',
   type: 'jobMultiSelect',
   defaultValue: [],
 };
 
 export const MONSTER_FILTER_INPUT: AnalysisInputDef = {
   key: 'monsterFilter',
-  label: 'Monster filter',
+  label: 'Monster Filter',
   type: 'monsterMultiSelect',
   defaultValue: [],
 };
 
 export const THRESHOLD_INPUT: AnalysisInputDef = {
   key: 'threshold',
-  label: 'Under-utilized threshold',
+  label: 'Under-Utilized Threshold',
   type: 'number',
   defaultValue: 1,
   min: 0,
@@ -50,7 +50,7 @@ export const THRESHOLD_INPUT: AnalysisInputDef = {
 
 export const TRADESKILL_LEVEL_INPUT: AnalysisInputDef = {
   key: 'tradeskillLevel',
-  label: 'Tradeskill level',
+  label: 'Tradeskill Level',
   type: 'number',
   defaultValue: 1,
   min: 1,

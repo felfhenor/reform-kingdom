@@ -517,7 +517,7 @@ describe('worldNodeLocationHint', () => {
     seedHidden();
     seedGamestate();
 
-    expect(worldNodeLocationHint('Forest Ruins')).toBe('Unvisited region');
+    expect(worldNodeLocationHint('Forest Ruins')).toBe('Unvisited Region');
   });
 
   it('returns the real name once the node is visible', () => {

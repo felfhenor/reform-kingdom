@@ -232,7 +232,7 @@ function recordEncounterClear(combat: Combat): void {
     combatMessageLog(combat, sealedText);
     desktopNotify({
       category: 'Progress',
-      title: 'Region sealed',
+      title: 'Region Sealed',
       body: sealedText,
     });
     analyticsSendDesignEvent(

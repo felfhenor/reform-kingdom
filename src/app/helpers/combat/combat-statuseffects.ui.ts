@@ -69,7 +69,7 @@ function behaviorModifier(
     case 'HealDamage':
       if (amount !== undefined) return undefined;
       return {
-        label: behavior.type === 'TakeDamage' ? 'Takes damage' : 'Heals',
+        label: behavior.type === 'TakeDamage' ? 'Takes Damage' : 'Heals',
         isPercent: false,
         timing,
       };

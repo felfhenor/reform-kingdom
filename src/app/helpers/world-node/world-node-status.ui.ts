@@ -85,7 +85,7 @@ export function worldNodeLabelInfo(
     lines.push(`Lv. ${rangeLabel(levelRange)}`);
   }
 
-  if (teleportIsDemoLocked(entry)) lines.push('Full game');
+  if (teleportIsDemoLocked(entry)) lines.push('Full Game');
 
   const developTimerText = worldNodeDevelopmentTimerText(entry.nodeName);
   if (developTimerText) lines.unshift(developTimerText);

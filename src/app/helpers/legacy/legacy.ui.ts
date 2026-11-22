@@ -101,12 +101,12 @@ export async function legacyClearedEdictsCopyToRun(): Promise<void> {
 export function legacyHeroStatRows(stats: HeroRunStats): RunStatRow[] {
   return [
     { label: 'Kills', value: stats.kills },
-    { label: 'Damage dealt', value: stats.damageDealt },
-    { label: 'Damage taken', value: stats.damageTaken },
+    { label: 'Damage Dealt', value: stats.damageDealt },
+    { label: 'Damage Taken', value: stats.damageTaken },
     { label: 'Healing', value: stats.healing },
-    { label: 'Damage blocked', value: stats.damageBlocked },
+    { label: 'Damage Blocked', value: stats.damageBlocked },
     { label: 'Crits', value: stats.crits },
-    { label: 'Status effects applied', value: stats.statusEffectsApplied },
+    { label: 'Status Effects Applied', value: stats.statusEffectsApplied },
     { label: 'Deaths', value: stats.deaths },
     { label: 'Fights', value: stats.fights },
   ];

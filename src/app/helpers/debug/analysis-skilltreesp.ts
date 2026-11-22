@@ -95,7 +95,7 @@ function kindSp(
 
 function nodeCountTable(jobs: JobContent[]): AnalysisTable {
   return {
-    title: 'Nodes by type',
+    title: 'Nodes by Type',
     columns: ['Job', ...NODE_KINDS, 'Oath', 'Total'],
     rows: jobs.map((job) => {
       const nodes = skillTreeJobNodes(job.id);

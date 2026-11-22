@@ -127,10 +127,10 @@ export class PanelOptionsSavefileComponent
   );
 
   public readonly reasonLabels: Record<SavefileBackupReason, string> = {
-    load: 'Before loading',
-    import: 'Before importing',
-    restore: 'Before restoring',
-    periodic: 'During play',
+    load: 'Before Loading',
+    import: 'Before Importing',
+    restore: 'Before Restoring',
+    periodic: 'During Play',
   };
 
   ngOnInit() {

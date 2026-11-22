@@ -391,7 +391,7 @@ export function runSkillTreesAnalysis(): AnalysisRunResult {
     ),
     ...analysisIssueChecks(
       'skilltrees:orphans',
-      'Orphan nodes',
+      'Orphan Nodes',
       orphanNodeIssues(jobs),
       'Every node belongs to a job.',
     ),

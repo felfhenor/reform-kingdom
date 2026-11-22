@@ -177,7 +177,7 @@ export class PlayKingdomColosseumComponent {
   public readonly defaultSimulateCount = DEFAULT_SIMULATE_COUNT;
   public readonly fightOptions: SplitButtonOption<ColosseumFightMode>[] = [
     { value: 'auto', label: 'Auto' },
-    { value: 'manual', label: 'Turn-based' },
+    { value: 'manual', label: 'Turn-Based' },
   ];
   public readonly simulateOptions: SplitButtonOption<number>[] =
     SIMULATE_COUNTS.map((count) => ({
@@ -323,12 +323,12 @@ export class PlayKingdomColosseumComponent {
       },
       {
         icon: 'gameDuration',
-        label: 'Avg. rounds',
+        label: 'Avg. Rounds',
         value: n(summary.averageRounds),
       },
       {
         icon: 'gameBrokenHeart',
-        label: 'Avg. hero deaths',
+        label: 'Avg. Hero Deaths',
         value: n(summary.averageHeroDeaths),
       },
       {

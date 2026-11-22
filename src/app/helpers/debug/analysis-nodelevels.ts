@@ -64,7 +64,7 @@ export function runNodeLevelsAnalysis(
   ]);
 
   const table: AnalysisTable = {
-    title: 'Level-gated nodes',
+    title: 'Level-Gated Nodes',
     columns: ['Level', 'Name', 'Kind', 'Map'],
     rows: sorted.map((e) => ({
       Level: `${e.levelRange.min}-${e.levelRange.max}`,
@@ -85,13 +85,13 @@ export function runNodeLevelsAnalysis(
     windows.length === 0
       ? {
           id: 'coverage',
-          label: 'Level coverage',
+          label: 'Level Coverage',
           status: 'pass',
           message: `Every ${gapSize}-level window from 1..${maxLevel} has at least one node.`,
         }
       : {
           id: 'coverage',
-          label: 'Level coverage',
+          label: 'Level Coverage',
           status: 'warning',
           message: `${windows.length} gap window(s) with no node coverage: ${formatWindows(windows)}`,
         },
@@ -101,7 +101,7 @@ export function runNodeLevelsAnalysis(
   if (unplaced.length > 0) {
     checks.push({
       id: 'unplaced',
-      label: 'Unplaced nodes',
+      label: 'Unplaced Nodes',
       status: 'warning',
       message: `${unplaced.length} node(s) exist in gamedata but aren't placed on any map: ${unplaced.map((e) => e.name).join(', ')}`,
     });
@@ -111,7 +111,7 @@ export function runNodeLevelsAnalysis(
     if (entry.levelRange.min > entry.levelRange.max) {
       checks.push({
         id: 'minmax-error',
-        label: 'Level range',
+        label: 'Level Range',
         status: 'fail',
         message: `${entry.name} has a min level > max level`,
       });

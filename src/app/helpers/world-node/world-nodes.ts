@@ -309,7 +309,7 @@ export function worldNodeDisplayName(nodeName: string): string {
 export function worldNodeLocationHint(nodeName: string): string {
   const entry = worldNodeByName(nodeName);
   if (!entry || isWorldNodeVisible(entry)) return nodeName;
-  if (!isWorldMapVisited(entry.mapName)) return 'Unvisited region';
+  if (!isWorldMapVisited(entry.mapName)) return 'Unvisited Region';
 
   return `Somewhere in ${regionNameForMap(entry.mapName)}`;
 }
