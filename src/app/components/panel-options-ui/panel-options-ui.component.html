@@ -242,6 +242,50 @@
               />
             </label>
           </div>
+
+          <div class="form-control">
+            <label class="label cursor-pointer label-option">
+              <span class="label-text">
+                Desktop Notifications
+                <app-icon
+                  name="gameHelp"
+                  size="inline"
+                  class="text-lighter ml-1"
+                  [tp]="'Shows a system notification while the game is in the background.'"
+                  [tpPlacement]="'top'"
+                />
+              </span>
+              <input
+                type="checkbox"
+                [checked]="getOption('desktopNotifications')"
+                class="checkbox"
+                (click)="
+                  setOption(
+                    'desktopNotifications',
+                    !getOption('desktopNotifications')
+                  )
+                "
+              />
+            </label>
+          </div>
+
+          @if (getOption('desktopNotifications')) {
+            <div class="flex flex-col gap-2">
+              @for (kind of desktopNotificationKinds; track kind) {
+                <div class="form-control">
+                  <label class="label cursor-pointer label-option">
+                    <span class="label-text pl-6">{{ kind }}</span>
+                    <input
+                      type="checkbox"
+                      [checked]="getOption('desktopNotificationKinds')[kind]"
+                      class="checkbox checkbox-sm"
+                      (click)="toggleDesktopNotificationKind(kind)"
+                    />
+                  </label>
+                </div>
+              }
+            </div>
+          }
         </div>
       </div>
     }

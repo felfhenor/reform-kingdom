@@ -11,6 +11,20 @@ export type ElectronWindowState = {
   maxHeight: number;
 };
 
+export type DesktopNotificationCategory =
+  'Alerts' | 'Raids' | 'Progress' | 'Achievements';
+
+export type DesktopNotification = {
+  category: DesktopNotificationCategory;
+  title: string;
+  body: string;
+};
+
+export type WindowAttentionAlert = DesktopNotification & {
+  id: string;
+  flash: boolean;
+};
+
 export type ElectronWindowBridge = {
   windowGet: () => Promise<ElectronWindowState | undefined>;
   windowSetFullscreen: (
@@ -21,6 +35,7 @@ export type ElectronWindowBridge = {
     height: number,
   ) => Promise<ElectronWindowState | undefined>;
   windowFlash: () => void;
+  windowNotify: (title: string, body: string) => void;
   windowOnChange: (
     callback: (state: ElectronWindowState) => void,
   ) => () => void;

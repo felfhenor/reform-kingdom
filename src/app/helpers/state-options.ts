@@ -26,6 +26,13 @@ export function defaultOptions(): GameOptions {
     muteWhenUnfocused: false,
     lowerFrameRateWhenUnfocused: false,
     flashTaskbarOnAlerts: true,
+    desktopNotifications: true,
+    desktopNotificationKinds: {
+      Alerts: true,
+      Raids: true,
+      Progress: true,
+      Achievements: true,
+    },
     optionsTab: 'UI',
 
     showBackdropGrid: false,

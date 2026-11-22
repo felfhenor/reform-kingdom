@@ -1,5 +1,49 @@
-const { ipcMain, screen } = require('electron');
+const { ipcMain, Notification, screen } = require('electron');
+const path = require('path');
 const { coreLog } = require('./logging');
+
+const NOTIFICATION_ICON = path.join(__dirname, '..', 'icons', 'icon.png');
+
+// Held so GC keeps the click handler; capped rather than released on close, since Windows toasts stay clickable in Action Center.
+const MAX_LIVE_NOTIFICATIONS = 20;
+const liveNotifications = [];
+
+const notificationHold = (notification) => {
+  liveNotifications.push(notification);
+  if (liveNotifications.length > MAX_LIVE_NOTIFICATIONS)
+    liveNotifications.shift();
+};
+
+const notificationRelease = (notification) => {
+  const index = liveNotifications.indexOf(notification);
+  if (index !== -1) liveNotifications.splice(index, 1);
+};
+
+const windowBringToFront = (win) => {
+  if (win.isMinimized()) win.restore();
+  win.show();
+  win.focus();
+};
+
+// The window is looked up on click since it may have been closed or recreated since.
+const showNotification = (getWindow, title, body) => {
+  const notification = new Notification({
+    title,
+    body,
+    icon: NOTIFICATION_ICON,
+  });
+  notification.on('click', () => {
+    notificationRelease(notification);
+    const win = getWindow();
+    if (win && !win.isDestroyed()) windowBringToFront(win);
+  });
+  notification.on('failed', (_event, error) => {
+    notificationRelease(notification);
+    coreLog().warn('WindowSettings', 'notification failed', error);
+  });
+  notificationHold(notification);
+  notification.show();
+};
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
@@ -108,6 +152,16 @@ const registerWindowSettingsHandlers = (getWindow) => {
     if (win && !win.isFocused()) win.flashFrame(true);
   });
 
+  // Like the flash, only an unfocused window notifies.
+  ipcMain.on('window:notify', (_event, title, body) => {
+    const win = getWindow();
+    const isValid = typeof title === 'string' && typeof body === 'string';
+    if (!win || win.isFocused() || !isValid || !Notification.isSupported())
+      return;
+
+    showNotification(getWindow, title, body);
+  });
+
   // Reports the requested mode since the fullscreen transition can still be animating.
   ipcMain.handle('window:set-fullscreen', (_event, fullscreen) => {
     const win = getWindow();
@@ -151,6 +205,7 @@ const registerWindowSettingsHandlers = (getWindow) => {
 
 module.exports = {
   registerWindowSettingsHandlers,
+  windowBringToFront,
   watchFullscreenHotkeys,
   watchWindowState,
   windowRestorableBounds,

@@ -1,3 +1,4 @@
+import { categoryMessageLog } from '@helpers/combat/combat-log';
 import {
   RAID_BASE_WARNING_TICKS,
   RAID_CHECK_INTERVAL_TICKS,
@@ -5,12 +6,12 @@ import {
   RAID_WARNING_TICKS_PER_MAP_HOP,
   RAID_WARNING_TICKS_PER_REPUTATION_TIER,
 } from '@helpers/config';
-import { categoryMessageLog } from '@helpers/combat/combat-log';
 import { getEntriesByType } from '@helpers/content/content';
 import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { desktopNotify } from '@helpers/engine/desktop-notify';
 import { notifyError } from '@helpers/engine/notify';
 import { riskBandForLevelRange } from '@helpers/engine/risk-band';
 import { timerTicksElapsed } from '@helpers/engine/timer';
@@ -70,6 +71,12 @@ export function telegraphRaid(town: TownContent): void {
     raidDefenseGlobalEffectApply(state, now);
     return state;
   });
+
+  desktopNotify({
+    category: 'Raids',
+    title: 'Raid Incoming',
+    body: `${town.name} is about to be raided. Defend it before time runs out.`,
+  });
 }
 
 function processTownRaid(town: TownContent): void {
@@ -85,7 +92,13 @@ function processTownRaid(town: TownContent): void {
       state.raidEngageWindowExpiresAtTick !== undefined &&
       now >= state.raidEngageWindowExpiresAtTick
     ) {
-      notifyError(`${town.name} was raided while undefended!`);
+      const raidedText = `${town.name} was raided while undefended!`;
+      notifyError(raidedText);
+      desktopNotify({
+        category: 'Raids',
+        title: 'Town Raided',
+        body: raidedText,
+      });
       categoryMessageLog(
         'Raid',
         town.name,

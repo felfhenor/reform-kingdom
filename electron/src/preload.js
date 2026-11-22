@@ -29,6 +29,7 @@ contextBridge.exposeInMainWorld('reformElectron', {
   windowSetSize: (width, height) =>
     ipcRenderer.invoke('window:set-size', width, height),
   windowFlash: () => ipcRenderer.send('window:flash'),
+  windowNotify: (title, body) => ipcRenderer.send('window:notify', title, body),
   // A throwing save still answers, so the main process doesn't sit out its timeout.
   windowOnSaveBeforeClose: (callback) => {
     const listener = () =>

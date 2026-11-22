@@ -26,6 +26,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { desktopNotify } from '@helpers/engine/desktop-notify';
 import { playGameSFX } from '@helpers/engine/sfx';
 import {
   partyGainXp,
@@ -227,7 +228,13 @@ function recordEncounterClear(combat: Combat): void {
 
   const sealed = runStatsRecordSeal(encounter.id);
   if (sealed) {
-    combatMessageLog(combat, `The memory of ${sealed.name} is set in stone.`);
+    const sealedText = `The memory of ${sealed.name} is set in stone.`;
+    combatMessageLog(combat, sealedText);
+    desktopNotify({
+      category: 'Progress',
+      title: 'Region sealed',
+      body: sealedText,
+    });
     analyticsSendDesignEvent(
       `Progress:Seal:${analyticsSafeSegment(sealed.name)}`,
     );

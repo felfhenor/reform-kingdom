@@ -7,6 +7,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { desktopNotify } from '@helpers/engine/desktop-notify';
 import { modalHasAnyOpen } from '@helpers/engine/modal-stack';
 import { gamePlayView } from '@helpers/engine/ui';
 import { gameloopShouldRun } from '@helpers/gameloop';
@@ -18,8 +19,16 @@ import type { AchievementAnnouncement, AchievementCard } from '@interfaces';
 
 export function achievementsAnnounceLog({
   unlocked,
+  isCatchUp,
 }: AchievementAnnouncement): void {
   unlocked.forEach(({ achievement }) => {
+    if (!isCatchUp) {
+      desktopNotify({
+        category: 'Achievements',
+        title: 'Achievement unlocked',
+        body: achievement.name,
+      });
+    }
     categoryMessageLog(
       'Achievement',
       'Achievement',

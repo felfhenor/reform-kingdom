@@ -1,6 +1,7 @@
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import { MAX_ACTIVE_ASTRAL_PROJECTOR_SPELLS } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { desktopNotify } from '@helpers/engine/desktop-notify';
 import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
 import { notifySuccess } from '@helpers/engine/notify';
 import { timerTicksElapsed } from '@helpers/engine/timer';
@@ -103,7 +104,13 @@ function astralProjectorProcessUnlocks(): void {
       return state;
     });
 
-    notifySuccess(`New Astral Projector spell unlocked: ${content.name}`);
+    const unlockedText = `New Astral Projector spell unlocked: ${content.name}`;
+    notifySuccess(unlockedText);
+    desktopNotify({
+      category: 'Progress',
+      title: 'Spell Unlocked',
+      body: unlockedText,
+    });
     miscellaneousMessageLog(
       `A new Astral Projector spell has been unlocked: **${content.name}**.`,
     );

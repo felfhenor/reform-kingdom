@@ -25,6 +25,7 @@ import {
 import { defaultOptions } from '@helpers/state-options';
 import type {
   AdventureLogEntryKind,
+  DesktopNotificationCategory,
   ElectronWindowState,
   WindowDisplayMode,
 } from '@interfaces';
@@ -124,6 +125,20 @@ export class PanelOptionsUIComponent extends OptionsBaseComponent {
   public toggleAdventureLogOverlayKind(kind: AdventureLogEntryKind): void {
     const kinds = this.getOption('adventureLogOverlayKinds');
     this.setOption('adventureLogOverlayKinds', {
+      ...kinds,
+      [kind]: !kinds[kind],
+    });
+  }
+
+  public readonly desktopNotificationKinds = Object.keys(
+    defaultOptions().desktopNotificationKinds,
+  ) as DesktopNotificationCategory[];
+
+  public toggleDesktopNotificationKind(
+    kind: DesktopNotificationCategory,
+  ): void {
+    const kinds = this.getOption('desktopNotificationKinds');
+    this.setOption('desktopNotificationKinds', {
       ...kinds,
       [kind]: !kinds[kind],
     });

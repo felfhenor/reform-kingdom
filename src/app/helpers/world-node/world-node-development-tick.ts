@@ -3,6 +3,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { desktopNotify } from '@helpers/engine/desktop-notify';
 import { notifySuccess } from '@helpers/engine/notify';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { updateGamestate } from '@helpers/state-game';
@@ -29,7 +30,13 @@ function worldNodeDevelopmentAnnounce(due: WorldNodeDevelopmentDue): void {
   miscellaneousMessageLog(
     worldNodeDevelopmentCompleteText(due, `**${content.name}**`),
   );
-  notifySuccess(worldNodeDevelopmentCompleteText(due, content.name));
+  const completeText = worldNodeDevelopmentCompleteText(due, content.name);
+  notifySuccess(completeText);
+  desktopNotify({
+    category: 'Progress',
+    title: 'Development Finished',
+    body: completeText,
+  });
 
   if (content.__type === 'shrine') {
     void taskEventShrineLevel(nodeName, level);

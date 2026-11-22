@@ -1,17 +1,8 @@
 import { WINDOW_SIZE_PRESETS } from '@helpers/config';
-import type {
-  ElectronWindowBridge,
-  ElectronWindowState,
-  WindowSizeChoice,
-  WindowWithElectronWindowBridge,
-} from '@interfaces';
+import { electronWindowBridge } from '@helpers/engine/electron';
+import type { ElectronWindowState, WindowSizeChoice } from '@interfaces';
 
 const WINDOW_SIZE_MAXIMIZED_ID = 'maximized';
-
-// Partial since a desktop build older than these handlers still exposes the savefile bridge.
-function electronWindowBridge(): Partial<ElectronWindowBridge> | undefined {
-  return (window as WindowWithElectronWindowBridge).reformElectron;
-}
 
 export async function electronWindowState(): Promise<
   ElectronWindowState | undefined

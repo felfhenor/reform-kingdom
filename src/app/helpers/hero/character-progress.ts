@@ -6,14 +6,15 @@ import {
   HEALING_SECONDS_PER_LEVEL,
 } from '@helpers/config';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
+import { desktopNotify } from '@helpers/engine/desktop-notify';
 import { heroLevelUpVfxEmit } from '@helpers/engine/hero-level-up-vfx';
 import { playGameSFX } from '@helpers/engine/sfx';
 import { characterStats, characterXpForLevel } from '@helpers/hero/party';
 import { skillTreeEarnedSp } from '@helpers/hero/skill-tree';
 import { globalEffectSumsState, updateGamestate } from '@helpers/state-game';
+import { taskEventLevelReached } from '@helpers/task/task-events';
 import type { Character, CharacterXpGain, Combatant } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
-import { taskEventLevelReached } from '@helpers/task/task-events';
 
 // Bonus from the precomputed global effect sums cache - 1x with nothing active/owned.
 function xpGainMultiplier(): number {
@@ -175,11 +176,18 @@ export function partyGainXp(
     announceCharacterXpGain(beforeLevel, gained, after),
   );
 
-  const leveledUp = progress.some((p) => p.after.level > p.beforeLevel);
-  if (leveledUp) {
+  const leveledUp = progress.filter((p) => p.after.level > p.beforeLevel);
+  if (leveledUp.length > 0) {
     void taskEventLevelReached(
       Math.max(...progress.map(({ after }) => after.level)),
     );
+    desktopNotify({
+      category: 'Progress',
+      title: 'Level Up',
+      body: leveledUp
+        .map(({ after }) => `${after.name} reached level ${after.level}.`)
+        .join(' '),
+    });
   }
 
   return progress

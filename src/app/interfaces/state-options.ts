@@ -1,4 +1,5 @@
 import type { AdventureLogEntryKind } from '@interfaces/combat-log';
+import type { DesktopNotificationCategory } from '@interfaces/electron-window';
 
 export type GameOption =
   | 'showDebug'
@@ -19,6 +20,7 @@ export type GameOption =
   | 'runInBackground'
   | 'muteWhenUnfocused'
   | 'lowerFrameRateWhenUnfocused'
+  | 'desktopNotifications'
   | 'flashTaskbarOnAlerts'
   | 'skipFeatureTutorials'
   | 'skipLosingStreakTutorial';
@@ -43,4 +45,5 @@ export type GameOptions = Record<GameOption, boolean> & {
   uiScale: UiScale;
   motionPreference: MotionPreference;
   adventureLogOverlayKinds: Record<AdventureLogEntryKind, boolean>;
+  desktopNotificationKinds: Record<DesktopNotificationCategory, boolean>;
 };

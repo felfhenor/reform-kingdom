@@ -53,6 +53,7 @@ const { watchSaveBeforeClose } = require('./save-before-close');
 const {
   registerWindowSettingsHandlers,
   watchFullscreenHotkeys,
+  windowBringToFront,
   watchWindowState,
   windowRestorableBounds,
 } = require('./window-settings');
@@ -68,10 +69,7 @@ let mainWindow = undefined;
 let onGameLogAttached = () => {};
 
 app.on('second-instance', () => {
-  if (!mainWindow) return;
-  if (mainWindow.isMinimized()) mainWindow.restore();
-  mainWindow.show();
-  mainWindow.focus();
+  if (mainWindow) windowBringToFront(mainWindow);
 });
 
 const createWindow = () => {

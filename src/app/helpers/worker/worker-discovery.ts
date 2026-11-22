@@ -3,18 +3,19 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
+import { desktopNotify } from '@helpers/engine/desktop-notify';
 import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
 import { notifySuccess } from '@helpers/engine/notify';
 import { discoveredWorkersState, updateGamestate } from '@helpers/state-game';
+import { taskEventWorkerRescued } from '@helpers/task/task-events';
 import { defaultWorkerState } from '@helpers/worker/worker-progression';
 import type {
   GameStateWorkers,
   WorkerAssignment,
-  WorkerStatus,
   WorkerContent,
   WorkerId,
+  WorkerStatus,
 } from '@interfaces';
-import { taskEventWorkerRescued } from '@helpers/task/task-events';
 
 export function isWorkerRescued(workerId: WorkerId): boolean {
   return ledgerHas(discoveredWorkersState(), workerId);
@@ -37,7 +38,13 @@ export function workerRescue(workerId: WorkerId): void {
   });
 
   void taskEventWorkerRescued(workerId);
-  notifySuccess(`You rescued ${worker.name}!`);
+  const rescuedText = `You rescued ${worker.name}!`;
+  notifySuccess(rescuedText);
+  desktopNotify({
+    category: 'Progress',
+    title: 'Worker Rescued',
+    body: rescuedText,
+  });
   analyticsSendDesignEvent(
     `Worker:Rescue:${analyticsSafeSegment(worker.name)}`,
   );
