@@ -26,4 +26,11 @@ describe('gatherVfxFloatState', () => {
     expect(gatherVfxFloatState(750, 1000, 0.5)?.alpha).toBeCloseTo(0.5, 5);
     expect(gatherVfxFloatState(1000, 1000, 0.5)).toBeUndefined();
   });
+
+  it('pops in from nothing, overshoots, then settles at full size', () => {
+    expect(gatherVfxFloatState(0)?.scale).toBeCloseTo(0, 5);
+    expect(gatherVfxFloatState(175)?.scale).toBeGreaterThan(1);
+    expect(gatherVfxFloatState(250)?.scale).toBeCloseTo(1, 5);
+    expect(gatherVfxFloatState(800)?.scale).toBeCloseTo(1, 5);
+  });
 });

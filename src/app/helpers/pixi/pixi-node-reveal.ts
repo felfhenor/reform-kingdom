@@ -5,7 +5,7 @@ import {
 } from '@helpers/config';
 import { clamp } from 'es-toolkit/compat';
 
-function easeOutBack(t: number): number {
+export function easeOutBack(t: number): number {
   const c1 = NODE_REVEAL_OVERSHOOT;
   const c3 = c1 + 1;
   return 1 + c3 * (t - 1) ** 3 + c1 * (t - 1) ** 2;

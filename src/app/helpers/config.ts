@@ -374,6 +374,7 @@ export const PATHFINDING_HOP_TREE_CACHE_MAX = 8;
 export const GATHER_VFX_LIFETIME_MS = 1100;
 export const GATHER_VFX_FLOAT_DISTANCE = 40;
 export const GATHER_VFX_JITTER_RANGE = 30;
+export const GATHER_VFX_POP_MS = 250;
 // Quotes (e.g. a rescued worker's thanks) stay fully opaque for most of their life so they can be read.
 export const GATHER_VFX_QUOTE_LIFETIME_MS = 6000;
 export const GATHER_VFX_QUOTE_HOLD_FRACTION = 0.75;

@@ -2,14 +2,17 @@ import {
   GATHER_VFX_FLOAT_DISTANCE,
   GATHER_VFX_JITTER_RANGE,
   GATHER_VFX_LIFETIME_MS,
+  GATHER_VFX_POP_MS,
   GATHER_VFX_QUOTE_HOLD_FRACTION,
   GATHER_VFX_QUOTE_LIFETIME_MS,
   GATHER_VFX_QUOTE_WRAP_WIDTH,
 } from '@helpers/config';
 import { uiTextFontFamily, uiTextLetterSpacing } from '@helpers/engine/font.ui';
 import { isMotionReduced } from '@helpers/engine/motion';
+import { easeOutBack } from '@helpers/pixi/pixi-node-reveal';
 import type { GatherVfxEvent } from '@interfaces';
 import type { Texture } from 'pixi.js';
+import { clamp } from 'es-toolkit/compat';
 import { Container, Sprite, Text } from 'pixi.js';
 
 // Elapsed-time -> visual state. Returns undefined once the effect's lifetime has passed (caller destroys it).
@@ -17,7 +20,7 @@ export function gatherVfxFloatState(
   elapsedMs: number,
   lifetimeMs = GATHER_VFX_LIFETIME_MS,
   holdFraction = 0,
-): { alpha: number; offsetY: number } | undefined {
+): { alpha: number; offsetY: number; scale: number } | undefined {
   if (elapsedMs >= lifetimeMs) return undefined;
 
   const fraction = elapsedMs / lifetimeMs;
@@ -26,6 +29,7 @@ export function gatherVfxFloatState(
   return {
     alpha: 1 - fadeFraction,
     offsetY: -GATHER_VFX_FLOAT_DISTANCE * fraction,
+    scale: easeOutBack(clamp(elapsedMs / GATHER_VFX_POP_MS, 0, 1)),
   };
 }
 
@@ -143,6 +147,7 @@ export function pixiFloatingTextCreate(
     if (!state) return false;
 
     container.alpha = state.alpha;
+    container.scale.set(isMotionReduced() ? 1 : state.scale);
     // `nodePosition` is the tile's top-left corner, so `+ tileSize / 2`
     // centers the row on the tile horizontally.
     container.position.set(
