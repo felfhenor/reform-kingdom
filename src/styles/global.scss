@@ -107,3 +107,7 @@ app-game {
 .tab {
   @apply select-none;
 }
+
+.btn:active:not(:disabled, [disabled], .btn-disabled) {
+  translate: 0 2px;
+}
