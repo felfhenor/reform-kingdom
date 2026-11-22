@@ -1,28 +1,23 @@
 
-## 0.15.1 (2026-11-17)
+# 0.16.0 (2026-11-22)
 
 
 ### Bug Fixes
 
-* **combat:** disable the ability to charge a skill that's already being charged
-* **combat:** fix left offset for monsters
-* **combat:** fix string missing a comma in xp gained
-* **edict:** lots of fixes for taskmaster combats
-* **electron:** background images should load correctly in prod build
-* **electron:** remove unnecessary service worker in desktop build
-* **ui:** achievements post-manual-combat will now close the backdrop correctly
-* **ui:** add commas to skill values when formatted
-* **ui:** all glowing is now synchronized to keep the ui state looking consistent
-* **ui:** don't show lv. -
-* **ui:** emphasize accuracy on skills that have it (charged strike, etc)
-* **ui:** hide decree material gathering clauses when warren hunt is active
-* **ui:** line up top-right bubbles with the content better
+* **ui:** adjust hero tab so it doesn't stretch as much with needing to spend SP
+* **ui:** do not show restore actions after finishing a run in desktop mode
+* **ui:** help address quartermasters annex lag spikes
+* **ui:** make kingdom page more consistent. remove the separate font used for tabular nums
+* **ui:** reduce selectable surface for things that need not be selectable
+* **ui:** workshop will show slots instead of listing x/y
+* **world:** always start at the kingdom, even when I move the map around
 
 
 ### Features
 
-* **combat:** add monster death sound
-* **combat:** show charging skills
-* **kingdom:** add colosseum to simulate combat
-* **sfx:** play sample SFX to test volume
-* **ui:** show how long a region took to seal when looking at the seal node. also, show which node seals the region
+* **edict:** add 'edict of scavenging crows'
+* **edict:** add 'spontaneous memory' edict
+* **edict:** add speedrun edict
+* **world:** add animations to some world nodes
+* **world:** add sparkles to uncleared nodes
+* **world:** collectible gates will now be more clear about where to find their missing collectible
