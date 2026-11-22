@@ -2,6 +2,7 @@ import { computed } from '@angular/core';
 import { getEntry } from '@helpers/content/content';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { allMaps } from '@helpers/maps';
+import { regionNameForMap } from '@helpers/lore/region-intro';
 import { tiledMapGetLayer } from '@helpers/pixi/tiled-map';
 import {
   globalEffectSumsState,
@@ -302,6 +303,15 @@ export function worldNodeDisplayName(nodeName: string): string {
   if (!entry) return nodeName;
 
   return isWorldNodeVisible(entry) ? nodeName : '???';
+}
+
+// Points at the region instead of '???', so a player knows which map to search.
+export function worldNodeLocationHint(nodeName: string): string {
+  const entry = worldNodeByName(nodeName);
+  if (!entry || isWorldNodeVisible(entry)) return nodeName;
+  if (!isWorldMapVisited(entry.mapName)) return 'Unvisited region';
+
+  return `Somewhere in ${regionNameForMap(entry.mapName)}`;
 }
 
 // Unplaced names (e.g. caravan traders) have no map to gate on.

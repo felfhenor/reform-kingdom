@@ -27,6 +27,7 @@ import { ensureEncounter } from '@helpers/content/ensure-encounternode';
 import { ensureExchangeNode } from '@helpers/content/ensure-exchangenode';
 import { ensureNodeOverride } from '@helpers/content/ensure-nodeoverride';
 import { ensureOutpost } from '@helpers/content/ensure-outpost';
+import { ensureRegion } from '@helpers/content/ensure-region';
 import { ensureTown } from '@helpers/content/ensure-town';
 import { ensureTrainer } from '@helpers/content/ensure-trainer';
 import { seedContent } from '@/testing/content';
@@ -39,6 +40,7 @@ import {
   isWorldNodeMapVisited,
   isWorldNodeVisible,
   worldNodeDisplayName,
+  worldNodeLocationHint,
   worldNodeMapsBuild,
   worldNodeOverride,
   worldNodeTown,
@@ -490,6 +492,39 @@ describe('worldNodeDisplayName', () => {
 
   it('falls back to the raw name when the node no longer resolves', () => {
     expect(worldNodeDisplayName('Ghost Node')).toBe('Ghost Node');
+  });
+});
+
+describe('worldNodeLocationHint', () => {
+  function seedHidden(): void {
+    seedContent([
+      buildEncounter({ hidden: true }),
+      ensureRegion({ name: 'Carrina', mapName: 'TestMap' }),
+    ]);
+    seedWorldNodes([{ name: 'Forest Ruins', type: 'ExploreNode' }]);
+  }
+
+  it('names the region of a hidden node on a visited map', () => {
+    seedHidden();
+    seedGamestate((state) => {
+      state.discoveredMaps['TestMap'] = { foundAt: 1 };
+    });
+
+    expect(worldNodeLocationHint('Forest Ruins')).toBe('Somewhere in Carrina');
+  });
+
+  it('only says unvisited region before the map is visited', () => {
+    seedHidden();
+    seedGamestate();
+
+    expect(worldNodeLocationHint('Forest Ruins')).toBe('Unvisited region');
+  });
+
+  it('returns the real name once the node is visible', () => {
+    seedHidden();
+    found({ node: true });
+
+    expect(worldNodeLocationHint('Forest Ruins')).toBe('Forest Ruins');
   });
 });
 

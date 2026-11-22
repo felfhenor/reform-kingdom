@@ -24,7 +24,10 @@ import {
   globalEffectSumsState,
   legacyClearedEdictsState,
 } from '@helpers/state-game';
-import { worldNodeDisplayName } from '@helpers/world-node/world-nodes';
+import {
+  worldNodeDisplayName,
+  worldNodeLocationHint,
+} from '@helpers/world-node/world-nodes';
 import type {
   CollectibleContent,
   CollectibleId,
@@ -89,21 +92,21 @@ export function getMuseumCollectibleEntries(): MuseumCollectibleEntry[] {
   return orderBy(entries, [(entry) => entry.collectible.name], ['asc']);
 }
 
-// An unknown collectible's source stays hidden until its map is visited or its town visited; an unmet trader is hinted at without a name.
+// Node sources always hint their region; other unknown sources stay hidden, except an unmet trader is hinted at without a name.
 function museumCollectibleSource(
   collectibleId: CollectibleId,
   known: boolean,
 ): CollectibleSource | undefined {
   const source = getCollectibleSource(collectibleId);
   if (!source) return undefined;
-  if (!known && !isCollectibleSourceKnown(source)) {
-    return source.type === 'trader'
-      ? { ...source, name: UNMET_TRADER_NAME }
-      : undefined;
+  if (source.type === 'node') {
+    return { type: 'node', name: worldNodeLocationHint(source.name) };
   }
-  if (source.type !== 'node') return source;
+  if (known || isCollectibleSourceKnown(source)) return source;
 
-  return { type: 'node', name: worldNodeDisplayName(source.name) };
+  return source.type === 'trader'
+    ? { ...source, name: UNMET_TRADER_NAME }
+    : undefined;
 }
 
 function collectibleSourceName(source: CollectibleSource): string {
