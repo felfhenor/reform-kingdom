@@ -7,6 +7,10 @@
     @if (qty > 0) {
       <div class="mt-2 type-meta">Quantity: {{ qty | number }}</div>
     }
+
+    <div class="mt-2 type-meta">
+      {{ reward().kind }}
+    </div>
   </app-tooltip-item-preview>
 
   <div tabindex="0" [tp]="preview.template()" [tpPlacement]="'top'">
