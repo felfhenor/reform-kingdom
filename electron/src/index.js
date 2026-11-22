@@ -98,6 +98,12 @@ app.on('second-instance', () => {
   if (mainWindow) windowBringToFront(mainWindow);
 });
 
+// Windows only: macOS traffic lights and Linux window managers would each need their own layout.
+const WINDOWS_TITLE_BAR = {
+  titleBarStyle: 'hidden',
+  titleBarOverlay: { color: '#00000000', symbolColor: '#e5e7eb', height: 32 },
+};
+
 const createWindow = () => {
   const { workArea } = screen.getPrimaryDisplay();
   const workAreas = screen.getAllDisplays().map((display) => display.workArea);
@@ -107,6 +113,7 @@ const createWindow = () => {
     show: false,
     backgroundColor: '#1d232a',
     icon: './icons/icon.png',
+    ...(process.platform === 'win32' ? WINDOWS_TITLE_BAR : {}),
     minWidth: Math.min(1280, ...workAreas.map((area) => area.width)),
     minHeight: Math.min(720, ...workAreas.map((area) => area.height)),
     ...workArea,

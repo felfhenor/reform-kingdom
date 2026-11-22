@@ -1,3 +1,10 @@
+<div
+  class="h-(--titlebar-height) flex items-center gap-2 px-2 bg-base-300 text-sm text-lighter overflow-hidden"
+>
+  <img ngSrc="favicon/favicon-96x96.png" width="20" height="20" alt="" />
+  <span>{{ windowTitle }}</span>
+</div>
+
 <div class="navbar bg-base-100 relative flex py-0" ffFocusSkip>
   <div class="absolute left-1/2 -translate-x-1/2" appRequireSetup>
     <app-status-run-timer />
@@ -271,7 +278,7 @@
   </div>
 </div>
 
-<div class="absolute top-[40px] left-1/2 -translate-x-1/2 z-30">
+<div class="absolute top-(--navbar-height) left-1/2 -translate-x-1/2 z-30">
   <app-bar-resource />
 </div>
 

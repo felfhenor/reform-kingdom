@@ -2,6 +2,12 @@ html {
   scrollbar-gutter: auto;
 }
 
+// Electron's Windows title bar overlay sets these; 0 wherever the overlay isn't shown.
+:root {
+  --titlebar-height: env(titlebar-area-height, 0px);
+  --navbar-height: calc(40px + var(--titlebar-height));
+}
+
 body {
   --font-text: 'OtherText', serif;
   --font-fancy: 'FancyText', sans-serif;

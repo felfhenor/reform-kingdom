@@ -1,4 +1,6 @@
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
+import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { isDemoBuild } from '@helpers/demo/demo';
 import { ButtonGlowDirective } from '@directives/button-glow.directive';
@@ -84,6 +86,7 @@ import {
 @Component({
   selector: 'app-navbar',
   imports: [
+    NgOptimizedImage,
     TippyDirective,
     StatusRunTimerComponent,
     RequireSetupDirective,
@@ -118,6 +121,7 @@ export class NavbarComponent {
   public meta = inject(MetaService);
   private ffInput = inject(FFInputService);
   public readonly isDemo = isDemoBuild();
+  protected readonly windowTitle = inject(Title).getTitle();
   public router = inject(Router);
 
   public showPauseMenu = computed(() => modalIsOpen('pause-menu'));

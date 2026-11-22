@@ -1,7 +1,7 @@
 @reference 'tailwindcss';
 
 :host {
-  @apply fixed top-16 left-0 right-0 z-[150] flex justify-center px-4 pointer-events-none;
+  @apply fixed top-[calc(var(--navbar-height)+1.5rem)] left-0 right-0 z-[150] flex justify-center px-4 pointer-events-none;
 }
 
 .card-achievement {

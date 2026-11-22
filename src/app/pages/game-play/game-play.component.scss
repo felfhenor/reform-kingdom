@@ -10,7 +10,7 @@
 
 .game-container {
   width: 100vw;
-  height: calc(100vh - 40px);
+  height: calc(100vh - var(--navbar-height));
 }
 
 .pause-vignette {
