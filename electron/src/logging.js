@@ -156,6 +156,14 @@ const gameLog = () => logs.game;
 
 const asString = (value) => (typeof value === 'string' ? value : String(value));
 
+// openPath resolves to an error string rather than rejecting.
+const openLogsFolder = async () => {
+  fs.mkdirSync(logsDir(), { recursive: true });
+  const error = await shell.openPath(logsDir());
+  if (error) logs.core.warn('Log', 'Could not open logs folder', error);
+  return !error;
+};
+
 // Everything here comes from the renderer, so it's coerced rather than trusted.
 const registerLogHandlers = (onRendererLog) => {
   ipcMain.on('log:write', (event, level, category, message) => {
@@ -167,13 +175,7 @@ const registerLogHandlers = (onRendererLog) => {
     );
   });
 
-  // openPath resolves to an error string rather than rejecting.
-  ipcMain.handle('log:open-folder', async () => {
-    fs.mkdirSync(logsDir(), { recursive: true });
-    const error = await shell.openPath(logsDir());
-    if (error) logs.core.warn('Log', 'Could not open logs folder', error);
-    return !error;
-  });
+  ipcMain.handle('log:open-folder', openLogsFolder);
 };
 
 module.exports = {
@@ -182,5 +184,6 @@ module.exports = {
   initLogging,
   logFilePath,
   logsDir,
+  openLogsFolder,
   registerLogHandlers,
 };

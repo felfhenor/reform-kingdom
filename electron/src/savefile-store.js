@@ -247,4 +247,4 @@ const registerSavefileStoreHandlers = () => {
   ipcMain.handle('demo-save:read', readDemoSave);
 };
 
-module.exports = { registerSavefileStoreHandlers };
+module.exports = { openSavefileFolder, registerSavefileStoreHandlers };

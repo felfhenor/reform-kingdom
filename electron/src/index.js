@@ -2,7 +2,12 @@ const { app, screen, session, shell, BrowserWindow } = require('electron');
 const path = require('path');
 const url = require('url');
 
-const { coreLog, initLogging, registerLogHandlers } = require('./logging');
+const {
+  coreLog,
+  initLogging,
+  openLogsFolder,
+  registerLogHandlers,
+} = require('./logging');
 const {
   logPreviousSessionEnd,
   logReadyDiagnostics,
@@ -10,6 +15,13 @@ const {
   watchAppLifecycle,
   watchWindowLifecycle,
 } = require('./lifecycle-logging');
+const {
+  JUMP_LIST_OPEN_LOGS,
+  JUMP_LIST_OPEN_SAVES,
+  jumpListFlag,
+  jumpListRegister,
+  jumpListRun,
+} = require('./jump-list');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 const isSquirrelEvent = require('electron-squirrel-startup');
@@ -31,9 +43,12 @@ app.commandLine.appendSwitch(
   'WinSystemLocationPermission,WinrtGeolocationImplementation',
 );
 
+// A jump list launch only opens a folder, so it skips the lock and everything gated on it, like log rotation.
+const jumpListLaunch = jumpListFlag(process.argv);
+
 // A second copy would tick and save the same game alongside this one.
-const hasInstanceLock = app.requestSingleInstanceLock();
-if (!hasInstanceLock) {
+const hasInstanceLock = !jumpListLaunch && app.requestSingleInstanceLock();
+if (!hasInstanceLock && !jumpListLaunch) {
   app.exit(0);
 }
 
@@ -48,7 +63,10 @@ if (hasInstanceLock && !isSquirrelEvent) {
 const rpc = require('discord-rpc');
 const Config = require('electron-config');
 const { registerSavefileBackupHandlers } = require('./savefile-backups');
-const { registerSavefileStoreHandlers } = require('./savefile-store');
+const {
+  openSavefileFolder,
+  registerSavefileStoreHandlers,
+} = require('./savefile-store');
 const { watchSaveBeforeClose } = require('./save-before-close');
 const {
   registerWindowSettingsHandlers,
@@ -62,6 +80,14 @@ const config = new Config();
 coreLog().info('Session', `config ${config.path}`);
 
 if (hasInstanceLock && !isSquirrelEvent) initSteam();
+
+if (jumpListLaunch) {
+  const openers = {
+    [JUMP_LIST_OPEN_SAVES]: openSavefileFolder,
+    [JUMP_LIST_OPEN_LOGS]: openLogsFolder,
+  };
+  jumpListRun(openers[jumpListLaunch]);
+}
 
 const showDevTools = process.argv.includes('--dev');
 
@@ -168,6 +194,8 @@ const createWindow = () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
+  if (!hasInstanceLock) return;
+
   logReadyDiagnostics();
   // Older builds registered the web service worker on file://, which 504s every launch after the first.
   await session.defaultSession
@@ -188,6 +216,7 @@ app.on('ready', async () => {
   registerSavefileStoreHandlers();
   registerWindowSettingsHandlers(() => mainWindow);
   registerSteamHandlers();
+  jumpListRegister();
   createWindow();
 });
 
