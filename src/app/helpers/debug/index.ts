@@ -10,6 +10,7 @@ export * from './analysis-defaults.ui';
 export * from './analysis-exchangenodes';
 export * from './analysis-fieldnodes';
 export * from './analysis-gatherdevelopmentlevels';
+export * from './analysis-gearhomes';
 export * from './analysis-herostats';
 export * from './analysis-infusiongaps';
 export * from './analysis-inputs.ui';

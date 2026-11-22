@@ -60,6 +60,7 @@ export * from './decree';
 export * from './discord';
 export * from './droppable';
 export * from './electron-log';
+export * from './equipment-home';
 export * from './electron-window';
 export * from './element';
 export * from './equipment';

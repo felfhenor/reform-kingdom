@@ -1,215 +1,23 @@
 import { isTraderDiscovered } from '@helpers/caravan/caravan';
-import { getEntriesByType } from '@helpers/content/content';
-import { isMonsterDiscovered } from '@helpers/kingdom';
+import { getEntry } from '@helpers/content/content';
+import { isMonsterDiscovered } from '@helpers/kingdom/bestiary';
+import { isSourceAvailableThisRun } from '@helpers/item/obtainable-this-run';
+import { regionContentSources } from '@helpers/item/region-sources';
 import { isTownVisited } from '@helpers/town/town-visit';
-import {
-  regionGatheringDrops,
-  worldNodeMonsterIds,
-} from '@helpers/world-node/world-node-monster-drops';
-import {
-  isWorldNodeMapVisited,
-  isWorldNodeNameRemoved,
-  worldNodesOfType,
-} from '@helpers/world-node/world-nodes';
+import { isWorldMapVisited } from '@helpers/world-node/world-map-discovery';
+import { isWorldNodeMapVisited } from '@helpers/world-node/world-nodes';
 import type {
-  CaravanTraderContent,
   CollectibleSource,
-  EncounterContent,
-  EncounterRandomContent,
   EquipmentId,
-  ExchangeNodeContent,
-  GatheringContent,
   ItemId,
-  MonsterContent,
-  RecipeContent,
   RecipeId,
   SourceTarget,
-  TownContent,
+  TaskContent,
+  TaskId,
 } from '@interfaces';
-import { uniq, uniqBy } from 'es-toolkit/compat';
 
-// Drops, trades, recipe results, gather results and town sales all name their output with these same fields, so one matcher covers every channel.
-const SOURCE_KEYS = [
-  'itemId',
-  'equipmentId',
-  'recipeId',
-  'collectibleId',
-] as const;
-type SourceKey = (typeof SOURCE_KEYS)[number];
-type SourceFields = Partial<Record<SourceKey, string>>;
-
-// Takes `object` rather than SourceFields: a worker drop shares none of these keys, which TS would reject as a weak-type mismatch.
-function matchesTarget(output: object, target: SourceTarget): boolean {
-  const fields = output as SourceFields;
-  const wanted = target as SourceFields;
-  return SOURCE_KEYS.some(
-    (key) => wanted[key] !== undefined && fields[key] === wanted[key],
-  );
-}
-
-// Town-unique recipes are never on the player's craft list - credit the town whose shop sells the output instead.
-function recipeCraftSource(
-  recipe: RecipeContent,
-  towns: TownContent[],
-): CollectibleSource[] {
-  const owningTowns = towns.filter((town) =>
-    town.crafting.uniqueRecipeIds.includes(recipe.id),
-  );
-  if (owningTowns.length === 0) {
-    return [
-      {
-        type: 'crafting',
-        tradeskillId: recipe.tradeskillId,
-        tradeskillLevel: recipe.minTradeskillLevel,
-      },
-    ];
-  }
-
-  return owningTowns.map((town) => ({
-    type: 'town',
-    townId: town.id,
-    name: town.name,
-  }));
-}
-
-function sourceKey(source: CollectibleSource): string {
-  return source.type === 'crafting'
-    ? `crafting:${source.tradeskillId}:${source.tradeskillLevel}`
-    : `${source.type}:${source.name}`;
-}
-
-// The entries whose outputs include the target, each turned into the source(s) it represents.
-function sourcesFrom<T>(
-  target: SourceTarget,
-  entries: T[],
-  outputsOf: (entry: T) => object[],
-  toSource: (entry: T) => CollectibleSource | CollectibleSource[],
-): CollectibleSource[] {
-  return entries
-    .filter((entry) =>
-      outputsOf(entry).some((output) => matchesTarget(output, target)),
-    )
-    .flatMap((entry) => toSource(entry));
-}
-
-const nodeSource = (entry: { name: string }): CollectibleSource => ({
-  type: 'node',
-  name: entry.name,
-});
-
-// Every fight on a map whose gather tables monsters drop from.
-function regionGatheringSources(target: SourceTarget): CollectibleSource[] {
-  const mapNames = new Set(
-    uniq(worldNodesOfType('GatherNode').map((entry) => entry.mapName)).filter(
-      (mapName) =>
-        regionGatheringDrops(mapName).some((drop) =>
-          matchesTarget(drop, target),
-        ),
-    ),
-  );
-  if (mapNames.size === 0) return [];
-
-  return [
-    ...worldNodesOfType('ExploreNode'),
-    ...worldNodesOfType('ExploreRandomNode'),
-  ]
-    .filter(
-      (entry) =>
-        mapNames.has(entry.mapName) && worldNodeMonsterIds(entry).length > 0,
-    )
-    .map((entry) => nodeSource({ name: entry.nodeName }));
-}
-
-function isCollectibleSourceRemoved(source: CollectibleSource): boolean {
-  return source.type === 'node' && isWorldNodeNameRemoved(source.name);
-}
-
-// Has sources, and every one is a node removed this run.
-export function isFoundOnlyAtRemovedNodes(target: SourceTarget): boolean {
-  const sources = everyContentSource(target);
-  return sources.length > 0 && sources.every(isCollectibleSourceRemoved);
-}
-
-// Leaves out nodes removed this run.
 export function contentSources(target: SourceTarget): CollectibleSource[] {
-  return everyContentSource(target).filter(
-    (source) => !isCollectibleSourceRemoved(source),
-  );
-}
-
-function everyContentSource(target: SourceTarget): CollectibleSource[] {
-  const towns = getEntriesByType<TownContent>('town');
-  const encounters = [
-    ...getEntriesByType<EncounterContent>('encounter'),
-    ...getEntriesByType<EncounterRandomContent>('encounterrandom'),
-  ];
-
-  return uniqBy(
-    [
-      ...sourcesFrom(
-        target,
-        getEntriesByType<GatheringContent>('gathering'),
-        (gather) => gather.gatherResults.flatMap((result) => result.items),
-        nodeSource,
-      ),
-      ...sourcesFrom(
-        target,
-        encounters,
-        (encounter) => encounter.completionRewards,
-        nodeSource,
-      ),
-      // 'buy' trades are the trader buying from the party - not a source.
-      ...sourcesFrom(
-        target,
-        getEntriesByType<CaravanTraderContent>('caravantrader'),
-        (trader) => [
-          ...trader.trades.filter((trade) => trade.type === 'sell'),
-          ...trader.tokenTrades,
-        ],
-        (trader) => ({
-          type: 'trader',
-          traderId: trader.id,
-          name: trader.name,
-        }),
-      ),
-      ...sourcesFrom(
-        target,
-        getEntriesByType<RecipeContent>('recipe'),
-        (recipe) => [recipe.result],
-        (recipe) => recipeCraftSource(recipe, towns),
-      ),
-      ...sourcesFrom(
-        target,
-        towns,
-        (town) => town.materialThresholds.filter((sale) => sale.value > 0),
-        (town) => ({ type: 'town', townId: town.id, name: town.name }),
-      ),
-      ...sourcesFrom(
-        target,
-        towns,
-        (town) => town.defense.rewards,
-        (town) => ({ type: 'raid', townId: town.id, name: town.name }),
-      ),
-      ...sourcesFrom(
-        target,
-        getEntriesByType<ExchangeNodeContent>('exchangenode'),
-        (node) => node.exchanges.map((exchange) => exchange.output),
-        nodeSource,
-      ),
-      ...sourcesFrom(
-        target,
-        getEntriesByType<MonsterContent>('monster'),
-        (monster) => monster.drops,
-        (monster) => ({
-          type: 'monster',
-          name: monster.name,
-          monsterId: monster.id,
-        }),
-      ),
-      ...regionGatheringSources(target),
-    ],
-    sourceKey,
-  );
+  return regionContentSources(target).filter(isSourceAvailableThisRun);
 }
 
 export function itemSources(itemId: ItemId): CollectibleSource[] {
@@ -226,6 +34,12 @@ export function recipeSources(recipeId: RecipeId): CollectibleSource[] {
   return contentSources({ recipeId });
 }
 
+// Matches the task list, which hides a task until its map is visited.
+function isTaskSourceKnown(taskId: TaskId): boolean {
+  const mapName = getEntry<TaskContent>(taskId)?.requireMapVisit;
+  return !mapName || isWorldMapVisited(mapName);
+}
+
 // Whether the player has been where this source is, so naming it can't spoil anything.
 export function isCollectibleSourceKnown(source: CollectibleSource): boolean {
   switch (source.type) {
@@ -235,7 +49,10 @@ export function isCollectibleSourceKnown(source: CollectibleSource): boolean {
       return isTraderDiscovered(source.traderId);
     case 'raid':
     case 'town':
+    case 'townCraft':
       return isTownVisited(source.townId);
+    case 'task':
+      return isTaskSourceKnown(source.taskId);
     case 'crafting':
       return true;
     case 'monster':

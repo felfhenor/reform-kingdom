@@ -4,10 +4,8 @@ import { ensureEncounter } from '@helpers/content/ensure-encounternode';
 import { ensureGathering } from '@helpers/content/ensure-gathernode';
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { ensureMonster } from '@helpers/content/ensure-monster';
-import {
-  isFoundOnlyAtRemovedNodes,
-  itemSources,
-} from '@helpers/kingdom/museum';
+import { isUnobtainableThisRun } from '@helpers/item/obtainable-this-run';
+import { itemSources } from '@helpers/kingdom/museum';
 import {
   regionGatheringDrops,
   worldNodeMonsterDropTable,
@@ -144,11 +142,11 @@ describe('museum sources for region gathering drops', () => {
     seedGamestate((state) => {
       state.globalEffectSums.removedWorldNodeTypes.GatherNode = true;
     });
-    expect(isFoundOnlyAtRemovedNodes({ itemId: wood })).toBe(true);
+    expect(isUnobtainableThisRun({ itemId: wood })).toBe(true);
 
     withDropChance(40);
     expect(itemSources(wood)).toEqual([{ type: 'node', name: 'Den' }]);
-    expect(isFoundOnlyAtRemovedNodes({ itemId: wood })).toBe(false);
-    expect(isFoundOnlyAtRemovedNodes({ itemId: ore })).toBe(true);
+    expect(isUnobtainableThisRun({ itemId: wood })).toBe(false);
+    expect(isUnobtainableThisRun({ itemId: ore })).toBe(true);
   });
 });

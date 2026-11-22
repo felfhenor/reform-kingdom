@@ -40,6 +40,8 @@ export type GlobalEffectSums = {
   craftTimeMultiplierBonus: number;
   skillPointsPerLevel: number;
   reclassDisabled: boolean;
+  tradeskillsDisabled: boolean;
+  workersDisabled: boolean;
   manualCombat: boolean;
   requireSealForDecreeAutomation: boolean;
   partySharesClass: boolean;
@@ -60,6 +62,10 @@ export type GlobalEffectSums = {
   astralSpellStrengthBonus: number;
   // Whole percent, summed additively.
   regionGatheringDropChance: number;
+  // Whole percent, summed additively.
+  regionGearDropChance: number;
+  // Whole percent, summed additively.
+  regionMaterialDropChance: number;
   combatItemDropRateBoost: number;
   gatheringItemDropRateBoost: number;
   gatheringItemDropAmountBoost: number;

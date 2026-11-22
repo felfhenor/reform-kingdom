@@ -11,12 +11,12 @@ import {
 import { ensureRecipe } from '@helpers/content/ensure-recipe';
 import { ensureTown } from '@helpers/content/ensure-town';
 import { ensureTradeskill } from '@helpers/content/ensure-tradeskill';
+import { isRecipeTownUnique } from '@helpers/crafting/recipe-town-unique';
 import {
   isRecipeCraftable,
   isRecipeDiscovered,
   isRecipeDropGated,
   isRecipeKnown,
-  isRecipeTownUnique,
   isRecipeAvailable,
   recipeCanUnlockWithTokens,
   recipeDiscover,
@@ -165,6 +165,13 @@ describe('isRecipeCraftable', () => {
 
     seedDiscovered(equipmentRecipe.id);
     expect(isRecipeCraftable(equipmentRecipe.id)).toBe(true);
+  });
+
+  it('is false for every recipe while crafting is disabled', () => {
+    seedGamestate((state) => {
+      state.globalEffectSums.tradeskillsDisabled = true;
+    });
+    expect(isRecipeCraftable(itemRecipe.id)).toBe(false);
   });
 
   it("is false for a town's unique recipe, even if already discovered", () => {

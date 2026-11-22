@@ -20,7 +20,10 @@ import {
   itemSources,
   recipeSources,
 } from '@helpers/kingdom/museum';
-import { legacyClearedEdictsState } from '@helpers/state-game';
+import {
+  globalEffectSumsState,
+  legacyClearedEdictsState,
+} from '@helpers/state-game';
 import { worldNodeDisplayName } from '@helpers/world-node/world-nodes';
 import type {
   CollectibleContent,
@@ -207,7 +210,10 @@ export function getMuseumRecipeEntries(): MuseumRecipeEntry[] {
       recipe,
       discovered,
       sourceNodeNames: knownSourceNames(recipeSources(recipe.id), discovered),
-      tokenUnlockCost: discovered ? undefined : recipe.tokenUnlockCost,
+      tokenUnlockCost:
+        discovered || globalEffectSumsState().tradeskillsDisabled
+          ? undefined
+          : recipe.tokenUnlockCost,
       discoveredButNotMade: false,
     };
   });

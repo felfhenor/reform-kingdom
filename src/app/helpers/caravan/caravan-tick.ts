@@ -6,7 +6,11 @@ import { caravanTradeUnlockOwned } from '@helpers/caravan/caravan-trade-quantity
 import { ACTIVE_TRADE_COUNT } from '@helpers/config';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { newCurseFreeEquipmentItem } from '@helpers/item/equipment';
-import { updateGamestate, worldCaravansState } from '@helpers/state-game';
+import {
+  globalEffectSumsState,
+  updateGamestate,
+  worldCaravansState,
+} from '@helpers/state-game';
 import {
   worldNodeCaravan,
   worldNodesOfType,
@@ -75,7 +79,11 @@ function pickTrader(
 function pickActiveTradeIndices(trader: CaravanTraderContent): number[] {
   const eligible = trader.trades
     .map((trade, index) => ({ index, weight: trade.weight, trade }))
-    .filter(({ trade }) => !caravanTradeUnlockOwned(trade));
+    .filter(({ trade }) => !caravanTradeUnlockOwned(trade))
+    .filter(
+      ({ trade }) =>
+        !trade.recipeId || !globalEffectSumsState().tradeskillsDisabled,
+    );
 
   return caravanWeightedSample(eligible, ACTIVE_TRADE_COUNT).map(
     (entry) => entry.index,

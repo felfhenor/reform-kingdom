@@ -120,6 +120,10 @@ export function globalEffectEffectDescription(
         : `Skill Points: ${signedNumber(Math.sign(effect.value))} every ${Math.round(1 / Math.abs(effect.value))} levels`;
     case 'GlobalReclassDisabled':
       return 'Heroes cannot reclass';
+    case 'GlobalTradeskillsDisabled':
+      return 'Crafting is forgotten';
+    case 'GlobalWorkersDisabled':
+      return 'Workers cannot be rescued';
     case 'GlobalManualCombat':
       return 'Heroes act only on your orders';
     case 'GlobalRequireSealForDecreeAutomation':
@@ -154,6 +158,10 @@ export function globalEffectEffectDescription(
       return `Astral Spell Strength: ${signedPercent(effect.value * 100)}`;
     case 'GlobalMonstersDropRegionGathering':
       return `Monsters: ${effect.value}% chance to drop regional gathering materials`;
+    case 'GlobalMonstersDropRegionGear':
+      return `Monsters: ${effect.value}% chance to drop regional gear near their level`;
+    case 'GlobalMonstersDropRegionCraftedMaterials':
+      return `Monsters: ${effect.value}% chance to drop regional crafted materials`;
     case 'EnemyExtraSkills':
       return `Enemy Skills: +${effect.value}`;
     case 'GlobalLevelStatMultiplier':
@@ -303,6 +311,12 @@ function accumulateGlobalEffectEffect(
     case 'GlobalReclassDisabled':
       sums.reclassDisabled = true;
       return;
+    case 'GlobalTradeskillsDisabled':
+      sums.tradeskillsDisabled = true;
+      return;
+    case 'GlobalWorkersDisabled':
+      sums.workersDisabled = true;
+      return;
     case 'GlobalManualCombat':
       sums.manualCombat = true;
       return;
@@ -354,6 +368,12 @@ function accumulateGlobalEffectEffect(
       return;
     case 'GlobalMonstersDropRegionGathering':
       sums.regionGatheringDropChance += effect.value;
+      return;
+    case 'GlobalMonstersDropRegionGear':
+      sums.regionGearDropChance += effect.value;
+      return;
+    case 'GlobalMonstersDropRegionCraftedMaterials':
+      sums.regionMaterialDropChance += effect.value;
       return;
     case 'DebuffResistance':
       sums.debuffResistanceFlat += effect.value;

@@ -4,7 +4,7 @@
  * defense rewards, commission offers): it must resolve to a real compiled
  * recipe, and it must not be a town-exclusive recipe (those are only ever
  * sold via a town's own crafting.uniqueRecipeIds shop stock - see
- * `isRecipeTownUnique` in `crafting/recipes.ts` - so a random drop of one is
+ * `isRecipeTownUnique` in `crafting/recipe-town-unique.ts` - so a random drop of one is
  * always a content mistake, not an intended second source).
  */
 

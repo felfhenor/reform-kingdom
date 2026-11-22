@@ -22,6 +22,7 @@ import {
   updateGamestate,
 } from '@helpers/state-game';
 import { taskEventTradeskillLevel } from '@helpers/task/task-events';
+import { sortBy } from 'es-toolkit/compat';
 import type {
   DifficultyTier,
   GameState,
@@ -249,4 +250,13 @@ export function craftXpChanceTier(
   if (chance >= 50) return 'Medium';
   if (chance >= 25) return 'Easy';
   return 'Trivial';
+}
+
+// Empty when this run's edicts disabled crafting.
+export function tradeskillsEnabled(): TradeskillContent[] {
+  if (globalEffectSumsState().tradeskillsDisabled) return [];
+  return sortBy(
+    getEntriesByType<TradeskillContent>('tradeskill'),
+    (content) => content.name,
+  );
 }

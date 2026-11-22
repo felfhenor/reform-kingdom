@@ -4,9 +4,9 @@ import { ensureCaravanTrader } from '@helpers/content/ensure-caravan';
 import { ensureEncounter } from '@helpers/content/ensure-encounternode';
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { ensureTown } from '@helpers/content/ensure-town';
+import { isUnobtainableThisRun } from '@helpers/item/obtainable-this-run';
 import {
   isCollectibleSourceKnown,
-  isFoundOnlyAtRemovedNodes,
   recipeSources,
 } from '@helpers/kingdom/museum';
 import type {
@@ -72,14 +72,14 @@ describe('sources at removed nodes', () => {
 
     seedGamestate();
     expect(recipeSources(cloakRecipe)).toHaveLength(1);
-    expect(isFoundOnlyAtRemovedNodes({ recipeId: cloakRecipe })).toBe(false);
+    expect(isUnobtainableThisRun({ recipeId: cloakRecipe })).toBe(false);
 
     seedGamestate((state) => {
       state.globalEffectSums.removedWorldNodeTypes.ExploreNode = true;
     });
     expect(recipeSources(cloakRecipe)).toEqual([]);
-    expect(isFoundOnlyAtRemovedNodes({ recipeId: cloakRecipe })).toBe(true);
-    expect(isFoundOnlyAtRemovedNodes({ recipeId: ingotRecipe })).toBe(false);
+    expect(isUnobtainableThisRun({ recipeId: cloakRecipe })).toBe(true);
+    expect(isUnobtainableThisRun({ recipeId: ingotRecipe })).toBe(false);
   });
 });
 

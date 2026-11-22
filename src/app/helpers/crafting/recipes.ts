@@ -3,6 +3,7 @@ import {
   getEntriesByType,
   getEntry,
 } from '@helpers/content/content';
+import { isRecipeTownUnique } from '@helpers/crafting/recipe-town-unique';
 import {
   tradeskillBuilding,
   tradeskillNameForId,
@@ -14,6 +15,7 @@ import { getMaterialQuantity, traderTokenId } from '@helpers/item/materials';
 import { getArmoryEntries } from '@helpers/kingdom/armory';
 import {
   discoveredRecipesState,
+  globalEffectSumsState,
   updateGamestate,
   worldPartyState,
 } from '@helpers/state-game';
@@ -28,7 +30,6 @@ import type {
   ItemId,
   RecipeContent,
   RecipeId,
-  TownContent,
   TradeskillContent,
 } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
@@ -48,7 +49,6 @@ export function isRecipeDiscovered(
 
 // Keyed by the content map, so a content reload is just a cache miss.
 const dropGatedCache = new WeakMap<object, Set<RecipeId>>();
-const townUniqueCache = new WeakMap<object, Set<RecipeId>>();
 
 function dropGatedRecipeIds(): Set<RecipeId> {
   const content = allContentById();
@@ -75,34 +75,16 @@ function dropGatedRecipeIds(): Set<RecipeId> {
   return ids;
 }
 
-function townUniqueRecipeIds(): Set<RecipeId> {
-  const content = allContentById();
-  const cached = townUniqueCache.get(content);
-  if (cached) return cached;
-
-  const ids = new Set(
-    getEntriesByType<TownContent>('town').flatMap(
-      (town) => town.crafting.uniqueRecipeIds,
-    ),
-  );
-  townUniqueCache.set(content, ids);
-  return ids;
-}
-
 // Whether this recipe is gated behind a world drop or a caravan trader sale -
 // gated recipes should never be craftable until discovered.
 export function isRecipeDropGated(recipeId: RecipeId): boolean {
   return dropGatedRecipeIds().has(recipeId);
 }
 
-// Exclusively obtainable through the town's own shop stock - never on the player's own tradeskill craft list.
-export function isRecipeTownUnique(recipeId: RecipeId): boolean {
-  return townUniqueRecipeIds().has(recipeId);
-}
-
 // A drop-gated recipe can only be crafted once found; every other recipe is
 // available as soon as the tradeskill level gate is met.
 export function isRecipeCraftable(recipeId: RecipeId): boolean {
+  if (globalEffectSumsState().tradeskillsDisabled) return false;
   if (isRecipeTownUnique(recipeId)) return false;
   if (isRecipeDiscovered(recipeId)) return true;
   return !isRecipeDropGated(recipeId);
@@ -166,6 +148,7 @@ export function recipeCanUnlockWithTokens(
     : getMaterialQuantity(traderTokenId());
 
   return (
+    !globalEffectSumsState().tradeskillsDisabled &&
     isRecipeDropGated(recipeId) &&
     !isRecipeDiscovered(recipeId, state) &&
     tokenQuantity >= recipe.tokenUnlockCost

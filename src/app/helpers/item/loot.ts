@@ -1,5 +1,5 @@
 import { CHARACTER_MAX_LEVEL } from '@helpers/config';
-import { isRecipeTownUnique } from '@helpers/crafting/recipes';
+import { isRecipeTownUnique } from '@helpers/crafting/recipe-town-unique';
 import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
 import { rangeAtLevel } from '@helpers/engine/leveled-range';
 import { jobAbilityValue } from '@helpers/hero/job-ability';
@@ -98,11 +98,12 @@ export function isClearProofReward(drop: DroppedReward): boolean {
   );
 }
 
-// A recipe the player can never personally craft (town-exclusive) isn't usable;
-// one above their tradeskill level still drops and waits in the list until it's reached.
-export function isRecipeUsable(drop: DroppedReward): boolean {
+// Town-exclusive recipes, and recipes or workers this run's edicts disabled, never roll; a recipe above the tradeskill level still does.
+export function isDropUsable(drop: DroppedReward): boolean {
+  const sums = globalEffectSumsState();
+  if (drop.kind === 'Worker') return !sums.workersDisabled;
   if (drop.kind !== 'Recipe') return true;
-  return !isRecipeTownUnique(drop.recipeId);
+  return !sums.tradeskillsDisabled && !isRecipeTownUnique(drop.recipeId);
 }
 
 export function rollDroppedRewards(
@@ -115,7 +116,7 @@ export function rollDroppedRewards(
       (drop) =>
         (drop.minLevel ?? 0) <= level &&
         (drop.maxLevel ?? CHARACTER_MAX_LEVEL) >= level &&
-        isRecipeUsable(drop),
+        isDropUsable(drop),
     )
     .map((drop) => resolveDrop(drop, level, bonus))
     .filter((drop): drop is ResolvedDrop => !!drop);

@@ -26,6 +26,7 @@
   name: Edict of the Blessed Cornucopia
   groups:
     - WarrenCornucopia
+    - SpontaneousCornucopia
   sprite: '0002'
   description: Item drop chance is increased by 25%, and workers gather 25% faster.
   kind: Boon
@@ -101,6 +102,8 @@
 
 - id: afeb283e-97fd-4bbb-a5e9-905e6c766304
   name: Edict of Hasty Hammers
+  groups:
+    - SpontaneousHammers
   sprite: '0026'
   description: Crafting timers are reduced by 50%.
   kind: Boon
@@ -128,6 +131,8 @@
 
 - id: 1b3ffa90-0f05-4b98-8270-c836f44f136c
   name: Edict of Sharp Unionization
+  groups:
+    - SpontaneousUnionization
   sprite: '0031'
   description: Workers get +300% XP.
   kind: Boon

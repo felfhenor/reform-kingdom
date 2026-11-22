@@ -190,67 +190,69 @@
       </div>
     }
 
-    <div class="card shadow-sm bg-section-crafting">
-      <div class="card-body p-3 gap-2">
-        <h2 class="type-section-title">Crafting</h2>
+    @if (tradeskillButtonViewModels().length > 0) {
+      <div class="card shadow-sm bg-section-crafting">
+        <div class="card-body p-3 gap-2">
+          <h2 class="type-section-title">Crafting</h2>
 
-        <div class="grid grid-cols-5 gap-2">
-          @for (
-            tradeskill of tradeskillButtonViewModels();
-            track tradeskill.subview
-          ) {
-            <button
-              type="button"
-              class="btn btn-neutral px-2 flex flex-col justify-center gap-2 h-36"
-              (click)="openSubview(tradeskill.subview)"
-              appSfx="ui-click"
-              [sfxOffset]="$index + 6"
-              [sfxTrigger]="['click', 'hover']"
-            >
-              <app-atlas-image
-                spritesheet="tradeskill"
-                [assetName]="tradeskill.sprite"
-                class="zoom-tile"
-              />
-              <span class="text-base font-bold">
-                {{ tradeskill.label }} Lv. {{ tradeskill.level }}
-              </span>
-
-              <app-bar-progress
-                color="xp"
-                [value]="tradeskill.xpCurrent"
-                [max]="tradeskill.xpMaximum"
+          <div class="grid grid-cols-5 gap-2">
+            @for (
+              tradeskill of tradeskillButtonViewModels();
+              track tradeskill.subview
+            ) {
+              <button
+                type="button"
+                class="btn btn-neutral px-2 flex flex-col justify-center gap-2 h-36"
+                (click)="openSubview(tradeskill.subview)"
+                appSfx="ui-click"
+                [sfxOffset]="$index + 6"
+                [sfxTrigger]="['click', 'hover']"
               >
-                <app-text-number-tween [value]="tradeskill.xpCurrent" />
-                /{{ tradeskill.xpMaximum | number }}
-              </app-bar-progress>
+                <app-atlas-image
+                  spritesheet="tradeskill"
+                  [assetName]="tradeskill.sprite"
+                  class="zoom-tile"
+                />
+                <span class="text-base font-bold">
+                  {{ tradeskill.label }} Lv. {{ tradeskill.level }}
+                </span>
 
-              @if (tradeskill.hasQueue) {
                 <app-bar-progress
-                  color="primary"
-                  [value]="tradeskill.overallPercent"
-                  [max]="tradeskill.activePercent"
+                  color="xp"
+                  [value]="tradeskill.xpCurrent"
+                  [max]="tradeskill.xpMaximum"
                 >
-                  <div
-                    class="absolute inset-y-0 w-0.5 bg-white"
-                    [style.left.%]="tradeskill.activePercent"
-                  ></div>
-
-                  {{ tradeskill.queueUnitsRemaining }}
-                  {{ 'item' | pluralize: tradeskill.queueUnitsRemaining > 1 }}
-                  ·
-                  {{ tradeskill.totalRemainingLabel }}
+                  <app-text-number-tween [value]="tradeskill.xpCurrent" />
+                  /{{ tradeskill.xpMaximum | number }}
                 </app-bar-progress>
-              } @else {
-                <div class="relative w-full h-4 type-meta text-shadow-black">
-                  Not currently crafting
-                </div>
-              }
-            </button>
-          }
+
+                @if (tradeskill.hasQueue) {
+                  <app-bar-progress
+                    color="primary"
+                    [value]="tradeskill.overallPercent"
+                    [max]="tradeskill.activePercent"
+                  >
+                    <div
+                      class="absolute inset-y-0 w-0.5 bg-white"
+                      [style.left.%]="tradeskill.activePercent"
+                    ></div>
+
+                    {{ tradeskill.queueUnitsRemaining }}
+                    {{ 'item' | pluralize: tradeskill.queueUnitsRemaining > 1 }}
+                    ·
+                    {{ tradeskill.totalRemainingLabel }}
+                  </app-bar-progress>
+                } @else {
+                  <div class="relative w-full h-4 type-meta text-shadow-black">
+                    Not currently crafting
+                  </div>
+                }
+              </button>
+            }
+          </div>
         </div>
       </div>
-    </div>
+    }
 
     <div class="card shadow-sm">
       <div class="card-body p-3 gap-2">

@@ -7,6 +7,7 @@ export * from './recipe-craft-time';
 export * from './recipe-filter.ui';
 export * from './recipe-requirements';
 export * from './recipe-result';
+export * from './recipe-town-unique';
 export * from './recipes';
 export * from './recipes.ui';
 export * from './tradeskill';

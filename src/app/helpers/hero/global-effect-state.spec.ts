@@ -246,6 +246,10 @@ describe('recomputeGlobalEffectSums', () => {
           { effectType: 'GlobalDecreeClauseCapBoost', value: 1 },
           { effectType: 'GlobalMonstersDropRegionGathering', value: 30 },
           { effectType: 'GlobalMonstersDropRegionGathering', value: 20 },
+          { effectType: 'GlobalMonstersDropRegionGear', value: 10 },
+          { effectType: 'GlobalMonstersDropRegionGear', value: 1 },
+          { effectType: 'GlobalTradeskillsDisabled' },
+          { effectType: 'GlobalWorkersDisabled' },
         ]),
       ];
     });
@@ -269,6 +273,9 @@ describe('recomputeGlobalEffectSums', () => {
       onPathTravelSpeedBonus: 0.05,
       decreeClauseCapBoost: 1,
       regionGatheringDropChance: 50,
+      regionGearDropChance: 11,
+      tradeskillsDisabled: true,
+      workersDisabled: true,
     });
   });
 

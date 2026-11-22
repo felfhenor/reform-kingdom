@@ -334,3 +334,13 @@
 
   effects:
     - effectType: GlobalShowRunTimer
+
+- id: f0b9cd3d-5268-43d9-805b-8b74a4255ade
+  name: Vow of Spontaneous Memory
+  rarity: Mystical
+  description: A vow to seek help in the most unlikely of places.
+  sprite: '0118'
+
+  effects:
+    - effectType: GlobalMonstersDropRegionGear
+      value: 1

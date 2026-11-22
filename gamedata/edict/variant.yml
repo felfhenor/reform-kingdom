@@ -43,6 +43,8 @@
 
 - id: d9f1a5fc-a65a-43ae-a5c6-e0cfe363f961
   name: Edict of the Heated Forge
+  groups:
+    - SpontaneousForge
   sprite: '0019'
   description: Town shops no longer sell equipment. Workers craft 50% faster, and every tradeskill queue holds 1 more craft.
   kind: Variant
@@ -123,6 +125,8 @@
 
 - id: c03e5ab7-1e05-4e4d-a128-be17f5e58b2d
   name: Edict of Artificial Scarcity
+  groups:
+    - SpontaneousScarcity
   sprite: '0009'
   description: Recipes need 100% more of every material. Crafted gear always rolls one extra affix.
   kind: Variant
@@ -203,3 +207,23 @@
     - effectType: GlobalSkipRegionIntros
     - effectType: GlobalSkipTutorials
     - effectType: GlobalSkipStoryCrawls
+
+- id: 13dbb8b4-85b8-468a-a9cf-93a370e72940
+  name: Edict of Spontaneous Memory
+  groups:
+    - SpontaneousForge
+    - SpontaneousScarcity
+    - SpontaneousHammers
+    - SpontaneousUnionization
+    - SpontaneousCornucopia
+  sprite: '0035'
+  description: Crafting and workers are permanently forgotten. Monsters have a 10% chance to drop gear made from their region's materials, near their own level, and a 10% chance to drop the region's crafted materials.
+  kind: Variant
+  fragments: 0
+  effects:
+    - effectType: GlobalMonstersDropRegionGear
+      value: 10
+    - effectType: GlobalMonstersDropRegionCraftedMaterials
+      value: 10
+    - effectType: GlobalTradeskillsDisabled
+    - effectType: GlobalWorkersDisabled

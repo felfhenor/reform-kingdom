@@ -1,4 +1,5 @@
 import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { globalEffectSumsState } from '@helpers/state-game';
 import { isWorldNodeNameRemoved } from '@helpers/world-node/world-nodes';
 import type {
   TaskContent,
@@ -41,8 +42,15 @@ export function taskRequirementNodeName(
   }
 }
 
-// Set at a node this run's edicts removed, so it can never be done.
-export function isTaskOnRemovedNode(task: TaskContent): boolean {
+// Set at a node, or on a feature, this run's edicts removed.
+export function isTaskImpossibleThisRun(task: TaskContent): boolean {
+  const sums = globalEffectSumsState();
+  const kind = task.requirement.kind;
+  if (kind === 'CraftRecipe' || kind === 'TradeskillLevel') {
+    if (sums.tradeskillsDisabled) return true;
+  }
+  if (kind === 'RescueWorker' && sums.workersDisabled) return true;
+
   const nodeName = taskRequirementNodeName(task.requirement);
   return !!nodeName && isWorldNodeNameRemoved(nodeName);
 }

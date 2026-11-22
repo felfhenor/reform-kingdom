@@ -229,6 +229,16 @@ export type GlobalEffectEffectReclassDisabled = {
   effectType: 'GlobalReclassDisabled';
 };
 
+// Every crafting tradeskill is hidden and nothing can be crafted.
+export type GlobalEffectEffectTradeskillsDisabled = {
+  effectType: 'GlobalTradeskillsDisabled';
+};
+
+// Duchy workers can't be rescued.
+export type GlobalEffectEffectWorkersDisabled = {
+  effectType: 'GlobalWorkersDisabled';
+};
+
 // Heroes act only on the player's round orders, except in Decree fights on sealed maps.
 export type GlobalEffectEffectManualCombat = {
   effectType: 'GlobalManualCombat';
@@ -321,6 +331,18 @@ export type GlobalEffectEffectMonstersDropRegionGathering = {
   value: number;
 };
 
+// Whole percent per monster killed to drop one piece of gear whose home map is the fight's map, near the monster's level.
+export type GlobalEffectEffectMonstersDropRegionGear = {
+  effectType: 'GlobalMonstersDropRegionGear';
+  value: number;
+};
+
+// Whole percent per monster killed to drop a crafted-only material homed on the fight's map, sized by what non-recipe costs need.
+export type GlobalEffectEffectMonstersDropRegionCraftedMaterials = {
+  effectType: 'GlobalMonstersDropRegionCraftedMaterials';
+  value: number;
+};
+
 // Fraction (0.5 = 50% more) on every kingdom recipe material, rounded down, never below 1.
 export type GlobalEffectEffectTradeskillMaterialBoost = {
   effectType: 'GlobalTradeskillMaterialBoost';
@@ -376,6 +398,8 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectCraftTimeMultiplier
   | GlobalEffectEffectSkillPointsPerLevel
   | GlobalEffectEffectReclassDisabled
+  | GlobalEffectEffectTradeskillsDisabled
+  | GlobalEffectEffectWorkersDisabled
   | GlobalEffectEffectManualCombat
   | GlobalEffectEffectRequireSealForDecreeAutomation
   | GlobalEffectEffectPartySharesClass
@@ -393,6 +417,8 @@ export type GlobalEffectEffect =
   | GlobalEffectEffectAstralSpellDuration
   | GlobalEffectEffectAstralSpellStrength
   | GlobalEffectEffectMonstersDropRegionGathering
+  | GlobalEffectEffectMonstersDropRegionGear
+  | GlobalEffectEffectMonstersDropRegionCraftedMaterials
   | GlobalEffectEffectDebuffResistance
   | GlobalEffectEffectDebuffResistanceTag
   | GlobalEffectEffectCombatItemDropRateBoost

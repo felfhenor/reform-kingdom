@@ -161,6 +161,8 @@ export function ensureGlobalEffectEffect(
 
   if (
     effect.effectType === 'GlobalReclassDisabled' ||
+    effect.effectType === 'GlobalTradeskillsDisabled' ||
+    effect.effectType === 'GlobalWorkersDisabled' ||
     effect.effectType === 'GlobalManualCombat' ||
     effect.effectType === 'GlobalRequireSealForDecreeAutomation' ||
     effect.effectType === 'GlobalPartySharesClass' ||
@@ -229,6 +231,8 @@ export function ensureGlobalEffectEffect(
     effect.effectType === 'GlobalAstralSpellDuration' ||
     effect.effectType === 'GlobalAstralSpellStrength' ||
     effect.effectType === 'GlobalMonstersDropRegionGathering' ||
+    effect.effectType === 'GlobalMonstersDropRegionGear' ||
+    effect.effectType === 'GlobalMonstersDropRegionCraftedMaterials' ||
     effect.effectType === 'GlobalShrineBuffDuration' ||
     effect.effectType === 'GlobalShrineBuffStrength'
   ) {

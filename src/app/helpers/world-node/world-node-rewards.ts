@@ -7,7 +7,7 @@ import {
   recipeStylizedName,
 } from '@helpers/crafting/recipes';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
-import { assertNeverReward, isRecipeUsable } from '@helpers/item/loot';
+import { assertNeverReward, isDropUsable } from '@helpers/item/loot';
 import { isMaterialDiscovered } from '@helpers/item/materials';
 import { isEquipmentDiscovered } from '@helpers/kingdom/armory';
 import { isWorkerRescued } from '@helpers/worker/worker-discovery';
@@ -162,6 +162,6 @@ export function worldNodeHasObtainableMissingReward(
     (reward) =>
       !isRewardDiscovered(reward) &&
       !isGoldCoinReward(reward) &&
-      isRecipeUsable(reward),
+      isDropUsable(reward),
   );
 }

@@ -7,6 +7,7 @@ import { runContentGapsAnalysis } from '@helpers/debug/analysis-contentgaps';
 import { runDebuffResistanceAnalysis } from '@helpers/debug/analysis-debuffresistance';
 import { runFieldNodesAnalysis } from '@helpers/debug/analysis-fieldnodes';
 import { runGatherDevelopmentLevelsAnalysis } from '@helpers/debug/analysis-gatherdevelopmentlevels';
+import { runGearHomesAnalysis } from '@helpers/debug/analysis-gearhomes';
 import { runHeroStatsAnalysis } from '@helpers/debug/analysis-herostats';
 import { runInfusionGapsAnalysis } from '@helpers/debug/analysis-infusiongaps';
 import { runJobAbilitiesAnalysis } from '@helpers/debug/analysis-jobabilities';
@@ -369,6 +370,16 @@ export const ANALYSIS_SCRIPTS: AnalysisScriptDefinition[] = [
     strict: false,
     inputKeys: [],
     run: runWorkerReachabilityAnalysis,
+  },
+  {
+    id: 'gearhomes',
+    title: 'Gear Home Maps',
+    description:
+      'Which map each crafted gear piece drops on under the region gear drop effect, and crafted gear that never drops.',
+    category: 'World & Maps',
+    strict: false,
+    inputKeys: [],
+    run: runGearHomesAnalysis,
   },
 
   // --- Caravans & Commissions ---

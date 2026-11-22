@@ -1,98 +1,26 @@
 import { computed } from '@angular/core';
 import { getEntriesByType } from '@helpers/content/content';
 import { error } from '@helpers/engine/logging';
+import { baseContentSources } from '@helpers/item/content-sources';
 import type {
-  CaravanTraderContent,
+  CollectibleContent,
   CollectibleId,
   CollectibleSource,
-  EncounterContent,
-  EncounterRandomContent,
-  ExchangeNodeContent,
-  RecipeContent,
-  TownContent,
 } from '@interfaces';
 
-// Builds the collectible -> source lookup from static content only, so it reflects current content even for old saves. A collectible with more than one source is a content bug and gets logged.
+// Static content only, so it reflects current content even for old saves. A collectible with more than one source is a content bug and gets logged.
 export function collectibleSourceMapBuild(): Map<
   CollectibleId,
   CollectibleSource[]
 > {
-  const sources = new Map<CollectibleId, CollectibleSource[]>();
-
-  const addSource = (
-    collectibleId: CollectibleId,
-    source: CollectibleSource,
-  ) => {
-    sources.set(collectibleId, [...(sources.get(collectibleId) ?? []), source]);
-  };
-
-  const nodeContents = [
-    ...getEntriesByType<EncounterContent>('encounter'),
-    ...getEntriesByType<EncounterRandomContent>('encounterrandom'),
-  ];
-  nodeContents.forEach((node) => {
-    node.completionRewards.forEach((reward) => {
-      if ('collectibleId' in reward) {
-        addSource(reward.collectibleId, { type: 'node', name: node.name });
-      }
-    });
-  });
-
-  getEntriesByType<RecipeContent>('recipe').forEach((recipe) => {
-    if ('collectibleId' in recipe.result) {
-      addSource(recipe.result.collectibleId, {
-        type: 'crafting',
-        tradeskillId: recipe.tradeskillId,
-        tradeskillLevel: recipe.minTradeskillLevel,
-      });
-    }
-  });
-
-  getEntriesByType<CaravanTraderContent>('caravantrader').forEach((trader) => {
-    trader.trades.forEach((trade) => {
-      if (trade.type === 'sell' && trade.collectibleId) {
-        addSource(trade.collectibleId, {
-          type: 'trader',
-          traderId: trader.id,
-          name: trader.name,
-        });
-      }
-    });
-
-    // Token trades (bought with Trader Scrip) are a separate offer list from `trades`.
-    trader.tokenTrades.forEach((trade) => {
-      if (trade.collectibleId) {
-        addSource(trade.collectibleId, {
-          type: 'trader',
-          traderId: trader.id,
-          name: trader.name,
-        });
-      }
-    });
-  });
-
-  getEntriesByType<ExchangeNodeContent>('exchangenode').forEach((node) => {
-    node.exchanges.forEach((exchange) => {
-      if (exchange.kind === 'Collectible') {
-        addSource(exchange.output.collectibleId, {
-          type: 'node',
-          name: node.name,
-        });
-      }
-    });
-  });
-
-  getEntriesByType<TownContent>('town').forEach((town) => {
-    town.defense.rewards.forEach((reward) => {
-      if ('collectibleId' in reward) {
-        addSource(reward.collectibleId, {
-          type: 'raid',
-          townId: town.id,
-          name: town.name,
-        });
-      }
-    });
-  });
+  const sources = new Map(
+    getEntriesByType<CollectibleContent>('collectible').flatMap(
+      (collectible) => {
+        const found = baseContentSources({ collectibleId: collectible.id });
+        return found.length > 0 ? [[collectible.id, found] as const] : [];
+      },
+    ),
+  );
 
   sources.forEach((collectibleSources, collectibleId) => {
     if (collectibleSources.length > 1) {

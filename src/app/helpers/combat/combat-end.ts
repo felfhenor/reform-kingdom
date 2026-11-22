@@ -34,6 +34,10 @@ import {
 import { travelBeginDeathsDoor } from '@helpers/hero/travel';
 import { combatDropChanceBonus, rollDroppedRewards } from '@helpers/item/loot';
 import { loseCurrency, loseRandomMaterials } from '@helpers/item/materials';
+import {
+  rollRegionGearDrop,
+  rollRegionMaterialDrop,
+} from '@helpers/item/region-gear-drop';
 import { monsterRecordKill } from '@helpers/kingdom/bestiary';
 import { founderWhisperLog } from '@helpers/lore/founder-whisper';
 import {
@@ -185,9 +189,11 @@ function grantVictoryXp(combat: Combat, rawXps: number[]): void {
 function rollMonsterDrops(combat: Combat): ResolvedDrop[] {
   const bonus = combatDropChanceBonus();
   const mapName = worldNodeByName(combat.locationName)?.mapName ?? '';
-  return rewardingMonsters(combat).flatMap(({ monster, level }) =>
-    rollDroppedRewards(monsterDropsOnMap(monster, mapName), level, bonus),
-  );
+  return rewardingMonsters(combat).flatMap(({ monster, level }) => [
+    ...rollDroppedRewards(monsterDropsOnMap(monster, mapName), level, bonus),
+    ...rollRegionGearDrop(mapName, level, bonus),
+    ...rollRegionMaterialDrop(mapName, level, bonus),
+  ]);
 }
 
 function completedEncounter(combat: Combat): EncounterContent | undefined {

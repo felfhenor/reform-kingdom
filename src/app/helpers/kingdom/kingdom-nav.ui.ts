@@ -1,6 +1,6 @@
 import { hasAnyCommission } from '@helpers/commission/commission-tick.ui';
 import { COLOSSEUM_UNLOCK_LEVEL } from '@helpers/config';
-import { getEntriesByType } from '@helpers/content/content';
+import { tradeskillsEnabled } from '@helpers/crafting/tradeskill';
 import { edictsActive } from '@helpers/edict/edict';
 import { isRevealedAtLevel } from '@helpers/engine/feature-reveal';
 import { kingdomSubviewForTradeskill } from '@helpers/engine/ui';
@@ -16,9 +16,8 @@ import type {
   KingdomNavGroup,
   KingdomNavSection,
   Tradeskill,
-  TradeskillContent,
 } from '@interfaces';
-import { sortBy, uniq } from 'es-toolkit/compat';
+import { uniq } from 'es-toolkit/compat';
 
 export const KINGDOM_FEATURE_NAV: Record<
   KingdomFeatureSubview,
@@ -136,10 +135,7 @@ function kingdomFeatureNavEntries(group: KingdomNavGroup): KingdomNavEntry[] {
 }
 
 function kingdomTradeskillNavEntries(): KingdomNavEntry[] {
-  return sortBy(
-    getEntriesByType<TradeskillContent>('tradeskill'),
-    (content) => content.name,
-  ).map((content) => {
+  return tradeskillsEnabled().map((content) => {
     const tradeskill = content.name as Tradeskill;
     return {
       kind: 'tradeskill',

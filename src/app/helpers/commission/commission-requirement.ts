@@ -1,10 +1,7 @@
 import { caravanTraderSoldGoodIds } from '@helpers/caravan/caravan-trader-goods';
 import { getEntry } from '@helpers/content/content';
-import {
-  isRecipeCraftable,
-  isRecipeTownUnique,
-  recipesProducing,
-} from '@helpers/crafting/recipes';
+import { isRecipeTownUnique } from '@helpers/crafting/recipe-town-unique';
+import { isRecipeCraftable, recipesProducing } from '@helpers/crafting/recipes';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { armoryGet } from '@helpers/kingdom/armory';
 import { rngNumberRange } from '@helpers/rng';

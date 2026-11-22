@@ -10,14 +10,17 @@ import { IconKingdomComponent } from '@components/icon-kingdom/icon-kingdom.comp
 import { SFXDirective } from '@directives/sfx.directive';
 import { isCaravanDiscovered } from '@helpers/caravan/caravan';
 import { commissionCanFulfill } from '@helpers/commission/commission-fulfill';
-import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { getEntry } from '@helpers/content/content';
 import { craftQueueTicksRemaining } from '@helpers/crafting/crafting';
 import { recipeCraftTime } from '@helpers/crafting/recipe-craft-time';
 import {
   craftQueueTotalTicks,
   craftQueueUnitsRemaining,
 } from '@helpers/crafting/crafting.ui';
-import { tradeskillBuilding } from '@helpers/crafting/tradeskill';
+import {
+  tradeskillBuilding,
+  tradeskillsEnabled,
+} from '@helpers/crafting/tradeskill';
 import { modalOpen } from '@helpers/engine/modal-stack';
 import { notifySuccess } from '@helpers/engine/notify';
 import { formatDuration } from '@helpers/engine/timer';
@@ -63,10 +66,9 @@ import type {
   KingdomSubview,
   RecipeContent,
   Tradeskill,
-  TradeskillContent,
 } from '@interfaces';
 import { PluralizePipe } from '@pipes/pluralize.pipe';
-import { clamp, sortBy } from 'es-toolkit/compat';
+import { clamp } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-play-kingdom-home',
@@ -159,9 +161,7 @@ export class PlayKingdomHomeComponent {
       }).length,
   );
 
-  public readonly tradeskillContent = computed(() =>
-    sortBy(getEntriesByType<TradeskillContent>('tradeskill'), (t) => t.name),
-  );
+  public readonly tradeskillContent = computed(() => tradeskillsEnabled());
 
   // Also recomputes once a second so the progress bars never look frozen while the gameloop skips ticks (e.g. tab backgrounded).
   public tradeskillButtonViewModels = computed(() => {

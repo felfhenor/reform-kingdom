@@ -84,6 +84,12 @@ export const LEVEL_UP_NODE_FAILURE_LIMIT = 5;
 export const EDICT_FRAGMENT_MULTIPLIER_STEP = 0.1;
 export const EDICT_SCORE_MULTIPLIER_FLOOR = 0.1;
 
+// Regional gear drops from monsters this many levels under to this many over the gear's level requirement.
+export const REGION_GEAR_DROP_LEVELS_BELOW = 2;
+export const REGION_GEAR_DROP_LEVELS_ABOVE = 5;
+// A crafted material drop is this share of the largest single non-recipe cost that needs it.
+export const REGION_MATERIAL_DROP_COST_FRACTION = 0.1;
+
 // First guesses, for the scoring balance pass. Speed points scale with how far under par a region was sealed.
 export const SCORE_SEAL_POINTS = 1000;
 export const SCORE_SEAL_SPEED_POINTS = 1000;

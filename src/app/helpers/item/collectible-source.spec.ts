@@ -9,6 +9,7 @@ import {
   ensureEncounterRandom,
 } from '@helpers/content/ensure-encounternode';
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
+import { ensureCollectible } from '@helpers/content/ensure-item';
 import { ensureRecipe } from '@helpers/content/ensure-recipe';
 import { ensureTown } from '@helpers/content/ensure-town';
 import { error } from '@helpers/engine/logging';
@@ -43,7 +44,12 @@ function trader(trades: Partial<CaravanTrade>[]): CaravanTraderContent {
   });
 }
 
+const collectibles = [ruby, flower, card, effigy, treasureMap, houseModel].map(
+  (id) => ensureCollectible({ id, name: id }),
+);
+
 const allSources = [
+  ...collectibles,
   ensureEncounter({
     id: 'field-ruins' as EncounterId,
     name: 'Field Ruins',
@@ -97,7 +103,8 @@ describe('collectibleSourceMapBuild', () => {
 
   it('flags a collectible with more than one source as a content bug', () => {
     seedContent([
-      allSources[0],
+      ...collectibles,
+      allSources[collectibles.length],
       trader([{ type: 'sell', collectibleId: ruby }]),
     ]);
 

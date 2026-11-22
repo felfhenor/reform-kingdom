@@ -7,7 +7,7 @@ import {
 import { ensureTown } from '@helpers/content/ensure-town';
 import { ensureTrainer } from '@helpers/content/ensure-trainer';
 import {
-  isTaskOnRemovedNode,
+  isTaskImpossibleThisRun,
   taskRequirementNodeName,
 } from '@helpers/task/task';
 import type { TownId, TrainerId } from '@interfaces';
@@ -56,7 +56,7 @@ describe('taskRequirementNodeName', () => {
   });
 });
 
-describe('isTaskOnRemovedNode', () => {
+describe('isTaskImpossibleThisRun', () => {
   it('is true only for tasks set at a node type removed this run', () => {
     seedWorldNodes([{ name: 'Woods', type: 'GatherNode' }]);
     const gather = ensureTask({
@@ -70,12 +70,29 @@ describe('isTaskOnRemovedNode', () => {
     });
 
     seedGamestate();
-    expect(isTaskOnRemovedNode(gather)).toBe(false);
+    expect(isTaskImpossibleThisRun(gather)).toBe(false);
 
     seedGamestate((state) => {
       state.globalEffectSums.removedWorldNodeTypes.GatherNode = true;
     });
-    expect(isTaskOnRemovedNode(gather)).toBe(true);
-    expect(isTaskOnRemovedNode(level)).toBe(false);
+    expect(isTaskImpossibleThisRun(gather)).toBe(true);
+    expect(isTaskImpossibleThisRun(level)).toBe(false);
+  });
+
+  it('is true for crafting and rescue tasks while those features are disabled', () => {
+    const task = (kind: 'CraftRecipe' | 'TradeskillLevel' | 'RescueWorker') =>
+      ensureTask({ requirement: ensureTaskRequirement({ kind }) });
+
+    seedGamestate((state) => {
+      state.globalEffectSums.tradeskillsDisabled = true;
+    });
+    expect(isTaskImpossibleThisRun(task('CraftRecipe'))).toBe(true);
+    expect(isTaskImpossibleThisRun(task('TradeskillLevel'))).toBe(true);
+    expect(isTaskImpossibleThisRun(task('RescueWorker'))).toBe(false);
+
+    seedGamestate((state) => {
+      state.globalEffectSums.workersDisabled = true;
+    });
+    expect(isTaskImpossibleThisRun(task('RescueWorker'))).toBe(true);
   });
 });

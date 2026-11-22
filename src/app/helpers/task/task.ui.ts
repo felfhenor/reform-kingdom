@@ -1,3 +1,4 @@
+import { isTaskUnavailableThisRun } from '@helpers/item/obtainable-this-run';
 import { combatOrdersMostEnabled } from '@helpers/combat/combat-order';
 import { TASK_WIDGET_ENTRY_COUNT } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
@@ -12,7 +13,6 @@ import {
   worldPartyState,
 } from '@helpers/state-game';
 import {
-  isTaskOnRemovedNode,
   isTaskRequirementCounter,
   taskRequirementNodeName,
   tasksOrdered,
@@ -99,13 +99,10 @@ function taskRowViewModel(
 
 // Completed tasks stay listed so a reward earned off-map can still be claimed.
 function isTaskVisible(task: TaskContent, tasks: GameStateTasks): boolean {
-  if (isTaskOnRemovedNode(task)) return false;
+  if (tasks[task.id]?.completedAt) return true;
+  if (isTaskUnavailableThisRun(task)) return false;
 
-  return (
-    !task.requireMapVisit ||
-    !!tasks[task.id]?.completedAt ||
-    isWorldMapVisited(task.requireMapVisit)
-  );
+  return !task.requireMapVisit || isWorldMapVisited(task.requireMapVisit);
 }
 
 function taskRowViewModelsByOrder(): TaskRowViewModel[] {

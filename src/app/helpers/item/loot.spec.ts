@@ -139,6 +139,13 @@ describe('rollDroppedRewards', () => {
     ]);
   });
 
+  it('skips worker drops while workers are disabled', () => {
+    seedGamestate((state) => {
+      state.globalEffectSums.workersDisabled = true;
+    });
+    expect(rollDroppedRewards([guaranteed.worker], 1)).toEqual([]);
+  });
+
   it('returns nothing for no rewards', () => {
     expect(rollDroppedRewards([], 1)).toEqual([]);
   });
@@ -177,6 +184,14 @@ describe('rollDroppedRewards', () => {
 
     it('dont drop when only a town crafts them', () => {
       seedRecipe(true, 5);
+      expect(rollDroppedRewards([guaranteed.recipe], 5)).toEqual([]);
+    });
+
+    it('dont drop while crafting is disabled', () => {
+      seedRecipe(false, 5);
+      seedGamestate((state) => {
+        state.globalEffectSums.tradeskillsDisabled = true;
+      });
       expect(rollDroppedRewards([guaranteed.recipe], 5)).toEqual([]);
     });
 
