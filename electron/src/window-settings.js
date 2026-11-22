@@ -91,6 +91,7 @@ const watchWindowState = (win) => {
   ['resize', 'move'].forEach((event) =>
     win.on(event, () => pushWindowStateSoon(win)),
   );
+  win.on('focus', () => win.flashFrame(false));
 };
 
 const registerWindowSettingsHandlers = (getWindow) => {
@@ -99,6 +100,12 @@ const registerWindowSettingsHandlers = (getWindow) => {
   ipcMain.handle('window:get', () => {
     const win = getWindow();
     return win ? windowState(win) : undefined;
+  });
+
+  // Only an unfocused window flashes; focusing it stops the flash.
+  ipcMain.on('window:flash', () => {
+    const win = getWindow();
+    if (win && !win.isFocused()) win.flashFrame(true);
   });
 
   // Reports the requested mode since the fullscreen transition can still be animating.

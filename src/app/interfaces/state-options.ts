@@ -19,6 +19,7 @@ export type GameOption =
   | 'runInBackground'
   | 'muteWhenUnfocused'
   | 'lowerFrameRateWhenUnfocused'
+  | 'flashTaskbarOnAlerts'
   | 'skipFeatureTutorials'
   | 'skipLosingStreakTutorial';
 

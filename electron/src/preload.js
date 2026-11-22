@@ -28,6 +28,7 @@ contextBridge.exposeInMainWorld('reformElectron', {
     ipcRenderer.invoke('window:set-fullscreen', fullscreen),
   windowSetSize: (width, height) =>
     ipcRenderer.invoke('window:set-size', width, height),
+  windowFlash: () => ipcRenderer.send('window:flash'),
   // A throwing save still answers, so the main process doesn't sit out its timeout.
   windowOnSaveBeforeClose: (callback) => {
     const listener = () =>

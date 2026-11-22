@@ -31,6 +31,10 @@ export async function electronWindowSetSize(
   return electronWindowBridge()?.windowSetSize?.(choice.width, choice.height);
 }
 
+export function electronWindowFlash(): void {
+  electronWindowBridge()?.windowFlash?.();
+}
+
 export function electronWindowOnSaveBeforeClose(
   callback: () => Promise<boolean>,
 ): (() => void) | undefined {

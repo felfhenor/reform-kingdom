@@ -25,6 +25,7 @@ export function defaultOptions(): GameOptions {
     runInBackground: isInElectron(),
     muteWhenUnfocused: false,
     lowerFrameRateWhenUnfocused: false,
+    flashTaskbarOnAlerts: true,
     optionsTab: 'UI',
 
     showBackdropGrid: false,

@@ -11,6 +11,7 @@ import { ScreenTitleCrawlComponent } from '@components/screen-title-crawl/screen
 import { FadeInDirective } from '@directives/fade-in.directive';
 import { isDemoEndPending } from '@helpers/demo/demo.ui';
 import { discordUpdateStatus } from '@helpers/engine/discord';
+import { windowAttentionBind } from '@helpers/engine/window-attention.ui';
 import {
   isOutroCrawlPending,
   isRunLost,
@@ -51,6 +52,10 @@ export class GameComponent implements OnInit {
 
   public titleCrawlParagraphs = TITLE_CRAWL_PARAGRAPHS;
   public outroCrawlParagraphs = OUTRO_CRAWL_PARAGRAPHS;
+
+  constructor() {
+    windowAttentionBind();
+  }
 
   ngOnInit() {
     discordUpdateStatus();

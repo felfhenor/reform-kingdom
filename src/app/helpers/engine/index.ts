@@ -42,3 +42,5 @@ export * from './timer.ui';
 export * from './ui';
 export * from './ui-scale.ui';
 export * from './version';
+export * from './window-attention';
+export * from './window-attention.ui';

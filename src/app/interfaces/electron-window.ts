@@ -20,6 +20,7 @@ export type ElectronWindowBridge = {
     width: number,
     height: number,
   ) => Promise<ElectronWindowState | undefined>;
+  windowFlash: () => void;
   windowOnChange: (
     callback: (state: ElectronWindowState) => void,
   ) => () => void;

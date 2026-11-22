@@ -216,6 +216,32 @@
               </label>
             </div>
           }
+
+          <div class="form-control">
+            <label class="label cursor-pointer label-option">
+              <span class="label-text">
+                Flash Taskbar
+                <app-icon
+                  name="gameHelp"
+                  size="inline"
+                  class="text-lighter ml-1"
+                  [tp]="'Flashes the taskbar icon while the game is in the background and you win, lose, or the armory fills up.'"
+                  [tpPlacement]="'top'"
+                />
+              </span>
+              <input
+                type="checkbox"
+                [checked]="getOption('flashTaskbarOnAlerts')"
+                class="checkbox"
+                (click)="
+                  setOption(
+                    'flashTaskbarOnAlerts',
+                    !getOption('flashTaskbarOnAlerts')
+                  )
+                "
+              />
+            </label>
+          </div>
         </div>
       </div>
     }
