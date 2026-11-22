@@ -105,6 +105,7 @@ const createWindow = () => {
   // Capped at the smallest display so a small or heavily scaled laptop screen can still fit the whole window.
   const opts = {
     show: false,
+    backgroundColor: '#1d232a',
     icon: './icons/icon.png',
     minWidth: Math.min(1280, ...workAreas.map((area) => area.width)),
     minHeight: Math.min(720, ...workAreas.map((area) => area.height)),
