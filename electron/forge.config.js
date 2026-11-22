@@ -15,7 +15,8 @@ module.exports = {
     appCategoryType: 'public.app-category.games',
     icon: './icons/icon',
     // Forge only skips the current outDir, so the other edition's build would ship inside this one.
-    ignore: [/^\/out(-demo)?(\/|$)/],
+    // installer/ is only read by the Squirrel maker, not the running app.
+    ignore: [/^\/out(-demo)?(\/|$)/, /^\/installer(\/|$)/],
     win32metadata: {
       // Squirrel names the Start Menu folder after it, so it can't fall back to the colon in `author`.
       CompanyName: 'reForm Kingdom Team',
@@ -33,6 +34,7 @@ module.exports = {
         icon: './icons/icon.ico',
         setupIcon: './icons/icon.ico',
         setupExe: `${appName}.exe`,
+        loadingGif: './installer/install.gif',
       },
     },
     {
