@@ -2,6 +2,11 @@ import { caravanBrandName, caravanState } from '@helpers/caravan/caravan';
 import { getEntry } from '@helpers/content/content';
 import { isDemoBuild } from '@helpers/demo/demo';
 import { isInElectron } from '@helpers/engine/electron';
+import {
+  presenceActivityText,
+  presencePausedText,
+  steamRichPresence,
+} from '@helpers/engine/presence';
 import { activeTownNode, gamePlayView } from '@helpers/engine/ui';
 import { isGlobalEffectActive } from '@helpers/hero/global-effects';
 import { isStoryScreenPending } from '@helpers/lore/outro';
@@ -23,47 +28,44 @@ import type {
   DiscordPresenceOpts,
   GlobalEffectId,
   JobContent,
+  PresenceActivity,
+  PresenceStatus,
   WorldNodeEntry,
 } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
 
-let discordMainStatus = '';
-export function discordSetMainStatus(status: string) {
-  discordMainStatus = status;
-}
-
-export function discordSetStatus(status: DiscordPresenceOpts) {
+export function discordSetStatus(status: PresenceStatus) {
+  const activityText = presenceActivityText(status.activity);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window as any).discordRPCStatus = {
-    ...status,
-    details: discordMainStatus || status.details,
-    largeImageText: isDemoBuild()
-      ? 're:Form Kingdom Demo'
-      : status.largeImageText,
-  };
+    state: status.paused ? presencePausedText(activityText) : activityText,
+    details: status.partyDetails || undefined,
+    largeImageText: isDemoBuild() ? 're:Form Kingdom Demo' : undefined,
+    steam: steamRichPresence(status.activity, status.partyLevel, status.paused),
+  } satisfies DiscordPresenceOpts;
 }
 
-function discordCombatState(): string | undefined {
+function discordCombatState(): PresenceActivity | undefined {
   const combat = worldCombatState();
-  return combat ? `Exploring ${combat.locationName}` : undefined;
+  return combat ? { kind: 'Exploring', name: combat.locationName } : undefined;
 }
 
-function discordTravelState(): string | undefined {
+function discordTravelState(): PresenceActivity | undefined {
   const travel = worldTravelState();
   if (travel.status !== 'Traveling' || !travel.destinationNodeName) {
     return undefined;
   }
 
-  return `Traveling to ${travel.destinationNodeName}`;
+  return { kind: 'TravelingTo', name: travel.destinationNodeName };
 }
 
-function discordGatherState(): string | undefined {
+function discordGatherState(): PresenceActivity | undefined {
   const gathering = worldGatheringState();
   if (gathering.status !== 'Gathering' || !gathering.nodeName) {
     return undefined;
   }
 
-  return `Gathering in ${gathering.nodeName}`;
+  return { kind: 'Gathering', name: gathering.nodeName };
 }
 
 function discordCaravanTraderName(entry: WorldNodeEntry): string | undefined {
@@ -82,12 +84,12 @@ function discordLocationDisplayName(entry: WorldNodeEntry): string {
     : entry.nodeName;
 }
 
-function discordTownState(): string | undefined {
+function discordTownState(): PresenceActivity | undefined {
   if (gamePlayView() !== 'town') return undefined;
 
   const entry = activeTownNode();
   const town = entry ? worldNodeTown(entry) : undefined;
-  return town ? `Visiting ${town.name}` : undefined;
+  return town ? { kind: 'Visiting', name: town.name } : undefined;
 }
 
 function isPartyRecovering(): boolean {
@@ -97,31 +99,27 @@ function isPartyRecovering(): boolean {
   );
 }
 
-function discordIdleState(): string {
+function discordIdleState(): PresenceActivity {
   const entry = worldNodeAtCurrentLocation();
-  if (!entry) return 'Traveling';
+  if (!entry) return { kind: 'Traveling' };
 
   const traderName = discordCaravanTraderName(entry);
-  if (traderName) return `Trading with ${traderName}`;
+  if (traderName) return { kind: 'Trading', name: traderName };
 
-  const locationName = discordLocationDisplayName(entry);
-  return isPartyRecovering()
-    ? `Recovering at ${locationName}`
-    : `Resting at ${locationName}`;
+  return {
+    kind: isPartyRecovering() ? 'Recovering' : 'Resting',
+    name: discordLocationDisplayName(entry),
+  };
 }
 
-function discordActivityState(): string {
-  if (isTitleCrawlPending()) return 'Starting a grand adventure';
-  if (isStoryScreenPending()) return 'Finishing a grand adventure';
-
-  const activity =
+function discordWorldActivity(): PresenceActivity {
+  return (
     discordCombatState() ??
     discordTravelState() ??
     discordGatherState() ??
     discordTownState() ??
-    discordIdleState();
-
-  return getOption('gameloopPaused') ? `Paused · ${activity}` : activity;
+    discordIdleState()
+  );
 }
 
 function discordPartyDetails(): string {
@@ -135,14 +133,30 @@ function discordPartyDetails(): string {
     })
     .join(', ');
 
-  const averageLevel = Math.round(sumBy(party, 'level') / party.length);
+  return `${heroes} · Avg. Lv. ${discordPartyAverageLevel()}`;
+}
 
-  return `${heroes} · Avg. Lv. ${averageLevel}`;
+function discordPartyAverageLevel(): number | undefined {
+  const party = worldPartyState();
+  if (party.length === 0) return undefined;
+
+  return Math.round(sumBy(party, 'level') / party.length);
+}
+
+function discordStoryActivity(): PresenceActivity | undefined {
+  if (isTitleCrawlPending()) return { kind: 'NewAdventure' };
+  if (isStoryScreenPending()) return { kind: 'FinishedAdventure' };
+  return undefined;
 }
 
 export function discordUpdateStatus() {
   if (!isInElectron()) return;
 
-  discordSetMainStatus(discordPartyDetails());
-  discordSetStatus({ state: discordActivityState() });
+  const storyActivity = discordStoryActivity();
+  discordSetStatus({
+    activity: storyActivity ?? discordWorldActivity(),
+    partyDetails: discordPartyDetails(),
+    partyLevel: discordPartyAverageLevel(),
+    paused: !storyActivity && !!getOption('gameloopPaused'),
+  });
 }

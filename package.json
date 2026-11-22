@@ -26,6 +26,7 @@
     "build:barrels": "ts-node --project tsconfig.scripts.json scripts/build-barrels",
     "build:glyphs": "ts-node --project tsconfig.scripts.json scripts/build-glyphs && prettier --write src/app/ff/input/ff-glyph-codes.ts",
     "build:nodebg": "ts-node --project tsconfig.scripts.json scripts/build-nodebg",
+    "build:steampresence": "ts-node --project tsconfig.scripts.json -r tsconfig-paths/register scripts/build-steampresence",
     "build:electron": "npm run build && npm run build:syncversion && npm run build:electron:package",
     "build:electron:package": "cd electron && npm run make",
     "build:demo": "npm run build:versioninfo && npm run build:updates && npm run build:barrels && npm run gamedata:build && npm run gamedata:art:spritesheets && npm run build:demo:content && npm run build:nodebg && ng build --configuration production,demo && npm run build:copychangelog:demo",

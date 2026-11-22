@@ -75,7 +75,11 @@ const {
   watchWindowState,
   windowRestorableBounds,
 } = require('./window-settings');
-const { initSteam, registerSteamHandlers } = require('./steam');
+const {
+  initSteam,
+  registerSteamHandlers,
+  steamRichPresenceSet,
+} = require('./steam');
 const config = new Config();
 coreLog().info('Session', `config ${config.path}`);
 
@@ -250,6 +254,9 @@ app.on('activate', () => {
 
 const DISCORD_CLIENT_ID = '1538621457343455332';
 
+// Replaced once Discord connects.
+let discordActivitySet = () => {};
+
 const handleRPC = () => {
   const isRegistered = rpc.register(DISCORD_CLIENT_ID); // only needed if we want spectate / join / ask to join
   coreLog().info('Discord', `registered: ${!!isRegistered}`);
@@ -258,43 +265,34 @@ const handleRPC = () => {
   const rpcClient = new rpc.Client({ transport: 'ipc' });
   let startTimestamp;
 
-  const setActivity = () => {
-    if (!rpcClient || !mainWindow) {
-      return;
+  const setActivity = (result) => {
+    if (!result) {
+      startTimestamp = null;
+      return rpcClient.clearActivity();
     }
 
-    mainWindow.webContents
-      .executeJavaScript('window.discordRPCStatus')
-      .then((result) => {
-        if (!result) {
-          startTimestamp = null;
-          return rpcClient.clearActivity();
-        }
+    if (!startTimestamp) {
+      startTimestamp = new Date();
+    }
 
-        if (!startTimestamp) {
-          startTimestamp = new Date();
-        }
-
-        return rpcClient.setActivity({
-          startTimestamp,
-          state: result.state || 'Idle',
-          details: result.details,
-          smallImageKey: result.smallImageKey,
-          smallImageText: result.smallImageText,
-          largeImageKey: result.largeImageKey || 'defaultimage',
-          largeImageText: result.largeImageText,
-        });
-      })
-      .catch((e) => coreLog().warn('Discord', 'Could not update activity', e));
+    return rpcClient.setActivity({
+      startTimestamp,
+      state: result.state || 'Idle',
+      details: result.details,
+      smallImageKey: result.smallImageKey,
+      smallImageText: result.smallImageText,
+      largeImageKey: result.largeImageKey || 'defaultimage',
+      largeImageText: result.largeImageText,
+    });
   };
 
   rpcClient.on('ready', () => {
     coreLog().info('Discord', 'connected');
-    setActivity();
-
-    setInterval(() => {
-      setActivity();
-    }, 15e3);
+    discordActivitySet = (result) =>
+      setActivity(result).catch((e) =>
+        coreLog().warn('Discord', 'Could not update activity', e),
+      );
+    presenceUpdate();
   });
 
   // Expected whenever Discord isn't running, so it's info rather than an error.
@@ -303,4 +301,19 @@ const handleRPC = () => {
     .catch((e) => coreLog().info('Discord', 'not connected', e.message));
 };
 
-if (hasInstanceLock) handleRPC();
+const presenceUpdate = () => {
+  if (!mainWindow) return;
+
+  mainWindow.webContents
+    .executeJavaScript('window.discordRPCStatus')
+    .then((result) => {
+      discordActivitySet(result);
+      steamRichPresenceSet(result?.steam);
+    })
+    .catch((e) => coreLog().warn('Presence', 'Could not read status', e));
+};
+
+if (hasInstanceLock) {
+  handleRPC();
+  setInterval(presenceUpdate, 15e3);
+}

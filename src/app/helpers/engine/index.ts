@@ -32,6 +32,7 @@ export * from './motion';
 export * from './notify';
 export * from './number';
 export * from './page-visibility';
+export * from './presence';
 export * from './record';
 export * from './risk-band';
 export * from './scheduler';

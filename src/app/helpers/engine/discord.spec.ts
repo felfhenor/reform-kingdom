@@ -15,15 +15,13 @@ import {
 import { ensureGlobalEffect } from '@helpers/content/ensure-globaleffect';
 import { ensureJob } from '@helpers/content/ensure-job';
 import { ensureTown } from '@helpers/content/ensure-town';
-import {
-  discordSetMainStatus,
-  discordUpdateStatus,
-} from '@helpers/engine/discord';
+import { discordUpdateStatus } from '@helpers/engine/discord';
 import { activeTownNode, setGamePlayView } from '@helpers/engine/ui';
 import { defaultOptions, setOption, setOptions } from '@helpers/state-options';
 import type {
   CaravanId,
   CaravanTraderId,
+  DiscordPresenceOpts,
   GameState,
   GlobalEffectContent,
   GlobalEffectId,
@@ -32,7 +30,7 @@ import type {
 } from '@interfaces';
 
 type DiscordWindow = Window & {
-  discordRPCStatus?: { state?: string; details?: string };
+  discordRPCStatus?: DiscordPresenceOpts;
 };
 
 const caravanNodeName = 'Goblin Group Company - Carrina';
@@ -93,7 +91,6 @@ function presenceFor(
 
 beforeEach(() => {
   delete (window as DiscordWindow).discordRPCStatus;
-  discordSetMainStatus('');
   runningInElectron(true);
   setOptions(defaultOptions());
   setGamePlayView('world');
@@ -245,5 +242,31 @@ describe('discordUpdateStatus', () => {
     ).toBe(
       'Warrior Lv5, Magician Lv3, Adventurer Lv1, Warrior Lv2 · Avg. Lv. 3',
     );
+  });
+
+  it('gives Steam the activity token, its name and the partys average level', () => {
+    setOption('gameloopPaused', true);
+
+    expect(
+      presenceFor((state) => {
+        state.world.combat = buildCombat({ locationName: 'Whispering Woods' });
+        state.world.party = [
+          buildCharacter({ jobId: warrior.id, level: 5 }),
+          buildCharacter({ jobId: magician.id, level: 2 }),
+        ];
+      }).steam,
+    ).toEqual({
+      steam_display: '#Exploring_Level_Paused',
+      name: 'Whispering Woods',
+      level: '4',
+    });
+  });
+
+  it('leaves the level off Steam with no party', () => {
+    expect(presenceFor().steam).toEqual({
+      steam_display: '#Traveling',
+      name: undefined,
+      level: undefined,
+    });
   });
 });

@@ -43,10 +43,7 @@ import {
   edictsSet,
   edictsTrackRun,
 } from '@helpers/edict/edict.ui';
-import {
-  discordSetMainStatus,
-  discordSetStatus,
-} from '@helpers/engine/discord';
+import { discordSetStatus } from '@helpers/engine/discord';
 import { gameReset, gameStart } from '@helpers/game-init';
 import { globalEffectSumsOf } from '@helpers/hero/global-effect-state';
 import { getUnlockedJobs, jobIdsShared } from '@helpers/hero/job';
@@ -226,10 +223,7 @@ export class GameSetupWorldComponent implements OnInit {
   }
 
   ngOnInit() {
-    discordSetMainStatus('');
-    discordSetStatus({
-      state: 'Starting a new game...',
-    });
+    discordSetStatus({ activity: { kind: 'NewGame' } });
   }
 
   public jobFor(jobId: JobId): JobContent | undefined {

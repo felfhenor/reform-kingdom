@@ -72,3 +72,6 @@ scripts/trailer/output/
 
 # Capsule art compositor (scripts/capsule)
 scripts/capsule/output/
+
+# Steam specific files
+*.vdf

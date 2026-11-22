@@ -56,6 +56,25 @@ const steamInputType = () => {
 const isAchievementName = (name) =>
   typeof name === 'string' && /^\w+$/.test(name);
 
+const RICH_PRESENCE_KEYS = ['steam_display', 'name', 'level'];
+
+// Every key is rewritten, so a name left over from the last activity can't leak into the next token.
+const steamRichPresenceSet = (presence) => {
+  if (!client) return;
+
+  try {
+    RICH_PRESENCE_KEYS.forEach((key) => {
+      const value = presence?.[key];
+      client.localplayer.setRichPresence(
+        key,
+        typeof value === 'string' ? value.slice(0, 255) : null,
+      );
+    });
+  } catch (e) {
+    coreLog().warn('Steam', 'rich presence not set', e.message);
+  }
+};
+
 const registerSteamHandlers = () => {
   // Answers with the names newly set, so already-set ones can be re-sent freely.
   ipcMain.handle('steam:achievements-activate', (_event, names) => {
@@ -108,4 +127,4 @@ const registerSteamHandlers = () => {
   });
 };
 
-module.exports = { initSteam, registerSteamHandlers };
+module.exports = { initSteam, registerSteamHandlers, steamRichPresenceSet };
