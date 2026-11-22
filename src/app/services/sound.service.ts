@@ -40,6 +40,10 @@ const bgmsToLoad: Record<BGM, string> = {
 
 const CROSSFADE_TIME = 2; // seconds
 
+const BGM_MUFFLED_HZ = 500;
+const BGM_MUFFLED_VOLUME = 0.3;
+const BGM_MUFFLE_TIME_CONSTANT = 0.1;
+
 @Injectable({
   providedIn: 'root',
 })
@@ -47,6 +51,9 @@ export class SoundService {
   private context = new AudioContext();
   // Every source routes through here so a focus mute also silences fading-out BGM and in-flight SFX.
   private masterGain = this.context.createGain();
+  // Shared by every BGM source so a crossfading-out track muffles along with the new one.
+  private bgmFilter = this.context.createBiquadFilter();
+  private bgmMuffleGain = this.context.createGain();
   private audioRefs: Partial<Record<SFX | BGM, AudioBuffer>> = {};
 
   private bgmGain?: GainNode;
@@ -77,6 +84,12 @@ export class SoundService {
 
   constructor() {
     this.masterGain.connect(this.context.destination);
+
+    this.bgmFilter.type = 'lowpass';
+    this.bgmFilter.Q.value = 0;
+    this.bgmFilter.frequency.value = this.bgmClearHz();
+    this.bgmFilter.connect(this.bgmMuffleGain);
+    this.bgmMuffleGain.connect(this.masterGain);
 
     // Short ramp instead of a step so alt-tabbing doesn't click.
     effect(() => {
@@ -210,6 +223,24 @@ export class SoundService {
     this.lastSFX = source;
   }
 
+  private bgmClearHz() {
+    return this.context.sampleRate / 2;
+  }
+
+  public setBGMMuffled(muffled: boolean) {
+    const now = this.context.currentTime;
+    this.bgmFilter.frequency.setTargetAtTime(
+      muffled ? BGM_MUFFLED_HZ : this.bgmClearHz(),
+      now,
+      BGM_MUFFLE_TIME_CONSTANT,
+    );
+    this.bgmMuffleGain.gain.setTargetAtTime(
+      muffled ? BGM_MUFFLED_VOLUME : 1,
+      now,
+      BGM_MUFFLE_TIME_CONSTANT,
+    );
+  }
+
   public stopSFX() {
     this.lastSFX?.stop();
   }
@@ -230,7 +261,7 @@ export class SoundService {
     const gainNode = this.context.createGain();
     gainNode.gain.value = volume;
     source.connect(gainNode);
-    gainNode.connect(this.masterGain);
+    gainNode.connect(this.bgmFilter);
 
     if (this.bgm) {
       const currTime = this.context.currentTime;

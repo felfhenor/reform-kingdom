@@ -1,7 +1,7 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import type { Event } from '@angular/router';
 import { NavigationEnd, Router } from '@angular/router';
-import { bgmForWorld } from '@helpers/engine/bgm.ui';
+import { bgmForWorld, bgmIsMuffled } from '@helpers/engine/bgm.ui';
 import { gameloopShouldRun } from '@helpers/gameloop';
 import { getOption } from '@helpers/state-options';
 import type { BGM } from '@interfaces/sfx.ui';
@@ -40,6 +40,12 @@ export class BGMService {
         BGM_CASUAL_SETTLE_MS,
       );
       onCleanup(() => clearTimeout(timer));
+    });
+
+    effect(() => {
+      this.soundService.setBGMMuffled(
+        bgmIsMuffled(this.currentPlace() === 'game'),
+      );
     });
 
     effect(() => {
