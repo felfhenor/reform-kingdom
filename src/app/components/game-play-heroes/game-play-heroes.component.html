@@ -23,10 +23,12 @@
           type="button"
           class="btn btn-primary btn-sm"
           (click)="optimizeAll()"
-          appSfx="ui-click"
           [disabled]="!equipmentModifiable()"
           [tp]="'Optimizing your equipment will automatically equip the best equipment for each hero, based on their class and the stat priorities that class has.'"
-          [sfxTrigger]="['click', 'hover']"
+          ffFocusSkip
+          ffButton="ui-click"
+          ffPadAction="context"
+          ffPadLabel="Optimize All"
         >
           Optimize All
         </button>

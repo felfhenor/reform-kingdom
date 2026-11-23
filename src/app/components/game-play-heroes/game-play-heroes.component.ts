@@ -1,3 +1,4 @@
+import { FFFocusSkipDirective } from '@/app/ff/focus/ff-focus-skip.directive';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { CardPageComponent } from '@components/card-page/card-page.component';
@@ -7,13 +8,13 @@ import { PlayHeroesRegaliaComponent } from '@components/play-heroes-regalia/play
 import { PlayHeroesSkillTreeComponent } from '@components/play-heroes-skill-tree/play-heroes-skill-tree.component';
 import { SlotButtonContainerComponent } from '@components/slot-button-container/slot-button-container.component';
 import { TabsHeroComponent } from '@components/tabs-hero/tabs-hero.component';
-import { SFXDirective } from '@directives/sfx.directive';
+import { FFButtonComponent } from '@ff/components/button/button.component';
+import { gamepadBindHeroCycle } from '@helpers/engine/gamepad.ui';
 import {
   heroesSelectCharacter,
   heroesSelectedCharacterId,
   heroesSubview,
 } from '@helpers/engine/ui';
-import { gamepadBindHeroCycle } from '@helpers/engine/gamepad.ui';
 import { optimizeCharacterEquipment } from '@helpers/hero/character-equipment';
 import { canModifyEquipment } from '@helpers/item/equipment';
 import { worldPartyState } from '@helpers/state-game';
@@ -30,10 +31,11 @@ import { TippyDirective } from '@ngneat/helipopper';
     PageBlankComponent,
     PlayHeroesRegaliaComponent,
     PlayHeroesSkillTreeComponent,
-    SFXDirective,
     SlotButtonContainerComponent,
     TabsHeroComponent,
     TippyDirective,
+    FFFocusSkipDirective,
+    FFButtonComponent,
   ],
   templateUrl: './game-play-heroes.component.html',
 })
