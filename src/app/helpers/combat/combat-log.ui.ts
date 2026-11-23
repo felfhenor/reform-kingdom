@@ -15,6 +15,13 @@ import type {
 } from '@interfaces';
 
 const COMBATANT_TOKEN_PATTERN = /@@([^@]+)@@/g;
+const COMBATANT_STATUS_PATTERN =
+  /\s*\[[^\]]+ HP\](?: \[[^\]]+ shield\])? \[[^\]]+ EP\]/g;
+
+// Statuses are baked into the message at log time, so views with live HP/EP bars strip them on display.
+export function adventureLogStripCombatantStatus(message: string): string {
+  return message.replace(COMBATANT_STATUS_PATTERN, '');
+}
 
 export type AdventureLogMessagePart =
   | { kind: 'text'; html: string }

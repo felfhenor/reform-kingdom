@@ -183,7 +183,10 @@
         >
           @for (entry of logEntries(); track entry.messageId) {
             <div class="leading-5">
-              <app-adventure-log-message [entry]="entry" />
+              <app-adventure-log-message
+                [entry]="entry"
+                [hideCombatantStatus]="true"
+              />
             </div>
           }
         </div>

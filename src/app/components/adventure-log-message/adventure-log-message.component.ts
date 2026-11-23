@@ -6,7 +6,10 @@ import {
 } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-blank.component';
-import { adventureLogMessageParts } from '@helpers/combat/combat-log.ui';
+import {
+  adventureLogMessageParts,
+  adventureLogStripCombatantStatus,
+} from '@helpers/combat/combat-log.ui';
 import type { CombatLog } from '@interfaces';
 
 @Component({
@@ -19,6 +22,14 @@ import type { CombatLog } from '@interfaces';
 })
 export class AdventureLogMessageComponent {
   public entry = input.required<CombatLog>();
+  public hideCombatantStatus = input(false);
 
-  public parts = computed(() => adventureLogMessageParts(this.entry()));
+  public parts = computed(() => {
+    const entry = this.entry();
+    return adventureLogMessageParts(
+      this.hideCombatantStatus()
+        ? { ...entry, message: adventureLogStripCombatantStatus(entry.message) }
+        : entry,
+    );
+  });
 }
