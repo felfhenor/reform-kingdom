@@ -9,6 +9,7 @@ import {
   combatExpireCombatantStatusEffects,
   combatTickCombatantStatusEffects,
   combatUnapplyAllStatusEffects,
+  statusEffectDamage,
   statusEffectTagResistance,
 } from '@helpers/combat/combat-statuseffects';
 import { ensureStatusEffect } from '@helpers/content/ensure-statuseffect';
@@ -57,6 +58,47 @@ describe('statusEffectTagResistance', () => {
   it('returns 0 for a tag the combatant has no resistance to', () => {
     const combatant = withTagResistance({});
     expect(statusEffectTagResistance(combatant, ['Stun'])).toBe(0);
+  });
+});
+
+describe('statusEffectDamage', () => {
+  const weakEffect = (
+    effectType: StatusEffect['effectType'],
+  ): StatusEffect => ({
+    ...ensureStatusEffect({
+      id: 'weak' as StatusEffectId,
+      name: 'Weak',
+      effectType,
+      statScaling: { ...defaultStats(), Vitality: 0.3 },
+    }),
+    duration: 1,
+    creatorStats: { ...defaultStats(), Vitality: 2 },
+    targetStats: defaultStats(),
+  });
+
+  it('floors a debuff at 1 so it never lands as -0', () => {
+    expect(statusEffectDamage(weakEffect('Debuff'))).toBe(1);
+  });
+
+  it('leaves non-debuffs unclamped', () => {
+    expect(statusEffectDamage(weakEffect('Buff'))).toBe(0);
+  });
+
+  it('round-trips a stat-down debuff to the original stat on unapply', () => {
+    const combatant = buildCombatant();
+    const effect: StatusEffect = {
+      ...weakEffect('Debuff'),
+      onApply: [{ type: 'TakeDamageFromStat', modifyStat: 'Vitality' }],
+      onUnapply: [{ type: 'AddDamageToStat', modifyStat: 'Vitality' }],
+    };
+    const before = combatant.totalStats.Vitality;
+    const combat = buildCombat({ heroes: [combatant] });
+
+    combatApplyStatusEffectToTarget(combat, combatant, effect);
+    expect(combatant.totalStats.Vitality).toBe(before - 1);
+
+    combatUnapplyAllStatusEffects(combat, combatant);
+    expect(combatant.totalStats.Vitality).toBe(before);
   });
 });
 

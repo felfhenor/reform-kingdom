@@ -10,6 +10,7 @@ import {
   combatMessageLog,
 } from '@helpers/combat/combat-log';
 import { combatCombatantCombatStatSucceedsChance } from '@helpers/combat/combat-stats';
+import { STATUS_EFFECT_DEBUFF_MIN_AMOUNT } from '@helpers/config';
 import { runStatsRecordHit } from '@helpers/run-stats/run-stats-combat';
 import type { Combat, Combatant, CombatStatBlock } from '@interfaces/combat';
 import type { EquipmentSkill } from '@interfaces/content-skill';
@@ -49,12 +50,16 @@ export function statusEffectDamage(effect: StatusEffect): number {
     ? effect.targetStats
     : effect.creatorStats;
 
-  return Math.floor(
+  const amount = Math.floor(
     sumBy(
       Object.keys(effect.statScaling) as GameStat[],
       (stat) => statBlock[stat] * effect.statScaling[stat],
     ),
   );
+
+  return effect.effectType === 'Debuff'
+    ? Math.max(STATUS_EFFECT_DEBUFF_MIN_AMOUNT, amount)
+    : amount;
 }
 
 // An effect at 0 duration is in its final turn and is removed once that turn ends.
