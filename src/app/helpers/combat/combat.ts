@@ -18,15 +18,15 @@ import {
   combatManualPick,
 } from '@helpers/combat/combat-manual';
 import { pickSkillFromCombatOrders } from '@helpers/combat/combat-order-evaluation';
+import { combatantTickSkillCooldowns } from '@helpers/combat/combat-skill-cooldown';
+import { combatantQueueDelayedSkill } from '@helpers/combat/combat-skill-delay';
+import { combatantPaySkillCast } from '@helpers/combat/combat-skill-elements';
+import { combatantSkillCastEventEmit } from '@helpers/combat/combat-skill-events';
 import { combatantPickSkill } from '@helpers/combat/combat-skill-pick';
 import {
   combatantFireDelayedSkills,
   combatantUseSkill,
 } from '@helpers/combat/combat-skill-use';
-import { combatantTickSkillCooldowns } from '@helpers/combat/combat-skill-cooldown';
-import { combatantPaySkillCast } from '@helpers/combat/combat-skill-elements';
-import { combatantQueueDelayedSkill } from '@helpers/combat/combat-skill-delay';
-import { combatantSkillCastEventEmit } from '@helpers/combat/combat-skill-events';
 import {
   combatCanTakeTurn,
   combatExpireCombatantStatusEffects,
@@ -34,13 +34,13 @@ import {
   combatUnapplyAllStatusEffects,
 } from '@helpers/combat/combat-statuseffects';
 import {
-  combatRoundQueue,
-  combatTurnCombatant,
-} from '@helpers/combat/combat-turn-queue';
-import {
   combatAvailableSkillsForCombatant,
   combatGetPossibleCombatantTargetsForSkill,
 } from '@helpers/combat/combat-targetting';
+import {
+  combatRoundQueue,
+  combatTurnCombatant,
+} from '@helpers/combat/combat-turn-queue';
 import {
   runStatsCombatBegin,
   runStatsCombatFlush,
@@ -177,10 +177,6 @@ export function combatantStartTurn(
 
       combatUnapplyAllStatusEffects(combat, combatant);
     } else {
-      combatMessageLog(
-        combat,
-        `**${combatantMessageToken(combatant)}** is dead, skipping turn.`,
-      );
       return 'over';
     }
   }
