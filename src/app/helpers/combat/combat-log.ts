@@ -14,6 +14,7 @@ import type {
   CollectibleContent,
   Combat,
   Combatant,
+  CombatId,
   CombatLog,
   CombatLogIcon,
   DropRarity,
@@ -216,9 +217,14 @@ export function recipeDropHtml(recipe: RecipeContent): string {
   return `${recipeNameHtml(recipe)}`;
 }
 
-export function miscellaneousMessageLog(message: string): void {
+// A combatId also surfaces the line in that fight's manual combat scene.
+export function miscellaneousMessageLog(
+  message: string,
+  combatId?: CombatId,
+): void {
   pushLogEntry({
     kind: 'Miscellaneous',
+    combatId,
     messageId: rngUuid(),
     timestamp: Date.now(),
     locationName: 'Miscellaneous',

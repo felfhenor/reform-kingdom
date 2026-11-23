@@ -340,7 +340,9 @@ function handleCombatVictory(combat: Combat): boolean {
   grantEncounterFightDrops(combat, monsterDrops, !nextFight);
 
   const fight = currentEncounterFight(combat);
-  if (fight?.postFightWhisper) founderWhisperLog(fight.postFightWhisper);
+  if (fight?.postFightWhisper) {
+    founderWhisperLog(fight.postFightWhisper, combat.id);
+  }
   if (!nextFight) return false;
 
   encounterStartFight(

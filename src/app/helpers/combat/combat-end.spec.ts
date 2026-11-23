@@ -300,6 +300,20 @@ describe('combatCheckIfOver', () => {
       expect(encounterStartFight).not.toHaveBeenCalled();
     });
 
+    it("tags the whisper with the fight's combatId for the manual scene log", () => {
+      seedContent([
+        goblin,
+        encounter({ fights: [{ monsters: [], postFightWhisper: 'Hush.' }] }),
+        ...items,
+      ]);
+      const ended = fight({ encounterId, fightIndex: 0 });
+
+      endFight(ended);
+
+      const whisper = combatLog().find((e) => e.message.includes('Hush.'));
+      expect(whisper?.combatId).toBe(ended.id);
+    });
+
     it('clears the node after its last fight, granting kill drops and completion rewards together', () => {
       seedContent([
         goblin,
