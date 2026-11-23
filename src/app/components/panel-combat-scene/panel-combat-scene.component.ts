@@ -2,7 +2,10 @@ import { FFFocusMemoryDirective } from '@ff/focus/ff-focus-memory.directive';
 import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
 import { FFFocusService } from '@ff/focus/ff-focus.service';
 import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
-import { GAMEPAD_PRIORITY } from '@helpers/engine/gamepad.ui';
+import {
+  GAMEPAD_PRIORITY,
+  gamepadBindInspectTips,
+} from '@helpers/engine/gamepad.ui';
 import { DecimalPipe } from '@angular/common';
 import type { AnimationCallbackEvent } from '@angular/core';
 import {
@@ -337,6 +340,8 @@ export class PanelCombatSceneComponent {
       enabled: () => !!this.pendingSkillId(),
       label: 'Cancel',
     });
+    // After Cancel, so B closes an open inspect before it drops the picked skill.
+    gamepadBindInspectTips('.scene-combatant', () => !this.isResolving());
   }
 
   private skillLanding(): HTMLElement | undefined {

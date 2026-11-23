@@ -6,6 +6,7 @@ import {
   inject,
   Injector,
 } from '@angular/core';
+import { FF_DIRECTIONS } from '@ff/input/ff-action-map';
 import { FFInputService } from '@ff/input/ff-input.service';
 import { FFFocusService } from '@ff/focus/ff-focus.service';
 import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
@@ -130,6 +131,63 @@ export function gamepadBindFocusTips(): void {
   inject(DestroyRef).onDestroy(() => {
     document.removeEventListener('focusin', onFocusIn);
     document.removeEventListener('focusout', hide);
+  });
+}
+
+function gamepadInspectStops(host: HTMLElement, selector: string): Instance[] {
+  const owner = document.activeElement?.closest(selector);
+  if (!owner || !host.contains(owner)) return [];
+  return [...owner.querySelectorAll<ReferenceElement>('.ff-inspect-tip')]
+    .map((anchor) => anchor._tippy)
+    .filter((tip) => !!tip);
+}
+
+// Injection context only; L3 pages through the .ff-inspect-tip tips inside the focused `selector` without moving focus.
+export function gamepadBindInspectTips(
+  selector: string,
+  canInspect: () => boolean,
+): void {
+  const host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+  const ffInput = inject(FFInputService);
+  const stops = () => gamepadInspectStops(host, selector);
+  let shown: Instance | undefined;
+  const show = (tip?: Instance) => {
+    if (tip === shown) return;
+    if (shown && !shown.state.isDestroyed) shown.hide();
+    shown = tip;
+    tip?.show();
+  };
+  effect(() => {
+    if (!canInspect() || ffInput.mode() !== 'gamepad') show(undefined);
+  });
+  // A tab switch, pause menu or focus jump silences the close buttons, so the tip must close itself.
+  const stopRefresh = ffInput.onRefresh(() => {
+    if (!shown) return;
+    if (!ffInput.isElementActive(host) || !stops().includes(shown))
+      show(undefined);
+  });
+  inject(DestroyRef).onDestroy(() => {
+    stopRefresh();
+    show(undefined);
+  });
+
+  const options = {
+    priority: GAMEPAD_PRIORITY.popover,
+    element: host,
+    enabled: () => !!shown,
+  };
+  ffGamepadOn('zone', () => show(shown ? undefined : stops()[0]), {
+    ...options,
+    enabled: () => !!shown || (canInspect() && stops().length > 0),
+    label: () => (shown ? 'Close' : 'Inspect'),
+  });
+  ffGamepadOn('back', () => show(undefined), { ...options, label: 'Close' });
+  FF_DIRECTIONS.forEach((direction) => {
+    const step = direction === 'left' || direction === 'up' ? -1 : 1;
+    ffGamepadOn(direction, () => show(cycleStep(stops(), shown, step)), {
+      ...options,
+      label: 'Browse',
+    });
   });
 }
 
