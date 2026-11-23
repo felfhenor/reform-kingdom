@@ -127,12 +127,14 @@
         - monsterId: Akroki Swashbuckler
         - monsterId: Angry Spirit
         - monsterId: Bloodmoth
+        - monsterId: Akroki Vanguard
 
     - monsters:
         - monsterId: Akroki Swashbuckler
         - monsterId: Akroki Vanguard
         - monsterId: Angry Spirit
         - monsterId: Bloodmoth
+        - monsterId: Akroki Vanguard
 
     - monsters:
         - monsterId: Akroki Swashbuckler
@@ -140,6 +142,7 @@
         - monsterId: Angry Spirit
         - monsterId: Bloodmoth
         - monsterId: Bloodmoth
+        - monsterId: Akroki Vanguard
 
   completionRewards:
     - collectibleId: Elven Satchel

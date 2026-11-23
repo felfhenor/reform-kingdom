@@ -169,16 +169,19 @@
         - monsterId: Orc Smasher
         - monsterId: Angry Spirit
         - monsterId: Angry Spirit
+        - monsterId: Orc Smasher
     - monsters:
         - monsterId: Orc Smasher
         - monsterId: Orc Smasher
         - monsterId: Angry Spirit
         - monsterId: Angry Spirit
+        - monsterId: Orc Smasher
     - monsters:
         - monsterId: Orc Smasher
         - monsterId: Orc Screamchanter
         - monsterId: Angry Spirit
         - monsterId: Angry Spirit
+        - monsterId: Orc Smasher
         - monsterId: Banshee
 
   completionRewards:

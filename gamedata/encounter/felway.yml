@@ -148,17 +148,20 @@
     - monsters:
         - monsterId: Fel Villager
         - monsterId: Pixie
+        - monsterId: Fel Villager
 
     - monsters:
         - monsterId: Demon Knight
         - monsterId: Fel Villager
         - monsterId: Beholder
+        - monsterId: Demon Knight
 
     - monsters:
         - monsterId: Fel Demon
         - monsterId: Pixie
         - monsterId: Demon Knight
         - monsterId: Beholder
+        - monsterId: Demon Knight
 
   completionRewards:
     - collectibleId: Fel Knightcrest Shield

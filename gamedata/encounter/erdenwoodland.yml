@@ -158,14 +158,17 @@
         - monsterId: Fel Demon
         - monsterId: Fel Demon
         - monsterId: Elf Ritualist
+        - monsterId: Fel Demon
 
     - monsters:
         - monsterId: Fel Demon
         - monsterId: Elf Ritualist
         - monsterId: Darkbat
+        - monsterId: Fel Demon
 
     - monsters:
         - monsterId: Elf Ritualist
+        - monsterId: Darkbat
         - monsterId: Darkbat
         - monsterId: Darkbat
 

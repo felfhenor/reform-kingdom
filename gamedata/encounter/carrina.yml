@@ -140,13 +140,16 @@
         - monsterId: Spiderling
         - monsterId: Spiderling
         - monsterId: Spider
+        - monsterId: Spider
     - monsters:
         - monsterId: Spiderling
         - monsterId: Spider
         - monsterId: Spider
+        - monsterId: Spider
     - monsters:
         - monsterId: Spiderling
         - monsterId: Spiderling
+        - monsterId: Spider
         - monsterId: Spider
         - monsterId: Spider
         - monsterId: Spider Queen

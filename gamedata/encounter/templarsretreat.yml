@@ -12,14 +12,17 @@
         - monsterId: Angry Spirit
         - monsterId: Angry Spirit
         - monsterId: Templar
+        - monsterId: Templar
 
     - monsters:
         - monsterId: Angry Spirit
         - monsterId: Templar
         - monsterId: Templar
+        - monsterId: Templar
 
     - monsters:
         - monsterId: Angry Spirit
+        - monsterId: Templar
         - monsterId: Templar
         - monsterId: Templar
         - monsterId: Banshee

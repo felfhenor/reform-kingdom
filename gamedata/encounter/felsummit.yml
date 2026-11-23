@@ -166,16 +166,19 @@
     - monsters:
         - monsterId: Fel Demon
         - monsterId: Vengeful Spirit
-
-    - monsters:
-        - monsterId: Fel Demon
-        - monsterId: Fel Demon
         - monsterId: Vengeful Spirit
 
     - monsters:
+        - monsterId: Fel Demon
+        - monsterId: Fel Demon
+        - monsterId: Vengeful Spirit
+        - monsterId: Vengeful Spirit
+
+    - monsters:
         - monsterId: Vengeful Spirit
         - monsterId: Vengeful Spirit
         - monsterId: Fel Demon
+        - monsterId: Vengeful Spirit
 
   completionRewards:
     - collectibleId: Soul Cubes
