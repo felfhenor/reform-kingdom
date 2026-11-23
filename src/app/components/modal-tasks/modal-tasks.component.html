@@ -15,6 +15,7 @@
   >
     @for (row of rows(); track row.taskId) {
       <div
+        ffFocusRow
         class="flex items-center gap-4 p-3 bg-base-200"
         [class.opacity-50]="row.isClaimed"
       >
@@ -56,8 +57,10 @@
               type="button"
               class="btn btn-xs btn-primary"
               (click)="claim([row.taskId])"
-              appSfx="ui-success"
-              [sfxTrigger]="['click', 'hover']"
+              ffButton="ui-success"
+              [ffSoundOffset]="$index"
+              ffPadAction="confirm"
+              ffPadLabel="Claim"
             >
               Claim
             </button>
@@ -68,12 +71,14 @@
             >
               <button
                 type="button"
-                class="btn btn-xs btn-square btn-neutral"
+                class="btn btn-sm btn-neutral"
                 tp="Locate on Map"
                 [disabled]="!!locate.disabledReason"
                 (click)="locateNode(locate.node)"
-                appSfx="ui-click"
-                [sfxTrigger]="['click', 'hover']"
+                ffButton="ui-click"
+                [ffSoundOffset]="$index"
+                [ffPadAction]="locate.disabledReason ? undefined : 'confirm'"
+                ffPadLabel="Locate"
               >
                 <app-icon name="tablerFocus" />
               </button>
@@ -87,12 +92,15 @@
   <div actions>
     @let claimableIds = claimableTaskIds();
     @if (claimableIds.length > 0) {
+      <!-- X claims from any row, so the D-pad only walks the list. -->
       <button
         type="button"
         class="btn btn-sm btn-primary"
+        ffFocusSkip
         (click)="claim(claimableIds)"
-        appSfx="ui-success"
-        [sfxTrigger]="['click', 'hover']"
+        ffButton="ui-success"
+        ffPadAction="context"
+        ffPadLabel="Claim All"
       >
         Claim All
       </button>

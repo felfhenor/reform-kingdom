@@ -1,3 +1,6 @@
+import { FFButtonComponent } from '@ff/components/button/button.component';
+import { FFFocusRowDirective } from '@ff/focus/ff-focus-row.directive';
+import { FFFocusSkipDirective } from '@ff/focus/ff-focus-skip.directive';
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
@@ -7,7 +10,6 @@ import { ModalComponent } from '@components/modal/modal.component';
 import { TextNumberTweenComponent } from '@components/text-number-tween/text-number-tween.component';
 import { ListReflowDirective } from '@directives/list-reflow.directive';
 import { SlotButtonContainerComponent } from '@components/slot-button-container/slot-button-container.component';
-import { SFXDirective } from '@directives/sfx.directive';
 import { tasksClaim } from '@helpers/task/task-claim.ui';
 import {
   taskNodeLocate,
@@ -25,9 +27,11 @@ import { TippyDirective } from '@ngneat/helipopper';
     ListReflowDirective,
     CurrencyCostComponent,
     DecimalPipe,
+    FFButtonComponent,
+    FFFocusRowDirective,
+    FFFocusSkipDirective,
     IconComponent,
     ModalComponent,
-    SFXDirective,
     SlotButtonContainerComponent,
     TextNumberTweenComponent,
     TippyDirective,
