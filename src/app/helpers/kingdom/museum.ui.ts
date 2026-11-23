@@ -1,8 +1,6 @@
 import { getEntriesByType, getEntry } from '@helpers/content/content';
-import {
-  isRecipeDiscovered,
-  isRecipeDropGated,
-} from '@helpers/crafting/recipes';
+import { isRecipeDropGated } from '@helpers/crafting/recipe-drop-gated';
+import { isRecipeDiscovered } from '@helpers/crafting/recipes';
 import {
   exchangeEdictRewardCollectibleIds,
   exchangeIsCollectibleAvailableThisRun,

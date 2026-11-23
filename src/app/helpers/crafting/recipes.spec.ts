@@ -11,11 +11,11 @@ import {
 import { ensureRecipe } from '@helpers/content/ensure-recipe';
 import { ensureTown } from '@helpers/content/ensure-town';
 import { ensureTradeskill } from '@helpers/content/ensure-tradeskill';
+import { isRecipeDropGated } from '@helpers/crafting/recipe-drop-gated';
 import { isRecipeTownUnique } from '@helpers/crafting/recipe-town-unique';
 import {
   isRecipeCraftable,
   isRecipeDiscovered,
-  isRecipeDropGated,
   isRecipeKnown,
   isRecipeAvailable,
   recipeCanUnlockWithTokens,

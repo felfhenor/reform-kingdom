@@ -9,7 +9,7 @@ import {
   WORKER_MAX_LEVEL,
 } from '@helpers/config';
 import { getEntriesByType } from '@helpers/content/content';
-import { isRecipeDropGated } from '@helpers/crafting/recipes';
+import { isRecipeDropGated } from '@helpers/crafting/recipe-drop-gated';
 import {
   debugDiscoverAllRecipes,
   debugFillBestiary,

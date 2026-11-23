@@ -4,6 +4,7 @@ import {
   getEntry,
 } from '@helpers/content/content';
 import { isRecipeTownUnique } from '@helpers/crafting/recipe-town-unique';
+import { isRecipeDropGated } from '@helpers/crafting/recipe-drop-gated';
 import {
   baseContentSources,
   isCraftedOnly,
@@ -108,19 +109,27 @@ function playerRecipesByResult(): Map<string, RecipeContent[]> {
   return byResult;
 }
 
-// A recipe is obtainable once its latest sourced ingredient is; unsourced ones (shop goods, collectibles) don't count.
+function recipeRequirementTargets(recipe: RecipeContent): SourceTarget[] {
+  const ingredients = recipe.requirements.flatMap<SourceTarget>(
+    (requirement) =>
+      'itemId' in requirement
+        ? [{ itemId: requirement.itemId }]
+        : 'equipmentId' in requirement
+          ? [{ equipmentId: requirement.equipmentId }]
+          : [],
+  );
+  return isRecipeDropGated(recipe.id)
+    ? [...ingredients, { recipeId: recipe.id }]
+    : ingredients;
+}
+
+// A recipe is obtainable once its latest sourced ingredient (and its own drop, if gated) is; unsourced ones (shop goods, collectibles) don't count.
 function recipeEarliest(
   recipe: RecipeContent,
   context: EquipmentHomeContext,
 ): MaterialSource | undefined {
-  const sources = recipe.requirements.flatMap((requirement) => {
-    const target: SourceTarget | undefined =
-      'itemId' in requirement
-        ? { itemId: requirement.itemId }
-        : 'equipmentId' in requirement
-          ? { equipmentId: requirement.equipmentId }
-          : undefined;
-    const source = target ? sourceEarliest(target, context) : undefined;
+  const sources = recipeRequirementTargets(recipe).flatMap((target) => {
+    const source = sourceEarliest(target, context);
     return source ? [source] : [];
   });
   return maxBy(sources, (source) => source.level);

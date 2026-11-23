@@ -139,11 +139,23 @@ beforeEach(() => {
     gearRecipe('r-fangCharm', 'fangCharm', [{ itemId: fang, quantity: 1 }]),
     gear('relic', 3, true),
     gearRecipe('r-relic', 'relic', [{ itemId: ore, quantity: 1 }]),
+    // Early ingredients, but the recipe itself only drops late.
+    gear('forgedBlade', 8),
+    gearRecipe('r-forgedBlade', 'forgedBlade', [{ itemId: ore, quantity: 1 }]),
+    ensureEncounter({
+      id: 'vault' as EncounterId,
+      name: 'LateVault',
+      levelRange: { min: 35, max: 40 },
+      completionRewards: [
+        ensureDroppedReward({ recipeId: 'r-forgedBlade' as RecipeId }),
+      ],
+    }),
   ]);
   seedWorldNodes([
     { name: 'EarlyMine', type: 'GatherNode', mapName: 'Early' },
     { name: 'EarlyDen', type: 'ExploreNode', mapName: 'Early' },
     { name: 'LateMine', type: 'GatherNode', mapName: 'Late' },
+    { name: 'LateVault', type: 'ExploreNode', mapName: 'Late' },
   ]);
 });
 
@@ -158,6 +170,7 @@ describe('equipmentHomeMapsBuild', () => {
       fangCharm: 'Late',
       loopGear: 'Early',
       loopBGear: 'Early',
+      forgedBlade: 'Late',
     });
   });
 });
@@ -167,6 +180,7 @@ describe('equipmentHomeGear', () => {
     expect(equipmentHomeGear('Late').map((equipment) => equipment.id)).toEqual([
       'blade',
       'fangCharm',
+      'forgedBlade',
     ]);
     expect(equipmentHomeGear('Nowhere')).toEqual([]);
   });

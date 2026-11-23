@@ -10,11 +10,8 @@ import {
   WORKER_MAX_LEVEL,
 } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
-import {
-  isRecipeDropGated,
-  recipeDiscover,
-  recipeUndiscover,
-} from '@helpers/crafting/recipes';
+import { recipeDiscover, recipeUndiscover } from '@helpers/crafting/recipes';
+import { isRecipeDropGated } from '@helpers/crafting/recipe-drop-gated';
 import {
   tradeskillBuildingIn,
   tradeskillIdForName,
