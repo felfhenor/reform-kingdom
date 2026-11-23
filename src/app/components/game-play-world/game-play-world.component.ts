@@ -135,6 +135,7 @@ import {
 } from '@helpers/world-node/world-nodes';
 import { isWorldNodeUncleared } from '@helpers/world-node/world-node-uncleared';
 import { worldNodeDiscoverIfHidden } from '@helpers/world-node/world-nodes.ui';
+import { worldNodeAtCurrentLocation } from '@helpers/world';
 import { isPlayerAtLocation } from '@helpers/world.ui';
 import type {
   AtlasedImage,
@@ -1004,6 +1005,9 @@ export class GamePlayWorldComponent implements OnDestroy {
     const { x, y } = this.partyGlide.visual;
     this.mapCursor = { x, y };
     this.recenterCamera();
+
+    const here = worldNodeAtCurrentLocation();
+    if (here) mapNodeSelect(here);
   }
 
   public recenterCamera(): void {
