@@ -15,8 +15,9 @@
       class="btn btn-primary btn-sm"
       [disabled]="pending === 0"
       (click)="confirm()"
-      appSfx="ui-success"
-      [sfxTrigger]="['click', 'hover']"
+      ffButton="ui-success"
+      ffPadAction="recenter"
+      ffPadLabel="Confirm"
     >
       Confirm
     </button>
@@ -99,8 +100,8 @@
               <p class="mt-2 ff-gamepad-only">
                 Press X on a skill to mark it to be learned (Y to unmark it)
                 (indicated by orange outlines and arrows). Some skills can be
-                learned multiple times. To confirm your choices, you must hit
-                the Confirm button.
+                learned multiple times. To confirm your choices, you must press
+                R3 (the Confirm button).
               </p>
 
               <p class="mt-2 ff-kbm-only">

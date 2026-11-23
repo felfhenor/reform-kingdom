@@ -20,6 +20,7 @@ import { RowCurrencyCostComponent } from '@components/row-currency-cost/row-curr
 import { SlotButtonContainerComponent } from '@components/slot-button-container/slot-button-container.component';
 import { TabsHeroComponent } from '@components/tabs-hero/tabs-hero.component';
 import { SFXDirective } from '@directives/sfx.directive';
+import { FFButtonComponent } from '@ff/components/button/button.component';
 import { getEntry } from '@helpers/content/content';
 import {
   heroesSelectCharacter,
@@ -62,6 +63,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     BlankSlateComponent,
     DecimalPipe,
     ButtonKingdomBackComponent,
+    FFButtonComponent,
     CardPageComponent,
     PanelHeroesSkillTreeDetailComponent,
     PanelHeroesSkillTreeGridComponent,
