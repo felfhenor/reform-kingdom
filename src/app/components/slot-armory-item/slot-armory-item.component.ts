@@ -2,6 +2,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  ElementRef,
+  inject,
   input,
   output,
 } from '@angular/core';
@@ -10,6 +12,7 @@ import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { TooltipItemPreviewComponent } from '@components/tooltip-item-preview/tooltip-item-preview.component';
 import { SFXDirective } from '@directives/sfx.directive';
+import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
 import {
   equipmentItemBonusCombatStats,
   equipmentItemBonusResistances,
@@ -40,7 +43,17 @@ export class SlotArmoryItemComponent {
   public sellMode = input(false);
   public selected = input(false);
 
-  public toggleSelect = output<MouseEvent>();
+  // Emits whether to select a range from the last toggled item.
+  public toggleSelect = output<boolean>();
+
+  constructor() {
+    const host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+    ffGamepadOn('details', () => this.toggleSelect.emit(true), {
+      element: host,
+      enabled: () => this.sellMode() && host.contains(document.activeElement),
+      label: 'Select Range',
+    });
+  }
 
   public display = computed(() =>
     itemPreviewDisplay('equipment', this.equipment(), this.equipmentItem()),

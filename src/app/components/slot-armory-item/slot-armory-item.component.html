@@ -26,7 +26,7 @@
     [class.outline-4]="selected()"
     [tp]="preview.template()"
     [tpPlacement]="'top'"
-    (click)="toggleSelect.emit($event)"
+    (click)="toggleSelect.emit($event.shiftKey)"
     appSfx="ui-click"
     [sfxTrigger]="['click', 'hover']"
   >

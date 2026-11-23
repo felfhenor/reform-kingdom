@@ -146,10 +146,10 @@ export class PlayKingdomArmoryComponent {
     this.sellMode.set(true);
   }
 
-  public toggleSelected(itemId: EquipmentItemId, event: MouseEvent): void {
+  public toggleSelected(itemId: EquipmentItemId, range: boolean): void {
     const anchorId = this.lastSelectedId();
 
-    if (event.shiftKey && anchorId !== undefined) {
+    if (range && anchorId !== undefined) {
       this.selectRange(anchorId, itemId);
     } else {
       this.selectedIds.update((current) => {
