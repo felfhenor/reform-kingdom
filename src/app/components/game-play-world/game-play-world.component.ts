@@ -4,7 +4,7 @@ import { FF_DIRECTIONS } from '@ff/input/ff-action-map';
 import type { FFDirection } from '@ff/interfaces/ff-input';
 import { GAMEPAD_PRIORITY } from '@helpers/engine/gamepad.ui';
 import { modalHasAnyOpen } from '@helpers/engine/modal-stack';
-import type { ElementRef, OnDestroy } from '@angular/core';
+import type { OnDestroy } from '@angular/core';
 import {
   afterNextRender,
   ChangeDetectionStrategy,
@@ -12,8 +12,8 @@ import {
   computed,
   DestroyRef,
   effect,
+  ElementRef,
   inject,
-  Injector,
   signal,
   untracked,
   viewChild,
@@ -144,6 +144,7 @@ import type {
   CurrentLocation,
   GatherVfxEvent,
   GlobalEffectId,
+  HudZone,
   JobContent,
   PartyPositionSample,
   PixiNodeAnimationUpdate,
@@ -170,6 +171,14 @@ const FLOATING_TEXT_MAX_ACTIVE = 24;
 const FLOATING_TEXT_MAX_PENDING = 40;
 // Countdown/visibility text only needs to read accurately within this window, not every tick.
 const NODE_STATUS_UPDATE_INTERVAL_MS = 150;
+
+const HUD_ZONES: HudZone[] = ['buffs', 'bubbles', 'tasks', 'panel'];
+const HUD_ZONE_LABELS: Record<HudZone, string> = {
+  buffs: 'Buffs',
+  bubbles: 'Bubbles',
+  tasks: 'Tasks',
+  panel: 'Node',
+};
 
 @Component({
   selector: 'app-game-play-world',
@@ -204,7 +213,7 @@ const NODE_STATUS_UPDATE_INTERVAL_MS = 150;
       <div
         class="absolute top-0 left-0 right-0 flex flex-col pointer-events-none z-[11]"
       >
-        <div class="flex items-start">
+        <div #buffsZone class="flex items-start">
           <app-status-edicts
             class="pointer-events-auto cursor-pointer"
             (click)="viewEdicts()"
@@ -219,17 +228,23 @@ const NODE_STATUS_UPDATE_INTERVAL_MS = 150;
           class="ms-4 mr-2 mt-2 w-[32rem] max-w-[calc(100%-2rem)]"
         ></app-adventure-log-overlay>
       </div>
-      <app-panel-map-node></app-panel-map-node>
+      <app-panel-map-node #panelZone></app-panel-map-node>
 
       <app-status-encounter
         class="encounter-status-layer"
       ></app-status-encounter>
-      <div class="absolute top-8 right-4 flex gap-2 pointer-events-auto z-[20]">
+      <div
+        #bubblesZone
+        class="absolute top-8 right-4 flex gap-2 pointer-events-auto z-[20]"
+      >
         <app-status-worker-levelup></app-status-worker-levelup>
         <app-status-crafting></app-status-crafting>
         <app-status-tutorial-unlock></app-status-tutorial-unlock>
       </div>
-      <app-status-task-list class="task-list-layer"></app-status-task-list>
+      <app-status-task-list
+        #tasksZone
+        class="task-list-layer"
+      ></app-status-task-list>
       @if (introMapName(); as mapName) {
         <app-card-region-intro class="region-intro-layer" [mapName]="mapName" />
       }
@@ -243,8 +258,17 @@ export class GamePlayWorldComponent implements OnDestroy {
   private pixiContainer =
     viewChild<ElementRef<HTMLDivElement>>('pixiContainer');
   private hudFrame = viewChild<ElementRef<HTMLDivElement>>('hudFrame');
-  // Controller focus is on the HUD widgets (L3), not the map cursor.
-  private hudMode = signal(false);
+  private buffsZone = viewChild<ElementRef<HTMLElement>>('buffsZone');
+  private bubblesZone = viewChild<ElementRef<HTMLElement>>('bubblesZone');
+  private tasksZone = viewChild<string, ElementRef<HTMLElement>>('tasksZone', {
+    read: ElementRef,
+  });
+  private panelZone = viewChild<string, ElementRef<HTMLElement>>('panelZone', {
+    read: ElementRef,
+  });
+  // Unset while the map cursor drives.
+  private hudZone = signal<HudZone | undefined>(undefined);
+  private hudMode = computed(() => !!this.hudZone());
 
   private cameraOffset = signal<CameraPosition>({ x: 0, y: 0 });
 
@@ -311,7 +335,6 @@ export class GamePlayWorldComponent implements OnDestroy {
   private nodeSelectionIndicator?: Graphics;
   private readonly ffInput = inject(FFInputService);
   private readonly focus = inject(FFFocusService);
-  private readonly injector = inject(Injector);
   // Controller cursor in tile coordinates; undefined until the pad drives the map.
   private mapCursor?: CameraPosition;
   private mapCursorAt?: MapCursorNode;
@@ -427,14 +450,30 @@ export class GamePlayWorldComponent implements OnDestroy {
     effect(() => {
       const leftMap =
         this.ffInput.mode() !== 'gamepad' || gamePlayView() !== 'world';
-      if (leftMap) untracked(() => this.hudMode.set(false));
+      if (leftMap) untracked(() => this.setHudZone(undefined));
     });
     afterNextRender(() => {
       const unregisters = [
         ...this.registerMapCursorActions(),
         ...this.registerHudActions(),
-        focus.registerScope(GAMEPAD_PRIORITY.page, () =>
-          this.hudMode() ? (this.hudFrame()?.nativeElement ?? null) : null,
+        // A zone emptied under focus (node closed, last task done) would otherwise strand the D-pad.
+        this.ffInput.onRefresh(() => {
+          const zone = this.hudZone();
+          const element = zone ? this.hudZoneElement(zone) : undefined;
+          if (element && !focus.hasLanding(element)) this.setHudZone(undefined);
+        }),
+        focus.registerScope(GAMEPAD_PRIORITY.page, () => {
+          const zone = this.hudZone();
+          return zone ? (this.hudZoneElement(zone) ?? null) : null;
+        }),
+        // Body, not the host, so pad actions outside the world view still pass the scope filter.
+        focus.registerScope(
+          GAMEPAD_PRIORITY.page,
+          () =>
+            gamePlayView() === 'world' && !this.hudMode()
+              ? document.body
+              : null,
+          false,
         ),
       ];
       destroyRef.onDestroy(() => {
@@ -1378,7 +1417,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     ];
   }
 
-  // L3 swaps the D-pad between the map cursor and the HUD widgets; B also leaves the HUD.
+  // L3 steps the D-pad through the non-empty HUD zones and back to the map cursor; B returns to the map.
   private registerHudActions(): (() => void)[] {
     const inHud = {
       priority: GAMEPAD_PRIORITY.pageMode,
@@ -1393,12 +1432,16 @@ export class GamePlayWorldComponent implements OnDestroy {
       ...(['context', 'details'] as const).map((action) =>
         this.ffInput.register(action, () => undefined, inHud),
       ),
-      this.ffInput.register('zone', () => this.setHudMode(!this.hudMode()), {
+      this.ffInput.register('zone', () => this.setHudZone(this.nextHudZone()), {
         priority: GAMEPAD_PRIORITY.pageMode,
-        enabled: () => this.canToggleHud(),
-        label: () => (this.hudMode() ? 'Map' : 'HUD'),
+        enabled: () =>
+          this.canToggleHud() && (this.hudMode() || !!this.nextHudZone()),
+        label: () => {
+          const next = this.nextHudZone();
+          return next ? HUD_ZONE_LABELS[next] : 'Map';
+        },
       }),
-      this.ffInput.register('back', () => this.setHudMode(false), {
+      this.ffInput.register('back', () => this.setHudZone(undefined), {
         priority: GAMEPAD_PRIORITY.pageMode,
         enabled: () => this.hudMode() && this.canToggleHud(),
         label: 'Map',
@@ -1412,10 +1455,32 @@ export class GamePlayWorldComponent implements OnDestroy {
       return false;
     }
 
-    const hud = this.hudFrame()?.nativeElement;
-    return this.hudMode()
-      ? !!hud && this.ffInput.isElementActive(hud)
+    const zone = this.hudZone();
+    const element = zone ? this.hudZoneElement(zone) : undefined;
+    return zone
+      ? !!element && this.ffInput.isElementActive(element)
       : this.isMapCursorDriving();
+  }
+
+  private hudZoneElement(zone: HudZone): HTMLElement | undefined {
+    const zones = {
+      buffs: this.buffsZone,
+      bubbles: this.bubblesZone,
+      tasks: this.tasksZone,
+      panel: this.panelZone,
+    };
+    return zones[zone]()?.nativeElement;
+  }
+
+  private nextHudZone(): HudZone | undefined {
+    const current = this.hudZone();
+    const after = current
+      ? HUD_ZONES.slice(HUD_ZONES.indexOf(current) + 1)
+      : HUD_ZONES;
+    return after.find((zone) => {
+      const element = this.hudZoneElement(zone);
+      return !!element && this.focus.hasLanding(element);
+    });
   }
 
   private clickFocusedHudElement(): void {
@@ -1424,20 +1489,17 @@ export class GamePlayWorldComponent implements OnDestroy {
     if (active instanceof HTMLElement && hud?.contains(active)) active.click();
   }
 
-  private setHudMode(on: boolean): void {
-    const hud = this.hudFrame()?.nativeElement;
-    if (!hud) return;
-
-    this.hudMode.set(on);
-    if (on) {
-      afterNextRender(() => this.focus.focusLanding(hud), {
-        injector: this.injector,
-      });
+  private setHudZone(zone?: HudZone): void {
+    this.hudZone.set(zone);
+    const element = zone ? this.hudZoneElement(zone) : undefined;
+    if (element) {
+      this.focus.focusLanding(element);
       return;
     }
 
     const active = document.activeElement;
-    if (active instanceof HTMLElement && hud.contains(active)) active.blur();
+    const hud = this.hudFrame()?.nativeElement;
+    if (active instanceof HTMLElement && hud?.contains(active)) active.blur();
   }
 
   // Over empty ground A does nothing, rather than travelling to a node that may be off-screen.

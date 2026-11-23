@@ -71,6 +71,7 @@ export * from './gather-vfx';
 export * from './gathering';
 export * from './global-effect-sums';
 export * from './hero-effect';
+export * from './hud.ui';
 export * from './icon-size';
 export * from './identifiable';
 export * from './item-preview';

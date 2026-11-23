@@ -94,11 +94,13 @@ export class FFFocusService {
     });
   }
 
+  // autoFocus false: nothing gets focus in the scope until the player moves it there (e.g. a map that owns the D-pad).
   public registerScope(
     priority: number,
     resolve: () => HTMLElement | null,
+    autoFocus = true,
   ): () => void {
-    const scope = { priority, resolve, order: this.nextOrder++ };
+    const scope = { priority, resolve, autoFocus, order: this.nextOrder++ };
     this.scopes = [...this.scopes, scope];
     return () => {
       this.scopes = this.scopes.filter((existing) => existing !== scope);
@@ -125,6 +127,10 @@ export class FFFocusService {
 
     this.focus(target);
     return true;
+  }
+
+  public hasLanding(container: HTMLElement): boolean {
+    return !!this.landingIn(container);
   }
 
   // Lets a caller that places focus itself (e.g. LT/RT hero cycling) stop ffFocusOnChange lists grabbing it.
@@ -161,15 +167,18 @@ export class FFFocusService {
   }
 
   private topScope(): HTMLElement {
+    return this.topScopeEntry()?.element ?? document.body;
+  }
+
+  private topScopeEntry() {
     const visible = this.scopes.flatMap((scope) => {
       const element = scope.resolve();
       return element && isActive(element) ? [{ scope, element }] : [];
     });
-    const top = sortBy(visible, [
+    return sortBy(visible, [
       ({ scope }) => -scope.priority,
       ({ scope }) => -scope.order,
     ])[0];
-    return top?.element ?? document.body;
   }
 
   private focusables(container: HTMLElement): HTMLElement[] {
@@ -306,7 +315,8 @@ export class FFFocusService {
 
   // Opening a scope remembers what had focus, closing one hands it back; an unfocused scope gets its remembered/first element.
   private syncScope(): void {
-    const scope = this.topScope();
+    const entry = this.topScopeEntry();
+    const scope = entry?.element ?? document.body;
     const root = this.activeRootIn(scope);
     const previous = this.activeScope;
     const changed = scope !== previous || root !== this.activeRoot;
@@ -317,6 +327,7 @@ export class FFFocusService {
       if (isActive(previous)) this.rememberOpener(scope);
       else if (this.restoreOpener(previous, scope)) return;
     }
+    if (entry?.scope.autoFocus === false) return;
     if (changed || !this.focusedIn(scope)) this.focusInitial(scope);
   }
 

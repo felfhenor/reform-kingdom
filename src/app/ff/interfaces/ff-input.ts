@@ -43,6 +43,7 @@ export interface FFFocusScopeRegistration {
   priority: number;
   order: number;
   resolve: () => HTMLElement | null;
+  autoFocus: boolean;
 }
 
 export interface FFFocusEdgeDetail {
