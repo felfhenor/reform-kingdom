@@ -105,7 +105,7 @@ function worldNodeAllCompletionRewards(entry: WorldNodeEntry): DroppedReward[] {
   );
 }
 
-// Distinct completion rewards, excluding Gold Coin and de-duplicated by identity.
+// Distinct completion rewards, excluding Gold Coin and drops that can never roll this run.
 export function worldNodeCompletionRewards(
   entry: WorldNodeEntry,
 ): DroppedReward[] {
@@ -113,7 +113,7 @@ export function worldNodeCompletionRewards(
   const rewards: DroppedReward[] = [];
 
   worldNodeAllCompletionRewards(entry).forEach((reward) => {
-    if (isGoldCoinReward(reward)) return;
+    if (isGoldCoinReward(reward) || !isDropUsable(reward)) return;
 
     const key = rewardKey(reward);
     if (seen.has(key)) return;
@@ -154,14 +154,10 @@ export function worldNodeCompletionRewardProgress(
   };
 }
 
-// Ignores rewards that can never roll (e.g. town-exclusive recipes), so a node isn't chased for nothing.
 export function worldNodeHasObtainableMissingReward(
   entry: WorldNodeEntry,
 ): boolean {
-  return worldNodeAllCompletionRewards(entry).some(
-    (reward) =>
-      !isRewardDiscovered(reward) &&
-      !isGoldCoinReward(reward) &&
-      isDropUsable(reward),
+  return worldNodeCompletionRewards(entry).some(
+    (reward) => !isRewardDiscovered(reward),
   );
 }

@@ -7,6 +7,7 @@ import type {
   RecipeId,
   TownId,
   TradeskillId,
+  WorkerId,
   WorldNodeEntry,
 } from '@interfaces';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -21,6 +22,7 @@ import {
 import { ensureRecipe } from '@helpers/content/ensure-recipe';
 import { ensureTown } from '@helpers/content/ensure-town';
 import { ensureTradeskill } from '@helpers/content/ensure-tradeskill';
+import { ensureWorker } from '@helpers/content/ensure-worker';
 import { recipeStylizedName } from '@helpers/crafting/recipes';
 import { defaultTradeskillBuilding } from '@helpers/defaults';
 import {
@@ -108,6 +110,25 @@ describe('worldNodeCompletionRewards', () => {
     seedEncounterWith([recipeReward], [cloakRecipe]);
 
     expect(worldNodeCompletionRewards(node())).toEqual([recipeReward]);
+  });
+
+  it('excludes workers and recipes when this run disables them', () => {
+    const worker = ensureWorker({ id: 'gob' as WorkerId, name: 'Gob' });
+    const boneReward = ensureDroppedReward({ itemId: bone.id, chance: 100 });
+    seedEncounterWith(
+      [
+        ensureDroppedReward({ workerId: worker.id, chance: 100 }),
+        ensureDroppedReward({ recipeId: cloakRecipe.id, chance: 25 }),
+        boneReward,
+      ],
+      [worker, cloakRecipe, bone],
+    );
+    seedGamestate((state) => {
+      state.globalEffectSums.workersDisabled = true;
+      state.globalEffectSums.tradeskillsDisabled = true;
+    });
+
+    expect(worldNodeCompletionRewards(node())).toEqual([boneReward]);
   });
 });
 
