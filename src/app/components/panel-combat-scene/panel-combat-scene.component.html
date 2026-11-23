@@ -12,6 +12,17 @@
     <div class="combat-vignette"></div>
   </div>
 
+  <!-- Samples one pixel per 6px block and dilates it, so the vector skull matches the pixel-art sprites. -->
+  <svg class="absolute size-0" aria-hidden="true">
+    <filter id="scene-pixelate" x="0" y="0">
+      <feFlood x="2" y="2" width="2" height="2" />
+      <feComposite width="6" height="6" />
+      <feTile result="grid" />
+      <feComposite in="SourceGraphic" in2="grid" operator="in" />
+      <feMorphology operator="dilate" radius="3" />
+    </filter>
+  </svg>
+
   <div class="card-body relative flex flex-col gap-2 p-4">
     <ng-content select="[sceneHelp]" />
 
@@ -27,7 +38,10 @@
     </p>
 
     <div class="flex gap-4 h-[736px] shrink-0">
-      <div class="flex flex-col gap-2 w-[856px] shrink-0">
+      <div
+        class="flex flex-col gap-2 w-[856px] shrink-0"
+        [class.scene-instant]="isMotionReduced()"
+      >
         <!-- Padding keeps the hover glow inside the clip, which hard-cuts a long order; only hidden in review, since removal lets slot leave animations shift the party. -->
         <div
           class="glass flex items-center h-[72px] pr-3 shrink-0 overflow-hidden"
@@ -81,17 +95,19 @@
           @if (!isReview()) {
             @for (enemy of fight.guardians; track enemy.id) {
               @let targetable = targetableIds().has(enemy.id);
+              @let enemyDead = isDead(enemy);
               <button
                 type="button"
-                class="scene-combatant p-1 border-2"
+                class="scene-combatant relative p-1 border-2"
                 [class.border-warning]="targetable"
                 [class.target-ring]="targetable"
                 [class.cursor-pointer]="targetable"
                 [class.border-transparent]="!targetable"
                 [class.cursor-default]="!targetable"
                 [class.opacity-50]="!!pendingOption() && !targetable"
-                [class.ff-focus-skip]="isDead(enemy)"
-                [attr.tabindex]="isDead(enemy) ? -1 : null"
+                [class.scene-combatant-dead]="enemyDead"
+                [class.ff-focus-skip]="enemyDead"
+                [attr.tabindex]="enemyDead ? -1 : null"
                 (click)="clickCombatant(enemy)"
                 (mouseenter)="hover(enemy)"
                 (focus)="hover(enemy)"
@@ -108,6 +124,11 @@
                   [reserveElementTag]="true"
                   [elementTag]="enemyElementTags().get(enemy.id)"
                 />
+                <app-icon
+                  class="scene-skull"
+                  name="gameDeathSkull"
+                  size="nav"
+                />
               </button>
             }
           }
@@ -118,18 +139,21 @@
         >
           @for (ally of allies(); track ally.id) {
             @let targetable = targetableIds().has(ally.id);
+            @let allyDead = isDead(ally);
             <button
               type="button"
-              class="scene-combatant p-1 border-2 text-left"
+              class="scene-combatant relative p-1 border-2 text-left"
               [class.border-warning]="targetable"
               [class.target-ring]="targetable"
               [class.border-primary]="!targetable && activeHero() === ally"
               [class.border-transparent]="!targetable && activeHero() !== ally"
               [class.cursor-pointer]="targetable"
               [class.cursor-default]="!targetable"
+              [class.opacity-50]="!!pendingOption() && !targetable"
               [disabled]="isResolving() || isReview()"
-              [class.ff-focus-skip]="isDead(ally)"
-              [attr.tabindex]="isDead(ally) ? -1 : null"
+              [class.scene-combatant-dead]="allyDead"
+              [class.ff-focus-skip]="allyDead"
+              [attr.tabindex]="allyDead ? -1 : null"
               (click)="clickCombatant(ally)"
               (mouseenter)="hover(ally)"
               (focus)="hover(ally)"
@@ -144,6 +168,7 @@
                 [effectsBelow]="true"
                 [eventKeyPrefix]="eventKeyPrefix()"
               />
+              <app-icon class="scene-skull" name="gameDeathSkull" size="nav" />
             </button>
           }
         </div>

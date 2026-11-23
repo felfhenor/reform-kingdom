@@ -1,3 +1,5 @@
+@reference 'tailwindcss';
+
 // Box size and icon scale grow together, so the leader pushes the rest of the bar over as it doubles.
 .turn-slot {
   width: 34px;
@@ -75,4 +77,83 @@
 // A dark halo keeps the yellow target border readable on light backdrops like sand.
 .target-ring {
   box-shadow: 0 0 0 2px rgb(0 0 0 / 0.85);
+}
+
+// Transforms only, so neither focus nor death moves a neighbor or the pad's spatial grid.
+.scene-combatant {
+  transition: transform 150ms ease;
+
+  app-card-status-combatant {
+    transition: opacity 400ms ease;
+  }
+}
+
+// Shape and motion read from the couch where a thin colored ring doesn't.
+:host-context(html.ff-input-gamepad)
+  .scene-combatant:focus:not(.scene-combatant-dead) {
+  z-index: 10;
+  transform: scale(1.05);
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 100%;
+    width: 28px;
+    height: 20px;
+    margin-left: -14px;
+    background: white;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    filter: drop-shadow(0 0 2px #000) drop-shadow(0 0 6px #000);
+    animation: scene-pointer-bob 700ms ease-in-out infinite alternate;
+  }
+}
+
+.scene-skull {
+  @apply absolute text-4xl text-gray-200 pointer-events-none;
+  left: 50%;
+  top: 50%;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.5);
+  filter: url(#scene-pixelate) drop-shadow(0 2px 3px #000);
+  transition:
+    transform 400ms ease,
+    opacity 400ms ease;
+}
+
+// Delayed so the killing blow's damage number plays out at full brightness first.
+.scene-combatant-dead {
+  app-card-status-combatant {
+    opacity: 0.5;
+    transition-delay: 1700ms;
+  }
+
+  .scene-skull {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    transition-delay: 1700ms;
+  }
+}
+
+.scene-instant {
+  .scene-combatant,
+  app-card-status-combatant,
+  .scene-skull {
+    transition: none;
+  }
+}
+
+:host-context(html.ff-input-gamepad)
+  .scene-instant
+  .scene-combatant:focus:not(.scene-combatant-dead)::before {
+  animation: none;
+}
+
+@keyframes scene-pointer-bob {
+  from {
+    translate: 0 -10px;
+  }
+  to {
+    translate: 0 -2px;
+  }
 }
