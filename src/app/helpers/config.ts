@@ -52,9 +52,9 @@ export const ELEMENT_RESISTANCE_MAX = 100;
 export const ELEMENT_RESISTANCE_MIN = -100;
 
 // XP degrades once the party out-levels a node's max, then drops to 0 at the hard cap - keeps overleveled parties from farming trivial nodes.
-export const OVERLEVEL_XP_DEGRADE_PER_LEVEL = 0.25;
+export const OVERLEVEL_XP_DEGRADE_PER_LEVEL = 0.5;
 export const OVERLEVEL_XP_DEGRADE_FLOOR = 1;
-export const OVERLEVEL_XP_HARD_CAP_LEVELS = 4;
+export const OVERLEVEL_XP_HARD_CAP_LEVELS = 2;
 
 // Commission
 
