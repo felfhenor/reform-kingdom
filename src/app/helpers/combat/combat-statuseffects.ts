@@ -272,6 +272,9 @@ function combatHandleStatusEffectBehaviors(
     // Spread here, not in templateData, so combatant keeps the damage/healing applied above.
     const renderData = {
       ...templateData,
+      damage: templateData.damage.toLocaleString(),
+      healing: templateData.healing.toLocaleString(),
+      absdamage: templateData.absdamage.toLocaleString(),
       combatant: { ...combatant, name: combatantMessageToken(combatant) },
       combatantStatus: combatantStatusText(combatant),
     };

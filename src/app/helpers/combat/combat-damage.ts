@@ -221,7 +221,7 @@ function combatApplyRetaliation(
   runStatsRecordHit(combat, source, combatant, { change });
   combatMessageLog(
     combat,
-    `**${combatantMessageToken(combatant)}** took ${damage} damage in retaliation ${combatantStatusText(combatant)}!`,
+    `**${combatantMessageToken(combatant)}** took ${damage.toLocaleString()} damage in retaliation ${combatantStatusText(combatant)}!`,
     combatant,
   );
   if (

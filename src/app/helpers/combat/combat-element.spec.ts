@@ -95,5 +95,6 @@ describe('elementalDamageText', () => {
     expect(elementalDamageText(12, ['Fire'])).toBe('12 Fire damage');
     expect(elementalDamageText(12, ['Fire', 'Water'])).toBe('12 Steam damage');
     expect(elementalDamageText(0, [])).toBe('0 damage');
+    expect(elementalDamageText(2991, [])).toBe('2,991 damage');
   });
 });

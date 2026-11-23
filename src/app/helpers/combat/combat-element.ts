@@ -90,7 +90,8 @@ export function elementalDamageText(
   damage: number,
   elements: GameElement[],
 ): string {
+  const amount = damage.toLocaleString();
   return elements.length > 0
-    ? `${damage} ${elementsLabel(elements)} damage`
-    : `${damage} damage`;
+    ? `${amount} ${elementsLabel(elements)} damage`
+    : `${amount} damage`;
 }
