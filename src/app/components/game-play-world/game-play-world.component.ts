@@ -999,9 +999,10 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.positionCamera();
   }
 
-  // An explicit recenter also brings the controller cursor home.
+  // Homes on the party, not the view center: the camera clamps at map edges, so they can differ.
   private recenterOnParty(): void {
-    this.mapCursor = undefined;
+    const { x, y } = this.partyGlide.visual;
+    this.mapCursor = { x, y };
     this.recenterCamera();
   }
 
@@ -1507,7 +1508,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     if (this.mapCursorAt) this.selectNode(this.mapCursorAt.name, 1);
   }
 
-  // Where the camera is looking, so the cursor starts on screen after a recenter or mouse use.
+  // Where the camera is looking, so the cursor starts on screen after mouse use.
   private mapViewCenter(): CameraPosition {
     return {
       x: this.lastCamera.x + this.viewportTiles.widthTiles / 2,
