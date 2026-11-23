@@ -14,6 +14,7 @@ import { CardPageComponent } from '@components/card-page/card-page.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { SlotRequirementComponent } from '@components/slot-requirement/slot-requirement.component';
 import { FFButtonComponent } from '@ff/components/button/button.component';
+import { FFFocusRowDirective } from '@ff/focus/ff-focus-row.directive';
 import { getEntry } from '@helpers/content/content';
 import { notifySuccess } from '@helpers/engine/notify';
 import { formatDuration } from '@helpers/engine/timer';
@@ -57,6 +58,7 @@ type AstralProjectorRowViewModel = {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     FFButtonComponent,
+    FFFocusRowDirective,
     SlotRequirementComponent,
     BlankSlateComponent,
     ButtonKingdomBackComponent,
