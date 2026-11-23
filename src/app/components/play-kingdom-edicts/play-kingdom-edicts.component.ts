@@ -1,3 +1,4 @@
+import { FFFocusRowDirective } from '@/app/ff/focus/ff-focus-row.directive';
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
@@ -25,6 +26,7 @@ import type { EdictKind } from '@interfaces';
     AtlasImageComponent,
     RowSeatBoonsComponent,
     SlotIconBlankComponent,
+    FFFocusRowDirective,
   ],
   template: `
     <app-card-page heightProfile="full">
@@ -43,7 +45,10 @@ import type { EdictKind } from '@interfaces';
 
       <div class="flex flex-col gap-2 h-full overflow-y-auto pb-2">
         @for (edict of edicts; track edict.id) {
-          <div class="flex items-center gap-4 p-2 bg-base-200 shrink-0">
+          <div
+            ffFocusRow
+            class="flex items-center gap-4 p-2 bg-base-200 shrink-0"
+          >
             <app-slot-icon-blank class="shrink-0">
               <app-atlas-image spritesheet="edict" [assetName]="edict.sprite" />
             </app-slot-icon-blank>
