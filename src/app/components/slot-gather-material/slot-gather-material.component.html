@@ -21,14 +21,18 @@
     }
   </ng-template>
 
-  <div [tp]="tooltip" [tpPlacement]="'top'">
+  <div tabindex="0" [tp]="tooltip" [tpPlacement]="'top'">
     <app-slot-rarity-outline
       spritesheet="item"
       [entry]="material"
     ></app-slot-rarity-outline>
   </div>
 } @else {
-  <div [tp]="'A material yet to be discovered.'" [tpPlacement]="'top'">
+  <div
+    tabindex="0"
+    [tp]="'A material yet to be discovered.'"
+    [tpPlacement]="'top'"
+  >
     <app-icon-unknown />
   </div>
 }

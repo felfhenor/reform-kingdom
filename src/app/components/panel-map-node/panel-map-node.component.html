@@ -128,71 +128,75 @@
           </div>
         }
 
-        @if (isDemoLocked()) {
-          <div class="flex items-center justify-between gap-2">
-            <span class="text-sm type-muted">Available in the full game.</span>
-            <app-button-wishlist />
-          </div>
-        } @else if (!isAtNode()) {
-          @if (!meetsCaravanAvailability()) {
-            <div class="text-sm text-error">
-              No traders are available for this timeframe. Check back later.
+        <div class="contents ff-focus-landing">
+          @if (isDemoLocked()) {
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-sm type-muted">
+                Available in the full game.
+              </span>
+              <app-button-wishlist />
             </div>
-          }
+          } @else if (!isAtNode()) {
+            @if (!meetsCaravanAvailability()) {
+              <div class="text-sm text-error">
+                No traders are available for this timeframe. Check back later.
+              </div>
+            }
 
-          <button
-            type="button"
-            class="btn btn-sm btn-primary"
-            [disabled]="!canTravelHere()"
-            (click)="travel()"
-            ffButton="ui-click"
-            ffPadAction="confirm"
-            ffPadLabel="Travel"
-          >
-            Travel ({{ travelSeconds() ?? '-' }}s)
-          </button>
-        } @else if (isExploreNode()) {
-          <app-panel-map-node-actions-explore
-            [entry]="entry"
-            [canReExplore]="canReExplore()"
-            (reExplore)="reExplore()"
-          />
-        } @else if (isCaravanNode()) {
-          <app-panel-map-node-actions-caravan (openTrade)="openTrade()" />
-        } @else if (isGatherNode()) {
-          <app-button-world-node-develop [entry]="entry" />
-        } @else if (isShrineNode()) {
-          <app-panel-map-node-actions-shrine
-            [entry]="entry"
-            (pray)="prayShrine()"
-          />
-        } @else if (isOutpostNode()) {
-          <app-panel-map-node-actions-outpost
-            [entry]="entry"
-            (setHome)="setOutpostHome()"
-            (teleport)="openOutpostTeleport()"
-          />
-        } @else if (isTownNode()) {
-          <app-panel-map-node-actions-town (openTown)="openTown()" />
-        } @else if (isTrainerNode()) {
-          <app-panel-map-node-actions-trainer (visit)="visitTrainer()" />
-        } @else if (isKingdomNode()) {
-          <button
-            type="button"
-            class="btn btn-block btn-sm btn-primary"
-            (click)="visitKingdom()"
-            ffButton="ui-click"
-            ffPadAction="context"
-            ffPadLabel="Visit"
-          >
-            Visit
-          </button>
-        } @else if (exchangeNode(); as exchange) {
-          <app-panel-map-node-actions-exchange
-            [node]="exchange"
-            (open)="openExchange()"
-          />
-        }
+            <button
+              type="button"
+              class="btn btn-sm btn-primary"
+              [disabled]="!canTravelHere()"
+              (click)="travel()"
+              ffButton="ui-click"
+              ffPadAction="confirm"
+              ffPadLabel="Travel"
+            >
+              Travel ({{ travelSeconds() ?? '-' }}s)
+            </button>
+          } @else if (isExploreNode()) {
+            <app-panel-map-node-actions-explore
+              [entry]="entry"
+              [canReExplore]="canReExplore()"
+              (reExplore)="reExplore()"
+            />
+          } @else if (isCaravanNode()) {
+            <app-panel-map-node-actions-caravan (openTrade)="openTrade()" />
+          } @else if (isGatherNode()) {
+            <app-button-world-node-develop [entry]="entry" />
+          } @else if (isShrineNode()) {
+            <app-panel-map-node-actions-shrine
+              [entry]="entry"
+              (pray)="prayShrine()"
+            />
+          } @else if (isOutpostNode()) {
+            <app-panel-map-node-actions-outpost
+              [entry]="entry"
+              (setHome)="setOutpostHome()"
+              (teleport)="openOutpostTeleport()"
+            />
+          } @else if (isTownNode()) {
+            <app-panel-map-node-actions-town (openTown)="openTown()" />
+          } @else if (isTrainerNode()) {
+            <app-panel-map-node-actions-trainer (visit)="visitTrainer()" />
+          } @else if (isKingdomNode()) {
+            <button
+              type="button"
+              class="btn btn-block btn-sm btn-primary"
+              (click)="visitKingdom()"
+              ffButton="ui-click"
+              ffPadAction="context"
+              ffPadLabel="Visit"
+            >
+              Visit
+            </button>
+          } @else if (exchangeNode(); as exchange) {
+            <app-panel-map-node-actions-exchange
+              [node]="exchange"
+              (open)="openExchange()"
+            />
+          }
+        </div>
       </div>
     </div>
   </div>

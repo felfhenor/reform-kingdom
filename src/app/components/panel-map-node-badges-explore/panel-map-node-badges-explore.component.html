@@ -6,6 +6,7 @@
 @if (sealRegionValue) {
   <div
     class="badge"
+    tabindex="0"
     [class.badge-warning]="!isSealed()"
     [class.badge-success]="isSealed()"
     [tp]="sealTooltip"
@@ -33,7 +34,12 @@
 }
 
 @if (monsterCountValue) {
-  <div class="badge badge-data" [tp]="monstersTooltip" [tpPlacement]="'top'">
+  <div
+    class="badge badge-data"
+    tabindex="0"
+    [tp]="monstersTooltip"
+    [tpPlacement]="'top'"
+  >
     {{ monsterCountValue }} Monsters
   </div>
 }

@@ -7,6 +7,7 @@
   [tp]="missingTooltip"
   [tpPlacement]="'top'"
   [tpIsEnabled]="rows().length > 0"
+  [attr.tabindex]="rows().length > 0 ? 0 : null"
 >
   {{ gate.obtained | number }}/{{ gate.total | number }} Collectibles
 </div>

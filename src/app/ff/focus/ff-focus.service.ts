@@ -29,6 +29,9 @@ const FOCUSABLE_SELECTOR = [
 const CURRENT_SELECTOR =
   '[aria-current]:not([aria-current="false"]), [aria-selected="true"]';
 
+// Otherwise the first stop inside a marked region (e.g. a panel's actions), so focus skips past info-only stops.
+const LANDING_SELECTOR = '.ff-focus-landing';
+
 function isActive(element: HTMLElement): boolean {
   return (
     element.isConnected &&
@@ -280,7 +283,13 @@ export class FFFocusService {
     const focusables = this.focusables(container);
     const currents = focusables.filter((el) => el.matches(CURRENT_SELECTOR));
     const pool = currents.length > 0 ? currents : focusables;
-    if (!lastRect) return pool[0];
+    if (!lastRect) {
+      return (
+        currents[0] ??
+        focusables.find((el) => el.closest(LANDING_SELECTOR)) ??
+        focusables[0]
+      );
+    }
 
     const index = ffNearestTo(
       lastRect,
