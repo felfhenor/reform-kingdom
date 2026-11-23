@@ -8,7 +8,7 @@ import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
 } from '@helpers/engine/analytics';
-import { combatDropChanceBonus, rollDroppedRewards } from '@helpers/item/loot';
+import { dropPityRollCompletionRewards } from '@helpers/item/drop-pity';
 import { updateGamestate, worldPartyState } from '@helpers/state-game';
 import { taskRecordEncounterClear } from '@helpers/task/task-progress';
 import {
@@ -95,10 +95,10 @@ function grantEncounterRandomCompletionRewards(
   // guardian at `encounterRandomStartFight` time, so the first guardian's
   // level represents it - same convention as the static-encounter path.
   const level = combat.guardians[0]?.level ?? 1;
-  const drops = rollDroppedRewards(
+  const drops = dropPityRollCompletionRewards(
+    combat.locationName,
     content.completionRewards,
     level,
-    combatDropChanceBonus(),
   );
   grantResolvedDrops(combat, [...monsterDrops, ...drops]);
 

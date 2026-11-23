@@ -33,6 +33,7 @@ import {
   syncPartyHpFromCombat,
 } from '@helpers/hero/character-progress';
 import { travelBeginDeathsDoor } from '@helpers/hero/travel';
+import { dropPityRollCompletionRewards } from '@helpers/item/drop-pity';
 import { combatDropChanceBonus, rollDroppedRewards } from '@helpers/item/loot';
 import { loseCurrency, loseRandomMaterials } from '@helpers/item/materials';
 import {
@@ -210,10 +211,10 @@ function rollEncounterCompletionRewards(combat: Combat): ResolvedDrop[] {
   // The encounter's level is rolled once and applied to every guardian,
   // so the first guardian's level represents it.
   const level = combat.guardians[0]?.level ?? 1;
-  return rollDroppedRewards(
+  return dropPityRollCompletionRewards(
+    combat.locationName,
     encounter.completionRewards,
     level,
-    combatDropChanceBonus(),
   );
 }
 

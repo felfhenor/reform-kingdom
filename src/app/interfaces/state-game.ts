@@ -155,6 +155,9 @@ export type GameStateBestiary = {
   };
 };
 
+// Keyed by node name + reward key; clears since that completion reward last dropped there.
+export type GameStateDropPity = Record<string, number>;
+
 export type GameStateClock = {
   numTicks: number;
   lastSaveTick: number;
@@ -206,6 +209,7 @@ export type GameState = {
   worldDiscoveries: GameStateWorldDiscoveries;
   discoveredMaps: GameStateDiscoveredMaps;
   bestiary: GameStateBestiary;
+  dropPity: GameStateDropPity;
   workers: GameStateWorkers;
   discoveredWorkers: GameStateDiscoveredWorkers;
   globalEffects: GlobalEffect[];

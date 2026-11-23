@@ -80,6 +80,7 @@ export function defaultGameState(): GameState {
     worldDiscoveries: {},
     discoveredMaps: {},
     bestiary: {},
+    dropPity: {},
     workers: {},
     discoveredWorkers: {},
     globalEffects: [],

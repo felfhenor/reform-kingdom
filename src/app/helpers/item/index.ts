@@ -3,6 +3,7 @@ export * from './affix-display.ui';
 export * from './collectible-source';
 export * from './collectibles';
 export * from './content-sources';
+export * from './drop-pity';
 export * from './equipment';
 export * from './equipment-bonus';
 export * from './equipment-display';

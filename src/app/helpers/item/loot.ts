@@ -106,18 +106,21 @@ export function isDropUsable(drop: DroppedReward): boolean {
   return !sums.tradeskillsDisabled && !isRecipeTownUnique(drop.recipeId);
 }
 
+export function isDropRollable(drop: DroppedReward, level: number): boolean {
+  return (
+    (drop.minLevel ?? 0) <= level &&
+    (drop.maxLevel ?? CHARACTER_MAX_LEVEL) >= level &&
+    isDropUsable(drop)
+  );
+}
+
 export function rollDroppedRewards(
   rewards: DroppedReward[],
   level: number,
   bonus: DropChanceBonus = {},
 ): ResolvedDrop[] {
   return rewards
-    .filter(
-      (drop) =>
-        (drop.minLevel ?? 0) <= level &&
-        (drop.maxLevel ?? CHARACTER_MAX_LEVEL) >= level &&
-        isDropUsable(drop),
-    )
+    .filter((drop) => isDropRollable(drop, level))
     .map((drop) => resolveDrop(drop, level, bonus))
     .filter((drop): drop is ResolvedDrop => !!drop);
 }

@@ -29,6 +29,7 @@ import { pruneInvalidPartyEquipment } from '@helpers/hero/party';
 import { stateRegaliaMigrate } from '@helpers/hero/regalia-state';
 import { characterSkillTreesMigrate } from '@helpers/hero/skill-tree';
 import { grantFoundingStoneIfMissing } from '@helpers/item/collectibles';
+import { dropPityKeyIsValid } from '@helpers/item/drop-pity';
 import {
   backfillEquipmentBlock,
   backfillEquipmentItem,
@@ -297,6 +298,7 @@ export function migrateGameState() {
     newState.world.autoMode.clauses,
     legacyRiskTolerance,
   );
+  newState.dropPity = recordPrune(newState.dropPity, dropPityKeyIsValid);
   newState.bestiary = recordPrune(newState.bestiary, contentExists);
   newState.bestiary = repairInvalidBestiaryLevels(newState.bestiary);
   newState.bestiary = syncBestiaryAnalyzed(newState.bestiary);

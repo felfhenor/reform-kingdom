@@ -97,7 +97,9 @@ export function isGoldCoinReward(reward: DroppedReward): boolean {
   return reward.itemId === getEntry<ItemContent>(GOLD_COIN_NAME)?.id;
 }
 
-function worldNodeAllCompletionRewards(entry: WorldNodeEntry): DroppedReward[] {
+export function worldNodeAllCompletionRewards(
+  entry: WorldNodeEntry,
+): DroppedReward[] {
   return (
     worldNodeEncounter(entry)?.completionRewards ??
     worldNodeEncounterRandom(entry)?.completionRewards ??

@@ -48,6 +48,8 @@ export const COMBAT_MANUAL_TURN_HOLD_MS = 1000;
 export const COMBAT_MANUAL_REPEAT_DELAY_MS = 2000;
 // Stops a weak creator's debuff from landing as a no-op "-0".
 export const STATUS_EFFECT_DEBUFF_MIN_AMOUNT = 1;
+// Added to a completion reward's chance per clear of its node that didn't drop it.
+export const COMBAT_DROP_PITY_PERCENT_PER_MISS = 1;
 
 // A weakness can at most double incoming damage.
 export const ELEMENT_RESISTANCE_MAX = 100;

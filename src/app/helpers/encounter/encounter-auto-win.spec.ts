@@ -5,6 +5,7 @@ vi.mock('@helpers/combat/combat-rewards');
 vi.mock('@helpers/commission/commission-kill-progress');
 vi.mock('@helpers/decree/auto-mode-state');
 vi.mock('@helpers/hero/character-progress');
+vi.mock('@helpers/item/drop-pity');
 vi.mock('@helpers/kingdom/bestiary');
 vi.mock('@helpers/task/task-progress');
 vi.mock('@helpers/item/loot', async (importOriginal) => ({
@@ -25,6 +26,7 @@ import {
   partyGainXp,
   syncPartyHpFromCombat,
 } from '@helpers/hero/character-progress';
+import { dropPityRollCompletionRewards } from '@helpers/item/drop-pity';
 import { rollDroppedRewards } from '@helpers/item/loot';
 import { gamestate, worldPartyState } from '@helpers/state-game';
 import { taskRecordEncounterClear } from '@helpers/task/task-progress';
@@ -129,9 +131,8 @@ describe('encounterTryIntimidate', () => {
     seed([warrior]);
     const content = encounter(1);
     seedContent([goblin, content, ...warriorJob]);
-    vi.mocked(rollDroppedRewards).mockImplementation((drops) =>
-      drops === content.completionRewards ? [chest] : [pelt],
-    );
+    vi.mocked(rollDroppedRewards).mockReturnValue([pelt]);
+    vi.mocked(dropPityRollCompletionRewards).mockReturnValue([chest]);
 
     tryAt(content);
 
