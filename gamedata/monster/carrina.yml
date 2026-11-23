@@ -484,7 +484,7 @@
 
   types: [Insect]
   elementalResistances:
-    Fire: -25
+    Fire: -50
 
   debuffResistances:
     Poison: 5
