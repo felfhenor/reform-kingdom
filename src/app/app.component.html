@@ -22,7 +22,9 @@
 
 <app-tutorial-overlay></app-tutorial-overlay>
 
-<ff-bar-prompts />
+@if (!isHomeRoute()) {
+  <ff-bar-prompts />
+}
 <ff-number-popup #numberPopup [priority]="selectPopupPriority">
   <app-button-close
     close

@@ -4,9 +4,11 @@ import {
   Component,
   HostListener,
   inject,
+  signal,
 } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { RouterOutlet } from '@angular/router';
+import type { Event } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { CardAchievementComponent } from '@components/card-achievement/card-achievement.component';
 import { BannerAnalyticsConsentComponent } from '@components/banner-analytics-consent/banner-analytics-consent.component';
 import { ScreenLoadingComponent } from '@components/screen-loading/screen-loading.component';
@@ -48,13 +50,19 @@ import { LoadingService } from '@services/loading.service';
 })
 export class AppComponent {
   private anim = inject(AnimationService);
+  private router = inject(Router);
   protected loadingService = inject(LoadingService);
+  protected readonly isHomeRoute = signal(true);
 
   constructor() {
     // Electron's window title follows the page's.
     if (isDemoBuild()) inject(Title).setTitle('re:Form Kingdom Demo');
 
     inject(FFFocusService);
+    this.router.events.subscribe((event: Event) => {
+      if (!(event instanceof NavigationEnd)) return;
+      this.isHomeRoute.set(event.urlAfterRedirects === '/');
+    });
     this.bindGamepadDialogs();
     gamepadBindSwal();
     gamepadBindFocusTips();
