@@ -455,8 +455,8 @@ describe('mostChallengingExploreNodeForRisk', () => {
     const nodes = seedDecreeWorld(
       [
         { content: explore('Hard', 10), steps: 1 },
-        { content: explore('Middling', 8), steps: 1 },
-        { content: explore('Easy', 7), steps: 1 },
+        { content: explore('Middling', 9), steps: 1 },
+        { content: explore('Easy', 8), steps: 1 },
       ],
       nodeFailures({
         Hard: LEVEL_UP_NODE_FAILURE_LIMIT,
@@ -473,10 +473,10 @@ describe('mostChallengingExploreNodeForRisk', () => {
     const nodes = seedDecreeWorld(
       [
         { content: explore('Hard', 10), steps: 1 },
-        { content: explore('Easy', 8), steps: 1 },
+        { content: explore('Easy', 9), steps: 1 },
       ],
       nodeFailures({
-        Hard: LEVEL_UP_NODE_FAILURE_LIMIT + 3,
+        Hard: LEVEL_UP_NODE_FAILURE_LIMIT + 1,
         Easy: LEVEL_UP_NODE_FAILURE_LIMIT,
       }),
     );
