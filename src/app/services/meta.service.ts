@@ -150,7 +150,7 @@ export class MetaService {
       return;
     }
 
-    window.open('https://seiyria.itch.io/reform-kingdom');
+    window.open('https://github.com/felfhenor/reform-kingdom/releases/latest');
   }
 
   // The desktop shell saves before letting the window close.
