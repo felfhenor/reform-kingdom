@@ -24,11 +24,16 @@
 
 - SpellBook Megapack - global effect icons
 - Admurins Items Mega Pack - item icons
-- Oryx Ultimate Fantasy - sprite sheets for characters and enemies
+- Oryx Ultimate Fantasy - sprite sheets for characters, enemies, and overworld sprites
+- Minifantasy - Maps - overworld sprites
+- 16x16 Puny World Tileset - overworld sprites
 - CraftPix - manual combat background images
-- UI & Menus Sound FX Pack - SFX
-- Fantasy Game UI Sounds - SFX
 - Kenney Input Prompts - controller button glyphs
+- UI & Menu Sound FX Pack - SFX
+- Fantasy Game UI Sounds - SFX
+- RPG Music Pack The Complete Collection II - SFX
+- Fantasy Ambience Complete Collection - BGM
+- Ambient Music Pack Vol. 1 and Vol 2. - BGM
 
 ## Useful Scripts
 
