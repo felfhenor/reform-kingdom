@@ -4,7 +4,7 @@
   isShrineBuff: true
   effects:
     - effectType: GlobalXPGainMultiplier
-      value: 0.05
+      value: 0.1
 
 - id: d596131f-496b-4f40-817c-8386d99f7f90
   name: Wisdom of the Founder II
@@ -12,7 +12,7 @@
   isShrineBuff: true
   effects:
     - effectType: GlobalXPGainMultiplier
-      value: 0.1
+      value: 0.2
 
 - id: 86e6bc24-024d-4cb8-913e-a34b6a44b116
   name: Wisdom of the Founder III
@@ -20,7 +20,7 @@
   isShrineBuff: true
   effects:
     - effectType: GlobalXPGainMultiplier
-      value: 0.15
+      value: 0.3
 
 - id: e49589f9-5052-42ef-8599-225a58d2a255
   name: Wisdom of the Founder IV
@@ -28,7 +28,7 @@
   isShrineBuff: true
   effects:
     - effectType: GlobalXPGainMultiplier
-      value: 0.2
+      value: 0.4
 
 - id: 0d154b25-a247-4ae3-bf68-aeaf12d664c7
   name: Wisdom of the Founder V
@@ -37,4 +37,4 @@
   hideDuration: true
   effects:
     - effectType: GlobalXPGainMultiplier
-      value: 0.25
+      value: 0.5
