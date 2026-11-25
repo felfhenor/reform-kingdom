@@ -17,4 +17,5 @@ export type ModalId =
   | 'changelog'
   | 'pause-menu'
   | 'settings'
-  | 'tasks';
+  | 'tasks'
+  | 'credits';

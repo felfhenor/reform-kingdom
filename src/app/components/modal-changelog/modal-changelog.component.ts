@@ -11,7 +11,6 @@ import {
 } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ModalComponent } from '@components/modal/modal.component';
-import { ModalCloseDirective } from '@directives/modal-close.directive';
 import { ModalOpenDirective } from '@directives/modal-open.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { TeleportToDirective } from '@directives/teleport.to.directive';
@@ -32,7 +31,6 @@ import type { JSAnimation } from 'animejs';
     SFXDirective,
     ModalComponent,
     ModalOpenDirective,
-    ModalCloseDirective,
     TeleportToDirective,
   ],
   providers: [provideIcons({ tablerPackage })],

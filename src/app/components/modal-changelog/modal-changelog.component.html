@@ -1,6 +1,6 @@
 <button
   class="btn btn-ghost btn-untextured social-icon"
-  [tp]="'View Changelog'"
+  [tp]="'Changelog'"
   [style.--social-color]="color"
   (mouseenter)="currentColor = color"
   (mouseleave)="currentColor = '#ccc'"
@@ -13,7 +13,11 @@
 </button>
 
 <div *appTeleportTo="'changelog-modal'">
-  <app-modal modalId="changelog" [allowEscToClose]="true">
+  <app-modal
+    modalId="changelog"
+    [allowEscToClose]="true"
+    [showCloseButton]="true"
+  >
     <span title>Changelog</span>
 
     <div body>
@@ -49,17 +53,6 @@
           <section #section [innerHTML]="section.html"></section>
         }
       </div>
-    </div>
-
-    <div actions>
-      <button
-        class="btn btn-neutral"
-        appModalClose
-        appSfx="ui-click"
-        [sfxTrigger]="['click', 'hover']"
-      >
-        Close
-      </button>
     </div>
   </app-modal>
 </div>

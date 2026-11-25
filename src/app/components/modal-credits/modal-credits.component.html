@@ -1,0 +1,38 @@
+<button
+  class="btn btn-ghost btn-untextured social-icon"
+  [tp]="'Credits'"
+  [style.--social-color]="color"
+  (mouseenter)="currentColor = color"
+  (mouseleave)="currentColor = '#ccc'"
+  appModalOpen="credits"
+  appSfx="ui-click"
+  [sfxOffset]="5"
+  [sfxTrigger]="['click', 'hover']"
+>
+  <ng-icon
+    [name]="'tablerCertificate'"
+    [color]="currentColor || '#ccc'"
+  ></ng-icon>
+</button>
+
+<div *appTeleportTo="'credits-modal'">
+  <app-modal
+    modalId="credits"
+    [allowEscToClose]="true"
+    [showCloseButton]="true"
+  >
+    <span title>Credits</span>
+
+    <div body>
+      @for (credit of credits; track $index) {
+        <div class="mt-2 flex gap-2">
+          <span class="badge badge-info min-w-16">{{ credit.type }}</span>
+
+          <span>
+            {{ credit.name }}
+          </span>
+        </div>
+      }
+    </div>
+  </app-modal>
+</div>

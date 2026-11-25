@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { ModalChangelogComponent } from '@components/modal-changelog/modal-changelog.component';
+import { ModalCreditsComponent } from '@components/modal-credits/modal-credits.component';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { discordCopyInvite } from '@helpers/engine/discord.ui';
@@ -21,6 +22,7 @@ import { TippyDirective } from '@ngneat/helipopper';
     ModalChangelogComponent,
     AnalyticsClickDirective,
     SFXDirective,
+    ModalCreditsComponent,
   ],
   providers: [
     provideIcons({
