@@ -62,6 +62,17 @@ jobs:
           draft: false
           prerelease: false
 
+      - run: npm run mods:kit
+
+      - name: Upload Mod Kit
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ./dist/mods/reform-modkit.zip
+          asset_name: reform-modkit.zip
+          tag: ${{ github.ref }}
+          overwrite: true
+
       - name: Build Blog Post for Version Update
         run: npm run build:blogpost
 
