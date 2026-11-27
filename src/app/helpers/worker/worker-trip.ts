@@ -5,6 +5,7 @@ import {
   isWorkerCombatNode,
   workerCombatUnitTicks,
 } from '@helpers/worker/worker-combat';
+import { workerAssignmentAfterUnit } from '@helpers/worker/worker-order';
 import { workerStatsForLevel } from '@helpers/worker/worker-progression';
 import {
   applyWorkerGatherProgress,
@@ -111,14 +112,34 @@ export function workerTripBeginReturn<W extends WorkerTripWorker>(
   return !!path;
 }
 
+// True when this unit filled a counted order, which clears the assignment so the worker idles once home.
+function workerTripCountUnit<W extends WorkerTripWorker>(
+  host: WorkerTripHost<W>,
+  worker: W,
+): boolean {
+  const assignment = worker.assignment;
+  if (!assignment || 'recipeId' in assignment) return false;
+
+  const next = workerAssignmentAfterUnit(assignment);
+  if (next === assignment) return false;
+
+  updateGamestate((state) => {
+    const target = host.draft(state);
+    if (target) host.setAssignment(target, next);
+    return state;
+  });
+
+  return !next;
+}
+
 function workerTripCompleteGatherUnit<W extends WorkerTripWorker>(
   host: WorkerTripHost<W>,
   nodeName: string,
   itemId: ItemId,
   itemsGathered: number,
-  capacity: number,
+  tripFull: boolean,
 ): void {
-  if (itemsGathered >= capacity) {
+  if (tripFull) {
     const startedTrip = workerTripBeginReturn(host, {
       itemId,
       quantity: itemsGathered,
@@ -202,13 +223,14 @@ export function workerTripGatheringTick<W extends WorkerTripWorker>(
 
   host.onUnitGathered?.(nodeName, itemId, worker.level);
 
+  const orderFilled = workerTripCountUnit(host, worker);
   const capacity = workerStatsForLevel(content, worker.level).capacity;
   workerTripCompleteGatherUnit(
     host,
     nodeName,
     itemId,
     outcome.itemsGathered,
-    capacity,
+    orderFilled || outcome.itemsGathered >= capacity,
   );
 }
 

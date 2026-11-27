@@ -4,6 +4,8 @@ export * from './worker-combat';
 export * from './worker-crafting';
 export * from './worker-crafting.ui';
 export * from './worker-discovery';
+export * from './worker-order';
+export * from './worker-order.ui';
 export * from './worker-progression';
 export * from './worker-progression.ui';
 export * from './worker-shared';

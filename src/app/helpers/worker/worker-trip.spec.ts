@@ -209,6 +209,27 @@ describe('workerTripGatheringTick', () => {
     expect(worker().status).toEqual({ kind: 'AtDuchy' });
   });
 
+  it('counts units down, heading home early and unassigned on the last one', () => {
+    const { host } = stubHost();
+    seedWorker(gathering(), { assignment: { ...assignment, remaining: 2 } });
+
+    tickWhile(
+      () => itemsGathered() === 0,
+      () => inTick(() => workerTripGatheringTick(host)),
+    );
+    expect(worker().assignment).toEqual({ ...assignment, remaining: 1 });
+
+    tickWhile(
+      () => worker().status.kind === 'Gathering',
+      () => inTick(() => workerTripGatheringTick(host)),
+    );
+    expect(worker().assignment).toBeNull();
+    expect(worker().status).toMatchObject({
+      kind: 'TravelingBack',
+      carriedQuantity: 2,
+    });
+  });
+
   it('abandons an invalid assignment: idle, unassigned, nothing reported', () => {
     const { host, calls } = stubHost({ assignmentIsValid: () => false });
     seedWorker(gathering());

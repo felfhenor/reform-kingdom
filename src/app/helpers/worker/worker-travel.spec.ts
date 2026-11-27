@@ -203,6 +203,38 @@ describe('workerAssign', () => {
     expect(events).toEqual(['Worker:Assign:Weaver Nell']);
   });
 
+  it('retargets the count in place for the same job, keeping the haul', () => {
+    seedWorker(staminaFor(tripCost()));
+    const gatheringStatus = {
+      kind: 'Gathering' as const,
+      ...assignment,
+      itemsGathered: 2,
+      ticksIntoGather: 3,
+    };
+    seedWorkerState({
+      assignment: { ...assignment, remaining: 9 },
+      status: gatheringStatus,
+    });
+
+    inTick(() => workerAssign(workerId, woods, copperId, 4));
+
+    expect(workersState()[workerId]).toEqual(
+      expect.objectContaining({
+        assignment: { ...assignment, remaining: 4 },
+        status: gatheringStatus,
+      }),
+    );
+  });
+
+  it('stores no count for a blank or non-positive one', () => {
+    seedWorker(staminaFor(tripCost()));
+    seedWorkerState();
+
+    inTick(() => workerAssign(workerId, woods, copperId, 0));
+
+    expect(workersState()[workerId].assignment).toEqual(assignment);
+  });
+
   it('only changes the assignment for a worker already out on a trip', () => {
     seedWorker(staminaFor(tripCost()));
     seedWorkerState({

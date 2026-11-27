@@ -1,4 +1,5 @@
 import { FFSelectDirective } from '@ff/controls/ff-select.directive';
+import { FFStepperDirective } from '@ff/controls/ff-stepper.directive';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -20,6 +21,10 @@ import {
 } from '@helpers/worker/worker-assignment.ui';
 import { workerCombatPower } from '@helpers/worker/worker-combat';
 import { kingdomWorkerStatsForLevel } from '@helpers/worker/worker-progression';
+import {
+  workerAssignmentSameJob,
+  workerOrderDraftKept,
+} from '@helpers/worker/worker-order.ui';
 import { workerAssign } from '@helpers/worker/worker-travel';
 import type {
   ItemId,
@@ -29,6 +34,7 @@ import type {
   WorkerContent,
   WorkerGatherAssignment,
   WorkerId,
+  WorkerOrderDraftSource,
 } from '@interfaces';
 import {
   NgLabelTemplateDirective,
@@ -36,12 +42,14 @@ import {
   NgSelectComponent,
 } from '@ng-select/ng-select';
 import { DecimalPipe } from '@angular/common';
+import { TippyDirective } from '@ngneat/helipopper';
 
 @Component({
   selector: 'app-panel-kingdom-workers-assignment-node',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     FFSelectDirective,
+    FFStepperDirective,
     DecimalPipe,
     FormsModule,
     IconComponent,
@@ -51,6 +59,7 @@ import { DecimalPipe } from '@angular/common';
     OptionRewardComponent,
     SpriteNodeComponent,
     SFXDirective,
+    TippyDirective,
   ],
   templateUrl: './panel-kingdom-workers-assignment-node.component.html',
   styleUrl: './panel-kingdom-workers-assignment-node.component.scss',
@@ -110,8 +119,10 @@ export class PanelKingdomWorkersAssignmentNodeComponent {
     },
   );
 
-  // Immer keeps this reference stable across ticks, so drafts reset only when any panel's confirm lands.
-  private assignment = computed(() => this.worker()?.assignment);
+  // Ignores the ticking count, so drafts reset only when a confirm changes the job.
+  private assignment = computed(() => this.worker()?.assignment, {
+    equal: workerAssignmentSameJob,
+  });
   private draftSource = computed(() => ({
     workerId: this.workerId(),
     assignment: this.assignment(),
@@ -126,6 +137,28 @@ export class PanelKingdomWorkersAssignmentNodeComponent {
   });
 
   public isActive = computed(() => !!this.nodeAssignment());
+
+  private liveRemaining = computed(() =>
+    this.isActive() ? this.worker()?.assignment?.remaining : undefined,
+  );
+
+  public draftCount = linkedSignal<WorkerOrderDraftSource, string | undefined>({
+    source: () => ({
+      job: this.draftSource(),
+      remaining: this.liveRemaining(),
+    }),
+    computation: (source, previous) =>
+      !!previous &&
+      previous.source.job === source.job &&
+      workerOrderDraftKept(previous.value, source.remaining)
+        ? previous.value
+        : undefined,
+  });
+
+  public countTooltip = computed(
+    () =>
+      `How many to ${this.mode() === 'Gather' ? 'gather' : 'fight for'}. Leave blank or 0 to repeat forever.`,
+  );
 
   public displayedNodeName = computed(
     () => this.draftNodeName() ?? this.currentAssignment()?.nodeName,
@@ -151,6 +184,16 @@ export class PanelKingdomWorkersAssignmentNodeComponent {
       : undefined;
   });
 
+  // The live count only belongs to the job it's counting, not a different one being picked.
+  public displayedCount = computed(() => {
+    const current = this.nodeAssignment();
+    const sameJob =
+      current?.nodeName === this.displayedNodeName() &&
+      current?.itemId === this.displayedItemId();
+    const live = sameJob ? this.liveRemaining()?.toString() : undefined;
+    return this.draftCount() ?? live ?? '';
+  });
+
   public canConfirm = computed(
     () => !!this.displayedNodeName() && !!this.displayedItemId(),
   );
@@ -169,9 +212,11 @@ export class PanelKingdomWorkersAssignmentNodeComponent {
     const itemId = this.displayedItemId();
     if (!nodeName || !itemId) return;
 
-    if (workerAssign(this.workerId(), nodeName, itemId)) return;
+    const count = Number(this.displayedCount());
+    if (workerAssign(this.workerId(), nodeName, itemId, count)) return;
 
     this.draftNodeName.set(undefined);
     this.draftItemId.set(undefined);
+    this.draftCount.set(undefined);
   }
 }

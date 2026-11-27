@@ -22,6 +22,7 @@ import {
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import { gamestate, updateGamestate } from '@helpers/state-game';
+import { workerAssignmentAfterUnit } from '@helpers/worker/worker-order';
 import {
   workerGainXp,
   workerLevelInRange,
@@ -217,8 +218,16 @@ function completeCraftUnit(
     // A whiffed roll uses the unit up but crafts nothing, matching the kingdom queue.
     if (delivered > 0) runStatsRecordCraft(state);
 
-    const status = state.workers[workerId]?.status;
+    const target = state.workers[workerId];
+    const status = target?.status;
     if (status?.kind !== 'Crafting') return state;
+
+    const wasCounted = target.assignment?.remaining !== undefined;
+    target.assignment = workerAssignmentAfterUnit(target.assignment);
+    if (wasCounted && !target.assignment) {
+      target.status = { kind: 'AtDuchy' };
+      return state;
+    }
 
     status.ticksIntoCraft = 0;
     status.materialsHeld = takeCraftUnit(state, recipe);

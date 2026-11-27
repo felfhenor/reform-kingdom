@@ -1,4 +1,5 @@
 import { FFSelectDirective } from '@ff/controls/ff-select.directive';
+import { FFStepperDirective } from '@ff/controls/ff-stepper.directive';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -23,6 +24,11 @@ import {
   recipeWorkerStaminaCost,
 } from '@helpers/worker/worker-crafting';
 import { workerAssignCraft } from '@helpers/worker/worker-crafting.ui';
+import { workerOrderCount } from '@helpers/worker/worker-order';
+import {
+  workerAssignmentSameJob,
+  workerOrderDraftKept,
+} from '@helpers/worker/worker-order.ui';
 import {
   kingdomWorkerStatsForLevel,
   workerStatsForLevel,
@@ -34,12 +40,14 @@ import type {
   RecipeId,
   WorkerContent,
   WorkerId,
+  WorkerOrderDraftSource,
 } from '@interfaces';
 import {
   NgLabelTemplateDirective,
   NgOptionTemplateDirective,
   NgSelectComponent,
 } from '@ng-select/ng-select';
+import { TippyDirective } from '@ngneat/helipopper';
 import { sortBy } from 'es-toolkit/compat';
 
 type RecipeOption = {
@@ -60,6 +68,7 @@ type RecipeOption = {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     FFSelectDirective,
+    FFStepperDirective,
     AtlasImageComponent,
     DecimalPipe,
     IconComponent,
@@ -68,6 +77,7 @@ type RecipeOption = {
     NgOptionTemplateDirective,
     NgLabelTemplateDirective,
     SFXDirective,
+    TippyDirective,
   ],
   templateUrl: './panel-kingdom-workers-assignment-craft.component.html',
   styleUrl: './panel-kingdom-workers-assignment-craft.component.scss',
@@ -86,21 +96,45 @@ export class PanelKingdomWorkersAssignmentCraftComponent {
       : 0;
   });
 
-  public assignedRecipeId = computed(() => {
+  private craftAssignment = computed(() => {
     const assignment = this.worker()?.assignment;
-    return assignment && 'recipeId' in assignment
-      ? assignment.recipeId
-      : undefined;
+    return assignment && 'recipeId' in assignment ? assignment : undefined;
   });
 
-  // Immer keeps this reference stable across ticks, so the draft resets only when any panel's confirm lands.
-  private assignment = computed(() => this.worker()?.assignment);
+  public assignedRecipeId = computed(() => this.craftAssignment()?.recipeId);
+
+  // Ignores the ticking count, so drafts reset only when a confirm changes the job.
+  private assignment = computed(() => this.worker()?.assignment, {
+    equal: workerAssignmentSameJob,
+  });
+  private draftSource = computed(() => ({
+    workerId: this.workerId(),
+    assignment: this.assignment(),
+  }));
   public draftRecipeId = linkedSignal<unknown, RecipeId | undefined>({
-    source: () => ({
-      workerId: this.workerId(),
-      assignment: this.assignment(),
-    }),
+    source: this.draftSource,
     computation: () => undefined,
+  });
+  public draftCount = linkedSignal<WorkerOrderDraftSource, string | undefined>({
+    source: () => ({
+      job: this.draftSource(),
+      remaining: this.craftAssignment()?.remaining,
+    }),
+    computation: (source, previous) =>
+      !!previous &&
+      previous.source.job === source.job &&
+      workerOrderDraftKept(previous.value, source.remaining)
+        ? previous.value
+        : undefined,
+  });
+
+  // The live count only belongs to the recipe it's counting, not a different one being picked.
+  public displayedCount = computed(() => {
+    const sameJob = this.displayedRecipeId() === this.assignedRecipeId();
+    const live = sameJob
+      ? this.craftAssignment()?.remaining?.toString()
+      : undefined;
+    return this.draftCount() ?? live ?? '';
   });
 
   public isActive = computed(() => !!this.assignedRecipeId());
@@ -129,9 +163,12 @@ export class PanelKingdomWorkersAssignmentCraftComponent {
 
   public canConfirm = computed(() => {
     const recipeId = this.displayedRecipeId();
+    const countChanged =
+      workerOrderCount(Number(this.displayedCount())) !==
+      this.craftAssignment()?.remaining;
     return (
       !!recipeId &&
-      recipeId !== this.assignedRecipeId() &&
+      (recipeId !== this.assignedRecipeId() || countChanged) &&
       this.recipeOptions().some((o) => o.recipeId === recipeId && !o.disabled)
     );
   });
@@ -144,9 +181,14 @@ export class PanelKingdomWorkersAssignmentCraftComponent {
     const recipeId = this.displayedRecipeId();
     if (!recipeId) return;
 
-    void workerAssignCraft(this.workerId(), recipeId).then((assigned) => {
-      if (!assigned) this.draftRecipeId.set(undefined);
-    });
+    const count = Number(this.displayedCount());
+    void workerAssignCraft(this.workerId(), recipeId, count).then(
+      (assigned) => {
+        if (assigned) return;
+        this.draftRecipeId.set(undefined);
+        this.draftCount.set(undefined);
+      },
+    );
   }
 
   private recipeOption(

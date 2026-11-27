@@ -10,6 +10,7 @@ import {
   workerCraftTicksPerUnit,
   workerStartCrafting,
 } from '@helpers/worker/worker-crafting';
+import { workerOrderCount } from '@helpers/worker/worker-order';
 import { kingdomWorkerStatsForLevel } from '@helpers/worker/worker-progression';
 import { workerTurnHome } from '@helpers/worker/worker-travel';
 import type {
@@ -27,11 +28,16 @@ import type {
 export async function workerAssignCraft(
   workerId: WorkerId,
   recipeId: RecipeId,
+  count?: number,
 ): Promise<boolean> {
   const worker = gamestate().workers[workerId];
   if (!worker) return false;
 
-  const assignment: WorkerCraftAssignment = { recipeId };
+  const remaining = workerOrderCount(count);
+  const assignment: WorkerCraftAssignment = {
+    recipeId,
+    ...(remaining ? { remaining } : {}),
+  };
   if (!workerCraftAssignmentIsValid(workerId, worker.level, assignment))
     return false;
 
@@ -92,6 +98,7 @@ function workerCraftSlot(
   workerId: WorkerId,
   recipeId: RecipeId,
   waiting: boolean,
+  remaining?: number,
 ): WorkerCraftSlot | undefined {
   const worker = getEntry<WorkerContent>(workerId);
   const recipe = getEntry<RecipeContent>(recipeId);
@@ -100,13 +107,15 @@ function workerCraftSlot(
   const item = getEntry<ItemContent>(recipe.result.itemId);
   if (!item) return undefined;
 
+  const left =
+    remaining !== undefined ? ` (${remaining.toLocaleString()} left)` : '';
   return {
     workerId,
     sprite: item.sprite,
     waiting,
     tooltip: waiting
-      ? `${worker.name} is waiting for materials to craft ${item.name}`
-      : `${worker.name} is crafting ${item.name}`,
+      ? `${worker.name} is waiting for materials to craft ${item.name}${left}`
+      : `${worker.name} is crafting ${item.name}${left}`,
   };
 }
 
@@ -117,14 +126,19 @@ export function workerCraftSlots(
 
   return (Object.keys(workers) as WorkerId[])
     .map((workerId) => {
-      const status = workers[workerId].status;
+      const { status, assignment } = workers[workerId];
       if (status.kind !== 'Crafting') return undefined;
       if (
         getEntry<RecipeContent>(status.recipeId)?.tradeskillId !== tradeskillId
       )
         return undefined;
 
-      return workerCraftSlot(workerId, status.recipeId, !status.materialsHeld);
+      return workerCraftSlot(
+        workerId,
+        status.recipeId,
+        !status.materialsHeld,
+        assignment?.remaining,
+      );
     })
     .filter((slot): slot is WorkerCraftSlot => !!slot);
 }

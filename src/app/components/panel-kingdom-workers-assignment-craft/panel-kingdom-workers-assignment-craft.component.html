@@ -103,6 +103,17 @@
       </ng-template>
     </ng-select>
 
+    <input
+      type="number"
+      ffStepper="How Many"
+      min="0"
+      placeholder="∞"
+      class="input input-sm w-20 shrink-0"
+      [tp]="'How many times to craft. Leave blank or 0 to repeat forever.'"
+      [value]="displayedCount()"
+      (input)="draftCount.set($any($event.target).value)"
+    />
+
     <button
       class="btn btn-sm btn-primary w-fit"
       [disabled]="!canConfirm()"

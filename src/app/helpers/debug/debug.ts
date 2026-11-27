@@ -60,8 +60,9 @@ export function debugAssignWorker(
   workerId: WorkerId,
   nodeName: string,
   itemId: ItemId,
+  count?: number,
 ): void {
-  if (!workerAssign(workerId, nodeName, itemId)) {
+  if (!workerAssign(workerId, nodeName, itemId, count)) {
     console.warn(
       `Could not assign worker ${workerId} to ${nodeName} for ${itemId} - not rescued, node not discovered, item not gathered there, or out of stamina range.`,
     );

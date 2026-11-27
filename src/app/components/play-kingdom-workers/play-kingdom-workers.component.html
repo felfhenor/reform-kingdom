@@ -45,7 +45,12 @@
                 <span class="type-entity-name truncate">
                   {{ entry.content.name }}
                 </span>
-                <span class="type-meta">Lv. {{ entry.state.level }}</span>
+                <span class="type-meta">
+                  Lv. {{ entry.state.level }}
+                  @if (entry.state.assignment?.remaining; as left) {
+                    · {{ left | number }} left
+                  }
+                </span>
                 <span class="flex items-center gap-2 type-meta">
                   @if (display.locationEntry) {
                     <app-sprite-node

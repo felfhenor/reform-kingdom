@@ -10,14 +10,20 @@ import type {
   WorldNodeEntry,
 } from '@interfaces/world-nodes';
 
-export type WorkerGatherAssignment = {
+// Units left on a counted order; absent = repeat forever.
+type WorkerOrderCount = { remaining?: number };
+
+export type WorkerGatherAssignment = WorkerOrderCount & {
   nodeName: string;
   itemId: ItemId;
 };
 
-export type WorkerCraftAssignment = {
+export type WorkerCraftAssignment = WorkerOrderCount & {
   recipeId: RecipeId;
 };
+
+// Display-only source for an assignment panel's count draft.
+export type WorkerOrderDraftSource = { job: unknown; remaining?: number };
 
 export type WorkerAssignmentKind = 'Gather' | 'Combat' | 'Craft';
 

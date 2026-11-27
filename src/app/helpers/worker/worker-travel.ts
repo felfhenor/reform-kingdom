@@ -6,6 +6,7 @@ import {
 import { gamestate, updateGamestate } from '@helpers/state-game';
 import { workerAssignmentIsValid } from '@helpers/worker/worker-assignment';
 import { workerStopCrafting } from '@helpers/worker/worker-crafting';
+import { workerOrderCount } from '@helpers/worker/worker-order';
 import { workerGatheringStatusStart } from '@helpers/worker/worker-shared';
 import {
   workerTripBeginOutbound,
@@ -81,11 +82,17 @@ export function workerAssign(
   workerId: WorkerId,
   nodeName: string,
   itemId: ItemId,
+  count?: number,
 ): boolean {
   const worker = gamestate().workers[workerId];
   if (!worker) return false;
 
-  const assignment: WorkerGatherAssignment = { nodeName, itemId };
+  const remaining = workerOrderCount(count);
+  const assignment: WorkerGatherAssignment = {
+    nodeName,
+    itemId,
+    ...(remaining ? { remaining } : {}),
+  };
   if (!workerAssignmentIsValid(workerId, worker.level, assignment))
     return false;
 

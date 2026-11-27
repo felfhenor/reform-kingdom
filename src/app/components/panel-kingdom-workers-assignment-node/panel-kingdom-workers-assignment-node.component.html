@@ -169,6 +169,17 @@
       </ng-select>
     }
 
+    <input
+      type="number"
+      ffStepper="How Many"
+      min="0"
+      placeholder="∞"
+      class="input input-sm w-20 shrink-0"
+      [tp]="countTooltip()"
+      [value]="displayedCount()"
+      (input)="draftCount.set($any($event.target).value)"
+    />
+
     <button
       class="btn btn-sm btn-primary w-fit"
       [disabled]="!canConfirm()"

@@ -280,6 +280,22 @@ describe('workerCraftingProcessTick', () => {
     expect(runStatsState().itemsCrafted).toBe(2);
   });
 
+  it('idles and unassigns after the last counted unit, taking no more materials', () => {
+    seedState({ assignment: { recipeId, remaining: 2 } });
+    giveOre(10);
+
+    tick();
+    tick();
+    expect(current().assignment).toEqual({ recipeId, remaining: 1 });
+
+    tick();
+    tick();
+    expect(ingots()).toBe(2);
+    expect(ore()).toBe(6);
+    expect(current().assignment).toBeNull();
+    expect(current().status).toEqual({ kind: 'AtDuchy' });
+  });
+
   it('finishes one unit per tick at a single tick per unit, never chaining', () => {
     seed(
       {},
