@@ -2,6 +2,8 @@
 
 At present, mods are data and art only - this is done in YAML. Sprites/animations/node backgrounds can also be added to mods. Tiled maps are possible, too. You can use [Tiled 1.12.2](https://www.mapeditor.org/2026/05/27/tiled-1-12-2-released.html) or newer to create maps (a template is provided). At this time, you cannot add custom scripts. Additionally, the demo cannot use mods.
 
+Looking for the mod kit? Get the latest version [here](https://github.com/felfhenor/reform-kingdom/releases/latest/download/reform-modkit.zip).
+
 ## Mod Kit Structure
 
 ```
