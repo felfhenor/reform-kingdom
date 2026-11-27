@@ -9,6 +9,7 @@ import {
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { applyGlobalEffectAdd } from '@helpers/hero/global-effect-state';
 import { jobAbilityValue } from '@helpers/hero/job-ability';
+import { jobAbilityShrineBoostStrength } from '@helpers/hero/job-ability-edict';
 import { rumorWhisper } from '@helpers/rumor/rumor-whisper';
 import { globalEffectSumsState, updateGamestate } from '@helpers/state-game';
 import { isPartyAtNode } from '@helpers/world';
@@ -76,7 +77,7 @@ export async function shrinePray(nodeName: string): Promise<boolean> {
       duration,
       currentTick,
       permanent,
-      1 + sums.shrineBuffStrengthBonus,
+      shrineBuffStrength(),
     );
     state.world.prayerLastTick = currentTick;
     prayed = true;
@@ -100,6 +101,14 @@ function shrinePrayAnnounce(shrine: ShrineContent, tier: ShrineLevel): void {
 
   analyticsSendDesignEvent(
     `World:Shrine:Pray:${analyticsSafeSegment(shrine.name)}`,
+  );
+}
+
+export function shrineBuffStrength(): number {
+  return (
+    1 +
+    globalEffectSumsState().shrineBuffStrengthBonus +
+    jobAbilityShrineBoostStrength()
   );
 }
 

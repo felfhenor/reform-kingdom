@@ -6,6 +6,7 @@ import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
 import { notifySuccess } from '@helpers/engine/notify';
 import { timerTicksElapsed } from '@helpers/engine/timer';
 import { jobAbilityValue } from '@helpers/hero/job-ability';
+import { jobAbilityShrineBoostAstralDuration } from '@helpers/hero/job-ability-edict';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import {
   getMaterialQuantity,
@@ -46,6 +47,7 @@ export function astralProjectorDuration(
     content.duration *
       (1 +
         jobAbilityValue('AstralDurationBoost') +
+        jobAbilityShrineBoostAstralDuration() +
         globalEffectSumsState().astralSpellDurationBonus),
   );
 }

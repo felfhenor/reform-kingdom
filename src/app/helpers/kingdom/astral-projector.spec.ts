@@ -82,6 +82,25 @@ describe('astralProjectorDuration', () => {
     expect(astralProjectorDuration(lasting)).toBe(125);
   });
 
+  it('adds Sanctified Incantations once shrines are gone', () => {
+    const lasting = ensureAstralProjector({ ...starfall, duration: 100 });
+    seedContent([
+      lasting,
+      ...abilityJobContent('Healer', [['ShrineDurationBoost', 1, 0.5]]),
+    ]);
+    const healer = (state: GameState) =>
+      (state.world.party = [buildAbilityHero('Healer', 1)]);
+
+    seed(healer);
+    expect(astralProjectorDuration(lasting)).toBe(100);
+
+    seed((state) => {
+      healer(state);
+      state.globalEffectSums.removedWorldNodeTypes.Shrine = true;
+    });
+    expect(astralProjectorDuration(lasting)).toBe(150);
+  });
+
   it('adds a global duration bonus alongside Astral Resonance', () => {
     const lasting = ensureAstralProjector({ ...starfall, duration: 100 });
     seedContent([lasting]);

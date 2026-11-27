@@ -210,22 +210,26 @@ function grantGatherItems(
   );
 }
 
+// Only GatherYieldLuck can double a haul - one roll, at the best Luck x value in the party.
+export function gatherLuckyHauler(): Character | undefined {
+  const lucky = jobAbilityHighest('GatherYieldLuck');
+  return lucky && luckRollSucceeds(lucky.amount) ? lucky.character : undefined;
+}
+
+export function gatherLuckyHaulMessage(character: Character): string {
+  return `**${character.name}**'s luck doubled the haul!`;
+}
+
 function resolveGatherCycle(content: GatheringContent, nodeName: string): void {
   grantGatherXpIfInRange(content);
 
   const result = gatheringRollResult(content, worldNodeLevel(nodeName));
   if (result) {
-    // Only GatherYieldLuck can double the haul - one roll, at the best Luck x value in the party.
-    const lucky = jobAbilityHighest('GatherYieldLuck');
-    const doubled = !!lucky && luckRollSucceeds(lucky.amount);
-    grantGatherItems(result, nodeName, doubled ? 2 : 1);
+    const lucky = gatherLuckyHauler();
+    grantGatherItems(result, nodeName, lucky ? 2 : 1);
 
-    if (doubled) {
-      categoryMessageLog(
-        'Gather',
-        nodeName,
-        `**${lucky.character.name}**'s luck doubled the haul!`,
-      );
+    if (lucky) {
+      categoryMessageLog('Gather', nodeName, gatherLuckyHaulMessage(lucky));
     }
   }
 

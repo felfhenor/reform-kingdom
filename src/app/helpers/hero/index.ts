@@ -10,6 +10,7 @@ export * from './global-effects';
 export * from './hero-effect';
 export * from './job';
 export * from './job-ability';
+export * from './job-ability-edict';
 export * from './job-ability-regen';
 export * from './job-ability.ui';
 export * from './luck';

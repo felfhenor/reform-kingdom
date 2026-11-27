@@ -12,3 +12,10 @@ export type JobAbilityRow = HasRarity &
     current?: JobAbilityRank;
     next?: JobAbilityRank;
   };
+
+// Replaces an ability's text while an edict reroutes what it does.
+export type JobAbilityEdictVariant = {
+  active: () => boolean;
+  description: string;
+  valueLabel?: (value: number) => string;
+};

@@ -12,12 +12,12 @@ import { TooltipGlobalEffectComponent } from '@components/tooltip-global-effect/
 import { getEntry } from '@helpers/content/content';
 import { formatDuration } from '@helpers/engine/timer';
 import { globalEffectEffectsScaled } from '@helpers/hero/global-effect-state';
-import { globalEffectSumsState } from '@helpers/state-game';
 import { isPartyAtNode } from '@helpers/world';
 import {
   shrinePrayerCooldownRemaining,
   worldNodeShrineCurrentTier,
 } from '@helpers/world-node/world-node-shrine';
+import { shrineBuffStrength } from '@helpers/world-node/world-node-shrine.ui';
 import { worldNodeShrine } from '@helpers/world-node/world-nodes';
 import type { GlobalEffectContent, WorldNodeEntry } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -64,7 +64,7 @@ export class PanelMapNodeActionsShrineComponent {
     const content = getEntry<GlobalEffectContent>(tier.globalEffectId);
     if (!content) return undefined;
 
-    const strength = 1 + globalEffectSumsState().shrineBuffStrengthBonus;
+    const strength = shrineBuffStrength();
     return {
       ...content,
       effects: globalEffectEffectsScaled(content.effects, strength),

@@ -11,6 +11,7 @@ vi.mock('@helpers/town/raid/town-raid-resolve');
 vi.mock('@helpers/task/task-progress');
 vi.mock('@helpers/engine/sfx');
 vi.mock('@helpers/achievement/achievement-moment');
+vi.mock('@helpers/hero/luck');
 
 import { achievementsMoment } from '@helpers/achievement/achievement-moment';
 import { captureAnalyticsEvents } from '@/testing/analytics';
@@ -21,6 +22,8 @@ import {
   buildMonsterCombatant,
 } from '@/testing/builders';
 import { seedContent } from '@/testing/content';
+import { abilityJobContent, buildAbilityHero } from '@/testing/job-ability';
+import { seedWorldNodes } from '@/testing/world';
 import { inTick, seedGamestate } from '@/testing/gamestate';
 import {
   combatCheckIfOver,
@@ -34,6 +37,7 @@ import {
   ensureEncounter,
   ensureEncounterRandom,
 } from '@helpers/content/ensure-encounternode';
+import { ensureGathering } from '@helpers/content/ensure-gathernode';
 import { ensureDroppedReward } from '@helpers/content/ensure-helpers-drops';
 import { ensureItem } from '@helpers/content/ensure-item';
 import { ensureMonster } from '@helpers/content/ensure-monster';
@@ -56,6 +60,7 @@ import {
   partyGainXp,
   syncPartyHpFromCombat,
 } from '@helpers/hero/character-progress';
+import { luckRollSucceeds } from '@helpers/hero/luck';
 import { travelBeginDeathsDoor } from '@helpers/hero/travel';
 import { gamestate } from '@helpers/state-game';
 import { taskRecordEncounterClear } from '@helpers/task/task-progress';
@@ -70,6 +75,7 @@ import type {
   EncounterContent,
   EncounterId,
   EncounterRandomId,
+  GatheringId,
   ItemId,
   MonsterId,
   RegionId,
@@ -700,5 +706,78 @@ describe('combatCheckIfOver', () => {
       expect(sortBy(commons)).toEqual([4, 8]);
       expect(travelBeginDeathsDoor).toHaveBeenCalled();
     });
+  });
+});
+
+describe('Fortunate Finds on monster gather drops', () => {
+  const stoneId = 'stone' as ItemId;
+
+  function seedGatherDrops(chance: number): void {
+    seedContent([
+      goblin,
+      encounter(),
+      ...items,
+      ensureItem({ id: stoneId, name: 'Stone' }),
+      ensureGathering({
+        id: 'quarry' as GatheringId,
+        name: 'Quarry',
+        gatherResults: [
+          {
+            chance: 1,
+            items: [{ itemId: stoneId, quantity: 2 }],
+            tradeskillIds: [],
+          },
+        ],
+      }),
+      ...abilityJobContent('Explorer', [['GatherYieldLuck', 1, 1]]),
+    ]);
+    seedWorldNodes([
+      { name: 'Field Ruins', type: 'ExploreNode', mapName: 'Hills' },
+      { name: 'Quarry', type: 'GatherNode', mapName: 'Hills' },
+    ]);
+    seedGamestate((state) => {
+      state.globalEffectSums.regionGatheringDropChance = chance;
+      state.globalEffectSums.removedWorldNodeTypes.GatherNode = chance > 0;
+      state.world.party = [
+        buildAbilityHero('Explorer', 1, { Luck: 30 }, { name: 'Ada' }),
+      ];
+    });
+  }
+
+  function winFight(): void {
+    inTick(() =>
+      combatResolveAutoWin(fight({ encounterId, fightIndex: 0 }), true),
+    );
+  }
+
+  it('doubles only the gather drops when the luckiest Explorer rolls well, and says who', () => {
+    seedGatherDrops(100);
+    vi.mocked(luckRollSucceeds).mockReturnValue(true);
+
+    winFight();
+
+    expect(luckRollSucceeds).toHaveBeenCalledWith(30);
+    expect(gamestate().materials[stoneId]?.quantity).toBe(4);
+    expect(gamestate().materials[oreId]?.quantity).toBe(3);
+    expect(logMessages().join()).toContain('Ada');
+  });
+
+  it('keeps the gather drops as rolled on a failed luck roll', () => {
+    seedGatherDrops(100);
+    vi.mocked(luckRollSucceeds).mockReturnValue(false);
+
+    winFight();
+
+    expect(gamestate().materials[stoneId]?.quantity).toBe(2);
+    expect(logMessages().join()).not.toContain('luck doubled');
+  });
+
+  it('never rolls luck when no gather drops are possible', () => {
+    seedGatherDrops(0);
+
+    winFight();
+
+    expect(luckRollSucceeds).not.toHaveBeenCalled();
+    expect(gamestate().materials[stoneId]).toBeUndefined();
   });
 });

@@ -34,6 +34,10 @@ import {
 } from '@helpers/hero/character-progress';
 import { travelBeginDeathsDoor } from '@helpers/hero/travel';
 import { dropPityRollCompletionRewards } from '@helpers/item/drop-pity';
+import {
+  gatherLuckyHauler,
+  gatherLuckyHaulMessage,
+} from '@helpers/item/gathering';
 import { combatDropChanceBonus, rollDroppedRewards } from '@helpers/item/loot';
 import { loseCurrency, loseRandomMaterials } from '@helpers/item/materials';
 import {
@@ -54,12 +58,13 @@ import {
 } from '@helpers/state-game';
 import { taskRecordEncounterClear } from '@helpers/task/task-progress';
 import { raidResolveVictory } from '@helpers/town/raid/town-raid-resolve';
-import { monsterDropsOnMap } from '@helpers/world-node/world-node-monster-drops';
+import { regionGatheringDrops } from '@helpers/world-node/world-node-monster-drops';
 import { worldNodeByName } from '@helpers/world-node/world-nodes';
 import type {
   CharacterXpGain,
   Combat,
   Combatant,
+  DropChanceBonus,
   EncounterContent,
   EncounterFight,
   EncounterId,
@@ -191,11 +196,35 @@ function grantVictoryXp(combat: Combat, rawXps: number[]): void {
 function rollMonsterDrops(combat: Combat): ResolvedDrop[] {
   const bonus = combatDropChanceBonus();
   const mapName = worldNodeByName(combat.locationName)?.mapName ?? '';
-  return rewardingMonsters(combat).flatMap(({ monster, level }) => [
-    ...rollDroppedRewards(monsterDropsOnMap(monster, mapName), level, bonus),
-    ...rollRegionGearDrop(mapName, level, bonus),
-    ...rollRegionMaterialDrop(mapName, level, bonus),
-  ]);
+  return [
+    ...rewardingMonsters(combat).flatMap(({ monster, level }) => [
+      ...rollDroppedRewards(monster.drops, level, bonus),
+      ...rollRegionGearDrop(mapName, level, bonus),
+      ...rollRegionMaterialDrop(mapName, level, bonus),
+    ]),
+    ...rollRegionGatheringDrops(combat, mapName, bonus),
+  ];
+}
+
+// These stand in for gathering when it's gone, so Fortunate Finds can double them.
+function rollRegionGatheringDrops(
+  combat: Combat,
+  mapName: string,
+  bonus: DropChanceBonus,
+): ResolvedDrop[] {
+  const table = regionGatheringDrops(mapName);
+  if (table.length === 0) return [];
+
+  const drops = rewardingMonsters(combat).flatMap(({ level }) =>
+    rollDroppedRewards(table, level, bonus),
+  );
+  const lucky = drops.length > 0 ? gatherLuckyHauler() : undefined;
+  if (!lucky) return drops;
+
+  combatMessageLog(combat, gatherLuckyHaulMessage(lucky));
+  return drops.map((drop) =>
+    drop.kind === 'Item' ? { ...drop, quantity: drop.quantity * 2 } : drop,
+  );
 }
 
 function completedEncounter(combat: Combat): EncounterContent | undefined {

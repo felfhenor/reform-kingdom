@@ -5,6 +5,11 @@ import {
   jobAbilityStacks,
 } from '@helpers/hero/job-ability';
 import {
+  jobAbilityGatherLuckOnMonsters,
+  jobAbilityShrineBoostToAstral,
+  jobAbilityShrineBoostToStrength,
+} from '@helpers/hero/job-ability-edict';
+import {
   skillTreeJobNodes,
   skillTreeNodeLevel,
 } from '@helpers/hero/skill-tree-content';
@@ -12,6 +17,7 @@ import type {
   Character,
   DropRarity,
   JobAbilityContent,
+  JobAbilityEdictVariant,
   JobAbilityId,
   JobAbilityRank,
   JobAbilityRow,
@@ -53,19 +59,55 @@ const JOB_ABILITY_VALUE_LABELS: Record<
   },
 };
 
+const JOB_ABILITY_EDICT_VARIANTS: Partial<
+  Record<JobAbilityType, JobAbilityEdictVariant[]>
+> = {
+  GatherYieldLuck: [
+    {
+      active: jobAbilityGatherLuckOnMonsters,
+      description:
+        'Explorers in the party have a chance, based on their Luck, to double the gathering materials monsters drop.',
+    },
+  ],
+  ShrineDurationBoost: [
+    {
+      active: jobAbilityShrineBoostToAstral,
+      description:
+        'While this Healer is in the party, Astral Projector spells last longer.',
+    },
+    {
+      active: jobAbilityShrineBoostToStrength,
+      description:
+        'While this Healer is in the party, shrine buffs are stronger.',
+      valueLabel: (value) => `+${percent(value)} strength`,
+    },
+  ],
+};
+
+function jobAbilityEdictVariant(
+  type: JobAbilityType,
+): JobAbilityEdictVariant | undefined {
+  return JOB_ABILITY_EDICT_VARIANTS[type]?.find((variant) => variant.active());
+}
+
 export function jobAbilityValueLabel(
   ability: JobAbilityContent,
   value: number,
 ): string {
-  return JOB_ABILITY_VALUE_LABELS[ability.type]?.(value) ?? `${value}`;
+  const label =
+    jobAbilityEdictVariant(ability.type)?.valueLabel ??
+    JOB_ABILITY_VALUE_LABELS[ability.type];
+  return label?.(value) ?? `${value}`;
 }
 
 // The stacking line follows the run's edicts, so it isn't written into the content.
 export function jobAbilityDescription(ability: JobAbilityContent): string {
+  const description =
+    jobAbilityEdictVariant(ability.type)?.description ?? ability.description;
   const stacks = jobAbilityStacks(ability.type);
-  if (stacks === undefined) return ability.description;
+  if (stacks === undefined) return description;
 
-  return `${ability.description} ${stacks ? 'Stacks.' : 'Does not stack.'}`;
+  return `${description} ${stacks ? 'Stacks.' : 'Does not stack.'}`;
 }
 
 function jobAbilityRow(

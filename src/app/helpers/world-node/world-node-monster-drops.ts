@@ -67,13 +67,6 @@ export function regionGatheringDrops(mapName: string): DroppedItemReward[] {
   );
 }
 
-export function monsterDropsOnMap(
-  monster: MonsterContent,
-  mapName: string,
-): DroppedReward[] {
-  return [...monster.drops, ...regionGatheringDrops(mapName)];
-}
-
 // One row per monster drop that can roll at this node's level - not de-duplicated, so per-monster odds survive.
 export function worldNodeMonsterDropTable(
   entry: WorldNodeEntry,
