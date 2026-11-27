@@ -1,3 +1,4 @@
+import { FFKeyboardDirective } from '@ff/controls/ff-keyboard.directive';
 import { FFFocusOnChangeDirective } from '@ff/focus/ff-focus-on-change.directive';
 import {
   ChangeDetectionStrategy,
@@ -33,6 +34,7 @@ import {
   equipmentItemSlotCount,
   infusionMaterialCost,
 } from '@helpers/item/infusion';
+import { filterInfusionMaterials } from '@helpers/item/infusion.ui';
 import {
   resolveGatherYieldBonusDisplay,
   resolveSkillStatBonusDisplay,
@@ -55,6 +57,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   selector: 'app-panel-kingdom-workshop-infuse',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FFKeyboardDirective,
     FFFocusOnChangeDirective,
     BlankSlateComponent,
     ListReflowDirective,
@@ -100,10 +103,31 @@ export class PanelKingdomWorkshopInfuseComponent {
     getStorageMaterials().filter((entry) => isInfusionMaterial(entry.item)),
   );
 
+  public searchText = linkedSignal<EquipmentItemId, string>({
+    source: () => this.item().id,
+    computation: () => '',
+  });
+
+  public filteredInfusionMaterials = computed(() =>
+    filterInfusionMaterials(this.infusionMaterials(), this.searchText()),
+  );
+
+  public onSearchInput(event: Event): void {
+    this.searchText.set((event.target as HTMLInputElement).value);
+  }
+
   public selectedInfusion = signal<StorageMaterialEntry | undefined>(undefined);
 
+  // Hidden by the search = not actionable, so shift-click can't infuse something off-screen.
+  public visibleSelectedInfusion = computed(() => {
+    const selectedId = this.selectedInfusion()?.item.id;
+    return this.filteredInfusionMaterials().find(
+      (entry) => entry.item.id === selectedId,
+    );
+  });
+
   public selectedInfusionCost = computed(() => {
-    const selected = this.selectedInfusion();
+    const selected = this.visibleSelectedInfusion();
 
     if (!selected) return [];
 

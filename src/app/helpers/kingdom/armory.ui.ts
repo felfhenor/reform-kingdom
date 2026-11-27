@@ -2,6 +2,10 @@ import { getEntry } from '@helpers/content/content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { equipmentItemAffixes } from '@helpers/item/affix';
 import { itemPreviewDisplay } from '@helpers/item/item-preview';
+import {
+  filterBySearchWords,
+  itemPreviewSearchTerms,
+} from '@helpers/item/item-search';
 import { gainGold, goldCoinId } from '@helpers/item/materials';
 import {
   tradeEquipmentItemLogPart,
@@ -15,21 +19,13 @@ import {
 } from '@helpers/kingdom/armory-global-effects';
 import { updateGamestate } from '@helpers/state-game';
 import {
-  CombatStatDimension,
-  ElementBoonDimension,
-  ElementResistanceDimension,
   EquipmentTypeToSlot,
-  MonsterTypeDimension,
-  StatDimension,
-  StatusEffectTagDimension,
   type AdventureLogRewardPart,
   type ArmoryFillColor,
   type ArmoryWarningTier,
   type EquipmentArmoryEntry,
   type EquipmentItemId,
   type ItemContent,
-  type ItemPreviewDisplay,
-  type StatDisplayDimension,
 } from '@interfaces';
 import { sum } from 'es-toolkit/compat';
 
@@ -74,59 +70,6 @@ export function armoryStatusDotClass(
   return ARMORY_STATUS_DOT_CLASS[armoryFillColor(armorySize, cap)];
 }
 
-function nonZeroLabels<K extends string>(
-  dimension: StatDisplayDimension<K>,
-  ...blocks: (Partial<Record<K, number>> | undefined)[]
-): string[] {
-  return dimension.order
-    .filter((key) => blocks.some((block) => (block?.[key] ?? 0) !== 0))
-    .map((key) => dimension.label[key]);
-}
-
-function previewBlockLabels(preview: ItemPreviewDisplay): string[] {
-  return [
-    ...nonZeroLabels(StatDimension, preview.stats, preview.bonusStats),
-    ...nonZeroLabels(
-      StatusEffectTagDimension,
-      preview.resistances,
-      preview.bonusResistances,
-    ),
-    ...nonZeroLabels(
-      CombatStatDimension,
-      preview.combatStats,
-      preview.bonusCombatStats,
-    ),
-    ...nonZeroLabels(
-      MonsterTypeDimension,
-      preview.monsterTypeDamage,
-      preview.bonusMonsterTypeDamage,
-    ),
-    ...nonZeroLabels(
-      ElementResistanceDimension,
-      preview.elementalResistances,
-      preview.bonusElementalResistances,
-    ),
-    ...nonZeroLabels(
-      ElementBoonDimension,
-      preview.elementalBoons,
-      preview.bonusElementalBoons,
-    ),
-  ];
-}
-
-function previewListTerms(preview: ItemPreviewDisplay): string[] {
-  return [
-    ...(preview.skills ?? []).map((skill) => skill.name),
-    ...(preview.gatherYieldBonuses ?? []).map((bonus) => bonus.tradeskillName),
-    ...(preview.skillStatBonuses ?? []).flatMap((bonus) => [
-      bonus.skillName,
-      bonus.stat,
-    ]),
-    ...(preview.elements ?? []),
-  ];
-}
-
-// Built from the tooltip model so ids (tradeskills, skills) are already resolved to display names.
 function armoryEntrySearchText(entry: EquipmentArmoryEntry): string {
   const preview = itemPreviewDisplay('equipment', entry.content, entry.item);
   const infusionNames = entry.item.infusedItemIds
@@ -134,31 +77,19 @@ function armoryEntrySearchText(entry: EquipmentArmoryEntry): string {
     .filter((name): name is string => !!name);
 
   return [
-    preview.name,
-    preview.description,
-    preview.rarity,
+    ...itemPreviewSearchTerms(preview),
     entry.content.type,
     ...EquipmentTypeToSlot[entry.content.type],
-    ...previewBlockLabels(preview),
-    ...previewListTerms(preview),
     ...equipmentItemAffixes(entry.item).map((affix) => affix.description),
     ...infusionNames,
-  ]
-    .join(' ')
-    .toLowerCase();
+  ].join(' ');
 }
 
 export function filterArmoryEntries(
   entries: EquipmentArmoryEntry[],
   searchText: string,
 ): EquipmentArmoryEntry[] {
-  const words = searchText.trim().toLowerCase().split(/\s+/).filter(Boolean);
-  if (words.length === 0) return entries;
-
-  return entries.filter((entry) => {
-    const text = armoryEntrySearchText(entry);
-    return words.every((word) => text.includes(word));
-  });
+  return filterBySearchWords(entries, searchText, armoryEntrySearchText);
 }
 
 function armorySoldLogPart(
