@@ -45,8 +45,6 @@ import {
 import { TippyDirective } from '@ngneat/helipopper';
 import { AnimationService } from '@services/animation.service';
 
-const SOURCES: LootSource[] = ['Combat', 'Crafting'];
-
 const RARITIES: DropRarity[] = [
   'Common',
   'Uncommon',
