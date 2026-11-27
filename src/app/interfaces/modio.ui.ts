@@ -17,6 +17,7 @@ export type ModioMod = {
   summary: string;
   profile_url: string;
   submitted_by: { username: string };
+  logo?: { thumb_320x180: string };
   modfile: {
     version: string | null;
     download: { binary_url: string; date_expires: number };

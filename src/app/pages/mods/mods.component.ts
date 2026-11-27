@@ -1,3 +1,5 @@
+import type { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -9,11 +11,22 @@ import {
 import { Router } from '@angular/router';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
+import { IconModLogoComponent } from '@components/icon-mod-logo/icon-mod-logo.component';
+import { IconComponent } from '@components/icon/icon.component';
 import { PanelModsModioComponent } from '@components/panel-mods-modio/panel-mods-modio.component';
 import { FadeInDirective } from '@directives/fade-in.directive';
+import { ListReflowDragDirective } from '@directives/list-reflow-drag.directive';
 import { ListReflowDirective } from '@directives/list-reflow.directive';
-import { SFXDirective } from '@directives/sfx.directive';
+import { FFButtonComponent } from '@ff/components/button/button.component';
+import { FFInputPromptComponent } from '@ff/components/input-prompt/input-prompt.component';
+import { FFPadActionDirective } from '@ff/controls/ff-pad-action.directive';
+import { FFReorderItemDirective } from '@ff/controls/ff-reorder-item.directive';
+import { FFReorderListDirective } from '@ff/controls/ff-reorder-list.directive';
+import { FFFocusRowDirective } from '@ff/focus/ff-focus-row.directive';
+import { FFTriggerTabsDirective } from '@ff/focus/ff-trigger-tabs.directive';
+import { GAMEPAD_PRIORITY } from '@helpers/engine/gamepad.ui';
 import { notifyError, notifySuccess } from '@helpers/engine/notify';
+import { uiScaleCurrent } from '@helpers/engine/ui-scale.ui';
 import {
   modsDiskAvailable,
   modsDiskOpenFolder,
@@ -21,20 +34,22 @@ import {
 import {
   modsAddToRun,
   modsImportZip,
-  modsMoveEnabled,
   modsRemoveStored,
+  modsReorderEnabled,
   modsSetEnabled,
 } from '@helpers/mod/mod-install.ui';
-import { modRefLabel, modsInstalled } from '@helpers/mod/mod-registry';
+import { modsInstalled } from '@helpers/mod/mod-registry';
+import { modioIsConfigured, modioUnsubscribe } from '@helpers/mod/modio.ui';
 import { savefileLoadStatus } from '@helpers/savefile/savefile-load';
 import { isSetup } from '@helpers/setup';
 import { metaState } from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
-import { modioIsConfigured, modioUnsubscribe } from '@helpers/mod/modio.ui';
-import type { ModInstalled, ModSource } from '@interfaces';
+import type { ModInstalled, ModSource, ModsTab } from '@interfaces';
+import { TippyDirective } from '@ngneat/helipopper';
 import { ModsService } from '@services/mods.service';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-mods',
@@ -42,10 +57,21 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   imports: [
     BlankSlateComponent,
     ButtonKingdomBackComponent,
+    FFButtonComponent,
+    FFFocusRowDirective,
+    FFPadActionDirective,
+    FFTriggerTabsDirective,
+    FFReorderItemDirective,
+    FFReorderListDirective,
+    FFInputPromptComponent,
+    IconComponent,
+    ListReflowDragDirective,
+    DragDropModule,
+    IconModLogoComponent,
     ListReflowDirective,
     PanelModsModioComponent,
-    SFXDirective,
     SweetAlert2Module,
+    TippyDirective,
   ],
   hostDirectives: [FadeInDirective],
   host: { class: 'block' },
@@ -60,6 +86,14 @@ export class ModsComponent {
 
   public readonly hasModsFolder = modsDiskAvailable();
   public isBusy = signal(false);
+  public readonly reorderPriority = GAMEPAD_PRIORITY.popover;
+  public uiScale = uiScaleCurrent;
+
+  public activeTab = signal<ModsTab>('installed');
+  public readonly tabs: { id: ModsTab; name: string }[] = [
+    { id: 'installed', name: 'Installed' },
+    { id: 'modio', name: 'mod.io' },
+  ];
 
   public missingMods = computed(() => {
     const status = savefileLoadStatus();
@@ -77,7 +111,7 @@ export class ModsComponent {
   public rows = computed(() => {
     const enabled = getOption('modsEnabled');
     const inRun = new Set((this.runMods() ?? []).map((ref) => ref.id));
-    return modsInstalled().map((mod) => {
+    const rows = modsInstalled().map((mod) => {
       const id = mod.manifest?.id ?? mod.key;
       const usable = !!mod.bundle && mod.errors.length === 0;
       return {
@@ -91,9 +125,11 @@ export class ModsComponent {
         canAddToRun: usable && this.runMods() !== undefined && !inRun.has(id),
       };
     });
+    return sortBy(rows, [
+      (row) => (row.enabledIndex >= 0 ? row.enabledIndex : Infinity),
+      (row) => (row.inRun ? 0 : 1),
+    ]);
   });
-
-  public modRefLabel = modRefLabel;
 
   public readonly hasModio = modioIsConfigured();
 
@@ -123,8 +159,16 @@ export class ModsComponent {
     modsSetEnabled(id, (event.target as HTMLInputElement).checked);
   }
 
-  move(id: string, offset: -1 | 1): void {
-    modsMoveEnabled(id, offset);
+  // Only New Games mods are ordered, and they lead the list, so list indices are load-order indices.
+  public canDropAt = (index: number): boolean =>
+    index < getOption('modsEnabled').length;
+
+  onDrop(event: CdkDragDrop<unknown>): void {
+    this.reorder(event.previousIndex, event.currentIndex);
+  }
+
+  reorder(fromIndex: number, toIndex: number): void {
+    modsReorderEnabled(fromIndex, toIndex);
   }
 
   async importZip(event: Event): Promise<void> {

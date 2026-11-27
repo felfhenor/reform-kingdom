@@ -9,7 +9,11 @@ import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { IconComponent } from '@components/icon/icon.component';
-import { SFXDirective } from '@directives/sfx.directive';
+import { IconModLogoComponent } from '@components/icon-mod-logo/icon-mod-logo.component';
+import { FFButtonComponent } from '@ff/components/button/button.component';
+import { FFKeyboardDirective } from '@ff/controls/ff-keyboard.directive';
+import { FFSelectDirective } from '@ff/controls/ff-select.directive';
+import { FFFocusRowDirective } from '@ff/focus/ff-focus-row.directive';
 import { notifyError, notifySuccess } from '@helpers/engine/notify';
 import { modsInstalled } from '@helpers/mod/mod-registry';
 import {
@@ -30,12 +34,16 @@ import { ModsService } from '@services/mods.service';
   selector: 'app-panel-mods-modio',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    IconModLogoComponent,
     BlankSlateComponent,
     DecimalPipe,
     FormsModule,
     IconComponent,
     NgSelectComponent,
-    SFXDirective,
+    FFButtonComponent,
+    FFFocusRowDirective,
+    FFKeyboardDirective,
+    FFSelectDirective,
   ],
   templateUrl: './panel-mods-modio.component.html',
 })

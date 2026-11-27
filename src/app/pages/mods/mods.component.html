@@ -13,8 +13,7 @@
             class="btn btn-sm btn-neutral"
             [disabled]="isBusy()"
             (click)="zipInput.click()"
-            appSfx="ui-click"
-            [sfxTrigger]="['click', 'hover']"
+            ffButton="ui-click"
           >
             Import Zip
           </button>
@@ -30,8 +29,7 @@
             <button
               class="btn btn-sm btn-neutral"
               (click)="openFolder()"
-              appSfx="ui-click"
-              [sfxTrigger]="['click', 'hover']"
+              ffButton="ui-click"
             >
               Open Mods Folder
             </button>
@@ -41,8 +39,7 @@
             class="btn btn-sm btn-neutral"
             [disabled]="modsService.isLoading() || isBusy()"
             (click)="rescan()"
-            appSfx="ui-click"
-            [sfxTrigger]="['click', 'hover']"
+            ffButton="ui-click"
           >
             Rescan
           </button>
@@ -60,133 +57,152 @@
           <button
             class="btn btn-sm btn-neutral"
             (click)="reloadGame()"
-            appSfx="ui-click"
-            [sfxTrigger]="['click', 'hover']"
+            ffButton="ui-click"
           >
             Reload Game
           </button>
         </div>
       }
 
-      <div class="flex flex-col gap-4 overflow-y-auto min-h-0">
-        @if (runMods(); as run) {
-          <div class="flex flex-col gap-2">
-            <h2 class="type-section-title">Current Run</h2>
-            @for (ref of run; track ref.id) {
-              <span class="type-meta">{{ modRefLabel(ref) }}</span>
-            } @empty {
-              <span class="type-muted">Your current run has no mods.</span>
-            }
-          </div>
-        }
-
-        <div class="flex flex-col gap-2">
-          <h2 class="type-section-title">Installed</h2>
-          <span class="type-hint">
-            Checked mods are used by new games. Mods are stored with the runs
-            and can have their versions updated, but they cannot be removed
-            mid-run.
-          </span>
-
-          <div class="flex flex-col gap-2" appListReflow>
-            @for (row of rows(); track row.trackKey) {
-              <div class="flex items-start gap-4 p-2 bg-base-200">
-                <div class="flex flex-col gap-2 flex-1 min-w-0">
-                  <span class="flex items-center gap-2">
-                    <span class="type-entity-name">
-                      {{ row.mod.manifest?.name ?? row.mod.key }}
-                    </span>
-                    @if (row.mod.manifest; as manifest) {
-                      <span class="badge badge-sm badge-data">
-                        v{{ manifest.version }}
-                      </span>
-                    }
-                    <span class="badge badge-sm badge-data">
-                      {{ sourceLabels[row.mod.source] }}
-                    </span>
-                    @if (row.inRun) {
-                      <span class="badge badge-sm badge-success">In Run</span>
-                    }
-                  </span>
-
-                  @if (row.mod.manifest?.author; as author) {
-                    <span class="type-meta">by {{ author }}</span>
-                  }
-                  @if (row.mod.manifest?.description; as description) {
-                    <span class="type-muted">{{ description }}</span>
-                  }
-                  @for (problem of row.mod.errors; track $index) {
-                    <span class="type-blocker">{{ problem }}</span>
-                  }
-                </div>
-
-                <div class="flex items-center gap-2 shrink-0">
-                  @if (row.mod.manifest) {
-                    <label class="flex items-center gap-2 type-label">
-                      <input
-                        type="checkbox"
-                        class="checkbox checkbox-sm"
-                        [checked]="row.enabledIndex >= 0"
-                        (change)="setEnabled(row.id, $event)"
-                      />
-                      New Games
-                    </label>
-                  }
-
-                  @if (row.enabledIndex >= 0) {
-                    <button
-                      class="btn btn-xs btn-neutral btn-outline"
-                      [disabled]="row.enabledIndex === 0"
-                      (click)="move(row.id, -1)"
-                      appSfx="ui-click"
-                      [sfxTrigger]="['click', 'hover']"
-                    >
-                      Earlier
-                    </button>
-                    <button
-                      class="btn btn-xs btn-neutral btn-outline"
-                      [disabled]="row.enabledIndex === row.enabledCount - 1"
-                      (click)="move(row.id, 1)"
-                      appSfx="ui-click"
-                      [sfxTrigger]="['click', 'hover']"
-                    >
-                      Later
-                    </button>
-                  }
-
-                  @if (row.canAddToRun) {
-                    <button
-                      class="btn btn-sm btn-neutral"
-                      [disabled]="isBusy()"
-                      (click)="addToRun(row.mod)"
-                      appSfx="ui-click"
-                      [sfxTrigger]="['click', 'hover']"
-                    >
-                      Add to Current Run
-                    </button>
-                  }
-
-                  @if (row.mod.source !== 'folder') {
-                    <button
-                      class="btn btn-sm btn-error btn-outline"
-                      [disabled]="isBusy()"
-                      (click)="remove(row.mod)"
-                      appSfx="ui-error"
-                      [sfxTrigger]="['click', 'hover']"
-                    >
-                      Remove
-                    </button>
-                  }
-                </div>
-              </div>
-            } @empty {
-              <app-blank-slate>No mods installed yet.</app-blank-slate>
-            }
-          </div>
+      @let currentTab = activeTab();
+      @if (hasModio) {
+        <div role="tablist" ffTriggerTabs class="tabs tabs-box">
+          @for (tab of tabs; track tab.id) {
+            <button
+              role="tab"
+              class="tab"
+              [class.tab-active]="currentTab === tab.id"
+              [attr.aria-selected]="currentTab === tab.id"
+              (click)="activeTab.set(tab.id)"
+              ffButton="ui-click"
+            >
+              {{ tab.name }}
+            </button>
+          }
         </div>
+      }
 
-        @if (hasModio) {
+      <div class="flex flex-col gap-4 overflow-y-auto min-h-0">
+        @if (currentTab === 'modio') {
           <app-panel-mods-modio />
+        } @else {
+          <div class="flex flex-col gap-2">
+            <span class="type-hint">
+              Checked mods are used by new games. Mods are stored with the runs
+              and can have their versions updated, but they cannot be removed
+              mid-run.
+            </span>
+
+            <div
+              cdkDropList
+              class="flex flex-col gap-2"
+              appListReflow
+              [cdkDropListSortPredicate]="canDropAt"
+              (cdkDropListDropped)="onDrop($event)"
+              [ffReorderPriority]="reorderPriority"
+              (ffReorderList)="reorder($event.fromIndex, $event.toIndex)"
+            >
+              @for (row of rows(); track row.trackKey) {
+                @let modName = row.mod.manifest?.name ?? row.mod.key;
+                @let isOrdered = row.enabledIndex >= 0;
+                <div
+                  cdkDrag
+                  [cdkDragDisabled]="!isOrdered"
+                  [cdkDragScale]="uiScale()"
+                  ffReorderItem
+                  [ffReorderItemDisabled]="!isOrdered"
+                  ffFocusRow
+                  appListReflowDrag
+                  class="flex items-center gap-4 p-2 bg-base-200"
+                >
+                  @if (isOrdered) {
+                    <app-icon
+                      cdkDragHandle
+                      name="tablerGripVertical"
+                      size="row"
+                      class="cursor-move text-lighter shrink-0 ff-kbm-only"
+                    />
+                    <ff-input-prompt
+                      action="context"
+                      class="ff-row-glyph ff-gamepad-only"
+                    />
+                  } @else {
+                    <span class="w-[1.2em] shrink-0"></span>
+                  }
+                  <app-icon-mod-logo [url]="row.mod.logoUrl" [name]="modName" />
+                  <div class="flex flex-col gap-2 flex-1 min-w-0">
+                    <span class="flex items-center gap-2">
+                      <span class="type-entity-name">{{ modName }}</span>
+                      @if (row.mod.manifest; as manifest) {
+                        <span class="badge badge-sm badge-data">
+                          v{{ manifest.version }}
+                        </span>
+                      }
+                      <span class="badge badge-sm badge-data">
+                        {{ sourceLabels[row.mod.source] }}
+                      </span>
+                      @if (row.inRun) {
+                        <span class="badge badge-sm badge-success">In Run</span>
+                      }
+                    </span>
+
+                    @if (row.mod.manifest?.author; as author) {
+                      <span class="type-meta">by {{ author }}</span>
+                    }
+                    @if (row.mod.manifest?.description; as description) {
+                      <span class="type-muted">{{ description }}</span>
+                    }
+                    @for (problem of row.mod.errors; track $index) {
+                      <span class="type-blocker">{{ problem }}</span>
+                    }
+                  </div>
+
+                  <div class="flex items-center gap-2 shrink-0">
+                    @if (row.mod.manifest) {
+                      <label class="flex items-center gap-2 type-label">
+                        <input
+                          type="checkbox"
+                          class="checkbox checkbox-sm"
+                          ffPadAction="confirm"
+                          ffPadLabel="New Games"
+                          [tp]="'If checked, this mod will be applied to any new games from this point on.'"
+                          [checked]="row.enabledIndex >= 0"
+                          (change)="setEnabled(row.id, $event)"
+                        />
+                        New Games
+                      </label>
+                    }
+
+                    @if (row.canAddToRun) {
+                      <button
+                        class="btn btn-sm btn-neutral"
+                        [disabled]="isBusy()"
+                        (click)="addToRun(row.mod)"
+                        ffButton="ui-click"
+                        ffPadAction="menu"
+                      >
+                        Add to Current Run
+                      </button>
+                    }
+
+                    @if (row.mod.source !== 'folder') {
+                      <button
+                        class="btn btn-sm btn-error btn-outline"
+                        [disabled]="isBusy()"
+                        (click)="remove(row.mod)"
+                        ffButton="ui-error"
+                        ffPadAction="details"
+                      >
+                        Remove
+                      </button>
+                    }
+                  </div>
+                </div>
+              } @empty {
+                <app-blank-slate>No mods installed yet.</app-blank-slate>
+              }
+            </div>
+          </div>
         }
       </div>
     </div>

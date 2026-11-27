@@ -107,11 +107,15 @@ export type ModInstalled = {
   errors: string[];
   key: string;
   modioId?: number;
+  logoUrl?: string;
 };
+
+export type ModsTab = 'installed' | 'modio';
 
 export type ModStoredEntry = {
   key: string;
   modioId?: number;
+  logoUrl?: string;
 };
 
 export type ModDiskRead = {

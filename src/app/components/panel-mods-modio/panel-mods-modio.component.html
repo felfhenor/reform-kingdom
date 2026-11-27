@@ -1,22 +1,18 @@
 <div class="flex flex-col gap-2">
-  <h2 class="type-section-title">mod.io</h2>
-
   @if (isSignedIn()) {
     <div class="flex items-center gap-2">
-      <span class="type-meta">Signed in to mod.io.</span>
+      <span class="type-meta badge badge-info">Signed in to mod.io.</span>
       <button
         class="btn btn-sm btn-neutral"
         (click)="installSubscribed()"
-        appSfx="ui-click"
-        [sfxTrigger]="['click', 'hover']"
+        ffButton="ui-click"
       >
         Install Subscribed
       </button>
       <button
         class="btn btn-sm btn-neutral btn-outline"
         (click)="signOut()"
-        appSfx="ui-click"
-        [sfxTrigger]="['click', 'hover']"
+        ffButton="ui-click"
       >
         Sign Out
       </button>
@@ -27,6 +23,7 @@
         <input
           class="input input-sm w-64"
           type="email"
+          ffKeyboard
           placeholder="Email for mod.io sign in..."
           [ngModel]="email()"
           (ngModelChange)="email.set($event)"
@@ -35,14 +32,14 @@
           class="btn btn-sm btn-neutral"
           [disabled]="email().length === 0"
           (click)="sendCode()"
-          appSfx="ui-click"
-          [sfxTrigger]="['click', 'hover']"
+          ffButton="ui-click"
         >
           Send Code
         </button>
       } @else {
         <input
           class="input input-sm w-32"
+          ffKeyboard
           placeholder="Code..."
           [ngModel]="code()"
           (ngModelChange)="code.set($event)"
@@ -51,8 +48,7 @@
           class="btn btn-sm btn-neutral"
           [disabled]="code().length === 0"
           (click)="signIn()"
-          appSfx="ui-click"
-          [sfxTrigger]="['click', 'hover']"
+          ffButton="ui-click"
         >
           Sign In
         </button>
@@ -66,12 +62,14 @@
   <div class="flex items-center gap-2">
     <input
       class="input input-sm flex-1"
+      ffKeyboard
       placeholder="Search mods by name..."
       [ngModel]="query()"
       (ngModelChange)="query.set($event)"
       (keyup.enter)="search()"
     />
     <ng-select
+      ffSelect="Sort"
       class="w-48"
       [items]="sortOptions"
       bindLabel="label"
@@ -83,8 +81,7 @@
     <button
       class="btn btn-sm btn-neutral"
       (click)="search()"
-      appSfx="ui-click"
-      [sfxTrigger]="['click', 'hover']"
+      ffButton="ui-click"
     >
       Search
     </button>
@@ -93,7 +90,8 @@
   @if (hasSearched()) {
     @for (mod of results(); track mod.id) {
       @let installed = installedVersions().get(mod.id);
-      <div class="flex items-start gap-4 p-2 bg-base-200">
+      <div ffFocusRow class="flex items-start gap-4 p-2 bg-base-200">
+        <app-icon-mod-logo [url]="mod.logo?.thumb_320x180" [name]="mod.name" />
         <div class="flex flex-col gap-2 flex-1 min-w-0">
           <span class="flex items-center gap-2">
             <span class="type-entity-name">{{ mod.name }}</span>
@@ -110,8 +108,8 @@
             class="btn btn-sm btn-neutral shrink-0"
             [disabled]="busyId() !== undefined"
             (click)="install(mod)"
-            appSfx="ui-click"
-            [sfxTrigger]="['click', 'hover']"
+            ffButton="ui-click"
+            ffPadAction="confirm"
           >
             Install
           </button>
@@ -122,8 +120,8 @@
             class="btn btn-sm btn-neutral shrink-0"
             [disabled]="busyId() !== undefined"
             (click)="install(mod)"
-            appSfx="ui-click"
-            [sfxTrigger]="['click', 'hover']"
+            ffButton="ui-click"
+            ffPadAction="confirm"
           >
             Update
           </button>
@@ -143,8 +141,7 @@
           aria-label="Previous Page"
           [disabled]="pager.page === 1"
           (click)="page(-1)"
-          appSfx="ui-click"
-          [sfxTrigger]="['click', 'hover']"
+          ffButton="ui-click"
         >
           <app-icon name="tablerChevronLeft" />
         </button>
@@ -156,8 +153,7 @@
           aria-label="Next Page"
           [disabled]="pager.page === pager.pages"
           (click)="page(1)"
-          appSfx="ui-click"
-          [sfxTrigger]="['click', 'hover']"
+          ffButton="ui-click"
         >
           <app-icon name="tablerChevronRight" />
         </button>

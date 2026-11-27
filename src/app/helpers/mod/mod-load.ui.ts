@@ -66,14 +66,15 @@ async function modsStoredLoad(): Promise<ModInstalled[]> {
   try {
     const entries = await modsStoreList();
     return Promise.all(
-      entries.map((entry) =>
-        modLoadSafely(
+      entries.map(async (entry) => ({
+        ...(await modLoadSafely(
           entry.modioId ? 'modio' : 'local',
           entry.key,
           () => modStoredFiles(entry.key),
           entry.modioId,
-        ),
-      ),
+        )),
+        logoUrl: entry.logoUrl,
+      })),
     );
   } catch (e) {
     error('Mods:Load', 'Could not read stored mods.', e);

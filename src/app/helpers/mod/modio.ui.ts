@@ -112,7 +112,11 @@ export async function modioInstall(mod: ModioMod): Promise<string[]> {
   const response = await fetch(fresh.modfile.download.binary_url);
   if (!response.ok) return [`Download failed (${response.status}).`];
 
-  const errors = await modsImportZip(await response.blob(), mod.id);
+  const errors = await modsImportZip(
+    await response.blob(),
+    mod.id,
+    fresh.logo?.thumb_320x180,
+  );
   if (errors.length === 0 && modioIsSignedIn()) {
     await modioSubscription(mod.id, 'POST').catch(() => undefined);
   }

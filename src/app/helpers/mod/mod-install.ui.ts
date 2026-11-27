@@ -14,11 +14,13 @@ import {
 import { gamestate } from '@helpers/state-game';
 import { getOption, setOption } from '@helpers/state-options';
 import type { ModInstalled } from '@interfaces';
+import { clamp } from 'es-toolkit/compat';
 
 // Validated before it's stored, so a broken zip never becomes an installed mod.
 export async function modsImportZip(
   data: Blob,
   modioId?: number,
+  logoUrl?: string,
 ): Promise<string[]> {
   try {
     const files = await modZipFiles(data);
@@ -28,7 +30,7 @@ export async function modsImportZip(
     if (parsed.errors.length > 0) return parsed.errors;
 
     const key = modioId === undefined ? parsed.manifest.id : `modio-${modioId}`;
-    await modsStorePut({ key, modioId }, data);
+    await modsStorePut({ key, modioId, logoUrl }, data);
     analyticsSendDesignEvent('Mods:Import');
     return [];
   } catch (e) {
@@ -53,13 +55,13 @@ export function modsSetEnabled(id: string, enabled: boolean): void {
   setOption('modsEnabled', enabled ? [...others, id] : others);
 }
 
-export function modsMoveEnabled(id: string, offset: -1 | 1): void {
+export function modsReorderEnabled(fromIndex: number, toIndex: number): void {
   const list = [...getOption('modsEnabled')];
-  const from = list.indexOf(id);
-  const to = from + offset;
-  if (from < 0 || to < 0 || to >= list.length) return;
+  const target = clamp(toIndex, 0, list.length - 1);
+  if (fromIndex < 0 || fromIndex >= list.length || fromIndex === target) return;
 
-  [list[from], list[to]] = [list[to], list[from]];
+  const [moved] = list.splice(fromIndex, 1);
+  list.splice(target, 0, moved);
   setOption('modsEnabled', list);
 }
 
