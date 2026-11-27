@@ -6,22 +6,29 @@ import {
   ensureGatherResult,
   ensureGathering,
 } from '@helpers/content/ensure-gathernode';
+import { ensureItem } from '@helpers/content/ensure-item';
+import { ensureRecipe } from '@helpers/content/ensure-recipe';
 import { ensureWorker } from '@helpers/content/ensure-worker';
 import { travelPathBaseTotalTicks } from '@helpers/hero/travel-cost-base';
+import { applyMaterialDelta } from '@helpers/item/materials';
 import { travelPathFrom } from '@helpers/pathfinding/pathfinding-travel';
 import {
   canWorkerReachNode,
   workerAssignmentIsValid,
   workerGatherAssignmentIsValid,
+  workerIdleReason,
   workerStaminaCostToNode,
 } from '@helpers/worker/worker-assignment';
 import { defaultWorkerState } from '@helpers/worker/worker-progression';
 import type {
   GatheringId,
   ItemId,
+  RecipeId,
   TravelStep,
   WorkerContent,
   WorkerId,
+  WorkerState,
+  WorkerStatusCrafting,
   WorldNodeEntry,
 } from '@interfaces';
 import { seedContent } from '@/testing/content';
@@ -171,5 +178,65 @@ describe('workerAssignmentIsValid', () => {
 
     seedWorker(staminaFor(tripCost() - 1));
     expect(workerAssignmentIsValid(workerId, 1, assignment)).toBe(false);
+  });
+});
+
+describe('workerIdleReason', () => {
+  const recipeId = 'ingot-recipe' as RecipeId;
+  const ingotId = 'ingot' as ItemId;
+
+  function worker(overrides: Partial<WorkerState>): WorkerState {
+    return { ...defaultWorkerState(), ...overrides };
+  }
+
+  function crafting(materialsHeld: boolean): WorkerStatusCrafting {
+    return { kind: 'Crafting', recipeId, ticksIntoCraft: 0, materialsHeld };
+  }
+
+  function seedRecipe(ore: number): void {
+    seedContent([
+      ensureItem({ id: copperId, name: 'Copper Ore' }),
+      ensureItem({ id: ingotId, name: 'Ingot' }),
+      ensureRecipe({
+        id: recipeId,
+        result: { itemId: ingotId, quantity: 1 },
+        requirements: [{ itemId: copperId, quantity: 2 }],
+      }),
+    ]);
+    seedGamestate((state) => applyMaterialDelta(state, copperId, ore));
+  }
+
+  it('is idle at the Duchy, even when stranded with a job', () => {
+    expect(workerIdleReason(worker({ assignment: null }))).toBe('AtDuchy');
+    expect(workerIdleReason(worker({ assignment }))).toBe('AtDuchy');
+  });
+
+  it('is busy while out on a trip', () => {
+    const status = {
+      kind: 'TravelingBack',
+      path,
+      ticksIntoStep: 0,
+      carriedQuantity: 0,
+    } as const;
+    expect(workerIdleReason(worker({ status, assignment }))).toBeUndefined();
+  });
+
+  it('waits for materials only when storage cannot supply a unit', () => {
+    seedRecipe(1);
+    expect(workerIdleReason(worker({ status: crafting(false) }))).toBe(
+      'WaitingForMaterials',
+    );
+
+    seedRecipe(2);
+    expect(
+      workerIdleReason(worker({ status: crafting(false) })),
+    ).toBeUndefined();
+  });
+
+  it('is busy while holding a unit, even with empty storage', () => {
+    seedRecipe(0);
+    expect(
+      workerIdleReason(worker({ status: crafting(true) })),
+    ).toBeUndefined();
   });
 });

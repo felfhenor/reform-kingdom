@@ -24,6 +24,7 @@ import {
 import { armoryCap, armoryGet } from '@helpers/kingdom/armory';
 import { armoryStatusDotClass } from '@helpers/kingdom/armory.ui';
 import { kingdomNavSections } from '@helpers/kingdom/kingdom-nav.ui';
+import { workersIdleStatusEntries } from '@helpers/worker/worker-progression.ui';
 import type { KingdomNavEntry, KingdomNavGroup, Tradeskill } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { AnimationService } from '@services/animation.service';
@@ -67,14 +68,15 @@ export class PanelKingdomNavComponent {
   // Ticks once a second so tradeskill queue tooltips never look frozen.
   public sections = computed(() => {
     uiClockTick();
+    const idleWorkers = workersIdleStatusEntries().length;
 
     return kingdomNavSections().map((section) => ({
       group: section.group,
       items: section.entries.map((entry) => ({
         entry,
-        isIdle: this.isTradeskillIdle(entry),
+        isIdle: this.isIdle(entry, idleWorkers),
         statusDotClass: this.statusDotClass(entry),
-        tooltip: this.tooltip(entry),
+        tooltip: this.tooltip(entry, idleWorkers),
       })),
     }));
   });
@@ -83,7 +85,8 @@ export class PanelKingdomNavComponent {
     if (this.hasRendered) this.anim.fadeIn(event.target);
   }
 
-  private isTradeskillIdle(entry: KingdomNavEntry): boolean {
+  private isIdle(entry: KingdomNavEntry, idleWorkers: number): boolean {
+    if (entry.subview === 'workers') return idleWorkers > 0;
     return (
       entry.kind === 'tradeskill' &&
       tradeskillBuilding(entry.tradeskill).queue.length === 0
@@ -96,10 +99,12 @@ export class PanelKingdomNavComponent {
       : undefined;
   }
 
-  private tooltip(entry: KingdomNavEntry): string {
-    return entry.kind === 'tradeskill'
-      ? this.tradeskillTooltip(entry.label, entry.tradeskill)
-      : entry.label;
+  private tooltip(entry: KingdomNavEntry, idleWorkers: number): string {
+    if (entry.kind === 'tradeskill')
+      return this.tradeskillTooltip(entry.label, entry.tradeskill);
+    if (entry.subview === 'workers' && idleWorkers > 0)
+      return `${entry.label} (${formatNumber(idleWorkers, this.locale)} idle)`;
+    return entry.label;
   }
 
   private tradeskillTooltip(label: string, tradeskill: Tradeskill): string {

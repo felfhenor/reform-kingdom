@@ -8,15 +8,21 @@ import {
   isWorkerCombatNodeUnlocked,
   workerCanFightFor,
 } from '@helpers/worker/worker-combat';
-import { workerCraftAssignmentIsValid } from '@helpers/worker/worker-crafting';
+import {
+  workerCraftAssignmentIsValid,
+  workerCraftUnitAvailable,
+} from '@helpers/worker/worker-crafting';
 import { workerStatsForLevel } from '@helpers/worker/worker-progression';
 import { workerGatherNodeHasItem } from '@helpers/worker/worker-shared';
 import { kingdomNodeGet } from '@helpers/world-node/world-nodes';
 import type {
+  RecipeContent,
   WorkerAssignment,
   WorkerContent,
   WorkerGatherAssignment,
   WorkerId,
+  WorkerIdleReason,
+  WorkerState,
 } from '@interfaces';
 
 // One-way only - the return trip is never stamina-gated (deliberate design
@@ -48,6 +54,20 @@ export function canWorkerReachNode(
 ): boolean {
   const cost = workerStaminaCostToNode(nodeName, allowTeleport);
   return cost !== undefined && cost <= stamina;
+}
+
+// Any AtDuchy counts - a worker whose route failed parks there with its assignment still set.
+// A fresh craft also starts without materials, so only a recipe storage can't supply counts as waiting.
+export function workerIdleReason({
+  status,
+}: WorkerState): WorkerIdleReason | undefined {
+  if (status.kind === 'AtDuchy') return 'AtDuchy';
+  if (status.kind !== 'Crafting' || status.materialsHeld) return undefined;
+
+  const recipe = getEntry<RecipeContent>(status.recipeId);
+  return recipe && !workerCraftUnitAvailable(recipe)
+    ? 'WaitingForMaterials'
+    : undefined;
 }
 
 // Shared validity check for workerAssign/auto-redeploy/migrate.

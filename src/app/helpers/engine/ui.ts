@@ -20,6 +20,7 @@ import type {
   HeroesSubview,
   KingdomSubview,
   Tradeskill,
+  WorkerId,
   WorldCameraRequest,
   WorldNodeEntry,
 } from '@interfaces';
@@ -68,6 +69,14 @@ export function kingdomSubviewForTradeskill(
   tradeskill: Tradeskill,
 ): KingdomSubview {
   return TRADESKILL_SUBVIEWS[tradeskill];
+}
+
+export const workersSelectedWorkerId = signal<WorkerId | undefined>(undefined);
+
+export function workerPageOpen(workerId: WorkerId): void {
+  workersSelectedWorkerId.set(workerId);
+  setGamePlayView('kingdom');
+  kingdomSubviewShow('workers');
 }
 
 // Not cleared on close - clearing it would collapse the modal's DOM mid-transition.

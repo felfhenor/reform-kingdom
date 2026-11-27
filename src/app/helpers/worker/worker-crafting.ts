@@ -109,15 +109,17 @@ export function workerCraftingStatusStart(
   };
 }
 
-// All-or-nothing: a partial take would be over-refunded later, since material deltas clamp at 0.
-function takeCraftUnit(state: GameState, recipe: RecipeContent): boolean {
-  const requirements = recipeItemRequirements(recipe);
-  const available = requirements.every(
+export function workerCraftUnitAvailable(recipe: RecipeContent): boolean {
+  return recipeItemRequirements(recipe).every(
     (requirement) => requirementAvailable(requirement) >= requirement.quantity,
   );
-  if (!available) return false;
+}
 
-  requirements.forEach((requirement) =>
+// All-or-nothing: a partial take would be over-refunded later, since material deltas clamp at 0.
+function takeCraftUnit(state: GameState, recipe: RecipeContent): boolean {
+  if (!workerCraftUnitAvailable(recipe)) return false;
+
+  recipeItemRequirements(recipe).forEach((requirement) =>
     consumeRequirement(state, requirement, 1),
   );
   return true;

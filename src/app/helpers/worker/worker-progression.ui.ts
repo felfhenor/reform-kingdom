@@ -7,6 +7,7 @@ import {
 import { goldCoinId, spendGold } from '@helpers/item/materials';
 import { tradeGoodsLogPart, tradeLog } from '@helpers/item/trade';
 import { gamestate, updateGamestate, workersState } from '@helpers/state-game';
+import { workerIdleReason } from '@helpers/worker/worker-assignment';
 import {
   workerIsReadyToLevelUp,
   workerLevelUpCost,
@@ -16,32 +17,58 @@ import {
 import type {
   WorkerContent,
   WorkerId,
+  WorkerIdleStatusEntry,
   WorkerLevelUpStatusEntry,
+  WorkerState,
 } from '@interfaces';
 
-// One entry per rescued worker with full xp, affordable or not - built for the corner status indicator.
-export function workersLevelUpStatusEntries(): WorkerLevelUpStatusEntry[] {
+function workersStatusEntries<T>(
+  build: (
+    worker: WorkerState,
+    content: WorkerContent,
+    workerId: WorkerId,
+  ) => T | undefined,
+): T[] {
   const workers = workersState();
 
   return (Object.keys(workers) as WorkerId[])
     .map((workerId) => {
-      const worker = workers[workerId];
-      if (!workerXpIsFull(worker)) return undefined;
-
       const content = getEntry<WorkerContent>(workerId);
-      if (!content) return undefined;
-
-      return {
-        workerId,
-        name: content.name,
-        sprite: content.sprite,
-        frames: content.frames,
-        level: worker.level,
-        cost: workerLevelUpCost(worker.level),
-        affordable: workerIsReadyToLevelUp(worker),
-      };
+      return content ? build(workers[workerId], content, workerId) : undefined;
     })
-    .filter((entry): entry is WorkerLevelUpStatusEntry => !!entry);
+    .filter((entry): entry is T => !!entry);
+}
+
+// One entry per rescued worker with full xp, affordable or not.
+export function workersLevelUpStatusEntries(): WorkerLevelUpStatusEntry[] {
+  return workersStatusEntries((worker, content, workerId) =>
+    workerXpIsFull(worker)
+      ? {
+          workerId,
+          name: content.name,
+          sprite: content.sprite,
+          frames: content.frames,
+          level: worker.level,
+          cost: workerLevelUpCost(worker.level),
+          affordable: workerIsReadyToLevelUp(worker),
+        }
+      : undefined,
+  );
+}
+
+export function workersIdleStatusEntries(): WorkerIdleStatusEntry[] {
+  return workersStatusEntries((worker, content, workerId) => {
+    const reason = workerIdleReason(worker);
+    return reason
+      ? {
+          workerId,
+          name: content.name,
+          sprite: content.sprite,
+          frames: content.frames,
+          reason,
+        }
+      : undefined;
+  });
 }
 
 function workerLevelUpLog(

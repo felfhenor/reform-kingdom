@@ -1,0 +1,24 @@
+@let data = entry();
+
+<app-card-status-bubble
+  [expanded]="expanded()"
+  [name]="data.name"
+  badge="Idle"
+  (click)="goToWorker()"
+  tabindex="0"
+>
+  <div bubbleIcon class="zoom-row">
+    <app-atlas-animation
+      spritesheet="worker"
+      [assetName]="data.sprite"
+      [frames]="data.frames"
+    />
+  </div>
+  @if (data.reason === 'AtDuchy') {
+    <span bubbleSubtitle class="type-blocker truncate">At the Duchy</span>
+  } @else {
+    <span bubbleSubtitle class="type-blocker truncate">
+      Waiting for Materials
+    </span>
+  }
+</app-card-status-bubble>

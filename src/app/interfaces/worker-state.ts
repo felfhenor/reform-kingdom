@@ -109,6 +109,17 @@ export type WorkerLevelUpStatusEntry = {
   affordable: boolean;
 };
 
+export type WorkerIdleReason = 'AtDuchy' | 'WaitingForMaterials';
+
+// Display-only shape for one idle-worker corner card.
+export type WorkerIdleStatusEntry = {
+  workerId: WorkerId;
+  name: string;
+  sprite: string;
+  frames: number;
+  reason: WorkerIdleReason;
+};
+
 // Display-only shape for one half-size worker craft square beside a tradeskill queue.
 export type WorkerCraftSlot = {
   workerId: WorkerId;

@@ -27,6 +27,7 @@ import { StatusEdictsComponent } from '@components/status-edicts/status-edicts.c
 import { StatusEncounterComponent } from '@components/status-encounter/status-encounter.component';
 import { StatusTaskListComponent } from '@components/status-task-list/status-task-list.component';
 import { StatusTutorialUnlockComponent } from '@components/status-tutorial-unlock/status-tutorial-unlock.component';
+import { StatusWorkerIdleComponent } from '@components/status-worker-idle/status-worker-idle.component';
 import { StatusWorkerLevelupComponent } from '@components/status-worker-levelup/status-worker-levelup.component';
 import {
   MAP_CURSOR_MAX_FRAME_MS,
@@ -196,6 +197,7 @@ const HUD_ZONE_LABELS: Record<HudZone, string> = {
     StatusEncounterComponent,
     StatusCraftingComponent,
     StatusWorkerLevelupComponent,
+    StatusWorkerIdleComponent,
     StatusTutorialUnlockComponent,
     StatusTaskListComponent,
   ],
@@ -256,6 +258,7 @@ const HUD_ZONE_LABELS: Record<HudZone, string> = {
         class="absolute top-8 right-4 flex gap-2 pointer-events-auto z-[20]"
       >
         <app-status-worker-levelup></app-status-worker-levelup>
+        <app-status-worker-idle></app-status-worker-idle>
         <app-status-crafting></app-status-crafting>
         <app-status-tutorial-unlock></app-status-tutorial-unlock>
       </div>

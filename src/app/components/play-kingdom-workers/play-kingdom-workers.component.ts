@@ -5,7 +5,6 @@ import {
   Component,
   computed,
   inject,
-  signal,
 } from '@angular/core';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
@@ -25,6 +24,7 @@ import { FFButtonComponent } from '@ff/components/button/button.component';
 import { TutorialTargetDirective } from '@directives/tutorial-target.directive';
 import { getEntry } from '@helpers/content/content';
 import { formatDuration } from '@helpers/engine/timer';
+import { workersSelectedWorkerId } from '@helpers/engine/ui';
 import { travelTicksRemaining } from '@helpers/hero/travel-progress';
 import { goldCoinId } from '@helpers/item/materials';
 import { discoveredWorkersState, workersState } from '@helpers/state-game';
@@ -97,8 +97,6 @@ type EntryStatusDisplay = {
 export class PlayKingdomWorkersComponent {
   private anim = inject(AnimationService);
 
-  public selectedWorkerId = signal<WorkerId | undefined>(undefined);
-
   public entries = computed<WorkerEntry[]>(() => {
     const discovered = discoveredWorkersState();
     const workers = workersState();
@@ -121,7 +119,7 @@ export class PlayKingdomWorkersComponent {
 
   public selectedEntry = computed(() => {
     const entries = this.entries();
-    const selectedId = this.selectedWorkerId();
+    const selectedId = workersSelectedWorkerId();
     return entries.find((e) => e.id === selectedId) ?? entries.at(0);
   });
 
@@ -251,7 +249,7 @@ export class PlayKingdomWorkersComponent {
   ]);
 
   public selectWorker(id: WorkerId): void {
-    this.selectedWorkerId.set(id);
+    workersSelectedWorkerId.set(id);
   }
 
   private craftingLabel(
