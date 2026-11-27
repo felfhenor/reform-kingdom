@@ -1,10 +1,15 @@
 
-## 0.16.3 (2026-11-26)
+# 0.17.0 (2026-11-27)
+
+
+### Bug Fixes
+
+* **ui:** only show crafting as a source in loot filters if crafting is possible
 
 
 ### Features
 
-* **ui:** add a resolution warning containing the min resolution, homepage only
-* **ui:** add credits modal, rework title screen modals
-* **world:** add some new sprites and use them in the world
-* **world:** select current location when recentering if at a location
+* **mod:** add basic mod support
+* **mod:** better support for player-made mods
+* **mods:** support images, controllers on mods page
+* **workshop:** support searching infusions
