@@ -8,7 +8,13 @@ import { error, info } from '@helpers/engine/logging';
 import { notifyError, notifyWarning } from '@helpers/engine/notify';
 import { gameloopIsProcessing } from '@helpers/gameloop';
 import { migrateGameState } from '@helpers/migrate';
+import {
+  modsLiveCapture,
+  modsLiveRestore,
+  modsReset,
+} from '@helpers/mod/mod-apply';
 import { savefileBackupStore } from '@helpers/savefile/savefile-backup-storage';
+import { savefileModsPrepare } from '@helpers/savefile/savefile-mods';
 import {
   savefileIsWorthKeeping,
   savefileValidationErrors,
@@ -38,6 +44,7 @@ const FAILURE_MESSAGES: Record<SavefileLoadFailureReason, string> = {
   storage: 'Your savefile could not be read from storage.',
   invalid: 'Your savefile appears to be corrupt.',
   migration: 'Your savefile could not be updated to this version.',
+  mods: 'Your savefile needs mods that are not installed or could not be loaded.',
 };
 
 export function savefileFailureMessage(
@@ -93,6 +100,7 @@ function savefileLoadFail(
   data?: unknown,
 ): void {
   setGameStateSavingBlocked(true);
+  modsReset();
   setGameState(defaultGameState(), false);
   savefileLoadStatus.set({ state: 'failed', reason, details, data });
 
@@ -123,7 +131,13 @@ async function savefileLoadStoredState(raw: unknown): Promise<void> {
     );
   }
 
-  const failures = await savefileMigrateWithRetry(raw as GameState);
+  const prepared = savefileModsPrepare(raw as GameState);
+  if (prepared.errors.length > 0) {
+    savefileLoadFail('mods', prepared.errors, raw);
+    return;
+  }
+
+  const failures = await savefileMigrateWithRetry(prepared.state);
   if (failures.length > 0) {
     savefileLoadFail('migration', failures, raw);
     return;
@@ -157,14 +171,19 @@ async function savefileReplaceIdle(
 ): Promise<string[]> {
   const previousStatus = savefileLoadStatus();
   const previous = gamestate();
+  const previousMods = modsLiveCapture();
 
   const rollback = (failures: string[]): string[] => {
+    modsLiveRestore(previousMods);
     setGameState(previous, false);
     setGameStateSavingBlocked(previousStatus.state !== 'ok');
     return failures;
   };
 
-  const failures = await savefileMigrateWithRetry(next);
+  const prepared = savefileModsPrepare(next);
+  if (prepared.errors.length > 0) return rollback(prepared.errors);
+
+  const failures = await savefileMigrateWithRetry(prepared.state);
   if (failures.length > 0) return rollback(failures);
 
   if (previousStatus.state === 'ok') {

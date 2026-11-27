@@ -63,6 +63,7 @@ if (hasInstanceLock && !isSquirrelEvent) {
 const rpc = require('discord-rpc');
 const Config = require('electron-config');
 const { registerSavefileBackupHandlers } = require('./savefile-backups');
+const { registerModHandlers } = require('./mods');
 const {
   openSavefileFolder,
   registerSavefileStoreHandlers,
@@ -228,6 +229,7 @@ app.on('ready', async () => {
   registerSavefileStoreHandlers();
   registerWindowSettingsHandlers(() => mainWindow);
   registerSteamHandlers();
+  registerModHandlers();
   jumpListRegister();
   createWindow();
 });

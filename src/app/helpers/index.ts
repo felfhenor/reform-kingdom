@@ -25,6 +25,7 @@ export * from './lore';
 export * from './maps';
 export * from './math';
 export * from './migrate';
+export * from './mod';
 export * from './noise';
 export * from './pathfinding';
 export * from './pixi';

@@ -1,3 +1,4 @@
+import { sortBy } from 'es-toolkit/compat';
 import { ensureAchievement } from '@helpers/content/ensure-achievement';
 import { ensureAffix } from '@helpers/content/ensure-affix';
 import { ensureAstralProjector } from '@helpers/content/ensure-astralprojector';
@@ -86,6 +87,10 @@ const initializers: Record<ContentType, (entry: any) => any> = {
   trainerteaching: ensureTrainerTeaching,
   worker: ensureWorker,
 };
+
+export function contentTypeList(): ContentType[] {
+  return sortBy(Object.keys(initializers) as ContentType[]);
+}
 
 export function hasContentInitializer<T extends IsContentItem>(
   content: T,

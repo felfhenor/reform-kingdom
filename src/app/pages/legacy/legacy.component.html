@@ -44,7 +44,19 @@
               </span>
             </span>
 
-            <span class="badge badge-data tabular-nums ml-auto mr-2 shrink-0">
+            @if (run.modsLabel) {
+              <span
+                class="badge badge-data ml-auto shrink-0"
+                [tp]="run.modsLabel"
+              >
+                Modded
+              </span>
+            }
+
+            <span
+              class="badge badge-data tabular-nums mr-2 shrink-0"
+              [class.ml-auto]="!run.modsLabel"
+            >
               {{ run.score | number }}
             </span>
           </button>

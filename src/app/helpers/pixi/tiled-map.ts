@@ -75,6 +75,7 @@ export function tiledLayerTileAt(
 }
 
 export function tiledTilesetImagePath(tileset: TiledTileset): string {
+  if (tileset.image.startsWith('blob:')) return tileset.image;
   return cacheBustURL(tileset.image.replace(/^\.\.\//, ''));
 }
 

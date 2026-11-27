@@ -75,6 +75,13 @@ export class HomeComponent implements OnInit {
       : '';
   });
 
+  public savefileModProblems = computed(() => {
+    const status = savefileLoadStatus();
+    return status.state === 'failed' && status.reason === 'mods'
+      ? status.details
+      : [];
+  });
+
   private backups = signal<SavefileBackup[]>([]);
   // Reactive so a Legacy refilled from backups at startup clears the warning.
   private hasUnfinishedBackup = computed(() =>
@@ -153,5 +160,9 @@ export class HomeComponent implements OnInit {
 
   openLegacy() {
     this.router.navigate(['/legacy']);
+  }
+
+  openMods() {
+    this.router.navigate(['/mods']);
   }
 }

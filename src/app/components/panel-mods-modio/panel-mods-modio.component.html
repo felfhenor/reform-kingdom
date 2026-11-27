@@ -1,0 +1,169 @@
+<div class="flex flex-col gap-2">
+  <h2 class="type-section-title">mod.io</h2>
+
+  @if (isSignedIn()) {
+    <div class="flex items-center gap-2">
+      <span class="type-meta">Signed in to mod.io.</span>
+      <button
+        class="btn btn-sm btn-neutral"
+        (click)="installSubscribed()"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        Install Subscribed
+      </button>
+      <button
+        class="btn btn-sm btn-neutral btn-outline"
+        (click)="signOut()"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        Sign Out
+      </button>
+    </div>
+  } @else {
+    <div class="flex items-center gap-2">
+      @if (!codeSent()) {
+        <input
+          class="input input-sm w-64"
+          type="email"
+          placeholder="Email for mod.io sign in..."
+          [ngModel]="email()"
+          (ngModelChange)="email.set($event)"
+        />
+        <button
+          class="btn btn-sm btn-neutral"
+          [disabled]="email().length === 0"
+          (click)="sendCode()"
+          appSfx="ui-click"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Send Code
+        </button>
+      } @else {
+        <input
+          class="input input-sm w-32"
+          placeholder="Code..."
+          [ngModel]="code()"
+          (ngModelChange)="code.set($event)"
+        />
+        <button
+          class="btn btn-sm btn-neutral"
+          [disabled]="code().length === 0"
+          (click)="signIn()"
+          appSfx="ui-click"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          Sign In
+        </button>
+      }
+      <span class="type-hint">
+        Optional: signing in keeps your mod.io subscriptions in sync.
+      </span>
+    </div>
+  }
+
+  <div class="flex items-center gap-2">
+    <input
+      class="input input-sm flex-1"
+      placeholder="Search mods by name..."
+      [ngModel]="query()"
+      (ngModelChange)="query.set($event)"
+      (keyup.enter)="search()"
+    />
+    <ng-select
+      class="w-48"
+      [items]="sortOptions"
+      bindLabel="label"
+      bindValue="value"
+      [clearable]="false"
+      [ngModel]="sort()"
+      (ngModelChange)="sort.set($event)"
+    ></ng-select>
+    <button
+      class="btn btn-sm btn-neutral"
+      (click)="search()"
+      appSfx="ui-click"
+      [sfxTrigger]="['click', 'hover']"
+    >
+      Search
+    </button>
+  </div>
+
+  @if (hasSearched()) {
+    @for (mod of results(); track mod.id) {
+      @let installed = installedVersions().get(mod.id);
+      <div class="flex items-start gap-4 p-2 bg-base-200">
+        <div class="flex flex-col gap-2 flex-1 min-w-0">
+          <span class="flex items-center gap-2">
+            <span class="type-entity-name">{{ mod.name }}</span>
+            @if (mod.modfile.version; as version) {
+              <span class="badge badge-sm badge-data">v{{ version }}</span>
+            }
+          </span>
+          <span class="type-meta">by {{ mod.submitted_by.username }}</span>
+          <span class="type-muted">{{ mod.summary }}</span>
+        </div>
+
+        @if (installed === undefined) {
+          <button
+            class="btn btn-sm btn-neutral shrink-0"
+            [disabled]="busyId() !== undefined"
+            (click)="install(mod)"
+            appSfx="ui-click"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            Install
+          </button>
+        } @else if (
+          mod.modfile.version !== null && installed !== mod.modfile.version
+        ) {
+          <button
+            class="btn btn-sm btn-neutral shrink-0"
+            [disabled]="busyId() !== undefined"
+            (click)="install(mod)"
+            appSfx="ui-click"
+            [sfxTrigger]="['click', 'hover']"
+          >
+            Update
+          </button>
+        } @else {
+          <span class="badge badge-success shrink-0">Installed</span>
+        }
+      </div>
+    } @empty {
+      <app-blank-slate>No mods found.</app-blank-slate>
+    }
+
+    @let pager = pageLabel();
+    @if (pager.pages > 1) {
+      <div class="flex items-center justify-center gap-2">
+        <button
+          class="btn btn-sm btn-neutral btn-outline"
+          aria-label="Previous Page"
+          [disabled]="pager.page === 1"
+          (click)="page(-1)"
+          appSfx="ui-click"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          <app-icon name="tablerChevronLeft" />
+        </button>
+        <span class="type-meta tabular-nums">
+          {{ pager.page | number }}/{{ pager.pages | number }}
+        </span>
+        <button
+          class="btn btn-sm btn-neutral btn-outline"
+          aria-label="Next Page"
+          [disabled]="pager.page === pager.pages"
+          (click)="page(1)"
+          appSfx="ui-click"
+          [sfxTrigger]="['click', 'hover']"
+        >
+          <app-icon name="tablerChevronRight" />
+        </button>
+      </div>
+    }
+  } @else {
+    <app-blank-slate>Search mod.io to find mods.</app-blank-slate>
+  }
+</div>

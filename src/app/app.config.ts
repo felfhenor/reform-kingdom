@@ -48,6 +48,7 @@ import { BGMService } from '@services/bgm.service';
 import { ClickModifiersPlugin } from '@services/click-modifiers.plugin';
 import { ContentService } from '@services/content.service';
 import { GamestateService } from '@services/gamestate.service';
+import { ModsService } from '@services/mods.service';
 import { LoggerService, RollbarErrorHandler } from '@services/logger.service';
 import { MetaService } from '@services/meta.service';
 import { NotifyService } from '@services/notify.service';
@@ -184,6 +185,11 @@ export const appConfig: ApplicationConfig = {
       provide: ENVIRONMENT_INITIALIZER,
       multi: true,
       useValue: async () => await inject(ContentService).init(),
+    },
+    {
+      provide: ENVIRONMENT_INITIALIZER,
+      multi: true,
+      useValue: () => void inject(ModsService).init(),
     },
     {
       provide: ENVIRONMENT_INITIALIZER,

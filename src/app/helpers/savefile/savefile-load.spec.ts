@@ -1,4 +1,4 @@
-import type { GameState } from '@interfaces';
+import type { GameState, ItemId } from '@interfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('es-toolkit', async (importOriginal) => ({
@@ -33,9 +33,23 @@ import {
   setGameStateSavingBlocked,
 } from '@helpers/state-game';
 import { seedGamestate, storedSave } from '@/testing/gamestate';
+import { seedContent } from '@/testing/content';
+import {
+  contentSnapshotBase,
+  getEntry,
+  unfurlContent,
+} from '@helpers/content/content';
+import { ensureItem } from '@helpers/content/ensure-item';
+import { setModsInstalled } from '@helpers/mod/mod-registry';
 import { captureNotifications } from '@/testing/notify';
 
 const untouched = defaultGameState();
+const MISSING_MOD = {
+  id: 'gone',
+  name: 'Gone',
+  version: '1',
+  kind: 'content' as const,
+};
 
 function setupState(numTicks = 10): GameState {
   const state = defaultGameState();
@@ -217,6 +231,24 @@ describe('savefileLoad', () => {
     expect(wasStored()).toBe(false);
   });
 
+  it('backs up, then backs out without migrating, when a mod is missing', async () => {
+    const stored = seedGamestate((state) => {
+      state.meta.isSetup = true;
+      state.meta.mods = [MISSING_MOD];
+    });
+
+    await savefileLoad();
+
+    expect(savefileBackupStore).toHaveBeenCalledWith(stored, 'load');
+    expect(migrateGameState).not.toHaveBeenCalled();
+    expect(wasStored()).toBe(false);
+    expect(savefileLoadStatus()).toMatchObject({
+      state: 'failed',
+      reason: 'mods',
+      details: ['Missing mod: Gone (v1)'],
+    });
+  });
+
   it('fails with a fresh, unsaved state when every migration throws', async () => {
     const stored = current();
     migrationAlwaysThrows();
@@ -319,6 +351,18 @@ describe('savefileReplace', () => {
     ).toBeLessThan(vi.mocked(migrateGameState).mock.invocationCallOrder[0]);
   });
 
+  it('rolls back without migrating when the replacement needs a missing mod', async () => {
+    const before = current();
+    const next = setupState();
+    next.meta.mods = [MISSING_MOD];
+
+    const failures = await savefileReplace(next, 'import');
+
+    expect(failures).toEqual(['Missing mod: Gone (v1)']);
+    expect(migrateGameState).not.toHaveBeenCalled();
+    expect(gamestate()).toBe(before);
+  });
+
   it('rolls back to the current save when the replacement will not migrate', async () => {
     const previous = current(5);
     migrationAlwaysThrows();
@@ -329,6 +373,19 @@ describe('savefileReplace', () => {
     expect(gamestate()).toBe(previous);
     expect(savingIsBlocked()).toBe(false);
     expect(isGameStateReady()).toBe(true);
+  });
+
+  it("restores the live run's mod content on rollback, even after the mod was removed", async () => {
+    seedContent([ensureItem({ id: 'ore' as ItemId, name: 'Ore' })]);
+    contentSnapshotBase();
+    unfurlContent({ item: [ensureItem({ id: 'gem' as ItemId, name: 'Gem' })] });
+    setModsInstalled([]);
+    current(5);
+    migrationAlwaysThrows();
+
+    await savefileReplace(setupState(99), 'import');
+
+    expect(getEntry('gem')).toBeDefined();
   });
 
   describe('from an unloadable save', () => {

@@ -1079,17 +1079,10 @@ export class GamePlayWorldComponent implements OnDestroy {
     const job = getEntry<JobContent>(hero.jobId);
     if (!job) return [];
 
-    const frame =
-      this.contentService.artAtlases()?.['job']?.[
-        `gameassets/job/${job.sprite}.png`
-      ];
+    const frame = this.contentService.spriteFrame('job', job.sprite);
     if (!frame) return [];
 
-    const jobSpritesheetUrl = this.contentService.toCacheBustURL(
-      'art/spritesheets/job.webp',
-    );
-
-    return pixiSpriteFrameTexturesLoad(jobSpritesheetUrl, frame, job.frames);
+    return pixiSpriteFrameTexturesLoad(frame.url, frame, job.frames);
   }
 
   private setupPlayerIndicator(): void {
@@ -1639,21 +1632,10 @@ export class GamePlayWorldComponent implements OnDestroy {
     const worker = getEntry<WorkerContent>(workerId);
     if (!worker) return [];
 
-    const frame =
-      this.contentService.artAtlases()['worker']?.[
-        `gameassets/worker/${worker.sprite}.png`
-      ];
+    const frame = this.contentService.spriteFrame('worker', worker.sprite);
     if (!frame) return [];
 
-    const workerSpritesheetUrl = this.contentService.toCacheBustURL(
-      'art/spritesheets/worker.webp',
-    );
-
-    return pixiSpriteFrameTexturesLoad(
-      workerSpritesheetUrl,
-      frame,
-      worker.frames,
-    );
+    return pixiSpriteFrameTexturesLoad(frame.url, frame, worker.frames);
   }
 
   private updateWorkerIndicators(): void {
@@ -1873,17 +1855,10 @@ export class GamePlayWorldComponent implements OnDestroy {
     spritesheet: AtlasedImage,
     sprite: string,
   ): Promise<Texture | undefined> {
-    const frame =
-      this.contentService.artAtlases()[spritesheet]?.[
-        `gameassets/${spritesheet}/${sprite}.png`
-      ];
+    const frame = this.contentService.spriteFrame(spritesheet, sprite);
     if (!frame) return undefined;
 
-    const url = this.contentService.toCacheBustURL(
-      `art/spritesheets/${spritesheet}.webp`,
-    );
-
-    const textures = await pixiSpriteFrameTexturesLoad(url, frame, 1);
+    const textures = await pixiSpriteFrameTexturesLoad(frame.url, frame, 1);
     return textures[0];
   }
 

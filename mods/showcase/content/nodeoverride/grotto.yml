@@ -1,0 +1,9 @@
+- id: 4c3c9a8e-1b7a-4d0e-9f2a-6c1d2e3f4d01
+  name: Grotto Entrance
+  description: A hole in the wall. It sparkles as you get deeper in.
+  background: cave-crystal-pink
+
+- id: 4c3c9a8e-1b7a-4d0e-9f2a-6c1d2e3f4d02
+  name: Grotto Mouth
+  description: An exit from the Glimmering Grotto back to the Duchy of Carrina. The sparkling cave gives way to the light of the world.
+  background: cave-crystal-pink

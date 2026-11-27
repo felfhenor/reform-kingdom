@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from '@components/navbar/navbar.component';
 import { FadeInDirective } from '@directives/fade-in.directive';
+import { modsApplyForNewGame } from '@helpers/mod/mod-newgame.ui';
 
 @Component({
   selector: 'app-setup',
@@ -10,4 +11,8 @@ import { FadeInDirective } from '@directives/fade-in.directive';
   templateUrl: './setup.component.html',
   styleUrl: './setup.component.scss',
 })
-export class SetupComponent {}
+export class SetupComponent {
+  constructor() {
+    modsApplyForNewGame();
+  }
+}

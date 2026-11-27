@@ -17,6 +17,9 @@ import { ticksToDurationParts } from '@helpers/engine/timer.ui';
 import { legacy } from '@helpers/legacy/legacy';
 import { legacyRunScore } from '@helpers/legacy/legacy-score.ui';
 import { legacyRunOutcomeTitle } from '@helpers/legacy/legacy.ui';
+import { modsAffectGameplay } from '@helpers/mod/mod-registry';
+import { modsListLabel } from '@helpers/mod/mod-registry.ui';
+import { TippyDirective } from '@ngneat/helipopper';
 import type { GameId, JobContent } from '@interfaces';
 import { PluralizePipe } from '@pipes/pluralize.pipe';
 import { sortBy } from 'es-toolkit/compat';
@@ -34,6 +37,7 @@ import { sortBy } from 'es-toolkit/compat';
     NgTemplateOutlet,
     PluralizePipe,
     SFXDirective,
+    TippyDirective,
   ],
   hostDirectives: [FadeInDirective],
   host: { class: 'block' },
@@ -50,6 +54,9 @@ export class LegacyComponent {
       playTime: ticksToDurationParts(run.ticks),
       edictCount: run.edicts.length,
       score: legacyRunScore(run).total,
+      modsLabel: modsAffectGameplay(run.mods)
+        ? modsListLabel(run.mods ?? [])
+        : undefined,
       jobs: run.party.map((hero) => getEntry<JobContent>(hero.jobId)),
     })),
   );

@@ -1,0 +1,58 @@
+import { isDemoBuild } from '@helpers/demo/demo';
+import { modsApply, modsApplyErrors, modsReset } from '@helpers/mod/mod-apply';
+import {
+  modRefLabel,
+  modRefOf,
+  modsFindBundles,
+  modUsableBundle,
+} from '@helpers/mod/mod-registry';
+import type { GameState, ModRef, SavefileModsPrepared } from '@interfaces';
+
+function savefileModRefs(state: GameState): ModRef[] {
+  return state.meta?.mods ?? [];
+}
+
+export function savefileModsMissing(state: GameState): string[] {
+  const refs = savefileModRefs(state);
+  if (refs.length > 0 && isDemoBuild()) {
+    return ['The demo cannot load modded savefiles.'];
+  }
+
+  return modsFindBundles(refs).missing.map(
+    (ref) => `Missing mod: ${modRefLabel(ref)}`,
+  );
+}
+
+// Applies the save's mods before migration, which would otherwise prune every mod id; versions are bumped to what's installed.
+export function savefileModsPrepare(state: GameState): SavefileModsPrepared {
+  const refs = savefileModRefs(state);
+  if (refs.length === 0) {
+    modsReset();
+    return { state, errors: [] };
+  }
+
+  const missing = savefileModsMissing(state);
+  if (missing.length > 0) return { state, errors: missing };
+
+  const { bundles } = modsFindBundles(refs);
+  const errors = modsApplyErrors(modsApply(bundles));
+  if (errors.length > 0) {
+    modsReset();
+    return { state, errors };
+  }
+
+  const mods = bundles.map(modRefOf);
+  return { state: { ...state, meta: { ...state.meta, mods } }, errors: [] };
+}
+
+export function modsApplyEnabled(enabledIds: string[]): string[] {
+  const bundles = enabledIds.map((id) => modUsableBundle(id));
+  const unusable = enabledIds
+    .filter((_, i) => bundles[i] === undefined)
+    .map((id) => `${id}: not installed, or it has errors.`);
+  if (unusable.length > 0) return unusable;
+
+  return modsApplyErrors(
+    modsApply(bundles.filter((bundle) => bundle !== undefined)),
+  );
+}

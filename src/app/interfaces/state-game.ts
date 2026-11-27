@@ -8,6 +8,7 @@ import type { CaravanTraderId } from '@interfaces/content-caravan-trader';
 import type { CollectibleId } from '@interfaces/content-collectible';
 import type { EdictId } from '@interfaces/content-edict';
 import type { EquipmentId } from '@interfaces/content-equipment';
+import type { ModRef } from '@interfaces/mod';
 import type { GlobalEffect } from '@interfaces/content-globaleffect';
 import type { ItemId } from '@interfaces/content-item';
 import type { MonsterId } from '@interfaces/content-monster';
@@ -179,6 +180,7 @@ export type GameStateMeta = {
   demoEndSeen?: boolean;
   // Wall-clock stamp of the last save; missing on saves from before it existed.
   savedAt?: number;
+  mods: ModRef[];
 };
 
 export type GameState = {

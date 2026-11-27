@@ -1,5 +1,10 @@
 import { environment } from '@environments/environment';
 import { getEntry } from '@helpers/content/content';
+import {
+  MOD_BACKGROUND_SHEET,
+  modSpriteKey,
+  modSprites,
+} from '@helpers/mod/mod-sprites';
 import { isOutpostBuilt } from '@helpers/world-node/world-node-outpost';
 import { worldNodeShrineLevel } from '@helpers/world-node/world-node-shrine';
 import {
@@ -20,6 +25,11 @@ import { NODE_BACKGROUNDS } from '@interfaces';
 
 // Production ships the webps built by `npm run build:nodebg`.
 export function nodeBackgroundURL(background: NodeBackground): string {
+  const modded = modSprites().get(
+    modSpriteKey(MOD_BACKGROUND_SHEET, background),
+  );
+  if (modded) return modded.url;
+
   return environment.production
     ? `art/nodebg/${background}.webp`
     : `asset/nodebg/${background}.png`;

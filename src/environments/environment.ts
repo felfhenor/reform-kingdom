@@ -2,6 +2,11 @@ export const environment = {
   production: true,
   platform: 'web',
   demo: false,
+  modio: {
+    url: 'https://g-14864.modapi.io/v1',
+    gameId: 14864,
+    apiKey: '901ec2e3536140fbcb6331b9f8d681d6',
+  },
   gameanalytics: {
     game: '27cb0b261b9161eebf9022f5bf78b762',
     secret: '588d18b838a973db3ca996579b47f5d12266bf40',

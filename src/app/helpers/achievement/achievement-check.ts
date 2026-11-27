@@ -9,6 +9,7 @@ import { achievementsUnlock } from '@helpers/achievement/achievement-unlock';
 import { error } from '@helpers/engine/logging';
 import { legacy, legacyRunFromGame } from '@helpers/legacy/legacy';
 import { isFelDefeated } from '@helpers/lore/outro';
+import { modsAffectGameplay } from '@helpers/mod/mod-registry';
 import { gamestate } from '@helpers/state-game';
 import type { AchievementUnlocked, GameId, RunRecord } from '@interfaces';
 
@@ -31,11 +32,13 @@ export function achievementsSafely<T>(check: () => T, fallback: T): T {
   }
 }
 
+// Modded runs never earn achievements, even when re-derived later in an unmodded session.
 export function achievementsEarnedByRuns(
   runs: RunRecord[],
 ): AchievementUnlocked[] {
+  const unmodded = runs.filter((run) => !modsAffectGameplay(run.mods));
   return achievementsLocked().flatMap((achievement) => {
-    const earner = achievementEarnerRun(achievement.condition, runs);
+    const earner = achievementEarnerRun(achievement.condition, unmodded);
     return earner
       ? [
           {
@@ -56,6 +59,7 @@ function achievementsEarnedWithRun(run: RunRecord): AchievementUnlocked[] {
 }
 
 export function achievementsCheckRun(run: RunRecord): void {
+  if (modsAffectGameplay(run.mods)) return;
   achievementsSafely(
     () => achievementsUnlock(achievementsEarnedWithRun(run)),
     undefined,
@@ -102,6 +106,7 @@ function achievementsEarnedFelRun(): AchievementUnlocked[] {
 
 // Unlocked together, so a save's first check (its catch-up) collapses into a single card.
 export function achievementsCheckLive(): void {
+  if (modsAffectGameplay(gamestate().meta.mods)) return;
   const gameId = gamestate().gameId;
   const isCatchUp = liveCheckedGameId !== gameId;
   liveCheckedGameId = gameId;

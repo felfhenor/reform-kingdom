@@ -17,6 +17,9 @@
         class="alert alert-error flex flex-col gap-2 w-full min-w-[400px]"
       >
         <span>{{ failText }}</span>
+        @for (detail of savefileModProblems(); track $index) {
+          <span class="text-sm">{{ detail }}</span>
+        }
         <span class="text-sm">It has not been overwritten.</span>
       </div>
     }
@@ -117,6 +120,18 @@
         [sfxTrigger]="['click', 'hover']"
       >
         Legacy
+      </button>
+    }
+
+    @if (!isDemo) {
+      <button
+        class="btn btn-neutral btn-block"
+        (click)="openMods()"
+        appAnalyticsClick="Meta:Play:Mods"
+        appSfx="ui-click"
+        [sfxTrigger]="['click', 'hover']"
+      >
+        Mods
       </button>
     }
 

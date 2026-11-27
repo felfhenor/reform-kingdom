@@ -2,6 +2,11 @@ export const environment = {
   production: true,
   platform: 'demo',
   demo: true,
+  modio: {
+    url: '',
+    gameId: 0,
+    apiKey: '',
+  },
   gameanalytics: {
     game: '27cb0b261b9161eebf9022f5bf78b762',
     secret: '588d18b838a973db3ca996579b47f5d12266bf40',

@@ -50,6 +50,10 @@ export function idbGet<T>(key: string): Promise<T | undefined> {
   return idbRequest<T | undefined>('readonly', (store) => store.get(key));
 }
 
+export async function idbDelete(key: string): Promise<void> {
+  await idbRequest('readwrite', (store) => store.delete(key));
+}
+
 export async function idbPut<T>(key: string, value: T): Promise<void> {
   await idbRequest('readwrite', (store) => store.put(value, key));
 }

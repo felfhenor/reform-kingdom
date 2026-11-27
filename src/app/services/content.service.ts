@@ -4,20 +4,28 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { TIPPY_LOADER } from '@ngneat/helipopper/config';
 import { SweetAlert2LoaderService } from '@sweetalert2/ngx-sweetalert2';
 import { LOADING_PRELOAD_FONTS, LOADING_PRELOAD_IMAGES } from '@helpers/config';
-import { unfurlContent } from '@helpers/content/content';
+import { contentSnapshotBase, unfurlContent } from '@helpers/content/content';
 import { nodeBackgroundURLs } from '@helpers/world-node/world-node-background.ui';
 import { kingdomIconURLs } from '@helpers/kingdom/kingdom-nav.ui';
-import { allMaps, setAllMaps } from '@helpers/maps';
+import {
+  allMaps,
+  mapsSnapshotBase,
+  setAllMaps,
+  setBaseTilesets,
+} from '@helpers/maps';
+import { spriteFrameFor } from '@helpers/mod/mod-sprites.ui';
 import { tiledMapsTilesetImagePaths } from '@helpers/pixi/tiled-map';
-import type { GameMap, IsContentItem, TiledMap } from '@interfaces';
+import type {
+  ArtAtlases,
+  GameMap,
+  IsContentItem,
+  SpriteFrame,
+  TiledMap,
+  TiledTileset,
+} from '@interfaces';
 import { LoggerService } from '@services/logger.service';
 import { MetaService } from '@services/meta.service';
 import { lastValueFrom } from 'rxjs';
-
-type ArtAtlases = Record<
-  string,
-  Record<string, { x: number; y: number; width: number; height: number }>
->;
 
 @Injectable({
   providedIn: 'root',
@@ -71,6 +79,12 @@ export class ContentService {
 
   public toCacheBustURL(url: string): string {
     return `${url}?v=${encodeURIComponent(this.metaService.versionString())}`;
+  }
+
+  public spriteFrame(sheet: string, sprite: string): SpriteFrame | undefined {
+    return spriteFrameFor(this.artAtlases(), sheet, sprite, (name) =>
+      this.toCacheBustURL(`art/spritesheets/${name}.webp`),
+    );
   }
 
   private async loadArt() {
@@ -215,6 +229,7 @@ export class ContentService {
     const assets = await lastValueFrom(req);
 
     unfurlContent(assets, (message) => this.logger.warn('Content', message));
+    contentSnapshotBase();
 
     this.logger.info(
       'Content:LoadJSON',
@@ -224,11 +239,19 @@ export class ContentService {
   }
 
   private async loadMaps() {
-    const req = this.http.get<Record<string, unknown>>(
-      this.toCacheBustURL(`./json/all-maps.json`),
-    );
-
-    const allMaps = await lastValueFrom(req);
+    const [allMaps, allTilesets] = await Promise.all([
+      lastValueFrom(
+        this.http.get<Record<string, unknown>>(
+          this.toCacheBustURL(`./json/all-maps.json`),
+        ),
+      ),
+      lastValueFrom(
+        this.http.get<Record<string, TiledTileset>>(
+          this.toCacheBustURL(`./json/all-tilesets.json`),
+        ),
+      ),
+    ]);
+    setBaseTilesets(allTilesets);
 
     const maps = new Map<string, GameMap>();
     Object.entries(allMaps).forEach(([name, data]) => {
@@ -236,6 +259,7 @@ export class ContentService {
     });
 
     setAllMaps(maps);
+    mapsSnapshotBase();
 
     this.logger.info(
       'Content:LoadMaps',

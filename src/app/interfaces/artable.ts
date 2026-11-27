@@ -10,6 +10,11 @@ export type HasAnimation = HasSprite & {
   frames: number;
 };
 
+export type ArtAtlases = Record<
+  string,
+  Record<string, { x: number; y: number; width: number; height: number }>
+>;
+
 export type AtlasedImage =
   | 'achievement'
   | 'collectible'

@@ -15,28 +15,11 @@ export class AtlasAnimationComponent {
   public assetName = input.required<string>();
   public frames = input<number>(4);
 
-  public assetPath = computed(
-    () => `gameassets/${this.spritesheet()}/${this.assetName()}.png`,
-  );
-  public assetJSON = computed(
-    () => this.contentService.artAtlases()[this.spritesheet()],
-  );
-  public specificAsset = computed(
-    () =>
-      this.assetJSON()?.[this.assetPath()] ?? {
-        x: 0,
-        y: 0,
-        width: 0,
-        height: 0,
-      },
+  private frame = computed(() =>
+    this.contentService.spriteFrame(this.spritesheet(), this.assetName()),
   );
 
-  public assetUrl = computed(() =>
-    this.contentService.toCacheBustURL(
-      `art/spritesheets/${this.spritesheet()}.webp`,
-    ),
-  );
-  public assetFrames = computed(() => this.frames());
-  public assetOffsetY = computed(() => this.specificAsset().y / 64);
+  public assetUrl = computed(() => this.frame()?.url ?? '');
+  public assetOffsetY = computed(() => (this.frame()?.y ?? 0) / 64);
   public totalAnimationDuration = computed(() => this.frames() * 100);
 }

@@ -561,6 +561,9 @@ export const WORKER_COMBAT_MIN_DROP_CHANCE = 10;
 // A node grants combat XP while its level is within this many points below the worker's combat power.
 export const WORKER_COMBAT_XP_POWER_WINDOW = 10;
 
+// Mods: total unpacked size allowed per mod, so a hostile zip can't exhaust memory on every boot.
+export const MOD_MAX_UNPACKED_BYTES = 200 * 1024 * 1024;
+
 // Common desktop sizes at or above the Electron window's 1280x720 minimum.
 export const WINDOW_SIZE_PRESETS: ReadonlyArray<{
   width: number;

@@ -1,7 +1,8 @@
 import type { LegacyState } from '@interfaces/legacy';
 import type { GameState } from '@interfaces/state-game';
 
-export type SavefileBackupReason = 'load' | 'import' | 'restore' | 'periodic';
+export type SavefileBackupReason =
+  'load' | 'import' | 'restore' | 'periodic' | 'mods';
 
 export type SavefileBackup = {
   id: string;
@@ -23,7 +24,8 @@ export type SavefileBackupReadResult = {
   unreadableSources: SavefileBackupSource[];
 };
 
-export type SavefileLoadFailureReason = 'storage' | 'invalid' | 'migration';
+export type SavefileLoadFailureReason =
+  'storage' | 'invalid' | 'migration' | 'mods';
 
 export type SavefileLoadStatus =
   | { state: 'pending' }

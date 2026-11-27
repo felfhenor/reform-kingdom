@@ -11,6 +11,9 @@ contextBridge.exposeInMainWorld('reformElectron', {
   legacyWrite: (json) => ipcRenderer.invoke('legacy:write', json),
   legacyRead: () => ipcRenderer.invoke('legacy:read'),
   demoSaveRead: () => ipcRenderer.invoke('demo-save:read'),
+  modsList: () => ipcRenderer.invoke('mods:list'),
+  modsRead: (name) => ipcRenderer.invoke('mods:read', name),
+  modsOpenFolder: () => ipcRenderer.invoke('mods:open-folder'),
   savefileBackupWrite: (id, json) =>
     ipcRenderer.invoke('savefile-backup:write', id, json),
   savefileBackupReadAll: () => ipcRenderer.invoke('savefile-backup:read-all'),

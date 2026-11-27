@@ -82,6 +82,8 @@ export * from './level-range';
 export * from './loading';
 export * from './loot-filter';
 export * from './meta';
+export * from './mod';
+export * from './modio.ui';
 export * from './modal';
 export * from './museum';
 export * from './museum.ui';

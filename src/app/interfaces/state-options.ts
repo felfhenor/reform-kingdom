@@ -46,4 +46,5 @@ export type GameOptions = Record<GameOption, boolean> & {
   motionPreference: MotionPreference;
   adventureLogOverlayKinds: Record<AdventureLogEntryKind, boolean>;
   desktopNotificationKinds: Record<DesktopNotificationCategory, boolean>;
+  modsEnabled: string[];
 };

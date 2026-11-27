@@ -6,6 +6,8 @@ import {
 } from '@helpers/engine/analytics';
 import { analyticsBoundEventId } from '@helpers/engine/analytics.ui';
 import { info } from '@helpers/engine/logging';
+import { modsAffectGameplay } from '@helpers/mod/mod-registry';
+import { gamestate } from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
 import { MetaService } from '@services/meta.service';
 import gameanalytics from 'gameanalytics';
@@ -47,6 +49,7 @@ export class AnalyticsService {
 
   sendDesignEvent(eventId: string, value: number = 0) {
     if (!getOption('analyticsEnabled')) return;
+    if (modsAffectGameplay(gamestate().meta.mods)) return;
 
     this.analytics?.addDesignEvent(analyticsBoundEventId(eventId), value);
   }

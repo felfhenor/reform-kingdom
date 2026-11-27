@@ -5,4 +5,5 @@ export * from './savefile-disk';
 export * from './savefile-disk.ui';
 export * from './savefile-load';
 export * from './savefile-load.ui';
+export * from './savefile-mods';
 export * from './savefile-validate';

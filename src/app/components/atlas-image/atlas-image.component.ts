@@ -16,19 +16,13 @@ export class AtlasImageComponent {
   public assetName = input.required<string>();
   public cssClass = input<string>('');
 
-  public assetUrl = computed(() =>
-    this.contentService.toCacheBustURL(
-      `art/spritesheets/${this.spritesheet()}.webp`,
-    ),
-  );
-  public assetPath = computed(
-    () => `gameassets/${this.spritesheet()}/${this.assetName()}.png`,
-  );
-  public assetJSON = computed(
-    () => this.contentService.artAtlases()[this.spritesheet()],
+  private frame = computed(() =>
+    this.contentService.spriteFrame(this.spritesheet(), this.assetName()),
   );
 
+  public assetUrl = computed(() => this.frame()?.url ?? '');
+
   public specificAsset = computed(
-    () => this.assetJSON()?.[this.assetPath()] ?? { width: 0, height: 0 },
+    () => this.frame() ?? { x: 0, y: 0, width: 0, height: 0 },
   );
 }

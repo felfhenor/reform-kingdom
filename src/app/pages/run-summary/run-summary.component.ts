@@ -28,6 +28,8 @@ import {
 } from '@helpers/engine/timer.ui';
 import { skillFamilyEntry } from '@helpers/hero/skill';
 import { legacyRunById } from '@helpers/legacy/legacy';
+import { modsAffectGameplay } from '@helpers/mod/mod-registry';
+import { modsListLabel } from '@helpers/mod/mod-registry.ui';
 import {
   legacyRunScore,
   legacyUnsealedRegions,
@@ -84,6 +86,11 @@ export class RunSummaryComponent {
   public runId = input.required<string>();
 
   public run = computed(() => legacyRunById(this.runId() as GameId));
+
+  public modsLabel = computed(() => {
+    const mods = this.run()?.mods;
+    return modsAffectGameplay(mods) ? modsListLabel(mods ?? []) : undefined;
+  });
   public achievements = computed(() =>
     achievementsEarnedByRun(this.runId() as GameId),
   );

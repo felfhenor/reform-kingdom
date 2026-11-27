@@ -33,6 +33,7 @@ import { getOption } from '@helpers/state-options';
 import { regionBuffsRefresh } from '@helpers/hero/region-buffs';
 import { ContentService } from '@services/content.service';
 import { LoggerService } from '@services/logger.service';
+import { ModsService } from '@services/mods.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { interval } from 'rxjs';
 
@@ -42,6 +43,7 @@ import { interval } from 'rxjs';
 export class GamestateService {
   private logger = inject(LoggerService);
   private contentService = inject(ContentService);
+  private modsService = inject(ModsService);
   private applicationRef = inject(ApplicationRef);
   private destroyRef = inject(DestroyRef);
 
@@ -53,6 +55,7 @@ export class GamestateService {
     effect(() => {
       if (
         !this.contentService.hasLoaded() ||
+        !this.modsService.hasLoaded() ||
         this.hasLoaded() ||
         !hasGameStateLoaded() ||
         this.isLoadingSavefile

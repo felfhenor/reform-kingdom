@@ -1,0 +1,21 @@
+- id: 4c3c9a8e-1b7a-4d0e-9f2a-6c1d2e3f4c01
+  name: Glimmering Den
+  description: A deep cave where the walls glitter, shadows flicker, and elementals skitter.
+  background: cave-crystal-pink
+
+  levelRange:
+    min: 2
+    max: 4
+
+  fights:
+    - monsters:
+        - monsterId: Crystal Elemental
+    - monsters:
+        - monsterId: Crystal Elemental
+        - monsterId: Crystal Elemental
+
+  completionRewards:
+    - itemId: Grotto Gem
+      min: 2
+      max: 4
+      chance: 100

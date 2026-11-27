@@ -36,7 +36,7 @@ import type {
 
 const NODE_LAYER_NAMES = ['Explore Nodes'];
 
-function tiledObjectTilePosition(
+export function tiledObjectTilePosition(
   map: TiledMap,
   object: TiledObject,
 ): { x: number; y: number } {

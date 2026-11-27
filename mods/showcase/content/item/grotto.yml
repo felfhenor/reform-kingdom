@@ -1,0 +1,23 @@
+- id: 4c3c9a8e-1b7a-4d0e-9f2a-6c1d2e3f4a01
+  name: Grotto Gem
+  description: A cold, glowing gemstone taken from the walls of the Glimmering Grotto.
+  rarity: Uncommon
+
+  sprite: grotto-gem
+
+  infusionStats:
+    Luck: 1
+
+- id: 4c3c9a8e-1b7a-4d0e-9f2a-6c1d2e3f4a02
+  name: Polished Grotto Gem
+  description: A Grotto Gem cut and polished many times over. It's often used as a lucky charm by grotto-goers.
+  rarity: Rare
+
+  sprite: grotto-gem-polished
+
+  infusionStats:
+    Luck: 3
+
+# Copper Ore Id
+- id: f251e6ea-bfc1-4562-b31a-492ec04d3c9f
+  description: A weak kind of ore used for basic gear crafting. Grotto-goers hear it hum when in the grotto.

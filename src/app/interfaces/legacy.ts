@@ -1,6 +1,7 @@
 import type { AchievementUnlocks } from '@interfaces/achievement';
 import type { EdictId } from '@interfaces/content-edict';
 import type { JobId } from '@interfaces/content-job';
+import type { ModRef } from '@interfaces/mod';
 import type { RemembranceCategory } from '@interfaces/remembrance';
 import type { HeroRunStats, RunStatsTotals } from '@interfaces/run-stats';
 import type { GameId } from '@interfaces/state-game';
@@ -51,6 +52,7 @@ export type RunRecord = {
   stats: RunRecordStats;
   // Whether the run showed a timer, so only those runs compete for a personal best.
   timed?: boolean;
+  mods?: ModRef[];
 };
 
 // `achievements` is optional so Legacies from builds before achievements stay version 1.

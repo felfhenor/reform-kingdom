@@ -6,6 +6,7 @@ import {
 } from '@helpers/edict/edict';
 import { error } from '@helpers/engine/logging';
 import { legacyRunHero } from '@helpers/legacy/legacy-hero';
+import { modsAffectGameplay } from '@helpers/mod/mod-registry';
 import { remembranceCategories } from '@helpers/remembrance/remembrance';
 import { savefileDiskLegacyWrite } from '@helpers/savefile/savefile-disk';
 import {
@@ -93,7 +94,8 @@ function legacyRunIsValid(run: RunRecord | null): boolean {
         typeof category.max === 'number',
     ) &&
     legacySealsAreValid(run.stats.run?.seals) &&
-    legacyFelPartyIsValid(run.stats.run?.felParty)
+    legacyFelPartyIsValid(run.stats.run?.felParty) &&
+    (run.mods === undefined || Array.isArray(run.mods))
   );
 }
 
@@ -243,5 +245,8 @@ export function legacyRunFromGame(
     ...legacyRunEdicts(),
     stats: legacyRunStats(),
     timed: globalEffectSumsState().showRunTimer,
+    ...(modsAffectGameplay(metaState().mods)
+      ? { mods: [...metaState().mods] }
+      : {}),
   };
 }

@@ -1,0 +1,14 @@
+- id: 4c3c9a8e-1b7a-4d0e-9f2a-6c1d2e3f4f01
+  name: 'Material: Polished Grotto Gem'
+  result:
+    itemId: Polished Grotto Gem
+
+  requirements:
+    - itemId: Grotto Gem
+      quantity: 2
+
+  tradeskillId: Jewelcrafting
+  minTradeskillLevel: 1
+  maxTradeskillLevel: 5
+  tradeskillXP: 2
+  craftTime: 5

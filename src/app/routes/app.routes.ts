@@ -43,6 +43,11 @@ export const routes: Routes = [
       import('@pages/legacy/legacy.component').then((m) => m.LegacyComponent),
   },
   {
+    path: 'mods',
+    loadComponent: () =>
+      import('@pages/mods/mods.component').then((m) => m.ModsComponent),
+  },
+  {
     path: 'summary/:runId',
     loadComponent: () =>
       import('@pages/run-summary/run-summary.component').then(

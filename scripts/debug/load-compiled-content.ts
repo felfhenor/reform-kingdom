@@ -8,8 +8,8 @@
  */
 
 import { unfurlContent } from '@helpers/content/content';
-import { setAllMaps } from '@helpers/maps';
-import type { GameMap, IsContentItem } from '@interfaces';
+import { setAllMaps, setBaseTilesets } from '@helpers/maps';
+import type { GameMap, IsContentItem, TiledTileset } from '@interfaces';
 import fs from 'fs-extra';
 import path from 'path';
 import { CONTENT_OUT_DIR } from '../content-out-dir';
@@ -44,4 +44,11 @@ export function loadCompiledContentFromDisk(): void {
     maps.set(name, { name, data });
   });
   setAllMaps(maps);
+
+  setBaseTilesets(
+    requireJson(
+      path.join(JSON_DIR, 'all-tilesets.json'),
+      'the compiled tileset bundle (all-tilesets.json)',
+    ) as Record<string, TiledTileset>,
+  );
 }

@@ -5,6 +5,13 @@ import {
 import type { TiledMap, TiledTileset } from '@interfaces';
 import { Assets, Rectangle, Texture } from 'pixi.js';
 
+// Blob URLs (mod art) carry no extension for Pixi to pick a parser from.
+function pixiTextureLoad(url: string): Promise<Texture> {
+  return url.startsWith('blob:')
+    ? Assets.load({ src: url, parser: 'texture' })
+    : Assets.load(url);
+}
+
 // Fills Pixi's asset cache by URL, so the world map's later loads of the same URLs resolve without fetching or decoding.
 export async function pixiTexturesPreload(urls: string[]): Promise<void> {
   await Assets.load(urls);
@@ -13,7 +20,7 @@ export async function pixiTexturesPreload(urls: string[]): Promise<void> {
 export async function pixiTiledTilesetTexturesLoad(
   tileset: TiledTileset,
 ): Promise<Record<number, Texture>> {
-  const baseTexture = await Assets.load(tiledTilesetImagePath(tileset));
+  const baseTexture = await pixiTextureLoad(tiledTilesetImagePath(tileset));
 
   // Nearest-neighbor avoids hairline seams from linear filtering sampling across tile edges in the atlas.
   baseTexture.source.scaleMode = 'nearest';
@@ -48,7 +55,7 @@ export async function pixiSpriteFrameTexturesLoad(
   frame: { x: number; y: number; width: number; height: number },
   frameCount: number,
 ): Promise<Texture[]> {
-  const baseTexture = await Assets.load(imageUrl);
+  const baseTexture = await pixiTextureLoad(imageUrl);
   baseTexture.source.scaleMode = 'nearest';
 
   const textures: Texture[] = [];

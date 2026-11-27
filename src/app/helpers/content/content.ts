@@ -5,6 +5,7 @@ import {
   hasContentInitializer,
 } from '@helpers/content/content-initializers';
 import type { ContentType, IsContentItem } from '@interfaces';
+import { isArray, mergeWith } from 'es-toolkit/compat';
 
 const _allIdsByName = signal<Map<string, string>>(new Map());
 export const allIdsByName: Signal<Map<string, string>> =
@@ -106,6 +107,54 @@ export function getEntry<T extends IsContentItem>(
   }
 
   return ret;
+}
+
+let baseIdsByName = new Map<string, string>();
+let baseContentById = new Map<string, IsContentItem>();
+
+export function contentSnapshotBase(): void {
+  baseIdsByName = new Map(allIdsByName());
+  baseContentById = new Map(allContentById());
+}
+
+export function contentRestoreBase(): void {
+  setAllIdsByName(baseIdsByName);
+  setAllContentById(baseContentById);
+}
+
+function contentPatchMerge(base: IsContentItem, patch: object): IsContentItem {
+  const merged = mergeWith(structuredClone(base), patch, (_, src) =>
+    isArray(src) ? src : undefined,
+  );
+  return ensureContent({ ...merged, __type: base.__type });
+}
+
+// Deep-merges onto the entry with the same id (arrays replace); returns an error instead of throwing.
+export function contentPatch(
+  patch: IsContentItem,
+  type: ContentType,
+): string | undefined {
+  const base = allContentById().get(patch.id);
+  if (!base) return `Patch "${patch.id}" matches no existing entry.`;
+  if (base.__type !== type) {
+    return `Patch "${patch.id}" is in ${type}/ but patches a ${base.__type}.`;
+  }
+
+  const patched = contentPatchMerge(base, patch);
+  const idsByName = new Map(allIdsByName());
+  const nameOwner = idsByName.get(patched.name);
+  if (nameOwner && nameOwner !== patched.id) {
+    return `Patch "${patch.id}" renames to "${patched.name}", which is taken.`;
+  }
+
+  idsByName.delete(base.name);
+  idsByName.set(patched.name, patched.id);
+  const contentById = new Map(allContentById());
+  contentById.set(patched.id, patched);
+
+  setAllIdsByName(idsByName);
+  setAllContentById(contentById);
+  return undefined;
 }
 
 // For migrations: a saved id that no longer resolves was renamed or removed from gamedata.

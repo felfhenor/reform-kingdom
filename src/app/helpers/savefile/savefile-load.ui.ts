@@ -22,6 +22,7 @@ import {
   savefileReplace,
 } from '@helpers/savefile/savefile-load';
 import { savefileBundleUnpack } from '@helpers/savefile/savefile-bundle';
+import { savefileModsMissing } from '@helpers/savefile/savefile-mods';
 import {
   savefileDiskBridge,
   savefileDiskDemoRead,
@@ -98,7 +99,9 @@ export async function savefileRestoreBackup(
   const failures = await savefileReplace(backup.state, 'restore');
   if (failures.length > 0) {
     analyticsSendDesignEvent('Savefile:Restore:Failure');
-    notifyError(`Could not restore the backup from ${backupLabel(backup)}.`);
+    notifyError(
+      `Could not restore the backup from ${backupLabel(backup)}: ${failures.join(' ')}`,
+    );
     return false;
   }
 
@@ -121,8 +124,14 @@ async function storedSavefileReadableAgain(): Promise<boolean> {
   }
 }
 
-function recoverFailureMessage(backupCount: number, hasUnreadable: boolean) {
-  if (backupCount > 0) return 'None of your backups could be loaded.';
+function recoverFailureMessage(
+  backupCount: number,
+  hasUnreadable: boolean,
+  lastFailures: string[],
+) {
+  if (backupCount > 0) {
+    return `None of your backups could be loaded. ${lastFailures.join(' ')}`;
+  }
   return hasUnreadable
     ? 'Backups could not be read from storage.'
     : 'No backups were found to recover from.';
@@ -139,8 +148,10 @@ export async function savefileRecover(): Promise<boolean> {
 
   const { backups, unreadableSources } = await savefileBackupsRead();
 
+  let lastFailures: string[] = [];
   for (const backup of backups) {
     const failures = await savefileReplace(backup.state, 'restore');
+    lastFailures = failures;
     if (failures.length === 0) {
       analyticsSendDesignEvent('Savefile:Recover:Success');
       notifySuccess(`Recovered your savefile from ${backupLabel(backup)}.`);
@@ -151,7 +162,11 @@ export async function savefileRecover(): Promise<boolean> {
 
   analyticsSendDesignEvent('Savefile:Recover:Failure');
   notifyError(
-    recoverFailureMessage(backups.length, unreadableSources.length > 0),
+    recoverFailureMessage(
+      backups.length,
+      unreadableSources.length > 0,
+      lastFailures,
+    ),
   );
   return false;
 }
@@ -190,6 +205,10 @@ function savefileImportProblem(state: unknown): string | undefined {
   }
   if (isDemoBuild() && (state as GameState).meta.isDemo !== true) {
     return 'The demo can only import savefiles made in the demo.';
+  }
+  const missingMods = savefileModsMissing(state as GameState);
+  if (missingMods.length > 0) {
+    return `That savefile can't be loaded. ${missingMods.join(' ')}`;
   }
   return undefined;
 }

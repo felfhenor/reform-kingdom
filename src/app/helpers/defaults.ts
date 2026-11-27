@@ -39,6 +39,7 @@ export function defaultGameState(): GameState {
       titleCrawlPending: false,
       outroCrawlSeen: false,
       victoryPopupSeen: false,
+      mods: [],
     },
     gameId: rngUuid() as GameId,
     clock: {

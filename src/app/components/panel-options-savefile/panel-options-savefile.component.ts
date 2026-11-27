@@ -131,6 +131,7 @@ export class PanelOptionsSavefileComponent
     import: 'Before Importing',
     restore: 'Before Restoring',
     periodic: 'During Play',
+    mods: 'Before Mod Changes',
   };
 
   ngOnInit() {

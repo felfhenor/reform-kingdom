@@ -65,6 +65,42 @@ describe('achievementsCheckRun', () => {
   });
 });
 
+describe('modded runs', () => {
+  const MOD = { id: 'm', name: 'M', version: '1', kind: 'content' as const };
+
+  it('never count toward run achievements, even when recorded', () => {
+    seedContent([twoRuns]);
+    legacy.set({
+      ...legacy(),
+      runs: [buildRunRecord({ id: 'a' as GameId, endedAt: 10, mods: [MOD] })],
+    });
+
+    achievementsCheckRun(buildRunRecord({ id: 'b' as GameId, endedAt: 20 }));
+    achievementsCheckRun(
+      buildRunRecord({ id: 'c' as GameId, endedAt: 30, mods: [MOD] }),
+    );
+
+    expect(legacy().achievements?.[twoRuns.id]).toBeUndefined();
+  });
+
+  it('skip live checks, but i18n mods do not', () => {
+    seedContent([level10]);
+    seedGamestate((state) => {
+      state.world.party = [buildCharacter({ level: 10 })];
+      state.meta.mods = [MOD];
+    });
+    achievementsCheckLive();
+    expect(legacy().achievements?.[level10.id]).toBeUndefined();
+
+    seedGamestate((state) => {
+      state.world.party = [buildCharacter({ level: 10 })];
+      state.meta.mods = [{ ...MOD, kind: 'i18n' }];
+    });
+    achievementsCheckLive();
+    expect(legacy().achievements?.[level10.id]).toBeDefined();
+  });
+});
+
 describe('achievementsCheckLive', () => {
   it('unlocks what the current save has reached, and nothing else', () => {
     seedContent([level10, queen, twoRuns]);

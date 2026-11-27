@@ -20,3 +20,4 @@ export * from './pixi-terrain-noise';
 export * from './pixi-texture-loader';
 export * from './pixi-travel-glide.ui';
 export * from './tiled-map';
+export * from './tiled-map-inline';

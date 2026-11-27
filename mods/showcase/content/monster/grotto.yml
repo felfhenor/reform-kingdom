@@ -1,0 +1,29 @@
+- id: 4c3c9a8e-1b7a-4d0e-9f2a-6c1d2e3f4b01
+  name: Crystal Elemental
+  description: A crystalline elemental. It's hard to tell if it's naturally pink, or if the lighting makes it look that way.
+
+  types: [Humanoid]
+
+  sprite: crystal-elemental
+  frames: 4
+
+  targetting: []
+
+  rarity: Common
+
+  xp:
+    min: 3
+    max: 5
+    bonusPerLevel: 2
+
+  drops:
+    - itemId: Grotto Gem
+      min: 1
+      max: 2
+      chance: 60
+
+    - itemId: Gold Coin
+      min: 3
+      max: 10
+      bonusPerLevel: 3
+      chance: 100
