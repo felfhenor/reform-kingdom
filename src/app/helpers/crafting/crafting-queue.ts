@@ -20,12 +20,11 @@ import {
 } from '@helpers/crafting/recipe-result';
 import { isRecipeAvailable } from '@helpers/crafting/recipes';
 import {
-  craftXpChance,
   tradeskillBuilding,
   tradeskillBuildingIn,
-  tradeskillGainXp,
   tradeskillIdForName,
   tradeskillMaxQueueSize,
+  tradeskillRollCraftXp,
 } from '@helpers/crafting/tradeskill';
 import {
   analyticsSafeSegment,
@@ -45,7 +44,7 @@ import {
   armoryAddLootDrop,
   equipmentAutoSells,
 } from '@helpers/kingdom/loot-filter';
-import { rngSucceedsChance, rngUuid } from '@helpers/rng';
+import { rngUuid } from '@helpers/rng';
 import { updateGamestate } from '@helpers/state-game';
 import { runStatsRecordCraft } from '@helpers/run-stats/run-stats';
 import { taskRecordCraft } from '@helpers/task/task-progress';
@@ -377,11 +376,7 @@ function resolveCraftUnit(tradeskill: Tradeskill, recipe: RecipeContent): void {
   analyticsSendDesignEvent(
     `Kingdom:Craft:Complete:${analyticsSafeSegment(recipe.name)}`,
   );
-
-  const chance = craftXpChance(recipe, tradeskillBuilding(tradeskill).level);
-  if (recipe.tradeskillXP > 0 && rngSucceedsChance(chance)) {
-    tradeskillGainXp(tradeskill, recipe.tradeskillXP);
-  }
+  tradeskillRollCraftXp(tradeskill, recipe);
 }
 
 function advanceQueueEntry(

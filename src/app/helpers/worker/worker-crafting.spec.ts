@@ -302,12 +302,12 @@ describe('workerCraftingProcessTick', () => {
     expect(ingots()).toBe(2);
   });
 
-  it('grants worker xp only within the recipe range, never tradeskill xp or tasks', () => {
+  it('grants worker xp only within the recipe range, plus tradeskill xp but never tasks', () => {
     giveOre(2);
     tick();
     tick();
     expect(current().xp.current).toBe(1);
-    expect(tradeskillsState()[smithingId].xp.current).toBe(0);
+    expect(tradeskillsState()[smithingId].xp.current).toBe(5);
     expect(taskRecordCraft).not.toHaveBeenCalled();
 
     seedState({ level: 5 });
@@ -318,7 +318,7 @@ describe('workerCraftingProcessTick', () => {
     expect(current().xp.current).toBe(0);
   });
 
-  it('uses up the unit even when the result roll whiffs', () => {
+  it('uses up the unit but still rolls tradeskill xp when the result roll whiffs', () => {
     seed({ result: { itemId: ingotId, quantity: 1, chance: 50 } });
     vi.mocked(rngSucceedsChance).mockReturnValueOnce(false);
     giveOre(2);
@@ -329,6 +329,7 @@ describe('workerCraftingProcessTick', () => {
     expect(ore()).toBe(0);
     expect(ingots()).toBe(0);
     expect(runStatsState().itemsCrafted).toBe(0);
+    expect(tradeskillsState()[smithingId].xp.current).toBe(5);
   });
 
   it('refunds the held unit and drops the assignment once the recipe stops qualifying', () => {

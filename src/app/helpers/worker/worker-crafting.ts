@@ -15,6 +15,10 @@ import {
   recipeResultRollSucceeds,
 } from '@helpers/crafting/recipe-result';
 import { isRecipeAvailable } from '@helpers/crafting/recipes';
+import {
+  tradeskillNameForId,
+  tradeskillRollCraftXp,
+} from '@helpers/crafting/tradeskill';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { applyMaterialDelta } from '@helpers/item/materials';
 import { gamestate, updateGamestate } from '@helpers/state-game';
@@ -275,6 +279,9 @@ export function workerCraftingProcessTick(workerId: WorkerId): void {
     : 0;
   completeCraftUnit(workerId, recipe, delivered);
   logWorkerCraft(content, recipe, delivered);
+
+  const tradeskill = tradeskillNameForId(recipe.tradeskillId);
+  if (tradeskill) tradeskillRollCraftXp(tradeskill, recipe);
 
   if (workerLevelInRange(recipeWorkerLevelRange(recipe), worker.level)) {
     workerGainXp(workerId, 1);

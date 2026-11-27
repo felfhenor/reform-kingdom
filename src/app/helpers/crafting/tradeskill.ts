@@ -16,6 +16,7 @@ import {
 } from '@helpers/engine/analytics';
 import { roundToNearest10 } from '@helpers/engine/number';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
+import { rngSucceedsChance } from '@helpers/rng';
 import {
   globalEffectSumsState,
   tradeskillsState,
@@ -238,6 +239,16 @@ export function craftXpChance(
   if (progress >= 0.5) return 50;
   if (progress >= 0.25) return 50;
   return 100;
+}
+
+export function tradeskillRollCraftXp(
+  tradeskill: Tradeskill,
+  recipe: RecipeContent,
+): void {
+  if (recipe.tradeskillXP <= 0) return;
+  const chance = craftXpChance(recipe, tradeskillBuilding(tradeskill).level);
+  if (rngSucceedsChance(chance))
+    tradeskillGainXp(tradeskill, recipe.tradeskillXP);
 }
 
 export function craftXpChanceTier(
