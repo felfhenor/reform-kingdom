@@ -13,7 +13,7 @@
     <div>
       <div class="type-label mb-2">Sources to Auto-Sell From</div>
       <div class="flex gap-2 w-full">
-        @for (source of sources; track source) {
+        @for (source of sources(); track source) {
           <button
             type="button"
             class="flex-1 btn btn-neutral btn-sm justify-start gap-2"

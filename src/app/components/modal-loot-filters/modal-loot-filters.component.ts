@@ -1,5 +1,3 @@
-import { FFStepperDirective } from '@ff/controls/ff-stepper.directive';
-import { FFSelectDirective } from '@ff/controls/ff-select.directive';
 import type { AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
@@ -15,6 +13,8 @@ import { ModalComponent } from '@components/modal/modal.component';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { ListReflowDirective } from '@directives/list-reflow.directive';
 import { SFXDirective } from '@directives/sfx.directive';
+import { FFSelectDirective } from '@ff/controls/ff-select.directive';
+import { FFStepperDirective } from '@ff/controls/ff-stepper.directive';
 import { allEquipmentItemTypes } from '@helpers/item/equipment-types';
 import { itemPreviewDisplay } from '@helpers/item/item-preview';
 import {
@@ -29,6 +29,7 @@ import {
   lootFilterSettings,
   lootFilterSummary,
 } from '@helpers/kingdom/loot-filter.ui';
+import { globalEffectSumsState } from '@helpers/state-game';
 import type {
   DropRarity,
   EquipmentId,
@@ -36,12 +37,12 @@ import type {
   LootFilterSettings,
   LootSource,
 } from '@interfaces';
-import { TippyDirective } from '@ngneat/helipopper';
 import {
   NgLabelTemplateDirective,
   NgOptionTemplateDirective,
   NgSelectComponent,
 } from '@ng-select/ng-select';
+import { TippyDirective } from '@ngneat/helipopper';
 import { AnimationService } from '@services/animation.service';
 
 const SOURCES: LootSource[] = ['Combat', 'Crafting'];
@@ -75,12 +76,26 @@ const RARITIES: DropRarity[] = [
   templateUrl: './modal-loot-filters.component.html',
 })
 export class ModalLootFiltersComponent {
-  public readonly sources = SOURCES;
+  private anim = inject(AnimationService);
+
   public readonly rarities = RARITIES;
   public readonly equipmentTypes = allEquipmentItemTypes();
 
+  public selectedExceptionId = signal<EquipmentId | undefined>(undefined);
+
+  public readonly removeException = lootFilterRemoveException;
+
   public filters = computed<LootFilterSettings>(() => lootFilterSettings());
   public summary = computed(() => lootFilterSummary(this.filters()));
+
+  public canCraft = computed(
+    () => !globalEffectSumsState().tradeskillsDisabled,
+  );
+  public sources = computed<LootSource[]>(() => {
+    if (!this.canCraft()) return ['Combat'];
+
+    return ['Combat', 'Crafting'];
+  });
 
   public exceptionOptions = computed(() =>
     lootFilterExceptionOptions(this.filters()),
@@ -91,11 +106,6 @@ export class ModalLootFiltersComponent {
       display: itemPreviewDisplay('equipment', content),
     })),
   );
-  public selectedExceptionId = signal<EquipmentId | undefined>(undefined);
-
-  public readonly removeException = lootFilterRemoveException;
-
-  private anim = inject(AnimationService);
 
   public toggleSource(source: LootSource): void {
     lootFilterSetSourceSells(source, !this.filters().sellFromSources[source]);
