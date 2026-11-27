@@ -27,6 +27,34 @@
             />
           </label>
         </div>
+
+        @if (!isDemo) {
+          <div class="form-control">
+            <label class="label cursor-pointer label-option">
+              <span class="label-text">
+                Show Map Coordinates
+                <app-icon
+                  name="gameHelp"
+                  size="inline"
+                  class="text-lighter"
+                  [tp]="'Hovering the world map shows the tile under the cursor and the x/y of the mouse on the map. This is useful for mod makers to place things on the existing maps.'"
+                  [tpPlacement]="'top'"
+                />
+              </span>
+              <input
+                type="checkbox"
+                [checked]="getOption('showMapCoordinates')"
+                class="checkbox"
+                (click)="
+                  setOption(
+                    'showMapCoordinates',
+                    !getOption('showMapCoordinates')
+                  )
+                "
+              />
+            </label>
+          </div>
+        }
       </div>
     </div>
   </div>

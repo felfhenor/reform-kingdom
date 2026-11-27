@@ -19,22 +19,23 @@ export class ModsService {
     this.hasLoaded.set(true);
   }
 
-  async reload(): Promise<void> {
+  // `reapply` pushes unchanged versions into the run too, so modders see edits without a version bump.
+  async reload(reapply = false): Promise<void> {
     this.isLoading.set(true);
     try {
       const previous = modsInstalled();
       setModsInstalled(await modsLoadAll());
-      modsRevokeUnused(previous);
       modsPruneEnabled(
         modsInstalled().flatMap((mod) =>
           mod.manifest ? [mod.manifest.id] : [],
         ),
       );
 
-      const failures = await modsRefreshRun();
+      const failures = await modsRefreshRun(reapply);
       if (failures.length > 0) {
         notifyError(`Could not update your run's mods. ${failures.join(' ')}`);
       }
+      modsRevokeUnused(previous);
     } catch (e) {
       error('Mods', 'Could not load installed mods.', e);
     } finally {

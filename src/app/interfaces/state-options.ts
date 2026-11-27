@@ -23,7 +23,8 @@ export type GameOption =
   | 'desktopNotifications'
   | 'flashTaskbarOnAlerts'
   | 'skipFeatureTutorials'
-  | 'skipLosingStreakTutorial';
+  | 'skipLosingStreakTutorial'
+  | 'showMapCoordinates';
 
 export type UiScale = 'auto' | number;
 

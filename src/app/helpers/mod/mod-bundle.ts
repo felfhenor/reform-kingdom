@@ -76,6 +76,9 @@ export function modManifestParse(
     kind,
     author: data['author'] ? String(data['author']) : undefined,
     description: data['description'] ? String(data['description']) : undefined,
+    gameVersion: data['gameVersion']
+      ? String(data['gameVersion']).replace(/^v/, '')
+      : undefined,
   };
 }
 
@@ -102,7 +105,13 @@ function modContentParse(
       return;
     }
 
-    (content[type] ??= []).push(...(entries as IsContentItem[]));
+    entries.forEach((entry, index) => {
+      if (entry && typeof entry === 'object') {
+        (content[type] ??= []).push(entry as IsContentItem);
+      } else {
+        errors.push(`${file.path}: entry ${index + 1} has no fields.`);
+      }
+    });
   });
   return content;
 }
@@ -139,6 +148,7 @@ function modSpritesParse(
         sheet: match[1],
         sprite: match[2],
         url: io.toUrl(file),
+        width,
       },
     ];
   });

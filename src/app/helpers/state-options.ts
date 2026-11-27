@@ -54,6 +54,7 @@ export function defaultOptions(): GameOptions {
 
     skipFeatureTutorials: false,
     skipLosingStreakTutorial: false,
+    showMapCoordinates: false,
 
     adventureLogOverlay: true,
     adventureLogOverlayKinds: {

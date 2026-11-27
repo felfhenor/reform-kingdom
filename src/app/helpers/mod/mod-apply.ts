@@ -6,6 +6,7 @@ import {
   setAllIdsByName,
 } from '@helpers/content/content';
 import { allMaps, mapsRestoreBase, setAllMaps } from '@helpers/maps';
+import { modArtErrors, modsKnownBackgrounds } from '@helpers/mod/mod-apply-art';
 import { modApplyContent } from '@helpers/mod/mod-apply-content';
 import { modApplyMaps } from '@helpers/mod/mod-apply-maps';
 import {
@@ -47,18 +48,30 @@ export function modsApply(bundles: ModBundle[]): ModApplyResult {
   modsReset();
 
   const result: ModApplyResult = {};
+  const backgrounds = modsKnownBackgrounds(bundles);
   bundles
     .filter((bundle) => bundle.manifest.kind !== 'i18n')
     .forEach((bundle) => {
       result[bundle.manifest.id] = [
         ...modApplyContent(bundle),
         ...modApplyMaps(bundle),
+        ...modArtErrors(bundle, backgrounds),
       ];
     });
 
   setModSprites(bundles.flatMap((bundle) => bundle.sprites));
   setModsAppliedRefs(bundles.map(modRefOf));
   return result;
+}
+
+// Checks bundles together without disturbing whatever is live, e.g. a mod being installed mid-run.
+export function modsApplyDryRun(bundles: ModBundle[]): ModApplyResult {
+  const live = modsLiveCapture();
+  try {
+    return modsApply(bundles);
+  } finally {
+    modsLiveRestore(live);
+  }
 }
 
 export function modsApplyErrors(result: ModApplyResult): string[] {

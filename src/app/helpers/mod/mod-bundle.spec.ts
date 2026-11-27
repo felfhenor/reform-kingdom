@@ -62,6 +62,7 @@ describe('modBundleParse', () => {
         sheet: 'item',
         sprite: 'gem',
         url: 'blob:sprites/item/gem.png',
+        width: 128,
       },
     ]);
     expect(bundle?.maps['Cave'].tilesets[0]).toEqual({
@@ -122,6 +123,15 @@ describe('modBundleParse', () => {
     );
 
     expect(errors).toHaveLength(3);
+  });
+
+  it('reports list items without fields', () => {
+    const { errors } = modBundleParse(
+      [MANIFEST, text('wrap/content/item/x.yml', '- id: a\n  name: A\n-')],
+      io,
+    );
+
+    expect(errors).toEqual(['content/item/x.yml: entry 2 has no fields.']);
   });
 
   it('takes node backgrounds at any width', () => {

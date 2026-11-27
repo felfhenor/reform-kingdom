@@ -29,6 +29,17 @@ export function modsRunOutdated(runMods: ModRef[]): boolean {
   });
 }
 
+// Patch releases don't change the mod format, so only major.minor is compared.
+export function modGameVersionMismatch(
+  gameVersion?: string,
+  current?: string,
+): boolean {
+  if (!gameVersion || !current) return false;
+  const minor = (version: string) =>
+    version.replace(/^v/, '').split('.').slice(0, 2).join('.');
+  return minor(gameVersion) !== minor(current);
+}
+
 export function modsAffectGameplay(mods: ModRef[] | undefined): boolean {
   return (mods ?? []).some((mod) => mod.kind !== 'i18n');
 }

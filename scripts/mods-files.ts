@@ -1,4 +1,5 @@
 import type { ModFile } from '@interfaces';
+import { Uint8ArrayReader, Uint8ArrayWriter, ZipWriter } from '@zip.js/zip.js';
 import fs from 'fs-extra';
 import path from 'path';
 import rec from 'recursive-readdir';
@@ -19,4 +20,12 @@ export async function modDirFiles(name: string): Promise<ModFile[]> {
     path: path.relative(dir, file).split(path.sep).join('/'),
     data: new Uint8Array(fs.readFileSync(file)),
   }));
+}
+
+export async function zipModFiles(files: ModFile[]): Promise<Uint8Array> {
+  const writer = new ZipWriter(new Uint8ArrayWriter());
+  for (const file of files) {
+    await writer.add(file.path, new Uint8ArrayReader(file.data));
+  }
+  return writer.close();
 }

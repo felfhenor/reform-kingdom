@@ -280,6 +280,16 @@ describe('savefileReplace', () => {
     expect(storedSave().clock.numTicks).toBe(99);
   });
 
+  it('skips the backup when no reason is given', async () => {
+    current(5);
+
+    const failures = await savefileReplace(setupState(99));
+
+    expect(failures).toEqual([]);
+    expect(savefileBackupStore).not.toHaveBeenCalled();
+    expect(gamestate().clock.numTicks).toBe(99);
+  });
+
   it('keeps the current save when it could not be backed up', async () => {
     const previous = current(5);
     vi.mocked(savefileBackupStore).mockResolvedValueOnce(false);

@@ -1,4 +1,5 @@
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
+import { modsApplyDryRun } from '@helpers/mod/mod-apply';
 import { modLoadFiles, modsRevokeUnused } from '@helpers/mod/mod-load.ui';
 import {
   modRefOf,
@@ -13,8 +14,16 @@ import {
 } from '@helpers/savefile/savefile-load';
 import { gamestate } from '@helpers/state-game';
 import { getOption, setOption } from '@helpers/state-options';
-import type { ModInstalled } from '@interfaces';
+import type { ModBundle, ModInstalled } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
+
+// Checked alongside the other New Games mods, since it may use their content or art.
+function modImportApplyErrors(bundle: ModBundle): string[] {
+  const others = getOption('modsEnabled')
+    .filter((id) => id !== bundle.manifest.id)
+    .flatMap((id) => modUsableBundle(id) ?? []);
+  return modsApplyDryRun([...others, bundle])[bundle.manifest.id] ?? [];
+}
 
 // Validated before it's stored, so a broken zip never becomes an installed mod.
 export async function modsImportZip(
@@ -25,9 +34,12 @@ export async function modsImportZip(
   try {
     const files = await modZipFiles(data);
     const parsed = await modLoadFiles('local', 'import', files, modioId);
+    const errors = parsed.bundle
+      ? [...parsed.errors, ...modImportApplyErrors(parsed.bundle)]
+      : parsed.errors;
     modsRevokeUnused([parsed]);
     if (!parsed.manifest) return parsed.errors;
-    if (parsed.errors.length > 0) return parsed.errors;
+    if (errors.length > 0) return errors;
 
     const key = modioId === undefined ? parsed.manifest.id : `modio-${modioId}`;
     await modsStorePut({ key, modioId, logoUrl }, data);
@@ -66,12 +78,18 @@ export function modsReorderEnabled(fromIndex: number, toIndex: number): void {
 }
 
 // Mods only apply when a save loads, so a newer copy of a run's mod needs a save swap to show up.
-export async function modsRefreshRun(): Promise<string[]> {
+export async function modsRefreshRun(force = false): Promise<string[]> {
   const meta = gamestate().meta;
   const isLive = savefileLoadStatus().state === 'ok' && meta.isSetup;
-  if (!isLive || !modsRunOutdated(meta.mods)) return [];
+  const isOutdated = modsRunOutdated(meta.mods);
+  const isStale = force ? meta.mods.length > 0 : isOutdated;
+  if (!isLive || !isStale) return [];
 
-  return savefileReplace(structuredClone(gamestate()), 'mods');
+  // A same-version reload would otherwise push a real backup out on every press.
+  return savefileReplace(
+    structuredClone(gamestate()),
+    isOutdated ? 'mods' : undefined,
+  );
 }
 
 // A full save swap, so the add gets the idle wait, a backup and a rollback.

@@ -119,6 +119,7 @@ import {
   worldTravelState,
 } from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
+import { mapCoordinatesAt } from '@helpers/pixi/pixi-map-coordinates';
 import { townWorkersTravelingTokens } from '@helpers/town/worker/town-worker-travel.ui';
 import { workersTravelingTokens } from '@helpers/worker/worker-travel.ui';
 import { worldNodeDiscoverIfCollectibleGateMet } from '@helpers/world-node/world-node-collectible-gate.ui';
@@ -158,10 +159,12 @@ import type {
   WorldNodeLabelInfo,
   WorldNodeStatusInfo,
   MapCursorNode,
+  MapCoordinates,
+  MapCoordinatesAnchor,
 } from '@interfaces';
 import { ContentService } from '@services/content.service';
 import { clamp, maxBy, sumBy } from 'es-toolkit/compat';
-import type { Application, Graphics, Text, Texture } from 'pixi.js';
+import type { Application, Graphics, PointData, Text, Texture } from 'pixi.js';
 import { Container } from 'pixi.js';
 import type { Subscription } from 'rxjs';
 
@@ -210,6 +213,20 @@ const HUD_ZONE_LABELS: Record<HudZone, string> = {
     }
     <div class="fade-overlay" [class.fade-active]="fadeVisible()"></div>
     <div class="death-overlay" [class.death-active]="isPartyDead()"></div>
+    @if (mapCoordinates(); as coords) {
+      @let cursor = coordinatesAnchor();
+      <!-- Follows the cursor so it never sits under the HUD; raw numbers on purpose, they're pasted into map patch YAML. -->
+      <div
+        class="absolute z-[30] pointer-events-none badge badge-data tabular-nums whitespace-nowrap"
+        [style.left.px]="cursor.flipX ? cursor.x - 16 : cursor.x + 16"
+        [style.top.px]="cursor.flipY ? cursor.y - 16 : cursor.y + 16"
+        [class.-translate-x-full]="cursor.flipX"
+        [class.-translate-y-full]="cursor.flipY"
+      >
+        {{ loadedMapLabel() }} · Tile {{ coords.tileX }}, {{ coords.tileY }} ·
+        x: {{ coords.patchX }} y: {{ coords.patchY }}
+      </div>
+    }
     <div #hudFrame class="hud-frame ui-scaled">
       <div
         class="absolute top-0 left-0 right-0 flex flex-col pointer-events-none z-[11]"
@@ -282,6 +299,14 @@ export class GamePlayWorldComponent implements OnDestroy {
 
   public fadeVisible = signal<boolean>(false);
   public isMapLoading = signal<boolean>(true);
+  public mapCoordinates = signal<MapCoordinates | undefined>(undefined);
+  public loadedMapLabel = signal<string>('');
+  public coordinatesAnchor = signal<MapCoordinatesAnchor>({
+    x: 0,
+    y: 0,
+    flipX: false,
+    flipY: false,
+  });
   public introMapName = signal<string | undefined>(undefined);
   private isDestroyed = false;
 
@@ -588,6 +613,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.canvas?.removeEventListener('pointermove', this.onPointerMove);
     this.canvas?.removeEventListener('pointerup', this.onPointerUp);
     this.canvas?.removeEventListener('pointercancel', this.onPointerUp);
+    this.canvas?.removeEventListener('pointerleave', this.onPointerLeave);
 
     this.resizeObserver?.disconnect();
     this.mapContainer?.removeChildren();
@@ -691,6 +717,9 @@ export class GamePlayWorldComponent implements OnDestroy {
       if (this.dragMoved) return;
       mapNodeDeselect();
     });
+    this.app.stage.on('globalpointermove', (event) =>
+      this.onCoordinatesHover(event.global),
+    );
 
     this.canvas = this.app.canvas as HTMLCanvasElement;
     this.canvas.style.touchAction = 'none';
@@ -698,6 +727,7 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.canvas.addEventListener('pointermove', this.onPointerMove);
     this.canvas.addEventListener('pointerup', this.onPointerUp);
     this.canvas.addEventListener('pointercancel', this.onPointerUp);
+    this.canvas.addEventListener('pointerleave', this.onPointerLeave);
 
     this.resizeObserver = pixiResponsiveCanvasSetup(this.app, element, () => {
       this.refreshViewportGeometry();
@@ -949,6 +979,33 @@ export class GamePlayWorldComponent implements OnDestroy {
     this.dragMoved = true;
     this.panCamera(dragDeltaX, dragDeltaY);
   };
+
+  private onPointerLeave = (): void => {
+    this.mapCoordinates.set(undefined);
+  };
+
+  private onCoordinatesHover(point: PointData): void {
+    if (
+      !getOption('showMapCoordinates') ||
+      !this.app ||
+      !this.map ||
+      !this.mapContainer
+    ) {
+      this.mapCoordinates.set(undefined);
+      return;
+    }
+
+    const local = this.mapContainer.toLocal(point);
+    this.loadedMapLabel.set(this.loadedMapName ?? '');
+    // Flips to the cursor's other side near the right/bottom edges so it stays on screen.
+    this.coordinatesAnchor.set({
+      x: point.x,
+      y: point.y,
+      flipX: point.x > this.app.screen.width - 480,
+      flipY: point.y > this.app.screen.height - 64,
+    });
+    this.mapCoordinates.set(mapCoordinatesAt(this.map, local.x, local.y));
+  }
 
   private onPointerUp = (event: PointerEvent): void => {
     if (event.pointerId !== this.dragPointerId) return;

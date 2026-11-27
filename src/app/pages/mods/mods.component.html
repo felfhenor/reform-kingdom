@@ -40,8 +40,10 @@
             [disabled]="modsService.isLoading() || isBusy()"
             (click)="rescan()"
             ffButton="ui-click"
+            ffHotkey="r"
+            [tp]="'Re-reads every mod and reloads them into your current run (R).'"
           >
-            Rescan
+            Reload Mods
           </button>
         </div>
       </h1>
@@ -143,6 +145,14 @@
                       </span>
                       @if (row.inRun) {
                         <span class="badge badge-sm badge-success">In Run</span>
+                      }
+                      @if (row.isOtherVersion) {
+                        <span
+                          class="badge badge-sm badge-warning"
+                          [tp]="'Made for a different version of the game. It may or may not work with this version.'"
+                        >
+                          Made for v{{ row.mod.manifest?.gameVersion }}
+                        </span>
                       }
                     </span>
 

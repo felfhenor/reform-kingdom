@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { IconComponent } from '@components/icon/icon.component';
 import { OptionsBaseComponent } from '@components/panel-options/option-base-page.component';
+import { isDemoBuild } from '@helpers/demo/demo';
 import { canAnalyticsActivate } from '@helpers/engine';
 import { TippyDirective } from '@ngneat/helipopper';
 
@@ -13,4 +14,5 @@ import { TippyDirective } from '@ngneat/helipopper';
 })
 export class PanelOptionsMiscComponent extends OptionsBaseComponent {
   public readonly canAnalyticsActivate = canAnalyticsActivate;
+  public readonly isDemo = isDemoBuild();
 }

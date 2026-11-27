@@ -8,6 +8,21 @@ export type PixiAppConfig = {
   antialias?: boolean;
 };
 
+export type MapCoordinates = {
+  tileX: number;
+  tileY: number;
+  // Where a Tiled tile object on this tile sits: objects anchor at their bottom-left corner.
+  patchX: number;
+  patchY: number;
+};
+
+export type MapCoordinatesAnchor = {
+  x: number;
+  y: number;
+  flipX: boolean;
+  flipY: boolean;
+};
+
 export type CameraPosition = {
   x: number;
   y: number;

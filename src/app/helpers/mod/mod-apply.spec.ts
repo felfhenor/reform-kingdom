@@ -6,8 +6,9 @@ import {
   getEntry,
 } from '@helpers/content/content';
 import { ensureItem } from '@helpers/content/ensure-item';
+import { ensureMonster } from '@helpers/content/ensure-monster';
 import { allMaps, mapsSnapshotBase } from '@helpers/maps';
-import { modsApply, modsReset } from '@helpers/mod/mod-apply';
+import { modsApply, modsApplyDryRun, modsReset } from '@helpers/mod/mod-apply';
 import { modsAffectGameplay } from '@helpers/mod/mod-registry';
 import { modSprites } from '@helpers/mod/mod-sprites';
 import type {
@@ -15,6 +16,7 @@ import type {
   ItemContent,
   ItemId,
   ModBundle,
+  MonsterId,
   RecipeContent,
   TiledMap,
 } from '@interfaces';
@@ -116,6 +118,70 @@ describe('modsApply content', () => {
   });
 });
 
+describe('modsApply art checks', () => {
+  const art = (sheet: string, sprite: string, width: number) => ({
+    sheet,
+    sprite,
+    url: `blob:${sprite}`,
+    width,
+  });
+  const strip = (id: string, overrides: Record<string, unknown>) =>
+    bundle(
+      {},
+      {
+        manifest: { id, name: id, version: '1', kind: 'content' },
+        ...overrides,
+      },
+    );
+
+  beforeEach(() => {
+    seedContent([
+      ore,
+      ensureMonster({
+        id: 'bat' as MonsterId,
+        name: 'Bat',
+        sprite: '0176',
+        frames: 4,
+      }),
+    ]);
+    contentSnapshotBase();
+  });
+
+  it('accepts backgrounds from any mod being applied, and flags unknown ones', () => {
+    const pack = strip('pack', { sprites: [art('backgrounds', 'glow', 1920)] });
+    const user = strip('user', {
+      content: {
+        encounter: [
+          { id: 'e1', name: 'Lit', background: 'glow' },
+          { id: 'e2', name: 'Dark', background: 'nowhere' },
+        ],
+      },
+    });
+
+    const result = modsApply([pack, user]);
+
+    expect(result['user']).toEqual([
+      `encounter "Dark": background "nowhere" doesn't exist.`,
+    ]);
+  });
+
+  it('flags a replaced base animation that is not a full strip', () => {
+    const result = modsApply([
+      strip('art', { sprites: [art('monster', '0176', 64)] }),
+    ]);
+
+    expect(result['art']).toEqual([
+      "sprites/monster/0176.png is 64px wide, but it's drawn with 4 frames, which needs 256px.",
+    ]);
+  });
+
+  it('leaves live content untouched on a dry run', () => {
+    modsApplyDryRun([bundle({ item: [{ id: 'gem', name: 'Gem' }] })]);
+
+    expect(getEntry('Gem')).toBeUndefined();
+  });
+});
+
 describe('modsApply maps and sprites', () => {
   beforeEach(() => {
     seedWorldNodes(
@@ -200,7 +266,7 @@ describe('modsApply maps and sprites', () => {
       bundle(
         {},
         {
-          sprites: [{ sheet: 'item', sprite: 'gem', url: 'blob:x' }],
+          sprites: [{ sheet: 'item', sprite: 'gem', url: 'blob:x', width: 64 }],
         },
       ),
     ]);

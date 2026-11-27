@@ -1,5 +1,6 @@
 import '@/testing/reset';
 import {
+  modGameVersionMismatch,
   modsDedupe,
   modsFindBundles,
   modsRunOutdated,
@@ -57,5 +58,14 @@ describe('modsRunOutdated', () => {
       false,
     );
     expect(modsRunOutdated([{ ...ref, id: 'gone', version: '0' }])).toBe(false);
+  });
+});
+
+describe('modGameVersionMismatch', () => {
+  it('compares major.minor only, ignoring a leading v', () => {
+    expect(modGameVersionMismatch('0.16.0', 'v0.16.3')).toBe(false);
+    expect(modGameVersionMismatch('0.15', 'v0.16.3')).toBe(true);
+    expect(modGameVersionMismatch(undefined, 'v0.16.3')).toBe(false);
+    expect(modGameVersionMismatch('0.16', undefined)).toBe(false);
   });
 });

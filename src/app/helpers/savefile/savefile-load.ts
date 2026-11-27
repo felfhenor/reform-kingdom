@@ -164,10 +164,11 @@ export async function savefileLoad(): Promise<void> {
 
 let isReplacing = false;
 
+// No `reason` skips the backup, for swaps that only reload the same mods into the same run.
 // The current save is only backed up after the replacement migrates, so restoring the oldest backup can't evict it first.
 async function savefileReplaceIdle(
   next: GameState,
-  reason: SavefileBackupReason,
+  reason?: SavefileBackupReason,
 ): Promise<string[]> {
   const previousStatus = savefileLoadStatus();
   const previous = gamestate();
@@ -186,7 +187,7 @@ async function savefileReplaceIdle(
   const failures = await savefileMigrateWithRetry(prepared.state);
   if (failures.length > 0) return rollback(failures);
 
-  if (previousStatus.state === 'ok') {
+  if (previousStatus.state === 'ok' && reason) {
     const backedUp = await savefileBackupStore(previous, reason);
     if (!backedUp) {
       return rollback([
@@ -201,7 +202,7 @@ async function savefileReplaceIdle(
 
 export async function savefileReplace(
   next: GameState,
-  reason: SavefileBackupReason,
+  reason?: SavefileBackupReason,
 ): Promise<string[]> {
   if (isReplacing) return ['Another savefile operation is still running.'];
 

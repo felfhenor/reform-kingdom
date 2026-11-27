@@ -38,7 +38,11 @@ import {
   modsReorderEnabled,
   modsSetEnabled,
 } from '@helpers/mod/mod-install.ui';
-import { modsInstalled } from '@helpers/mod/mod-registry';
+import {
+  modGameVersionMismatch,
+  modsInstalled,
+} from '@helpers/mod/mod-registry';
+import { localVersion } from '@helpers/engine/version';
 import { modioIsConfigured, modioUnsubscribe } from '@helpers/mod/modio.ui';
 import { savefileLoadStatus } from '@helpers/savefile/savefile-load';
 import { isSetup } from '@helpers/setup';
@@ -122,6 +126,10 @@ export class ModsComponent {
         enabledIndex: enabled.indexOf(id),
         enabledCount: enabled.length,
         inRun: inRun.has(id),
+        isOtherVersion: modGameVersionMismatch(
+          mod.manifest?.gameVersion,
+          localVersion()?.tag,
+        ),
         canAddToRun: usable && this.runMods() !== undefined && !inRun.has(id),
       };
     });
@@ -148,7 +156,7 @@ export class ModsComponent {
   }
 
   async rescan(): Promise<void> {
-    await this.modsService.reload();
+    await this.modsService.reload(true);
   }
 
   openFolder(): void {

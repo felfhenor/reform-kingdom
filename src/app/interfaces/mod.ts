@@ -23,6 +23,7 @@ export type ModRef = {
 export type ModManifest = ModRef & {
   author?: string;
   description?: string;
+  gameVersion?: string;
 };
 
 export type ModSource = 'local' | 'folder' | 'modio';
@@ -36,6 +37,7 @@ export type ModSprite = {
   sheet: string;
   sprite: string;
   url: string;
+  width: number;
 };
 
 export type ModMapPatch = {
