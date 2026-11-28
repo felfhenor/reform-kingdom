@@ -6,7 +6,6 @@ import {
   contentName,
   contentNameById,
   contentNestedText,
-  contentSearchFn,
   contentText,
   nodeNameText,
 } from '@helpers/i18n/i18n-content';
@@ -86,15 +85,6 @@ describe('contentNameById', () => {
 
     expect(contentNameById('fireball')).toBe('Boule de feu');
     expect(contentNameById('nope')).toBeUndefined();
-  });
-});
-
-describe('contentSearchFn', () => {
-  it('matches the translated name', () => {
-    french();
-
-    expect(contentSearchFn('boule', skill)).toBe(true);
-    expect(contentSearchFn('fireball', skill)).toBe(false);
   });
 });
 

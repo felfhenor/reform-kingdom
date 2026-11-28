@@ -1,3 +1,4 @@
+import { isDemoBuild } from '@helpers/demo/demo';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { t } from '@helpers/i18n/i18n';
 import { languageChoice, languageReset } from '@helpers/i18n/i18n-language';
@@ -37,11 +38,15 @@ export async function modsImportZip(
   try {
     const files = await modZipFiles(data);
     const parsed = await modLoadFiles('local', 'import', files, modioId);
-    const errors = parsed.bundle
-      ? [...parsed.errors, ...modImportApplyErrors(parsed.bundle)]
-      : parsed.errors;
+    const isRefused =
+      isDemoBuild() && !!parsed.manifest && parsed.manifest.kind !== 'i18n';
+    const errors =
+      parsed.bundle && !isRefused
+        ? [...parsed.errors, ...modImportApplyErrors(parsed.bundle)]
+        : parsed.errors;
     modsRevokeUnused([parsed]);
     if (!parsed.manifest) return parsed.errors;
+    if (isRefused) return [t('mods.languageOnly')];
     if (errors.length > 0) return errors;
 
     const key = modioId === undefined ? parsed.manifest.id : `modio-${modioId}`;

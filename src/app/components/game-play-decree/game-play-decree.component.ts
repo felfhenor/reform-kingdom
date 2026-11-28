@@ -1,4 +1,5 @@
-import { contentName, contentSearchFn } from '@helpers/i18n/i18n-content';
+import { contentName } from '@helpers/i18n/i18n-content';
+import { contentSearchFn } from '@helpers/i18n/i18n-content.ui';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { FFInputService } from '@ff/input/ff-input.service';

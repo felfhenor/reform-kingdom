@@ -89,11 +89,13 @@
           <app-panel-mods-modio />
         } @else {
           <div class="flex flex-col gap-2">
-            <span class="type-hint">
-              Checked mods are used by new games. Mods are stored with the runs
-              and can have their versions updated, but they cannot be removed
-              mid-run.
-            </span>
+            @if (!isDemo) {
+              <span class="type-hint">
+                Checked mods are used by new games. Mods are stored with the
+                runs and can have their versions updated, but they cannot be
+                removed mid-run.
+              </span>
+            }
 
             <div
               cdkDropList
@@ -184,7 +186,7 @@
                       </button>
                     }
 
-                    @if (row.mod.manifest && !row.isLanguage) {
+                    @if (row.mod.manifest && !row.isLanguage && !isDemo) {
                       <label class="flex items-center gap-2 type-label">
                         <input
                           type="checkbox"

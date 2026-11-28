@@ -123,17 +123,15 @@
       </button>
     }
 
-    @if (!isDemo) {
-      <button
-        class="btn btn-neutral btn-block"
-        (click)="openMods()"
-        appAnalyticsClick="Meta:Play:Mods"
-        appSfx="ui-click"
-        [sfxTrigger]="['click', 'hover']"
-      >
-        Mods
-      </button>
-    }
+    <button
+      class="btn btn-neutral btn-block"
+      (click)="openMods()"
+      appAnalyticsClick="Meta:Play:Mods"
+      appSfx="ui-click"
+      [sfxTrigger]="['click', 'hover']"
+    >
+      Mods
+    </button>
 
     <app-panel-debug-buttons></app-panel-debug-buttons>
 

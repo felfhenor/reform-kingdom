@@ -1,5 +1,3 @@
-import { contentSearchFn } from '@helpers/i18n/i18n-content';
-import { ContentNamePipe } from '@pipes/content-name.pipe';
 import type { AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
@@ -17,6 +15,7 @@ import { ListReflowDirective } from '@directives/list-reflow.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { FFSelectDirective } from '@ff/controls/ff-select.directive';
 import { FFStepperDirective } from '@ff/controls/ff-stepper.directive';
+import { contentSearchFn } from '@helpers/i18n/i18n-content.ui';
 import { allEquipmentItemTypes } from '@helpers/item/equipment-types';
 import { itemPreviewDisplay } from '@helpers/item/item-preview';
 import {
@@ -45,6 +44,7 @@ import {
   NgSelectComponent,
 } from '@ng-select/ng-select';
 import { TippyDirective } from '@ngneat/helipopper';
+import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { AnimationService } from '@services/animation.service';
 
 const RARITIES: DropRarity[] = [

@@ -52,11 +52,6 @@ export function contentNameById(id: string): string | undefined {
   return entry ? contentName(entry) : undefined;
 }
 
-// ng-select searches its bindLabel (the English name) unless given this.
-export function contentSearchFn(term: string, entry: IsContentItem): boolean {
-  return contentName(entry).toLowerCase().includes(term.toLowerCase());
-}
-
 export function contentDescription(entry: IsContentItem): string {
   return contentText(entry, 'description');
 }

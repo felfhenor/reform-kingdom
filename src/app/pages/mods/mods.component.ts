@@ -42,6 +42,7 @@ import {
   modGameVersionMismatch,
   modsInstalled,
 } from '@helpers/mod/mod-registry';
+import { isDemoBuild } from '@helpers/demo/demo';
 import { localVersion } from '@helpers/engine/version';
 import { languageChoice } from '@helpers/i18n/i18n-language';
 import { languageChoose, languageReload } from '@helpers/mod/mod-language.ui';
@@ -151,6 +152,7 @@ export class ModsComponent {
   });
 
   public readonly hasModio = modioIsConfigured();
+  public readonly isDemo = isDemoBuild();
 
   public readonly sourceLabels: Record<ModSource, string> = {
     local: 'Imported',

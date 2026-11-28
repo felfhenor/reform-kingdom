@@ -1,5 +1,6 @@
 import { ContentNamePipe } from '@pipes/content-name.pipe';
-import { contentName, contentSearchFn } from '@helpers/i18n/i18n-content';
+import { contentName } from '@helpers/i18n/i18n-content';
+import { contentSearchFn } from '@helpers/i18n/i18n-content.ui';
 import { ContentDescriptionPipe } from '@pipes/content-description.pipe';
 import { FFButtonComponent } from '@ff/components/button/button.component';
 import { FFSelectDirective } from '@ff/controls/ff-select.directive';

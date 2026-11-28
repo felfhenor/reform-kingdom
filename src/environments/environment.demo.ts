@@ -3,9 +3,9 @@ export const environment = {
   platform: 'demo',
   demo: true,
   modio: {
-    url: '',
-    gameId: 0,
-    apiKey: '',
+    url: 'https://g-14864.modapi.io/v1',
+    gameId: 14864,
+    apiKey: '901ec2e3536140fbcb6331b9f8d681d6',
   },
   gameanalytics: {
     game: '27cb0b261b9161eebf9022f5bf78b762',

@@ -1,4 +1,5 @@
-import { contentName, contentSearchFn } from '@helpers/i18n/i18n-content';
+import { contentName } from '@helpers/i18n/i18n-content';
+import { contentSearchFn } from '@helpers/i18n/i18n-content.ui';
 import { FFSelectDirective } from '@ff/controls/ff-select.directive';
 import { DecimalPipe } from '@angular/common';
 import {

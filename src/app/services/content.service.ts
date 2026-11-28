@@ -7,12 +7,14 @@ import { LOADING_PRELOAD_FONTS, LOADING_PRELOAD_IMAGES } from '@helpers/config';
 import { contentSnapshotBase, unfurlContent } from '@helpers/content/content';
 import {
   I18N_BASE_LOCALE,
-  languageBaseApply,
-  languageBaseLocaleToLoad,
   languageChoice,
-  languageHasBaseLocale,
   languageReset,
 } from '@helpers/i18n/i18n-language';
+import {
+  languageBaseApply,
+  languageBaseLocaleToLoad,
+  languageHasBaseLocale,
+} from '@helpers/i18n/i18n-language.ui';
 import { nodeBackgroundURLs } from '@helpers/world-node/world-node-background.ui';
 import { kingdomIconURLs } from '@helpers/kingdom/kingdom-nav.ui';
 import {

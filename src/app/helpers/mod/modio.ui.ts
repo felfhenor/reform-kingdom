@@ -12,13 +12,20 @@ import type {
 
 export const MODIO_PAGE_SIZE = 10;
 
+// The demo only takes translation mods, so it only lists mods carrying this mod.io tag.
+const MODIO_TRANSLATION_TAG = 'Language';
+
+function modioDemoFilter(): Record<string, string> {
+  return isDemoBuild() ? { tags: MODIO_TRANSLATION_TAG } : {};
+}
+
 export const modioAuth = localStorageSignal<ModioAuth | undefined>(
   'modioAuth',
   undefined,
 );
 
 export function modioIsConfigured(): boolean {
-  return !isDemoBuild() && !!environment.modio.apiKey;
+  return !!environment.modio.apiKey;
 }
 
 export function modioIsSignedIn(): boolean {
@@ -82,6 +89,7 @@ export function modioSearchMods(search: ModioSearch): Promise<ModioPage> {
       _offset: String(search.offset),
       _sort: search.sort,
       ...(search.query ? { 'name-lk': `*${search.query}*` } : {}),
+      ...modioDemoFilter(),
     },
   );
 }
@@ -92,6 +100,7 @@ export async function modioSubscribedMods(): Promise<ModioMod[]> {
     {},
     {
       game_id: String(environment.modio.gameId),
+      ...modioDemoFilter(),
     },
   );
   return page.data;

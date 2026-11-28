@@ -37,31 +37,12 @@ export function languageReset(): void {
   setOption('language', languageDefault());
 }
 
-export function languageHasBaseLocale(
-  languages: I18nLanguageInfo[],
-  locale: string,
-): boolean {
-  return languages.some((language) => language.locale === locale);
-}
-
-// A mod for a first-party language sits on top of it, so it only needs the lines it changes.
-export function languageBaseLocaleToLoad(
-  choice: LanguageChoice,
-  languages: I18nLanguageInfo[],
-): string | undefined {
-  return choice.locale !== I18N_BASE_LOCALE &&
-    languageHasBaseLocale(languages, choice.locale)
-    ? choice.locale
-    : undefined;
-}
-
-export function languageBaseApply(
-  languages: I18nLanguageInfo[],
-  layers: I18nLanguageData[],
-): void {
+export function setI18nLanguages(languages: I18nLanguageInfo[]): void {
   _i18nLanguages.set(languages);
+}
+
+export function setI18nBaseLayers(layers: I18nLanguageData[]): void {
   _i18nBaseLayers.set(layers);
-  i18nLayersApply(layers);
 }
 
 export function languageEnglishOnlyApply(): void {
