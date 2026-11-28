@@ -16,6 +16,26 @@
     max: 5
     bonusPerLevel: 2
 
+  baseStats:
+    Health: 35
+    Energy: 10
+    Luck: 1
+    Intelligence: 5
+    Strength: 2
+    Vitality: 5
+    Resistance: 10
+    Agility: 1
+
+  statsPerLevel:
+    Health: 8.1
+    Energy: 4.6
+    Luck: 1.2
+    Intelligence: 0.6
+    Strength: 0.5
+    Vitality: 0.2
+    Resistance: 0.9
+    Agility: 0.6
+
   drops:
     - itemId: Grotto Gem
       min: 1
