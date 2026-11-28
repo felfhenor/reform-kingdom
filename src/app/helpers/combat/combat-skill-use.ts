@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import { combatAnalyzeTarget } from '@helpers/combat/combat-analyze';
 import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
 import {
@@ -114,7 +115,7 @@ export function combatantUseSkill(
       if (combatTechniqueMisses(combatant, tech)) {
         combatMessageLog(
           combat,
-          `**${combatantMessageToken(combatant)}**'s **${chosenSkill.name}** misses **${combatantMessageToken(target)}**!`,
+          `**${combatantMessageToken(combatant)}**'s **${contentName(chosenSkill)}** misses **${combatantMessageToken(target)}**!`,
         );
         combatantDamageEventEmit(target.id, 0, 'miss');
         combatAnalyzeTarget(combat, combatant, target, tech);
@@ -139,7 +140,7 @@ export function combatantUseSkill(
         );
 
       if (shouldApplyAgain && !combatantIsDead(target)) {
-        combatMessageLog(combat, `**${appliedSkill.name}** strikes again!`);
+        combatMessageLog(combat, `**${contentName(appliedSkill)}** strikes again!`);
 
         combatApplySkillToTarget(
           combat,
@@ -167,10 +168,14 @@ export function combatantFireDelayedSkills(
     if (isCombatOver(combat) || combatantIsDead(combatant)) return;
 
     const { skill } = entry;
-    combatantSkillCastEventEmit(combatant.id, skill.name, skill.sprite);
+    combatantSkillCastEventEmit(
+      combatant.id,
+      contentName(skill),
+      skill.sprite,
+    );
     combatMessageLog(
       combat,
-      `**${combatantMessageToken(combatant)}** unleashes **${skill.name}**!`,
+      `**${combatantMessageToken(combatant)}** unleashes **${contentName(skill)}**!`,
     );
     combatantUseSkill(combat, combatant, skill, entry);
   });

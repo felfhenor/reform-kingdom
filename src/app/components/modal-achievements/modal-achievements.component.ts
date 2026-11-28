@@ -1,3 +1,5 @@
+import { ContentDescriptionPipe } from '@pipes/content-description.pipe';
+import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { FFFocusRowDirective } from '@ff/focus/ff-focus-row.directive';
 import { FFButtonComponent } from '@ff/components/button/button.component';
 import { DatePipe, DecimalPipe } from '@angular/common';
@@ -25,6 +27,8 @@ import type { GameId } from '@interfaces';
   selector: 'app-modal-achievements',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ContentDescriptionPipe,
+    ContentNamePipe,
     FFFocusRowDirective,
     FFButtonComponent,
     AtlasImageComponent,

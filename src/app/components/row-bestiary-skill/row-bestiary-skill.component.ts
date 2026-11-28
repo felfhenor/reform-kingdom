@@ -1,3 +1,4 @@
+import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { SlotRarityOutlineComponent } from '@components/slot-rarity-outline/slot-rarity-outline.component';
 import { TooltipSkillPreviewComponent } from '@components/tooltip-skill-preview/tooltip-skill-preview.component';
@@ -8,6 +9,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-row-bestiary-skill',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ContentNamePipe,
     TippyDirective,
     SlotRarityOutlineComponent,
     TooltipSkillPreviewComponent,

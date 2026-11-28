@@ -20,6 +20,7 @@ import type {
   WorkerIdleStatusEntry,
   WorkerLevelUpStatusEntry,
   WorkerState,
+  IsContentItem,
 } from '@interfaces';
 
 function workersStatusEntries<T>(
@@ -115,7 +116,7 @@ export async function workerLevelUp(workerId: WorkerId): Promise<boolean> {
 
   workerLevelUpLog(workerId, newLevel, cost);
 
-  const workerName = getEntry<WorkerContent>(workerId)?.name;
+  const workerName = getEntry<IsContentItem>(workerId)?.name;
   analyticsSendDesignEvent(
     workerName
       ? `Worker:LevelUp:${analyticsSafeSegment(workerName)}`

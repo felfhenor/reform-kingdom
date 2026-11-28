@@ -44,6 +44,7 @@ export function defaultOptions(): GameOptions {
     analyticsOptInDismissed: false,
     demoImportDismissed: false,
     modsEnabled: [],
+    language: { source: 'base', locale: 'en' },
 
     mapZoom: 1,
     mapFrameRate: 30,

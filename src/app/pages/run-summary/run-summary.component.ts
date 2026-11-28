@@ -1,3 +1,5 @@
+import { contentNameById } from '@helpers/i18n/i18n-content';
+import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { DatePipe, DecimalPipe, NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -60,6 +62,7 @@ function withSkill<T extends { skillFamily: string }>(used: T | undefined) {
   selector: 'app-run-summary',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ContentNamePipe,
     AtlasImageComponent,
     BarProgressComponent,
     BlankSlateComponent,
@@ -136,7 +139,7 @@ export class RunSummaryComponent {
         .filter((award) => award.heroIndex === index)
         .map((award) => award.label),
       jobsUsedText: (hero.snapshot?.jobsUsed ?? [])
-        .map((jobId) => getEntry<JobContent>(jobId)?.name ?? 'Unknown Job')
+        .map((jobId) => contentNameById(jobId) ?? 'Unknown Job')
         .join(', '),
     })),
   );

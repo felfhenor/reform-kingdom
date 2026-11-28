@@ -4,7 +4,7 @@
   [allowEscToClose]="true"
   [closeOnBackdropClick]="true"
 >
-  <span title>{{ town()?.name ?? 'Town' }} Material Sales</span>
+  <span title>{{ (town() | contentName) || 'Town' }} Material Sales</span>
 
   <div body class="flex flex-col gap-2 max-h-[400px] overflow-y-auto pr-2">
     @for (row of rows(); track row.index) {

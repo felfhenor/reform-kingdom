@@ -1,3 +1,4 @@
+import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { FFFocusMemoryDirective } from '@ff/focus/ff-focus-memory.directive';
 import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
 import { FFFocusService } from '@ff/focus/ff-focus.service';
@@ -70,6 +71,7 @@ import { AnimationService } from '@services/animation.service';
   selector: 'app-panel-combat-scene',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ContentNamePipe,
     AdventureLogMessageComponent,
     AtlasImageComponent,
     BackdropNodeComponent,

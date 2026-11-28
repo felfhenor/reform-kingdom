@@ -22,6 +22,11 @@ import {
   windowSizeChoices,
   windowSizeCurrentId,
 } from '@helpers/engine/electron-window.ui';
+import { languageChoice, languageChoiceKey } from '@helpers/i18n/i18n-language';
+import {
+  languageChoose,
+  languagePickerOptions,
+} from '@helpers/mod/mod-language.ui';
 import { defaultOptions } from '@helpers/state-options';
 import type {
   AdventureLogEntryKind,
@@ -31,6 +36,7 @@ import type {
 } from '@interfaces';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { TippyDirective } from '@ngneat/helipopper';
+import { TPipe } from '@pipes/t.pipe';
 
 type FrameRateChoice = { label: string; value: number };
 type DisplayModeChoice = { label: string; value: WindowDisplayMode };
@@ -45,11 +51,22 @@ type DisplayModeChoice = { label: string; value: WindowDisplayMode };
     IconComponent,
     NgSelectComponent,
     TippyDirective,
+    TPipe,
   ],
   templateUrl: './panel-options-ui.component.html',
   styleUrl: './panel-options-ui.component.scss',
 })
 export class PanelOptionsUIComponent extends OptionsBaseComponent {
+  public readonly languageOptions = computed(() => languagePickerOptions());
+  public readonly languageKey = computed(() =>
+    languageChoiceKey(languageChoice()),
+  );
+
+  chooseLanguage(key: string): void {
+    const option = this.languageOptions().find((opt) => opt.key === key);
+    if (option) void languageChoose(option.choice);
+  }
+
   public readonly mapFrameRateChoices: FrameRateChoice[] = [
     { label: '15 FPS', value: 15 },
     { label: '30 FPS', value: 30 },

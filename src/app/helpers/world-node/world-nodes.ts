@@ -1,3 +1,4 @@
+import { nodeNameText } from '@helpers/i18n/i18n-content';
 import { computed } from '@angular/core';
 import { getEntry } from '@helpers/content/content';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
@@ -300,15 +301,15 @@ export function isWorldNodeVisible(entry: WorldNodeEntry): boolean {
 // Masked to '???' when still hidden/undiscovered, so a location can't leak off-map.
 export function worldNodeDisplayName(nodeName: string): string {
   const entry = worldNodeByName(nodeName);
-  if (!entry) return nodeName;
+  if (!entry) return nodeNameText(nodeName);
 
-  return isWorldNodeVisible(entry) ? nodeName : '???';
+  return isWorldNodeVisible(entry) ? nodeNameText(nodeName) : '???';
 }
 
 // Points at the region instead of '???', so a player knows which map to search.
 export function worldNodeLocationHint(nodeName: string): string {
   const entry = worldNodeByName(nodeName);
-  if (!entry || isWorldNodeVisible(entry)) return nodeName;
+  if (!entry || isWorldNodeVisible(entry)) return nodeNameText(nodeName);
   if (!isWorldMapVisited(entry.mapName)) return 'Unvisited Region';
 
   return `Somewhere in ${regionNameForMap(entry.mapName)}`;

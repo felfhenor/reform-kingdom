@@ -1,3 +1,4 @@
+import { ContentNamePipe } from '@pipes/content-name.pipe';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { FFInputService } from '@ff/input/ff-input.service';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
@@ -125,6 +126,7 @@ const DEFAULT_DRAFT_HEALTH_DIRECTION: CombatOrderHealthDirection = 'Below';
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex flex-col gap-4' },
   imports: [
+    ContentNamePipe,
     SweetAlert2Module,
     FFInputPromptComponent,
     FFFocusRowDirective,

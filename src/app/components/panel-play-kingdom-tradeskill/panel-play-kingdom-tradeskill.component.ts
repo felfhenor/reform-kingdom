@@ -1,3 +1,4 @@
+import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { FFInputPromptComponent } from '@ff/components/input-prompt/input-prompt.component';
 import { FFFocusRowDirective } from '@ff/focus/ff-focus-row.directive';
 import { FFKeyboardDirective } from '@ff/controls/ff-keyboard.directive';
@@ -73,6 +74,7 @@ import { chunk, clamp } from 'es-toolkit/compat';
   selector: 'app-panel-play-kingdom-tradeskill',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ContentNamePipe,
     FFInputPromptComponent,
     FFFocusRowDirective,
     FFKeyboardDirective,

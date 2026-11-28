@@ -1,6 +1,7 @@
 import '@/testing/reset';
 import {
   modGameVersionMismatch,
+  modIsLanguage,
   modsDedupe,
   modsFindBundles,
   modsRunOutdated,
@@ -67,5 +68,17 @@ describe('modGameVersionMismatch', () => {
     expect(modGameVersionMismatch('0.15', 'v0.16.3')).toBe(true);
     expect(modGameVersionMismatch(undefined, 'v0.16.3')).toBe(false);
     expect(modGameVersionMismatch('0.16', undefined)).toBe(false);
+  });
+});
+
+describe('modIsLanguage', () => {
+  it('is true only for installed i18n mods', () => {
+    const language = mod('fr', 'fr');
+    language.manifest = { ...language.manifest!, kind: 'i18n' };
+    setModsInstalled([language, mod('gems', 'gems')]);
+
+    expect(modIsLanguage('fr')).toBe(true);
+    expect(modIsLanguage('gems')).toBe(false);
+    expect(modIsLanguage('nope')).toBe(false);
   });
 });

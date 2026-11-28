@@ -6,6 +6,7 @@ export * from './mod-bundle';
 export * from './mod-disk';
 export * from './mod-disk.ui';
 export * from './mod-install.ui';
+export * from './mod-language.ui';
 export * from './mod-load.ui';
 export * from './mod-newgame.ui';
 export * from './mod-registry';

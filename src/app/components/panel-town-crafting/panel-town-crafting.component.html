@@ -54,7 +54,7 @@
           <app-tooltip-recipe-preview
             #preview
             [recipe]="row.recipe"
-            [name]="row.recipe.name"
+            [name]="row.recipe | contentName"
           />
 
           <div

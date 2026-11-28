@@ -1,3 +1,5 @@
+import { contentName, contentSearchFn } from '@helpers/i18n/i18n-content';
+import { ContentNamePipe } from '@pipes/content-name.pipe';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { FFInputService } from '@ff/input/ff-input.service';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
@@ -172,7 +174,7 @@ function materialOptionsFor(ids: MaterialId[]): MaterialOption[] {
       .filter((item): item is ItemContent => !!item)
       .map((item) => ({
         id: item.id as MaterialId,
-        name: item.name,
+        name: contentName(item),
         sprite: item.sprite,
         spritesheet: 'item',
       })),
@@ -184,6 +186,7 @@ function materialOptionsFor(ids: MaterialId[]): MaterialOption[] {
   selector: 'app-game-play-decree',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ContentNamePipe,
     SweetAlert2Module,
     FFInputPromptComponent,
     FFFocusRowDirective,
@@ -210,6 +213,7 @@ function materialOptionsFor(ids: MaterialId[]): MaterialOption[] {
   templateUrl: './game-play-decree.component.html',
 })
 export class GamePlayDecreeComponent {
+  public readonly contentSearch = contentSearchFn;
   public readonly reorderPriority = GAMEPAD_PRIORITY.popover;
   private anim = inject(AnimationService);
 
@@ -299,7 +303,7 @@ export class GamePlayDecreeComponent {
   public draftTownName = signal<string | undefined>(undefined);
 
   public townOptions = computed(() =>
-    sortBy(visitedTowns(), (town) => town.name).map((town) => {
+    sortBy(visitedTowns(), (town) => contentName(town)).map((town) => {
       const lockedReason = combatAutomationLockedReason(
         worldNodeByName(town.name)?.mapName ?? '',
       );

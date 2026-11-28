@@ -1,3 +1,4 @@
+import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { FFFocusRowDirective } from '@ff/focus/ff-focus-row.directive';
 import { FFButtonComponent } from '@ff/components/button/button.component';
 import { formatNumber } from '@angular/common';
@@ -38,6 +39,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-modal-exchange-node',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ContentNamePipe,
     FFFocusRowDirective,
     FFButtonComponent,
     AtlasImageComponent,

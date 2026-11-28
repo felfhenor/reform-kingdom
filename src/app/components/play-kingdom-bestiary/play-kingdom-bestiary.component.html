@@ -57,7 +57,7 @@
                     entry.monster.rarity
                   }}"
                 >
-                  {{ entry.monster.name }}
+                  {{ entry.monster | contentName }}
                 </span>
                 @if (entry.analyzed) {
                   <app-icon

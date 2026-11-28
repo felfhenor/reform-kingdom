@@ -1,10 +1,13 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import type { CraftRecipeEntry } from '@interfaces';
 
 function recipeSearchNames(entry: CraftRecipeEntry): string[] {
   return [
-    entry.recipe.name,
-    entry.resultContent?.name,
-    ...entry.requirementEntries.map((requirement) => requirement.content?.name),
+    contentName(entry.recipe),
+    entry.resultContent ? contentName(entry.resultContent) : undefined,
+    ...entry.requirementEntries.map((requirement) =>
+      requirement.content ? contentName(requirement.content) : undefined,
+    ),
   ].filter((name): name is string => !!name);
 }
 

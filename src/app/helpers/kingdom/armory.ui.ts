@@ -1,4 +1,4 @@
-import { getEntry } from '@helpers/content/content';
+import { contentNameById } from '@helpers/i18n/i18n-content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { equipmentItemAffixes } from '@helpers/item/affix';
 import { itemPreviewDisplay } from '@helpers/item/item-preview';
@@ -25,7 +25,6 @@ import {
   type ArmoryWarningTier,
   type EquipmentArmoryEntry,
   type EquipmentItemId,
-  type ItemContent,
 } from '@interfaces';
 import { sum } from 'es-toolkit/compat';
 
@@ -73,7 +72,7 @@ export function armoryStatusDotClass(
 function armoryEntrySearchText(entry: EquipmentArmoryEntry): string {
   const preview = itemPreviewDisplay('equipment', entry.content, entry.item);
   const infusionNames = entry.item.infusedItemIds
-    .map((itemId) => (itemId ? getEntry<ItemContent>(itemId)?.name : undefined))
+    .map((itemId) => (itemId ? contentNameById(itemId) : undefined))
     .filter((name): name is string => !!name);
 
   return [

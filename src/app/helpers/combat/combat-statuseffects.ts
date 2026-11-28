@@ -1,3 +1,4 @@
+import { contentNestedText } from '@helpers/i18n/i18n-content';
 import { combatCombatantTakeDamage } from '@helpers/combat/combat-combatant-hp';
 import {
   elementalDamageText,
@@ -283,7 +284,10 @@ function combatHandleStatusEffectBehaviors(
       combatant: { ...combatant, name: combatantMessageToken(combatant) },
       combatantStatus: combatantStatusText(combatant),
     };
-    const message = combatFormatMessage(behavior.combatMessage, renderData);
+    const message = combatFormatMessage(
+      contentNestedText(effect, 'combatMessage', behavior.combatMessage),
+      renderData,
+    );
     combatMessageLog(combat, message, combatant);
   }
 }

@@ -4,10 +4,10 @@
   [allowEscToClose]="true"
   [closeOnBackdropClick]="true"
 >
-  <span title>{{ trader()?.name ?? 'Trader' }}</span>
+  <span title>{{ (trader() | contentName) || 'Trader' }}</span>
 
   @if (trader(); as traderContent) {
-    <p subtitle>{{ traderContent.description }}</p>
+    <p subtitle>{{ traderContent | contentDescription }}</p>
   }
 
   <div body class="flex flex-col gap-2">

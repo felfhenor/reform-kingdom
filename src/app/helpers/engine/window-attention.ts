@@ -1,14 +1,10 @@
-import { getEntry } from '@helpers/content/content';
+import { contentNameById } from '@helpers/i18n/i18n-content';
 import { tradeskillBuilding } from '@helpers/crafting/tradeskill';
 import { armoryHasRoom } from '@helpers/kingdom/armory';
 import { isFelDefeated, isRunLost } from '@helpers/lore/outro';
 import { workersState } from '@helpers/state-game';
 import { workerXpIsFull } from '@helpers/worker/worker-progression';
-import type {
-  WindowAttentionAlert,
-  WorkerContent,
-  WorkerId,
-} from '@interfaces';
+import type { WindowAttentionAlert, WorkerId } from '@interfaces';
 import { ALL_TRADESKILLS } from '@interfaces';
 
 function runAttentionAlerts(): WindowAttentionAlert[] {
@@ -68,7 +64,7 @@ function workerXpFullAlerts(): WindowAttentionAlert[] {
       flash: false,
       category: 'Alerts',
       title: 'Worker XP Full',
-      body: `${getEntry<WorkerContent>(workerId)?.name ?? 'A worker'} has full XP and is waiting to level up.`,
+      body: `${contentNameById(workerId) ?? 'A worker'} has full XP and is waiting to level up.`,
     }));
 }
 

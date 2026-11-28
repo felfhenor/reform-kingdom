@@ -59,7 +59,7 @@
                       <span class="type-entity-name">{{ hero.name }}</span>
                       <span class="type-muted inline-flex items-center gap-2">
                         Lv. {{ hero.level | number }}
-                        {{ hero.job?.name ?? 'Unknown Job' }}
+                        {{ (hero.job | contentName) || 'Unknown Job' }}
                         <app-icon-spec
                           class="pb-1"
                           [spec]="hero.snapshot?.specialization"
@@ -310,7 +310,7 @@
 
                     @for (region of unsealedRegions(); track region.id) {
                       <div class="flex justify-between gap-4 text-lighter">
-                        <span>{{ region.name }}</span>
+                        <span>{{ region | contentName }}</span>
                         <span>Not Sealed</span>
                       </div>
                     }

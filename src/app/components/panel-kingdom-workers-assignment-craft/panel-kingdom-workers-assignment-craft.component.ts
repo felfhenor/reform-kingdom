@@ -1,3 +1,4 @@
+import { contentName, contentNameById } from '@helpers/i18n/i18n-content';
 import { FFSelectDirective } from '@ff/controls/ff-select.directive';
 import { FFStepperDirective } from '@ff/controls/ff-stepper.directive';
 import { DecimalPipe } from '@angular/common';
@@ -14,7 +15,6 @@ import { IconComponent } from '@components/icon/icon.component';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { recipeResultOwnedQuantity } from '@helpers/crafting/recipes';
-import { tradeskillNameForId } from '@helpers/crafting/tradeskill';
 import { gatherDifficultyTier } from '@helpers/engine/difficulty-tier';
 import { rangeLabel } from '@helpers/engine/leveled-range';
 import { workersState } from '@helpers/state-game';
@@ -205,8 +205,8 @@ export class PanelKingdomWorkersAssignmentCraftComponent {
 
     return {
       recipeId: recipe.id,
-      name: recipe.name,
-      tradeskillName: tradeskillNameForId(recipe.tradeskillId) ?? '?',
+      name: contentName(recipe),
+      tradeskillName: contentNameById(recipe.tradeskillId) ?? '?',
       sprite: item.sprite,
       staminaCost,
       levelRangeLabel: rangeLabel(range),

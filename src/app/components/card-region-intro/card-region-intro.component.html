@@ -4,7 +4,7 @@
     (animate.leave)="onLeave($event)"
   >
     <div class="card-body items-center gap-2 p-4 text-center">
-      <h2 class="type-page-title">{{ currentRegion.name }}</h2>
+      <h2 class="type-page-title">{{ currentRegion | contentName }}</h2>
       <p class="type-flavor">
         @for (character of characters(); track $index) {
           <span

@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import { LOOT_FILTER_DEFAULT_MIN_ITEM_LEVEL } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { isEquipmentDiscovered } from '@helpers/kingdom/armory';
@@ -81,7 +82,7 @@ export function lootFilterExceptionOptions(
       !filters.exceptEquipment.includes(content.id),
   );
 
-  return sortBy(options, (content) => content.name);
+  return sortBy(options, (content) => contentName(content));
 }
 
 export function lootFilterExceptions(

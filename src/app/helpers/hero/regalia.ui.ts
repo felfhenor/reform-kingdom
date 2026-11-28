@@ -16,13 +16,13 @@ import { updateGamestate } from '@helpers/state-game';
 import type {
   CharacterId,
   GameState,
-  JobContent,
   JobId,
   RegaliaId,
+  IsContentItem,
 } from '@interfaces';
 
 function sendRegaliaAnalytics(action: string, jobId?: JobId): void {
-  const jobName = jobId ? getEntry<JobContent>(jobId)?.name : undefined;
+  const jobName = jobId ? getEntry<IsContentItem>(jobId)?.name : undefined;
   analyticsSendDesignEvent(`Hero:Regalia:${action}`);
   if (jobName) {
     analyticsSendDesignEvent(

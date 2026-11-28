@@ -1,3 +1,4 @@
+import type { I18nLanguageData } from '@interfaces/i18n';
 import type { IsContentItem } from '@interfaces/identifiable';
 import type { GameState } from '@interfaces/state-game';
 import type {
@@ -51,6 +52,7 @@ export type ModBundle = {
   maps: Record<string, TiledMap>;
   mapPatches: ModMapPatch[];
   sprites: ModSprite[];
+  translations?: I18nLanguageData;
 };
 
 export type ModBundleParseResult = {

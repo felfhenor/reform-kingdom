@@ -49,6 +49,7 @@
                       class="flex-1"
                       [items]="unlockedJobs()"
                       bindLabel="name"
+                      [searchFn]="contentSearch"
                       bindValue="id"
                       [clearable]="false"
                       [formField]="heroField.jobId"
@@ -56,21 +57,21 @@
                       <ng-template ng-option-tmp let-item="item">
                         <div class="flex items-center gap-2">
                           <app-icon-job class="zoom-row" [job]="item" />
-                          {{ item.name }} ({{ item.shorthand }})
+                          {{ item | contentName }} ({{ item.shorthand }})
                         </div>
                       </ng-template>
 
                       <ng-template ng-label-tmp let-item="item">
                         <div class="flex items-center gap-2">
                           <app-icon-job class="zoom-row" [job]="item" />
-                          {{ item.name }} ({{ item.shorthand }})
+                          {{ item | contentName }} ({{ item.shorthand }})
                         </div>
                       </ng-template>
                     </ng-select>
                   </div>
 
                   <div class="type-muted min-h-[100px]">
-                    {{ jobData?.description }}
+                    {{ jobData | contentDescription }}
                   </div>
                 </div>
               </div>

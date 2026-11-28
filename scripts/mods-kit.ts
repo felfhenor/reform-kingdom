@@ -4,6 +4,7 @@ import { sortBy } from 'es-toolkit/compat';
 import fs from 'fs-extra';
 import * as yaml from 'js-yaml';
 import path from 'path';
+import { i18nTemplateFiles } from './i18n-template';
 import { modDirFiles, zipModFiles } from './mods-files';
 
 // Builds dist/mods/reform-modkit(.zip): the only thing modders get, so it's generated from the game data and never edited by hand.
@@ -15,6 +16,8 @@ const ART_DIR = path.resolve('gameassets');
 const BACKGROUND_DIR = path.resolve('public/asset/nodebg');
 const SAMPLE_BACKGROUND = 'cave-crystal-red.png';
 const MOD = 'my-mod';
+const TRANSLATION_MOD = 'my-translation';
+const ENGLISH_UI = path.resolve('gamedata/i18n/en/ui.yml');
 const MANIFEST_HEADER = [
   '# id: lowercase letters, numbers and dashes. Savefiles use this to find your mod - do not change it!',
   '# version: bump it for every release. Savefiles use this to update your mod.',
@@ -172,13 +175,50 @@ const addArtIndex = (all: Record<string, KitArtEntry[]>) => {
   );
 };
 
+// Same layout as gamedata/i18n/<locale>, so a translation can move between a mod and the base game unchanged.
+const addTranslationSkeleton = (
+  all: Record<string, unknown[]>,
+  maps: Record<string, unknown>,
+) => {
+  text(
+    `${TRANSLATION_MOD}/mod.yml`,
+    MANIFEST_HEADER +
+      yaml.dump(
+        {
+          id: TRANSLATION_MOD,
+          name: 'My Translation',
+          version: '1.0.0',
+          kind: 'i18n',
+          author: 'Your Name',
+          description: 'Translates the game into your language.',
+          gameVersion: gameVersion(),
+        },
+        { lineWidth: -1, forceQuotes: true },
+      ),
+  );
+  text(
+    `${TRANSLATION_MOD}/i18n/language.yml`,
+    [
+      '# locale: a language tag such as fr, de, or pt-BR.',
+      '# languageName: the language name in that language.',
+      dump({ locale: 'fr', languageName: 'Français' }),
+    ].join('\n'),
+  );
+  const englishUi = yaml.load(fs.readFileSync(ENGLISH_UI, 'utf-8'));
+  Object.entries(i18nTemplateFiles(englishUi, all, maps)).forEach(
+    ([file, body]) => text(`${TRANSLATION_MOD}/i18n/${file}`, body),
+  );
+};
+
 const run = async () => {
   copy('MODDING.md', path.resolve('MODDING.md'));
   addModSkeleton();
   addTemplateMap();
   const all = fs.readJsonSync(path.join(JSON_DIR, 'all.json'));
+  const maps = fs.readJsonSync(path.join(JSON_DIR, 'all-maps.json'));
+  addTranslationSkeleton(all, maps);
   addContentIndex(all);
-  addMapIndex(fs.readJsonSync(path.join(JSON_DIR, 'all-maps.json')));
+  addMapIndex(maps);
   addArtIndex(all);
   await addExample();
 

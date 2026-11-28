@@ -1,5 +1,6 @@
 import type { AdventureLogEntryKind } from '@interfaces/combat-log';
 import type { DesktopNotificationCategory } from '@interfaces/electron-window';
+import type { LanguageChoice } from '@interfaces/i18n';
 
 export type GameOption =
   | 'showDebug'
@@ -48,4 +49,5 @@ export type GameOptions = Record<GameOption, boolean> & {
   adventureLogOverlayKinds: Record<AdventureLogEntryKind, boolean>;
   desktopNotificationKinds: Record<DesktopNotificationCategory, boolean>;
   modsEnabled: string[];
+  language: LanguageChoice;
 };

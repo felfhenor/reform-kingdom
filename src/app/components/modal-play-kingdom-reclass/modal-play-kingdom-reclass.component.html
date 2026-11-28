@@ -25,6 +25,7 @@
             class="w-64"
             [items]="unlockedJobs()"
             bindLabel="name"
+            [searchFn]="contentSearch"
             bindValue="id"
             [clearable]="false"
             [formField]="heroField.jobId"

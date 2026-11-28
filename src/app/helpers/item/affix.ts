@@ -1,3 +1,5 @@
+import { t } from '@helpers/i18n/i18n';
+import { contentName } from '@helpers/i18n/i18n-content';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { rngChoiceWeighted } from '@helpers/rng';
 import type {
@@ -170,20 +172,25 @@ export function equipmentItemAffixEffects(item: EquipmentItem): AffixEffect[] {
   return equipmentItemAffixes(item).flatMap((affix) => affix.effects);
 }
 
-// Composes prefixes before and suffixes after the base name, e.g. "Weakening" + "Copper Ring" + "of Strength" -> "Weakening Copper Ring of Strength".
+// e.g. "Weakening" + "Copper Ring" + "of Strength"; the order comes from the translation, since languages place affixes differently.
 export function equipmentItemDisplayName(
   item: EquipmentItem,
   baseName: string,
 ): string {
   const affixes = equipmentItemAffixes(item);
-  const prefixNames = affixes
-    .filter((affix) => affix.position === 'Prefix')
-    .map((affix) => affix.name);
-  const suffixNames = affixes
-    .filter((affix) => affix.position === 'Suffix')
-    .map((affix) => affix.name);
+  const namesAt = (position: AffixContent['position']) =>
+    affixes
+      .filter((affix) => affix.position === position)
+      .map(contentName)
+      .join(' ');
 
-  return [...prefixNames, baseName, ...suffixNames].join(' ');
+  return t('equipment.affixedName', {
+    prefixes: namesAt('Prefix'),
+    base: baseName,
+    suffixes: namesAt('Suffix'),
+  })
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 // Effect kinds already shown elsewhere in item UI (stat/resistance/combat-stat/monster-type-damage/elemental blocks, granted-skill list, infusion slot count, armory sell value, gather yield/skill stat bonus rows) - their affix's own description would be redundant.

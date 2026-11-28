@@ -112,7 +112,7 @@
                 <div>
                   <div class="type-label">{{ item.name }}</div>
                   <div class="type-meta">
-                    Lv. {{ item.level }} {{ item.job?.name }}
+                    Lv. {{ item.level }} {{ item.job | contentName }}
                   </div>
                 </div>
               </div>
@@ -298,7 +298,7 @@
                 <div>
                   <div class="type-label">{{ item.name }}</div>
                   <div class="type-meta">
-                    Lv. {{ item.level }} {{ item.job?.name }}
+                    Lv. {{ item.level }} {{ item.job | contentName }}
                   </div>
                 </div>
               </div>

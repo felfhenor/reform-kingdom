@@ -1,3 +1,4 @@
+import { contentDescription } from '@helpers/i18n/i18n-content';
 import {
   SKILL_TREE_COLUMN_GAP,
   SKILL_TREE_COLUMN_INTERVAL,
@@ -276,9 +277,10 @@ export function skillTreeNodeArt(
 
 export function skillTreeNodeEffectText(node: SkillTreeNodeContent): string {
   const ability = skillTreeNodeAbility(node);
+  const skill = skillTreeNodeSkill(node);
   return (
-    node.description ||
-    skillTreeNodeSkill(node)?.description ||
+    contentDescription(node) ||
+    (skill ? contentDescription(skill) : '') ||
     (ability ? jobAbilityDescription(ability) : '')
   );
 }

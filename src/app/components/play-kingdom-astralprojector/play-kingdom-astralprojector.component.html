@@ -27,7 +27,7 @@
             <span
               class="type-entity-name truncate text-{{ row.effect.rarity }}"
             >
-              {{ row.content.name }}
+              {{ row.content | contentName }}
             </span>
             <span class="type-meta truncate">
               {{ row.description }}

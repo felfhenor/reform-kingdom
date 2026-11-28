@@ -373,7 +373,7 @@
                 [class.location-text]="!!row.background"
               >
                 <span class="type-entity-name truncate">
-                  {{ row.encounter.name }}
+                  {{ row.encounter | contentName }}
                 </span>
                 <span class="flex gap-2">
                   <span
@@ -561,7 +561,7 @@
                     </app-slot-icon-blank>
                     <div class="flex flex-col min-w-0">
                       <span class="type-entity-name truncate">
-                        {{ job.name }}
+                        {{ job | contentName }}
                       </span>
                       <span class="type-meta">
                         Lv. {{ jobLevel(job.id) | number }}

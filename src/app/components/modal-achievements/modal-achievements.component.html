@@ -36,10 +36,14 @@
 
           <div class="flex flex-col gap-2 flex-1 min-w-0">
             <span class="type-entity-name">
-              {{ tile.isSecret ? '???' : tile.achievement.name }}
+              {{ tile.isSecret ? '???' : (tile.achievement | contentName) }}
             </span>
             <span class="text-lighter">
-              {{ tile.isSecret ? 'Hidden' : tile.achievement.description }}
+              {{
+                tile.isSecret
+                  ? 'Hidden'
+                  : (tile.achievement | contentDescription)
+              }}
             </span>
 
             @if (tile.unlock; as unlock) {

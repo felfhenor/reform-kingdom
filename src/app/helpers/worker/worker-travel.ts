@@ -15,13 +15,13 @@ import {
 import { kingdomWorkerTripHost } from '@helpers/worker/worker-trip-kingdom';
 import type {
   ItemId,
-  WorkerContent,
   WorkerGatherAssignment,
   WorkerId,
   WorkerStatus,
   WorkerStatusGathering,
   WorkerStatusTravelingTo,
   WorkerTripCargo,
+  IsContentItem,
 } from '@interfaces';
 
 export function workerTurnHome(
@@ -108,7 +108,7 @@ export function workerAssign(
 
   workerStartAssignment(workerId, worker.status, assignment);
 
-  const workerName = getEntry<WorkerContent>(workerId)?.name;
+  const workerName = getEntry<IsContentItem>(workerId)?.name;
   analyticsSendDesignEvent(
     workerName
       ? `Worker:Assign:${analyticsSafeSegment(workerName)}`
@@ -137,7 +137,7 @@ export function workerRecall(workerId: WorkerId): void {
 
   if (status.kind !== 'Crafting') workerTurnHome(workerId, status);
 
-  const workerName = getEntry<WorkerContent>(workerId)?.name;
+  const workerName = getEntry<IsContentItem>(workerId)?.name;
   analyticsSendDesignEvent(
     workerName
       ? `Worker:Recall:${analyticsSafeSegment(workerName)}`

@@ -2,6 +2,39 @@
   <div class="flex-1 flex flex-col gap-4">
     <div class="card shadow-sm">
       <div class="card-body p-3 gap-2">
+        <div class="type-section-title">
+          {{ 'options.language.title' | t }}
+        </div>
+
+        <div class="form-control">
+          <label class="label label-option">
+            <span class="label-text">
+              {{ 'options.language.title' | t }}
+              <app-icon
+                name="gameHelp"
+                size="inline"
+                class="text-lighter ml-1"
+                [tp]="'options.language.hint' | t"
+                [tpPlacement]="'top'"
+              />
+            </span>
+            <ng-select
+              ffSelect
+              [items]="languageOptions()"
+              bindLabel="label"
+              bindValue="key"
+              [clearable]="false"
+              [searchable]="false"
+              [ngModel]="languageKey()"
+              (ngModelChange)="chooseLanguage($event)"
+            ></ng-select>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-body p-3 gap-2">
         <div class="type-section-title">Gameplay</div>
 
         <div class="form-control">

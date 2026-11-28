@@ -18,5 +18,7 @@
       spritesheet="skill"
     ></app-slot-rarity-outline>
   </div>
-  <span class="text-xs truncate text-{{ s.rarity }}">{{ s.name }}</span>
+  <span class="text-xs truncate text-{{ s.rarity }}">
+    {{ s | contentName }}
+  </span>
 </div>

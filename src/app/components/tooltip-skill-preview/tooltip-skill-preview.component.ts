@@ -1,3 +1,4 @@
+import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { NgTemplateOutlet } from '@angular/common';
 import type { TemplateRef } from '@angular/core';
 import {
@@ -20,6 +21,7 @@ import { skillIsSpecial } from '@helpers/hero/skill';
   selector: 'app-tooltip-skill-preview',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ContentNamePipe,
     NgTemplateOutlet,
     DetailSkillPreviewComponent,
     IconItemPreviewComponent,

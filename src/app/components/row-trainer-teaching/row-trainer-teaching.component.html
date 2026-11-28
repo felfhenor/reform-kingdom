@@ -54,7 +54,7 @@
               <div class="zoom-inline">
                 <app-slot-rarity-outline [entry]="skill" spritesheet="skill" />
               </div>
-              <span>Learn {{ skill.name }}</span>
+              <span>Learn {{ skill | contentName }}</span>
             </div>
           }
         } @else if (showRequirements()) {
@@ -77,7 +77,7 @@
                       spritesheet="collectible"
                     />
                   </div>
-                  <span>{{ content.name }}</span>
+                  <span>{{ content | contentName }}</span>
                 }
               </div>
             }

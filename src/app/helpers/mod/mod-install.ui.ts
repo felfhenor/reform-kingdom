@@ -1,7 +1,10 @@
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
+import { t } from '@helpers/i18n/i18n';
+import { languageChoice, languageReset } from '@helpers/i18n/i18n-language';
 import { modsApplyDryRun } from '@helpers/mod/mod-apply';
 import { modLoadFiles, modsRevokeUnused } from '@helpers/mod/mod-load.ui';
 import {
+  modIsLanguage,
   modRefOf,
   modsRunOutdated,
   modUsableBundle,
@@ -52,7 +55,13 @@ export async function modsImportZip(
 
 export async function modsRemoveStored(mod: ModInstalled): Promise<void> {
   await modsStoreRemove(mod.key);
-  if (mod.manifest) modsSetEnabled(mod.manifest.id, false);
+  if (!mod.manifest) return;
+
+  modsSetEnabled(mod.manifest.id, false);
+  const choice = languageChoice();
+  if (choice.source === 'mod' && choice.modId === mod.manifest.id) {
+    languageReset();
+  }
 }
 
 // An enabled id with no installed mod would otherwise block every new game with no row to untick.
@@ -64,7 +73,8 @@ export function modsPruneEnabled(installedIds: string[]): void {
 
 export function modsSetEnabled(id: string, enabled: boolean): void {
   const others = getOption('modsEnabled').filter((other) => other !== id);
-  setOption('modsEnabled', enabled ? [...others, id] : others);
+  const canEnable = enabled && !modIsLanguage(id);
+  setOption('modsEnabled', canEnable ? [...others, id] : others);
 }
 
 export function modsReorderEnabled(fromIndex: number, toIndex: number): void {
@@ -96,6 +106,7 @@ export async function modsRefreshRun(force = false): Promise<string[]> {
 export async function modsAddToRun(id: string): Promise<string[]> {
   const bundle = modUsableBundle(id);
   if (!bundle) return ['That mod is not installed or has errors.'];
+  if (bundle.manifest.kind === 'i18n') return [t('mods.languageNotForRuns')];
 
   const state = gamestate();
   const next = structuredClone(state);

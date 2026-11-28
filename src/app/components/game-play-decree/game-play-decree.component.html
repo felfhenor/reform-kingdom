@@ -264,6 +264,7 @@
               class="w-56"
               [items]="townOptions()"
               bindLabel="name"
+              [searchFn]="contentSearch"
               bindValue="name"
               [clearable]="true"
               placeholder="Any Town"
@@ -271,12 +272,15 @@
               (change)="setDraftTownName($event)"
             >
               <ng-template ng-option-tmp let-item="item">
-                <div class="type-label">{{ item.name }}</div>
+                <div class="type-label">{{ item | contentName }}</div>
                 @if (item.lockedReason) {
                   <div class="type-meta text-warning whitespace-normal">
                     {{ item.lockedReason }}
                   </div>
                 }
+              </ng-template>
+              <ng-template ng-label-tmp let-item="item">
+                {{ item | contentName }}
               </ng-template>
             </ng-select>
           }

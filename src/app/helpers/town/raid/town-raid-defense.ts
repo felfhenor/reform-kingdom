@@ -1,3 +1,4 @@
+import { contentNameById } from '@helpers/i18n/i18n-content';
 import { ONE_YEAR_TICKS } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
@@ -51,7 +52,7 @@ export function raidDefenseGlobalEffectApply(
   applyGlobalEffectRemove(state, content.id);
 
   const townNames = telegraphedRaidTownIdsFromState(state)
-    .map((townId) => getEntry<TownContent>(townId)?.name)
+    .map((townId) => contentNameById(townId))
     .filter((name): name is string => !!name);
   if (townNames.length === 0) return;
 

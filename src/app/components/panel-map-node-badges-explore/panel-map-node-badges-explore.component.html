@@ -18,12 +18,12 @@
   <ng-template #sealTooltip>
     <div class="p-2 max-w-[300px]">
       @if (isSealed()) {
-        The memory of {{ sealRegionValue.name }} has been sealed! It took
-        {{ sealTicksTime() }} to seal it.
+        The memory of {{ sealRegionValue | contentName }} has been sealed! It
+        took {{ sealTicksTime() }} to seal it.
       } @else {
         The first time this location is cleared, it seals the memory of
-        {{ sealRegionValue.name }}. The sooner it's sealed, the more it scores
-        at the end of the run.
+        {{ sealRegionValue | contentName }}. The sooner it's sealed, the more it
+        scores at the end of the run.
       }
     </div>
   </ng-template>

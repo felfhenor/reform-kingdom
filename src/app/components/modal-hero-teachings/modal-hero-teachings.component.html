@@ -67,7 +67,7 @@
         }
       } @empty {
         <app-blank-slate>
-          No trainer teaches {{ selectedJob()?.name }} heroes yet.
+          No trainer teaches {{ selectedJob() | contentName }} heroes yet.
         </app-blank-slate>
       }
     </div>

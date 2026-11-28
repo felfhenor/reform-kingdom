@@ -1,3 +1,4 @@
+import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { DecimalPipe, formatNumber } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -28,6 +29,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-panel-town-crafting',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ContentNamePipe,
     AtlasImageComponent,
     DecimalPipe,
     IconComponent,

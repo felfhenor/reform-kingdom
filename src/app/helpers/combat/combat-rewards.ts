@@ -1,3 +1,4 @@
+import { contentNameById } from '@helpers/i18n/i18n-content';
 import {
   collectibleDropHtml,
   combatMessageLog,
@@ -75,7 +76,7 @@ function resolvedDropNameHtml(drop: ResolvedDrop): string | undefined {
       return recipe ? recipeDropHtml(recipe) : undefined;
     }
     case 'Worker':
-      return getEntry<WorkerContent>(drop.workerId)?.name;
+      return contentNameById(drop.workerId);
     default:
       return assertNeverReward(drop);
   }

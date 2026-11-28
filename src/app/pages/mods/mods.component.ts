@@ -43,6 +43,8 @@ import {
   modsInstalled,
 } from '@helpers/mod/mod-registry';
 import { localVersion } from '@helpers/engine/version';
+import { languageChoice } from '@helpers/i18n/i18n-language';
+import { languageChoose, languageReload } from '@helpers/mod/mod-language.ui';
 import { modioIsConfigured, modioUnsubscribe } from '@helpers/mod/modio.ui';
 import { savefileLoadStatus } from '@helpers/savefile/savefile-load';
 import { isSetup } from '@helpers/setup';
@@ -50,6 +52,7 @@ import { metaState } from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
 import type { ModInstalled, ModSource, ModsTab } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
+import { TPipe } from '@pipes/t.pipe';
 import { ModsService } from '@services/mods.service';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
@@ -76,6 +79,7 @@ import { sortBy } from 'es-toolkit/compat';
     PanelModsModioComponent,
     SweetAlert2Module,
     TippyDirective,
+    TPipe,
   ],
   hostDirectives: [FadeInDirective],
   host: { class: 'block' },
@@ -114,6 +118,7 @@ export class ModsComponent {
 
   public rows = computed(() => {
     const enabled = getOption('modsEnabled');
+    const language = languageChoice();
     const inRun = new Set((this.runMods() ?? []).map((ref) => ref.id));
     const rows = modsInstalled().map((mod) => {
       const id = mod.manifest?.id ?? mod.key;
@@ -126,11 +131,17 @@ export class ModsComponent {
         enabledIndex: enabled.indexOf(id),
         enabledCount: enabled.length,
         inRun: inRun.has(id),
+        isLanguage: mod.manifest?.kind === 'i18n',
+        isLanguageInUse: language.source === 'mod' && language.modId === id,
         isOtherVersion: modGameVersionMismatch(
           mod.manifest?.gameVersion,
           localVersion()?.tag,
         ),
-        canAddToRun: usable && this.runMods() !== undefined && !inRun.has(id),
+        canAddToRun:
+          usable &&
+          mod.manifest?.kind !== 'i18n' &&
+          this.runMods() !== undefined &&
+          !inRun.has(id),
       };
     });
     return sortBy(rows, [
@@ -196,6 +207,20 @@ export class ModsComponent {
     });
   }
 
+  async useLanguage(mod: ModInstalled): Promise<void> {
+    const manifest = mod.manifest;
+    const translations = mod.bundle?.translations;
+    if (!manifest || !translations) return;
+
+    await this.runBusy(() =>
+      languageChoose({
+        source: 'mod',
+        modId: manifest.id,
+        locale: translations.locale,
+      }),
+    );
+  }
+
   async addToRun(mod: ModInstalled): Promise<void> {
     const manifest = mod.manifest;
     const res = await this.addToRunSwal()?.fire();
@@ -215,10 +240,16 @@ export class ModsComponent {
     const res = await this.removeSwal()?.fire();
     if (!res?.isConfirmed) return;
 
+    const language = languageChoice();
+    const isLanguageInUse =
+      language.source === 'mod' && language.modId === mod.manifest?.id;
+
     await this.runBusy(async () => {
       await modsRemoveStored(mod);
       if (mod.modioId !== undefined) await modioUnsubscribe(mod.modioId);
       await this.modsService.reload();
+      // Text is read once at load, so dropping the active language needs a reload to show English.
+      if (isLanguageInUse) await languageReload();
     });
   }
 

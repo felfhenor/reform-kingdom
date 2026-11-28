@@ -1,3 +1,4 @@
+import { contentNameById } from '@helpers/i18n/i18n-content';
 import { combatRollAmbush } from '@helpers/combat/combat-ambush';
 import { getEntry } from '@helpers/content/content';
 import { exploreDifficultyTier } from '@helpers/engine/difficulty-tier';
@@ -19,7 +20,6 @@ import type {
   ColosseumSetup,
   Combat,
   CombatSimulation,
-  EncounterContent,
   EncounterId,
   EquipmentBlock,
   EquipmentContent,
@@ -177,7 +177,7 @@ export function colosseumCreateFight(
   fightIndex: number,
   simulation: CombatSimulation,
 ): Combat | undefined {
-  const name = getEntry<EncounterContent>(encounterId)?.name ?? 'Colosseum';
+  const name = contentNameById(encounterId) ?? 'Colosseum';
   const created = encounterCreateFightCombat(
     encounterId,
     fightIndex,

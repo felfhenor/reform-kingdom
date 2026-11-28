@@ -43,7 +43,7 @@
 
               <div class="flex flex-col min-w-0">
                 <span class="type-entity-name truncate">
-                  {{ entry.content.name }}
+                  {{ entry.content | contentName }}
                 </span>
                 <span class="type-meta">
                   Lv. {{ entry.state.level }}
@@ -88,7 +88,7 @@
 
             <div class="flex flex-col items-start gap-2 w-[600px] min-w-0">
               <div class="type-entity-heading">
-                {{ entry.content.name }}
+                {{ entry.content | contentName }}
                 <span class="type-muted font-normal">
                   Lv. {{ entry.state.level }}
                 </span>
@@ -133,7 +133,7 @@
           </div>
 
           <p class="type-flavor min-h-[60px]">
-            {{ entry.content.description }}
+            {{ entry.content | contentDescription }}
           </p>
 
           <div class="divider my-1"></div>

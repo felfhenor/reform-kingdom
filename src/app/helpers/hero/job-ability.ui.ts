@@ -1,3 +1,4 @@
+import { contentDescription, contentName } from '@helpers/i18n/i18n-content';
 import { DEBUFF_POTENCY_PER_RANK } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import {
@@ -103,7 +104,8 @@ export function jobAbilityValueLabel(
 // The stacking line follows the run's edicts, so it isn't written into the content.
 export function jobAbilityDescription(ability: JobAbilityContent): string {
   const description =
-    jobAbilityEdictVariant(ability.type)?.description ?? ability.description;
+    jobAbilityEdictVariant(ability.type)?.description ??
+    contentDescription(ability);
   const stacks = jobAbilityStacks(ability.type);
   if (stacks === undefined) return description;
 
@@ -120,7 +122,7 @@ function jobAbilityRow(
 
   return {
     ability,
-    name: `${ability.name} ${ROMAN_NUMERAL_REVERSE[tier]}`,
+    name: `${contentName(ability)} ${ROMAN_NUMERAL_REVERSE[tier]}`,
     sprite: ability.sprite,
     rarity: JOB_ABILITY_TIER_RARITIES[rarityIndex],
     current,

@@ -26,6 +26,7 @@
     "mods:kit": "ts-node --project tsconfig.scripts.json -r tsconfig-paths/register scripts/mods-kit",
     "mods:pack": "ts-node --project tsconfig.scripts.json -r tsconfig-paths/register scripts/mods-pack",
     "mods:validate": "ts-node --project tsconfig.scripts.json -r tsconfig-paths/register scripts/mods-validate",
+    "i18n:fill": "ts-node --project tsconfig.scripts.json -r tsconfig-paths/register scripts/i18n-fill",
     "build:barrels": "ts-node --project tsconfig.scripts.json scripts/build-barrels",
     "build:glyphs": "ts-node --project tsconfig.scripts.json scripts/build-glyphs && prettier --write src/app/ff/input/ff-glyph-codes.ts",
     "build:nodebg": "ts-node --project tsconfig.scripts.json scripts/build-nodebg",

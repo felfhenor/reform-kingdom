@@ -108,3 +108,28 @@ describe('modsApplyEnabled', () => {
     expect(modsAppliedRefs()).toEqual([]);
   });
 });
+
+describe('savefile translation refs', () => {
+  const FRENCH: ModRef = {
+    id: 'fr',
+    name: 'French',
+    version: '1',
+    kind: 'i18n',
+  };
+
+  it('drops them, even when the translation is not installed', () => {
+    const { state, errors } = savefileModsPrepare(saveWith([FRENCH]));
+
+    expect(errors).toEqual([]);
+    expect(state.meta.mods).toEqual([]);
+    expect(savefileModsMissing(saveWith([FRENCH]))).toEqual([]);
+  });
+
+  it('keeps content mods next to them', () => {
+    installed('1');
+
+    const { state } = savefileModsPrepare(saveWith([FRENCH, GEMS_V1]));
+
+    expect(state.meta.mods.map((ref) => ref.id)).toEqual(['gems']);
+  });
+});

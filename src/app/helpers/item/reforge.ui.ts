@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
 import {
@@ -44,7 +45,7 @@ export async function equipmentReforge(
   const content = getEntry<EquipmentContent>(item.equipmentId);
   if (!content) return false;
 
-  const oldName = equipmentItemDisplayName(item, content.name);
+  const oldName = equipmentItemDisplayName(item, contentName(content));
 
   await updateGamestate((state) => {
     result = applyEquipmentReforge(state, equipmentItemId);
@@ -57,7 +58,7 @@ export async function equipmentReforge(
   }
 
   const newItem = stateOwnedEquipmentItem(gamestate(), equipmentItemId)!;
-  const newName = equipmentItemDisplayName(newItem, content.name);
+  const newName = equipmentItemDisplayName(newItem, contentName(content));
   miscellaneousMessageLog(`Reforged "${oldName}" into "${newName}".`);
   analyticsSendDesignEvent(
     `Kingdom:Reforge:${analyticsSafeSegment(content.name)}`,

@@ -14,6 +14,7 @@ import {
   LOADING_STALL_WARN_MS,
 } from '@helpers/config';
 import { loadingProgressCalculate } from '@helpers/engine/loading.ui';
+import { t } from '@helpers/i18n/i18n';
 import { hasGameStateLoaded } from '@helpers/state-game';
 import type { LoadingStep } from '@interfaces';
 import { ContentService } from '@services/content.service';
@@ -93,41 +94,41 @@ export class LoadingService {
 
   private steps = computed<LoadingStep[]>(() => [
     {
-      label: 'Loading game data...',
+      label: t('loading.data'),
       isDone: this.contentService.hasLoadedData(),
     },
     {
-      label: 'Loading game art...',
+      label: t('loading.art'),
       isDone: this.contentService.hasLoadedArt(),
     },
     {
-      label: 'Loading UI art...',
+      label: t('loading.uiArt'),
       isDone: this.contentService.hasLoadedUIArt(),
     },
     {
-      label: 'Loading background art...',
+      label: t('loading.backgroundArt'),
       isDone: this.contentService.hasLoadedBackgroundArt(),
     },
     {
-      label: 'Loading UI fonts...',
+      label: t('loading.fonts'),
       isDone: this.contentService.hasLoadedFonts(),
     },
     {
-      label: 'Loading UI scripts...',
+      label: t('loading.scripts'),
       isDone: this.contentService.hasLoadedUILibraries(),
     },
     {
-      label: 'Loading map data...',
+      label: t('loading.maps'),
       isDone: this.contentService.hasLoadedMaps(),
     },
     {
-      label: 'Loading map art...',
+      label: t('loading.mapArt'),
       isDone: this.contentService.hasLoadedMapArt(),
     },
-    { label: 'Loading music...', isDone: this.soundService.hasLoadedAudio() },
-    { label: 'Loading your save...', isDone: hasGameStateLoaded() },
+    { label: t('loading.music'), isDone: this.soundService.hasLoadedAudio() },
+    { label: t('loading.save'), isDone: hasGameStateLoaded() },
     {
-      label: 'Preparing your kingdom...',
+      label: t('loading.kingdom'),
       isDone: this.gamestateService.hasLoaded(),
     },
   ]);

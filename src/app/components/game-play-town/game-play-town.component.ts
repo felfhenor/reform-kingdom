@@ -1,3 +1,4 @@
+import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -24,6 +25,7 @@ import { ContentService } from '@services/content.service';
   selector: 'app-game-play-town',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ContentNamePipe,
     CardPageComponent,
     DecimalPipe,
     BarTownReputationComponent,

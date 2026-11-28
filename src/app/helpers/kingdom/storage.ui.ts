@@ -1,3 +1,4 @@
+import { contentDescription, contentName } from '@helpers/i18n/i18n-content';
 import { getEntry } from '@helpers/content/content';
 import { discoveredMaterialsState, materialsState } from '@helpers/state-game';
 import type {
@@ -34,8 +35,10 @@ export function filterStorageMaterials(
   if (text === '') return entries;
 
   return entries.filter((entry) => {
-    if (entry.item.name.toLowerCase().includes(text)) return true;
-    if (entry.item.description.toLowerCase().includes(text)) return true;
+    if (contentName(entry.item).toLowerCase().includes(text)) return true;
+    if (contentDescription(entry.item).toLowerCase().includes(text)) {
+      return true;
+    }
 
     return false;
   });

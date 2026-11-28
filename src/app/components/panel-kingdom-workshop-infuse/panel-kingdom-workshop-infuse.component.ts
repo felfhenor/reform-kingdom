@@ -1,3 +1,4 @@
+import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { FFKeyboardDirective } from '@ff/controls/ff-keyboard.directive';
 import { FFFocusOnChangeDirective } from '@ff/focus/ff-focus-on-change.directive';
 import {
@@ -57,6 +58,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   selector: 'app-panel-kingdom-workshop-infuse',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ContentNamePipe,
     FFKeyboardDirective,
     FFFocusOnChangeDirective,
     BlankSlateComponent,

@@ -22,6 +22,11 @@ export function modUsableBundle(id: string): ModBundle | undefined {
   return mod?.bundle && mod.errors.length === 0 ? mod.bundle : undefined;
 }
 
+export function modIsLanguage(id: string): boolean {
+  const mod = modsInstalled().find((m) => m.manifest?.id === id);
+  return mod?.manifest?.kind === 'i18n';
+}
+
 export function modsRunOutdated(runMods: ModRef[]): boolean {
   return runMods.some((ref) => {
     const version = modUsableBundle(ref.id)?.manifest.version;

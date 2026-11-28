@@ -1,7 +1,11 @@
+import {
+  contentDescription,
+  contentName,
+  contentNameById,
+} from '@helpers/i18n/i18n-content';
 import { isTaskUnavailableThisRun } from '@helpers/item/obtainable-this-run';
 import { combatOrdersMostEnabled } from '@helpers/combat/combat-order';
 import { TASK_WIDGET_ENTRY_COUNT } from '@helpers/config';
-import { getEntry } from '@helpers/content/content';
 import { bestiaryAnalyzedCount } from '@helpers/kingdom/bestiary';
 import { modalClose } from '@helpers/engine/modal-stack';
 import { setGamePlayView, worldCameraFocus } from '@helpers/engine/ui';
@@ -21,7 +25,6 @@ import { isWorldMapVisited } from '@helpers/world-node/world-map-discovery';
 import { worldNodeByName } from '@helpers/world-node/world-nodes';
 import type {
   GameStateTasks,
-  ItemContent,
   TaskContent,
   TaskId,
   TaskRowViewModel,
@@ -84,15 +87,15 @@ function taskRowViewModel(
 
   return {
     taskId: task.id,
-    name: task.name,
-    description: task.description,
+    name: contentName(task),
+    description: contentDescription(task),
     isComplete,
     isClaimed: !!entry?.claimedAt,
     progress: isComplete ? undefined : taskProgress(task, tasks),
     locate: isComplete ? undefined : taskLocate(task),
     rewards: task.rewards.map((reward) => ({
       ...reward,
-      name: getEntry<ItemContent>(reward.itemId)?.name ?? '',
+      name: contentNameById(reward.itemId) ?? '',
     })),
   };
 }

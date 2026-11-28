@@ -1,3 +1,4 @@
+import { contentNameById } from '@helpers/i18n/i18n-content';
 import { categoryMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
 import {
@@ -22,6 +23,7 @@ import type {
   WorkerCraftAssignment,
   WorkerCraftSlot,
   WorkerId,
+  IsContentItem,
 } from '@interfaces';
 
 // A worker that's out gathering turns home with its haul and starts the craft there.
@@ -59,8 +61,8 @@ export async function workerAssignCraft(
     workerTurnHome(workerId, status);
   }
 
-  const workerName = getEntry<WorkerContent>(workerId)?.name;
-  const recipeName = getEntry<RecipeContent>(recipeId)?.name;
+  const workerName = contentNameById(workerId);
+  const recipeName = contentNameById(recipeId);
   if (workerName && recipeName) {
     categoryMessageLog(
       'Craft',
@@ -70,7 +72,7 @@ export async function workerAssignCraft(
   }
   analyticsSendDesignEvent(
     recipeName
-      ? `Worker:AssignCraft:${analyticsSafeSegment(recipeName)}`
+      ? `Worker:AssignCraft:${analyticsSafeSegment(getEntry<IsContentItem>(recipeId)?.name ?? recipeName)}`
       : 'Worker:AssignCraft',
   );
   return true;

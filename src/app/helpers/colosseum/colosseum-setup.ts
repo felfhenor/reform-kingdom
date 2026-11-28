@@ -1,3 +1,4 @@
+import { contentNameById } from '@helpers/i18n/i18n-content';
 import {
   colosseumEncounterOptions,
   colosseumGearPool,
@@ -12,7 +13,6 @@ import type {
   ColosseumSetup,
   ColosseumSetupPruneReport,
   EncounterContent,
-  EquipmentContent,
   EquipmentItem,
   EquipmentSlot,
   SkillTreeNodeContent,
@@ -37,7 +37,7 @@ function colosseumPruneGear(
       kept[slot as EquipmentSlot] = pick;
       return;
     }
-    const name = getEntry<EquipmentContent>(pick.equipmentId)?.name ?? 'Gear';
+    const name = contentNameById(pick.equipmentId) ?? 'Gear';
     if (!dropped.includes(`${name} (no longer owned)`)) {
       dropped.push(`${name} (no longer owned)`);
     }

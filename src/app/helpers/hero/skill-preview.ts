@@ -1,4 +1,8 @@
 import {
+  contentDescription,
+  contentNameById,
+} from '@helpers/i18n/i18n-content';
+import {
   combatDamageElements,
   getCombatantBaseDamageForTechnique,
 } from '@helpers/combat/combat-damage';
@@ -6,7 +10,6 @@ import { techniqueHasAttribute } from '@helpers/combat/combat-damage-amount';
 import { elementalBoonMultiplier } from '@helpers/combat/combat-element';
 import { combatFormatMessage } from '@helpers/combat/combat-log';
 import { SKILL_MAX_ALLY_TARGETS } from '@helpers/config';
-import { getEntry } from '@helpers/content/content';
 import {
   skillTechniqueGeneratedElements,
   skillTechniqueNumTargets,
@@ -21,12 +24,10 @@ import type {
   EquipmentSkillContentTechnique,
   EquipmentSkillTargetBehaviorData,
   GameElement,
-  MonsterContent,
   SkillTechniqueKind,
   SkillTechniquePreview,
   SkillTechniqueStatusPreview,
   SkillTechniqueTargeting,
-  StatusEffectContent,
 } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
 
@@ -89,8 +90,7 @@ function skillTargetBehaviorCondition(
   behavior: EquipmentSkillTargetBehaviorData,
 ): string[] {
   const effectName = () =>
-    getEntry<StatusEffectContent>(behavior.statusEffectId ?? '')?.name ??
-    'a status effect';
+    contentNameById(behavior.statusEffectId ?? '') ?? 'a status effect';
 
   switch (behavior.behavior) {
     case 'NotMaxHealth':
@@ -117,9 +117,7 @@ function skillTechniqueStatusPreviews(
   technique: EquipmentSkillContentTechnique,
 ): SkillTechniqueStatusPreview[] {
   return technique.statusEffects.map((application) => ({
-    name:
-      getEntry<StatusEffectContent>(application.statusEffectId)?.name ??
-      'Unknown Effect',
+    name: contentNameById(application.statusEffectId) ?? 'Unknown Effect',
     chance: skillTechniqueStatusEffectChance(skill, application),
     duration: skillTechniqueStatusEffectDuration(skill, application),
   }));
@@ -156,7 +154,7 @@ function skillTechniquePreview(
       ? 100
       : technique.accuracy,
     summonName: technique.summonMonsterId
-      ? getEntry<MonsterContent>(technique.summonMonsterId)?.name
+      ? contentNameById(technique.summonMonsterId)
       : undefined,
   };
 }
@@ -195,9 +193,10 @@ export function skillDescriptionWithPreview(
   combatant: Combatant,
   skill: EquipmentSkillContent,
 ): string {
-  if (skill.techniques.length === 0) return skill.description;
+  const description = contentDescription(skill);
+  if (skill.techniques.length === 0) return description;
 
-  return combatFormatMessage(skill.description, {
+  return combatFormatMessage(description, {
     value: skillDescriptionValue(combatant, skill).toLocaleString(),
   });
 }

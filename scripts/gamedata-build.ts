@@ -11,6 +11,7 @@ import path from 'path';
 import rec from 'recursive-readdir';
 import { CONTENT_OUT_DIR } from './content-out-dir';
 import { demoFilterContent } from './demo-content';
+import { buildI18n, I18N_DIR, writeI18n } from './gamedata-i18n';
 import { writeJsonIfChanged } from './write-json-if-changed';
 
 fs.ensureDirSync(CONTENT_OUT_DIR);
@@ -23,7 +24,9 @@ const fileOf = new Map<any, string>();
 
 // preload
 const processFiles = async () => {
-  const allFiles = sortBy(fs.readdirSync('gamedata'));
+  const allFiles = sortBy(fs.readdirSync('gamedata')).filter(
+    (folder: string) => folder !== I18N_DIR,
+  );
 
   // Read concurrently but process in sorted order, so output is stable across rebuilds.
   const filesPerFolder = await Promise.all(
@@ -113,9 +116,11 @@ const rewriteDataIds = () => {
 
 const run = async () => {
   await processFiles();
+  const languages = await buildI18n(allData);
   if (process.argv.includes('--demo')) {
     demoFilterContent(allData, fileOf, refsOf);
   }
+  writeI18n(languages, allData);
   rewriteDataIds();
 };
 

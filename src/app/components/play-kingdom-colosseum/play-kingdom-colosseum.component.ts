@@ -1,3 +1,4 @@
+import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { FFFocusOnChangeDirective } from '@ff/focus/ff-focus-on-change.directive';
 import { gamepadBindHeroCycle } from '@helpers/engine/gamepad.ui';
 import { DecimalPipe, formatNumber, PercentPipe } from '@angular/common';
@@ -133,6 +134,7 @@ const HERO_TABS: { id: ColosseumHeroTab; label: string }[] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [ColosseumFightService],
   imports: [
+    ContentNamePipe,
     FFFocusOnChangeDirective,
     AtlasAnimationComponent,
     BackdropNodeComponent,

@@ -1,3 +1,5 @@
+import { ContentDescriptionPipe } from '@pipes/content-description.pipe';
+import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { FFFocusOnChangeDirective } from '@ff/focus/ff-focus-on-change.directive';
 import { DecimalPipe } from '@angular/common';
 import {
@@ -71,6 +73,8 @@ type EntryStatusDisplay = {
   selector: 'app-play-kingdom-workers',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ContentDescriptionPipe,
+    ContentNamePipe,
     FFFocusOnChangeDirective,
     BlankSlateComponent,
     CardPageComponent,

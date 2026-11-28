@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import {
   combatantIsDead,
   combatCombatantTakeDamage,
@@ -147,7 +148,7 @@ function combatantAct(combat: Combat, combatant: Combatant): boolean {
   runStatsRecordSkillUse(combat, combatant, chosenSkill.family);
   combatantSkillCastEventEmit(
     combatant.id,
-    chosenSkill.name,
+    contentName(chosenSkill),
     chosenSkill.sprite,
   );
   combatantPaySkillCast(combat, combatant, chosenSkill);

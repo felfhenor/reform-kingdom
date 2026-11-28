@@ -1,3 +1,4 @@
+import { contentNameById } from '@helpers/i18n/i18n-content';
 import {
   HERO_BURST_SKILL_SLOTS,
   REGALIA_NAME_MAX_LENGTH,
@@ -197,7 +198,7 @@ export function regaliaNameClean(name: string, fallback: string): string {
 }
 
 export function regaliaDefaultName(jobId: JobId, existingCount: number) {
-  const jobName = getEntry<JobContent>(jobId)?.name ?? 'Hero';
+  const jobName = contentNameById(jobId) ?? 'Hero';
   return regaliaNameClean('', `${jobName} Regalia ${existingCount + 1}`);
 }
 

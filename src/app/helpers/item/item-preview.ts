@@ -1,3 +1,4 @@
+import { contentDescription, contentName } from '@helpers/i18n/i18n-content';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
   recipeBackdropSprite,
@@ -62,7 +63,7 @@ export function resolveGatherYieldBonusDisplay(
   return bonuses.map((bonus) => {
     const tradeskill = getEntry<TradeskillContent>(bonus.tradeskillId);
     return {
-      tradeskillName: tradeskill?.name ?? bonus.tradeskillId,
+      tradeskillName: tradeskill ? contentName(tradeskill) : bonus.tradeskillId,
       tradeskillSprite: tradeskill?.sprite ?? '',
       value: bonus.value,
     };
@@ -109,8 +110,8 @@ export function itemPreviewDisplay(
   instance?: EquipmentItem,
 ): ItemPreviewDisplay {
   const base: Partial<ItemPreviewDisplay> = {
-    name: content.name,
-    description: content.description,
+    name: contentName(content),
+    description: contentDescription(content),
     sprite: content.sprite,
     spritesheet,
     rarity: content.rarity,
@@ -118,7 +119,7 @@ export function itemPreviewDisplay(
   };
 
   if (instance) {
-    base.name = equipmentItemDisplayName(instance, content.name);
+    base.name = equipmentItemDisplayName(instance, contentName(content));
     base.skills = equipmentItemGrantedSkills(
       instance,
       content as EquipmentContent,
@@ -249,7 +250,7 @@ export function resolveRewardDisplay(reward: {
     const rumor = getEntry<RumorContent>(reward.rumorId);
     return rumor
       ? {
-          name: rumor.name,
+          name: contentName(rumor),
           description: rumorTeaser(rumor),
           sprite: rumorSprite() ?? '',
           spritesheet: 'item',

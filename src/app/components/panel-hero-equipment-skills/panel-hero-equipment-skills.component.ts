@@ -1,3 +1,4 @@
+import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -40,6 +41,7 @@ import { skillEpCost } from '@helpers/hero/skill';
   selector: 'app-panel-hero-equipment-skills',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ContentNamePipe,
     BlankSlateComponent,
     TippyDirective,
     SlotRarityOutlineComponent,

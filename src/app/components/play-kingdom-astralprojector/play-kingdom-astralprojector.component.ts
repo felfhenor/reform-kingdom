@@ -1,3 +1,5 @@
+import { contentDescription } from '@helpers/i18n/i18n-content';
+import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { formatNumber } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -57,6 +59,7 @@ type AstralProjectorRowViewModel = {
   selector: 'app-play-kingdom-astralprojector',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ContentNamePipe,
     FFButtonComponent,
     FFFocusRowDirective,
     SlotRequirementComponent,
@@ -79,7 +82,7 @@ export class PlayKingdomAstralProjectorComponent {
         effect: { rarity: content.rarity, sprite: '', ...(effect ?? {}) },
         description: effect
           ? globalEffectDescription({
-              description: effect.description,
+              description: contentDescription(effect),
               effects: globalEffectEffectsScaled(
                 effect.effects,
                 astralProjectorStrength(),

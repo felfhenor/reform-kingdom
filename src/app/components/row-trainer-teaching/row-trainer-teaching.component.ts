@@ -1,3 +1,4 @@
+import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -15,6 +16,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-row-trainer-teaching',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ContentNamePipe,
     DecimalPipe,
     RowStatSummaryComponent,
     SlotRarityOutlineComponent,

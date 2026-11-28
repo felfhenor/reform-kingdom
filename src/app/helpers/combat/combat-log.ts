@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import { signal } from '@angular/core';
 import { pluralize } from '@boringnode/pluralize';
 import {
@@ -174,7 +175,7 @@ export function rarityNameHtml(name: string, rarity: DropRarity): string {
 
 export function itemNameHtml(
   item: ItemContent,
-  displayName = item.name,
+  displayName = contentName(item),
 ): string {
   return rarityNameHtml(displayName, item.rarity);
 }
@@ -182,14 +183,14 @@ export function itemNameHtml(
 // "1 wergen stick" vs "3 wergen sticks" - only pluralize when the quantity
 // actually calls for it, since item names are authored in singular form.
 export function itemDropHtml(item: ItemContent, quantity: number): string {
-  const lowerName = item.name.toLowerCase();
+  const lowerName = contentName(item).toLowerCase();
   const displayName = quantity === 1 ? lowerName : pluralize(lowerName);
 
   return `${quantity.toLocaleString()} ${itemNameHtml(item, displayName)}`;
 }
 
 export function equipmentNameHtml(equipment: EquipmentContent): string {
-  return rarityNameHtml(equipment.name, equipment.rarity);
+  return rarityNameHtml(contentName(equipment), equipment.rarity);
 }
 
 // Equipment drops are always a single piece, so there's no quantity/plural to handle here.
@@ -198,7 +199,7 @@ export function equipmentDropHtml(equipment: EquipmentContent): string {
 }
 
 export function collectibleNameHtml(collectible: CollectibleContent): string {
-  return rarityNameHtml(collectible.name, collectible.rarity);
+  return rarityNameHtml(contentName(collectible), collectible.rarity);
 }
 
 // Collectible drops are always a single piece, same as equipment.

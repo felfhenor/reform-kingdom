@@ -1,4 +1,5 @@
 import { contentTypeList } from '@helpers/content/content-initializers';
+import { i18nLanguageParse } from '@helpers/i18n/i18n-parse';
 import {
   MOD_BACKGROUND_SHEET,
   MOD_SPRITE_SIZE,
@@ -6,6 +7,7 @@ import {
 import { tiledTilesetInline } from '@helpers/pixi/tiled-map-inline';
 import { sortBy } from 'es-toolkit/compat';
 import type {
+  I18nLanguageData,
   IsContentItem,
   ModBundle,
   ModBundleParseIO,
@@ -267,6 +269,27 @@ function modMapPatchesParse(
   });
 }
 
+// Same layout and parser as the game's own gamedata/i18n/<locale> folders.
+function modTranslationsParse(
+  files: ModFile[],
+  contentTypes: string[],
+  io: ModBundleParseIO,
+  errors: string[],
+): I18nLanguageData | undefined {
+  const docs: Record<string, unknown> = {};
+  files.forEach((file) => {
+    const path = /^i18n\/(.+\.ya?ml)$/.exec(file.path)?.[1];
+    // A translator may leave a file empty; that's "nothing translated", not an error.
+    if (path && modFileText(file).trim() !== '') {
+      docs[path] = modParseData(file, io);
+    }
+  });
+
+  const result = i18nLanguageParse(docs, contentTypes);
+  errors.push(...result.errors.map((error) => `i18n: ${error}`));
+  return result.language;
+}
+
 function modBundleBuild(
   manifest: ModManifest,
   files: ModFile[],
@@ -280,6 +303,10 @@ function modBundleBuild(
     maps: modMapsParse(files, io, errors),
     mapPatches: modMapPatchesParse(files, io, errors),
     sprites: modSpritesParse(files, io, errors),
+    translations:
+      manifest.kind === 'i18n'
+        ? modTranslationsParse(files, contentTypes, io, errors)
+        : undefined,
   };
 }
 

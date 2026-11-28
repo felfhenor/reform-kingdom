@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import { GOLD_COIN_NAME } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import {
@@ -45,7 +46,7 @@ export function rewardContentInfo(
   if ('itemId' in reward) {
     const item = getEntry<ItemContent>(reward.itemId);
     return item
-      ? { name: item.name, sprite: item.sprite, spritesheet: 'item' }
+      ? { name: contentName(item), sprite: item.sprite, spritesheet: 'item' }
       : undefined;
   }
 
@@ -53,7 +54,7 @@ export function rewardContentInfo(
     const equipment = getEntry<EquipmentContent>(reward.equipmentId);
     return equipment
       ? {
-          name: equipment.name,
+          name: contentName(equipment),
           sprite: equipment.sprite,
           spritesheet: 'equipment',
         }
@@ -64,7 +65,7 @@ export function rewardContentInfo(
     const collectible = getEntry<CollectibleContent>(reward.collectibleId);
     return collectible
       ? {
-          name: collectible.name,
+          name: contentName(collectible),
           sprite: collectible.sprite,
           spritesheet: 'collectible',
         }
@@ -74,7 +75,11 @@ export function rewardContentInfo(
   if ('workerId' in reward) {
     const worker = getEntry<WorkerContent>(reward.workerId);
     return worker
-      ? { name: worker.name, sprite: worker.sprite, spritesheet: 'worker' }
+      ? {
+          name: contentName(worker),
+          sprite: worker.sprite,
+          spritesheet: 'worker',
+        }
       : undefined;
   }
 

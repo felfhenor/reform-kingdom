@@ -195,7 +195,7 @@
             >
               <app-slot-rarity-outline [entry]="burst" spritesheet="skill" />
               <span class="text-{{ burst.rarity }}">
-                {{ burst.name }}
+                {{ burst | contentName }}
               </span>
             </div>
           } @else {

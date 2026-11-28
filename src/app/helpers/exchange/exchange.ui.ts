@@ -1,3 +1,4 @@
+import { contentName, contentNameById } from '@helpers/i18n/i18n-content';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
 import {
@@ -38,6 +39,7 @@ import type {
   ExchangeResult,
   ExchangeRow,
   ItemContent,
+  IsContentItem,
 } from '@interfaces';
 import { sortBy, uniqBy } from 'es-toolkit/compat';
 
@@ -75,7 +77,7 @@ export function exchangeRows(node: ExchangeNodeContent): ExchangeRow[] {
         return [
           {
             kind: 'Collectible',
-            outputName: collectible.name,
+            outputName: contentName(collectible),
             exchangeIndex,
             display: itemPreviewDisplay('collectible', collectible),
             costs: exchange.costs,
@@ -89,11 +91,9 @@ export function exchangeRows(node: ExchangeNodeContent): ExchangeRow[] {
           {
             kind: 'Item',
             inputContent: getEntry<ItemContent>(exchange.input.itemId)!,
-            inputName:
-              getEntry<ItemContent>(exchange.input.itemId)?.name || 'UNKNOWN',
+            inputName: contentNameById(exchange.input.itemId) || 'UNKNOWN',
             outputContent: getEntry<ItemContent>(exchange.output.itemId)!,
-            outputName:
-              getEntry<ItemContent>(exchange.output.itemId)?.name || 'UNKNOWN',
+            outputName: contentNameById(exchange.output.itemId) || 'UNKNOWN',
             exchangeIndex,
             exchange,
             canAfford,
@@ -121,10 +121,13 @@ export function exchangeRows(node: ExchangeNodeContent): ExchangeRow[] {
           exchangeIndex,
           item,
           inputContent,
-          inputName: equipmentItemDisplayName(item, inputContent.name),
+          inputName: equipmentItemDisplayName(item, contentName(inputContent)),
           outputItem,
           outputContent,
-          outputName: equipmentItemDisplayName(outputItem, outputContent.name),
+          outputName: equipmentItemDisplayName(
+            outputItem,
+            contentName(outputContent),
+          ),
           costs: exchange.costs,
           canAfford,
           losesGems: exchangeMayDestroyGems(item, outputItem),
@@ -167,7 +170,7 @@ function exchangeInputHint(
     discovered: isEquipment
       ? isEquipmentDiscovered(exchange.input.equipmentId)
       : isMaterialDiscovered(exchange.input.itemId),
-    name: content?.name ?? 'UNKNOWN',
+    name: content ? contentName(content) : 'UNKNOWN',
     spritesheet: isEquipment ? 'equipment' : 'item',
     sprite: content?.sprite ?? '',
   };
@@ -187,7 +190,8 @@ function exchangeVerb(nodeName: string): string {
   return exchangeNodeContent(nodeName)?.actionLabel ?? 'Exchange';
 }
 
-function exchangeAnalytics(nodeName: string, outputName: string): void {
+function exchangeAnalytics(nodeName: string, outputId: string): void {
+  const outputName = getEntry<IsContentItem>(outputId)?.name ?? 'UNKNOWN';
   analyticsSendDesignEvent(
     `World:Exchange:${analyticsSafeSegment(nodeName)}:${analyticsSafeSegment(outputName)}`,
   );
@@ -207,7 +211,7 @@ export async function exchangePerformEquipment(
     return false;
   }
 
-  const oldName = equipmentItemDisplayName(item, inputContent.name);
+  const oldName = equipmentItemDisplayName(item, contentName(inputContent));
   let result = 'invalid' as ExchangeResult;
 
   await updateGamestate((state) => {
@@ -229,11 +233,11 @@ export async function exchangePerformEquipment(
     (owned) => owned.id === equipmentItemId,
   )!;
   const outputContent = getEntry<EquipmentContent>(newItem.equipmentId)!;
-  const newName = equipmentItemDisplayName(newItem, outputContent.name);
+  const newName = equipmentItemDisplayName(newItem, contentName(outputContent));
   miscellaneousMessageLog(
     `${exchangeVerb(nodeName)}: "${oldName}" became "${newName}".`,
   );
-  exchangeAnalytics(nodeName, outputContent.name);
+  exchangeAnalytics(nodeName, outputContent.id);
 
   return true;
 }
@@ -257,14 +261,12 @@ export async function exchangePerformItem(
   const exchange = exchangeNodeContent(nodeName)?.exchanges[exchangeIndex];
   if (exchange?.kind !== 'Item') return true;
 
-  const inputName =
-    getEntry<ItemContent>(exchange.input.itemId)?.name ?? 'UNKNOWN';
-  const outputName =
-    getEntry<ItemContent>(exchange.output.itemId)?.name ?? 'UNKNOWN';
+  const inputName = contentNameById(exchange.input.itemId) ?? 'UNKNOWN';
+  const outputName = contentNameById(exchange.output.itemId) ?? 'UNKNOWN';
   miscellaneousMessageLog(
     `${exchangeVerb(nodeName)}: ${exchange.input.required.toLocaleString()}x ${inputName} became ${exchange.output.quantity.toLocaleString()}x ${outputName}.`,
   );
-  exchangeAnalytics(nodeName, outputName);
+  exchangeAnalytics(nodeName, exchange.output.itemId);
 
   return true;
 }
@@ -288,11 +290,9 @@ export async function exchangePerformCollectible(
   const exchange = exchangeNodeContent(nodeName)?.exchanges[exchangeIndex];
   if (exchange?.kind !== 'Collectible') return true;
 
-  const name =
-    getEntry<CollectibleContent>(exchange.output.collectibleId)?.name ??
-    'UNKNOWN';
+  const name = contentNameById(exchange.output.collectibleId) ?? 'UNKNOWN';
   miscellaneousMessageLog(`${exchangeVerb(nodeName)}: received ${name}.`);
-  exchangeAnalytics(nodeName, name);
+  exchangeAnalytics(nodeName, exchange.output.collectibleId);
   void taskEventCollectibleGained(exchange.output.collectibleId);
 
   return true;

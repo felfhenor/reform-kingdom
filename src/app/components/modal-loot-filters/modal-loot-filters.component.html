@@ -104,6 +104,7 @@
           class="flex-1"
           [items]="exceptionOptions()"
           bindLabel="name"
+          [searchFn]="contentSearch"
           bindValue="id"
           placeholder="Select discovered equipment..."
           [ngModel]="selectedExceptionId()"
@@ -116,7 +117,7 @@
                 spritesheet="equipment"
                 [assetName]="item.sprite"
               />
-              {{ item.name }}
+              {{ item | contentName }}
             </div>
           </ng-template>
 
@@ -127,7 +128,7 @@
                 spritesheet="equipment"
                 [assetName]="item.sprite"
               />
-              {{ item.name }}
+              {{ item | contentName }}
             </div>
           </ng-template>
         </ng-select>

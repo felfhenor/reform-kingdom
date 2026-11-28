@@ -1,3 +1,4 @@
+import { contentNameById } from '@helpers/i18n/i18n-content';
 import { caravanBrandName, caravanState } from '@helpers/caravan/caravan';
 import { getEntry } from '@helpers/content/content';
 import { isDemoBuild } from '@helpers/demo/demo';
@@ -24,7 +25,6 @@ import {
   worldNodeTown,
 } from '@helpers/world-node/world-nodes';
 import type {
-  CaravanTraderContent,
   DiscordPresenceOpts,
   GlobalEffectId,
   JobContent,
@@ -75,7 +75,7 @@ function discordCaravanTraderName(entry: WorldNodeEntry): string | undefined {
   const traderId = caravanState(caravan.id)?.traderId;
   if (!traderId) return undefined;
 
-  return getEntry<CaravanTraderContent>(traderId)?.name;
+  return contentNameById(traderId);
 }
 
 function discordLocationDisplayName(entry: WorldNodeEntry): string {

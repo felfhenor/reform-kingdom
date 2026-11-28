@@ -3,7 +3,7 @@
 <app-card-page heightProfile="full" appTutorialTarget="game-play-town">
   <span header class="flex gap-2 items-center">
     @if (townData) {
-      {{ townData.name }}
+      {{ townData | contentName }}
       <span class="badge badge-data">
         Lv. {{ townData.level | number }} {{ townData.scaleType }}
       </span>

@@ -1,3 +1,4 @@
+import { ContentNamePipe } from '@pipes/content-name.pipe';
 import {
   type AnimationCallbackEvent,
   ChangeDetectionStrategy,
@@ -27,6 +28,7 @@ const graphemeSegmenter = new Intl.Segmenter(undefined, {
 
 @Component({
   selector: 'app-card-region-intro',
+  imports: [ContentNamePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './card-region-intro.component.html',
   styleUrl: './card-region-intro.component.scss',

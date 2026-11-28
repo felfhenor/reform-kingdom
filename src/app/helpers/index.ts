@@ -18,6 +18,7 @@ export * from './game-init';
 export * from './gameloop';
 export * from './gameloop-slow';
 export * from './hero';
+export * from './i18n';
 export * from './item';
 export * from './kingdom';
 export * from './legacy';

@@ -36,6 +36,7 @@ export class ScreenLoadingComponent {
   protected anim = inject(AnimationService);
   protected loadingService = inject(LoadingService);
   private contentService = inject(ContentService);
+  protected hasLoadedI18n = this.contentService.hasLoadedI18n;
 
   private heroEl = viewChild.required<ElementRef<HTMLElement>>('hero');
 

@@ -27,7 +27,6 @@ import type {
   Character,
   CharacterId,
   GameState,
-  JobContent,
   JobId,
   Regalia,
   SkillTreeNodeContent,
@@ -36,6 +35,7 @@ import type {
   SkillTreeNodeState,
   SkillTreeOathChoice,
   SkillTreeStageContext,
+  IsContentItem,
 } from '@interfaces';
 import { isEqual, sortBy } from 'es-toolkit/compat';
 
@@ -50,7 +50,7 @@ async function skillTreeApply(
   });
   if (!jobId) return false;
 
-  const jobName = getEntry<JobContent>(jobId)?.name ?? 'Unknown';
+  const jobName = getEntry<IsContentItem>(jobId)?.name ?? 'Unknown';
   analyticsSendDesignEvent(`Hero:SkillTree:${action}`);
   analyticsSendDesignEvent(
     `Hero:SkillTree:${action}:${analyticsSafeSegment(jobName)}`,

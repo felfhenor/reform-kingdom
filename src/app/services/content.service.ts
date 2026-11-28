@@ -5,6 +5,14 @@ import { TIPPY_LOADER } from '@ngneat/helipopper/config';
 import { SweetAlert2LoaderService } from '@sweetalert2/ngx-sweetalert2';
 import { LOADING_PRELOAD_FONTS, LOADING_PRELOAD_IMAGES } from '@helpers/config';
 import { contentSnapshotBase, unfurlContent } from '@helpers/content/content';
+import {
+  I18N_BASE_LOCALE,
+  languageBaseApply,
+  languageBaseLocaleToLoad,
+  languageChoice,
+  languageHasBaseLocale,
+  languageReset,
+} from '@helpers/i18n/i18n-language';
 import { nodeBackgroundURLs } from '@helpers/world-node/world-node-background.ui';
 import { kingdomIconURLs } from '@helpers/kingdom/kingdom-nav.ui';
 import {
@@ -18,6 +26,8 @@ import { tiledMapsTilesetImagePaths } from '@helpers/pixi/tiled-map';
 import type {
   ArtAtlases,
   GameMap,
+  I18nLanguageData,
+  I18nLanguageInfo,
   IsContentItem,
   SpriteFrame,
   TiledMap,
@@ -51,6 +61,8 @@ export class ContentService {
   public hasLoadedBackgroundArt = signal<boolean>(false);
   public hasLoadedUILibraries = signal<boolean>(false);
   public hasLoadedFonts = signal<boolean>(false);
+  public hasLoadedI18n = signal<boolean>(false);
+  private i18nReady: Promise<void> = Promise.resolve();
   private uiImages: HTMLImageElement[] = [];
   private backgroundImages: HTMLImageElement[] = [];
 
@@ -66,7 +78,11 @@ export class ContentService {
 
   async init() {
     // Every content URL is versioned; building them before the version lands makes the preloads miss what's displayed later.
-    await this.metaService.loadLocalVersion();
+    // Text loads before anything else, so the loading screen and any load error can already be translated.
+    this.i18nReady = this.metaService
+      .loadLocalVersion()
+      .then(() => this.loadI18n());
+    await this.i18nReady;
 
     void this.loadJSON();
     void this.loadUIArt();
@@ -219,6 +235,55 @@ export class ContentService {
     }
 
     this.hasLoadedMapArt.set(true);
+  }
+
+  public waitForI18n(): Promise<void> {
+    return this.i18nReady;
+  }
+
+  private fetchLanguage(locale: string): Promise<I18nLanguageData> {
+    return lastValueFrom(
+      this.http.get<I18nLanguageData>(
+        this.toCacheBustURL(`./json/i18n/${locale}.json`),
+      ),
+    );
+  }
+
+  // Never rejects: missing text shows its key rather than holding the loading screen.
+  private async loadI18n() {
+    try {
+      const [languages, english] = await Promise.all([
+        lastValueFrom(
+          this.http.get<I18nLanguageInfo[]>(
+            this.toCacheBustURL(`./json/i18n/languages.json`),
+          ),
+        ),
+        this.fetchLanguage(I18N_BASE_LOCALE),
+      ]);
+
+      const choice = languageChoice();
+      if (
+        choice.source === 'base' &&
+        !languageHasBaseLocale(languages, choice.locale)
+      ) {
+        languageReset();
+      }
+
+      languageBaseApply(languages, [english]);
+
+      const locale = languageBaseLocaleToLoad(languageChoice(), languages);
+      if (locale) {
+        languageBaseApply(languages, [
+          english,
+          await this.fetchLanguage(locale),
+        ]);
+      }
+      this.logger.info('Content:LoadI18n', `Loaded: en ${locale ?? ''}`);
+    } catch (err) {
+      this.logger.error('Content:LoadI18n', 'Failed to load text', err);
+    }
+
+    this.hasLoadedI18n.set(true);
   }
 
   private async loadJSON() {

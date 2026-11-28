@@ -1,3 +1,4 @@
+import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { DecimalPipe, formatNumber } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -21,6 +22,7 @@ import type { BestiaryEntry } from '@interfaces';
   selector: 'app-detail-monster-summary',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ContentNamePipe,
     AtlasAnimationComponent,
     DecimalPipe,
     IconUnknownComponent,

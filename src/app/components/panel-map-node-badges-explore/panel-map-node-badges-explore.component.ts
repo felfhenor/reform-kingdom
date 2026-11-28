@@ -1,3 +1,4 @@
+import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { formatNumber } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -25,7 +26,7 @@ import { TippyDirective } from '@ngneat/helipopper';
 @Component({
   selector: 'app-panel-map-node-badges-explore',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DetailMonsterSummaryComponent, TippyDirective],
+  imports: [ContentNamePipe, DetailMonsterSummaryComponent, TippyDirective],
   templateUrl: './panel-map-node-badges-explore.component.html',
   styleUrl: './panel-map-node-badges-explore.component.scss',
 })

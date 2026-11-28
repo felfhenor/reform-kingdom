@@ -8,8 +8,9 @@ import {
 } from '@helpers/mod/mod-registry';
 import type { GameState, ModRef, SavefileModsPrepared } from '@interfaces';
 
+// Older saves recorded translation mods; the language is a global option now, so they never gate a load.
 function savefileModRefs(state: GameState): ModRef[] {
-  return state.meta?.mods ?? [];
+  return (state.meta?.mods ?? []).filter((ref) => ref.kind !== 'i18n');
 }
 
 export function savefileModsMissing(state: GameState): string[] {
@@ -28,7 +29,11 @@ export function savefileModsPrepare(state: GameState): SavefileModsPrepared {
   const refs = savefileModRefs(state);
   if (refs.length === 0) {
     modsReset();
-    return { state, errors: [] };
+    const hadRefs = (state.meta?.mods ?? []).length > 0;
+    return {
+      state: hadRefs ? { ...state, meta: { ...state.meta, mods: [] } } : state,
+      errors: [],
+    };
   }
 
   const missing = savefileModsMissing(state);

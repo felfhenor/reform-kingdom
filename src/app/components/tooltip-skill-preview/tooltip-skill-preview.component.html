@@ -8,7 +8,7 @@
 
     <div>
       <div class="type-entity-name mb-1 text-{{ skillData.rarity }}">
-        {{ skillData.name }}
+        {{ skillData | contentName }}
         @if (isSpecial()) {
           <span class="badge badge-sm badge-data ml-1">Burst</span>
         }

@@ -1,3 +1,4 @@
+import { contentDescription, contentName } from '@helpers/i18n/i18n-content';
 import {
   categoryMessageLog,
   ITEM_ICON_TOKEN,
@@ -26,13 +27,13 @@ export function achievementsAnnounceLog({
       desktopNotify({
         category: 'Achievements',
         title: 'Achievement Unlocked',
-        body: achievement.name,
+        body: contentName(achievement),
       });
     }
     categoryMessageLog(
       'Achievement',
       'Achievement',
-      `Achievement unlocked: ${ITEM_ICON_TOKEN}**${achievement.name}**`,
+      `Achievement unlocked: ${ITEM_ICON_TOKEN}**${contentName(achievement)}**`,
       { sprite: achievement.sprite, spritesheet: 'achievement' },
     );
     analyticsSendDesignEvent('Achievement:Unlock');
@@ -49,8 +50,8 @@ export function achievementCards({
 }: AchievementAnnouncement): AchievementCard[] {
   const cards = unlocked.map(({ achievement }) => ({
     heading: 'Achievement Unlocked',
-    name: achievement.name,
-    description: achievement.description,
+    name: contentName(achievement),
+    description: contentDescription(achievement),
     sprite: achievement.sprite,
   }));
   if (!isCatchUp || cards.length < 2) return cards;

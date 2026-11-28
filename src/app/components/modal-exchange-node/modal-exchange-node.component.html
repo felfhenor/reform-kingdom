@@ -5,7 +5,7 @@
   [allowEscToClose]="true"
   [closeOnBackdropClick]="true"
 >
-  <span title>{{ node()?.name ?? 'Exchange' }}</span>
+  <span title>{{ (node() | contentName) || 'Exchange' }}</span>
 
   <div body class="flex flex-col gap-2 max-h-[60vh] overflow-y-auto pr-2">
     @if (node(); as nodeContent) {

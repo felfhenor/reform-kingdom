@@ -13,7 +13,7 @@
     <div class="flex flex-col gap-2">
       <div class="flex items-center gap-2">
         <span class="type-entity-heading text-{{ e.monster.rarity }}">
-          {{ e.monster.name }}
+          {{ e.monster | contentName }}
         </span>
 
         <ng-content select="[summary-corner]" />

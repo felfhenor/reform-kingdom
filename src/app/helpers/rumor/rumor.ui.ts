@@ -1,3 +1,4 @@
+import { contentDescription, contentName } from '@helpers/i18n/i18n-content';
 import {
   caravanTraderMapNames,
   isTraderDiscovered,
@@ -65,8 +66,10 @@ function rumorCatalogRow(rumor: RumorContent): RumorCatalogRowViewModel {
 
   return {
     rumorId: rumor.id,
-    name: rumor.name,
-    description: destination ? rumor.description : rumorSourceLabel(rumor),
+    name: contentName(rumor),
+    description: destination
+      ? contentDescription(rumor)
+      : rumorSourceLabel(rumor),
     rarity: rumor.rarity,
     sprite: rumorSprite() ?? '',
     destination,

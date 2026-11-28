@@ -1,3 +1,4 @@
+import { contentName, contentSearchFn } from '@helpers/i18n/i18n-content';
 import { FFSelectDirective } from '@ff/controls/ff-select.directive';
 import { DecimalPipe } from '@angular/common';
 import {
@@ -83,11 +84,12 @@ const reclassPickSchema = schema<ReclassPick>((pick) => {
   templateUrl: './modal-play-kingdom-reclass.component.html',
 })
 export class ModalPlayKingdomReclassComponent {
+  public readonly contentSearch = contentSearchFn;
   public isVisible = computed(() => modalIsOpen('reclass-heroes'));
   public party = computed(() => worldPartyState());
 
   public unlockedJobs = computed(() =>
-    sortBy(getUnlockedJobs(), (job) => job.name),
+    sortBy(getUnlockedJobs(), (job) => contentName(job)),
   );
 
   private picksModel = signal<ReclassPick[]>([]);

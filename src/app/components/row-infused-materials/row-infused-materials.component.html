@@ -47,7 +47,7 @@
       @if (slot.content) {
         <div class="p-2">
           <div class="type-entity-name mb-1 text-{{ slot.content.rarity }}">
-            {{ slot.content.name }}
+            {{ slot.content | contentName }}
           </div>
           @if (isInfusable(slot.content)) {
             <app-row-stat-summary

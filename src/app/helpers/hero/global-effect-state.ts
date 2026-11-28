@@ -1,3 +1,4 @@
+import { contentNameById } from '@helpers/i18n/i18n-content';
 import { getEntry } from '@helpers/content/content';
 import { defaultGlobalEffectSums } from '@helpers/defaults';
 import { edictEntry, edictSeatBoons } from '@helpers/edict/edict';
@@ -16,7 +17,6 @@ import {
   type GlobalEffectId,
   type GlobalEffectSums,
   type StatBlock,
-  type TradeskillContent,
   type WorldNodeType,
 } from '@interfaces';
 import { isEqual } from 'es-toolkit';
@@ -184,7 +184,7 @@ export function globalEffectEffectDescription(
       return `Armory Size: +${effect.value}`;
     case 'GlobalTradeskillQueueSizeBoost': {
       const tradeskillName =
-        getEntry<TradeskillContent>(effect.tradeskillId)?.name ??
+        contentNameById(effect.tradeskillId) ??
         'Unknown Tradeskill';
       return `${tradeskillName} Queue Size: +${effect.value}`;
     }

@@ -17,7 +17,7 @@
   </app-detail-monster-summary>
 
   @if (e.discovered) {
-    <p class="type-flavor min-h-[60px]">{{ e.monster.description }}</p>
+    <p class="type-flavor min-h-[60px]">{{ e.monster | contentDescription }}</p>
 
     <div class="flex gap-4">
       @if (!e.analyzed) {

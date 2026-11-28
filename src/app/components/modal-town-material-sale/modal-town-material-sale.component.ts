@@ -1,3 +1,4 @@
+import { ContentNamePipe } from '@pipes/content-name.pipe';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -25,6 +26,7 @@ import type { CaravanTradeRow } from '@interfaces';
   selector: 'app-modal-town-material-sale',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ContentNamePipe,
     BlankSlateComponent,
     SlotCaravanTradeComponent,
     ModalComponent,

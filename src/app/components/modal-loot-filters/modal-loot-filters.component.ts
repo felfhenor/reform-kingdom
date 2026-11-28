@@ -1,3 +1,5 @@
+import { contentSearchFn } from '@helpers/i18n/i18n-content';
+import { ContentNamePipe } from '@pipes/content-name.pipe';
 import type { AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
@@ -57,6 +59,7 @@ const RARITIES: DropRarity[] = [
   selector: 'app-modal-loot-filters',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ContentNamePipe,
     FFStepperDirective,
     FFSelectDirective,
     ModalComponent,
@@ -74,6 +77,7 @@ const RARITIES: DropRarity[] = [
   templateUrl: './modal-loot-filters.component.html',
 })
 export class ModalLootFiltersComponent {
+  public readonly contentSearch = contentSearchFn;
   private anim = inject(AnimationService);
 
   public readonly rarities = RARITIES;

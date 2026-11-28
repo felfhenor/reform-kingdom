@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import {
   categoryMessageLog,
   ITEM_ICON_TOKEN,
@@ -92,7 +93,7 @@ export function tradeEquipmentItemLogPart(
   const icon = rewardContentInfo({ equipmentId: item.equipmentId });
   if (!content || !icon) return undefined;
 
-  const name = equipmentItemDisplayName(item, content.name);
+  const name = equipmentItemDisplayName(item, contentName(content));
   return {
     html: `${ITEM_ICON_TOKEN}${rarityNameHtml(name, content.rarity)}`,
     icon,
@@ -107,7 +108,7 @@ export function tradeRumorLogPart(
   if (!rumor || !sprite) return undefined;
 
   return {
-    html: `${ITEM_ICON_TOKEN}${rarityNameHtml(rumor.name, rumor.rarity)}`,
+    html: `${ITEM_ICON_TOKEN}${rarityNameHtml(contentName(rumor), rumor.rarity)}`,
     icon: { sprite, spritesheet: 'item' },
   };
 }

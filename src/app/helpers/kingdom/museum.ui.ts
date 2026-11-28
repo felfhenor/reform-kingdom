@@ -1,4 +1,5 @@
-import { getEntriesByType, getEntry } from '@helpers/content/content';
+import { contentName, contentNameById } from '@helpers/i18n/i18n-content';
+import { getEntriesByType } from '@helpers/content/content';
 import { isRecipeDropGated } from '@helpers/crafting/recipe-drop-gated';
 import { isRecipeDiscovered } from '@helpers/crafting/recipes';
 import {
@@ -38,7 +39,6 @@ import type {
   MuseumItemEntry,
   MuseumRecipeEntry,
   RecipeContent,
-  TradeskillContent,
 } from '@interfaces';
 import { orderBy } from 'es-toolkit/compat';
 
@@ -87,7 +87,11 @@ export function getMuseumCollectibleEntries(): MuseumCollectibleEntry[] {
     )
     .map(museumCollectibleEntry);
 
-  return orderBy(entries, [(entry) => entry.collectible.name], ['asc']);
+  return orderBy(
+    entries,
+    [(entry) => contentName(entry.collectible)],
+    ['asc'],
+  );
 }
 
 // Node sources always hint their region; other unknown sources stay hidden, except an unmet trader is hinted at without a name.
@@ -109,8 +113,7 @@ function museumCollectibleSource(
 
 function collectibleSourceName(source: CollectibleSource): string {
   if (source.type === 'crafting') {
-    const tradeskillName =
-      getEntry<TradeskillContent>(source.tradeskillId)?.name ?? 'Unknown';
+    const tradeskillName = contentNameById(source.tradeskillId) ?? 'Unknown';
 
     return `${CRAFTING_SOURCE_NAME} (${tradeskillName} Lv. ${source.tradeskillLevel})`;
   }

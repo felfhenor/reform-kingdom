@@ -254,7 +254,7 @@
                   />
                   <span class="flex flex-col flex-1 min-w-0">
                     <span class="font-semibold whitespace-nowrap truncate">
-                      {{ option.skill.name }}
+                      {{ option.skill | contentName }}
                     </span>
                     @if (option.disabledReason; as reason) {
                       <span class="type-meta text-error truncate">

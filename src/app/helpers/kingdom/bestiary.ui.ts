@@ -1,3 +1,4 @@
+import { contentName, nodeNameText } from '@helpers/i18n/i18n-content';
 import { getEntry } from '@helpers/content/content';
 import { rangeLabelAtLevel } from '@helpers/engine/leveled-range';
 import { rewardDisplayOrder } from '@helpers/item/loot';
@@ -135,8 +136,12 @@ export function filterBestiaryEntries(
   return entries.filter((entry) => {
     if (!entry.discovered) return false;
 
-    if (entry.monster.name.toLowerCase().includes(text)) return true;
-    if (entry.foundAtNodes.some((name) => name.toLowerCase().includes(text))) {
+    if (contentName(entry.monster).toLowerCase().includes(text)) return true;
+    if (
+      entry.foundAtNodes.some((name) =>
+        nodeNameText(name).toLowerCase().includes(text),
+      )
+    ) {
       return true;
     }
 

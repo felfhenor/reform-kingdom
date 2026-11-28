@@ -1,3 +1,4 @@
+import { i18nResetToEnglish } from '@/testing/i18n';
 // Mock Angular core to prevent JIT compilation issues in tests
 import { vi } from 'vitest';
 
@@ -141,3 +142,6 @@ vi.mock('@helpers/engine/signal', () => {
     ),
   };
 });
+
+// Specs see the real English UI text, so assertions match what players read.
+i18nResetToEnglish();

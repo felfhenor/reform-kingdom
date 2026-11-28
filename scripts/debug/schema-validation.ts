@@ -230,8 +230,10 @@ export async function runSchemaValidation(): Promise<string[]> {
 
   const folders: string[] = fs
     .readdirSync(GAMEDATA_DIR)
-    .filter((name: string) =>
-      fs.statSync(path.join(GAMEDATA_DIR, name)).isDirectory(),
+    .filter(
+      (name: string) =>
+        name !== 'i18n' &&
+        fs.statSync(path.join(GAMEDATA_DIR, name)).isDirectory(),
     )
     .sort();
 

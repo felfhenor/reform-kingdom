@@ -36,7 +36,7 @@
           You will not be able to progress to {{ tradeskill() }} Lv.
           {{ gateNextLevel() }} unless you acquire
           <span class="text-{{ collectible.rarity }}">
-            {{ collectible.name }}.
+            {{ collectible | contentName }}.
           </span>
         }
       </div>
@@ -135,7 +135,7 @@
           <app-tooltip-recipe-preview
             #preview
             [recipe]="entry.recipe"
-            [name]="entry.recipe.name"
+            [name]="entry.recipe | contentName"
           />
 
           <div
@@ -165,7 +165,7 @@
                     : ''
                 }}"
               >
-                {{ entry.recipe.name }}
+                {{ entry.recipe | contentName }}
                 @if (entry.resultQuantity > 1) {
                   (x{{ entry.resultQuantity | number }})
                 }

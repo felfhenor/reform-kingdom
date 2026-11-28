@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import { statusEffectDamage } from '@helpers/combat/combat-statuseffects';
 import type {
   Combatant,
@@ -119,7 +120,7 @@ function statusEffectPreviewBase(
 > {
   return {
     id: effect.id,
-    name: effect.name,
+    name: contentName(effect),
     sprite: effect.sprite,
     effectType: effect.effectType,
     elements: effect.elements,

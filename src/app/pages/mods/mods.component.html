@@ -168,7 +168,23 @@
                   </div>
 
                   <div class="flex items-center gap-2 shrink-0">
-                    @if (row.mod.manifest) {
+                    @if (row.isLanguageInUse) {
+                      <span class="badge badge-sm badge-success">
+                        {{ 'mods.languageInUse' | t }}
+                      </span>
+                    } @else if (row.isLanguage && row.usable) {
+                      <button
+                        class="btn btn-sm btn-neutral"
+                        [disabled]="isBusy()"
+                        (click)="useLanguage(row.mod)"
+                        ffButton="ui-click"
+                        ffPadAction="menu"
+                      >
+                        {{ 'mods.useLanguage' | t }}
+                      </button>
+                    }
+
+                    @if (row.mod.manifest && !row.isLanguage) {
                       <label class="flex items-center gap-2 type-label">
                         <input
                           type="checkbox"

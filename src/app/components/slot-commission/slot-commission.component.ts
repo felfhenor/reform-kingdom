@@ -1,3 +1,4 @@
+import { ContentDescriptionPipe } from '@pipes/content-description.pipe';
 import { FFButtonComponent } from '@ff/components/button/button.component';
 import { FFFocusRowDirective } from '@ff/focus/ff-focus-row.directive';
 import { DecimalPipe, formatNumber } from '@angular/common';
@@ -35,6 +36,7 @@ import type {
   selector: 'app-slot-commission',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ContentDescriptionPipe,
     ButtonTravelHereComponent,
     SlotRequirementComponent,
     DecimalPipe,

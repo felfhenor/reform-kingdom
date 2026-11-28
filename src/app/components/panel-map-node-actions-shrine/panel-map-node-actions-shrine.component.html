@@ -26,7 +26,7 @@
           spritesheet="globaleffect"
           [assetName]="buff.sprite"
         />
-        {{ buff.name }}
+        {{ buff | contentName }}
         @if (cooldownLabel(); as label) {
           ({{ label }})
         }

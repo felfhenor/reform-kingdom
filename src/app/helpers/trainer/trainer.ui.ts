@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import {
@@ -50,7 +51,7 @@ const UNKNOWN_NAME = '???';
 function teachingTrainerDisplayName(teachingId: TrainerTeachingId): string {
   const trainer = trainerForTeaching(teachingId);
   return trainer && isTrainerDiscovered(trainer.id)
-    ? trainer.name
+    ? contentName(trainer)
     : UNKNOWN_NAME;
 }
 
@@ -92,7 +93,7 @@ function trainerTeachingPrerequisite(
     !!prerequisite && isTrainerTeachingRevealed(character, prerequisite, jobId);
 
   return {
-    name: isRevealed ? prerequisite.name : UNKNOWN_NAME,
+    name: isRevealed ? contentName(prerequisite) : UNKNOWN_NAME,
     learned: isTrainerTeachingLearned(character, teachingId, jobId),
   };
 }
@@ -116,7 +117,7 @@ export function trainerTeachingRow(
 
   return {
     teaching,
-    displayName: isRevealed ? teaching.name : UNKNOWN_NAME,
+    displayName: isRevealed ? contentName(teaching) : UNKNOWN_NAME,
     isRevealed,
     trainerDisplayName: teachingTrainerDisplayName(teaching.id),
     availability: trainerTeachingAvailability(character, teaching, jobId),
@@ -140,7 +141,7 @@ function sortedRows(
 ): TrainerTeachingRow[] {
   return sortBy(teachings, [
     (teaching) => teaching.requiredLevel,
-    (teaching) => teaching.name,
+    (teaching) => contentName(teaching),
   ]).map((teaching) => trainerTeachingRow(character, teaching, jobId));
 }
 
@@ -172,7 +173,7 @@ export function characterTeachingRows(
 export function characterTeachingJobTabs(
   character: Character,
 ): TrainerTeachingJobTab[] {
-  return sortBy(getUnlockedJobs(), (job) => job.name).map((job) => {
+  return sortBy(getUnlockedJobs(), (job) => contentName(job)).map((job) => {
     const teachings = teachingsForJob(job.id);
     const learnedIds = characterTeachingIds(character, job.id);
 
@@ -220,9 +221,9 @@ export async function trainerTeach(
 
   if (!learned) return false;
 
-  notifySuccess(`${characterName} learned ${teaching.name}!`);
+  notifySuccess(`${characterName} learned ${contentName(teaching)}!`);
   miscellaneousMessageLog(
-    `**${characterName}** learned **${teaching.name}** from **${trainer.name}**.`,
+    `**${characterName}** learned **${contentName(teaching)}** from **${contentName(trainer)}**.`,
   );
   void taskEventTeachingLearned(teachingId);
   analyticsSendDesignEvent('Hero:Trainer:Teach');

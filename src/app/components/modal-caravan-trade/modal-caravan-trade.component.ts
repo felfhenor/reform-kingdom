@@ -1,3 +1,5 @@
+import { ContentDescriptionPipe } from '@pipes/content-description.pipe';
+import { ContentNamePipe } from '@pipes/content-name.pipe';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -49,6 +51,8 @@ import type {
   selector: 'app-modal-caravan-trade',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ContentDescriptionPipe,
+    ContentNamePipe,
     BlankSlateComponent,
     SlotCaravanTradeComponent,
     SlotCaravanTokenTradeComponent,

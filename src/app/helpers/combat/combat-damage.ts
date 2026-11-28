@@ -1,3 +1,5 @@
+import { getEntry } from '@helpers/content/content';
+import { contentName, contentNestedText } from '@helpers/i18n/i18n-content';
 import {
   combatantIsDead,
   combatCombatantTakeDamage,
@@ -32,6 +34,7 @@ import type {
   CombatTechniqueDamage,
   CombatTechniqueOutcome,
   EquipmentSkill,
+  EquipmentSkillContent,
   EquipmentSkillContentTechnique,
   GameElement,
   GameStat,
@@ -189,9 +192,18 @@ function combatLogTechniqueMessage(
 ): void {
   if (!technique.combatMessage) return;
 
-  const message = combatFormatMessage(technique.combatMessage, {
+  // Echoed techniques belong to another skill, so their text is keyed under that one.
+  const owner = technique.echoOf
+    ? (getEntry<EquipmentSkillContent>(technique.echoOf) ?? skill)
+    : skill;
+  const template = contentNestedText(
+    owner,
+    'combatMessage',
+    technique.combatMessage,
+  );
+  const message = combatFormatMessage(template, {
     combat,
-    skill,
+    skill: { ...skill, name: contentName(skill) },
     technique,
     damage: outcome.damage.toLocaleString(),
     absdamage: Math.abs(outcome.damage).toLocaleString(),

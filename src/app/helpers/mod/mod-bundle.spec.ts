@@ -156,6 +156,60 @@ describe('modBundleParse', () => {
   });
 });
 
+describe('modBundleParse translations', () => {
+  const I18N_MANIFEST = text(
+    'mod.yml',
+    'id: fr\nname: French\nversion: 1\nkind: i18n',
+  );
+
+  it('reads an i18n mod with the game language layout', () => {
+    const { bundle, errors } = modBundleParse(
+      [
+        I18N_MANIFEST,
+        text('i18n/language.yml', 'locale: fr\nlanguageName: Français'),
+        text('i18n/ui.yml', 'mods:\n  useLanguage: Utiliser'),
+      ],
+      io,
+    );
+
+    expect(errors).toEqual([]);
+    expect(bundle?.manifest.kind).toBe('i18n');
+    expect(bundle?.translations).toMatchObject({
+      locale: 'fr',
+      languageName: 'Français',
+      ui: { 'mods.useLanguage': 'Utiliser' },
+    });
+  });
+
+  it('treats an empty translation file as nothing translated', () => {
+    const { errors } = modBundleParse(
+      [
+        I18N_MANIFEST,
+        text('i18n/language.yml', 'locale: fr\nlanguageName: Français'),
+        text('i18n/content/item.yml', ''),
+      ],
+      io,
+    );
+
+    expect(errors).toEqual([]);
+  });
+
+  it('requires language.yml', () => {
+    const { errors } = modBundleParse([I18N_MANIFEST], io);
+
+    expect(errors).toEqual(['i18n: Missing language.yml.']);
+  });
+
+  it('ignores an i18n folder in a content mod', () => {
+    const { bundle } = modBundleParse(
+      [MANIFEST, text('wrap/i18n/language.yml', 'locale: fr')],
+      io,
+    );
+
+    expect(bundle?.translations).toBeUndefined();
+  });
+});
+
 describe('modPngWidth', () => {
   it('reads the IHDR width', () => {
     expect(modPngWidth(png('a.png', 64))).toBe(64);

@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import {
   OVERLEVEL_XP_DEGRADE_FLOOR,
   OVERLEVEL_XP_DEGRADE_PER_LEVEL,
@@ -84,5 +85,5 @@ export function monstersFromFights(
     });
   });
 
-  return sortBy(monsters, (monster) => monster.name);
+  return sortBy(monsters, (monster) => contentName(monster));
 }

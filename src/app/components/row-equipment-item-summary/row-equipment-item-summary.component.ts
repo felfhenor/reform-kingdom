@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -42,6 +43,6 @@ export class RowEquipmentItemSummaryComponent {
 
   public displayName = computed(() => {
     const content = this.content();
-    return content ? equipmentItemDisplayName(this.item(), content.name) : '';
+    return content ? equipmentItemDisplayName(this.item(), contentName(content)) : '';
   });
 }
