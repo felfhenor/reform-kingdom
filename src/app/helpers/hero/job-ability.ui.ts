@@ -1,4 +1,4 @@
-import { tPlural } from '@helpers/i18n/i18n';
+import { t, tPlural } from '@helpers/i18n/i18n';
 import { contentDescription, contentName } from '@helpers/i18n/i18n-content';
 import { DEBUFF_POTENCY_PER_RANK } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
@@ -39,22 +39,29 @@ const JOB_ABILITY_VALUE_LABELS: Record<
   JobAbilityType,
   (value: number) => string
 > = {
-  RestoreHealthOOC: (value) => `${value}x CON per second`,
-  RestoreEnergyOOC: (value) => `${value}x SPR per second`,
-  ShrineDurationBoost: (value) => `+${percent(value)} duration`,
-  CommissionReputationBoost: (value) => `+${percent(value)} reputation`,
-  AstralDurationBoost: (value) => `+${percent(value)} duration`,
-  EncounterResetReduction: (value) => `-${percent(value)} reset time`,
-  OnPathTravelSpeed: (value) => `+${percent(value)} on-path speed`,
-  OffPathTravelSpeed: (value) => `+${percent(value)} off-path speed`,
+  RestoreHealthOOC: (value) => t('jobAbility.xConPerSecond', { value }),
+  RestoreEnergyOOC: (value) => t('jobAbility.xSprPerSecond', { value }),
+  ShrineDurationBoost: (value) =>
+    t('jobAbility.durationBonus', { value: percent(value) }),
+  CommissionReputationBoost: (value) =>
+    t('jobAbility.reputationBonus', { value: percent(value) }),
+  AstralDurationBoost: (value) =>
+    t('jobAbility.durationBonus', { value: percent(value) }),
+  EncounterResetReduction: (value) =>
+    t('jobAbility.resetTime', { value: percent(value) }),
+  OnPathTravelSpeed: (value) =>
+    t('jobAbility.onPathSpeed', { value: percent(value) }),
+  OffPathTravelSpeed: (value) =>
+    t('jobAbility.offPathSpeed', { value: percent(value) }),
   Intimidation: (value) =>
-    `Enemies surrender when ${Math.abs(value)}+ levels under`,
-  Ambush: (value) => `${value}% chance`,
-  GatherYieldLuck: (value) => `${value}x LUK chance`,
-  EquipmentDropRateBoost: (value) => `+${value}% equipment drop rate`,
-  ItemDropRateBoost: (value) => `+${value}% item drop rate`,
-  SkillRepeatChance: (value) => `+${value}% skill repeat chance`,
-  CoverThreshold: (value) => `Covers allies below ${value}% HP`,
+    t('jobAbility.enemiesSurrenderWhenLevels', { value: Math.abs(value) }),
+  Ambush: (value) => t('jobAbility.chance', { value }),
+  GatherYieldLuck: (value) => t('jobAbility.xLukChance', { value }),
+  EquipmentDropRateBoost: (value) =>
+    t('jobAbility.equipmentDropRate', { value }),
+  ItemDropRateBoost: (value) => t('jobAbility.itemDropRate', { value }),
+  SkillRepeatChance: (value) => t('jobAbility.skillRepeatChance', { value }),
+  CoverThreshold: (value) => t('jobAbility.coversAlliesBelowHp', { value }),
   DebuffPotency: (value) => {
     const turns = value * DEBUFF_POTENCY_PER_RANK.duration;
     return tPlural('skill.debuffPotency', turns, {
@@ -69,21 +76,25 @@ const JOB_ABILITY_EDICT_VARIANTS: Partial<
   GatherYieldLuck: [
     {
       active: jobAbilityGatherLuckOnMonsters,
-      description:
-        'Explorers in the party have a chance, based on their Luck, to double the gathering materials monsters drop.',
+      get description() {
+        return t('jobAbility.gatherLuckOnMonsters');
+      },
     },
   ],
   ShrineDurationBoost: [
     {
       active: jobAbilityShrineBoostToAstral,
-      description:
-        'While this Healer is in the party, Astral Projector spells last longer.',
+      get description() {
+        return t('jobAbility.shrineBoostToAstral');
+      },
     },
     {
       active: jobAbilityShrineBoostToStrength,
-      description:
-        'While this Healer is in the party, shrine buffs are stronger.',
-      valueLabel: (value) => `+${percent(value)} strength`,
+      get description() {
+        return t('jobAbility.shrineBoostToStrength');
+      },
+      valueLabel: (value) =>
+        t('jobAbility.strengthBonus', { value: percent(value) }),
     },
   ],
 };
@@ -112,7 +123,10 @@ export function jobAbilityDescription(ability: JobAbilityContent): string {
   const stacks = jobAbilityStacks(ability.type);
   if (stacks === undefined) return description;
 
-  return `${description} ${stacks ? 'Stacks.' : 'Does not stack.'}`;
+  return t('jobAbility.descriptionWithStacking', {
+    description,
+    stacking: stacks ? t('jobAbility.stacks') : t('jobAbility.doesNotStack'),
+  });
 }
 
 function jobAbilityRow(

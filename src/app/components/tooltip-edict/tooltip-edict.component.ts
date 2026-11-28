@@ -58,7 +58,12 @@ import type { EdictContent } from '@interfaces';
             </ul>
           }
           <p class="type-meta">
-            {{ kindLabel() }} · {{ cleared() ? 'Completed' : 'Incomplete' }}
+            {{ kindLabel() }} ·
+            {{
+              cleared()
+                ? ('tooltipEdict.completed' | t)
+                : ('tooltipEdict.incomplete' | t)
+            }}
           </p>
 
           @if (blocked()) {

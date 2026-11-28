@@ -1,5 +1,5 @@
 import { t } from '@helpers/i18n/i18n';
-import { contentNameById } from '@helpers/i18n/i18n-content';
+import { contentName, contentNameById } from '@helpers/i18n/i18n-content';
 import {
   collectibleDropHtml,
   combatMessageLog,
@@ -205,7 +205,7 @@ export function grantResolvedDrops(
           combat,
           t('combatRewards.thePartyRescued', {
             icon: ITEM_ICON_TOKEN,
-            name: worker.name,
+            name: contentName(worker),
           }),
           undefined,
           info,

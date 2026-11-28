@@ -1,5 +1,5 @@
-import { t } from '@helpers/i18n/i18n';
-import { contentNameById } from '@helpers/i18n/i18n-content';
+import { i18nLocale, t } from '@helpers/i18n/i18n';
+import { contentName, contentNameById } from '@helpers/i18n/i18n-content';
 import { categoryMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
 import {
@@ -67,7 +67,7 @@ export async function workerAssignCraft(
   if (workerName && recipeName) {
     categoryMessageLog(
       'Craft',
-      'Worker Crafting',
+      t('workerCrafting.workerCrafting'),
       t('workerCrafting.wasAssignedToCraft', { workerName, recipeName }),
     );
   }
@@ -110,16 +110,20 @@ function workerCraftSlot(
   const item = getEntry<ItemContent>(recipe.result.itemId);
   if (!item) return undefined;
 
-  const left =
-    remaining !== undefined ? ` (${remaining.toLocaleString()} left)` : '';
-  return {
-    workerId,
-    sprite: item.sprite,
-    waiting,
-    tooltip: waiting
-      ? `${worker.name} is waiting for materials to craft ${item.name}${left}`
-      : `${worker.name} is crafting ${item.name}${left}`,
+  const params = {
+    name: contentName(worker),
+    name2: contentName(item),
+    left: remaining?.toLocaleString(i18nLocale()),
   };
+  const key =
+    remaining === undefined
+      ? waiting
+        ? 'workerCrafting.isWaitingForMaterials'
+        : 'workerCrafting.isCrafting'
+      : waiting
+        ? 'workerCrafting.isWaitingForMaterialsLeft'
+        : 'workerCrafting.isCraftingLeft';
+  return { workerId, sprite: item.sprite, waiting, tooltip: t(key, params) };
 }
 
 export function workerCraftSlots(

@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import { RAID_LOSS_CRAFT_DEBUFF_MULTIPLIER } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
 import { formatDuration } from '@helpers/engine/timer';
@@ -32,7 +33,7 @@ export function townTradeskillLevelRows(
     return [
       {
         tradeskillId: content.id,
-        name: content.name,
+        name: contentName(content),
         sprite: content.sprite,
         level: building?.level ?? 1,
         isSpecialty: content.id === town.crafting.specialtyTradeskillId,

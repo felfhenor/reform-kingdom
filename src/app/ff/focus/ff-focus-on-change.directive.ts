@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import {
   afterNextRender,
   Directive,
@@ -49,7 +50,7 @@ export class FFFocusOnChangeDirective {
         element: this.host,
         priority: this.ffFocusOnChangePriority(),
         enabled: () => this.canStepBack(),
-        label: 'Back',
+        label: t('gamepad.back'),
       });
       onCleanup(unregister);
     });

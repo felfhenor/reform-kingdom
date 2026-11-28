@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { contentDescription, contentName } from '@helpers/i18n/i18n-content';
 import {
   caravanTraderMapNames,
@@ -5,7 +6,6 @@ import {
 } from '@helpers/caravan/caravan';
 import { travelEtaSecondsTo } from '@helpers/hero/travel';
 import { travelCanStartTo } from '@helpers/hero/travel.ui';
-import { UNMET_TRADER_NAME } from '@helpers/kingdom/museum.ui';
 import { regionNameForMap } from '@helpers/lore/region-intro';
 import {
   isRumorBought,
@@ -55,8 +55,8 @@ function rumorSourceLabel(rumor: RumorContent): string {
       .map(regionNameForMap),
   );
   return regionNames.length > 0
-    ? `From: ${UNMET_TRADER_NAME} in ${regionNames.join(', ')}`
-    : 'Source Unknown';
+    ? t('rumor.fromUnmetTrader', { regions: regionNames.join(', ') })
+    : t('rumor.sourceUnknown');
 }
 
 function rumorCatalogRow(rumor: RumorContent): RumorCatalogRowViewModel {

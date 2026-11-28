@@ -1,3 +1,13 @@
+import {
+  CombatStatDimension,
+  ElementBoonDimension,
+  ElementResistanceDimension,
+  MonsterTypeDimension,
+  StatDimension,
+  StatInformation,
+  StatShorthand,
+  StatusEffectTagDimension,
+} from '@helpers/hero/stat-dimension';
 import { TPipe } from '@pipes/t.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
@@ -20,15 +30,7 @@ import {
   equipmentGearElements,
 } from '@helpers/item/equipment-element';
 import {
-  CombatStatDimension,
-  ElementBoonDimension,
-  ElementResistanceDimension,
-  MonsterTypeDimension,
-  StatDimension,
-  StatInformation,
   StatOrder,
-  StatShorthand,
-  StatusEffectTagDimension,
   type BaseStat,
   type Character,
   type CombatStat,

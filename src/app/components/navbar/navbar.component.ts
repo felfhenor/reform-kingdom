@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
@@ -149,28 +150,29 @@ export class NavbarComponent {
   constructor() {
     const viewCycle = {
       enabled: () => isSetup() && !modalHasAnyOpen(),
-      label: 'Switch View',
+      label: t('navbar.switchView'),
     };
     ffGamepadOn('tabPrev', () => this.cycleGamePlayView(-1), viewCycle);
     ffGamepadOn('tabNext', () => this.cycleGamePlayView(1), viewCycle);
     ffGamepadOn('menu', () => this.togglePauseMenu(), {
       enabled: () =>
         isSetup() && (modalIsTopmost('pause-menu') || !modalHasAnyOpen()),
-      label: () => (modalIsTopmost('pause-menu') ? 'Resume' : 'Menu'),
+      label: () =>
+        modalIsTopmost('pause-menu') ? t('gamepad.resume') : t('gamepad.menu'),
     });
     ffGamepadOn('pause', () => this.togglePause(), {
       enabled: () => isSetup() && !modalHasAnyOpen(),
-      label: () => (this.isPaused() ? 'Resume' : 'Pause'),
+      label: () => (this.isPaused() ? t('gamepad.resume') : t('gamepad.pause')),
     });
     ffGamepadOn('back', () => void this.leaveSwal()?.fire(), {
       priority: GAMEPAD_PRIORITY.page,
       enabled: () => !isSetup(),
-      label: 'Back',
+      label: t('gamepad.back'),
     });
     ffGamepadOn('back', () => this.closePauseMenu(), {
       priority: GAMEPAD_PRIORITY.pauseMenu,
       enabled: () => modalIsTopmost('pause-menu'),
-      label: 'Resume',
+      label: t('gamepad.resume'),
     });
   }
 

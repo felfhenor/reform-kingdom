@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import { t } from '@helpers/i18n/i18n';
 import {
   combatantMessageToken,
@@ -116,14 +117,17 @@ export function combatManualAwaitingOrders(combat: Combat): boolean {
 function combatantLosesTurn(
   combat: Combat,
   combatant: Combatant,
-  why: string,
+  skillName?: string,
 ): undefined {
+  const params = {
+    combatant: combatantMessageToken(combatant),
+    name: skillName,
+  };
   combatMessageLog(
     combat,
-    t('combatManual.andLosesTheTurn', {
-      combatant: combatantMessageToken(combatant),
-      why,
-    }),
+    skillName
+      ? t('combatManual.losesTurnCouldntUse', params)
+      : t('combatManual.losesTurnNoOrders', params),
   );
   return undefined;
 }
@@ -145,14 +149,15 @@ export function combatManualPick(
 ): CombatOrderPick | undefined {
   if (combat.manualFlee) return undefined;
   const action = combat.manualAction;
-  if (!action) return combatantLosesTurn(combat, combatant, 'has no orders');
+  if (!action) return combatantLosesTurn(combat, combatant);
 
   const skill = skills.find((s) => s.id === action.skillId);
   if (!skill) {
-    const name =
-      combatantSkills(combatant).find((s) => s.id === action.skillId)?.name ??
-      'their skill';
-    return combatantLosesTurn(combat, combatant, `couldn't use **${name}**`);
+    const known = combatantSkills(combatant).find(
+      (s) => s.id === action.skillId,
+    );
+    const name = known ? contentName(known) : t('combatManual.theirSkill');
+    return combatantLosesTurn(combat, combatant, name);
   }
 
   const everyone = [...combat.heroes, ...combat.helpers, ...combat.guardians];

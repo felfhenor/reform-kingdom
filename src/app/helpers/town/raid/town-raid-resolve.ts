@@ -219,9 +219,7 @@ function logRaidLossMessages(
     townName,
     t('townRaidResolve.sCraftingIsSlowed', {
       townName,
-      RAID_LOSS_CRAFT_DEBUFF_TICKS: formatDuration(
-        RAID_LOSS_CRAFT_DEBUFF_TICKS,
-      ),
+      duration: formatDuration(RAID_LOSS_CRAFT_DEBUFF_TICKS),
     }),
   );
 }

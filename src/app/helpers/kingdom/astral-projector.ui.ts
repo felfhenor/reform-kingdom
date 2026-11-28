@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import { t } from '@helpers/i18n/i18n';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
@@ -97,14 +98,14 @@ export function astralProjectorCast(id: AstralProjectorId): void {
   if (evicted) {
     miscellaneousMessageLog(
       t('astralProjector.hasFadedOverwrittenBy', {
-        name: evicted.name,
-        name2: content.name,
+        name: contentName(evicted),
+        name2: contentName(content),
       }),
     );
   }
 
   miscellaneousMessageLog(
-    t('astralProjector.hasBeenCast', { name: content.name }),
+    t('astralProjector.hasBeenCast', { name: contentName(content) }),
   );
   void taskRecordAstralCast(id);
 }

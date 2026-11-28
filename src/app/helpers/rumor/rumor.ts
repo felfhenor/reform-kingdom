@@ -1,3 +1,5 @@
+import { contentName } from '@helpers/i18n/i18n-content';
+import { t } from '@helpers/i18n/i18n';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
 import { regionForMap } from '@helpers/lore/region-intro';
@@ -106,6 +108,6 @@ export function isRumorRevealed(rumorId: RumorId): boolean {
 export function rumorTeaser(rumor: RumorContent): string {
   const region = regionForMap(rumor.requireMapVisit);
   return region
-    ? `Word of something hidden in ${region.name}.`
-    : 'Word of something hidden.';
+    ? t('rumor.wordOfSomethingHidden', { name: contentName(region) })
+    : t('rumor.wordOfSomethingHiddenNowhere');
 }

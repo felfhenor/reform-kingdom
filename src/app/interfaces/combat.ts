@@ -18,7 +18,6 @@ import type {
 import type { ElementBlock, GameElement } from '@interfaces/element';
 import type { Branded } from '@interfaces/identifiable';
 import type { SkillStatBonus, StatBlock } from '@interfaces/stat';
-import type { StatDisplayDimension } from '@interfaces/stat-display';
 
 export type CombatId = Branded<string, 'CombatId'>;
 
@@ -49,100 +48,6 @@ export type DebuffPotency = {
 };
 
 // Only agroValue is a flat weight - every other combat stat is a 0-100 percent chance/modifier.
-export const CombatStatDimension: StatDisplayDimension<CombatStat> = {
-  order: [
-    'repeatActionChance',
-    'skillStrikeAgainChance',
-    'damageReflectPercent',
-    'debuffIgnoreChance',
-    'reviveChance',
-    'coverThreshold',
-    'agroValue',
-    'missChance',
-    'stunChance',
-    'redirectionChance',
-    'healingIgnorePercent',
-    'epCostIncreasePercent',
-  ],
-  label: {
-    repeatActionChance: 'Extra Turn Chance',
-    skillStrikeAgainChance: 'Skill Repeat Chance',
-    redirectionChance: 'Confusion Chance',
-    missChance: 'Miss Chance',
-    debuffIgnoreChance: 'Debuff Resist Chance',
-    damageReflectPercent: 'Damage Reflect',
-    healingIgnorePercent: 'Healing Reduction',
-    reviveChance: 'Revive Chance',
-    stunChance: 'Self-Stun Chance',
-    epCostIncreasePercent: 'EP Cost Increase',
-    agroValue: 'Aggro',
-    coverThreshold: 'Cover Threshold',
-  },
-  icon: {
-    repeatActionChance: 'gameExtraTime',
-    skillStrikeAgainChance: 'gameDeadlyStrike',
-    redirectionChance: 'gameFog',
-    missChance: 'gameDodging',
-    debuffIgnoreChance: 'gameMagicShield',
-    damageReflectPercent: 'gameShieldReflect',
-    healingIgnorePercent: 'gameBrokenHeart',
-    reviveChance: 'gameAngelWings',
-    stunChance: 'gameKnockedOutStars',
-    epCostIncreasePercent: 'gameNestedEclipses',
-    agroValue: 'gameTargeted',
-    coverThreshold: 'gameShieldImpact',
-  },
-  color: {
-    repeatActionChance: 'text-green-500',
-    skillStrikeAgainChance: 'text-red-600',
-    redirectionChance: 'text-sky-500',
-    missChance: 'text-rose-400',
-    debuffIgnoreChance: 'text-pink-500',
-    damageReflectPercent: 'text-fuchsia-500',
-    healingIgnorePercent: 'text-red-800',
-    reviveChance: 'text-lime-500',
-    stunChance: 'text-yellow-500',
-    epCostIncreasePercent: 'text-violet-500',
-    agroValue: 'text-orange-600',
-    coverThreshold: 'text-cyan-600',
-  },
-  info: {
-    repeatActionChance: 'Chance to take another turn right after acting.',
-    skillStrikeAgainChance:
-      'Chance for each hit of a skill to hit a second time on the same target.',
-    redirectionChance:
-      'Chance for each part of a skill to change targets. Attacks hit allies instead of enemies, and heals or buffs go to enemies.',
-    missChance:
-      'Chance for each hit to miss outright, even when it would otherwise hit. Skills that never miss are immune.',
-    debuffIgnoreChance: 'Chance to ignore a debuff entirely.',
-    damageReflectPercent:
-      'Part of damage taken from reflectable attacks that is dealt back to the attacker.',
-    healingIgnorePercent: 'Healing from skills is reduced.',
-    reviveChance:
-      'Chance each turn to come back at full HP after being defeated.',
-    stunChance: 'Chance to lose turn.',
-    epCostIncreasePercent: 'Skills cost this much more EP.',
-    agroValue:
-      'Positive aggro causes the target to be first in line for attacks; negative aggro causes the target to be last in line for any attacks.',
-    coverThreshold:
-      'Steps in to take hits for an ally whose HP percent is below this.',
-  },
-  isPercent: {
-    repeatActionChance: true,
-    skillStrikeAgainChance: true,
-    redirectionChance: true,
-    missChance: true,
-    debuffIgnoreChance: true,
-    damageReflectPercent: true,
-    healingIgnorePercent: true,
-    reviveChance: true,
-    stunChance: true,
-    epCostIncreasePercent: true,
-    agroValue: false,
-    coverThreshold: true,
-  },
-};
-
 export type CombatantTargettingType =
   | 'Random'
   | 'Strongest'

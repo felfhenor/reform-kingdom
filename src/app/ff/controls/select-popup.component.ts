@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { NgTemplateOutlet } from '@angular/common';
 import type { ElementRef } from '@angular/core';
 import {
@@ -145,28 +146,28 @@ export class FFSelectPopupComponent {
         this.ffInput.register('back', () => this.cancel(), {
           priority,
           enabled: isOpen,
-          label: 'Cancel',
+          label: t('gamepad.cancel'),
         }),
         // The list is one column, so left/right are free to page too (and repeat when held).
         this.ffInput.register('left', () => this.page(-1), {
           priority,
           enabled: isOpen,
-          label: 'Page',
+          label: t('gamepad.page'),
         }),
         this.ffInput.register('right', () => this.page(1), {
           priority,
           enabled: isOpen,
-          label: 'Page',
+          label: t('gamepad.page'),
         }),
         this.ffInput.register('subPrev', () => this.page(-1), {
           priority,
           enabled: isOpen,
-          label: 'Page',
+          label: t('gamepad.page'),
         }),
         this.ffInput.register('subNext', () => this.page(1), {
           priority,
           enabled: isOpen,
-          label: 'Page',
+          label: t('gamepad.page'),
         }),
         ...BLOCKED_ACTIONS.map((action) =>
           this.ffInput.register(action, () => undefined, {

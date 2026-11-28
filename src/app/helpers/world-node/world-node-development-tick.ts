@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import {
   analyticsSafeSegment,
@@ -21,8 +22,8 @@ function worldNodeDevelopmentCompleteText(
   name: string,
 ): string {
   return content.__type === 'outpost' && level === 1
-    ? `${name} has been built.`
-    : `${name} has been developed to +${level}.`;
+    ? t('worldNodeDevelopmentTick.hasBeenBuilt', { name })
+    : t('worldNodeDevelopmentTick.hasBeenDevelopedTo', { name, level });
 }
 
 function worldNodeDevelopmentAnnounce(due: WorldNodeDevelopmentDue): void {
@@ -34,7 +35,7 @@ function worldNodeDevelopmentAnnounce(due: WorldNodeDevelopmentDue): void {
   notifySuccess(completeText);
   desktopNotify({
     category: 'Progress',
-    title: 'Development Finished',
+    title: t('worldNodeDevelopmentTick.developmentFinished'),
     body: completeText,
   });
 

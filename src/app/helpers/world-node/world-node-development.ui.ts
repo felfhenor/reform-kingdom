@@ -1,3 +1,5 @@
+import { contentName } from '@helpers/i18n/i18n-content';
+import { t } from '@helpers/i18n/i18n';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import {
   analyticsSafeSegment,
@@ -27,8 +29,13 @@ export async function worldNodeDevelopStart(
 
   miscellaneousMessageLog(
     content.__type === 'outpost' && targetLevel === 1
-      ? `The party has begun building **${content.name}**.`
-      : `The party has begun developing **${content.name}** to +${targetLevel}.`,
+      ? t('worldNodeDevelopment.thePartyHasBegun', {
+          name: contentName(content),
+        })
+      : t('worldNodeDevelopment.thePartyHasBegun2', {
+          name: contentName(content),
+          targetLevel,
+        }),
   );
   analyticsSendDesignEvent(
     `World:${WORLD_NODE_TYPE_BY_CONTENT_TYPE[content.__type]}:LevelUp:${analyticsSafeSegment(nodeName)}`,

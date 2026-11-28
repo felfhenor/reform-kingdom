@@ -42,21 +42,19 @@ import {
 import { setOption } from '@helpers/state-options';
 import type {
   GameState,
-  LegacyMergeResult,
   SavefileBackup,
   SavefileBundleSections,
+  SavefileLegacyMergeVerb,
 } from '@interfaces';
 
-const LEGACY_MERGE_WARNINGS: Partial<Record<LegacyMergeResult, string>> = {
-  invalid: "its Legacy couldn't be read.",
-  unsaved: "its Legacy couldn't be saved. Free up storage and try again.",
-};
-
 // A bad Legacy section never undoes the savefile change; it only warns.
-function savefileMergeLegacy(section: unknown, verb: string): void {
-  const warning = LEGACY_MERGE_WARNINGS[legacyMergeFrom([section])];
-  if (warning)
-    notifyWarning(t('savefileLoad.yourSavefileWasBut', { verb, warning }));
+function savefileMergeLegacy(
+  section: unknown,
+  verb: SavefileLegacyMergeVerb,
+): void {
+  const result = legacyMergeFrom([section]);
+  if (result === 'invalid' || result === 'unsaved')
+    notifyWarning(t(`savefileLoad.legacyWarning.${verb}.${result}`));
 }
 
 // Not ready during a replace, and a failed load isn't the player's save, so neither may roll real backups out.
@@ -137,11 +135,13 @@ function recoverFailureMessage(
   lastFailures: string[],
 ) {
   if (backupCount > 0) {
-    return `None of your backups could be loaded. ${lastFailures.join(' ')}`;
+    return t('savefileLoad.noneOfYourBackups', {
+      lastFailures: lastFailures.join(' '),
+    });
   }
   return hasUnreadable
-    ? 'Backups could not be read from storage.'
-    : 'No backups were found to recover from.';
+    ? t('savefileLoad.backupsCouldNotBe')
+    : t('savefileLoad.noBackupsFound');
 }
 
 // Newest first, skipping backups that fail, so one bad backup can't block an older good one.
@@ -210,14 +210,16 @@ function parseSavefileJson(json: string): unknown {
 function savefileImportProblem(state: unknown): string | undefined {
   const problems = savefileValidationErrors(state);
   if (problems.length > 0) {
-    return `That file is not a usable savefile: ${problems[0]}`;
+    return t('savefileLoad.thatFileIsNot', { problems: problems[0] });
   }
   if (isDemoBuild() && (state as GameState).meta.isDemo !== true) {
     return 'The demo can only import savefiles made in the demo.';
   }
   const missingMods = savefileModsMissing(state as GameState);
   if (missingMods.length > 0) {
-    return `That savefile can't be loaded. ${missingMods.join(' ')}`;
+    return t('savefileLoad.thatSavefileCanT', {
+      missingMods: missingMods.join(' '),
+    });
   }
   return undefined;
 }

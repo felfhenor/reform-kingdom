@@ -218,7 +218,7 @@ export function gatherLuckyHauler(): Character | undefined {
 }
 
 export function gatherLuckyHaulMessage(character: Character): string {
-  return `**${character.name}**'s luck doubled the haul!`;
+  return t('gathering.sLuckDoubledThe', { name: character.name });
 }
 
 function resolveGatherCycle(content: GatheringContent, nodeName: string): void {

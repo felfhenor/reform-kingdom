@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { resolvedDropLogPart } from '@helpers/combat/combat-rewards';
 import { getEntry } from '@helpers/content/content';
 import {
@@ -83,7 +84,10 @@ function workerLevelUpLog(
     'promoted',
     [
       worker
-        ? { ...worker, html: `${worker.html} to level ${level}` }
+        ? {
+            ...worker,
+            html: t('workerProgression.toLevel', { html: worker.html, level }),
+          }
         : undefined,
     ],
     [tradeGoodsLogPart({ itemId: goldCoinId() }, cost)],

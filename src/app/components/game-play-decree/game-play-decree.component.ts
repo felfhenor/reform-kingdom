@@ -1,5 +1,6 @@
+import { t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
-import { contentName } from '@helpers/i18n/i18n-content';
+import { contentName, nodeNameText } from '@helpers/i18n/i18n-content';
 import { contentSearchFn } from '@helpers/i18n/i18n-content.ui';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
@@ -122,18 +123,50 @@ function clauseTypeOf(formType: ClauseFormType): ClauseDraftType {
 const CLAUSE_TYPE_OPTIONS: {
   value: ClauseFormType;
   label: string;
-}[] = sortBy(
-  [
-    { value: 'GatherMaterial', label: 'Gather Material' },
-    { value: 'GatherFromNode', label: 'Gather from Location' },
-    { value: 'FarmNode', label: 'Farm Location' },
-    { value: 'FarmMaterial', label: 'Farm Material' },
-    { value: 'FinishUnfinishedAreas', label: 'Finish Unfinished Areas' },
-    { value: 'LevelUpParty', label: 'Level Up Party' },
-    { value: 'DefendTowns', label: 'Defend Towns' },
-  ],
-  'label',
-);
+}[] = [
+  {
+    value: 'GatherMaterial',
+    get label() {
+      return t('gamePlayDecree.gatherMaterial');
+    },
+  },
+  {
+    value: 'GatherFromNode',
+    get label() {
+      return t('gamePlayDecree.gatherFromLocation');
+    },
+  },
+  {
+    value: 'FarmNode',
+    get label() {
+      return t('gamePlayDecree.farmLocation');
+    },
+  },
+  {
+    value: 'FarmMaterial',
+    get label() {
+      return t('gamePlayDecree.farmMaterial');
+    },
+  },
+  {
+    value: 'FinishUnfinishedAreas',
+    get label() {
+      return t('gamePlayDecree.finishUnfinishedAreas');
+    },
+  },
+  {
+    value: 'LevelUpParty',
+    get label() {
+      return t('gamePlayDecree.levelUpParty');
+    },
+  },
+  {
+    value: 'DefendTowns',
+    get label() {
+      return t('gamePlayDecree.defendTowns');
+    },
+  },
+];
 
 type RiskToleranceOption = {
   value: DecreeRiskLevel;
@@ -149,23 +182,35 @@ const DEFAULT_DECREE_GATHER_QUANTITY = 100;
 const RISK_TOLERANCE_OPTIONS: RiskToleranceOption[] = [
   {
     value: 'Low',
-    label: 'Low',
+    get label() {
+      return t('gamePlayDecree.low');
+    },
     difficulty: RISK_BAND_DIFFICULTY.Low,
-    description:
-      "Only target locations with a max level at or below the party's level.",
+    get description() {
+      return t('gamePlayDecree.lowRiskDescription');
+    },
   },
   {
     value: 'Medium',
-    label: 'Medium',
+    get label() {
+      return t('gamePlayDecree.medium');
+    },
     difficulty: RISK_BAND_DIFFICULTY.Medium,
-    description:
-      "Target locations with at least a minimum level of the party's level.",
+    get description() {
+      return t('gamePlayDecree.mediumRiskDescription');
+    },
   },
   {
     value: 'High',
-    label: 'High',
+    get label() {
+      return t('gamePlayDecree.high');
+    },
     difficulty: RISK_BAND_DIFFICULTY.High,
-    description: `Attempt encounters up to ${HIGH_RISK_LEVELS_ABOVE_PARTY} levels above the party's weakest hero - the riskiest fights Auto Mode will ever pick on its own.`,
+    get description() {
+      return t('gamePlayDecree.highRiskDescription', {
+        levels: HIGH_RISK_LEVELS_ABOVE_PARTY,
+      });
+    },
   },
 ];
 
@@ -241,15 +286,19 @@ export class GamePlayDecreeComponent {
 
   public homeDisplayName = computed(() => {
     const home = homeNodeGet();
-    if (!home) return 'the Duchy';
-    return worldNodeTown(home)?.name ?? home.nodeName;
+    if (!home) return t('gamePlayDecree.theDuchy');
+    const town = worldNodeTown(home);
+    return town ? contentName(town) : nodeNameText(home.nodeName);
   });
 
-  public readonly clauseTypeOptions = isWorldNodeTypeRemoved('GatherNode')
-    ? CLAUSE_TYPE_OPTIONS.filter(
-        (option) => clauseTypeOf(option.value) !== 'GatherMaterial',
-      )
-    : CLAUSE_TYPE_OPTIONS;
+  public readonly clauseTypeOptions = sortBy(
+    isWorldNodeTypeRemoved('GatherNode')
+      ? CLAUSE_TYPE_OPTIONS.filter(
+          (option) => clauseTypeOf(option.value) !== 'GatherMaterial',
+        )
+      : CLAUSE_TYPE_OPTIONS,
+    'label',
+  );
   public readonly riskToleranceOptions = RISK_TOLERANCE_OPTIONS;
 
   public materialOptions = computed<MaterialOption[]>(() => {

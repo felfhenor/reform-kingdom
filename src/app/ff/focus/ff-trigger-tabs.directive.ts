@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { Directive, ElementRef, inject } from '@angular/core';
 import { FFFocusService } from '@ff/focus/ff-focus.service';
 import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
@@ -22,7 +23,7 @@ export class FFTriggerTabsDirective {
       element: this.host,
       priority: TAB_STRIP_PRIORITY,
       enabled: () => this.tabs().length > 1,
-      label: 'Switch Tab',
+      label: t('ffTriggerTabsDirective.switchTab'),
     };
     ffGamepadOn('subPrev', () => this.step(-1), options);
     ffGamepadOn('subNext', () => this.step(1), options);

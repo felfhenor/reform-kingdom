@@ -1,4 +1,11 @@
 import {
+  CombatStatDimension,
+  ElementBoonDimension,
+  ElementResistanceDimension,
+  MonsterTypeDimension,
+  StatusEffectTagDimension,
+} from '@helpers/hero/stat-dimension';
+import {
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -8,15 +15,10 @@ import { RowItemStatsComponent } from '@components/row-item-stats/row-item-stats
 import { RowLabeledValuesComponent } from '@components/row-labeled-values/row-labeled-values.component';
 import {
   type CombatStatBlock,
-  CombatStatDimension,
   type ElementBlock,
-  ElementBoonDimension,
-  ElementResistanceDimension,
   type MonsterType,
-  MonsterTypeDimension,
   type StatBlock,
   type StatusEffectBlock,
-  StatusEffectTagDimension,
 } from '@interfaces';
 
 function hasAnyNonzero(

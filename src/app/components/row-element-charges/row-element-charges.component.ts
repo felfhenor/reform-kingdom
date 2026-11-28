@@ -1,3 +1,5 @@
+import { EnumLabelPipe } from '@pipes/enum-label.pipe';
+import { TPipe } from '@pipes/t.pipe';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -12,7 +14,7 @@ import { TippyDirective } from '@ngneat/helipopper';
 @Component({
   selector: 'app-row-element-charges',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconElementChargeComponent, TippyDirective],
+  imports: [EnumLabelPipe, TPipe, IconElementChargeComponent, TippyDirective],
   template: `
     <div class="flex flex-row flex-wrap gap-2">
       @for (element of charges(); track $index) {
@@ -20,7 +22,10 @@ import { TippyDirective } from '@ngneat/helipopper';
           [element]="element"
           [filled]="filled()"
           size="sm"
-          [tp]="'Costs a ' + element + ' charge'"
+          [tp]="
+            'element.costsCharge'
+              | t: { element: (element | enumLabel: 'element') }
+          "
         />
       }
     </div>

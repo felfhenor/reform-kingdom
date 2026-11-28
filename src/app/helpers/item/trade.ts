@@ -1,4 +1,4 @@
-import { t } from '@helpers/i18n/i18n';
+import { i18nLabels, t } from '@helpers/i18n/i18n';
 import { contentName } from '@helpers/i18n/i18n-content';
 import {
   categoryMessageLog,
@@ -22,14 +22,13 @@ import type {
   RumorId,
   TradeCommitOutcome,
   TradeGoods,
+  TradeLogVerb,
 } from '@interfaces';
 import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
 import { compact } from 'es-toolkit/compat';
 
-const TRADE_FAILURE_MESSAGES: Partial<Record<TradeCommitOutcome, string>> = {
-  armoryFull: 'Your armory is full.',
-  vanished: 'That item has disappeared from the shop.',
-};
+const TRADE_FAILURE_MESSAGES: Partial<Record<TradeCommitOutcome, string>> =
+  i18nLabels('trade.failure', ['armoryFull', 'vanished']);
 
 export function tradeWarn(outcome: TradeCommitOutcome): void {
   const message = TRADE_FAILURE_MESSAGES[outcome];
@@ -120,7 +119,7 @@ function tradeLogPartsHtml(parts: AdventureLogRewardPart[]): string {
 
 export function tradeLog(
   locationName: string,
-  verb: string,
+  verb: TradeLogVerb,
   goods: (AdventureLogRewardPart | undefined)[],
   price: (AdventureLogRewardPart | undefined)[],
 ): void {
@@ -128,16 +127,16 @@ export function tradeLog(
   const priceParts = compact(price);
   if (goodsParts.length === 0) return;
 
-  const priceText =
-    priceParts.length === 0 ? '' : ` for ${tradeLogPartsHtml(priceParts)}`;
+  const goodsHtml = tradeLogPartsHtml(goodsParts);
   categoryMessageLog(
     'Miscellaneous',
     locationName,
-    t('trade.you', {
-      verb,
-      goodsParts: tradeLogPartsHtml(goodsParts),
-      priceText,
-    }),
+    priceParts.length === 0
+      ? t(`trade.${verb}`, { goods: goodsHtml })
+      : t(`trade.${verb}For`, {
+          goods: goodsHtml,
+          price: tradeLogPartsHtml(priceParts),
+        }),
     compact([...goodsParts, ...priceParts].map((part) => part.icon)),
   );
 }

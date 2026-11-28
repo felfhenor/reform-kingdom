@@ -90,7 +90,8 @@ function skillTargetBehaviorCondition(
   behavior: EquipmentSkillTargetBehaviorData,
 ): string[] {
   const effectName = () =>
-    contentNameById(behavior.statusEffectId ?? '') ?? 'a status effect';
+    contentNameById(behavior.statusEffectId ?? '') ??
+    t('skillPreview.aStatusEffect');
 
   switch (behavior.behavior) {
     case 'NotMaxHealth':
@@ -98,15 +99,15 @@ function skillTargetBehaviorCondition(
     case 'NotMaxEnergy':
       return ['Only if missing EP'];
     case 'IfStatusEffect':
-      return [`Only if it has ${effectName()}`];
+      return [t('skillPreview.onlyIfItHas', { effectName: effectName() })];
     case 'IfNotStatusEffect':
-      return [`Only if it lacks ${effectName()}`];
+      return [t('skillPreview.onlyIfItLacks', { effectName: effectName() })];
     case 'IfNoSummon':
-      return ['Only if no summon is active'];
+      return [t('skillPreview.onlyIfNoSummon')];
     case 'IfNoShield':
-      return ['Only if unshielded'];
+      return [t('skillPreview.onlyIfUnshielded')];
     case 'PreferHeroes':
-      return ['Heroes first'];
+      return [t('skillPreview.heroesFirst')];
     default:
       return [];
   }
@@ -117,7 +118,9 @@ function skillTechniqueStatusPreviews(
   technique: EquipmentSkillContentTechnique,
 ): SkillTechniqueStatusPreview[] {
   return technique.statusEffects.map((application) => ({
-    name: contentNameById(application.statusEffectId) ?? 'Unknown Effect',
+    name:
+      contentNameById(application.statusEffectId) ??
+      t('skillPreview.unknownEffect'),
     chance: skillTechniqueStatusEffectChance(skill, application),
     duration: skillTechniqueStatusEffectDuration(skill, application),
   }));

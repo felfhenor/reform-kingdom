@@ -17,6 +17,17 @@ import { goldCoinId, hasGold, traderTokenId } from '@helpers/item/materials';
 import type { CaravanTradeRow } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
+const MERCHANT_NOTE_KEYS = {
+  caravan: {
+    selling: 'slotCaravanTrade.caravanSelling',
+    buying: 'slotCaravanTrade.caravanBuying',
+  },
+  town: {
+    selling: 'slotCaravanTrade.townSelling',
+    buying: 'slotCaravanTrade.townBuying',
+  },
+} as const;
+
 @Component({
   selector: 'app-slot-caravan-trade',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,7 +46,7 @@ import { TippyDirective } from '@ngneat/helipopper';
 })
 export class SlotCaravanTradeComponent {
   public row = input.required<CaravanTradeRow>();
-  public merchantLabel = input('caravan');
+  public merchantLabel = input<'caravan' | 'town'>('caravan');
 
   // Emits whether the confirmation should be skipped (shift-click).
   public activate = output<boolean>();
@@ -54,4 +65,10 @@ export class SlotCaravanTradeComponent {
   // `type: 'sell'` is the trader selling to the party (the party buys);
   // `type: 'buy'` is the trader buying from the party (the party sells).
   public isPartyBuying = computed(() => this.row().trade.type === 'sell');
+  public merchantNoteKey = computed(
+    () =>
+      MERCHANT_NOTE_KEYS[this.merchantLabel()][
+        this.isPartyBuying() ? 'selling' : 'buying'
+      ],
+  );
 }

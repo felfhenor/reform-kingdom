@@ -83,7 +83,7 @@ export class PanelTownShopComponent {
   }
 
   public stockEntryName(entry: TownStockEntry): string {
-    return townStockDisplay(entry)?.name ?? 'Unknown Item';
+    return townStockDisplay(entry)?.name ?? t('panelTownShop.unknownItem');
   }
 
   public stockRowDisplay(entry: TownStockEntry) {

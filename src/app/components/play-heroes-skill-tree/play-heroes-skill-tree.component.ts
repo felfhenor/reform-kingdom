@@ -1,5 +1,6 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import { TPipe } from '@pipes/t.pipe';
-import { tPlural } from '@helpers/i18n/i18n';
+import { t, tPlural } from '@helpers/i18n/i18n';
 import { DecimalPipe, formatNumber } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -246,7 +247,10 @@ export class PlayHeroesSkillTreeComponent {
     const discardNote =
       pending > 0 ? ` ${tPlural('skillTree.pendingDiscarded', pending)}` : '';
     swal.swalOptions = {
-      title: `Reset ${character.name}'s ${job.name} skill tree?`,
+      title: t('playHeroesSkillTree.resetSSkillTree', {
+        name: character.name,
+        name2: contentName(job),
+      }),
       text:
         skillTreeResetPromptText(character, job, this.fluxOwned(), (n) =>
           formatNumber(n, this.locale),

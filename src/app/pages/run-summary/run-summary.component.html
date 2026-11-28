@@ -10,14 +10,8 @@
               {{ outcomeTitle() }}
             </h1>
             <p class="type-muted">
-              {{
-                'runSummary.middot'
-                  | t
-                    : {
-                        startedAt: (summary.startedAt | date: 'medium'),
-                        endedAt: (summary.endedAt | date: 'medium'),
-                      }
-              }}
+              {{ summary.startedAt | date: 'medium' }} -
+              {{ summary.endedAt | date: 'medium' }} &middot;
               <span class="font-bold tabular-nums">
                 <ng-container
                   [ngTemplateOutlet]="duration"
@@ -74,7 +68,8 @@
                               : {
                                   level: (hero.level | number),
                                   job:
-                                    (hero.job | contentName) || 'Unknown Job',
+                                    (hero.job | contentName) ||
+                                    ('runSummary.unknownJob' | t),
                                 }
                         }}
                         <app-icon-spec

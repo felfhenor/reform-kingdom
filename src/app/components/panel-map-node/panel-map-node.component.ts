@@ -450,7 +450,7 @@ export class PanelMapNodeComponent {
       element: inject<ElementRef<HTMLElement>>(ElementRef).nativeElement,
       priority: GAMEPAD_PRIORITY.pageMode,
       enabled: () => !!this.node(),
-      label: 'Close',
+      label: t('gamepad.close'),
     });
   }
 

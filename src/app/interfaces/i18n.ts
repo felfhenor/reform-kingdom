@@ -7,9 +7,12 @@ export type I18nEnumGroup =
   | 'element'
   | 'elementCombination'
   | 'equipmentType'
+  | 'equipmentSlot'
   | 'lootSource'
   | 'riskLevel'
-  | 'statShort';
+  | 'skillTreeNodeKind'
+  | 'skillTreeRow'
+  | 'rewardKind';
 
 export type I18nFlatStrings = Record<string, string>;
 

@@ -35,8 +35,8 @@
                 [class.badge-warning]="missing > 0"
                 [tp]="
                   missing > 0
-                    ? 'Some of this regalia\'s gear is unavailable.'
-                    : 'Current regalia.'
+                    ? ('panelHeroEquipment.someOfThisRegalia' | t)
+                    : ('panelHeroEquipment.currentRegalia' | t)
                 "
               >
                 {{ regalia.name }}
@@ -79,7 +79,7 @@
       <div [appHideUntilLevel]="3" class="flex">
         <app-slot-button-container
           [disabled]="!isAtKingdomCurrently()"
-          [helpText]="'Promote a hero to be higher in the party order. This must be done at the Duchy.'"
+          [helpText]="'panelHeroEquipment.promoteAHeroTo' | t"
         >
           <button
             type="button"
@@ -96,7 +96,7 @@
 
         <app-slot-button-container
           [disabled]="!isAtKingdomCurrently()"
-          [helpText]="'Demote a hero to be lower in the party order. This must be done at the Duchy.'"
+          [helpText]="'panelHeroEquipment.demoteAHeroTo' | t"
         >
           <button
             type="button"
@@ -115,7 +115,7 @@
       <div class="flex gap-2 ms-auto">
         <app-slot-button-container
           [disabled]="!equipmentModifiable()"
-          [helpText]="'Optimize this heros gear. This cannot be done in combat.'"
+          [helpText]="'panelHeroEquipment.optimizeThisHerosGear' | t"
         >
           <button
             type="button"
@@ -155,7 +155,7 @@
         @if (hasBurstOptions()) {
           <app-slot-button-container
             [disabled]="!equipmentModifiable()"
-            [helpText]="'Change the burst skill for this hero. This cannot be done in combat.'"
+            [helpText]="'panelHeroEquipment.changeTheBurstSkill' | t"
           >
             <button
               type="button"

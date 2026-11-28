@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import {
   contentDescription,
   contentName,
@@ -74,7 +75,7 @@ function taskLocate(task: TaskContent): TaskRowViewModel['locate'] {
   const disabledReason =
     node.mapName === worldCurrentLocationState().mapName
       ? ''
-      : `You must be in ${mapName} to locate this location.`;
+      : t('task.youMustBeIn', { mapName });
   return { node, disabledReason };
 }
 

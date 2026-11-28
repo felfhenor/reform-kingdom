@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import { t } from '@helpers/i18n/i18n';
 import { categoryMessageLog } from '@helpers/combat/combat-log';
 import {
@@ -75,8 +76,8 @@ export function telegraphRaid(town: TownContent): void {
 
   desktopNotify({
     category: 'Raids',
-    title: 'Raid Incoming',
-    body: `${town.name} is about to be raided. Defend it before time runs out.`,
+    title: t('townRaidTick.raidIncoming'),
+    body: t('townRaidTick.isAboutToBe', { name: contentName(town) }),
   });
 }
 
@@ -93,17 +94,19 @@ function processTownRaid(town: TownContent): void {
       state.raidEngageWindowExpiresAtTick !== undefined &&
       now >= state.raidEngageWindowExpiresAtTick
     ) {
-      const raidedText = `${town.name} was raided while undefended!`;
+      const raidedText = t('townRaidTick.wasRaidedWhileUndefended2', {
+        name: contentName(town),
+      });
       notifyError(raidedText);
       desktopNotify({
         category: 'Raids',
-        title: 'Town Raided',
+        title: t('townRaidTick.townRaided'),
         body: raidedText,
       });
       categoryMessageLog(
         'Raid',
         town.name,
-        t('townRaidTick.wasRaidedWhileUndefended', { name: town.name }),
+        t('townRaidTick.wasRaidedWhileUndefended', { name: contentName(town) }),
       );
       raidResolveDefeat(town.id);
     }

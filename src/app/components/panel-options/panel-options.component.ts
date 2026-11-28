@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import { FFTriggerTabsDirective } from '@ff/focus/ff-trigger-tabs.directive';
 import { Component, computed } from '@angular/core';
@@ -45,17 +46,25 @@ export class PanelOptionsComponent extends OptionsBaseComponent {
 
   public readonly tabs: OptionsTabLink[] = [
     {
-      name: 'UI',
+      name: t('panelOptions.ui'),
       link: 'UI',
       showIf: computed(() => true),
     },
     {
-      name: 'Accessibility',
+      name: t('panelOptions.accessibility'),
       link: 'Accessibility',
       showIf: computed(() => true),
     },
-    { name: 'Savefile', link: 'Savefile', showIf: computed(() => true) },
-    { name: 'Misc', link: 'Misc', showIf: computed(() => true) },
+    {
+      name: t('panelOptions.savefile'),
+      link: 'Savefile',
+      showIf: computed(() => true),
+    },
+    {
+      name: t('panelOptions.misc'),
+      link: 'Misc',
+      showIf: computed(() => true),
+    },
     {
       name: 'Debug',
       link: 'Debug',

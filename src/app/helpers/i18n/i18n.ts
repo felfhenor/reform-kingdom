@@ -36,6 +36,25 @@ export function t(key: I18nKey, params?: I18nParams): string {
   return i18nFill(_i18nUi()[key] ?? key, params);
 }
 
+// Label tables are created when their module loads, before any language does, so each read looks its text up then.
+export function i18nLabels<K extends string>(
+  prefix: string,
+  keys: readonly K[],
+): Record<K, string> {
+  const label = (key: K) => t(`${prefix}.${key}` as I18nKey);
+  const isKey = (key: string | symbol): key is K =>
+    typeof key === 'string' && keys.includes(key as K);
+  return new Proxy({} as Record<K, string>, {
+    get: (_, key) => (isKey(key) ? label(key) : undefined),
+    has: (_, key) => isKey(key),
+    ownKeys: () => [...keys],
+    getOwnPropertyDescriptor: (_, key) =>
+      isKey(key)
+        ? { enumerable: true, configurable: true, value: label(key) }
+        : undefined,
+  });
+}
+
 // Enum values double as keys; a value with no label (e.g. added by a mod) shows as itself.
 export function enumLabel(group: I18nEnumGroup, value: string): string {
   const key = `enum.${group}.${value}` as I18nKey;

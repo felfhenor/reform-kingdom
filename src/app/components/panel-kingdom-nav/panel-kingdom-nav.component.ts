@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import { formatNumber } from '@angular/common';
 import type { AnimationCallbackEvent } from '@angular/core';
@@ -105,7 +106,10 @@ export class PanelKingdomNavComponent {
     if (entry.kind === 'tradeskill')
       return this.tradeskillTooltip(entry.label, entry.tradeskill);
     if (entry.subview === 'workers' && idleWorkers > 0)
-      return `${entry.label} (${formatNumber(idleWorkers, this.locale)} idle)`;
+      return t('panelKingdomNav.idleWorkers', {
+        label: entry.label,
+        idle: formatNumber(idleWorkers, this.locale),
+      });
     return entry.label;
   }
 
@@ -119,6 +123,11 @@ export class PanelKingdomNavComponent {
       this.locale,
     );
     const remaining = formatDuration(craftQueueTicksRemaining(tradeskill));
-    return `${label} Lv. ${level} (${units} items crafting, ${remaining} remaining)`;
+    return t('panelKingdomNav.lvItemsCraftingRemaining', {
+      label,
+      level,
+      units,
+      remaining,
+    });
   }
 }

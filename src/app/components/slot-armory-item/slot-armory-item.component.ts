@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -51,7 +52,7 @@ export class SlotArmoryItemComponent {
     ffGamepadOn('details', () => this.toggleSelect.emit(true), {
       element: host,
       enabled: () => this.sellMode() && host.contains(document.activeElement),
-      label: 'Select Range',
+      label: t('slotArmoryItem.selectRange'),
     });
   }
 

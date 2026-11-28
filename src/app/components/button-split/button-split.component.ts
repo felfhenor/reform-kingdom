@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import type { AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
@@ -60,7 +61,7 @@ export class ButtonSplitComponent<T> {
       element: host,
       priority: GAMEPAD_PRIORITY.popover,
       enabled: () => this.isOpen(),
-      label: 'Close',
+      label: t('gamepad.close'),
     });
 
     document.addEventListener('pointerdown', onPointerDown, { capture: true });

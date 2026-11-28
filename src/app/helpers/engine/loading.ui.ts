@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { rngShuffle } from '@helpers/rng';
 import type {
   AtlasedImage,
@@ -11,7 +12,7 @@ export function loadingProgressCalculate(
   steps: LoadingStep[],
 ): LoadingProgress {
   if (steps.length === 0) {
-    return { percent: 100, label: 'Ready', isComplete: true };
+    return { percent: 100, label: t('loading.ready'), isComplete: true };
   }
 
   const doneCount = steps.filter((step) => step.isDone).length;

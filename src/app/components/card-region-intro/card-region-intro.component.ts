@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import {
   type AnimationCallbackEvent,
@@ -92,7 +93,7 @@ export class CardRegionIntroComponent {
     ffGamepadOn('back', () => this.dismiss(), {
       priority: GAMEPAD_PRIORITY.overlay,
       enabled: () => !!this.region() && !this.isDismissing,
-      label: 'Dismiss',
+      label: t('gamepad.dismiss'),
     });
     const onVisibilityChange = () => this.isPageShown.set(!document.hidden);
 

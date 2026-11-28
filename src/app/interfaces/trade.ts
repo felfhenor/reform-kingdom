@@ -11,6 +11,9 @@ export type TradeGoods = Pick<
   'itemId' | 'equipmentId' | 'collectibleId' | 'recipeId'
 >;
 
+export type TradeLogVerb =
+  'bought' | 'sold' | 'unlocked' | 'claimed' | 'promoted';
+
 // Filled in from live state during the commit, since draft references are revoked once it ends.
 export type TradeReceipt = {
   totalPrice: number;

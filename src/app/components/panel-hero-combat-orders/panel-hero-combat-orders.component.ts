@@ -1,3 +1,4 @@
+import { enumLabel, t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
@@ -80,15 +81,60 @@ type HeroOption = {
 };
 
 const CONDITION_TYPE_OPTIONS: SelectOption<CombatOrderCondition['type']>[] = [
-  { value: 'Always', label: 'Always' },
-  { value: 'SelfHealthPercent', label: 'My Health %' },
-  { value: 'SelfEnergyPercent', label: 'My Energy %' },
-  { value: 'AllyCountHealthPercent', label: 'Ally Count vs Health %' },
-  { value: 'EnemyCount', label: 'Enemy Count' },
-  { value: 'EnemyCountHealthPercent', label: 'Enemy Count vs Health %' },
-  { value: 'SpecificHeroHealthPercent', label: 'Specific Hero Health %' },
-  { value: 'SelfHasNoSummon', label: 'I Have No Summon' },
-  { value: 'ElementCount', label: 'Element Charges' },
+  {
+    value: 'Always',
+    get label() {
+      return t('panelHeroCombatOrders.always');
+    },
+  },
+  {
+    value: 'SelfHealthPercent',
+    get label() {
+      return t('panelHeroCombatOrders.myHealth');
+    },
+  },
+  {
+    value: 'SelfEnergyPercent',
+    get label() {
+      return t('panelHeroCombatOrders.myEnergy');
+    },
+  },
+  {
+    value: 'AllyCountHealthPercent',
+    get label() {
+      return t('panelHeroCombatOrders.allyCountVsHealth');
+    },
+  },
+  {
+    value: 'EnemyCount',
+    get label() {
+      return t('panelHeroCombatOrders.enemyCount');
+    },
+  },
+  {
+    value: 'EnemyCountHealthPercent',
+    get label() {
+      return t('panelHeroCombatOrders.enemyCountVsHealth');
+    },
+  },
+  {
+    value: 'SpecificHeroHealthPercent',
+    get label() {
+      return t('panelHeroCombatOrders.specificHeroHealth');
+    },
+  },
+  {
+    value: 'SelfHasNoSummon',
+    get label() {
+      return t('panelHeroCombatOrders.iHaveNoSummon');
+    },
+  },
+  {
+    value: 'ElementCount',
+    get label() {
+      return t('panelHeroCombatOrders.elementCharges');
+    },
+  },
 ];
 
 const COMPARATOR_OPTIONS: SelectOption<CombatOrderComparator>[] = [
@@ -100,23 +146,78 @@ const COMPARATOR_OPTIONS: SelectOption<CombatOrderComparator>[] = [
 ];
 
 const HEALTH_DIRECTION_OPTIONS: SelectOption<CombatOrderHealthDirection>[] = [
-  { value: 'Below', label: 'below' },
-  { value: 'Above', label: 'above' },
+  {
+    value: 'Below',
+    get label() {
+      return t('panelHeroCombatOrders.below');
+    },
+  },
+  {
+    value: 'Above',
+    get label() {
+      return t('panelHeroCombatOrders.above');
+    },
+  },
 ];
 
 const ALL_TARGET_MODE_OPTIONS: SelectOption<CombatantTargettingType | ''>[] = [
-  { value: '', label: "Skill's default targeting" },
-  { value: 'Random', label: 'Random' },
-  { value: 'Strongest', label: 'Strongest (Highest HP)' },
-  { value: 'Weakest', label: 'Weakest (Lowest HP)' },
-  { value: 'Self', label: 'Self' },
-  { value: 'SpecificHero', label: 'Specific Hero' },
-  { value: 'MatchingAllies', label: 'Matching Allies' },
-  { value: 'MatchingEnemies', label: 'Matching Enemies' },
+  {
+    value: '',
+    get label() {
+      return t('panelHeroCombatOrders.skillSDefaultTargeting');
+    },
+  },
+  {
+    value: 'Random',
+    get label() {
+      return t('panelHeroCombatOrders.random');
+    },
+  },
+  {
+    value: 'Strongest',
+    get label() {
+      return t('panelHeroCombatOrders.strongestHighestHp');
+    },
+  },
+  {
+    value: 'Weakest',
+    get label() {
+      return t('panelHeroCombatOrders.weakestLowestHp');
+    },
+  },
+  {
+    value: 'Self',
+    get label() {
+      return t('panelHeroCombatOrders.self');
+    },
+  },
+  {
+    value: 'SpecificHero',
+    get label() {
+      return t('panelHeroCombatOrders.specificHero');
+    },
+  },
+  {
+    value: 'MatchingAllies',
+    get label() {
+      return t('panelHeroCombatOrders.matchingAllies');
+    },
+  },
+  {
+    value: 'MatchingEnemies',
+    get label() {
+      return t('panelHeroCombatOrders.matchingEnemies');
+    },
+  },
 ];
 
 const ELEMENT_OPTIONS: SelectOption<GameElement>[] = GameElementOrder.map(
-  (element) => ({ value: element, label: element }),
+  (element) => ({
+    value: element,
+    get label() {
+      return enumLabel('element', element);
+    },
+  }),
 );
 
 const DEFAULT_DRAFT_COMPARATOR: CombatOrderComparator = 'LessThan';

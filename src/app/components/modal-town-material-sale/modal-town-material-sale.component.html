@@ -7,7 +7,11 @@
   <span title>
     {{
       'modalTownMaterialSale.materialSales'
-        | t: { town: (town() | contentName) || 'Town' }
+        | t
+          : {
+              town:
+                (town() | contentName) || ('modalTownMaterialSale.town' | t),
+            }
     }}
   </span>
 

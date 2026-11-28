@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import { t } from '@helpers/i18n/i18n';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import {
@@ -12,16 +13,17 @@ import type { TaskContent } from '@interfaces';
 
 export function tasksAnnounceCompleted(tasks: TaskContent[]): void {
   tasks.forEach((task) => {
-    notifySuccess(t('taskComplete.taskComplete', { name: task.name }), () =>
-      modalOpen('tasks'),
+    notifySuccess(
+      t('taskComplete.taskComplete', { name: contentName(task) }),
+      () => modalOpen('tasks'),
     );
     desktopNotify({
       category: 'Progress',
-      title: 'Task Complete',
-      body: task.name,
+      title: t('taskComplete.taskComplete3'),
+      body: contentName(task),
     });
     miscellaneousMessageLog(
-      t('taskComplete.taskComplete2', { name: task.name }),
+      t('taskComplete.taskComplete2', { name: contentName(task) }),
     );
     if (task.whisper) {
       founderWhisperLog(task.whisper);

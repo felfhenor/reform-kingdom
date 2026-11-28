@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import {
   ChangeDetectionStrategy,
@@ -44,7 +45,7 @@ export class ButtonKingdomBackComponent {
     ffGamepadOn('back', () => this.back(), {
       priority: GAMEPAD_PRIORITY.page,
       element: inject<ElementRef<HTMLElement>>(ElementRef).nativeElement,
-      label: 'Back',
+      label: t('gamepad.back'),
     });
   }
 

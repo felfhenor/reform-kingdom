@@ -1,3 +1,5 @@
+import { contentName } from '@helpers/i18n/i18n-content';
+import { t } from '@helpers/i18n/i18n';
 import { commissionRequirementsSatisfied } from '@helpers/commission/commission-requirement';
 import {
   commissionLogTurnIn,
@@ -130,7 +132,10 @@ export async function townCommissionFulfill(
         gained > 0
           ? [
               {
-                html: `${gained.toLocaleString()} reputation with ${townData.name}`,
+                html: t('townCommissionFulfill.reputationWith', {
+                  gained: gained.toLocaleString(),
+                  name: contentName(townData),
+                }),
               },
             ]
           : [],

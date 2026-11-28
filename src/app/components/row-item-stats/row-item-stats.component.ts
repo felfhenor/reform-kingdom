@@ -1,3 +1,4 @@
+import { StatDimension, StatShorthand } from '@helpers/hero/stat-dimension';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -5,13 +6,7 @@ import {
   input,
 } from '@angular/core';
 import { IconDimensionComponent } from '@components/icon-dimension/icon-dimension.component';
-import {
-  StatDimension,
-  StatOrder,
-  StatShorthand,
-  type BaseStat,
-  type StatBlock,
-} from '@interfaces';
+import { StatOrder, type BaseStat, type StatBlock } from '@interfaces';
 import { StatDisplayPipe } from '@pipes/stat-display.pipe';
 
 @Component({

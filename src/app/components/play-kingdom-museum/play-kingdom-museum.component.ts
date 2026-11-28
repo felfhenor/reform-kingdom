@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import { t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import { FFTriggerTabsDirective } from '@ff/focus/ff-trigger-tabs.directive';
@@ -117,6 +118,8 @@ export class PlayKingdomMuseumComponent {
     const recipe = getEntry<RecipeContent>(recipeId);
     if (!recipe) return;
 
-    notifySuccess(t('playKingdomMuseum.recipeUnlocked', { name: recipe.name }));
+    notifySuccess(
+      t('playKingdomMuseum.recipeUnlocked', { name: contentName(recipe) }),
+    );
   }
 }

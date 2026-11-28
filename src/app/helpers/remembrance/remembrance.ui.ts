@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { exchangeEdictRewardCollectibleIds } from '@helpers/exchange/exchange';
 import { isFelDefeated } from '@helpers/lore/outro';
 import { remembranceCategories } from '@helpers/remembrance/remembrance';
@@ -35,7 +36,7 @@ export function remembranceRows(): RemembranceRow[] {
 
 export function remembranceOverall(rows: RemembranceRow[]): RemembranceRow {
   return remembranceRow({
-    name: 'Overall',
+    name: t('remembrance.overall'),
     current: sumBy(rows, (row) => row.current),
     max: sumBy(rows, (row) => row.max),
   });

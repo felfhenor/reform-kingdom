@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { isDemoBuild } from '@helpers/demo/demo';
 import { modsApply, modsApplyErrors, modsReset } from '@helpers/mod/mod-apply';
 import {
@@ -16,11 +17,11 @@ function savefileModRefs(state: GameState): ModRef[] {
 export function savefileModsMissing(state: GameState): string[] {
   const refs = savefileModRefs(state);
   if (refs.length > 0 && isDemoBuild()) {
-    return ['The demo cannot load modded savefiles.'];
+    return [t('savefileMods.demoCannotLoadMods')];
   }
 
-  return modsFindBundles(refs).missing.map(
-    (ref) => `Missing mod: ${modRefLabel(ref)}`,
+  return modsFindBundles(refs).missing.map((ref) =>
+    t('savefileMods.missingMod', { ref: modRefLabel(ref) }),
   );
 }
 
@@ -54,7 +55,7 @@ export function modsApplyEnabled(enabledIds: string[]): string[] {
   const bundles = enabledIds.map((id) => modUsableBundle(id));
   const unusable = enabledIds
     .filter((_, i) => bundles[i] === undefined)
-    .map((id) => `${id}: not installed, or it has errors.`);
+    .map((id) => t('savefileMods.notInstalledOrIt', { id }));
   if (unusable.length > 0) return unusable;
 
   return modsApplyErrors(

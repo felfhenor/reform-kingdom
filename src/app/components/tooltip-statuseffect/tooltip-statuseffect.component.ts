@@ -1,3 +1,7 @@
+import {
+  StatDimension,
+  StatusEffectTagDimension,
+} from '@helpers/hero/stat-dimension';
 import { TPipe } from '@pipes/t.pipe';
 import { TPluralPipe } from '@pipes/t-plural.pipe';
 import { DecimalPipe } from '@angular/common';
@@ -11,7 +15,6 @@ import { AtlasImageComponent } from '@components/atlas-image/atlas-image.compone
 import { IconDimensionComponent } from '@components/icon-dimension/icon-dimension.component';
 import { IconComponent } from '@components/icon/icon.component';
 import type { StatusEffectPreview } from '@interfaces';
-import { StatDimension, StatusEffectTagDimension } from '@interfaces';
 
 @Component({
   selector: 'app-tooltip-statuseffect',

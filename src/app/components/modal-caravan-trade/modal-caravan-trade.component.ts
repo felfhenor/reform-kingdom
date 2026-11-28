@@ -1,3 +1,4 @@
+import { formatNumber } from '@angular/common';
 import { t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import { ContentDescriptionPipe } from '@pipes/content-description.pipe';
@@ -6,6 +7,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
+  LOCALE_ID,
   viewChild,
 } from '@angular/core';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
@@ -66,6 +69,7 @@ import type {
   templateUrl: './modal-caravan-trade.component.html',
 })
 export class ModalCaravanTradeComponent {
+  private locale = inject(LOCALE_ID);
   public entry = computed(() => activeCaravanNode());
 
   public caravan = computed(() => {
@@ -192,11 +196,20 @@ export class ModalCaravanTradeComponent {
     if (!(await caravanExecuteTrade(entry, row.index, quantity))) return;
     playSFX('item-get-minor', 0);
 
-    const qtyLabel = quantity > 1 ? ` x${quantity}` : '';
+    const bought = row.trade.type === 'sell';
+    const params = { name, quantity: formatNumber(quantity, this.locale) };
+    if (quantity > 1) {
+      notifySuccess(
+        bought
+          ? t('modalCaravanTrade.youBoughtQuantity', params)
+          : t('modalCaravanTrade.youSoldQuantity', params),
+      );
+      return;
+    }
     notifySuccess(
-      row.trade.type === 'sell'
-        ? `You bought ${name}${qtyLabel}!`
-        : `You sold ${name}${qtyLabel}!`,
+      bought
+        ? t('modalCaravanTrade.youBought2', params)
+        : t('modalCaravanTrade.youSold', params),
     );
   }
 

@@ -27,7 +27,7 @@ export function achievementsAnnounceLog({
     if (!isCatchUp) {
       desktopNotify({
         category: 'Achievements',
-        title: 'Achievement Unlocked',
+        title: t('achievementAnnounce.achievementUnlocked2'),
         body: contentName(achievement),
       });
     }
@@ -53,7 +53,7 @@ export function achievementCards({
   isCatchUp,
 }: AchievementAnnouncement): AchievementCard[] {
   const cards = unlocked.map(({ achievement }) => ({
-    heading: 'Achievement Unlocked',
+    heading: t('achievementAnnounce.achievementUnlocked2'),
     name: contentName(achievement),
     description: contentDescription(achievement),
     sprite: achievement.sprite,
@@ -63,10 +63,12 @@ export function achievementCards({
   return [
     {
       ...cards[0],
-      heading: 'Achievements',
+      heading: t('achievementAnnounce.achievements'),
       name: '',
       count: cards.length,
-      description: `You have earned: ${cards.map((c) => c.name).join(', ')}`,
+      description: t('achievementAnnounce.youHaveEarned', {
+        name: cards.map((c) => c.name).join(', '),
+      }),
     },
   ];
 }

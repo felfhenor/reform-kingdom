@@ -1,3 +1,5 @@
+import { StatShorthand } from '@helpers/hero/stat-dimension';
+import { EnumLabelPipe } from '@pipes/enum-label.pipe';
 import { TPipe } from '@pipes/t.pipe';
 import { TPluralPipe } from '@pipes/t-plural.pipe';
 import { DecimalPipe } from '@angular/common';
@@ -11,7 +13,6 @@ import { IconElementChargeComponent } from '@components/icon-element-charge/icon
 import { elementsLabel } from '@helpers/combat/combat-element';
 import { TippyDirective } from '@ngneat/helipopper';
 import type { SkillTechniqueKind, SkillTechniquePreview } from '@interfaces';
-import { StatShorthand } from '@interfaces';
 
 const kindClasses: Record<SkillTechniqueKind, string> = {
   Damage: 'text-error',
@@ -31,6 +32,7 @@ const energyKinds: SkillTechniqueKind[] = ['Restore', 'Drain'];
   selector: 'app-row-skill-technique',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    EnumLabelPipe,
     TPipe,
     TPluralPipe,
     DecimalPipe,

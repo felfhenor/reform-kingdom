@@ -1,3 +1,5 @@
+import { EnumLabelPipe } from '@pipes/enum-label.pipe';
+import { TPipe } from '@pipes/t.pipe';
 import type { TemplateRef } from '@angular/core';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { IconElementChargeComponent } from '@components/icon-element-charge/icon-element-charge.component';
@@ -9,6 +11,8 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-row-skill-modifier',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    EnumLabelPipe,
+    TPipe,
     IconElementChargeComponent,
     IconSkillModifierSegmentComponent,
     TippyDirective,
@@ -26,7 +30,10 @@ import { TippyDirective } from '@ngneat/helipopper';
           [element]="element"
           [filled]="true"
           size="sm"
-          [tp]="'Generates a ' + element + ' charge'"
+          [tp]="
+            'element.generatesCharge'
+              | t: { element: (element | enumLabel: 'element') }
+          "
         />
       }
       @for (part of entry.entries; track $index) {

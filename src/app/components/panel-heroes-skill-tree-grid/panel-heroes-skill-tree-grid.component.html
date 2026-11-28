@@ -80,7 +80,7 @@
         class="flex items-end justify-center pb-1 text-center text-sm leading-tight row-start-2"
         [style.grid-column]="lane.gridColumn"
       >
-        {{ lane.row }}
+        {{ lane.row | enumLabel: 'skillTreeRow' }}
       </div>
     }
 

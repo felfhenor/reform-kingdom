@@ -101,7 +101,7 @@ export class ModsComponent {
 
   public activeTab = signal<ModsTab>('installed');
   public readonly tabs: { id: ModsTab; name: string }[] = [
-    { id: 'installed', name: 'Installed' },
+    { id: 'installed', name: t('mods.installed') },
     { id: 'modio', name: 'mod.io' },
   ];
 
@@ -156,8 +156,8 @@ export class ModsComponent {
   public readonly isDemo = isDemoBuild();
 
   public readonly sourceLabels: Record<ModSource, string> = {
-    local: 'Imported',
-    folder: 'Mods Folder',
+    local: t('mods.imported'),
+    folder: t('mods.modsFolder'),
     modio: 'mod.io',
   };
 

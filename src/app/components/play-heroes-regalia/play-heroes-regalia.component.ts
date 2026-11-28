@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { FFFocusOnChangeDirective } from '@ff/focus/ff-focus-on-change.directive';
@@ -258,7 +259,10 @@ export class PlayHeroesRegaliaComponent {
       regaliaEquipLosesLiveTree(regaliasState().entries, character, regalia)
     ) {
       swal.swalOptions = {
-        text: `${character.name}'s current skill tree isn't saved in any regalia. Equipping "${regalia.name}" replaces it, and rebuilding it later would cost a Memory Flux.`,
+        text: t('playHeroesRegalia.sCurrentSkillTree', {
+          name: character.name,
+          name2: regalia.name,
+        }),
       };
       const result = await swal.fire();
       if (!result.isConfirmed) return;
@@ -317,13 +321,13 @@ export class PlayHeroesRegaliaComponent {
 
   public missingTooltip(reason: RegaliaMissingReason | undefined): string {
     if (reason === 'gone') {
-      return 'This item is no longer available. It may have been sold or otherwise destroyed.';
+      return t('playHeroesRegalia.itemGone');
     }
     if (reason === 'unequippable') {
-      return 'This hero can no longer equip this item.';
+      return t('playHeroesRegalia.itemUnequippable');
     }
     if (reason === 'displaced') {
-      return 'Conflicts with another item in this regalia.';
+      return t('playHeroesRegalia.itemDisplaced');
     }
     return '';
   }

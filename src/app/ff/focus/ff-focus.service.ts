@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { FF_DIRECTIONS } from '@ff/input/ff-action-map';
 import { FFInputService } from '@ff/input/ff-input.service';
@@ -80,7 +81,7 @@ export class FFFocusService {
       this.input.register('confirm', () => this.focusedInScope()?.click(), {
         priority: FOCUS_PRIORITY,
         enabled: () => !!this.focusedInScope(),
-        label: 'Select',
+        label: t('gamepad.select'),
       }),
       this.input.onRefresh(() => this.syncScope()),
       this.input.setElementFilter((element) =>

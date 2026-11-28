@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import { FFSelectDirective } from '@ff/controls/ff-select.directive';
 import { FFStepperDirective } from '@ff/controls/ff-stepper.directive';
@@ -157,9 +158,10 @@ export class PanelKingdomWorkersAssignmentNodeComponent {
         : undefined,
   });
 
-  public countTooltip = computed(
-    () =>
-      `How many to ${this.mode() === 'Gather' ? 'gather' : 'fight for'}. Leave blank or 0 to repeat forever.`,
+  public countTooltip = computed(() =>
+    this.mode() === 'Gather'
+      ? t('panelKingdomWorkersAssignmentNode.howManyToGather')
+      : t('panelKingdomWorkersAssignmentNode.howManyToFight'),
   );
 
   public displayedNodeName = computed(

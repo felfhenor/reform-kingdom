@@ -31,7 +31,11 @@
     </h2>
     <p class="type-flavor combat-text-shadow text-center tabular-nums">
       @if (isReview()) {
-        {{ isVictory() ? 'Victory' : 'Combat Over' }}
+        {{
+          isVictory()
+            ? ('panelCombatScene.victory' | t)
+            : ('panelCombatScene.combatOver' | t)
+        }}
       } @else {
         {{
           'panelCombatScene.round' | t: { rounds: (fight.rounds + 1 | number) }

@@ -19,7 +19,7 @@
         [class.tab-debug]="tab.link === 'Debug'"
         (click)="changeActiveTab(tab.link)"
         (keydown)="changeActiveTab(tab.link)"
-        [appAnalyticsClick]="'Options:Navigate:' + tab.name"
+        [appAnalyticsClick]="'Options:Navigate:' + tab.link"
         [class.hidden]="!tab.showIf()"
         appSfx="ui-click"
         [sfxTrigger]="['click', 'hover']"

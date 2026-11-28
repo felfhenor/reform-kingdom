@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import { FFSelectDirective } from '@ff/controls/ff-select.directive';
 import {
@@ -41,7 +42,7 @@ export class PanelOptionsAccessibilityComponent extends OptionsBaseComponent {
   ];
 
   public readonly uiScaleChoices: UiScaleChoice[] = [
-    { label: 'Auto', value: 'auto' },
+    { label: t('panelOptionsAccessibility.auto'), value: 'auto' },
     { label: '100%', value: 1 },
     { label: '125%', value: 1.25 },
     { label: '150%', value: 1.5 },
@@ -50,11 +51,13 @@ export class PanelOptionsAccessibilityComponent extends OptionsBaseComponent {
 
   public readonly motionChoices = computed<MotionChoice[]>(() => [
     {
-      label: `Follow System (${isMotionReducedBySystem() ? 'On' : 'Off'})`,
+      label: isMotionReducedBySystem()
+        ? t('panelOptionsAccessibility.followSystemOn')
+        : t('panelOptionsAccessibility.followSystemOff'),
       value: 'system',
     },
-    { label: 'Reduced Motion (On)', value: 'reduced' },
-    { label: 'Normal Motion (Off)', value: 'full' },
+    { label: t('panelOptionsAccessibility.reducedMotionOn'), value: 'reduced' },
+    { label: t('panelOptionsAccessibility.normalMotionOff'), value: 'full' },
   ]);
 
   public mapZoom = signal<number>(this.getOption('mapZoom'));

@@ -1,3 +1,5 @@
+import { contentName } from '@helpers/i18n/i18n-content';
+import { t } from '@helpers/i18n/i18n';
 import { getEntry } from '@helpers/content/content';
 import {
   analyticsSafeSegment,
@@ -38,11 +40,13 @@ export function workerRescue(workerId: WorkerId): void {
   });
 
   void taskEventWorkerRescued(workerId);
-  const rescuedText = `You rescued ${worker.name}!`;
+  const rescuedText = t('workerDiscovery.youRescued', {
+    name: contentName(worker),
+  });
   notifySuccess(rescuedText);
   desktopNotify({
     category: 'Progress',
-    title: 'Worker Rescued',
+    title: t('workerDiscovery.workerRescued'),
     body: rescuedText,
   });
   analyticsSendDesignEvent(

@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import type { AnimationCallbackEvent } from '@angular/core';
 import { combatManualOverlayVisible } from '@helpers/combat/combat-manual.ui';
@@ -177,7 +178,7 @@ export class TutorialOverlayComponent {
       ...whileShown,
       enabled: () =>
         this.isReadyToRender() && this.stepView()?.totalSteps === 1,
-      label: 'Close',
+      label: t('gamepad.close'),
     });
   }
 
@@ -185,7 +186,9 @@ export class TutorialOverlayComponent {
 
   protected nextLabel = computed(() => {
     const view = this.stepView();
-    return view?.stepIndex === (view?.totalSteps ?? 0) - 1 ? 'Done' : 'Next';
+    return view?.stepIndex === (view?.totalSteps ?? 0) - 1
+      ? t('gamepad.done')
+      : t('gamepad.next');
   });
 
   public onBackdropEnter(event: AnimationCallbackEvent): void {

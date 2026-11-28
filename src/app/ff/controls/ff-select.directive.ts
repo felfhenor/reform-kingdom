@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import {
   DestroyRef,
   Directive,
@@ -37,7 +38,7 @@ export class FFSelectDirective {
       element,
       enabled: () =>
         element.contains(document.activeElement) && !this.select.disabled(),
-      label: 'Choose',
+      label: t('gamepad.choose'),
     });
     inject(DestroyRef).onDestroy(() => {
       if (this.request) this.popup.closeIf(this.request);
@@ -72,7 +73,7 @@ export class FFSelectDirective {
     const select = this.select;
     if (!select.clearable() || !select.hasValue) return undefined;
     return {
-      label: select.placeholder() || 'None',
+      label: select.placeholder() || t('gamepad.none'),
       run: () => select.handleClearClick(),
     };
   }

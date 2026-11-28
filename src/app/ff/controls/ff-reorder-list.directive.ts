@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import {
   contentChildren,
   DestroyRef,
@@ -90,19 +91,19 @@ export class FFReorderListDirective {
     return [
       this.ffInput.register('up', () => this.move(-1), {
         ...options,
-        label: 'Move',
+        label: t('gamepad.move'),
       }),
       this.ffInput.register('down', () => this.move(1), {
         ...options,
-        label: 'Move',
+        label: t('gamepad.move'),
       }),
       this.ffInput.register('confirm', () => this.drop(), {
         ...options,
-        label: 'Drop',
+        label: t('gamepad.drop'),
       }),
       this.ffInput.register('back', () => this.cancel(), {
         ...options,
-        label: 'Cancel',
+        label: t('gamepad.cancel'),
       }),
       ...BLOCKED_ACTIONS.map((action) =>
         this.ffInput.register(action, () => undefined, options),

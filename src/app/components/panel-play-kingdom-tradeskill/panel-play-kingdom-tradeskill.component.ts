@@ -1,3 +1,5 @@
+import { contentName, contentNameById } from '@helpers/i18n/i18n-content';
+import { t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { FFInputPromptComponent } from '@ff/components/input-prompt/input-prompt.component';
@@ -241,9 +243,10 @@ export class PanelPlayKingdomTradeskillComponent {
   }
 
   public requirementTooltip(entry: CraftRequirementEntry): string {
-    const name = entry.content?.name ?? '???';
+    const name = entry.content ? contentName(entry.content) : '???';
 
-    if (entry.kind === 'collectible') return `${name} (not consumed)`;
+    if (entry.kind === 'collectible')
+      return t('panelPlayKingdomTradeskill.notConsumed', { name });
 
     const owned = formatNumber(entry.owned, this.locale);
     const quantity = formatNumber(entry.quantity, this.locale);
@@ -251,11 +254,17 @@ export class PanelPlayKingdomTradeskillComponent {
   }
 
   public xpChanceTooltip(entry: CraftRecipeEntry): string {
-    return `${entry.xpChanceTier} - ${Math.round(entry.xpChance)}% chance to gain tradeskill XP. This will reduce in probability as your tradeskill level gets higher.`;
+    return t('panelPlayKingdomTradeskill.chanceToGainTradeskill', {
+      xpChanceTier: entry.xpChanceTier,
+      xpChance: Math.round(entry.xpChance),
+    });
   }
 
   public levelLockedTooltip(entry: CraftRecipeEntry): string {
-    return `You can't craft this until ${this.tradeskill()} Lv. ${entry.recipe.minTradeskillLevel}.`;
+    return t('panelPlayKingdomTradeskill.youCanTCraft', {
+      tradeskill: contentNameById(this.tradeskill()) ?? this.tradeskill(),
+      minTradeskillLevel: entry.recipe.minTradeskillLevel,
+    });
   }
 
   public craft(

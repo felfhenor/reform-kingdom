@@ -1,3 +1,4 @@
+import { EnumLabelPipe } from '@pipes/enum-label.pipe';
 import { TPipe } from '@pipes/t.pipe';
 import { contentShortName } from '@helpers/i18n/i18n-content';
 import { DecimalPipe, NgTemplateOutlet } from '@angular/common';
@@ -49,6 +50,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-panel-heroes-skill-tree-grid',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    EnumLabelPipe,
     TPipe,
     DecimalPipe,
     IconItemPreviewComponent,

@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { nodeNameText } from '@helpers/i18n/i18n-content';
 import { computed } from '@angular/core';
 import { getEntry } from '@helpers/content/content';
@@ -310,9 +311,11 @@ export function worldNodeDisplayName(nodeName: string): string {
 export function worldNodeLocationHint(nodeName: string): string {
   const entry = worldNodeByName(nodeName);
   if (!entry || isWorldNodeVisible(entry)) return nodeNameText(nodeName);
-  if (!isWorldMapVisited(entry.mapName)) return 'Unvisited Region';
+  if (!isWorldMapVisited(entry.mapName)) return t('worldNodes.unvisitedRegion');
 
-  return `Somewhere in ${regionNameForMap(entry.mapName)}`;
+  return t('worldNodes.somewhereIn', {
+    mapName: regionNameForMap(entry.mapName),
+  });
 }
 
 // Unplaced names (e.g. caravan traders) have no map to gate on.

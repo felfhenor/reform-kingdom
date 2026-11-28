@@ -1,3 +1,5 @@
+import { contentName } from '@helpers/i18n/i18n-content';
+import { t } from '@helpers/i18n/i18n';
 import { getEntry } from '@helpers/content/content';
 import {
   analyticsSafeSegment,
@@ -14,8 +16,8 @@ function tasksAnnounceClaimed(claimed: TaskContent[]): void {
 
   notifySuccess(
     claimed.length === 1
-      ? `Claimed the reward for ${claimed[0].name}!`
-      : `Claimed the rewards for ${claimed.length} tasks!`,
+      ? t('taskClaim.claimedTheRewardFor', { name: contentName(claimed[0]) })
+      : t('taskClaim.claimedTheRewardsFor', { count: claimed.length }),
   );
 
   claimed.forEach((task) => {

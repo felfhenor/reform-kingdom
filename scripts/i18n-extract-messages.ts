@@ -109,14 +109,44 @@ function messageFound(
   return { text, start: node.getStart(source), end: node.getEnd(), params };
 }
 
-function collect(source: ts.SourceFile): Found[] {
+function messageBranches(node: ts.Expression): ts.Expression[] {
+  if (ts.isParenthesizedExpression(node))
+    return messageBranches(node.expression);
+  if (ts.isConditionalExpression(node)) {
+    return [
+      ...messageBranches(node.whenTrue),
+      ...messageBranches(node.whenFalse),
+    ];
+  }
+  return [node];
+}
+
+// Sentences glued together with + can't be reordered by a translator; they're reported, not rewritten.
+function isConcatenatedText(node: ts.Expression): boolean {
+  return (
+    ts.isBinaryExpression(node) &&
+    node.operatorToken.kind === ts.SyntaxKind.PlusToken &&
+    [node.left, node.right].some(
+      (side) =>
+        isConcatenatedText(side) ||
+        ((ts.isStringLiteral(side) || ts.isTemplateExpression(side)) &&
+          HAS_WORDS.test(side.getText())),
+    )
+  );
+}
+
+function collect(source: ts.SourceFile, concatenated: string[]): Found[] {
   const out: Found[] = [];
   const visit = (node: ts.Node) => {
     if (ts.isCallExpression(node) && ts.isIdentifier(node.expression)) {
       const index = MESSAGE_ARGUMENT[node.expression.text];
       const arg = index === undefined ? undefined : node.arguments[index];
-      const found = arg ? messageFound(arg, source) : undefined;
-      if (found) out.push(found);
+      for (const branch of arg ? messageBranches(arg) : []) {
+        const found = messageFound(branch, source);
+        if (found) out.push(found);
+        if (isConcatenatedText(branch))
+          concatenated.push(branch.getText(source));
+      }
     }
     ts.forEachChild(node, visit);
   };
@@ -182,7 +212,11 @@ for (const file of walk(ROOT)) {
     ts.ScriptTarget.Latest,
     true,
   );
-  const found = collect(source);
+  const concatenated: string[] = [];
+  const found = collect(source, concatenated);
+  concatenated.forEach((text) =>
+    console.log(`${path.relative(ROOT, file)} concatenated: ${text}`),
+  );
   if (found.length === 0) continue;
   total += found.length;
 

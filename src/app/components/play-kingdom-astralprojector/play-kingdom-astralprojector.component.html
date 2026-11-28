@@ -82,9 +82,13 @@
   #overwriteSwal
   [title]="'playKingdomAstralprojector.overwriteActiveSpell' | t"
   [text]="
-    'Casting this will end ' +
-    (overwriteTargetName() ?? 'the active spell') +
-    '. Continue?'
+    'playKingdomAstralprojector.castingThisWillEnd'
+      | t
+        : {
+            spell:
+              overwriteTargetName() ??
+              ('playKingdomAstralprojector.theActiveSpell' | t),
+          }
   "
   icon="warning"
   [confirmButtonText]="'playKingdomAstralprojector.yesCastIt' | t"

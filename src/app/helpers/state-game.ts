@@ -186,7 +186,7 @@ async function gameStateLoadStoredFailed(e: unknown): Promise<void> {
   }
 
   isSavingBlocked = true;
-  gameStateLoadError.set(e ?? new Error('Unknown storage error'));
+  gameStateLoadError.set(e ?? new Error(t('stateGame.unknownStorageError')));
   hasGameStateLoaded.set(true);
 }
 

@@ -5,7 +5,9 @@
   [allowEscToClose]="true"
   [closeOnBackdropClick]="true"
 >
-  <span title>{{ (trainer() | contentName) || 'Trainer' }}</span>
+  <span title>
+    {{ (trainer() | contentName) || ('modalTrainerVisit.trainer' | t) }}
+  </span>
 
   <div body class="flex flex-col gap-4">
     <div class="grid grid-cols-[220px_minmax(0,1fr)] gap-4">

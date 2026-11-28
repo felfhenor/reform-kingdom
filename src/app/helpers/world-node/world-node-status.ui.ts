@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { caravanBrandName } from '@helpers/caravan/caravan';
 import { teleportIsDemoLocked } from '@helpers/demo/demo';
 import { combatAutomationLockedReason } from '@helpers/combat/combat-manual.ui';
@@ -85,7 +86,7 @@ export function worldNodeLabelInfo(
     lines.push(`Lv. ${rangeLabel(levelRange)}`);
   }
 
-  if (teleportIsDemoLocked(entry)) lines.push('Full Game');
+  if (teleportIsDemoLocked(entry)) lines.push(t('worldNodeStatus.fullGame'));
 
   const developTimerText = worldNodeDevelopmentTimerText(entry.nodeName);
   if (developTimerText) lines.unshift(developTimerText);

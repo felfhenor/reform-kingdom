@@ -37,7 +37,8 @@ export function combatOrderClauses(
 
 function heroName(characterId: CharacterId): string {
   return (
-    worldPartyState().find((c) => c.id === characterId)?.name ?? 'Unknown Hero'
+    worldPartyState().find((c) => c.id === characterId)?.name ??
+    t('combatOrder.unknownHero')
   );
 }
 

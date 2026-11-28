@@ -26,7 +26,7 @@ import type { Character } from '@interfaces';
       @if (dot()) {
         <span
           class="absolute inset-0"
-          [tp]="(sp | number) + ' SP available'"
+          [tp]="'badgeSkillPoints.spAvailable' | t: { sp: (sp | number) }"
           (animate.enter)="onEnter($event)"
           (animate.leave)="onLeave($event)"
         >

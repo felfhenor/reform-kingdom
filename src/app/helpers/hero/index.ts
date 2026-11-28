@@ -32,6 +32,7 @@ export * from './skill-tree-layout.ui';
 export * from './skill-tree-node';
 export * from './skill-tree-state';
 export * from './skill-tree.ui';
+export * from './stat-dimension';
 export * from './travel';
 export * from './travel-cost';
 export * from './travel-cost-base';

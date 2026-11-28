@@ -1,3 +1,5 @@
+import { TPluralPipe } from '@pipes/t-plural.pipe';
+import { t, tPlural } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { FFFocusOnChangeDirective } from '@ff/focus/ff-focus-on-change.directive';
@@ -122,12 +124,42 @@ const GEAR_SLOTS: EquipmentSlot[] = [
 const SIMULATE_COUNTS = [10, 50, 100, 500];
 const DEFAULT_SIMULATE_COUNT = 50;
 const HERO_TABS: { id: ColosseumHeroTab; label: string }[] = [
-  { id: 'overview', label: 'Overview' },
-  { id: 'job', label: 'Job' },
-  { id: 'gear', label: 'Gear' },
-  { id: 'tree', label: 'Skill Tree' },
-  { id: 'orders', label: 'Combat Orders' },
-  { id: 'burst', label: 'Burst Skill' },
+  {
+    id: 'overview',
+    get label() {
+      return t('playKingdomColosseum.overview');
+    },
+  },
+  {
+    id: 'job',
+    get label() {
+      return t('playKingdomColosseum.job');
+    },
+  },
+  {
+    id: 'gear',
+    get label() {
+      return t('playKingdomColosseum.gear');
+    },
+  },
+  {
+    id: 'tree',
+    get label() {
+      return t('playKingdomColosseum.skillTree');
+    },
+  },
+  {
+    id: 'orders',
+    get label() {
+      return t('playKingdomColosseum.combatOrders');
+    },
+  },
+  {
+    id: 'burst',
+    get label() {
+      return t('playKingdomColosseum.burstSkill');
+    },
+  },
 ];
 
 @Component({
@@ -135,6 +167,7 @@ const HERO_TABS: { id: ColosseumHeroTab; label: string }[] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [ColosseumFightService],
   imports: [
+    TPluralPipe,
     TPipe,
     ContentNamePipe,
     FFFocusOnChangeDirective,
@@ -180,15 +213,19 @@ export class PlayKingdomColosseumComponent {
   public readonly speeds = [1, 2, 4];
   public readonly defaultSimulateCount = DEFAULT_SIMULATE_COUNT;
   public readonly fightOptions: SplitButtonOption<ColosseumFightMode>[] = [
-    { value: 'auto', label: 'Auto' },
-    { value: 'manual', label: 'Turn-Based' },
+    { value: 'auto', label: t('playKingdomColosseum.auto') },
+    { value: 'manual', label: t('playKingdomColosseum.turnBased') },
   ];
   public readonly simulateOptions: SplitButtonOption<number>[] =
     SIMULATE_COUNTS.map((count) => ({
       value: count,
-      label: `${formatNumber(count, this.locale)} fights`,
+      label: tPlural('playKingdomColosseum.fights', count, {
+        count: formatNumber(count, this.locale),
+      }),
     }));
-  public readonly simulateLabel = `Simulate ${formatNumber(DEFAULT_SIMULATE_COUNT, this.locale)}`;
+  public readonly simulateLabel = t('playKingdomColosseum.simulateCount', {
+    count: formatNumber(DEFAULT_SIMULATE_COUNT, this.locale),
+  });
 
   public setup = colosseumSetup;
   public restoredDropped = signal<string[]>([]);
@@ -322,22 +359,22 @@ export class PlayKingdomColosseumComponent {
     return [
       {
         icon: 'gameTrophyCup',
-        label: 'Wins',
+        label: t('playKingdomColosseum.wins'),
         value: `${n(summary.wins)}/${n(summary.runs)}`,
       },
       {
         icon: 'gameDuration',
-        label: 'Avg. Rounds',
+        label: t('playKingdomColosseum.avgRounds'),
         value: n(summary.averageRounds),
       },
       {
         icon: 'gameBrokenHeart',
-        label: 'Avg. Hero Deaths',
+        label: t('playKingdomColosseum.avgHeroDeaths'),
         value: n(summary.averageHeroDeaths),
       },
       {
         icon: 'gameSandstorm',
-        label: 'Stalemates',
+        label: t('playKingdomColosseum.stalemates'),
         value: n(summary.stalemates),
       },
     ];

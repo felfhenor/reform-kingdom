@@ -1,3 +1,4 @@
+import { i18nLabels, t } from '@helpers/i18n/i18n';
 import { categoryMessageLog } from '@helpers/combat/combat-log';
 import {
   buildCommissionRequirementEntries,
@@ -24,19 +25,18 @@ import type {
   TownRaidBuyoffOption,
 } from '@interfaces';
 
-const RAID_BUYOFF_LABELS: Record<TownRaidBuyoffKind, string> = {
-  Tribute: 'Pay Tribute',
-  Fortify: 'Fortify',
-};
+const RAID_BUYOFF_LABELS: Record<TownRaidBuyoffKind, string> = i18nLabels(
+  'townRaid.buyoffLabel',
+  ['Tribute', 'Fortify'],
+);
 
 const RAID_BUYOFF_LOG_MESSAGES: Record<
   TownRaidBuyoffKind,
   (townName: string) => string
 > = {
-  Tribute: (townName) =>
-    `You paid tribute to ${townName}, allowing them to quickly bolster their defenses.`,
+  Tribute: (townName) => t('townRaidBuyoff.youPaidTributeTo', { townName }),
   Fortify: (townName) =>
-    `You fortified ${townName}, leading to an overwhelmingly successful defense.`,
+    t('townRaidBuyoff.youFortifiedLeadingTo', { townName }),
 };
 
 export function raidBuyoffOptions(town: TownContent): TownRaidBuyoffOption[] {

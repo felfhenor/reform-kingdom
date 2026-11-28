@@ -1,6 +1,7 @@
-import { tPlural, t } from '@helpers/i18n/i18n';
+import { i18nNodes, tPlural, t } from '@helpers/i18n/i18n';
 import { combatantDisplayName } from '@helpers/combat/combat-create';
-import { contentName } from '@helpers/i18n/i18n-content';
+import { contentName, contentNameById } from '@helpers/i18n/i18n-content';
+import { regionForMap } from '@helpers/lore/region-intro';
 import { signal } from '@angular/core';
 import {
   COMBAT_LOG_MAX_ENTRIES,
@@ -19,6 +20,7 @@ import type {
   CombatId,
   CombatLog,
   CombatLogIcon,
+  CombatLogMarker,
   DropRarity,
   EquipmentContent,
   ItemContent,
@@ -90,7 +92,7 @@ export function combatMessageLog(
   message: string,
   actor?: Combatant,
   icons?: CombatLogIcon | CombatLogIcon[],
-  roundStart?: boolean,
+  marker?: CombatLogMarker,
 ): void {
   if (combat.simulation?.quiet) return;
 
@@ -118,7 +120,7 @@ export function combatMessageLog(
     sprite: actor?.sprite,
     combatants,
     itemIcons: logIconList(icons),
-    roundStart,
+    marker,
   };
 
   if (combat.simulation) {
@@ -162,6 +164,15 @@ export const ITEM_ICON_TOKEN = '@@icon@@';
 // Matches the bare item-icon token or a per-combatant one (`@@icon-<id>@@`), so the UI layer can find every icon anchor in one pass.
 export const ICON_TOKEN_PATTERN = /@@icon(?:-([^@]+))?@@/g;
 
+// Labels arrive as map ids, node names, content names or already-translated text.
+function logLocationLabel(name: string): string {
+  const region = regionForMap(name);
+  if (region) return contentName(region);
+  const translated = contentNameById(name) ?? i18nNodes()[name];
+  if (translated) return translated;
+  return /^[A-Za-z]+$/.test(name) ? startCase(name) : name;
+}
+
 export function categoryMessageLog(
   category: AdventureLogEntryKind,
   locationName: string,
@@ -172,7 +183,7 @@ export function categoryMessageLog(
     kind: category,
     messageId: rngUuid(),
     timestamp: Date.now(),
-    locationName: startCase(locationName),
+    locationName: logLocationLabel(locationName),
     message,
     itemIcons: logIconList(icons),
   });

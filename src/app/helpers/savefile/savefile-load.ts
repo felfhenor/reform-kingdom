@@ -1,4 +1,4 @@
-import { t } from '@helpers/i18n/i18n';
+import { i18nLabels, t } from '@helpers/i18n/i18n';
 import { signal } from '@angular/core';
 import {
   SAVEFILE_MIGRATE_ATTEMPTS,
@@ -41,12 +41,10 @@ export const savefileLoadStatus = signal<SavefileLoadStatus>({
   state: 'pending',
 });
 
-const FAILURE_MESSAGES: Record<SavefileLoadFailureReason, string> = {
-  storage: 'Your savefile could not be read from storage.',
-  invalid: 'Your savefile appears to be corrupt.',
-  migration: 'Your savefile could not be updated to this version.',
-  mods: 'Your savefile needs mods that are not installed or could not be loaded.',
-};
+const FAILURE_MESSAGES: Record<SavefileLoadFailureReason, string> = i18nLabels(
+  'savefileLoad.failure',
+  ['storage', 'invalid', 'migration', 'mods'],
+);
 
 export function savefileFailureMessage(
   reason: SavefileLoadFailureReason,
@@ -203,7 +201,7 @@ export async function savefileReplace(
   next: GameState,
   reason?: SavefileBackupReason,
 ): Promise<string[]> {
-  if (isReplacing) return ['Another savefile operation is still running.'];
+  if (isReplacing) return [t('savefileLoad.anotherSavefileOperationIs')];
 
   isReplacing = true;
   const wasReady = isGameStateReady();

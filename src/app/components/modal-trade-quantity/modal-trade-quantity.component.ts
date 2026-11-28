@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import { formatNumber } from '@angular/common';
 import {
@@ -33,7 +34,10 @@ export class ModalTradeQuantityComponent {
 
     const gold = `${formatNumber(prompt.price, this.locale)}g`;
     const price = prompt.tokenPrice
-      ? `${gold} and ${formatNumber(prompt.tokenPrice, this.locale)} Trader Scrip`
+      ? t('modalTradeQuantity.andTraderScrip', {
+          gold,
+          scrip: formatNumber(prompt.tokenPrice, this.locale),
+        })
       : gold;
     return prompt.maxQuantity === 1
       ? this.askSingle(prompt, price)
@@ -60,7 +64,11 @@ export class ModalTradeQuantityComponent {
     if (!swal) return 0;
 
     swal.swalOptions = {
-      text: `How many ${prompt.name} would you like to ${prompt.verb.toLowerCase()}? (${price} each)`,
+      text: t('modalTradeQuantity.howManyWouldYou', {
+        name: prompt.name,
+        verb: prompt.verb.toLowerCase(),
+        price,
+      }),
       inputValue: 1,
       inputAttributes: { min: '0', max: `${prompt.maxQuantity}` },
       showDenyButton: !!prompt.allowMax,

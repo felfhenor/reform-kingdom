@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import { t } from '@helpers/i18n/i18n';
 import {
   combatMessageLog,
@@ -63,7 +64,7 @@ function combatTargetResistsStatusEffect(
   combatMessageLog(
     combat,
     t('combatStatuseffectsTechnique.isResistedBy', {
-      name: effect.name,
+      name: contentName(effect),
       target: combatantMessageToken(target),
     }),
     target,

@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import {
   ChangeDetectionStrategy,
@@ -80,7 +81,7 @@ export class ScreenTitleCrawlComponent {
     ffGamepadOn('confirm', () => this.startSkipHold(), {
       priority: GAMEPAD_PRIORITY.overlay,
       enabled: () => !modalHasAnyOpen(),
-      label: 'Hold to Skip',
+      label: t('screenTitleCrawl.holdToSkip2'),
       onRelease: () => this.cancelSkipHold(),
     });
     inject(DestroyRef).onDestroy(() => {

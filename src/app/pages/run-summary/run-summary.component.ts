@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import {
   durationPartText,
@@ -141,7 +142,7 @@ export class RunSummaryComponent {
         .filter((award) => award.heroIndex === index)
         .map((award) => award.label),
       jobsUsedText: (hero.snapshot?.jobsUsed ?? [])
-        .map((jobId) => contentNameById(jobId) ?? 'Unknown Job')
+        .map((jobId) => contentNameById(jobId) ?? t('runSummary.unknownJob'))
         .join(', '),
     })),
   );
@@ -155,16 +156,22 @@ export class RunSummaryComponent {
     if (!stats) return [];
 
     return [
-      { label: 'Monsters Defeated', value: stats.kills },
-      { label: 'Monster Types Defeated', value: stats.monstersKilled },
-      { label: 'Maps Reached', value: stats.mapsReached },
-      { label: 'Towns Visited', value: stats.townsVisited },
+      { label: t('runSummary.monstersDefeated'), value: stats.kills },
+      {
+        label: t('runSummary.monsterTypesDefeated'),
+        value: stats.monstersKilled,
+      },
+      { label: t('runSummary.mapsReached'), value: stats.mapsReached },
+      { label: t('runSummary.townsVisited'), value: stats.townsVisited },
       ...(stats.run
         ? [
-            { label: 'Gold Earned', value: stats.run.goldEarned },
-            { label: 'Fights Won', value: stats.run.fightsWon },
-            { label: 'Fights Lost', value: stats.run.fightsLost },
-            { label: 'Items Crafted', value: stats.run.itemsCrafted },
+            { label: t('runSummary.goldEarned'), value: stats.run.goldEarned },
+            { label: t('runSummary.fightsWon'), value: stats.run.fightsWon },
+            { label: t('runSummary.fightsLost'), value: stats.run.fightsLost },
+            {
+              label: t('runSummary.itemsCrafted'),
+              value: stats.run.itemsCrafted,
+            },
           ]
         : []),
     ];

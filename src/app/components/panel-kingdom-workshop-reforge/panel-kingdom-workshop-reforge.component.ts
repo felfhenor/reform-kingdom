@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import type { AnimationCallbackEvent } from '@angular/core';
 import {
@@ -104,8 +105,8 @@ export class PanelKingdomWorkshopReforgeComponent {
     // A plain setter, so it applies before the synchronous fire() below.
     swal.swalOptions = {
       text: this.mayDestroyGems()
-        ? 'Its affixes will be rerolled and the current ones lost. Gems in sockets added by affixes may be destroyed; other infusions are kept.'
-        : 'Its affixes will be rerolled and the current ones lost. Infusions are kept.',
+        ? t('panelKingdomWorkshopReforge.rerollDestroysGems')
+        : t('panelKingdomWorkshopReforge.rerollKeepsInfusions'),
     };
     swal.fire();
   }

@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import {
   afterNextRender,
   DestroyRef,
@@ -82,7 +83,7 @@ export function gamepadBindHeroCycle(
   const options = {
     element,
     enabled: () => partyIds().length > 1 && !modalHasAnyOpen(),
-    label: 'Switch Hero',
+    label: t('gamepad.switchHero'),
   };
   const step = (direction: 1 | -1) => {
     const id = currentId();
@@ -179,14 +180,17 @@ export function gamepadBindInspectTips(
   ffGamepadOn('zone', () => show(shown ? undefined : stops()[0]), {
     ...options,
     enabled: () => !!shown || (canInspect() && stops().length > 0),
-    label: () => (shown ? 'Close' : 'Inspect'),
+    label: () => (shown ? t('gamepad.close') : t('gamepad.inspect')),
   });
-  ffGamepadOn('back', () => show(undefined), { ...options, label: 'Close' });
+  ffGamepadOn('back', () => show(undefined), {
+    ...options,
+    label: t('gamepad.close'),
+  });
   FF_DIRECTIONS.forEach((direction) => {
     const step = direction === 'left' || direction === 'up' ? -1 : 1;
     ffGamepadOn(direction, () => show(cycleStep(stops(), shown, step)), {
       ...options,
-      label: 'Browse',
+      label: t('gamepad.browse'),
     });
   });
 }

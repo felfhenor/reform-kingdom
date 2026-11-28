@@ -1,4 +1,4 @@
-import { t } from '@helpers/i18n/i18n';
+import { i18nLabels, t } from '@helpers/i18n/i18n';
 import { contentName, contentNameById } from '@helpers/i18n/i18n-content';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
@@ -44,11 +44,10 @@ import type {
 } from '@interfaces';
 import { sortBy, uniqBy } from 'es-toolkit/compat';
 
-const EXCHANGE_ERRORS: Record<Exclude<ExchangeResult, 'ok'>, string> = {
-  missing: 'You no longer have what that exchange requires.',
-  unaffordable: 'You cannot afford that exchange.',
-  invalid: 'That exchange is no longer available.',
-};
+const EXCHANGE_ERRORS: Record<
+  Exclude<ExchangeResult, 'ok'>,
+  string
+> = i18nLabels('exchange.error', ['missing', 'unaffordable', 'invalid']);
 
 // True when the swap would drop a socketed gem - compared against the actual swap so affix-granted sockets count.
 export function exchangeMayDestroyGems(

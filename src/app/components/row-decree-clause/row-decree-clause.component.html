@@ -46,7 +46,7 @@
     name="tablerExclamationCircle"
     size="row"
     class="text-warning shrink-0"
-    [tp]="clause().failureCount + ' failures in a row'"
+    [tp]="'decree.failuresInARow' | tPlural: clause().failureCount"
     [tpPlacement]="'top'"
   />
 }

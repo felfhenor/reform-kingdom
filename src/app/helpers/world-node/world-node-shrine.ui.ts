@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import { t } from '@helpers/i18n/i18n';
 import { achievementsMoment } from '@helpers/achievement/achievement-moment';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
@@ -94,8 +95,8 @@ function shrinePrayAnnounce(shrine: ShrineContent, tier: ShrineLevel): void {
   if (content) {
     miscellaneousMessageLog(
       t('worldNodeShrine.thePartyHasPrayed', {
-        name: shrine.name,
-        name2: content.name,
+        name: contentName(shrine),
+        name2: contentName(content),
       }),
     );
   }

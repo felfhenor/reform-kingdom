@@ -34,8 +34,8 @@ export function legacyRunOutcome(): RunOutcome {
 }
 
 export function legacyRunOutcomeTitle(outcome: RunOutcome): string {
-  if (outcome === 'Completed') return 'Run Complete';
-  return outcome === 'Lost' ? 'Run Lost' : 'Run Abandoned';
+  if (outcome === 'Completed') return t('legacy.runComplete');
+  return outcome === 'Lost' ? t('legacy.runLost') : t('legacy.runAbandoned');
 }
 
 // The caller pauses first; a tick batch still in flight would otherwise commit over the reset that follows.
@@ -101,15 +101,18 @@ export async function legacyClearedEdictsCopyToRun(): Promise<void> {
 
 export function legacyHeroStatRows(stats: HeroRunStats): RunStatRow[] {
   return [
-    { label: 'Kills', value: stats.kills },
-    { label: 'Damage Dealt', value: stats.damageDealt },
-    { label: 'Damage Taken', value: stats.damageTaken },
-    { label: 'Healing', value: stats.healing },
-    { label: 'Damage Blocked', value: stats.damageBlocked },
-    { label: 'Crits', value: stats.crits },
-    { label: 'Status Effects Applied', value: stats.statusEffectsApplied },
-    { label: 'Deaths', value: stats.deaths },
-    { label: 'Fights', value: stats.fights },
+    { label: t('legacy.heroStat.kills'), value: stats.kills },
+    { label: t('legacy.heroStat.damageDealt'), value: stats.damageDealt },
+    { label: t('legacy.heroStat.damageTaken'), value: stats.damageTaken },
+    { label: t('legacy.heroStat.healing'), value: stats.healing },
+    { label: t('legacy.heroStat.damageBlocked'), value: stats.damageBlocked },
+    { label: t('legacy.heroStat.crits'), value: stats.crits },
+    {
+      label: t('legacy.heroStat.statusEffectsApplied'),
+      value: stats.statusEffectsApplied,
+    },
+    { label: t('legacy.heroStat.deaths'), value: stats.deaths },
+    { label: t('legacy.heroStat.fights'), value: stats.fights },
   ];
 }
 
@@ -121,12 +124,18 @@ export function legacyHeroMostUsedSkill(
 }
 
 const RUN_AWARDS: RunAwardDefinition[] = [
-  { label: 'Most Damage', value: (stats) => stats.damageDealt },
-  { label: 'Most Healing', value: (stats) => stats.healing },
-  { label: 'Most Damage Taken', value: (stats) => stats.damageTaken },
-  { label: 'Most Deaths', value: (stats) => stats.deaths },
-  { label: 'Biggest Hit', value: (stats) => stats.biggestHit?.amount ?? 0 },
-  { label: 'Most Crits', value: (stats) => stats.crits },
+  { labelKey: 'legacy.award.mostDamage', value: (stats) => stats.damageDealt },
+  { labelKey: 'legacy.award.mostHealing', value: (stats) => stats.healing },
+  {
+    labelKey: 'legacy.award.mostDamageTaken',
+    value: (stats) => stats.damageTaken,
+  },
+  { labelKey: 'legacy.award.mostDeaths', value: (stats) => stats.deaths },
+  {
+    labelKey: 'legacy.award.biggestHit',
+    value: (stats) => stats.biggestHit?.amount ?? 0,
+  },
+  { labelKey: 'legacy.award.mostCrits', value: (stats) => stats.crits },
 ];
 
 // Worked out on render, not stored, so tuning awards also updates old runs. A solo hero would win everything, so they get none.
@@ -140,7 +149,7 @@ export function legacyRunAwards(run: RunRecord): RunAward[] {
     const top = Math.max(...values);
     // indexOf keeps ties with the hero listed first.
     return top > 0
-      ? [{ label: award.label, heroIndex: values.indexOf(top) }]
+      ? [{ label: t(award.labelKey), heroIndex: values.indexOf(top) }]
       : [];
   });
 }

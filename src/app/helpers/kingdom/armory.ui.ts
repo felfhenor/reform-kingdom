@@ -1,3 +1,4 @@
+import { i18nLocale, tPlural } from '@helpers/i18n/i18n';
 import { contentNameById } from '@helpers/i18n/i18n-content';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { equipmentItemAffixes } from '@helpers/item/affix';
@@ -97,7 +98,11 @@ function armorySoldLogPart(
   if (entries.length === 1) {
     return tradeEquipmentItemLogPart(entries[0].item);
   }
-  return { html: `${entries.length.toLocaleString()} pieces of equipment` };
+  return {
+    html: tPlural('armory.piecesOfEquipment', entries.length, {
+      count: entries.length.toLocaleString(i18nLocale()),
+    }),
+  };
 }
 
 // Sells owned armory items atomically; stale ids are silently skipped. Returns total gold gained.

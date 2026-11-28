@@ -5,6 +5,7 @@ import {
 } from '@/testing/i18n';
 import {
   enumLabel,
+  i18nLabels,
   i18nLayersApply,
   i18nList,
   i18nLocale,
@@ -98,5 +99,25 @@ describe('enumLabel', () => {
     ]);
 
     expect(enumLabel('rarity', 'Rare')).toBe('Rare (fr)');
+  });
+});
+
+describe('i18nLabels', () => {
+  const labels = i18nLabels('enum.rarity', ['Common', 'Rare'] as const);
+
+  it('reads each label at lookup time, so a later language applies', () => {
+    expect(labels.Rare).toBe('Rare');
+    i18nLayersApply([
+      i18nLanguageLayer({ ui: { 'enum.rarity.Rare': 'Rare (fr)' } }),
+    ]);
+
+    expect(labels.Rare).toBe('Rare (fr)');
+  });
+
+  it('enumerates only its keys', () => {
+    expect(Object.keys(labels)).toEqual(['Common', 'Rare']);
+    expect(Object.values(labels)).toEqual(['Common', 'Rare']);
+    expect('Rare' in labels).toBe(true);
+    expect((labels as Record<string, string>)['Epic']).toBeUndefined();
   });
 });

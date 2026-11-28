@@ -150,7 +150,7 @@
 >
   <span>{{ 'home.version' | t: { meta: meta.versionString() } }}</span>
 
-  <span class="mx-2">{{ 'home.middot' | t }}</span>
+  <span class="mx-2">&middot;</span>
 
   <button
     type="button"
@@ -160,7 +160,7 @@
     appSfx="ui-click"
     [sfxTrigger]="['click', 'hover']"
   >
-    {{ 'home.analytics' | t: { Off: analyticsEnabled() ? 'On' : 'Off' } }}
+    {{ (analyticsEnabled() ? 'home.analyticsOn' : 'home.analyticsOff') | t }}
   </button>
 
   <app-button-update></app-button-update>

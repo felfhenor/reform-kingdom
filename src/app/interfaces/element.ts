@@ -1,5 +1,4 @@
 import type { Icon } from '@interfaces/artable';
-import type { StatDisplayDimension } from '@interfaces/stat-display';
 
 export type GameElement = 'Fire' | 'Water' | 'Earth' | 'Air';
 
@@ -37,28 +36,4 @@ export const GameElementTextColor: Record<GameElement, string> = {
   Water: 'text-element-Water',
   Earth: 'text-element-Earth',
   Air: 'text-element-Air',
-};
-
-export const ElementResistanceDimension: StatDisplayDimension<GameElement> = {
-  order: GameElementOrder,
-  label: {
-    Fire: 'Fire Resist',
-    Water: 'Water Resist',
-    Earth: 'Earth Resist',
-    Air: 'Air Resist',
-  },
-  icon: GameElementIcon,
-  color: GameElementTextColor,
-};
-
-export const ElementBoonDimension: StatDisplayDimension<GameElement> = {
-  order: GameElementOrder,
-  label: {
-    Fire: 'Fire Boon',
-    Water: 'Water Boon',
-    Earth: 'Earth Boon',
-    Air: 'Air Boon',
-  },
-  icon: GameElementIcon,
-  color: GameElementTextColor,
 };

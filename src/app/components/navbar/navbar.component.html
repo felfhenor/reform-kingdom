@@ -229,7 +229,11 @@
       >
         <button
           class="btn btn-sm btn-neutral"
-          [tp]="isPaused() ? 'Resume Game [SPACE]' : 'Pause Game [SPACE]'"
+          [tp]="
+            isPaused()
+              ? ('navbar.resumeGameSpace' | t)
+              : ('navbar.pauseGameSpace' | t)
+          "
           (click)="togglePause()"
           ffButton="ui-click"
           [ffSoundOffset]="panelConfigs.length + 2"

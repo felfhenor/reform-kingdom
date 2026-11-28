@@ -11,7 +11,7 @@
     }
 
     <div class="mt-2 type-meta">
-      {{ reward().kind }}
+      {{ reward().kind | enumLabel: 'rewardKind' }}
     </div>
   </app-tooltip-item-preview>
 

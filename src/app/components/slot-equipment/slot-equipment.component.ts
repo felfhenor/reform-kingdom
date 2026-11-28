@@ -1,3 +1,4 @@
+import { enumLabel, t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import {
   ChangeDetectionStrategy,
@@ -70,7 +71,7 @@ export class SlotEquipmentComponent {
         this.showUnequipHint() &&
         !!this.equippedItem() &&
         host.contains(document.activeElement),
-      label: 'Unequip',
+      label: t('gamepad.unequip'),
     });
   }
 
@@ -121,6 +122,12 @@ export class SlotEquipmentComponent {
     const content = this.equippedContent();
     return content ? EquipmentTypeToSlot[content.type] : [];
   });
+
+  public occupiedSlotLabels = computed(() =>
+    this.occupiedPaperdollSlots()
+      .map((slot) => enumLabel('equipmentSlot', slot))
+      .join(' + '),
+  );
 
   public isSecondarySlot = computed<boolean>(() => {
     const content = this.equippedContent();

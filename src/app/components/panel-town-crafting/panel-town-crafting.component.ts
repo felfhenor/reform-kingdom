@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { DecimalPipe, formatNumber } from '@angular/common';
@@ -53,9 +54,13 @@ export class PanelTownCraftingComponent {
   );
 
   public tradeskillTooltip(row: TownTradeskillLevelRow): string {
-    const name = row.isSpecialty ? `${row.name} (Speciality)` : row.name;
-    const reduction = formatNumber(row.level, this.locale);
-    return `${name}: -${reduction}% crafting time for matching recipes`;
+    const params = {
+      name: row.name,
+      reduction: formatNumber(row.level, this.locale),
+    };
+    return row.isSpecialty
+      ? t('panelTownCrafting.craftingTimeForMatchingSpecialty', params)
+      : t('panelTownCrafting.craftingTimeForMatching', params);
   }
 
   public craftQueueRows = computed<TownCraftQueueRow[]>(() =>

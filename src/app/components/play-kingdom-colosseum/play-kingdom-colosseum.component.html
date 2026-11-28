@@ -29,8 +29,16 @@
           type="button"
           class="btn btn-sm btn-neutral join-item"
           [class.btn-outline]="!fight.isPaused()"
-          [attr.aria-label]="fight.isPaused() ? 'Resume' : 'Pause'"
-          [tp]="fight.isPaused() ? 'Resume' : 'Pause'"
+          [attr.aria-label]="
+            fight.isPaused()
+              ? ('playKingdomColosseum.resume' | t)
+              : ('playKingdomColosseum.pause' | t)
+          "
+          [tp]="
+            fight.isPaused()
+              ? ('playKingdomColosseum.resume' | t)
+              : ('playKingdomColosseum.pause' | t)
+          "
           (click)="fight.isPaused.set(!fight.isPaused())"
           appSfx="ui-click"
           [sfxTrigger]="['click', 'hover']"
@@ -415,7 +423,9 @@
                   >
                     {{
                       'playKingdomColosseum.fights'
-                        | t: { length: (row.encounter.fights.length | number) }
+                        | tPlural
+                          : row.encounter.fights.length
+                          : { count: (row.encounter.fights.length | number) }
                     }}
                   </span>
                 </span>
@@ -480,7 +490,8 @@
                 <div class="flex flex-col gap-2 min-w-0 py-2">
                   <span class="type-entity-name">
                     {{
-                      'playKingdomColosseum.fight2' | t: { i: (i + 1 | number) }
+                      'playKingdomColosseum.fight2'
+                        | t: { number: (i + 1 | number) }
                     }}
                   </span>
                   <div class="flex flex-wrap gap-2">
@@ -514,7 +525,7 @@
           <span class="badge badge-warning">
             {{
               'playKingdomColosseum.lastSetupRestoredRemoved'
-                | t: { join: restoredDropped().join(', ') }
+                | t: { removed: restoredDropped().join(', ') }
             }}
           </span>
         }

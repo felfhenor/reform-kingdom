@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import {
   computed,
   Directive,
@@ -32,7 +33,7 @@ export class FFReorderItemDirective {
         !this.ffReorderItemDisabled() &&
         !this.list.grab() &&
         host.contains(document.activeElement),
-      label: 'Move',
+      label: t('gamepad.move'),
     });
   }
 }

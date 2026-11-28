@@ -85,3 +85,5 @@ export type SavefileDiskRead =
   | { status: 'missing' }
   | { status: 'unreadable' }
   | { status: 'ok'; value: unknown };
+
+export type SavefileLegacyMergeVerb = 'restored' | 'recovered' | 'imported';

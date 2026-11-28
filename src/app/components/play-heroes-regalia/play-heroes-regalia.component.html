@@ -21,7 +21,7 @@
     @if (character && regalia) {
       <app-slot-button-container
         [disabled]="!canModify"
-        [helpText]="'Set this regalia as active. This cannot be done in combat.'"
+        [helpText]="'playHeroesRegalia.setThisRegaliaAs' | t"
       >
         <button
           type="button"
@@ -112,7 +112,7 @@
                   @if (missingCount > 0) {
                     <span
                       class="badge badge-sm badge-warning"
-                      [tp]="'Some of this regalia\'s gear is unavailable.'"
+                      [tp]="'playHeroesRegalia.someOfThisRegalia' | t"
                     >
                       {{
                         'playHeroesRegalia.missing'

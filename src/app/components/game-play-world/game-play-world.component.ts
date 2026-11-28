@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import { FFFocusService } from '@ff/focus/ff-focus.service';
 import { FFInputService } from '@ff/input/ff-input.service';
@@ -1467,7 +1468,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       ...FF_DIRECTIONS.map((direction) =>
         this.ffInput.register(direction, () => this.jumpMapCursor(direction), {
           ...options,
-          label: 'Move',
+          label: t('gamepad.move'),
         }),
       ),
       // Selecting only; on the already-selected node A falls through to the panel's Travel.
@@ -1476,7 +1477,7 @@ export class GamePlayWorldComponent implements OnDestroy {
         enabled: () =>
           this.isMapCursorDriving() &&
           this.mapCursorAt?.name !== selectedMapNode()?.nodeName,
-        label: () => (this.mapCursorAt ? 'Select' : ''),
+        label: () => (this.mapCursorAt ? t('gamepad.select') : ''),
       }),
       // Below the panel's buttons: an A with nothing to do mustn't click whichever HUD button holds focus.
       this.ffInput.register('confirm', () => undefined, {
@@ -1496,7 +1497,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       // Above the node panel's own pad buttons, so A presses what's focused rather than Travel.
       this.ffInput.register('confirm', () => this.clickFocusedHudElement(), {
         ...inHud,
-        label: 'Select',
+        label: t('gamepad.select'),
       }),
       ...(['context', 'details'] as const).map((action) =>
         this.ffInput.register(action, () => undefined, inHud),
@@ -1513,7 +1514,7 @@ export class GamePlayWorldComponent implements OnDestroy {
       this.ffInput.register('back', () => this.setHudZone(undefined), {
         priority: GAMEPAD_PRIORITY.pageMode,
         enabled: () => this.hudMode() && this.canToggleHud(),
-        label: 'Map',
+        label: t('gamepad.map'),
       }),
     ];
   }

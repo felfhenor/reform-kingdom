@@ -1,5 +1,5 @@
-import { tPlural } from '@helpers/i18n/i18n';
-import { contentNameById } from '@helpers/i18n/i18n-content';
+import { contentName, contentNameById } from '@helpers/i18n/i18n-content';
+import { t, tPlural } from '@helpers/i18n/i18n';
 import {
   colosseumEncounterOptions,
   colosseumGearPool,
@@ -38,9 +38,9 @@ function colosseumPruneGear(
       kept[slot as EquipmentSlot] = pick;
       return;
     }
-    const name = contentNameById(pick.equipmentId) ?? 'Gear';
-    if (!dropped.includes(`${name} (no longer owned)`)) {
-      dropped.push(`${name} (no longer owned)`);
+    const name = contentNameById(pick.equipmentId) ?? t('colosseumSetup.gear');
+    if (!dropped.includes(t('colosseumSetup.noLongerOwned', { name }))) {
+      dropped.push(t('colosseumSetup.noLongerOwned', { name }));
     }
   });
   return kept;
@@ -75,7 +75,7 @@ function colosseumPruneHero(
   const base = jobKnown
     ? edit
     : { characterId: edit.characterId, equipment: edit.equipment };
-  if (!jobKnown) dropped.push(`${hero.name}'s job`);
+  if (!jobKnown) dropped.push(t('colosseumSetup.heroJob', { hero: hero.name }));
 
   return {
     ...base,
@@ -96,7 +96,13 @@ function colosseumPruneEncounter(
   );
   const encounter = getEntry<EncounterContent>(encounterId);
   if (!visited || !encounter) {
-    dropped.push(`${encounter?.name ?? 'A location'} (not visited)`);
+    dropped.push(
+      t('colosseumSetup.notVisited', {
+        location: encounter
+          ? contentName(encounter)
+          : t('colosseumSetup.aLocation'),
+      }),
+    );
     return {};
   }
 

@@ -16,7 +16,9 @@
   <div class="flex flex-col gap-4">
     <span class="type-section-title">
       {{ info.name }}
-      <span class="badge badge-sm badge-data">{{ info.kind }}</span>
+      <span class="badge badge-sm badge-data">
+        {{ info.kind | enumLabel: 'skillTreeNodeKind' }}
+      </span>
     </span>
 
     <div class="flex items-center gap-4">

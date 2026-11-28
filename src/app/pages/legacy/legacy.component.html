@@ -29,15 +29,12 @@
                 {{ run.title }}
               </span>
               <span class="type-meta">
-                {{
-                  'legacy.middot'
-                    | t: { endedAt: (run.endedAt | date: 'medium') }
-                }}
+                {{ run.endedAt | date: 'medium' }} &middot;
                 <ng-container
                   [ngTemplateOutlet]="duration"
                   [ngTemplateOutletContext]="{ $implicit: run.playTime }"
                 />
-                {{ 'legacy.middot2' | t }}
+                &middot;
                 @if (run.edictCount > 0) {
                   {{ 'legacy.edicts' | tPlural: run.edictCount }}
                 } @else {

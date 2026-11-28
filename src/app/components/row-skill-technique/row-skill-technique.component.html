@@ -9,7 +9,10 @@
         [element]="element"
         [filled]="true"
         size="sm"
-        [tp]="'Generates a ' + element + ' charge'"
+        [tp]="
+          'element.generatesCharge'
+            | t: { element: (element | enumLabel: 'element') }
+        "
       />
     }
 

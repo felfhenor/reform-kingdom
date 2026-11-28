@@ -9,7 +9,7 @@
 
   <app-slot-button-container
     [disabled]="!modifiable() || !selected"
-    [helpText]="'Equipped gear cannot be infused in combat.'"
+    [helpText]="'panelKingdomWorkshopInfuse.equippedGearCannotBe' | t"
   >
     <button
       class="btn btn-primary btn-sm"
@@ -38,7 +38,7 @@
   @if (slotCount() > 0) {
     <div
       class="type-hint my-2 mt-4"
-      [textContent]="'Select a slot to choose what to infuse into it.'"
+      [textContent]="'panelKingdomWorkshopInfuse.selectASlotTo' | t"
     ></div>
 
     <app-row-infused-materials

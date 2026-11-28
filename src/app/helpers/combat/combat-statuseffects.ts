@@ -1,5 +1,5 @@
 import { t } from '@helpers/i18n/i18n';
-import { contentNestedText } from '@helpers/i18n/i18n-content';
+import { contentName, contentNestedText } from '@helpers/i18n/i18n-content';
 import { combatCombatantTakeDamage } from '@helpers/combat/combat-combatant-hp';
 import {
   elementalDamageText,
@@ -144,7 +144,7 @@ export function combatApplyStatusEffectToTarget(
     combatMessageLog(
       combat,
       t('combatStatuseffects.isShruggedOffBy', {
-        name: statusEffect.name,
+        name: contentName(statusEffect),
         combatant: combatantMessageToken(combatant),
       }),
       combatant,

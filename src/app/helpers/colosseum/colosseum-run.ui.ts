@@ -23,13 +23,14 @@ import type {
   ColosseumRunResult,
   Combat,
   EncounterId,
+  I18nKey,
 } from '@interfaces';
 
-const OUTCOME_MESSAGES: Record<ColosseumFightOutcome, string> = {
-  Won: 'Heroes have won the combat!',
-  Lost: 'The heroes have fallen.',
-  Stalemate: 'Heroes were not able to finish the fight.',
-};
+const OUTCOME_MESSAGE_KEYS = {
+  Won: 'combatEnd.heroesHaveWonThe',
+  Lost: 'colosseumRun.theHeroesHaveFallen',
+  Stalemate: 'colosseumRun.heroesWereNotAble',
+} as const satisfies Record<ColosseumFightOutcome, I18nKey>;
 
 export function colosseumLiveFight(
   party: Character[],
@@ -64,7 +65,15 @@ export function colosseumLiveStep(current: Combat): {
   );
   // Drained so the next real round starts clean; a watched fight shows no stats.
   runStatsCombatTake();
-  if (escaped) combatMessageLog(combat, t('colosseumRun.thePartyEscaped'));
+  if (escaped) {
+    combatMessageLog(
+      combat,
+      t('colosseumRun.thePartyEscaped'),
+      undefined,
+      undefined,
+      'escaped',
+    );
+  }
   return { combat, outcome: escaped ? 'Lost' : colosseumFightOutcome(combat) };
 }
 
@@ -84,7 +93,13 @@ export function colosseumLiveFinish(
   combat: Combat,
   outcome: ColosseumFightOutcome,
 ): void {
-  combatMessageLog(combat, OUTCOME_MESSAGES[outcome]);
+  combatMessageLog(
+    combat,
+    t(OUTCOME_MESSAGE_KEYS[outcome]),
+    undefined,
+    undefined,
+    outcome === 'Won' ? 'won' : undefined,
+  );
 }
 
 // The next fight of a whole-encounter run, with HP and EP carried over like a real encounter.

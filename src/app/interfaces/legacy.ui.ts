@@ -1,3 +1,4 @@
+import type { I18nKey } from '@interfaces/i18n-keys';
 import type { RegionContent } from '@interfaces/content-region';
 import type { HeroRunStats } from '@interfaces/run-stats';
 
@@ -18,7 +19,7 @@ export type RunMostUsedSkill = {
 };
 
 export type RunAwardDefinition = {
-  label: string;
+  labelKey: I18nKey;
   value: (stats: HeroRunStats) => number;
 };
 

@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { DestroyRef, effect, inject } from '@angular/core';
 import { ffStepNumber } from '@ff/controls/ff-number-step';
 import { FFFocusService } from '@ff/focus/ff-focus.service';
@@ -111,11 +112,11 @@ function gamepadBindSwalButtons(loader: SweetAlert2LoaderService): void {
   );
   ffGamepadOn('confirm', () => click((swal) => swal.clickConfirm()), {
     ...dialog,
-    label: 'Confirm',
+    label: t('gamepad.confirm'),
   });
   ffGamepadOn('back', () => click((swal) => swal.clickCancel()), {
     ...dialog,
-    label: 'Cancel',
+    label: t('gamepad.cancel'),
   });
   ffGamepadOn('context', () => click((swal) => swal.clickDeny()), {
     ...dialog,
@@ -127,7 +128,7 @@ function gamepadBindSwalButtons(loader: SweetAlert2LoaderService): void {
 function gamepadBindSwalInputs(): void {
   const priority = GAMEPAD_PRIORITY.dialog;
   const hasNumber = () => !!gamepadSwalInput('number');
-  const adjust = { priority, enabled: hasNumber, label: 'Adjust' };
+  const adjust = { priority, enabled: hasNumber, label: t('gamepad.adjust') };
   ffGamepadOn('left', () => gamepadSwalStep(-1), adjust);
   ffGamepadOn('right', () => gamepadSwalStep(1), adjust);
   const fast = { priority, enabled: hasNumber, label: '±10' };
@@ -145,7 +146,11 @@ function gamepadBindSwalInputs(): void {
       input.focus();
       void keyboard(input.getBoundingClientRect());
     },
-    { priority, enabled: () => !!gamepadSwalInput('text'), label: 'Type' },
+    {
+      priority,
+      enabled: () => !!gamepadSwalInput('text'),
+      label: t('gamepad.type'),
+    },
   );
 }
 

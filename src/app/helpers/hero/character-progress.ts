@@ -189,9 +189,14 @@ export function partyGainXp(
     );
     desktopNotify({
       category: 'Progress',
-      title: 'Level Up',
+      title: t('characterProgress.levelUp'),
       body: leveledUp
-        .map(({ after }) => `${after.name} reached level ${after.level}.`)
+        .map(({ after }) =>
+          t('characterProgress.reachedLevel2', {
+            name: after.name,
+            level: after.level,
+          }),
+        )
         .join(' '),
     });
   }

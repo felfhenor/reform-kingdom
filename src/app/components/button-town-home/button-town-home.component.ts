@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import { t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import {
@@ -54,6 +55,8 @@ export class ButtonTownHomeComponent {
   public setHome(): void {
     const town = this.town();
     void homeNodeSet(this.entry());
-    notifySuccess(t('buttonTownHome.isNowYourHome', { name: town.name }));
+    notifySuccess(
+      t('buttonTownHome.isNowYourHome', { name: contentName(town) }),
+    );
   }
 }

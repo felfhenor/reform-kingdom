@@ -1,13 +1,17 @@
+import { contentName } from '@helpers/i18n/i18n-content';
+import { t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { FFKeyboardDirective } from '@ff/controls/ff-keyboard.directive';
 import { FFFocusOnChangeDirective } from '@ff/focus/ff-focus-on-change.directive';
+import { formatNumber } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
   ElementRef,
   inject,
+  LOCALE_ID,
   input,
   linkedSignal,
   signal,
@@ -85,6 +89,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 })
 export class PanelKingdomWorkshopInfuseComponent {
   private anim = inject(AnimationService);
+  private locale = inject(LOCALE_ID);
   private materialsRowEl = viewChild(RowInfusedMaterialsComponent, {
     read: ElementRef,
   });
@@ -184,10 +189,15 @@ export class PanelKingdomWorkshopInfuseComponent {
   private buildInfuseConfirmText(materialItemId: ItemId): string {
     const material = getEntry<ItemContent>(materialItemId);
     const cost = this.materialCost(materialItemId);
-    const base = `Infuse ${material?.name ?? 'this material'} for ${cost}g?`;
+    const base = t('panelKingdomWorkshopInfuse.infuseForCost', {
+      material: material
+        ? contentName(material)
+        : t('panelKingdomWorkshopInfuse.thisMaterial'),
+      cost: formatNumber(cost, this.locale),
+    });
 
     return this.isOverwritingSelectedSlot()
-      ? `${base} This slot is already infused - doing this will replace it, and the existing items will not be refunded.`
+      ? t('panelKingdomWorkshopInfuse.thisSlotIsAlready', { base })
       : base;
   }
 

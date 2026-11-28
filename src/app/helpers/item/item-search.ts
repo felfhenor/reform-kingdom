@@ -5,6 +5,8 @@ import {
   MonsterTypeDimension,
   StatDimension,
   StatusEffectTagDimension,
+} from '@helpers/hero/stat-dimension';
+import {
   type ItemPreviewDisplay,
   type StatDisplayDimension,
 } from '@interfaces';

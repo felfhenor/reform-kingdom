@@ -103,10 +103,10 @@
   #reclassAllSwal
   [title]="'modalPlayKingdomReclass.reclassAllChangedHeroes' | t"
   [text]="
-    'Any hero whose class you changed will be reclassed and their equipment will be unequipped. This action will cost ' +
-    (totalReclassCost() | number) +
-    ' gold.' +
-    (hasUnsavedRegalias() ? ' Some heroes have unsaved regalia changes.' : '')
+    (hasUnsavedRegalias()
+      ? 'modalPlayKingdomReclass.reclassAllWarningUnsavedRegalia'
+      : 'modalPlayKingdomReclass.reclassAllWarning'
+    ) | t: { cost: (totalReclassCost() | number) }
   "
   icon="warning"
   (confirm)="applyReclassAll()"

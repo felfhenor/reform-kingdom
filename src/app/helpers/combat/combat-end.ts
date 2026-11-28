@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import { t } from '@helpers/i18n/i18n';
 import { achievementsMoment } from '@helpers/achievement/achievement-moment';
 import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
@@ -176,7 +177,7 @@ function recordVictoryKills(combat: Combat): void {
     if (monsterRecordKill(monster.id, level, combat.locationName)) {
       combatMessageLog(
         combat,
-        t('combatEnd.thePartyHasFought', { name: monster.name }),
+        t('combatEnd.thePartyHasFought', { name: contentName(monster) }),
       );
     }
   });
@@ -259,11 +260,13 @@ function recordEncounterClear(combat: Combat): void {
 
   const sealed = runStatsRecordSeal(encounter.id);
   if (sealed) {
-    const sealedText = `The memory of ${sealed.name} is set in stone.`;
+    const sealedText = t('combatEnd.theMemoryOfIs', {
+      name: contentName(sealed),
+    });
     combatMessageLog(combat, sealedText);
     desktopNotify({
       category: 'Progress',
-      title: 'Region Sealed',
+      title: t('combatEnd.regionSealed'),
       body: sealedText,
     });
     analyticsSendDesignEvent(
@@ -339,7 +342,13 @@ function combatHasNextFight(combat: Combat): boolean {
 
 // Returns true if another fight was started; callers must not reset combat state then.
 function handleCombatVictory(combat: Combat): boolean {
-  combatMessageLog(combat, t('combatEnd.heroesHaveWonThe'));
+  combatMessageLog(
+    combat,
+    t('combatEnd.heroesHaveWonThe'),
+    undefined,
+    undefined,
+    'won',
+  );
   analyticsSendDesignEvent('Combat:Encounter:Win');
   combatVictoryMoments(combat).forEach((moment) => achievementsMoment(moment));
 

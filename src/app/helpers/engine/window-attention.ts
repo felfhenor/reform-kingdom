@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { contentNameById } from '@helpers/i18n/i18n-content';
 import { tradeskillBuilding } from '@helpers/crafting/tradeskill';
 import { armoryHasRoom } from '@helpers/kingdom/armory';
@@ -15,8 +16,8 @@ function runAttentionAlerts(): WindowAttentionAlert[] {
         id: 'run-won',
         flash: true,
         category: 'Alerts',
-        title: 'Victory',
-        body: 'Fel has been defeated.',
+        title: t('windowAttention.victory'),
+        body: t('windowAttention.felDefeated'),
       },
     ],
     [
@@ -25,8 +26,8 @@ function runAttentionAlerts(): WindowAttentionAlert[] {
         id: 'run-lost',
         flash: true,
         category: 'Alerts',
-        title: 'Game Over',
-        body: 'Your party has fallen.',
+        title: t('windowAttention.gameOver'),
+        body: t('windowAttention.partyFallen'),
       },
     ],
     [
@@ -35,8 +36,8 @@ function runAttentionAlerts(): WindowAttentionAlert[] {
         id: 'armory-full',
         flash: true,
         category: 'Alerts',
-        title: 'Armory Full',
-        body: 'New equipment has nowhere to go until you clean out your armory.',
+        title: t('windowAttention.armoryFull'),
+        body: t('windowAttention.armoryFullBody'),
       },
     ],
   ];
@@ -50,8 +51,10 @@ function craftIdleAlerts(): WindowAttentionAlert[] {
     id: `craft-idle:${tradeskill}`,
     flash: false,
     category: 'Alerts',
-    title: 'Crafting Finished',
-    body: `${tradeskill} has nothing left to craft.`,
+    title: t('windowAttention.craftingFinished'),
+    body: t('windowAttention.hasNothingLeftTo', {
+      tradeskill: contentNameById(tradeskill) ?? tradeskill,
+    }),
   }));
 }
 
@@ -63,8 +66,10 @@ function workerXpFullAlerts(): WindowAttentionAlert[] {
       id: `worker-xp-full:${workerId}`,
       flash: false,
       category: 'Alerts',
-      title: 'Worker XP Full',
-      body: `${contentNameById(workerId) ?? 'A worker'} has full XP and is waiting to level up.`,
+      title: t('windowAttention.workerXpFull'),
+      body: t('windowAttention.hasFullXpAnd', {
+        worker: contentNameById(workerId) ?? t('windowAttention.aWorker'),
+      }),
     }));
 }
 

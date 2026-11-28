@@ -42,10 +42,7 @@
 
       @if (occupiedPaperdollSlots().length > 1) {
         <div class="type-meta mt-2">
-          {{
-            'slotEquipment.occupies'
-              | t: { join: occupiedPaperdollSlots().join(' + ') }
-          }}
+          {{ 'slotEquipment.occupies' | t: { slots: occupiedSlotLabels() } }}
         </div>
       }
 

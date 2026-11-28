@@ -3,7 +3,11 @@
 
   <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
     <span class="flex items-center gap-2 type-label min-w-[120px]">
-      {{ mode() === 'Gather' ? 'Gathering' : 'Combat' }}
+      {{
+        mode() === 'Gather'
+          ? ('panelKingdomWorkersAssignmentNode.gathering' | t)
+          : ('panelKingdomWorkersAssignmentNode.combat' | t)
+      }}
     </span>
 
     <span
@@ -69,8 +73,8 @@
       bindValue="nodeName"
       [placeholder]="
         mode() === 'Gather'
-          ? 'Select a gather location...'
-          : 'Select a combat location...'
+          ? ('panelKingdomWorkersAssignmentNode.selectAGatherLocation' | t)
+          : ('panelKingdomWorkersAssignmentNode.selectACombatLocation' | t)
       "
       [clearable]="false"
       [ngModel]="displayedNodeName()"

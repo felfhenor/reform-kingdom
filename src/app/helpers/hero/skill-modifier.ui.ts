@@ -1,4 +1,5 @@
-import { t, tPlural } from '@helpers/i18n/i18n';
+import { StatDimension } from '@helpers/hero/stat-dimension';
+import { enumLabel, t, tPlural } from '@helpers/i18n/i18n';
 import { combatantFromCharacter } from '@helpers/combat/combat-create';
 import { statusEffectContentPreview } from '@helpers/combat/combat-statuseffects.ui';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
@@ -60,20 +61,34 @@ function statusSegment(
     : { text: modifier.statusEffectId };
 }
 
-function statusVerb(modifier: { statusEffectId: string }): string {
+function isBuffModifier(modifier: { statusEffectId: string }): boolean {
   const status = getEntry<StatusEffectContent>(modifier.statusEffectId);
-  return status?.effectType === 'Buff' ? 'grant' : 'inflict';
+  return status?.effectType === 'Buff';
 }
 
 function inflictSegments(
   modifier: HeroEffectSkillModifierInflict,
   format: (value: number) => string,
 ): SkillModifierLineSegment[] {
-  const hits = modifier.onElement ? ` on ${modifier.onElement} hits` : '';
+  const turns = turnsText(modifier.duration, format);
   return [
-    { text: `${format(modifier.chance)}% chance to ${statusVerb(modifier)}` },
+    {
+      text: t(
+        isBuffModifier(modifier)
+          ? 'skillModifier.chanceToGrant'
+          : 'skillModifier.chanceToInflict',
+        { chance: format(modifier.chance) },
+      ),
+    },
     statusSegment(modifier, format),
-    { text: `for ${turnsText(modifier.duration, format)}${hits}` },
+    {
+      text: modifier.onElement
+        ? t('skillModifier.forTurnsOnHits', {
+            turns,
+            element: enumLabel('element', modifier.onElement),
+          })
+        : t('skillModifier.forTurns', { turns }),
+    },
   ];
 }
 
@@ -84,14 +99,26 @@ function potencySegments(
 ): SkillModifierLineSegment[] {
   const turns = `+${turnsText(modifier.duration, format)}`;
   if (!modifier.chance) {
-    return [{ text: `${turns} of` }, statusSegment(modifier, format)];
+    return [
+      { text: t('skillModifier.turnsOf', { turns }) },
+      statusSegment(modifier, format),
+    ];
   }
 
   const chance = {
-    text: `+${format(modifier.chance)}% chance to ${statusVerb(modifier)}`,
+    text: t(
+      isBuffModifier(modifier)
+        ? 'skillModifier.bonusChanceToGrant'
+        : 'skillModifier.bonusChanceToInflict',
+      { chance: format(modifier.chance) },
+    ),
   };
   return modifier.duration
-    ? [chance, statusSegment(modifier, format), { text: `for ${turns}` }]
+    ? [
+        chance,
+        statusSegment(modifier, format),
+        { text: t('skillModifier.forTurns', { turns }) },
+      ]
     : [chance, statusSegment(modifier, format)];
 }
 
@@ -111,7 +138,7 @@ function echoSegments(
 ): SkillModifierLineSegment[] {
   const skill = getEntry<EquipmentSkillContent>(modifier.skillId);
   return [
-    { text: 'Also casts' },
+    { text: t('skillModifier.alsoCasts') },
     skill
       ? {
           ...namedSegment(skill.name, {
@@ -120,7 +147,7 @@ function echoSegments(
           }),
           skill: echoedSkill(skill),
         }
-      : { text: 'UNKNOWN' },
+      : { text: t('skillModifier.unknown') },
   ];
 }
 
@@ -134,11 +161,14 @@ function skillModifierText(
         count: format(modifier.value),
       });
     case 'Scaling':
-      return `+${format(modifier.value)}x ${modifier.stat} scaling`;
+      return t('skillModifier.scaling', {
+        value: format(modifier.value),
+        stat: StatDimension.label[modifier.stat],
+      });
     case 'Accuracy':
-      return `+${format(modifier.value)}% accuracy`;
+      return t('skillModifier.accuracy', { value: format(modifier.value) });
     case 'EpCost':
-      return `-${format(modifier.value)}% EP cost`;
+      return t('skillModifier.epCost', { value: format(modifier.value) });
     case 'Attribute':
       return capitalize(modifier.attribute.replace(/([a-z])([A-Z])/g, '$1 $2'));
     default:

@@ -1,3 +1,4 @@
+import { i18nLabels } from '@helpers/i18n/i18n';
 import { contentShortName } from '@helpers/i18n/i18n-content';
 import {
   analyticsSafeSegment,
@@ -8,19 +9,15 @@ import { recomputeGlobalEffectSums } from '@helpers/hero/global-effect-state';
 import { updateGamestate } from '@helpers/state-game';
 import type { EdictContent, EdictId, EdictKind } from '@interfaces';
 
-const EDICT_KIND_LABELS: Record<EdictKind, string> = {
-  PartySize: 'Party Size',
-  Challenge: 'Challenge',
-  Variant: 'Variant',
-  Boon: 'Boon',
-};
+const EDICT_KIND_LABELS: Record<EdictKind, string> = i18nLabels(
+  'edict.kindLabel',
+  ['PartySize', 'Challenge', 'Variant', 'Boon'],
+);
 
-const EDICT_KIND_GROUP_LABELS: Record<EdictKind, string> = {
-  PartySize: 'Party Size',
-  Challenge: 'Challenges',
-  Variant: 'Variants',
-  Boon: 'Boons',
-};
+const EDICT_KIND_GROUP_LABELS: Record<EdictKind, string> = i18nLabels(
+  'edict.kindGroupLabel',
+  ['PartySize', 'Challenge', 'Variant', 'Boon'],
+);
 
 export async function edictsSet(ids: EdictId[]): Promise<void> {
   const sanitized = edictsSanitized(ids);

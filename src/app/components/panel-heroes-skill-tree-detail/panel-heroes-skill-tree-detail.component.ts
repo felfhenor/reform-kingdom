@@ -1,3 +1,4 @@
+import { EnumLabelPipe } from '@pipes/enum-label.pipe';
 import { TPipe } from '@pipes/t.pipe';
 import { contentShortName } from '@helpers/i18n/i18n-content';
 import { DecimalPipe, formatNumber, NgTemplateOutlet } from '@angular/common';
@@ -56,6 +57,7 @@ import { AnimationService } from '@services/animation.service';
   selector: 'app-panel-heroes-skill-tree-detail',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    EnumLabelPipe,
     TPipe,
     BlankSlateComponent,
     DecimalPipe,

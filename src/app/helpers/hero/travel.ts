@@ -118,8 +118,12 @@ function travelRecoverFromPathingFailure(destinationNodeName: string): void {
   categoryMessageLog(
     'Travel',
     location.mapName,
-    `Pathing error: no route to ${destinationNodeName} could be found from ` +
-      `${location.mapName} (${location.x}, ${location.y}). The party was recalled to the kingdom.`,
+    t('travel.pathingErrorRecalled', {
+      destinationNodeName,
+      mapName: location.mapName,
+      x: location.x,
+      y: location.y,
+    }),
   );
 }
 
@@ -199,8 +203,8 @@ export function travelStart(
     'Travel',
     worldCurrentLocationState().mapName,
     wasTraveling
-      ? `The party changed course for ${destinationNodeName}.`
-      : `The party left for ${destinationNodeName}.`,
+      ? t('travel.thePartyChangedCourse', { destinationNodeName })
+      : t('travel.thePartyLeftFor', { destinationNodeName }),
   );
 
   return true;
@@ -227,8 +231,8 @@ export function travelBeginDeathsDoor(): void {
     'Travel',
     worldCurrentLocationState().mapName,
     globalEffectSumsState().reviveInPlace
-      ? 'The fallen party awaits revival.'
-      : 'The fallen party awaits recall home.',
+      ? t('travel.awaitsRevival')
+      : t('travel.awaitsRecall'),
   );
 }
 

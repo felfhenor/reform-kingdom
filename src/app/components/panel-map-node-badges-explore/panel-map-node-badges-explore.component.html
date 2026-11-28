@@ -12,7 +12,11 @@
     [tp]="sealTooltip"
     [tpPlacement]="'top'"
   >
-    {{ isSealed() ? 'Sealed' : 'Seal' }}
+    {{
+      isSealed()
+        ? ('panelMapNodeBadgesExplore.sealed' | t)
+        : ('panelMapNodeBadgesExplore.seal' | t)
+    }}
   </div>
 
   <ng-template #sealTooltip>

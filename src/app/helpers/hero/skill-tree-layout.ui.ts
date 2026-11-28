@@ -1,5 +1,7 @@
+import { t } from '@helpers/i18n/i18n';
 import {
   contentDescription,
+  contentName,
   contentShortName,
 } from '@helpers/i18n/i18n-content';
 import {
@@ -358,12 +360,23 @@ export function skillTreeResetPromptText(
     learned.length + characterSkillTreeAvailableSp(character, job.id);
 
   return [
-    `${character.name} will forget every ${job.name} skill, ability and bonus they learned${spec ? `, including their ${contentShortName(spec)} specialization,` : ''} and get all ${format(refund)} SP back.`,
+    spec
+      ? t('skillTreeLayout.willForgetEverySkillSpec', {
+          name: character.name,
+          name2: contentName(job),
+          spec: contentShortName(spec),
+          refund: format(refund),
+        })
+      : t('skillTreeLayout.willForgetEverySkill', {
+          name: character.name,
+          name2: contentName(job),
+          refund: format(refund),
+        }),
     regalia
-      ? `Their regalia "${regalia.name}" is reset too; other regalias keep their builds.`
+      ? t('skillTreeLayout.theirRegaliaIsReset', { name: regalia.name })
       : '',
     'Combat Orders that use a forgotten skill will be turned off.',
-    `This uses 1 Memory Flux (you have ${format(fluxOwned)}).`,
+    t('skillTreeLayout.thisUses1Memory', { fluxOwned: format(fluxOwned) }),
   ]
     .filter((line) => line !== '')
     .join(' ');

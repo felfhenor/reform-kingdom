@@ -1,12 +1,15 @@
-import { enumLabel, t } from '@helpers/i18n/i18n';
+import {
+  CombatStatDimension,
+  StatShorthand,
+  StatusEffectTagDimension,
+} from '@helpers/hero/stat-dimension';
+import { i18nLabels, t } from '@helpers/i18n/i18n';
 import { contentNameById } from '@helpers/i18n/i18n-content';
 import { getEntry } from '@helpers/content/content';
 import { defaultGlobalEffectSums } from '@helpers/defaults';
 import { edictEntry, edictSeatBoons } from '@helpers/edict/edict';
 import { characterRecalculateStats } from '@helpers/hero/party';
 import {
-  CombatStatDimension,
-  StatusEffectTagDimension,
   type CollectibleContent,
   type CombatStat,
   type CollectibleId,
@@ -25,20 +28,23 @@ import {
 import { isEqual } from 'es-toolkit';
 import { round } from 'es-toolkit/compat';
 
-const WORLD_NODE_TYPE_LABELS: Record<WorldNodeType, string> = {
-  Kingdom: 'Duchies',
-  NonPlayerKingdom: 'Towns',
-  CaravanNode: 'Caravans',
-  ExploreNode: 'Encounters',
-  ExploreRandomNode: 'Mystical Locations',
-  GatherNode: 'Gather Locations',
-  Shrine: 'Shrines',
-  Outpost: 'Outposts',
-  Trainer: 'Trainers',
-  ExchangeNode: 'Exchanges',
-  TeleportNode: 'Teleports',
-  CollectibleGate: 'Gates',
-};
+const WORLD_NODE_TYPE_LABELS: Record<WorldNodeType, string> = i18nLabels(
+  'worldNodeType.pluralLabel',
+  [
+    'Kingdom',
+    'NonPlayerKingdom',
+    'CaravanNode',
+    'ExploreNode',
+    'ExploreRandomNode',
+    'GatherNode',
+    'Shrine',
+    'Outpost',
+    'Trainer',
+    'ExchangeNode',
+    'TeleportNode',
+    'CollectibleGate',
+  ],
+);
 
 // Rounded so scaled fractions (0.15 * 100) don't print float noise.
 function signedNumber(value: number): string {
@@ -93,9 +99,7 @@ function globalEffectTextParams(effect: GlobalEffectEffect): I18nParams {
     levels: value === 0 ? 0 : Math.round(1 / Math.abs(value)),
     percent: signedPercent(value),
     percent100: signedPercent(value * 100),
-    stat: stat
-      ? enumLabel('statShort', String(stat))
-      : t('globalEffect.anyStat'),
+    stat: stat ? StatShorthand[stat as GameStat] : t('globalEffect.anyStat'),
     combatStat: combatStat
       ? CombatStatDimension.label[combatStat as CombatStat]
       : '',

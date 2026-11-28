@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
@@ -108,11 +109,11 @@ export class FFNumberPopupComponent {
       const unregisters = [
         this.ffInput.register('left', () => this.adjust(-1), {
           ...options,
-          label: 'Adjust',
+          label: t('gamepad.adjust'),
         }),
         this.ffInput.register('right', () => this.adjust(1), {
           ...options,
-          label: 'Adjust',
+          label: t('gamepad.adjust'),
         }),
         this.ffInput.register('subPrev', () => this.step(-FAST_STEPS), {
           ...options,
@@ -124,7 +125,7 @@ export class FFNumberPopupComponent {
         }),
         this.ffInput.register('back', () => this.cancel(), {
           ...options,
-          label: 'Cancel',
+          label: t('gamepad.cancel'),
         }),
         ...BLOCKED_ACTIONS.map((action) =>
           this.ffInput.register(action, () => undefined, options),

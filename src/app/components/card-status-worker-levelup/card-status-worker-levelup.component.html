@@ -3,7 +3,9 @@
 <app-card-status-bubble
   [expanded]="expanded()"
   [name]="data.name"
-  [badge]="'Lv. ' + (data.level | number)"
+  [badge]="
+    'cardStatusWorkerLevelup.level' | t: { level: (data.level | number) }
+  "
   [dimmed]="!data.affordable"
   (click)="goToWorker()"
   tabindex="0"

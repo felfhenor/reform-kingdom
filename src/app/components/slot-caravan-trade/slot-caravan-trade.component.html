@@ -6,11 +6,7 @@
     @if (entry.trade.rumorId) {
       {{ 'slotCaravanTrade.buyingThisRevealsWhere' | t }}
     } @else {
-      {{
-        isPartyBuying()
-          ? 'This ' + merchantLabel() + ' is selling this item to you.'
-          : 'This ' + merchantLabel() + ' is buying this item from you.'
-      }}
+      {{ merchantNoteKey() | t }}
     }
   </div>
 </app-tooltip-item-preview>
@@ -46,7 +42,11 @@
             [class.badge-success]="isPartyBuying()"
             [class.badge-warning]="!isPartyBuying()"
           >
-            {{ isPartyBuying() ? 'Buy' : 'Sell' }}
+            {{
+              isPartyBuying()
+                ? ('slotCaravanTrade.buy' | t)
+                : ('slotCaravanTrade.sell' | t)
+            }}
           </span>
         }
 
@@ -63,7 +63,11 @@
 
         @if (remaining > 0) {
           <span class="badge badge-sm badge-data">
-            {{ isPartyBuying() ? 'Stock' : 'Requested' }}: {{ remaining }}
+            {{
+              isPartyBuying()
+                ? ('slotCaravanTrade.stock' | t)
+                : ('slotCaravanTrade.requested' | t)
+            }}: {{ remaining }}
           </span>
         }
 

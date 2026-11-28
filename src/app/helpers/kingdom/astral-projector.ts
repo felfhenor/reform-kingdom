@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import { t } from '@helpers/i18n/i18n';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import { MAX_ACTIVE_ASTRAL_PROJECTOR_SPELLS } from '@helpers/config';
@@ -107,15 +108,17 @@ function astralProjectorProcessUnlocks(): void {
       return state;
     });
 
-    const unlockedText = `New Astral Projector spell unlocked: ${content.name}`;
+    const unlockedText = t('astralProjector.newAstralProjectorSpell', {
+      name: contentName(content),
+    });
     notifySuccess(unlockedText);
     desktopNotify({
       category: 'Progress',
-      title: 'Spell Unlocked',
+      title: t('astralProjector.spellUnlocked'),
       body: unlockedText,
     });
     miscellaneousMessageLog(
-      t('astralProjector.aNewAstralProjector', { name: content.name }),
+      t('astralProjector.aNewAstralProjector', { name: contentName(content) }),
     );
   });
 }
@@ -139,7 +142,7 @@ function astralProjectorProcessExpiry(): void {
 
     if (content) {
       miscellaneousMessageLog(
-        t('astralProjector.hasFaded', { name: content.name }),
+        t('astralProjector.hasFaded', { name: contentName(content) }),
       );
     }
   });

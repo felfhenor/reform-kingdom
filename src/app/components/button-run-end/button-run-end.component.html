@@ -40,20 +40,32 @@
     [appSfx]="finished ? 'ui-success' : 'ui-error'"
     [sfxTrigger]="['click', 'hover']"
   >
-    {{ finished ? 'Finish Run' : 'Abandon Run' }}
+    {{
+      finished
+        ? ('buttonRunEnd.finishRun' | t)
+        : ('buttonRunEnd.abandonRun' | t)
+    }}
   </button>
 }
 
 <swal
   #endSwal
-  [title]="finished ? 'Finish This Run?' : 'Abandon This Run?'"
+  [title]="
+    finished
+      ? ('buttonRunEnd.finishThisRun2' | t)
+      : ('buttonRunEnd.abandonThisRun' | t)
+  "
   [text]="
     finished
-      ? 'This run is added to your Legacy as completed, and your savefile is reset so you can start a new one.'
-      : 'This run is added to your Legacy as abandoned, and your savefile is reset. This cannot be undone.'
+      ? ('buttonRunEnd.thisRunIsAdded' | t)
+      : ('buttonRunEnd.thisRunIsAdded2' | t)
   "
   [icon]="finished ? 'question' : 'warning'"
-  [confirmButtonText]="finished ? 'Yes, finish run' : 'Yes, abandon run'"
+  [confirmButtonText]="
+    finished
+      ? ('buttonRunEnd.yesFinishRun' | t)
+      : ('buttonRunEnd.yesAbandonRun' | t)
+  "
   [cancelButtonText]="'buttonRunEnd.noKeepPlaying' | t"
   (confirm)="endRun()"
 ></swal>

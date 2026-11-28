@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import { t } from '@helpers/i18n/i18n';
 import {
   categoryMessageLog,
@@ -85,9 +86,9 @@ function kingdomWorkerLogReturn(
 
   categoryMessageLog(
     'Gather',
-    'Worker Resources',
+    t('workerTripKingdom.workerResources'),
     t('workerTripKingdom.returnedWith', {
-      name: worker.name,
+      name: contentName(worker),
       icon: ITEM_ICON_TOKEN,
       quantity: itemDropHtml(item, quantity),
     }),

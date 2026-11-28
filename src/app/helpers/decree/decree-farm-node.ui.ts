@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { farmableExploreNodes } from '@helpers/decree/decree-farm-node';
 import { assertNeverReward } from '@helpers/item/loot';
 import { worldNodeMonsterDropTable } from '@helpers/world-node/world-node-monster-drops';
@@ -26,7 +27,7 @@ export function farmNodeActiveWarning(nodeName: string): string | undefined {
   const entry = worldNodeByName(nodeName);
   if (!entry || !worldNodeEncounterRandom(entry)) return undefined;
 
-  return 'This is a mystical location, it will only be visited while it is active.';
+  return t('decreeFarmNode.mysticalLocation');
 }
 
 export function exploreNodeFarmOptions(): ExploreNodeFarmOption[] {

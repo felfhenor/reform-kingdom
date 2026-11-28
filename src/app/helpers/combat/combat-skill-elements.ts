@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import { t } from '@helpers/i18n/i18n';
 import {
   elementBlockText,
@@ -30,7 +31,10 @@ export function combatantPaySkillCast(
     if (delayed) {
       combatMessageLog(
         combat,
-        t('combatSkillElements.beginsCharging', { name, name2: skill.name }),
+        t('combatSkillElements.beginsCharging', {
+          name,
+          name2: contentName(skill),
+        }),
       );
     }
     return;
@@ -43,8 +47,12 @@ export function combatantPaySkillCast(
   combatMessageLog(
     combat,
     delayed
-      ? `${name} begins charging **${skill.name}**, consuming ${spent}!`
-      : `${name} channels ${spent}!`,
+      ? t('combatSkillElements.beginsChargingConsuming', {
+          name,
+          name2: contentName(skill),
+          spent,
+        })
+      : t('combatSkillElements.channels', { name, spent }),
   );
 }
 

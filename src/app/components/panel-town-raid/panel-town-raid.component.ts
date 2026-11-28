@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import { t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import { DecimalPipe } from '@angular/common';
@@ -103,7 +104,7 @@ export class PanelTownRaidComponent {
     try {
       if (!(await raidBuyoff(town.id, kind))) {
         notifyError(
-          t('panelTownRaid.couldNotMitigateThe', { name: town.name }),
+          t('panelTownRaid.couldNotMitigateThe', { name: contentName(town) }),
         );
       }
     } finally {
@@ -115,7 +116,9 @@ export class PanelTownRaidComponent {
     const town = this.town();
 
     if (!raidEngageCombat(town.id)) {
-      notifyError(t('panelTownRaid.couldNotEngageThe', { name: town.name }));
+      notifyError(
+        t('panelTownRaid.couldNotEngageThe', { name: contentName(town) }),
+      );
       return;
     }
 

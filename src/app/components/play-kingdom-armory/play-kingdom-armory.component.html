@@ -87,7 +87,7 @@
           (animate.enter)="onButtonEnter($event)"
           (animate.leave)="onButtonLeave($event)"
           [disabled]="!equipmentModifiable()"
-          [helpText]="'This cannot be done in combat.'"
+          [helpText]="'playKingdomArmory.thisCannotBeDone' | t"
         >
           <button
             type="button"

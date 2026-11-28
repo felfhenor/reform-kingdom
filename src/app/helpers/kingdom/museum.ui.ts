@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { contentName, contentNameById } from '@helpers/i18n/i18n-content';
 import { getEntriesByType } from '@helpers/content/content';
 import { isRecipeDropGated } from '@helpers/crafting/recipe-drop-gated';
@@ -42,9 +43,6 @@ import type {
 } from '@interfaces';
 import { orderBy } from 'es-toolkit/compat';
 
-const CRAFTING_SOURCE_NAME = 'Crafting';
-export const UNMET_TRADER_NAME = 'an unmet trader';
-
 export function museumCollectibleEntry(
   collectible: CollectibleContent,
 ): MuseumCollectibleEntry {
@@ -87,11 +85,7 @@ export function getMuseumCollectibleEntries(): MuseumCollectibleEntry[] {
     )
     .map(museumCollectibleEntry);
 
-  return orderBy(
-    entries,
-    [(entry) => contentName(entry.collectible)],
-    ['asc'],
-  );
+  return orderBy(entries, [(entry) => contentName(entry.collectible)], ['asc']);
 }
 
 // Node sources always hint their region; other unknown sources stay hidden, except an unmet trader is hinted at without a name.
@@ -107,15 +101,17 @@ function museumCollectibleSource(
   if (known || isCollectibleSourceKnown(source)) return source;
 
   return source.type === 'trader'
-    ? { ...source, name: UNMET_TRADER_NAME }
+    ? { ...source, name: t('museum.unmetTrader') }
     : undefined;
 }
 
 function collectibleSourceName(source: CollectibleSource): string {
   if (source.type === 'crafting') {
-    const tradeskillName = contentNameById(source.tradeskillId) ?? 'Unknown';
-
-    return `${CRAFTING_SOURCE_NAME} (${tradeskillName} Lv. ${source.tradeskillLevel})`;
+    return t('museum.craftingSource', {
+      tradeskill:
+        contentNameById(source.tradeskillId) ?? t('museum.unknownTradeskill'),
+      level: source.tradeskillLevel,
+    });
   }
 
   return source.name;
@@ -124,7 +120,9 @@ function collectibleSourceName(source: CollectibleSource): string {
 export function museumCollectibleSourceLabel({
   source,
 }: MuseumCollectibleEntry): string | undefined {
-  return collectibleSourceName(source ?? { type: 'node', name: 'Unknown' });
+  return collectibleSourceName(
+    source ?? { type: 'node', name: t('museum.unknownSource') },
+  );
 }
 
 function textIncludes(value: string, text: string): boolean {

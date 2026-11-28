@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { FFStepperDirective } from '@ff/controls/ff-stepper.directive';
 import { FFSelectDirective } from '@ff/controls/ff-select.directive';
 import { DecimalPipe } from '@angular/common';
@@ -78,8 +79,8 @@ export class PanelOptionsUIComponent extends OptionsBaseComponent {
   public readonly isElectron = isInElectron();
 
   public readonly displayModeChoices: DisplayModeChoice[] = [
-    { label: 'Windowed', value: 'windowed' },
-    { label: 'Fullscreen', value: 'fullscreen' },
+    { label: t('panelOptionsUi.windowed'), value: 'windowed' },
+    { label: t('panelOptionsUi.fullscreen'), value: 'fullscreen' },
   ];
 
   public windowState = signal<ElectronWindowState | undefined>(undefined);

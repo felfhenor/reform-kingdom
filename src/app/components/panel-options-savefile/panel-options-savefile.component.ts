@@ -128,11 +128,11 @@ export class PanelOptionsSavefileComponent
   );
 
   public readonly reasonLabels: Record<SavefileBackupReason, string> = {
-    load: 'Before Loading',
-    import: 'Before Importing',
-    restore: 'Before Restoring',
-    periodic: 'During Play',
-    mods: 'Before Mod Changes',
+    load: t('panelOptionsSavefile.beforeLoading'),
+    import: t('panelOptionsSavefile.beforeImporting'),
+    restore: t('panelOptionsSavefile.beforeRestoring'),
+    periodic: t('panelOptionsSavefile.duringPlay'),
+    mods: t('panelOptionsSavefile.beforeModChanges'),
   };
 
   ngOnInit() {

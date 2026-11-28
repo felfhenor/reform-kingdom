@@ -97,9 +97,10 @@ const NAMED_ENTITIES: Record<string, string> = {
 
 function decodeEntity(match: string, name: string): string {
   if (name.startsWith('#')) {
-    const code = name[1].toLowerCase() === 'x'
-      ? parseInt(name.slice(2), 16)
-      : parseInt(name.slice(1), 10);
+    const code =
+      name[1].toLowerCase() === 'x'
+        ? parseInt(name.slice(2), 16)
+        : parseInt(name.slice(1), 10);
     return String.fromCodePoint(code);
   }
   return NAMED_ENTITIES[name.toLowerCase()] ?? match;
@@ -120,7 +121,9 @@ function textEdit(
 ): Found | undefined {
   const range = trimmedRange(source, start, end);
   const raw = source.slice(range.start, range.end);
-  const literal = raw.replace(/\{\{[\s\S]*?\}\}/g, ' ');
+  const literal = raw
+    .replace(/\{\{[\s\S]*?\}\}/g, ' ')
+    .replace(/&(#x?[0-9a-f]+|[a-z]+);/gi, ' ');
   if (!HAS_WORDS.test(literal)) return undefined;
 
   const used = new Set<string>();
@@ -183,6 +186,109 @@ function attributeEdits(node: any, source: string): Found[] {
   return found;
 }
 
+const DISPLAY_INPUTS = [
+  ...TEXT_ATTRIBUTES,
+  'label',
+  'heading',
+  'description',
+  'message',
+  'emptyMessage',
+  'searchPlaceholder',
+  'tooltip',
+  'helpText',
+  'textContent',
+  'badge',
+];
+const LITERAL = /'((?:\\'|[^'])*)'/g;
+const ANALYTICS_ID = /^[\w-]+:[\w:-]*$/;
+const CSS_CLASSES = /^[a-z0-9-:/[\]]+( [a-z0-9-:/[\]]+)*$/;
+
+// Literals compared against or passed to calls are identifiers, not text.
+function isIdentifierPosition(
+  expr: string,
+  start: number,
+  end: number,
+): boolean {
+  const before = expr.slice(0, start).trimEnd();
+  const after = expr.slice(end).trimStart();
+  return (
+    /(===|!==|==|!=|\(|\[|,)$/.test(before) || /^(===|!==|==|!=)/.test(after)
+  );
+}
+
+function isDisplayText(text: string): boolean {
+  return (
+    HAS_WORDS.test(text) &&
+    (/\s/.test(text) || /^[A-Z][a-z]/.test(text)) &&
+    !ANALYTICS_ID.test(text) &&
+    !CSS_CLASSES.test(text)
+  );
+}
+
+// English string literals inside an expression, e.g. `paused() ? 'Resume' : 'Pause'`.
+function expressionLiteralEdits(
+  source: string,
+  start: number,
+  end: number,
+): Found[] {
+  const expr = source.slice(start, end);
+  const found: Found[] = [];
+  for (const match of expr.matchAll(LITERAL)) {
+    const text = match[1].replace(/\\'/g, "'");
+    const from = match.index;
+    const to = from + match[0].length;
+    if (!isDisplayText(text) || isIdentifierPosition(expr, from, to)) continue;
+    found.push({
+      kind: 'expr',
+      text,
+      edit: { start: start + from, end: start + to, text: `('%KEY%' | t)` },
+    });
+  }
+  return found;
+}
+
+function interpolationEdits(
+  source: string,
+  start: number,
+  end: number,
+): Found[] {
+  const raw = source.slice(start, end);
+  return [...raw.matchAll(/\{\{([\s\S]*?)\}\}/g)].flatMap((m) => {
+    const exprStart = start + m.index + 2;
+    return expressionLiteralEdits(source, exprStart, exprStart + m[1].length);
+  });
+}
+
+function boundInputEdits(node: any, source: string): Found[] {
+  return (node.inputs ?? []).flatMap((input: any) => {
+    if (!DISPLAY_INPUTS.includes(input.name) || !input.valueSpan) return [];
+    return expressionLiteralEdits(
+      source,
+      input.valueSpan.start.offset,
+      input.valueSpan.end.offset,
+    );
+  });
+}
+
+function collectExpressions(nodes: any[], source: string, out: Found[]): void {
+  for (const node of nodes) {
+    const name = node.constructor.name;
+    if (name === 'BoundText') {
+      out.push(
+        ...interpolationEdits(
+          source,
+          node.sourceSpan.start.offset,
+          node.sourceSpan.end.offset,
+        ),
+      );
+    }
+    if (name === 'Element' || name === 'Template') {
+      out.push(...boundInputEdits(node, source));
+    }
+    collectExpressions(children(node), source, out);
+  }
+}
+
 function children(node: any): any[] {
   return [
     ...(node.children ?? []),
@@ -233,7 +339,16 @@ function templateFound(source: string, file: string): Found[] {
   const parsed = parseTemplate(source, file, { preserveWhitespaces: true });
   const out: Found[] = [];
   collect(parsed.nodes, source, out);
-  return out;
+  const expressions: Found[] = [];
+  collectExpressions(parsed.nodes, source, expressions);
+  // Literals inside text or attributes already being moved get picked up on the next run.
+  const free = expressions.filter(
+    (item) =>
+      !out.some(
+        (o) => item.edit.start < o.edit.end && o.edit.start < item.edit.end,
+      ),
+  );
+  return [...out, ...free];
 }
 
 function walk(dir: string): string[] {

@@ -1,7 +1,3 @@
-import { TPipe } from '@pipes/t.pipe';
-import { TPluralPipe } from '@pipes/t-plural.pipe';
-import { FFTriggerTabsDirective } from '@ff/focus/ff-trigger-tabs.directive';
-import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -20,7 +16,9 @@ import { RowInfusedMaterialsComponent } from '@components/row-infused-materials/
 import { SFXDirective } from '@directives/sfx.directive';
 import { TeleportOutletDirective } from '@directives/teleport.outlet.directive';
 import { TutorialTargetDirective } from '@directives/tutorial-target.directive';
+import { FFTriggerTabsDirective } from '@ff/focus/ff-trigger-tabs.directive';
 import { ownedEquipmentItem } from '@helpers/hero/character-equipment.ui';
+import { t } from '@helpers/i18n/i18n';
 import { canModifyEquipment } from '@helpers/item/equipment';
 import {
   equipmentItemSlotCount,
@@ -36,11 +34,15 @@ import type {
   EquipmentPickerSource,
   WorkshopTabOption,
 } from '@interfaces';
+import { TPluralPipe } from '@pipes/t-plural.pipe';
+import { TPipe } from '@pipes/t.pipe';
 
 const WORKSHOP_TABS: WorkshopTabOption[] = [
   {
     id: 'infuse',
-    label: 'Infuse',
+    get label() {
+      return t('playKingdomWorkshop.infuse');
+    },
     icon: 'gameMagicPotion',
     tutorialTarget: 'kingdom-workshop-tab-infuse',
     isUnlocked: isInfusionUnlocked,
@@ -48,7 +50,9 @@ const WORKSHOP_TABS: WorkshopTabOption[] = [
   },
   {
     id: 'reforge',
-    label: 'Reforge',
+    get label() {
+      return t('playKingdomWorkshop.reforge');
+    },
     icon: 'gameAnvilImpact',
     tutorialTarget: 'kingdom-workshop-tab-reforge',
     isUnlocked: isReforgeUnlocked,
@@ -66,7 +70,6 @@ const WORKSHOP_TABS: WorkshopTabOption[] = [
     BlankSlateComponent,
     ButtonKingdomBackComponent,
     CardPageComponent,
-    DecimalPipe,
     PanelEquipmentPickerComponent,
     PanelKingdomWorkshopInfuseComponent,
     PanelKingdomWorkshopReforgeComponent,

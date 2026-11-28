@@ -1,3 +1,4 @@
+import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { TPipe } from '@pipes/t.pipe';
 import { contentShortName } from '@helpers/i18n/i18n-content';
 import { DecimalPipe } from '@angular/common';
@@ -17,7 +18,7 @@ import type { Character, JobContent, JobId } from '@interfaces';
 @Component({
   selector: 'app-label-job',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TPipe, DecimalPipe, IconSpecComponent],
+  imports: [ContentNamePipe, TPipe, DecimalPipe, IconSpecComponent],
   template: `
     @let jobData = job();
     @let node = spec();
@@ -27,7 +28,9 @@ import type { Character, JobContent, JobId } from '@interfaces';
           {{ 'labelJob.lv' | t: { level: (level() | number) } }}
         }
         @if (long()) {
-          {{ node ? specName() : jobData?.name }} ({{ jobData?.shorthand }})
+          {{ node ? specName() : (jobData | contentName) }} ({{
+            jobData?.shorthand
+          }})
         } @else {
           {{ jobData?.shorthand ?? 'JOB' }}
         }

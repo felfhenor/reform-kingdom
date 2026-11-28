@@ -1,3 +1,5 @@
+import { contentName, nodeNameText } from '@helpers/i18n/i18n-content';
+import { t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import { ContentDescriptionPipe } from '@pipes/content-description.pipe';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
@@ -150,7 +152,7 @@ export class PlayKingdomWorkersComponent {
     const status = entry.state.status;
     switch (status.kind) {
       case 'AtDuchy':
-        return 'At the Duchy';
+        return t('playKingdomWorkers.atTheDuchy');
       case 'Crafting':
         return this.craftingLabel(entry.id, status);
       case 'TravelingTo': {
@@ -159,11 +161,19 @@ export class PlayKingdomWorkersComponent {
           entry.state.location,
           status.ticksIntoStep,
         );
-        return `Traveling to ${status.nodeName} (${formatDuration(remaining)} remaining)`;
+        return t('playKingdomWorkers.travelingToRemaining', {
+          nodeName: status.nodeName,
+          remaining: formatDuration(remaining),
+        });
       }
       case 'Gathering': {
         const item = getEntry<ItemContent>(status.itemId);
-        return `At ${status.nodeName} (${status.itemsGathered}/${this.capacityDisplay()} ${item?.name ?? '???'})`;
+        return t('playKingdomWorkers.gatheringAt', {
+          nodeName: nodeNameText(status.nodeName),
+          gathered: status.itemsGathered,
+          capacity: this.capacityDisplay(),
+          item: item ? contentName(item) : '???',
+        });
       }
       case 'TravelingBack': {
         const remaining = travelTicksRemaining(
@@ -171,7 +181,9 @@ export class PlayKingdomWorkersComponent {
           entry.state.location,
           status.ticksIntoStep,
         );
-        return `Returning to the Duchy (${formatDuration(remaining)} remaining)`;
+        return t('playKingdomWorkers.returningToTheDuchy', {
+          remaining: formatDuration(remaining),
+        });
       }
     }
   });
@@ -181,10 +193,15 @@ export class PlayKingdomWorkersComponent {
     const status = entry.state.status;
     switch (status.kind) {
       case 'AtDuchy':
-        return { label: 'At the Duchy', locationEntry: kingdomNodeGet() };
+        return {
+          label: t('playKingdomWorkers.atTheDuchy'),
+          locationEntry: kingdomNodeGet(),
+        };
       case 'Crafting':
         return {
-          label: status.materialsHeld ? 'Crafting...' : 'Waiting for Materials',
+          label: status.materialsHeld
+            ? t('playKingdomWorkers.crafting')
+            : t('playKingdomWorkers.waitingForMaterials'),
           locationEntry: kingdomNodeGet(),
         };
       case 'TravelingTo': {
@@ -263,11 +280,15 @@ export class PlayKingdomWorkersComponent {
     status: WorkerStatusCrafting,
   ): string {
     const recipe = getEntry<RecipeContent>(status.recipeId);
-    const name = recipe?.name ?? '???';
-    if (!status.materialsHeld) return `Waiting for materials (${name})`;
+    const name = recipe ? contentName(recipe) : '???';
+    if (!status.materialsHeld)
+      return t('playKingdomWorkers.waitingForMaterials2', { name });
 
     const remaining = workerCraftRemainingTicks(workerId);
-    return `Crafting ${name} (${remaining !== undefined ? formatDuration(remaining) : '?'} remaining)`;
+    return t('playKingdomWorkers.craftingRemaining', {
+      name,
+      remaining: remaining !== undefined ? formatDuration(remaining) : '?',
+    });
   }
 
   public recall(): void {

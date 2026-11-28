@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import { FFFocusOnChangeDirective } from '@ff/focus/ff-focus-on-change.directive';
 import { NgTemplateOutlet } from '@angular/common';
@@ -56,7 +57,7 @@ export class PanelEquipmentPickerComponent {
   );
   public itemEnabled = input<(item: EquipmentItem) => boolean>(() => true);
   public itemMeta = input.required<TemplateRef<EquipmentPickerMetaContext>>();
-  public emptyArmoryText = input('No matching gear in the armory.');
+  public emptyArmoryText = input(t('panelEquipmentPicker.noMatchingGear'));
 
   public source = model<EquipmentPickerSource | undefined>(undefined);
   public selectedItemId = model<EquipmentItemId | undefined>(undefined);

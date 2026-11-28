@@ -266,7 +266,15 @@ export function combatDoCombatIteration(): void {
   runStatsCombatBegin();
 
   const escaped = combatStep(combat);
-  if (escaped) combatMessageLog(combat, t('combat.thePartyEscaped'));
+  if (escaped) {
+    combatMessageLog(
+      combat,
+      t('combat.thePartyEscaped'),
+      undefined,
+      undefined,
+      'escaped',
+    );
+  }
   gamestateFreezeSubtree(combat);
   updateGamestate((state) => {
     state.world.combat = escaped ? undefined : combat;
@@ -318,7 +326,7 @@ function combatBeginRound(combat: Combat): CombatTurn[] {
       : t('combat.round', { round: combat.rounds + 1 }),
     undefined,
     undefined,
-    !combat.ambushedBy,
+    combat.ambushedBy ? undefined : 'roundStart',
   );
   return combatRoundQueue(combat);
 }

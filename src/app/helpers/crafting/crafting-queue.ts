@@ -1,3 +1,4 @@
+import { contentName, contentNameById } from '@helpers/i18n/i18n-content';
 import { t } from '@helpers/i18n/i18n';
 import { recipeCraftTime } from '@helpers/crafting/recipe-craft-time';
 import { recipeKingdomRequirements } from '@helpers/crafting/recipe-requirements';
@@ -298,15 +299,22 @@ function logCraftedEquipment(
 ): void {
   if (outcome.kind !== 'Kept' && outcome.kind !== 'AutoSold') return;
 
-  const crafted = `${tradeskill} crafted ${ITEM_ICON_TOKEN}${equipmentDropHtml(outcome.content)}`;
+  const params = {
+    tradeskill: contentNameById(tradeskill) ?? tradeskill,
+    icon: ITEM_ICON_TOKEN,
+    equipment: equipmentDropHtml(outcome.content),
+  };
   const goldItem =
     outcome.kind === 'AutoSold'
       ? getEntry<ItemContent>(goldCoinId())
       : undefined;
   const message =
     outcome.kind === 'AutoSold' && goldItem
-      ? `${crafted} and automatically sold it for ${itemDropHtml(goldItem, outcome.goldEarned)}.`
-      : `${crafted}!`;
+      ? t('craftingQueue.craftedEquipmentAutoSold', {
+          ...params,
+          goldEarned: itemDropHtml(goldItem, outcome.goldEarned),
+        })
+      : t('craftingQueue.craftedEquipment', params);
 
   categoryMessageLog('Craft', tradeskill, message, {
     sprite: outcome.content.sprite,
@@ -321,7 +329,10 @@ function grantCraftResult(tradeskill: Tradeskill, recipe: RecipeContent): void {
     categoryMessageLog(
       'Craft',
       tradeskill,
-      t('craftingQueue.failedToCraft', { tradeskill, name: recipe.name }),
+      t('craftingQueue.failedToCraft', {
+        tradeskill: contentNameById(tradeskill) ?? tradeskill,
+        name: contentName(recipe),
+      }),
     );
     return;
   }
@@ -344,7 +355,7 @@ function grantCraftResult(tradeskill: Tradeskill, recipe: RecipeContent): void {
         'Craft',
         tradeskill,
         t('craftingQueue.crafted', {
-          tradeskill,
+          tradeskill: contentNameById(tradeskill) ?? tradeskill,
           icon: ITEM_ICON_TOKEN,
           quantity: itemDropHtml(item, quantity),
         }),
@@ -371,7 +382,7 @@ function grantCraftResult(tradeskill: Tradeskill, recipe: RecipeContent): void {
       'Craft',
       tradeskill,
       t('craftingQueue.crafted2', {
-        tradeskill,
+        tradeskill: contentNameById(tradeskill) ?? tradeskill,
         icon: ITEM_ICON_TOKEN,
         collectible: collectibleDropHtml(collectible),
       }),

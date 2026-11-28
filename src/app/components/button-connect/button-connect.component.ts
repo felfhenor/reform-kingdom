@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { Component } from '@angular/core';
 import { ModalChangelogComponent } from '@components/modal-changelog/modal-changelog.component';
 import { ModalCreditsComponent } from '@components/modal-credits/modal-credits.component';
@@ -39,6 +40,7 @@ export class ButtonConnectComponent {
   public readonly externalLinks = [
     {
       name: 'Discord',
+      label: t('buttonConnect.discord'),
       link: 'https://discord.felfhenor.com',
       color: '#5865f2',
       currentColor: '#ccc',
@@ -47,6 +49,7 @@ export class ButtonConnectComponent {
     },
     {
       name: 'Blog',
+      label: t('buttonConnect.blog'),
       link: 'https://blog.felfhenor.com',
       color: '#e37418',
       currentColor: '#ccc',
@@ -54,6 +57,7 @@ export class ButtonConnectComponent {
     },
     {
       name: 'Email',
+      label: t('buttonConnect.email'),
       link: 'mailto:support@felfhenor.com',
       color: '#ce00ce',
       currentColor: '#ccc',

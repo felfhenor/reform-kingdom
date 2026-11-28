@@ -1,9 +1,10 @@
+import { t } from '@helpers/i18n/i18n';
 import type { GameState } from '@interfaces';
 import { isPlainObject } from 'es-toolkit';
 
 // Only checks fields every save has had since the first release, so old-but-migratable saves still pass.
 export function savefileValidationErrors(state: unknown): string[] {
-  if (!isPlainObject(state)) return ['The savefile is not a game state.'];
+  if (!isPlainObject(state)) return [t('savefileValidate.theSavefileIsNot')];
 
   const errors: string[] = [];
 
@@ -20,7 +21,7 @@ export function savefileValidationErrors(state: unknown): string[] {
   if (!isPlainObject(world)) {
     errors.push('World data is missing.');
   } else if (world['party'] !== undefined && !Array.isArray(world['party'])) {
-    errors.push('Party data is corrupt.');
+    errors.push(t('savefileValidate.partyDataIsCorrupt'));
   }
 
   return errors;

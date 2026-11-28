@@ -1,3 +1,4 @@
+import { i18nLabels } from '@helpers/i18n/i18n';
 import { getEntriesByType } from '@helpers/content/content';
 import { exchangeEdictRewardCollectibleIds } from '@helpers/exchange/exchange';
 import { isCollectibleDiscovered } from '@helpers/item/collectibles';
@@ -38,11 +39,7 @@ import { WORLD_NODE_TYPE_BY_CONTENT_TYPE } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
 
 const REMEMBRANCE_DEVELOPMENT_NAMES: Record<WorldNodeDevelopableType, string> =
-  {
-    shrine: 'Shrine Development',
-    outpost: 'Outpost Development',
-    gathering: 'Gather Location Development',
-  };
+  i18nLabels('remembrance.developmentName', ['shrine', 'outpost', 'gathering']);
 
 function findable<T extends { id: string; unobtainable?: boolean }>(
   entries: T[],

@@ -44,11 +44,13 @@ export type CombatLog = {
   spritesheet?: 'guardian' | 'hero';
   sprite?: string;
   combatants?: CombatLogCombatantSnapshot[];
-  // Marks a round's first line, so views can count rounds whatever language it was logged in.
-  roundStart?: boolean;
+  // Lets views find round starts and outcomes whatever language the line was logged in.
+  marker?: CombatLogMarker;
   // The Nth `ITEM_ICON_TOKEN` in the message renders the Nth icon here.
   itemIcons?: CombatLogIcon[];
   // Legacy single-icon fields - still read so entries saved before `itemIcons` keep their icon.
   itemSprite?: string;
   itemSpritesheet?: AtlasedImage;
 };
+
+export type CombatLogMarker = 'roundStart' | 'won' | 'escaped';

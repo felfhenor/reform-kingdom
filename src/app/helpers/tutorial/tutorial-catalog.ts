@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { heroesSelectCharacter } from '@helpers/engine/ui';
 import { partyFirstBurstSkillHero } from '@helpers/hero/job';
 import { partyFirstHeroWithFreeSp } from '@helpers/hero/skill-tree';
@@ -7,158 +8,232 @@ import type { TutorialDefinition } from '@interfaces';
 export const TUTORIAL_CATALOG: TutorialDefinition[] = [
   {
     id: 'main-ui',
-    name: 'Getting Started',
+    get name() {
+      return t('tutorial.mainUi.name');
+    },
     trigger: { kind: 'game-start' },
     steps: [
       {
         targetKey: 'nav-world',
         view: 'world',
-        title: 'World',
-        body: 'Your party explores the map here - travel between locations, gather materials, and fight encounters.',
+        get title() {
+          return t('tutorial.mainUi.world');
+        },
+        get body() {
+          return t('tutorial.mainUi.yourPartyExploresThe');
+        },
       },
       {
         targetKey: 'nav-kingdom',
         view: 'kingdom',
-        title: 'Kingdom',
-        body: 'Manage your storage, crafting buildings, armory, and other kingdom facilities from here.',
+        get title() {
+          return t('tutorial.mainUi.kingdom');
+        },
+        get body() {
+          return t('tutorial.mainUi.manageYourStorageCrafting');
+        },
       },
       {
         targetKey: 'nav-heroes',
         view: 'heroes',
-        title: 'Heroes',
-        body: 'Review your party equipment/skills, equip gear, give your heroes orders.',
+        get title() {
+          return t('tutorial.mainUi.heroes');
+        },
+        get body() {
+          return t('tutorial.mainUi.reviewYourPartyEquipment');
+        },
       },
       {
         targetKey: 'nav-adventurelog',
         view: 'adventurelog',
-        title: 'Adventure Log',
-        body: 'A record of everything your party and kingdom has done - combat, travel, gathering, and crafting.',
+        get title() {
+          return t('tutorial.mainUi.adventureLog');
+        },
+        get body() {
+          return t('tutorial.mainUi.aRecordOfEverything');
+        },
       },
     ],
   },
   {
     id: 'losing-streak',
-    name: 'Struggling?',
+    get name() {
+      return t('tutorial.losingStreak.name');
+    },
     trigger: { kind: 'losing-streak', losses: 3, belowLevel: 10 },
     repeatable: true,
     steps: [
       {
-        title: 'Struggling?',
-        body: "You might be underpowered, underleveled, or both, for the creatures you're trying to face in combat. You should seek out crafting materials, craft items using the Kingdom tradeskills, and boost your overall power first!",
+        get title() {
+          return t('tutorial.losingStreak.name');
+        },
+        get body() {
+          return t('tutorial.losingStreak.youMightBeUnderpowered');
+        },
       },
     ],
   },
   {
     id: 'workers',
-    name: 'Workers',
+    get name() {
+      return t('tutorial.workers.name');
+    },
     trigger: { kind: 'first-worker' },
     steps: [
       {
         targetKey: 'kingdom-subview-workers',
         view: 'kingdom',
         subview: 'workers',
-        title: 'Workers',
-        body: 'Rescued workers can be assigned to gather materials automatically and independently of your party. They can level up to reach further out locations, too!',
+        get title() {
+          return t('tutorial.workers.name');
+        },
+        get body() {
+          return t('tutorial.workers.rescuedWorkersCanBe');
+        },
       },
     ],
   },
   {
     id: 'infusion',
-    name: 'Infusion',
+    get name() {
+      return t('tutorial.infusion.name');
+    },
     trigger: { kind: 'first-infusion-material' },
     steps: [
       {
         targetKey: 'kingdom-workshop-tab-infuse',
         view: 'kingdom',
         subview: 'workshop',
-        title: 'Infusion',
-        body: 'Here you can infuse your equipment with materials found on your travels to increase your exploration and combat power!',
+        get title() {
+          return t('tutorial.infusion.name');
+        },
+        get body() {
+          return t('tutorial.infusion.hereYouCanInfuse');
+        },
       },
     ],
   },
   {
     id: 'reforge',
-    name: 'Reforge',
+    get name() {
+      return t('tutorial.reforge.name');
+    },
     trigger: { kind: 'first-reforge-reagent' },
     steps: [
       {
         targetKey: 'kingdom-workshop-tab-reforge',
         view: 'kingdom',
         subview: 'workshop',
-        title: 'Reforge',
-        body: 'Here you can reforge your gear by spending gold and Duskhall Flux to reroll the affixes on a piece of equipment!',
+        get title() {
+          return t('tutorial.reforge.name');
+        },
+        get body() {
+          return t('tutorial.reforge.hereYouCanReforge');
+        },
       },
     ],
   },
   {
     id: 'decree',
-    name: 'Decree',
+    get name() {
+      return t('tutorial.decree.name');
+    },
     trigger: { kind: 'party-level', level: 5 },
     steps: [
       {
         targetKey: 'nav-decree',
         view: 'decree',
-        title: 'Decree',
-        body: 'The Decree allows you to tell your hero party how to explore the world, what items to gather, and what dungeons to farm for loot. There are other orders you can specify too - be sure to check them out! For the decree to be active, you must turn auto mode ON!',
+        get title() {
+          return t('tutorial.decree.name');
+        },
+        get body() {
+          return t('tutorial.decree.theDecreeAllowsYou');
+        },
       },
     ],
   },
   {
     id: 'combat-orders',
-    name: 'Combat Orders',
+    get name() {
+      return t('tutorial.combatOrders.name');
+    },
     trigger: { kind: 'party-level', level: 3 },
     steps: [
       {
         targetKey: 'hero-combat-orders',
         view: 'heroes',
-        title: 'Combat Orders',
-        body: 'Each hero has a set of combat orders that you can use to loosely guide their actions in combat.',
+        get title() {
+          return t('tutorial.combatOrders.name');
+        },
+        get body() {
+          return t('tutorial.combatOrders.eachHeroHasA');
+        },
       },
     ],
   },
   {
     id: 'town',
-    name: 'Town',
+    get name() {
+      return t('tutorial.town.name');
+    },
     trigger: { kind: 'first-town-visit' },
     steps: [
       {
         targetKey: 'game-play-town',
         view: 'town',
-        title: 'Town',
-        body: "Towns have their own shop, commissions, and crafting. As you build reputation, they'll offer you more perks.",
+        get title() {
+          return t('tutorial.town.name');
+        },
+        get body() {
+          return t('tutorial.town.townsHaveTheirOwn');
+        },
       },
     ],
   },
   {
     id: 'commissions',
-    name: 'Commissions',
+    get name() {
+      return t('tutorial.commissions.name');
+    },
     trigger: { kind: 'first-caravan-visit' },
     steps: [
       {
         targetKey: 'kingdom-subview-commissions',
         view: 'kingdom',
         subview: 'commissions',
-        title: 'Commissions',
-        body: 'Caravans are all over the world, selling items and offering commissions. Complete their commissions to earn Trader Scrip, a currency you can use to unlock more permanent rewards.',
+        get title() {
+          return t('tutorial.commissions.name');
+        },
+        get body() {
+          return t('tutorial.commissions.caravansAreAllOver');
+        },
       },
     ],
   },
   {
     id: 'teachings',
-    name: 'Teachings',
+    get name() {
+      return t('tutorial.teachings.name');
+    },
     trigger: { kind: 'first-trainer-visit' },
     steps: [
       {
         targetKey: 'hero-teachings',
         view: 'heroes',
-        title: 'Teachings',
-        body: 'Trainers around the world teach permanent upgrades to your heroes. Each teaching is learned per hero, per job, and applies to every job the hero has unlocked.',
+        get title() {
+          return t('tutorial.teachings.name');
+        },
+        get body() {
+          return t('tutorial.teachings.trainersAroundTheWorld');
+        },
       },
     ],
   },
   {
     id: 'burst-skills',
-    name: 'Burst Skills',
+    get name() {
+      return t('tutorial.burstSkills.name');
+    },
     trigger: { kind: 'first-burst-skill' },
     steps: [
       {
@@ -168,14 +243,20 @@ export const TUTORIAL_CATALOG: TutorialDefinition[] = [
           const hero = partyFirstBurstSkillHero(worldPartyState());
           if (hero) heroesSelectCharacter(hero.id);
         },
-        title: 'Burst Skills',
-        body: 'This hero has learned a burst skill - a powerful special attack. Each hero can slot one burst skill per job here, and it will be used in combat alongside their normal skills.',
+        get title() {
+          return t('tutorial.burstSkills.name');
+        },
+        get body() {
+          return t('tutorial.burstSkills.thisHeroHasLearned');
+        },
       },
     ],
   },
   {
     id: 'skill-trees',
-    name: 'Skill Trees',
+    get name() {
+      return t('tutorial.skillTrees.name');
+    },
     trigger: { kind: 'first-skill-point' },
     steps: [
       {
@@ -186,8 +267,12 @@ export const TUTORIAL_CATALOG: TutorialDefinition[] = [
           const hero = partyFirstHeroWithFreeSp(worldPartyState());
           if (hero) heroesSelectCharacter(hero.id);
         },
-        title: 'Skill Trees',
-        body: 'This hero has skill points to spend. Heroes earn skill points when they level up. They can be spent in the skill tree on new skills, abilities and a specialization.',
+        get title() {
+          return t('tutorial.skillTrees.name');
+        },
+        get body() {
+          return t('tutorial.skillTrees.thisHeroHasSkill');
+        },
       },
     ],
   },

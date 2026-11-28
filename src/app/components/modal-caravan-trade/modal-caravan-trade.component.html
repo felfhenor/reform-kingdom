@@ -4,7 +4,9 @@
   [allowEscToClose]="true"
   [closeOnBackdropClick]="true"
 >
-  <span title>{{ (trader() | contentName) || 'Trader' }}</span>
+  <span title>
+    {{ (trader() | contentName) || ('modalCaravanTrade.trader' | t) }}
+  </span>
 
   @if (trader(); as traderContent) {
     <p subtitle>{{ traderContent | contentDescription }}</p>

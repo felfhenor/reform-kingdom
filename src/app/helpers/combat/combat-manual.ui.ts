@@ -220,22 +220,24 @@ function combatManualAutoTargetLabel(
   skill: EquipmentSkill,
 ): string {
   const tech = skillOwnTechniques(skill)[0];
-  if (!tech || tech.targetType === 'Self') return 'Self';
-  if (skill.delay > 0) return 'Picked when it fires';
+  if (!tech || tech.targetType === 'Self') return t('combatManual.self');
+  if (skill.delay > 0) return t('combatManual.pickedWhenItFires');
 
   const base = unconfusedPool(combat, hero, skill, tech);
   const taunter = foeTaunters(hero, base)[0];
-  if (taunter) return `${combatantDisplayName(taunter)} (taunting)`;
-  if (base.length === 1) return `${combatantDisplayName(base[0])} (auto)`;
+  if (taunter)
+    return t('combatManual.taunting', { name: combatantDisplayName(taunter) });
+  if (base.length === 1)
+    return t('combatManual.auto', { name: combatantDisplayName(base[0]) });
 
   const group =
     tech.targetType === 'Allies'
-      ? 'Party'
+      ? t('combatManual.party')
       : tech.targetType === 'Enemies'
-        ? 'All Enemies'
-        : 'Everyone';
+        ? t('combatManual.allEnemies')
+        : t('combatManual.everyone');
   return base.length < skillTechniqueNumTargets(skill, tech)
-    ? `${group} (auto)`
+    ? t('combatManual.auto', { name: group })
     : group;
 }
 
@@ -245,13 +247,17 @@ function combatManualDisabledReason(
   skill: EquipmentSkill,
 ): string | undefined {
   if (combatManualSkillUsable(combat, hero, skill)) return undefined;
-  if (hero.ep < combatCombatantSkillEpCost(hero, skill)) return 'Not Enough EP';
-  if (combatantSkillOnCooldown(hero, skill)) return 'Cooling Down';
-  if (combatantSkillCharging(hero, skill)) return 'Charging';
+  if (hero.ep < combatCombatantSkillEpCost(hero, skill))
+    return t('combatManual.notEnoughEp');
+  if (combatantSkillOnCooldown(hero, skill))
+    return t('combatManual.coolingDown');
+  if (combatantSkillCharging(hero, skill)) return t('combatManual.charging');
   const hasTargets = skillOwnTechniques(skill).some(
     (tech) => unconfusedPool(combat, hero, skill, tech).length > 0,
   );
-  return hasTargets ? 'Unavailable' : 'No Valid Targets';
+  return hasTargets
+    ? t('combatManual.unavailable')
+    : t('combatManual.noValidTargets');
 }
 
 export function combatManualSkillOptions(

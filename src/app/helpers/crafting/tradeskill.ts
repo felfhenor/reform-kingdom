@@ -1,3 +1,4 @@
+import { contentNameById } from '@helpers/i18n/i18n-content';
 import { t } from '@helpers/i18n/i18n';
 import { categoryMessageLog } from '@helpers/combat/combat-log';
 import {
@@ -197,7 +198,10 @@ export function tradeskillGainXp(tradeskill: Tradeskill, amount: number): void {
     categoryMessageLog(
       'Craft',
       tradeskill,
-      t('tradeskill.reachedLevel', { tradeskill, newLevel }),
+      t('tradeskill.reachedLevel', {
+        tradeskill: contentNameById(tradeskill) ?? tradeskill,
+        newLevel,
+      }),
     );
     analyticsSendDesignEvent(
       `Kingdom:Building:LevelUp:${analyticsSafeSegment(tradeskill)}`,

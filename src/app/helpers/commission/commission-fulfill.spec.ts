@@ -213,7 +213,7 @@ describe('commissionFulfill', () => {
     expect(taskEventWorkerRescued).toHaveBeenCalledWith(nell.id);
     expect(combatLog()[0]).toEqual(
       expect.objectContaining({
-        locationName: 'Duchy Trading Caravan Carrina',
+        locationName: 'Duchy Trading Caravan - Carrina',
         message: expect.stringMatching(
           /^You got @@icon@@2x .*Trader Token.*, @@icon@@.*Medal.*, @@icon@@Nell from turning in "Bundle of Wergen Sticks"!$/,
         ),

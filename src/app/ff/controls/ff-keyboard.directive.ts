@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { Directive, ElementRef, inject } from '@angular/core';
 import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
 import { FF_TEXT_KEYBOARD } from '@ff/input/ff-tokens';
@@ -15,7 +16,7 @@ export class FFKeyboardDirective {
     ffGamepadOn('confirm', () => void keyboard(host.getBoundingClientRect()), {
       element: host,
       enabled: () => document.activeElement === host,
-      label: 'Type',
+      label: t('gamepad.type'),
     });
   }
 }

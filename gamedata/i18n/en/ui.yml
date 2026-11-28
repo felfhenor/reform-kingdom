@@ -10,6 +10,7 @@ loading:
   music: Loading music...
   save: Loading your save...
   kingdom: Preparing your kingdom...
+  ready: Ready
 combat:
   round: _Combat round {{ round }}._
   ambush: '**{{ ambusher }}** sprung an ambush!'
@@ -71,6 +72,9 @@ mods:
   modInstalled: Mod installed.
   couldNotAddThat: Could not add that mod. {{ failures }}
   wasAddedToYour: '{{ name }} was added to your current run.'
+  modsFolder: Mods Folder
+  imported: Imported
+  installed: Installed
 duration:
   shortHours: '{{ count }}h'
   shortMinutes: '{{ count }}m'
@@ -126,6 +130,8 @@ statusEffect:
   turnsRemaining:
     one: turn remaining
     other: turns remaining
+  dataLabel:
+    isFrozen: Frozen (cannot act)
 armory:
   sellItems:
     one: Sell {{ count }} item
@@ -133,6 +139,9 @@ armory:
   equippedItems:
     one: Equipped {{ count }} item.
     other: Equipped {{ count }} items.
+  piecesOfEquipment:
+    one: '{{ count }} piece of equipment'
+    other: '{{ count }} pieces of equipment'
 kingdomHome:
   materialsStored:
     one: '{{ count }} material stored'
@@ -155,12 +164,30 @@ legacy:
     one: '{{ count }} edict'
     other: '{{ count }} edicts'
   legacy: Legacy
-  middot: '{{ endedAt }} ·'
-  middot2: '·'
   noEdicts: No edicts
   modded: Modded
   noRunsInYour: No runs in your Legacy yet.
   couldNotSaveThis: Could not save this run to your Legacy, so it was not ended.
+  runComplete: Run Complete
+  runLost: Run Lost
+  runAbandoned: Run Abandoned
+  award:
+    mostDamage: Most Damage
+    mostHealing: Most Healing
+    mostDamageTaken: Most Damage Taken
+    mostDeaths: Most Deaths
+    biggestHit: Biggest Hit
+    mostCrits: Most Crits
+  heroStat:
+    kills: Kills
+    damageDealt: Damage Dealt
+    damageTaken: Damage Taken
+    healing: Healing
+    damageBlocked: Damage Blocked
+    crits: Crits
+    statusEffectsApplied: Status Effects Applied
+    deaths: Deaths
+    fights: Fights
 skillTree:
   oath: Oath
   pendingDiscarded:
@@ -191,6 +218,18 @@ autoMode:
   idle: Idle
 element:
   charges: '{{ count }} {{ element }}'
+  resistLabel:
+    Fire: Fire Resist
+    Water: Water Resist
+    Earth: Earth Resist
+    Air: Air Resist
+  boonLabel:
+    Fire: Fire Boon
+    Water: Water Boon
+    Earth: Earth Boon
+    Air: Air Boon
+  costsCharge: Costs a {{ element }} charge
+  generatesCharge: Generates a {{ element }} charge
 presence:
   paused: Paused · {{ text }}
   MainMenu: In Main Menu
@@ -230,6 +269,7 @@ combatOrder:
     noSummon: if I have no summon
     elementCount: if {{ element }} charges {{ comparator }} {{ count }}
     heroHealth: if {{ hero }}'s Health {{ comparator }} {{ value }}%
+  unknownHero: Unknown Hero
 decree:
   gather: Gather {{ item }} until {{ quantity }} in storage
   gatherFrom: Gather {{ item }} from {{ node }} until {{ quantity }} in storage
@@ -242,6 +282,9 @@ decree:
   autoFarm: Farm {{ node }} until the party leaves
   someMaterials: materials
   someReward: reward
+  failuresInARow:
+    one: '{{ count }} failure in a row'
+    other: '{{ count }} failures in a row'
 lootFilter:
   nothingSold: Nothing is automatically sold. Everything found or crafted goes into your armory.
   summary: From {{ sources }}, {{ rules }} will be automatically sold.
@@ -365,19 +408,53 @@ enum:
   lootSource:
     Combat: Combat
     Crafting: Crafting
-  statShort:
-    Agility: AGI
-    Energy: EP
-    Health: HP
-    Intelligence: INT
-    Luck: LUK
-    Resistance: RES
-    Strength: STR
-    Vitality: VIT
-    Spirit: SPR
-    Constitution: CON
+  skillTreeNodeKind:
+    Skill: Skill
+    Burst Skill: Burst Skill
+    Job Ability: Job Ability
+    Skill Modifier: Skill Modifier
+    Specialization: Specialization
+    Perk: Perk
+  skillTreeRow:
+    Abilities: Abilities
+    Weapon Arts: Weapon Arts
+    Shield Arts: Shield Arts
+    Swashbuckler: Swashbuckler
+    Bastion: Bastion
+    Marksmanship: Marksmanship
+    Nature: Nature
+    Stalker: Stalker
+    Wayfinder: Wayfinder
+    Fieldcraft: Fieldcraft
+    Fortune: Fortune
+    Treasure Hunter: Treasure Hunter
+    Dungeon Delver: Dungeon Delver
+    Evocation: Evocation
+    Spellweaving: Spellweaving
+    Arcanist: Arcanist
+    Celestar: Celestar
+    Restoration: Restoration
+    Divine Might: Divine Might
+    Lifegiver: Lifegiver
+    Templar: Templar
+  rewardKind:
+    Item: Item
+    Equipment: Equipment
+    Collectible: Collectible
+    Recipe: Recipe
+    Worker: Worker
+  equipmentSlot:
+    Armor: Armor
+    Helmet: Helmet
+    Weapon: Weapon
+    Offhand: Offhand
+    Ring: Ring
+    Accessory: Accessory
+    Artifact: Artifact
+    Ammo: Ammo
 badgeSkillPoints:
   sp: '{{ sp }} SP'
+  spAvailable: '{{ sp }} SP available'
 bannerAnalyticsConsent:
   helpUsImproveThe: 'Help us improve the game by opting into analytics. Analytics are not tied to your email or any identifying information. What is collected: events related to game progress, discoveries, and in-game actions.'
   optIn: Opt In
@@ -403,6 +480,14 @@ buttonRunEnd:
   finishThisRun: Finish This Run
   endRun: End Run
   noKeepPlaying: No, keep playing
+  finishRun: Finish Run
+  abandonRun: Abandon Run
+  finishThisRun2: Finish This Run?
+  abandonThisRun: Abandon This Run?
+  thisRunIsAdded: This run is added to your Legacy as completed, and your savefile is reset so you can start a new one.
+  thisRunIsAdded2: This run is added to your Legacy as abandoned, and your savefile is reset. This cannot be undone.
+  yesFinishRun: Yes, finish run
+  yesAbandonRun: Yes, abandon run
 buttonSavefileExport:
   export: Export
 buttonSavefileImport:
@@ -457,6 +542,7 @@ cardStatusWorkerIdle:
 cardStatusWorkerLevelup:
   readyToLevelUp: Ready to Level Up
   needGold: Need {{ cost }} gold
+  level: Lv. {{ level }}
 cardVictory:
   theKingdomRemembers: The Kingdom Remembers
   youHaveReachedThe: You have reached the end of the story.
@@ -519,11 +605,30 @@ gamePlayDecree:
   removeThisClause: Remove This Clause?
   yesRemoveIt: Yes, remove it
   noKeepIt: No, keep it
+  theDuchy: the Duchy
+  gatherMaterial: Gather Material
+  gatherFromLocation: Gather from Location
+  farmLocation: Farm Location
+  farmMaterial: Farm Material
+  finishUnfinishedAreas: Finish Unfinished Areas
+  levelUpParty: Level Up Party
+  defendTowns: Defend Towns
+  low: Low
+  medium: Medium
+  high: High
+  highRiskDescription: Attempt encounters up to {{ levels }} levels above the party's weakest hero - the riskiest fights Auto Mode will ever pick on its own.
+  editClause: Edit Clause
+  addClause: Add Clause
+  save: Save
+  add: Add
+  lowRiskDescription: Only target locations with a max level at or below the party's level.
+  mediumRiskDescription: Target locations with at least a minimum level of the party's level.
 gamePlayHeroes:
   heroes: Heroes
   optimizeAll: Optimize All
   optimizingYourEquipmentWill: Optimizing your equipment will automatically equip the best equipment for each hero, based on their class and the stat priorities that class has.
   noHeroesYet: No heroes yet.
+  optimizeAllOfYour: Optimize all of your heroes' gear. This cannot be done in combat.
 gamePlayTown:
   lv: Lv. {{ level }} {{ scaleType }}
 gamePlayWorld:
@@ -535,10 +640,16 @@ modalAchievements:
   achievements: Achievements
   unlocked: Unlocked {{ unlockedAt }}
   viewRun: View Run
+  hidden: Hidden
 modalCaravanTrade:
   thisTraderHasNothing: This trader has nothing in stock right now.
   thisMerchantWillBe: This merchant will be leaving in {{ label }}.
   youBought: You bought {{ name }}!
+  youBought2: You bought {{ name }}!
+  youSold: You sold {{ name }}!
+  trader: Trader
+  youBoughtQuantity: You bought {{ name }} x{{ quantity }}!
+  youSoldQuantity: You sold {{ name }} x{{ quantity }}!
 modalChangelog:
   changelog: Changelog
   recent: Recent
@@ -549,6 +660,7 @@ modalExchangeNode:
   gemsInExtraSockets: Gems in extra sockets will be lost.
   accepts: 'Accepts:'
   someOfYourHeroes: Some of your heroes are wearing gear that could be exchanged here. Unequip it first.
+  exchange: Exchange
 modalHeroBurstSkills:
   burstSkill: Burst Skill
   unset: Unset
@@ -594,6 +706,8 @@ modalPlayKingdomReclass:
   cost: 'Cost:'
   reclassAll: Reclass All
   reclassAllChangedHeroes: Reclass All Changed Heroes?
+  reclassAllWarning: Any hero whose class you changed will be reclassed and their equipment will be unequipped. This action will cost {{ cost }} gold.
+  reclassAllWarningUnsavedRegalia: Any hero whose class you changed will be reclassed and their equipment will be unequipped. This action will cost {{ cost }} gold. Some heroes have unsaved regalia changes.
 modalRaidDefense:
   requestedDefenses: Requested Defenses
   noTownsCurrentlyNeed: No towns currently need defending.
@@ -621,13 +735,17 @@ modalTownMaterialSale:
   materialSales: '{{ town }} Material Sales'
   thisTownHasNothing: This town has nothing to sell right now.
   youBought: You bought {{ name }}{{ qtyLabel }}!
+  town: Town
 modalTradeQuantity:
   'yes': 'Yes'
   cancel: Cancel
   confirm: Confirm
+  andTraderScrip: '{{ gold }} and {{ scrip }} Trader Scrip'
+  howManyWouldYou: How many {{ name }} would you like to {{ verb }}? ({{ price }} each)
 modalTrainerVisit:
   train: Train
   thisTrainerDoesnT: This trainer doesn't teach {{ selectedJobName }} heroes.
+  trainer: Trainer
 navbar:
   world1: World [1]
   world: World
@@ -657,6 +775,9 @@ navbar:
   gamePaused: Game Paused
   resume: Resume
   quitToMainMenu: Quit to Main Menu
+  switchView: Switch View
+  resumeGameSpace: Resume Game [SPACE]
+  pauseGameSpace: Pause Game [SPACE]
 optionWorldNode:
   lv: Lv. {{ levelLabel }}
 overlayCombatOrders:
@@ -675,17 +796,29 @@ pagePagedGrid:
   page: Page
   page2: Page {{ page }} / {{ totalPages }}
   nextPage: Next Page
+  searchByNameOr: Search by name or description...
+  noResultsFound: No results found.
 panelCombatScene:
   round: Round {{ rounds }}
   round2: Round {{ round }}
   self: Self
   ep: '{{ epCost }} EP'
+  youLostTheFight: You lost the fight.
+  pickATargetFor: Pick a target for {{ name }}'s {{ name2 }}.
+  chooseASkillFor: Choose a skill for {{ name }}.
+  victory: Victory!
+  combatOver: Combat Over
+  thePartyEscaped: The party escaped.
+  theGameIsPaused: The game is paused.
 panelEquipmentPicker:
   heroes: Heroes
   armory: Armory
   unequippedGear: Unequipped Gear
   thisHeroHasNothing: This hero has nothing equipped.
   selectAHeroOr: Select a hero or the armory.
+  armoryItems: Armory Items
+  equippedItems: Equipped Items
+  noMatchingGear: No matching gear in the armory.
 panelHeroBurstSkills:
   ep: '{{ skill }} EP'
   chosen: Chosen
@@ -714,6 +847,28 @@ panelHeroCombatOrders:
   removeThisClause: Remove This Clause?
   yesRemoveIt: Yes, remove it
   noKeepIt: No, keep it
+  always: Always
+  myHealth: My Health %
+  myEnergy: My Energy %
+  allyCountVsHealth: Ally Count vs Health %
+  enemyCountVsHealth: Enemy Count vs Health %
+  specificHeroHealth: Specific Hero Health %
+  iHaveNoSummon: I Have No Summon
+  elementCharges: Element Charges
+  below: below
+  above: above
+  skillSDefaultTargeting: Skill's default targeting
+  random: Random
+  strongestHighestHp: Strongest (Highest HP)
+  weakestLowestHp: Weakest (Lowest HP)
+  self: Self
+  specificHero: Specific Hero
+  matchingAllies: Matching Allies
+  matchingEnemies: Matching Enemies
+  editOrder: Edit Order
+  addOrder: Add Order
+  save: Save
+  add: Add
 panelHeroEquipment:
   updateThisRegaliaTo: Update this regalia to match this hero.
   update: Update
@@ -731,11 +886,19 @@ panelHeroEquipment:
   itWillBeOverwritten: It will be overwritten with this hero's current gear, combat orders and burst skill.
   yesUpdateIt: Yes, update it
   cancel: Cancel
+  someOfThisRegalia: Some of this regalia's gear is unavailable.
+  currentRegalia: Current regalia.
+  promoteAHeroTo: Promote a hero to be higher in the party order. This must be done at the Duchy.
+  demoteAHeroTo: Demote a hero to be lower in the party order. This must be done at the Duchy.
+  optimizeThisHerosGear: Optimize this hero's gear. This cannot be done in combat.
+  changeTheBurstSkill: Change the burst skill for this hero. This cannot be done in combat.
 panelHeroEquipmentEquipment:
   gear: Gear
   unequip: Unequip
   noEquippableItemsAvailable: No equippable items available for this slot.
   selectASlotTo: Select a slot to see available gear.
+  unequipThisItemFrom: Unequip this item from this hero. This cannot be done in combat.
+  equipThisItemTo: Equip this item to this hero. This cannot be done in combat.
 panelHeroEquipmentSkills:
   yourHeroSCombat: Your hero's Combat Orders will not allow them to use this skill.
   burstSkill: Burst Skill
@@ -769,6 +932,8 @@ panelHeroesSkillTreeGrid:
 panelKingdomNav:
   kingdomNavigation: Kingdom Navigation
   kingdom: Kingdom
+  lvItemsCraftingRemaining: '{{ label }} Lv. {{ level }} ({{ units }} items crafting, {{ remaining }} remaining)'
+  idleWorkers: '{{ label }} ({{ idle }} idle)'
 panelKingdomWorkersAssignmentCraft:
   crafting: Crafting
   onReturn: On Return
@@ -797,6 +962,12 @@ panelKingdomWorkersAssignmentNode:
   owned: 'Owned: {{ owned }}'
   howMany: How Many
   confirm: Confirm
+  howManyToGather: How many to gather. Leave blank or 0 to repeat forever.
+  howManyToFight: How many to fight for. Leave blank or 0 to repeat forever.
+  gathering: Gathering
+  combat: Combat
+  selectAGatherLocation: Select a gather location...
+  selectACombatLocation: Select a combat location...
 panelKingdomWorkshopInfuse:
   infuse: Infuse
   infuseSlot: Infuse Slot {{ slotIndex }}
@@ -807,6 +978,11 @@ panelKingdomWorkshopInfuse:
   infuseThisSlot: Infuse This Slot?
   yesInfuseIt: Yes, infuse it
   cancel: Cancel
+  thisSlotIsAlready: '{{ base }} This slot is already infused - doing this will replace it, and the existing items will not be refunded.'
+  equippedGearCannotBe: Equipped gear cannot be infused in combat.
+  selectASlotTo: Select a slot to choose what to infuse into it.
+  infuseForCost: Infuse {{ material }} for {{ cost }}g?
+  thisMaterial: this material
 panelKingdomWorkshopReforge:
   reforge: Reforge
   affixes: Affixes
@@ -817,6 +993,9 @@ panelKingdomWorkshopReforge:
   reforgeThisItem: Reforge This Item?
   yesReforgeIt: Yes, reforge it
   cancel: Cancel
+  equippedGearCannotBe: Equipped gear cannot be reforged in combat.
+  rerollDestroysGems: Its affixes will be rerolled and the current ones lost. Gems in sockets added by affixes may be destroyed; other infusions are kept.
+  rerollKeepsInfusions: Its affixes will be rerolled and the current ones lost. Infusions are kept.
 panelMapNode:
   continuouslyFarmThisLocation: Continuously farm this location until your party leaves.
   autoFarm: Auto Farm
@@ -828,6 +1007,7 @@ panelMapNode:
   visit: Visit
   youPrayAtThe: You pray at the shrine!
   isNowYourHome: '{{ nodeName }} is now your home.'
+  noInformationAvailableYet: No information available yet.
 panelMapNodeActionsCaravan:
   trade: Trade
   openTrade: Open Trade
@@ -864,9 +1044,12 @@ panelMapNodeBadgesExplore:
   encounters: '{{ encounters }} Encounters'
   monsters: '{{ monsterCountValue }} Monsters'
   rewards: '{{ obtained }}/{{ total }} Rewards'
+  sealed: Sealed
+  seal: Seal
 panelMapNodeBadgesGate:
   collectibles: '{{ obtained }}/{{ total }} Collectibles'
-  andMore: ...and {{ hiddenCount }} more
+  andMore: '...and {{ hiddenCount }} more'
+  sourceUnknown: Source Unknown
 panelMapNodeBadgesGather:
   gatherTimeS: Gather Time {{ gatherSeconds }}s
 panelMapNodeBadgesTown:
@@ -900,9 +1083,17 @@ panelModsModio:
   couldNotInstall: Could not install {{ name }}. {{ errors }}
   installed2: '{{ name }} installed.'
   allSubscribedModsAre: All subscribed mods are installed.
-  modIo: 'mod.io: {{ e }}'
+  modIo: 'mod.io: {{ error }}'
+  name: Name
+  popular: Popular
+  downloads: Downloads
+  recentlyUpdated: Recently Updated
 panelOptions:
   settings: Settings
+  ui: UI
+  accessibility: Accessibility
+  savefile: Savefile
+  misc: Misc
 panelOptionsAccessibility:
   visuals: Visuals
   uiScale: UI Scale
@@ -915,6 +1106,11 @@ panelOptionsAccessibility:
   motion: Motion
   reduceMotion: Reduce Motion
   removesSlidingBouncingShaking: Removes sliding, bouncing, shaking and looping animations. Fades and highlights stay as-is. Follow System uses the reduce motion setting from your operating system.
+  reducedMotionOn: Reduced Motion (On)
+  normalMotionOff: Normal Motion (Off)
+  followSystemOn: Follow System (On)
+  followSystemOff: Follow System (Off)
+  auto: Auto
 panelOptionsMisc:
   miscellaneous: Miscellaneous
   analytics: Analytics
@@ -966,6 +1162,11 @@ panelOptionsSavefile:
   couldNotOpenThe: Could not open the logs folder.
   couldNotOpenThe2: Could not open the savefile folder.
   couldNotExportYour: Could not export your savefile and logs.
+  beforeLoading: Before Loading
+  beforeImporting: Before Importing
+  beforeRestoring: Before Restoring
+  duringPlay: During Play
+  beforeModChanges: Before Mod Changes
 panelOptionsUi:
   gameplay: Gameplay
   runInBackground: Run in Background
@@ -999,6 +1200,8 @@ panelOptionsUi:
   volume: Volume
   playSoundEffects: Play Sound Effects
   muteWhenUnfocused: Mute When Unfocused
+  windowed: Windowed
+  fullscreen: Fullscreen
 panelPlayKingdomTradeskill:
   lv: '{{ tradeskill }} Lv. {{ level }}'
   hideUncraftable: Hide Uncraftable ({{ uncraftableTotal }})
@@ -1021,10 +1224,15 @@ panelPlayKingdomTradeskill:
   thisWillRemoveThe: This will remove the item from the queue. Unused materials will be refunded.
   yesRemoveIt: Yes, remove it
   noKeepIt: No, keep it
+  notConsumed: '{{ name }} (not consumed)'
+  chanceToGainTradeskill: '{{ xpChanceTier }} - {{ xpChance }}% chance to gain tradeskill XP. This will reduce in probability as your tradeskill level gets higher.'
+  youCanTCraft: You can't craft this until {{ tradeskill }} Lv. {{ minTradeskillLevel }}.
 panelTownCrafting:
   tradeskillLevels: Tradeskill Levels
   lv: Lv. {{ level }}
   craftingQueue: Crafting Queue
+  craftingTimeForMatching: '{{ name }}: -{{ reduction }}% crafting time for matching recipes'
+  craftingTimeForMatchingSpecialty: '{{ name }} (Specialty): -{{ reduction }}% crafting time for matching recipes'
 panelTownQuests:
   commissions: Commissions
   noCommissionsAreAvailable: No commissions are available yet.
@@ -1043,6 +1251,7 @@ panelTownShop:
   townShopsSellNo: Town shops sell no equipment under the Edict of the Heated Forge.
   thisTownSShop: This town's shop hasn't opened for business yet.
   youBought: You bought {{ name }}!
+  unknownItem: Unknown Item
 panelTownWorkers:
   workers: Workers
   noWorkersHaveBeen: No workers have been assigned yet.
@@ -1077,6 +1286,12 @@ playHeroesRegalia:
   removeThisRegalia: Remove This Regalia?
   gearTheHeroIs: Gear the hero is wearing stays equipped. Stored gear only this regalia uses returns to the armory.
   yesRemoveIt: Yes, remove it
+  sCurrentSkillTree: '{{ name }}''s current skill tree isn''t saved in any regalia. Equipping "{{ name2 }}" replaces it, and rebuilding it later would cost a Memory Flux.'
+  someOfThisRegalia: Some of this regalia's gear is unavailable.
+  setThisRegaliaAs: Set this regalia as active. This cannot be done in combat.
+  itemGone: This item is no longer available. It may have been sold or otherwise destroyed.
+  itemUnequippable: This hero can no longer equip this item.
+  itemDisplaced: Conflicts with another item in this regalia.
 playHeroesSkillTree:
   skillTree: Skill Tree
   confirm: Confirm
@@ -1094,6 +1309,8 @@ playHeroesSkillTree:
   keepEditing: Keep Editing
   yesResetIt: Yes, reset it
   cancel: Cancel
+  resetSSkillTree: Reset {{ name }}'s {{ name2 }} skill tree?
+  thereIsNothingTo: There is nothing to reset.
 playKingdomArmory:
   armory: Armory
   sell: Sell
@@ -1106,6 +1323,7 @@ playKingdomArmory:
   equipTheMatchingItems: Equip the matching items, in order, on the first hero who can use each one.
   equipThese: Equip These
   noHeroCouldEquip: No hero could equip any of those items.
+  thisCannotBeDone: This cannot be done in combat.
 playKingdomAstralprojector:
   astralProjector: Astral Projector
   cast: Cast
@@ -1114,6 +1332,8 @@ playKingdomAstralprojector:
   yesCastIt: Yes, cast it
   cancel: Cancel
   youVeCast: You've cast {{ spell }}!
+  castingThisWillEnd: Casting this will end {{ spell }}. Continue?
+  theActiveSpell: the active spell
 playKingdomBestiary:
   bestiary: Bestiary
   searchByNameDrop: Search by name, drop, or location...
@@ -1143,15 +1363,32 @@ playKingdomColosseum:
   avgKills: Avg. Kills
   avgDeaths: Avg. Deaths
   location: Location
-  fights: '{{ length }} fights'
+  fights:
+    one: '{{ count }} fight'
+    other: '{{ count }} fights'
   visitALocationTo: Visit a location to fight there.
   fights2: Fights
   allFights: All Fights
-  fight2: Fight {{ i }}
-  lastSetupRestoredRemoved: 'Last setup restored. Removed since: {{ join }}.'
+  fight2: Fight {{ number }}
+  lastSetupRestoredRemoved: 'Last setup restored. Removed since: {{ removed }}.'
   resetAll: Reset All
   edited: Edited
   reset: Reset
+  avgRounds: Avg. Rounds
+  avgHeroDeaths: Avg. Hero Deaths
+  overview: Overview
+  job: Job
+  gear: Gear
+  skillTree: Skill Tree
+  combatOrders: Combat Orders
+  burstSkill: Burst Skill
+  resume: Resume
+  pause: Pause
+  auto: Auto
+  turnBased: Turn-Based
+  wins: Wins
+  stalemates: Stalemates
+  simulateCount: Simulate {{ count }}
 playKingdomCommissions:
   commissions: Commissions
   nextCommissionsIn: Next Commissions in {{ resetLabel }}
@@ -1168,9 +1405,9 @@ playKingdomHome:
   reserves: Reserves
   items: '{{ armoryTotal }}/{{ armoryCapValue }} items'
   collections: Collections
-  items2: '{{ foundCollectibles }}/{{ length }} items'
-  recipes: '{{ foundRecipes }}/{{ length }} recipes'
-  discovered: '{{ discovered }}/{{ length }} discovered'
+  items2: '{{ foundCollectibles }}/{{ total }} items'
+  recipes: '{{ foundRecipes }}/{{ total }} recipes'
+  discovered: '{{ discovered }}/{{ total }} discovered'
   remembrance: Remembrance
   remembered: '{{ percent }}% remembered'
   workforce: Workforce
@@ -1186,6 +1423,8 @@ playKingdomHome:
   reclassHeroes: Reclass Heroes
   setHome: Set Home
   theDuchyIsYour: The Duchy is your home once again!
+  reclassHeroesThisMust: Reclass heroes. This must be done at the Duchy.
+  setTheDuchyAs: Set the Duchy as your home. This must be done at the Duchy.
 playKingdomMuseum:
   collectibles: Collectibles
   recipes: Recipes
@@ -1197,7 +1436,7 @@ playKingdomStorage:
   storage: Storage
 playKingdomWorkers:
   quartermasterSAnnex: Quartermaster's Annex
-  busy: '{{ busyCount }}/{{ length }} busy'
+  busy: '{{ busyCount }}/{{ total }} busy'
   thisWorkerIsReady: This worker is ready to level up!
   lv: Lv. {{ level }}
   left: · {{ left }} left
@@ -1208,12 +1447,22 @@ playKingdomWorkers:
   cancelThisWorkersCurrent: Cancel this workers current order. If they are currently gathering or fighting, they will return to the Duchy. If they are currently crafting, they will cease immediately.
   cancelOrder: Cancel Order
   noWorkerSelected: No worker selected.
+  atTheDuchy: At the Duchy
+  travelingToRemaining: Traveling to {{ nodeName }} ({{ remaining }} remaining)
+  returningToTheDuchy: Returning to the Duchy ({{ remaining }} remaining)
+  crafting: Crafting...
+  waitingForMaterials: Waiting for Materials
+  waitingForMaterials2: Waiting for materials ({{ name }})
+  gatheringAt: At {{ nodeName }} ({{ gathered }}/{{ capacity }} {{ item }})
+  craftingRemaining: Crafting {{ name }} ({{ remaining }} remaining)
 playKingdomWorkshop:
   workshop: Workshop
   commonGearCannotBe: Common gear cannot be reforged
   noInfusionSlots: No Infusion Slots
   selectAnItemTo: Select an item to modify it.
   theWorkshopHasNothing: The Workshop has nothing to offer yet.
+  infuse: Infuse
+  reforge: Reforge
 rowCombatOrderClause:
   thisHeroNoLonger: This hero no longer knows this skill family.
   notUsableWithThe: Not usable with the equipped weapon, or not the chosen burst skill.
@@ -1249,6 +1498,7 @@ rowTrainerTeaching:
 screenTitleCrawl:
   holdToSkip: Hold to skip
   holdSpaceToSkip: Hold SPACE to skip
+  holdToSkip2: Hold to Skip
 slotCaravanTokenTrade:
   thisTraderSUnique: This trader's unique offering.
   unique: Unique
@@ -1256,6 +1506,14 @@ slotCaravanTrade:
   buyingThisRevealsWhere: Buying this reveals where the rumor leads.
   owned: 'Owned: {{ ownedQuantity }}'
   soldOut: Sold Out
+  caravanSelling: This caravan is selling this item to you.
+  caravanBuying: This caravan is buying this item from you.
+  townSelling: This town is selling this item to you.
+  townBuying: This town is buying this item from you.
+  buy: Buy
+  sell: Sell
+  stock: Stock
+  requested: Requested
 slotCommission:
   activeCommission: Active Commission
   for: 'For: {{ title }}'
@@ -1265,8 +1523,10 @@ slotCommission:
   turnInCommission: Turn In Commission
 slotCompletionReward:
   quantity: 'Quantity: {{ qty }}'
+  aRewardYetTo: A reward yet to be discovered.
+  undiscoveredRecipe: A {{ tradeskill }} recipe yet to be discovered, craftable at Lv. {{ level }}.
 slotEquipment:
-  occupies: 'Occupies: {{ join }}'
+  occupies: 'Occupies: {{ slots }}'
   rightClickToUnequip: Right-click to unequip.
 slotGatherMaterial:
   quantity: 'Quantity: {{ qty }}'
@@ -1299,6 +1559,8 @@ statusTaskList:
   tasks: Tasks
 tooltipEdict:
   canTBePicked: Can't be picked with your current edicts.
+  completed: Completed
+  incomplete: Incomplete
 tooltipJobAbility:
   lv: 'Lv. {{ level }}: {{ value }}'
 tooltipMonsterPreview:
@@ -1356,8 +1618,8 @@ home:
   legacy: Legacy
   mods: Mods
   version: Version {{ meta }}
-  middot: '·'
-  analytics: 'Analytics: {{ Off }}'
+  analyticsOn: 'Analytics: On'
+  analyticsOff: 'Analytics: Off'
   resetYourGame: Reset Your Game?
   yesResetGame: Yes, reset game
   noCancel: No, cancel
@@ -1366,8 +1628,12 @@ home:
   yesStartANew: Yes, start a new game
 icons:
   iconCatalog: Icon Catalog
+  combatStats: Combat Stats
+  monsterTypes: Monster Types
+  stats: Stats
+  resistances: Resistances
+  elements: Elements
 runSummary:
-  middot: '{{ startedAt }} - {{ endedAt }} ·'
   modded: Modded
   finalTime: Final Time
   personalBest: Personal Best
@@ -1406,11 +1672,25 @@ runSummary:
   mainMenu: Main Menu
   legacy: Legacy
   startANewRun: Start a New Run
+  unknownJob: Unknown Job
+  monstersDefeated: Monsters Defeated
+  monsterTypesDefeated: Monster Types Defeated
+  mapsReached: Maps Reached
+  townsVisited: Towns Visited
+  goldEarned: Gold Earned
+  fightsWon: Fights Won
+  fightsLost: Fights Lost
+  itemsCrafted: Items Crafted
 achievementAnnounce:
   achievementUnlocked: 'Achievement unlocked: {{ icon }}**{{ achievement }}**'
+  achievementUnlocked2: Achievement Unlocked
+  youHaveEarned: 'You have earned: {{ name }}'
+  achievements: Achievements
 colosseumRun:
   encounteringMonsterGroup: 'Encountering monster group #{{ fightIndex }}...'
   thePartyEscaped: The party escaped!
+  theHeroesHaveFallen: The heroes have fallen.
+  heroesWereNotAble: Heroes were not able to finish the fight.
 combatAnalyze:
   learnedTheStrengthsAnd: '**{{ caster }}** learned the strengths and weaknesses of **{{ target }}**!'
 combatDamage:
@@ -1427,8 +1707,24 @@ combatEnd:
   heroesHaveLostThe: Heroes have lost the combat!
   theRaidersStillThreaten: The raiders still threaten {{ locationName }} - regroup and defend it before time runs out!
   combatIsOver: Combat is over.
+  theMemoryOfIs: The memory of {{ name }} is set in stone.
+  regionSealed: Region Sealed
 combatManual:
-  andLosesTheTurn: '**{{ combatant }}** {{ why }} and loses the turn!'
+  allEnemies: All Enemies
+  notEnoughEp: Not Enough EP
+  coolingDown: Cooling Down
+  unavailable: Unavailable
+  noValidTargets: No Valid Targets
+  theirSkill: their skill
+  self: Self
+  pickedWhenItFires: Picked when it fires
+  taunting: '{{ name }} (taunting)'
+  auto: '{{ name }} (auto)'
+  party: Party
+  everyone: Everyone
+  charging: Charging
+  losesTurnNoOrders: '**{{ combatant }}** has no orders and loses the turn!'
+  losesTurnCouldntUse: '**{{ combatant }}** couldn''t use **{{ name }}** and loses the turn!'
 combatRewards:
   yourArmoryIsFull: Your armory is full. An item drop was lost.
   youAutomaticallySoldFor: You automatically sold {{ icon }}{{ content }} for {{ goldEarned }}.
@@ -1439,6 +1735,8 @@ combatRewards:
   thePartyFound4: The party found {{ icon }}{{ quantity }}!
 combatSkillElements:
   beginsCharging: '{{ name }} begins charging **{{ name2 }}**!'
+  beginsChargingConsuming: '{{ name }} begins charging **{{ name2 }}**, consuming {{ spent }}!'
+  channels: '{{ name }} channels {{ spent }}!'
 combatSkillUse:
   covers: '**{{ cover }}** covers **{{ intendedTarget }}**!'
   sMisses: '**{{ combatant }}**''s **{{ chosenSkill }}** misses **{{ target }}**!'
@@ -1448,12 +1746,21 @@ combatStatuseffectsTechnique:
   isResistedBy: '**{{ name }}** is resisted by **{{ target }}**!'
 combatStatuseffects:
   isShruggedOffBy: '**{{ name }}** is shrugged off by **{{ combatant }}**!'
+  takesDamage: Takes Damage
+  heals: Heals
+  basedOn: Based on {{ parts }}
+  statUp: '{{ stat }} up'
+  statDown: '{{ stat }} down'
+  percentOfTargetStat: '{{ percent }}% of the target''s {{ stat }}'
+  percentOfCasterStat: '{{ percent }}% of the caster''s {{ stat }}'
 commissionTurnIn:
   youGotFromTurning: You got {{ html }} from turning in "{{ offerName }}"!
 craftingQueue:
   failedToCraft: '{{ tradeskill }} failed to craft {{ name }}.'
   crafted: '{{ tradeskill }} crafted {{ icon }}{{ quantity }}!'
   crafted2: '{{ tradeskill }} crafted {{ icon }}{{ collectible }}!'
+  craftedEquipment: '{{ tradeskill }} crafted {{ icon }}{{ equipment }}!'
+  craftedEquipmentAutoSold: '{{ tradeskill }} crafted {{ icon }}{{ equipment }} and automatically sold it for {{ goldEarned }}.'
 tradeskill:
   reachedLevel: '**{{ tradeskill }}** reached level {{ newLevel }}!'
 encounterAutoWin:
@@ -1469,26 +1776,57 @@ exchange:
   became: '{{ nodeName }}: "{{ oldName }}" became "{{ newName }}".'
   xBecameX: '{{ nodeName }}: {{ required }}x {{ inputName }} became {{ quantity }}x {{ outputName }}.'
   received: '{{ nodeName }}: received {{ name }}.'
+  error:
+    missing: You no longer have what that exchange requires.
+    unaffordable: You cannot afford that exchange.
+    invalid: That exchange is no longer available.
 characterProgress:
   reachedLevel: '**{{ name }}** reached level {{ level }}!'
+  levelUp: Level Up
+  reachedLevel2: '{{ name }} reached level {{ level }}.'
 globalEffects:
   thePartyHasBeen: The party has been recalled home.
   thePartyHasBeen2: The party has been revived where it fell.
   thePartyHasFinished: The party has finished healing.
 travel:
   thePartyHasArrived: The party has arrived at {{ destinationNodeName }}.
+  thePartyChangedCourse: The party changed course for {{ destinationNodeName }}.
+  thePartyLeftFor: The party left for {{ destinationNodeName }}.
+  awaitsRevival: The fallen party awaits revival.
+  awaitsRecall: The fallen party awaits recall home.
+  pathingErrorRecalled: 'Pathing error: no route to {{ destinationNodeName }} could be found from {{ mapName }} ({{ x }}, {{ y }}). The party was recalled to the kingdom.'
 gathering:
   thePartyBeginsGathering: The party begins gathering at {{ nodeName }}.
   thePartyFound: The party found {{ descriptions }}!
+  sLuckDoubledThe: '**{{ name }}**''s luck doubled the haul!'
 reforge:
   reforgedInto: Reforged "{{ oldName }}" into "{{ newName }}".
+  error:
+    missing: That item is no longer in your possession.
+    unaffordable: You cannot afford to reforge that item.
+    in-combat: Equipped gear cannot be reforged during combat.
+    not-reforgeable: That item cannot be reforged.
 trade:
-  you: You {{ verb }} {{ goodsParts }}{{ priceText }}.
+  failure:
+    armoryFull: Your armory is full.
+    vanished: That item has disappeared from the shop.
+  bought: You bought {{ goods }}.
+  boughtFor: You bought {{ goods }} for {{ price }}.
+  sold: You sold {{ goods }}.
+  soldFor: You sold {{ goods }} for {{ price }}.
+  unlocked: You unlocked {{ goods }}.
+  unlockedFor: You unlocked {{ goods }} for {{ price }}.
+  claimed: You claimed {{ goods }}.
+  claimedFor: You claimed {{ goods }} for {{ price }}.
+  promoted: You promoted {{ goods }}.
+  promotedFor: You promoted {{ goods }} for {{ price }}.
 astralProjector:
   aNewAstralProjector: 'A new Astral Projector spell has been unlocked: **{{ name }}**.'
   hasFaded: '**{{ name }}** has faded.'
   hasFadedOverwrittenBy: '**{{ name }}** has faded, overwritten by **{{ name2 }}**.'
   hasBeenCast: '**{{ name }}** has been cast.'
+  newAstralProjectorSpell: 'New Astral Projector spell unlocked: {{ name }}'
+  spellUnlocked: Spell Unlocked
 founderWhisper:
   theFounderWhispers: '*The Founder whispers: "{{ text }}"*'
 modNewgame:
@@ -1496,7 +1834,6 @@ modNewgame:
 savefileLoad:
   itHasNotBeen: '{{ reason }} It has not been overwritten - open Settings > Savefile to recover a backup.'
   couldNotBackUp: Could not back up your savefile before loading it. If this keeps happening, reset unreadable backups in Settings > Savefile.
-  yourSavefileWasBut: Your savefile was {{ verb }}, but {{ warning }}
   couldNotRestoreThe: 'Could not restore the backup from {{ backup }}: {{ failures }}'
   restoredTheBackupFrom: Restored the backup from {{ backup }}.
   yourSavefileCanBe: Your savefile can be read again - reload the game to load it instead of recovering a backup.
@@ -1506,22 +1843,49 @@ savefileLoad:
   couldNotImportThat: 'Could not import that savefile: {{ failures }}'
   successfullyImportedSavefile: Successfully imported savefile!
   couldNotFindA: Could not find a savefile from the demo.
+  anotherSavefileOperationIs: Another savefile operation is still running.
+  noneOfYourBackups: None of your backups could be loaded. {{ lastFailures }}
+  backupsCouldNotBe: Backups could not be read from storage.
+  thatFileIsNot: 'That file is not a usable savefile: {{ problems }}'
+  thatSavefileCanT: That savefile can't be loaded. {{ missingMods }}
+  failure:
+    storage: Your savefile could not be read from storage.
+    invalid: Your savefile appears to be corrupt.
+    migration: Your savefile could not be updated to this version.
+    mods: Your savefile needs mods that are not installed or could not be loaded.
+  legacyWarning:
+    restored:
+      invalid: Your savefile was restored, but its Legacy couldn't be read.
+      unsaved: Your savefile was restored, but its Legacy couldn't be saved. Free up storage and try again.
+    recovered:
+      invalid: Your savefile was recovered, but its Legacy couldn't be read.
+      unsaved: Your savefile was recovered, but its Legacy couldn't be saved. Free up storage and try again.
+    imported:
+      invalid: Your savefile was imported, but its Legacy couldn't be read.
+      unsaved: Your savefile was imported, but its Legacy couldn't be saved. Free up storage and try again.
+  noBackupsFound: No backups were found to recover from.
 stateGame:
   yourSavefileCouldNot: Your savefile could not be read from browser storage, so the copy on disk was loaded.
   yourGameCouldNot: Your game could not be saved to storage.
   yourGameCouldNot2: Your game could not be saved to disk.
+  unknownStorageError: Unknown storage error
 taskComplete:
   taskComplete: 'Task complete: {{ name }}'
   taskComplete2: 'Task complete: **{{ name }}**'
+  taskComplete3: Task Complete
 townRaidCombat:
   theRaidOnBegins: The raid on {{ name }} begins!
 townRaidResolve:
   lostTheFollowingItems: '{{ townName }} lost the following items: {{ stolenItems }}'
   lostTheFollowingIn: '{{ townName }} lost the following in-progress crafts: {{ cancelledCrafts }}'
   lostTheFollowingResources: '{{ townName }} lost the following resources: {{ descriptions }}'
-  sCraftingIsSlowed: '{{ townName }}''s crafting is slowed for {{ RAID_LOSS_CRAFT_DEBUFF_TICKS }} following the raid.'
+  sCraftingIsSlowed: '{{ townName }}''s crafting is slowed for {{ duration }} following the raid.'
 townRaidTick:
   wasRaidedWhileUndefended: '**{{ name }}** was raided while undefended!'
+  raidIncoming: Raid Incoming
+  isAboutToBe: '{{ name }} is about to be raided. Defend it before time runs out.'
+  wasRaidedWhileUndefended2: '{{ name }} was raided while undefended!'
+  townRaided: Town Raided
 townSpawn:
   isNowYourHome: '**{{ nodeName }}** is now your home.'
   theDuchyIsYour: The **Duchy** is your home once again.
@@ -1534,8 +1898,14 @@ workerCrafting:
   failedToCraft: '{{ name }} failed to craft {{ name2 }}.'
   crafted: '{{ name }} crafted {{ icon }}{{ delivered }}!'
   wasAssignedToCraft: '{{ workerName }} was assigned to craft {{ recipeName }}.'
+  workerCrafting: Worker Crafting
+  isWaitingForMaterials: '{{ name }} is waiting for materials to craft {{ name2 }}'
+  isCrafting: '{{ name }} is crafting {{ name2 }}'
+  isWaitingForMaterialsLeft: '{{ name }} is waiting for materials to craft {{ name2 }} ({{ left }} left)'
+  isCraftingLeft: '{{ name }} is crafting {{ name2 }} ({{ left }} left)'
 workerTripKingdom:
   returnedWith: '{{ name }} returned with {{ icon }}{{ quantity }}.'
+  workerResources: Worker Resources
 worldNodeCollectibleGate:
   isNowAccessible: '**{{ nodeName }}** is now accessible.'
   isNowAccessible2: '{{ nodeName }} is now accessible.'
@@ -1547,7 +1917,345 @@ worldNodeShrine:
   thePartyHasPrayed: The party has prayed at **{{ name }}**, gaining **{{ name2 }}**.
 worldNodes:
   youDiscovered: You discovered **{{ nodeName }}**!
+  unvisitedRegion: Unvisited Region
+  somewhereIn: Somewhere in {{ mapName }}
 gamestateService:
   yourGameCouldNot: Your game could not be saved. Close again to quit without saving.
 modsService:
   couldNotUpdateYour: Could not update your run's mods. {{ failures }}
+combatStat:
+  label:
+    repeatActionChance: Extra Turn Chance
+    skillStrikeAgainChance: Skill Repeat Chance
+    redirectionChance: Confusion Chance
+    missChance: Miss Chance
+    debuffIgnoreChance: Debuff Resist Chance
+    damageReflectPercent: Damage Reflect
+    healingIgnorePercent: Healing Reduction
+    reviveChance: Revive Chance
+    stunChance: Self-Stun Chance
+    epCostIncreasePercent: EP Cost Increase
+    agroValue: Aggro
+    coverThreshold: Cover Threshold
+  info:
+    repeatActionChance: Chance to take another turn right after acting.
+    skillStrikeAgainChance: Chance for each hit of a skill to hit a second time on the same target.
+    redirectionChance: Chance for each part of a skill to change targets. Attacks hit allies instead of enemies, and heals or buffs go to enemies.
+    missChance: Chance for each hit to miss outright, even when it would otherwise hit. Skills that never miss are immune.
+    debuffIgnoreChance: Chance to ignore a debuff entirely.
+    damageReflectPercent: Part of damage taken from reflectable attacks that is dealt back to the attacker.
+    healingIgnorePercent: Healing from skills is reduced.
+    reviveChance: Chance each turn to come back at full HP after being defeated.
+    stunChance: Chance to lose turn.
+    epCostIncreasePercent: Skills cost this much more EP.
+    agroValue: Positive aggro causes the target to be first in line for attacks; negative aggro causes the target to be last in line for any attacks.
+    coverThreshold: Steps in to take hits for an ally whose HP percent is below this.
+monsterType:
+  damageLabel:
+    Humanoid: Humanoid Damage
+    Demon: Demon Damage
+    Amalgamation: Amalgamation Damage
+    Insect: Insect Damage
+    Beast: Beast Damage
+    Spirit: Spirit Damage
+    Forgetter: Forgetter Damage
+statusEffectTag:
+  resistLabel:
+    Stun: Stun Resist
+    StatDown: Stat Down Resist
+    Accuracy: Accuracy Down Resist
+    DamageOverTime: Damage Over Time Resist
+    Poison: Poison Resist
+    Burn: Burn Resist
+    Bleed: Bleed Resist
+stat:
+  info:
+    Agility: Agility is used to determine turn order, and contributes to damage scaling for some skills.
+    Energy: EP determines how many Energy Points a hero has when going into an encounter.
+    Health: HP determines how many Health Points a hero has when going into an encounter.
+    Intelligence: Intelligence is used primarily to scale magical skills.
+    Strength: Strength is used primarily to scale physical skills.
+    Luck: Luck is used to mitigate incoming damage, debuffs, get critical hits, and rarely contributes to damage scaling for some skills.
+    Resistance: Resistance is used to mitigate incoming magical damage.
+    Vitality: Vitality is used to mitigate incoming physical damage.
+    Spirit: Spirit is used to regenerate Energy faster when out of combat.
+    Constitution: Constitution is used to regenerate Health faster when out of combat.
+  label:
+    Intelligence: Intelligence
+    Strength: Strength
+    Vitality: Vitality
+    Resistance: Resistance
+    Agility: Agility
+    Health: Health
+    Energy: Energy
+    Luck: Luck
+    Constitution: Constitution
+    Spirit: Spirit
+  short:
+    Agility: AGI
+    Energy: EP
+    Health: HP
+    Intelligence: INT
+    Luck: LUK
+    Resistance: RES
+    Strength: STR
+    Vitality: VIT
+    Spirit: SPR
+    Constitution: CON
+edict:
+  kindLabel:
+    PartySize: Party Size
+    Challenge: Challenge
+    Variant: Variant
+    Boon: Boon
+  kindGroupLabel:
+    PartySize: Party Size
+    Challenge: Challenges
+    Variant: Variants
+    Boon: Boons
+worldNodeType:
+  pluralLabel:
+    Kingdom: Duchies
+    NonPlayerKingdom: Towns
+    CaravanNode: Caravans
+    ExploreNode: Encounters
+    ExploreRandomNode: Mystical Locations
+    GatherNode: Gather Locations
+    Shrine: Shrines
+    Outpost: Outposts
+    Trainer: Trainers
+    ExchangeNode: Exchanges
+    TeleportNode: Teleports
+    CollectibleGate: Gates
+remembrance:
+  developmentName:
+    shrine: Shrine Development
+    outpost: Outpost Development
+    gathering: Gather Location Development
+  overall: Overall
+kingdomNav:
+  storage: Storage
+  armory: Armory
+  astralProjector: Astral Projector
+  museum: Museum
+  bestiary: Bestiary
+  workshop: Workshop
+  commissions: Commissions
+  edicts: Edicts
+  colosseum: Colosseum
+  quartermastersAnnex: Quartermaster's Annex
+slotArmoryItem:
+  selectRange: Select Range
+ffTriggerTabsDirective:
+  switchTab: Switch Tab
+gamepad:
+  switchHero: Switch Hero
+  back: Back
+  close: Close
+  dismiss: Dismiss
+  move: Move
+  select: Select
+  map: Map
+  resume: Resume
+  menu: Menu
+  pause: Pause
+  cancel: Cancel
+  unequip: Unequip
+  done: Done
+  next: Next
+  type: Type
+  drop: Drop
+  choose: Choose
+  none: None
+  edit: Edit
+  adjust: Adjust
+  page: Page
+  confirm: Confirm
+  inspect: Inspect
+  browse: Browse
+colosseumSetup:
+  noLongerOwned: '{{ name }} (no longer owned)'
+  notVisited: '{{ location }} (not visited)'
+  aLocation: A location
+  gear: Gear
+  heroJob: '{{ hero }}''s job'
+windowAttention:
+  gameOver: Game Over
+  armoryFull: Armory Full
+  craftingFinished: Crafting Finished
+  hasNothingLeftTo: '{{ tradeskill }} has nothing left to craft.'
+  workerXpFull: Worker XP Full
+  hasFullXpAnd: '{{ worker }} has full XP and is waiting to level up.'
+  aWorker: A worker
+  victory: Victory
+  felDefeated: Fel has been defeated.
+  partyFallen: Your party has fallen.
+  armoryFullBody: New equipment has nowhere to go until you clean out your armory.
+jobAbility:
+  xConPerSecond: '{{ value }}x CON per second'
+  xSprPerSecond: '{{ value }}x SPR per second'
+  resetTime: -{{ value }} reset time
+  onPathSpeed: +{{ value }} on-path speed
+  offPathSpeed: +{{ value }} off-path speed
+  enemiesSurrenderWhenLevels: Enemies surrender when {{ value }}+ levels under
+  xLukChance: '{{ value }}x LUK chance'
+  equipmentDropRate: +{{ value }}% equipment drop rate
+  itemDropRate: +{{ value }}% item drop rate
+  skillRepeatChance: +{{ value }}% skill repeat chance
+  coversAlliesBelowHp: Covers allies below {{ value }}% HP
+  stacks: Stacks.
+  doesNotStack: Does not stack.
+  durationBonus: +{{ value }} duration
+  reputationBonus: +{{ value }} reputation
+  chance: '{{ value }}% chance'
+  strengthBonus: +{{ value }} strength
+  gatherLuckOnMonsters: Explorers in the party have a chance, based on their Luck, to double the gathering materials monsters drop.
+  shrineBoostToAstral: While this Healer is in the party, Astral Projector spells last longer.
+  shrineBoostToStrength: While this Healer is in the party, shrine buffs are stronger.
+  descriptionWithStacking: '{{ description }} {{ stacking }}'
+skillModifier:
+  alsoCasts: Also casts
+  epCost: -{{ value }}% EP cost
+  chanceToGrant: '{{ chance }}% chance to grant'
+  chanceToInflict: '{{ chance }}% chance to inflict'
+  bonusChanceToGrant: +{{ chance }}% chance to grant
+  bonusChanceToInflict: +{{ chance }}% chance to inflict
+  forTurns: for {{ turns }}
+  forTurnsOnHits: for {{ turns }} on {{ element }} hits
+  turnsOf: '{{ turns }} of'
+  unknown: UNKNOWN
+  scaling: +{{ value }}x {{ stat }} scaling
+  accuracy: +{{ value }}% accuracy
+skillPreview:
+  aStatusEffect: a status effect
+  onlyIfItHas: Only if it has {{ effectName }}
+  onlyIfItLacks: Only if it lacks {{ effectName }}
+  onlyIfNoSummon: Only if no summon is active
+  onlyIfUnshielded: Only if unshielded
+  heroesFirst: Heroes first
+  unknownEffect: Unknown Effect
+skillTreeLayout:
+  willForgetEverySkill: '{{ name }} will forget every {{ name2 }} skill, ability and bonus they learned and get all {{ refund }} SP back.'
+  theirRegaliaIsReset: Their regalia "{{ name }}" is reset too; other regalias keep their builds.
+  thisUses1Memory: This uses 1 Memory Flux (you have {{ fluxOwned }}).
+  willForgetEverySkillSpec: '{{ name }} will forget every {{ name2 }} skill, ability and bonus they learned, including their {{ spec }} specialization, and get all {{ refund }} SP back.'
+museum:
+  unmetTrader: an unmet trader
+  craftingSource: Crafting ({{ tradeskill }} Lv. {{ level }})
+  unknownTradeskill: Unknown
+  unknownSource: Unknown
+rumor:
+  wordOfSomethingHidden: Word of something hidden in {{ name }}.
+  sourceUnknown: Source Unknown
+  fromUnmetTrader: 'From: an unmet trader in {{ regions }}'
+  wordOfSomethingHiddenNowhere: Word of something hidden.
+savefileMods:
+  missingMod: 'Missing mod: {{ ref }}'
+  notInstalledOrIt: '{{ id }}: not installed, or it has errors.'
+  demoCannotLoadMods: The demo cannot load modded savefiles.
+savefileValidate:
+  theSavefileIsNot: The savefile is not a game state.
+  partyDataIsCorrupt: Party data is corrupt.
+taskClaim:
+  claimedTheRewardFor: Claimed the reward for {{ name }}!
+  claimedTheRewardsFor: Claimed the rewards for {{ count }} tasks!
+task:
+  youMustBeIn: You must be in {{ mapName }} to locate this location.
+townRaidBuyoff:
+  youPaidTributeTo: You paid tribute to {{ townName }}, allowing them to quickly bolster their defenses.
+  youFortifiedLeadingTo: You fortified {{ townName }}, leading to an overwhelmingly successful defense.
+townCommissionFulfill:
+  reputationWith: '{{ gained }} reputation with {{ name }}'
+townWorkerRoster:
+  travelingToRemaining: Traveling to {{ nodeName }} ({{ remaining }} remaining)
+  returningToTownRemaining: Returning to town ({{ remaining }} remaining)
+  atTown: At Town
+  fightingAt: Fighting at {{ nodeName }}
+  gatheringAt: Gathering at {{ nodeName }}
+  resting: Resting
+workerDiscovery:
+  youRescued: You rescued {{ name }}!
+  workerRescued: Worker Rescued
+workerProgression:
+  toLevel: '{{ html }} to level {{ level }}'
+worldNodeDevelopmentTick:
+  hasBeenBuilt: '{{ name }} has been built.'
+  hasBeenDevelopedTo: '{{ name }} has been developed to +{{ level }}.'
+  developmentFinished: Development Finished
+worldNodeDevelopment:
+  thePartyHasBegun: The party has begun building **{{ name }}**.
+  thePartyHasBegun2: The party has begun developing **{{ name }}** to +{{ targetLevel }}.
+worldNodeStatus:
+  fullGame: Full Game
+townRaid:
+  buyoffLabel:
+    Tribute: Pay Tribute
+    Fortify: Fortify
+tutorial:
+  mainUi:
+    name: Getting Started
+    world: World
+    yourPartyExploresThe: Your party explores the map here - travel between locations, gather materials, and fight encounters.
+    kingdom: Kingdom
+    manageYourStorageCrafting: Manage your storage, crafting buildings, armory, and other kingdom facilities from here.
+    heroes: Heroes
+    reviewYourPartyEquipment: Review your party equipment/skills, equip gear, give your heroes orders.
+    adventureLog: Adventure Log
+    aRecordOfEverything: A record of everything your party and kingdom has done - combat, travel, gathering, and crafting.
+  losingStreak:
+    name: Struggling?
+    youMightBeUnderpowered: You might be underpowered, underleveled, or both, for the creatures you're trying to face in combat. You should seek out crafting materials, craft items using the Kingdom tradeskills, and boost your overall power first!
+  workers:
+    name: Workers
+    rescuedWorkersCanBe: Rescued workers can be assigned to gather materials automatically and independently of your party. They can level up to reach further out locations, too!
+  infusion:
+    name: Infusion
+    hereYouCanInfuse: Here you can infuse your equipment with materials found on your travels to increase your exploration and combat power!
+  reforge:
+    name: Reforge
+    hereYouCanReforge: Here you can reforge your gear by spending gold and Duskhall Flux to reroll the affixes on a piece of equipment!
+  decree:
+    name: Decree
+    theDecreeAllowsYou: The Decree allows you to tell your hero party how to explore the world, what items to gather, and what dungeons to farm for loot. There are other orders you can specify too - be sure to check them out! For the decree to be active, you must turn auto mode ON!
+  combatOrders:
+    name: Combat Orders
+    eachHeroHasA: Each hero has a set of combat orders that you can use to loosely guide their actions in combat.
+  town:
+    name: Town
+    townsHaveTheirOwn: Towns have their own shop, commissions, and crafting. As you build reputation, they'll offer you more perks.
+  commissions:
+    name: Commissions
+    caravansAreAllOver: Caravans are all over the world, selling items and offering commissions. Complete their commissions to earn Trader Scrip, a currency you can use to unlock more permanent rewards.
+  teachings:
+    name: Teachings
+    trainersAroundTheWorld: Trainers around the world teach permanent upgrades to your heroes. Each teaching is learned per hero, per job, and applies to every job the hero has unlocked.
+  burstSkills:
+    name: Burst Skills
+    thisHeroHasLearned: This hero has learned a burst skill - a powerful special attack. Each hero can slot one burst skill per job here, and it will be used in combat alongside their normal skills.
+  skillTrees:
+    name: Skill Trees
+    thisHeroHasSkill: This hero has skill points to spend. Heroes earn skill points when they level up. They can be spent in the skill tree on new skills, abilities and a specialization.
+titleCrawl:
+  paragraph1: Once, there was a kingdom.
+  paragraph2: The Founder formed it from nothing, setting a single stone at its heart. While the Founding Stone stood firm, the paths, towers, rivers and forests stayed within sight. Thus, the kingdom came to life.
+  paragraph3: Then came the Sundering. The Founding Stone cracked, and slowly, the kingdom became fractured.
+  paragraph4: The land began to forget itself. Paths became lost, towers vanished, rivers ran dry, and forests thinned. Those who left the kingdom never found their way back.
+  paragraph5: Beyond the Felway lies Fel, the Demon of Forgetting. The Sundering was his doing, and his wish is for everything to be forgotten.
+  paragraph6: 'Only the Duchy of Carrina remembered. There, beside the fractured Founding Stone, the Founder still rules: unseen, but not unheard.'
+  paragraph7: Now, the Founder has issued a decree. You have a party of heroes, the Founder's authority, and a great deal of paperwork. You must help find the lost, rebuild what is broken, and re-form the kingdom.
+outroCrawl:
+  paragraph1: Fel, the Forgetter, has fallen.
+  paragraph2: Without him, his demons scatter back toward the Pale. The Astral Observatory collapses and the land he forgot begins, slowly, to remember itself.
+  paragraph3: The memories he devoured will slowly find their way home. The sands of Larsia recall the soil beneath them. The Erden trees recall how to grow. The mire, the mountains and the frozen summit each recall their own shape.
+  paragraph4: The Founding Stone is still cracked. It may never recover from that. But a kingdom was never only a stone - it is roads that lead somewhere, towns that trade, and travelers who explore. The damage may never be fully undone, but together with the Founder, you can mend the scars.
+  paragraph5: 'In Carrina, the Founder reads your final report and issues one more decree: the work will continue. You both know the work will never be done.'
+  paragraph6: There are still the lost to find, roads to mend, and, as ever, a great deal of paperwork.
+  paragraph7: Once, there was a kingdom - expansive and diverse. Thanks to you, there still is.
+timeago:
+  justNow: just now
+decreeFarmNode:
+  mysticalLocation: This is a mystical location, it will only be visited while it is active.
+buttonConnect:
+  discord: Discord
+  blog: Blog
+  email: Email

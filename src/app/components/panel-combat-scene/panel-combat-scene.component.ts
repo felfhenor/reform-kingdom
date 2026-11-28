@@ -1,3 +1,5 @@
+import { contentName } from '@helpers/i18n/i18n-content';
+import { t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { FFFocusMemoryDirective } from '@ff/focus/ff-focus-memory.directive';
@@ -159,8 +161,11 @@ export class PanelCombatSceneComponent {
     for (const entry of this.log()) {
       if (!entry.combatId || !ids.has(entry.combatId)) continue;
       lines.push(entry);
-      // Entries logged before roundStart existed are English.
-      if (entry.roundStart || entry.message.startsWith('_Combat round')) {
+      // Entries logged before markers existed are English.
+      if (
+        entry.marker === 'roundStart' ||
+        entry.message.startsWith('_Combat round')
+      ) {
         rounds++;
       }
       if (rounds === 2) break;
@@ -175,7 +180,9 @@ export class PanelCombatSceneComponent {
   private readonly focus = inject(FFFocusService);
 
   public isEscaped = computed(() =>
-    this.logEntries().some((e) => e.message === 'The party escaped!'),
+    this.logEntries().some(
+      (e) => e.marker === 'escaped' || e.message === 'The party escaped!',
+    ),
   );
 
   // Each hero's last order: pre-highlighted, and replayed when Enter is pressed.
@@ -225,34 +232,48 @@ export class PanelCombatSceneComponent {
   public turnOrder = computed(() => combatManualTurnOrder(this.combat()));
 
   public isVictory = computed(() =>
-    this.logEntries().some((e) => e.message === 'Heroes have won the combat!'),
+    this.logEntries().some(
+      (e) => e.marker === 'won' || e.message === 'Heroes have won the combat!',
+    ),
   );
 
   public status = computed(() => {
     const option = this.pendingOption();
     const hero = this.activeHero();
     if (this.isReview() && this.isEscaped()) {
-      return { tone: 'alert-info', text: 'The party escaped.' };
+      return {
+        tone: 'alert-info',
+        text: t('panelCombatScene.thePartyEscaped'),
+      };
     }
     if (this.isReview()) {
       return this.isVictory()
         ? {
             tone: 'alert-success',
-            text: 'Victory!',
+            text: t('panelCombatScene.victory'),
           }
-        : { tone: 'alert-error', text: 'You lost the fight.' };
+        : { tone: 'alert-error', text: t('panelCombatScene.youLostTheFight') };
     }
     if (this.paused()) {
-      return { tone: 'alert-warning', text: 'The game is paused.' };
+      return {
+        tone: 'alert-warning',
+        text: t('panelCombatScene.theGameIsPaused'),
+      };
     }
     if (this.isResolving() || !hero) return undefined;
     if (option) {
       return {
         tone: 'alert-info',
-        text: `Pick a target for ${hero.name}'s ${option.skill.name}.`,
+        text: t('panelCombatScene.pickATargetFor', {
+          name: hero.name,
+          name2: contentName(option.skill),
+        }),
       };
     }
-    return { tone: 'alert-info', text: `Choose a skill for ${hero.name}.` };
+    return {
+      tone: 'alert-info',
+      text: t('panelCombatScene.chooseASkillFor', { name: hero.name }),
+    };
   });
 
   public cardFor = combatManualStatusCard;
@@ -345,7 +366,7 @@ export class PanelCombatSceneComponent {
     ffGamepadOn('back', () => this.cancelPick(), {
       priority: GAMEPAD_PRIORITY.popover,
       enabled: () => !!this.pendingSkillId(),
-      label: 'Cancel',
+      label: t('gamepad.cancel'),
     });
     // After Cancel, so B closes an open inspect before it drops the picked skill.
     gamepadBindInspectTips('.scene-combatant', () => !this.isResolving());

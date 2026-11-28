@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { TPipe } from '@pipes/t.pipe';
 import { FFKeyboardDirective } from '@ff/controls/ff-keyboard.directive';
 import { FFButtonComponent } from '@ff/components/button/button.component';
@@ -47,8 +48,8 @@ export class PagePagedGridComponent<T> implements OnDestroy {
 
   public entries = input.required<T[]>();
   public filterFn = input.required<(entries: T[], searchText: string) => T[]>();
-  public searchPlaceholder = input('Search by name or description...');
-  public emptyMessage = input('No results found.');
+  public searchPlaceholder = input(t('pagePagedGrid.searchByNameOr'));
+  public emptyMessage = input(t('pagePagedGrid.noResultsFound'));
   public showToolbar = input(true);
   public showGrid = input(true);
   public reflow = input(false);

@@ -99,7 +99,7 @@
         </div>
 
         <p class="type-muted my-4">
-          {{ description() ?? 'No information available yet.' }}
+          {{ description() ?? ('panelMapNode.noInformationAvailableYet' | t) }}
         </p>
 
         @if (isShrineNode()) {

@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import {
   DestroyRef,
   Directive,
@@ -41,7 +42,7 @@ export class FFStepperDirective {
         (row
           ? row.contains(document.activeElement)
           : document.activeElement === host),
-      label: 'Edit',
+      label: t('gamepad.edit'),
     });
     inject(DestroyRef).onDestroy(() => {
       if (this.request) this.popup.closeIf(this.request);

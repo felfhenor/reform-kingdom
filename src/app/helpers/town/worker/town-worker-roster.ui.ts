@@ -1,3 +1,5 @@
+import { nodeNameText } from '@helpers/i18n/i18n-content';
+import { t } from '@helpers/i18n/i18n';
 import { getEntry } from '@helpers/content/content';
 import { formatDuration } from '@helpers/engine/timer';
 import { travelTicksRemaining } from '@helpers/hero/travel-progress';
@@ -55,17 +57,28 @@ export function townWorkerStatusDisplay(
         status.ticksIntoStep,
       );
       return {
-        label: `Traveling to ${status.nodeName} (${formatDuration(remaining)} remaining)`,
+        label: t('townWorkerRoster.travelingToRemaining', {
+          nodeName: status.nodeName,
+          remaining: formatDuration(remaining),
+        }),
         locationEntry: worldNodeByName(status.nodeName),
       };
     }
     case 'Gathering':
       return {
-        label: `${isWorkerCombatNode(status.nodeName) ? 'Fighting' : 'Gathering'} at ${status.nodeName}`,
+        label: t(
+          isWorkerCombatNode(status.nodeName)
+            ? 'townWorkerRoster.fightingAt'
+            : 'townWorkerRoster.gatheringAt',
+          { nodeName: nodeNameText(status.nodeName) },
+        ),
         locationEntry: worldNodeByName(status.nodeName),
       };
     case 'Resting':
-      return { label: 'Resting', locationEntry: atTownEntry };
+      return {
+        label: t('townWorkerRoster.resting'),
+        locationEntry: atTownEntry,
+      };
     case 'TravelingBack': {
       const remaining = travelTicksRemaining(
         status.path,
@@ -73,11 +86,16 @@ export function townWorkerStatusDisplay(
         status.ticksIntoStep,
       );
       return {
-        label: `Returning to town (${formatDuration(remaining)} remaining)`,
+        label: t('townWorkerRoster.returningToTownRemaining', {
+          remaining: formatDuration(remaining),
+        }),
         locationEntry: atTownEntry,
       };
     }
     case 'AtTown':
-      return { label: 'At Town', locationEntry: atTownEntry };
+      return {
+        label: t('townWorkerRoster.atTown'),
+        locationEntry: atTownEntry,
+      };
   }
 }

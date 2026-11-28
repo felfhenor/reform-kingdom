@@ -1,4 +1,4 @@
-import { t } from '@helpers/i18n/i18n';
+import { i18nLabels, t } from '@helpers/i18n/i18n';
 import { contentName } from '@helpers/i18n/i18n-content';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
@@ -30,12 +30,15 @@ export function reforgeMayDestroyGems(item: EquipmentItem): boolean {
   );
 }
 
-const REFORGE_ERRORS: Record<Exclude<EquipmentReforgeResult, 'ok'>, string> = {
-  missing: 'That item is no longer in your possession.',
-  unaffordable: 'You cannot afford to reforge that item.',
-  'in-combat': 'Equipped gear cannot be reforged during combat.',
-  'not-reforgeable': 'That item cannot be reforged.',
-};
+const REFORGE_ERRORS: Record<
+  Exclude<EquipmentReforgeResult, 'ok'>,
+  string
+> = i18nLabels('reforge.error', [
+  'missing',
+  'unaffordable',
+  'in-combat',
+  'not-reforgeable',
+]);
 
 export async function equipmentReforge(
   equipmentItemId: EquipmentItemId,

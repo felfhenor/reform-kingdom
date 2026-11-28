@@ -127,7 +127,7 @@ function combatTargetDodges(
     t('combatDamage.dodgesS', {
       target: combatantMessageToken(target),
       combatant: combatantMessageToken(combatant),
-      name: skill.name,
+      name: contentName(skill),
     }),
     target,
   );

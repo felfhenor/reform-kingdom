@@ -1,16 +1,17 @@
-import { TPipe } from '@pipes/t.pipe';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { IconDimensionComponent } from '@components/icon-dimension/icon-dimension.component';
-import { ICON_SIZE_VALUES } from '@helpers/engine/icons';
-import type { BaseStat, IconSize } from '@interfaces';
 import {
   CombatStatDimension,
   ElementResistanceDimension,
   MonsterTypeDimension,
   StatDimension,
-  StatOrder,
   StatusEffectTagDimension,
-} from '@interfaces';
+} from '@helpers/hero/stat-dimension';
+import { t } from '@helpers/i18n/i18n';
+import { TPipe } from '@pipes/t.pipe';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { IconDimensionComponent } from '@components/icon-dimension/icon-dimension.component';
+import { ICON_SIZE_VALUES } from '@helpers/engine/icons';
+import type { BaseStat, IconSize } from '@interfaces';
+import { StatOrder } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 
 // Every IconSize token, small to large - 'badge' is skipped since it's
@@ -34,23 +35,23 @@ export class IconsComponent {
 
   public iconCategories = [
     {
-      title: 'Stats',
+      title: t('icons.stats'),
       dimension: StatDimension,
     },
     {
-      title: 'Combat Stats',
+      title: t('icons.combatStats'),
       dimension: CombatStatDimension,
     },
     {
-      title: 'Resistances',
+      title: t('icons.resistances'),
       dimension: StatusEffectTagDimension,
     },
     {
-      title: 'Elements',
+      title: t('icons.elements'),
       dimension: ElementResistanceDimension,
     },
     {
-      title: 'Monster Types',
+      title: t('icons.monsterTypes'),
       dimension: MonsterTypeDimension,
     },
   ];

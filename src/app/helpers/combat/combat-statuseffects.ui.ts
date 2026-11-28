@@ -1,7 +1,13 @@
+import {
+  CombatStatDimension,
+  StatDimension,
+} from '@helpers/hero/stat-dimension';
+import { i18nLabels, t } from '@helpers/i18n/i18n';
 import { contentName } from '@helpers/i18n/i18n-content';
 import { statusEffectDamage } from '@helpers/combat/combat-statuseffects';
 import type {
   Combatant,
+  CombatantStatusEffectData,
   GameStat,
   StatusEffect,
   StatusEffectAddCombatStatNumber,
@@ -15,10 +21,11 @@ import type {
   StatusEffectPreviewTiming,
   StatusEffectTakeCombatStatNumber,
 } from '@interfaces';
-import {
-  CombatantStatusEffectDataLabel,
-  CombatStatDimension,
-} from '@interfaces';
+
+const CombatantStatusEffectDataLabel: Record<
+  keyof CombatantStatusEffectData,
+  string
+> = i18nLabels('statusEffect.dataLabel', ['isFrozen']);
 
 function statModifier(
   behavior: StatusEffectBehaviorAddStat | StatusEffectBehaviorTakeStat,
@@ -28,7 +35,10 @@ function statModifier(
   const raises = behavior.type === 'AddDamageToStat';
   if (amount === undefined) {
     return {
-      label: `${behavior.modifyStat} ${raises ? 'up' : 'down'}`,
+      label: t(
+        raises ? 'combatStatuseffects.statUp' : 'combatStatuseffects.statDown',
+        { stat: StatDimension.label[behavior.modifyStat] },
+      ),
       stat: behavior.modifyStat,
       isPercent: false,
       timing,
@@ -70,7 +80,10 @@ function behaviorModifier(
     case 'HealDamage':
       if (amount !== undefined) return undefined;
       return {
-        label: behavior.type === 'TakeDamage' ? 'Takes Damage' : 'Heals',
+        label:
+          behavior.type === 'TakeDamage'
+            ? t('combatStatuseffects.takesDamage')
+            : t('combatStatuseffects.heals'),
         isPercent: false,
         timing,
       };
@@ -167,14 +180,20 @@ function statusEffectScalingText(
 ): string | undefined {
   if (!statusEffectUsesScaling(effect)) return undefined;
 
-  const whose = effect.useTargetStats ? "the target's" : "the caster's";
+  const key = effect.useTargetStats
+    ? 'combatStatuseffects.percentOfTargetStat'
+    : 'combatStatuseffects.percentOfCasterStat';
   const parts = (Object.keys(effect.statScaling) as GameStat[])
     .filter((stat) => effect.statScaling[stat] > 0)
-    .map(
-      (stat) =>
-        `${format(effect.statScaling[stat] * 100)}% of ${whose} ${stat}`,
+    .map((stat) =>
+      t(key, {
+        percent: format(effect.statScaling[stat] * 100),
+        stat: StatDimension.label[stat],
+      }),
     );
-  return parts.length > 0 ? `Based on ${parts.join(' + ')}` : undefined;
+  return parts.length > 0
+    ? t('combatStatuseffects.basedOn', { parts: parts.join(' + ') })
+    : undefined;
 }
 
 // Outside combat amounts can't be sized yet, so each change shows what it scales with instead.

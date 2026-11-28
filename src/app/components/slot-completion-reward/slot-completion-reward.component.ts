@@ -1,3 +1,6 @@
+import { contentNameById } from '@helpers/i18n/i18n-content';
+import { t } from '@helpers/i18n/i18n';
+import { EnumLabelPipe } from '@pipes/enum-label.pipe';
 import { TPipe } from '@pipes/t.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
@@ -26,7 +29,6 @@ import type {
   EquipmentContent,
   ItemContent,
   RecipeContent,
-  TradeskillContent,
   WorkerContent,
 } from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
@@ -42,6 +44,7 @@ type RewardContent = {
   selector: 'app-slot-completion-reward',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    EnumLabelPipe,
     TPipe,
     IconUnknownComponent,
     TippyDirective,
@@ -139,18 +142,19 @@ export class SlotCompletionRewardComponent {
     switch (reward.kind) {
       case 'Recipe': {
         const recipe = this.recipeContent();
-        if (!recipe) return 'A reward yet to be discovered.';
+        if (!recipe) return t('slotCompletionReward.aRewardYetTo');
 
-        const tradeskillName = getEntry<TradeskillContent>(
-          recipe.tradeskillId,
-        )?.name;
-        if (!tradeskillName) return 'A reward yet to be discovered.';
+        const tradeskillName = contentNameById(recipe.tradeskillId);
+        if (!tradeskillName) return t('slotCompletionReward.aRewardYetTo');
 
-        return `A ${tradeskillName} recipe yet to be discovered, craftable at Lv. ${recipe.minTradeskillLevel}.`;
+        return t('slotCompletionReward.undiscoveredRecipe', {
+          tradeskill: tradeskillName,
+          level: recipe.minTradeskillLevel,
+        });
       }
 
       default: {
-        return 'A reward yet to be discovered';
+        return t('slotCompletionReward.aRewardYetTo');
       }
     }
   });

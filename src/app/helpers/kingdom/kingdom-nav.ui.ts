@@ -1,3 +1,5 @@
+import { contentName } from '@helpers/i18n/i18n-content';
+import { t } from '@helpers/i18n/i18n';
 import { hasAnyCommission } from '@helpers/commission/commission-tick.ui';
 import { COLOSSEUM_UNLOCK_LEVEL } from '@helpers/config';
 import { tradeskillsEnabled } from '@helpers/crafting/tradeskill';
@@ -24,57 +26,77 @@ export const KINGDOM_FEATURE_NAV: Record<
   KingdomFeatureNav
 > = {
   storage: {
-    label: 'Storage',
+    get label() {
+      return t('kingdomNav.storage');
+    },
     icon: 'storage',
     group: 'reserves',
   },
   armory: {
-    label: 'Armory',
+    get label() {
+      return t('kingdomNav.armory');
+    },
     icon: 'armory',
     group: 'reserves',
   },
   astralprojector: {
-    label: 'Astral Projector',
+    get label() {
+      return t('kingdomNav.astralProjector');
+    },
     icon: 'astralprojector',
     group: 'reserves',
     isAvailable: () => unlockedAstralProjectorEntries().length > 0,
   },
   museum: {
-    label: 'Museum',
+    get label() {
+      return t('kingdomNav.museum');
+    },
     icon: 'museum',
     group: 'collections',
   },
   bestiary: {
-    label: 'Bestiary',
+    get label() {
+      return t('kingdomNav.bestiary');
+    },
     icon: 'bestiary',
     group: 'collections',
   },
   workers: {
-    label: "Quartermaster's Annex",
+    get label() {
+      return t('kingdomNav.quartermastersAnnex');
+    },
     icon: 'workers',
     group: 'workforce',
     isAvailable: () => Object.keys(discoveredWorkersState()).length > 0,
   },
   workshop: {
-    label: 'Workshop',
+    get label() {
+      return t('kingdomNav.workshop');
+    },
     icon: 'workshop',
     group: 'actions',
     isAvailable: () => isInfusionUnlocked() || isReforgeUnlocked(),
   },
   commissions: {
-    label: 'Commissions',
+    get label() {
+      return t('kingdomNav.commissions');
+    },
     icon: 'commissions',
     group: 'actions',
     isAvailable: hasAnyCommission,
   },
   edicts: {
-    label: 'Edicts',
+    get label() {
+      return t('kingdomNav.edicts');
+    },
     icon: 'edicts',
     group: 'actions',
     isAvailable: () => edictsActive().length > 0,
   },
   colosseum: {
-    label: 'Colosseum',
+    get label() {
+      return t('kingdomNav.colosseum');
+    },
     icon: 'colosseum',
     group: 'actions',
     isAvailable: () => isRevealedAtLevel(COLOSSEUM_UNLOCK_LEVEL),
@@ -140,7 +162,7 @@ function kingdomTradeskillNavEntries(): KingdomNavEntry[] {
     return {
       kind: 'tradeskill',
       subview: kingdomSubviewForTradeskill(tradeskill),
-      label: content.name,
+      label: contentName(content),
       sprite: content.sprite,
       tradeskill,
     };

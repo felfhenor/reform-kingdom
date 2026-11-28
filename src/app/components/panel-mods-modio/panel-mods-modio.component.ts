@@ -54,10 +54,10 @@ export class PanelModsModioComponent {
   private modsService = inject(ModsService);
 
   public readonly sortOptions: { label: string; value: ModioSort }[] = [
-    { label: 'Name', value: 'name' },
-    { label: 'Popular', value: '-popular' },
-    { label: 'Downloads', value: '-downloads_total' },
-    { label: 'Recently Updated', value: '-date_updated' },
+    { label: t('panelModsModio.name'), value: 'name' },
+    { label: t('panelModsModio.popular'), value: '-popular' },
+    { label: t('panelModsModio.downloads'), value: '-downloads_total' },
+    { label: t('panelModsModio.recentlyUpdated'), value: '-date_updated' },
   ];
 
   public email = signal('');
@@ -162,7 +162,7 @@ export class PanelModsModioComponent {
     } catch (e) {
       notifyError(
         t('panelModsModio.modIo', {
-          e: e instanceof Error ? e.message : String(e),
+          error: e instanceof Error ? e.message : String(e),
         }),
       );
     }

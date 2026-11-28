@@ -17,13 +17,10 @@ import {
   isRunLost,
   isVictoryPopupPending,
 } from '@helpers/lore/outro';
-import {
-  OUTRO_CRAWL_PARAGRAPHS,
-  outroCrawlFinish,
-} from '@helpers/lore/outro.ui';
+import { outroCrawlParagraphs, outroCrawlFinish } from '@helpers/lore/outro.ui';
 import { isTitleCrawlPending } from '@helpers/lore/title-crawl';
 import {
-  TITLE_CRAWL_PARAGRAPHS,
+  titleCrawlParagraphs,
   titleCrawlFinish,
 } from '@helpers/lore/title-crawl.ui';
 
@@ -50,8 +47,8 @@ export class GameComponent implements OnInit {
   public isRunLost = computed(() => isRunLost());
   public isDemoEndPending = computed(() => isDemoEndPending());
 
-  public titleCrawlParagraphs = TITLE_CRAWL_PARAGRAPHS;
-  public outroCrawlParagraphs = OUTRO_CRAWL_PARAGRAPHS;
+  public titleCrawlParagraphs = titleCrawlParagraphs();
+  public outroCrawlParagraphs = outroCrawlParagraphs();
 
   constructor() {
     windowAttentionBind();

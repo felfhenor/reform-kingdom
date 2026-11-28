@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import { t } from '@helpers/i18n/i18n';
 import {
   TOWN_FIRST_VISIT_COMPLETED_CRAFT_COUNT,
@@ -81,7 +82,7 @@ export function townMarkVisited(townId: TownId): void {
       categoryMessageLog(
         'Travel',
         town.name,
-        t('townVisit.youArrivedAtFor', { name: town.name }),
+        t('townVisit.youArrivedAtFor', { name: contentName(town) }),
       );
     }
     void taskEventTownVisited(townId);
