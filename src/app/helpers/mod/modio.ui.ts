@@ -13,7 +13,7 @@ import type {
 export const MODIO_PAGE_SIZE = 10;
 
 // The demo only takes translation mods, so it only lists mods carrying this mod.io tag.
-const MODIO_TRANSLATION_TAG = 'Language';
+const MODIO_TRANSLATION_TAG = 'Translation';
 
 function modioDemoFilter(): Record<string, string> {
   return isDemoBuild() ? { tags: MODIO_TRANSLATION_TAG } : {};
