@@ -8,7 +8,7 @@ import * as yaml from 'js-yaml';
 import path from 'path';
 import rec from 'recursive-readdir';
 import { CONTENT_OUT_DIR } from './content-out-dir';
-import { tiledObjectNames } from './i18n-template';
+import { i18nTiledObjectNames } from '@helpers/i18n/i18n-fields';
 import { writeJsonIfChanged } from './write-json-if-changed';
 
 export const I18N_DIR = 'i18n';
@@ -36,7 +36,7 @@ const mapNodeNames = (): string[] =>
     .readdirSync('gamemaps')
     .filter((file: string) => file.endsWith('.json'))
     .flatMap((file: string) =>
-      tiledObjectNames(fs.readJsonSync(path.join('gamemaps', file))),
+      i18nTiledObjectNames(fs.readJsonSync(path.join('gamemaps', file))),
     );
 
 const writeKeysFile = (uiDoc: unknown, ui: Record<string, string>) => {

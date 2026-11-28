@@ -49,7 +49,7 @@ mods:
   openModsFolder: Open Mods Folder
   reReadsEveryMod: Re-reads every mod and reloads them into your current run (R).
   reloadMods: Reload Mods
-  yourSavefileCanT: 'Your savefile can''t load until these are fixed:'
+  yourSavefileCanT: "Your savefile can't load until these are fixed:"
   reloadGame: Reload Game
   checkedModsAreUsed: Checked mods are used by new games. Mods are stored with the runs and can have their versions updated, but they cannot be removed mid-run.
   inRun: In Run
@@ -75,6 +75,11 @@ mods:
   modsFolder: Mods Folder
   imported: Imported
   installed: Installed
+  checkTranslation: Check Translation
+  checkTranslationTip: Pick a translation mod zip to see which lines are missing, unchanged from English, or out of date.
+  couldNotCheckThat: 'Could not check that translation: {{ errors }}'
+  notATranslation: 'That zip is not a translation mod (mod.yml needs kind: i18n).'
+  couldNotReadZip: 'Could not read that zip: {{ error }}'
 duration:
   shortHours: '{{ count }}h'
   shortMinutes: '{{ count }}m'
@@ -194,8 +199,8 @@ skillTree:
     one: Your {{ count }} unconfirmed change will be discarded.
     other: Your {{ count }} unconfirmed changes will be discarded.
   unconfirmedChanges:
-    one: '{{ hero }} has {{ count }} skill tree change you haven''t confirmed. If you leave now, it will be discarded.'
-    other: '{{ hero }} has {{ count }} skill tree changes you haven''t confirmed. If you leave now, they''ll be discarded.'
+    one: "{{ hero }} has {{ count }} skill tree change you haven't confirmed. If you leave now, it will be discarded."
+    other: "{{ hero }} has {{ count }} skill tree changes you haven't confirmed. If you leave now, they'll be discarded."
 colosseum:
   lostNodes:
     one: '{{ count }} skill tree node on {{ hero }}'
@@ -671,7 +676,7 @@ modalHeroCombatOrders:
   underTaskmasterSIntervention: Under Taskmaster's Intervention, orders only apply when the Decree fights on a sealed map.
   noHeroSelected: No hero selected.
 modalHeroTeachings:
-  sTeachings: '{{ name }}''s Teachings'
+  sTeachings: "{{ name }}'s Teachings"
   teachingsApplyNoMatter: Teachings apply no matter which class this hero is.
   taughtBy: Taught by {{ trainerDisplayName }}
   for: for
@@ -1694,7 +1699,7 @@ colosseumRun:
 combatAnalyze:
   learnedTheStrengthsAnd: '**{{ caster }}** learned the strengths and weaknesses of **{{ target }}**!'
 combatDamage:
-  dodgesS: '**{{ target }}** dodges **{{ combatant }}**''s **{{ name }}**!'
+  dodgesS: "**{{ target }}** dodges **{{ combatant }}**'s **{{ name }}**!"
   tookDamageInRetaliation: '**{{ combatant }}** took {{ damage }} damage in retaliation {{ combatant2 }}!'
   hasBeenDefeated: '**{{ target }}** has been defeated!'
 combatEnd:
@@ -1724,7 +1729,7 @@ combatManual:
   everyone: Everyone
   charging: Charging
   losesTurnNoOrders: '**{{ combatant }}** has no orders and loses the turn!'
-  losesTurnCouldntUse: '**{{ combatant }}** couldn''t use **{{ name }}** and loses the turn!'
+  losesTurnCouldntUse: "**{{ combatant }}** couldn't use **{{ name }}** and loses the turn!"
 combatRewards:
   yourArmoryIsFull: Your armory is full. An item drop was lost.
   youAutomaticallySoldFor: You automatically sold {{ icon }}{{ content }} for {{ goldEarned }}.
@@ -1740,7 +1745,7 @@ combatSkillElements:
   channels: '{{ name }} channels {{ spent }}!'
 combatSkillUse:
   covers: '**{{ cover }}** covers **{{ intendedTarget }}**!'
-  sMisses: '**{{ combatant }}**''s **{{ chosenSkill }}** misses **{{ target }}**!'
+  sMisses: "**{{ combatant }}**'s **{{ chosenSkill }}** misses **{{ target }}**!"
   strikesAgain: '**{{ appliedSkill }}** strikes again!'
   unleashes: '**{{ combatant }}** unleashes **{{ skill }}**!'
 combatStatuseffectsTechnique:
@@ -1752,8 +1757,8 @@ combatStatuseffects:
   basedOn: Based on {{ parts }}
   statUp: '{{ stat }} up'
   statDown: '{{ stat }} down'
-  percentOfTargetStat: '{{ percent }}% of the target''s {{ stat }}'
-  percentOfCasterStat: '{{ percent }}% of the caster''s {{ stat }}'
+  percentOfTargetStat: "{{ percent }}% of the target's {{ stat }}"
+  percentOfCasterStat: "{{ percent }}% of the caster's {{ stat }}"
 commissionTurnIn:
   youGotFromTurning: You got {{ html }} from turning in "{{ offerName }}"!
 craftingQueue:
@@ -1799,7 +1804,7 @@ travel:
 gathering:
   thePartyBeginsGathering: The party begins gathering at {{ nodeName }}.
   thePartyFound: The party found {{ descriptions }}!
-  sLuckDoubledThe: '**{{ name }}**''s luck doubled the haul!'
+  sLuckDoubledThe: "**{{ name }}**'s luck doubled the haul!"
 reforge:
   reforgedInto: Reforged "{{ oldName }}" into "{{ newName }}".
   error:
@@ -1880,7 +1885,7 @@ townRaidResolve:
   lostTheFollowingItems: '{{ townName }} lost the following items: {{ stolenItems }}'
   lostTheFollowingIn: '{{ townName }} lost the following in-progress crafts: {{ cancelledCrafts }}'
   lostTheFollowingResources: '{{ townName }} lost the following resources: {{ descriptions }}'
-  sCraftingIsSlowed: '{{ townName }}''s crafting is slowed for {{ duration }} following the raid.'
+  sCraftingIsSlowed: "{{ townName }}'s crafting is slowed for {{ duration }} following the raid."
 townRaidTick:
   wasRaidedWhileUndefended: '**{{ name }}** was raided while undefended!'
   raidIncoming: Raid Incoming
@@ -2079,7 +2084,7 @@ colosseumSetup:
   notVisited: '{{ location }} (not visited)'
   aLocation: A location
   gear: Gear
-  heroJob: '{{ hero }}''s job'
+  heroJob: "{{ hero }}'s job"
 windowAttention:
   gameOver: Game Over
   armoryFull: Armory Full
@@ -2260,3 +2265,17 @@ buttonConnect:
   discord: Discord
   blog: Blog
   email: Email
+panelModsTranslationCheck:
+  title: 'Translation Check: {{ language }} ({{ locale }})'
+  translated: '{{ translated }}/{{ total }} lines translated'
+  upToDate: Every line is translated
+  downloadPatch: Download Patch
+  downloadPatchTip: A zip with only the missing and out-of-date lines, in English with their _en source. Each file and key matches your i18n/ folder; merge the lines into place and translate them.
+  close: Close
+  problems: Problems ({{ count }})
+  missing: Missing ({{ count }})
+  outdated: English Changed ({{ count }})
+  unchanged: Same as English ({{ count }})
+  was: 'Was: {{ text }}'
+  andMore: …and {{ count }} more.
+  andMoreInPatch: …and {{ count }} more. Download the patch for the full list.

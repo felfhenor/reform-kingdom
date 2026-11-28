@@ -122,6 +122,7 @@ export type TiledLayer = {
   height?: number;
   data?: number[];
   objects?: TiledObject[];
+  layers?: TiledLayer[];
 };
 
 export type TiledMap = {

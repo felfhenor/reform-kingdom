@@ -1,6 +1,6 @@
 # RFK Modding
 
-At present, mods are data and art only - this is done in YAML. Sprites/animations/node backgrounds can also be added to mods. Tiled maps are possible, too. You can use [Tiled 1.12.2](https://www.mapeditor.org/2026/05/27/tiled-1-12-2-released.html) or newer to create maps (a template is provided). At this time, you cannot add custom scripts. Additionally, the demo cannot use mods.
+At present, mods are data and art only - this is done in YAML. Sprites/animations/node backgrounds can also be added to mods. Tiled maps are possible, too. You can use [Tiled 1.12.2](https://www.mapeditor.org/2026/05/27/tiled-1-12-2-released.html) or newer to create maps (a template is provided). At this time, you cannot add custom scripts. Additionally, the demo can only use Translation mods.
 
 Looking for the mod kit? Get the latest version [here](https://github.com/felfhenor/reform-kingdom/releases/latest/download/reform-modkit.zip).
 
@@ -15,6 +15,12 @@ reform-modkit/
     sprites/<sheet>/         one folder per art sheet, plus backgrounds/
     maps/MyMap.json          a blank map to start from
     maps/tilesets/           the game's tilesets, so Tiled can open maps
+  my-translation/            a translation mod, already filled with every English line
+    mod.yml                  note `kind: i18n`
+    i18n/language.yml        locale (e.g. fr, pt-BR) and languageName, in that language
+    i18n/ui.yml              interface text
+    i18n/nodes.yml           map node names
+    i18n/content/<type>.yml  content text, keyed by English name
   examples/showcase/         a complete mod that uses every feature below
   reference/
     content/<type>.yml       the name and id of every base-game entry
@@ -34,6 +40,7 @@ Mods can be managed on the "Mods" page, accessible from the home screen. On this
 - Import Mod - if you zip up your mod, you can load it here
 - Mods folder - in desktop mod, there is a mod folder that sits alongside the game where you can put mods (this folder accepts both zips and folders)
 - mod.io - browse, install, and update published mods
+- Check Translation - pick a translation mod zip to see which lines are missing, still in English, or out of date since the English changed.
 
 Importing a zip will do a full check of the mod to make sure it works as expected. If there are errors, this screen will tell you. Mods in the mods folder will only get some basic checks applied to their setup.
 
@@ -46,7 +53,8 @@ If you want to make map edits easier, go to Settings > Misc > Show Map Coordinat
 - Mods that have "New Games" ticked will be used when a new game starts. These can be reordered to specify mod load order. Order is only important when it comes to edits - a later mod will apply it's changes last.
 - A run will remember it's mods (id, name, version). If there are any missing, the save is not loaded or changed. You will need to install the mods and hit "Reload Game".
 - A runs mods can be updated by bumping the `version` field in a mod. More can be added to a run while it's in progress, but you can never remove a mod from a run.
-- Runs with mods do not earn achievements or send analytics, and will be called out in your legacy as `Modded`
+- Runs with mods do not earn achievements or send analytics, and will be called out in your legacy as `Modded`.
+- Translation mods do not get added to a run. After adding a translation, turn it on in Options.
 
 ## mod.yml
 
@@ -57,6 +65,7 @@ version: 1.0.0 # bump for every release
 author: Your Name
 description: What your mod adds or changes.
 gameVersion: '0.16.3' # optional; players on another major.minor version see a warning. Make sure you keep it quoted! Unquoted, 0.20 would read as 0.2, which is not the same.
+kind: i18n # only for translation mods (these mods cannot contain content, art, or maps)
 ```
 
 ## Content
@@ -166,6 +175,18 @@ To add an entrance to a map off of a base map (likely required for your use case
 ```
 
 `gid` is the "global id" in Tiled. The easiest way to figure out the `gid` for the tile sprite you want is to place one on the Explore Nodes on the map and look at the `gid` property in the resulting JSON file. Tiled does not seem to display this information anywhere in the editor, at least nowhere easily accessible.
+
+## Translations
+
+Start in the `my-translation` directory. Rename it, set the properties in `mod.yml`. Translate only the values! Content will be keyed by the English `name`. Notes:
+
+- Don't touch the `_en` blocks. They're there to indicate what the text was before you changed it, so when checking translation in game it can tell you if the text has changed since the game last updated.
+- Anything missing will be displayed in English, so you don't have to translate everything at once.
+- Every line that has a `{{ placeholder }}` must have it when you translate the line, otherwise it will fail.
+- Do not use HTML, and do not use the character sequence `@@` (this is used to encode combat entities).
+- Plural groups in `ui.yml` will follow your language's plural rules. Add as few or many as needed, and remove the ones you won't use.
+- After the game updates, you can run Check Translation from the mods screen by uploading your mod zip file. Anything missing, you can Download Patch to get the correct content.
+- When publishing, use the `Translation` tag on mod.io. This will also let it show up in the demo (the only mods the demo can use are translation mods).
 
 ## Publishing on mod.io
 

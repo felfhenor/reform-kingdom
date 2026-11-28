@@ -1,19 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { i18nContentFields } from '@helpers/i18n/i18n-fields';
+import {
+  i18nContentFields,
+  i18nTiledObjectNames,
+} from '@helpers/i18n/i18n-fields';
 import { i18nFlatten } from '@helpers/i18n/i18n-parse';
 import { merge, sortBy, uniq } from 'es-toolkit/compat';
 import * as yaml from 'js-yaml';
 
 const dump = (data: unknown) => yaml.dump(data, { lineWidth: -1 });
-
-export const tiledObjectNames = (map: any): string[] => {
-  const collect = (layers: any[]): string[] =>
-    (layers ?? []).flatMap((layer: any) => [
-      ...(layer.objects ?? []).map((object: any) => object.name),
-      ...collect(layer.layers),
-    ]);
-  return collect(map.layers).filter(Boolean);
-};
 
 // Every line carries the English it was copied from: unchanged lines count as untranslated, and changed English gets flagged.
 const templateEntry = (
@@ -48,7 +42,9 @@ export const i18nTemplateFiles = (
   allMaps: Record<string, any>,
   existing: Record<string, any> = {},
 ): Record<string, string> => {
-  const nodes = sortBy(uniq(Object.values(allMaps).flatMap(tiledObjectNames)));
+  const nodes = sortBy(
+    uniq(Object.values(allMaps).flatMap(i18nTiledObjectNames)),
+  );
   const files: Record<string, string> = {
     'ui.yml': dump(
       merge({}, englishUi, existing['ui.yml'], {

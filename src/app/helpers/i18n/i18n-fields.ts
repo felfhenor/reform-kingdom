@@ -1,5 +1,5 @@
 import { contentShortNameEnglish } from '@helpers/content/content-short-name';
-import type { I18nContentFields } from '@interfaces';
+import type { I18nContentFields, TiledLayer, TiledMap } from '@interfaces';
 import { get } from 'es-toolkit/compat';
 
 // Player-facing prose fields in gamedata; everything else is a reference or a number.
@@ -33,7 +33,8 @@ function i18nCollectFields(
 
   Object.entries(value).forEach(([key, child]) => {
     if (typeof child === 'string' && I18N_CONTENT_FIELDS.includes(key)) {
-      out[[...path, key].join('.')] = child;
+      // Ensured content fills unset prose with '', which has nothing to translate.
+      if (child !== '') out[[...path, key].join('.')] = child;
       return;
     }
     i18nCollectFields(child, [...path, key], out);
@@ -66,4 +67,14 @@ export function i18nContentFieldText(
   if (path === 'shortName') return i18nShortName(entry, type);
   const value: unknown = get(entry, path);
   return typeof value === 'string' ? value : undefined;
+}
+
+// Every named object on a map, group layers included: the names nodes.yml translates.
+export function i18nTiledObjectNames(map: Pick<TiledMap, 'layers'>): string[] {
+  const collect = (layers: TiledLayer[] = []): string[] =>
+    layers.flatMap((layer) => [
+      ...(layer.objects ?? []).map((object) => object.name),
+      ...collect(layer.layers),
+    ]);
+  return collect(map.layers).filter(Boolean);
 }

@@ -6,11 +6,16 @@ import { i18nValidate } from '@helpers/i18n/i18n-validate';
 import { baseTilesetGet, mapsSnapshotBase } from '@helpers/maps';
 import { modsApply, modsApplyErrors } from '@helpers/mod/mod-apply';
 import { modBundleParse } from '@helpers/mod/mod-bundle';
-import type { ContentType, I18nLanguageData, IsContentItem } from '@interfaces';
+import type {
+  ContentType,
+  I18nLanguageData,
+  IsContentItem,
+  TiledMap,
+} from '@interfaces';
 import fs from 'fs-extra';
 import * as yaml from 'js-yaml';
 import { loadCompiledContentFromDisk } from './debug/load-compiled-content';
-import { tiledObjectNames } from './i18n-template';
+import { i18nTiledObjectNames } from '@helpers/i18n/i18n-fields';
 import { modDirFiles, modDirs } from './mods-files';
 
 const io = {
@@ -23,9 +28,9 @@ const englishLanguage = (): I18nLanguageData =>
   fs.readJsonSync('public/json/i18n/en.json');
 
 const mapNodeNames = (): string[] =>
-  Object.values(fs.readJsonSync('public/json/all-maps.json')).flatMap(
-    tiledObjectNames,
-  );
+  Object.values(
+    fs.readJsonSync('public/json/all-maps.json') as Record<string, TiledMap>,
+  ).flatMap(i18nTiledObjectNames);
 
 // Unknown lines only warn, since a translation can outlive content a game update removed.
 const validateTranslations = (translations: I18nLanguageData): string[] => {

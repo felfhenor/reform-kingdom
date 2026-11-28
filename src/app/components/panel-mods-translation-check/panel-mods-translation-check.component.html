@@ -1,0 +1,102 @@
+@let data = report();
+<div class="flex flex-col gap-2 min-h-0">
+  <div class="flex items-center gap-2">
+    <h2 class="type-section-title flex-1">
+      {{
+        'panelModsTranslationCheck.title'
+          | t: { language: data.languageName, locale: data.locale }
+      }}
+    </h2>
+    <button
+      class="btn btn-sm btn-primary"
+      [disabled]="needsWork() === 0 || isDownloading()"
+      (click)="download()"
+      ffButton="ui-success"
+      [tp]="'panelModsTranslationCheck.downloadPatchTip' | t"
+    >
+      {{ 'panelModsTranslationCheck.downloadPatch' | t }}
+    </button>
+    <button
+      class="btn btn-sm btn-neutral"
+      (click)="closed.emit()"
+      ffButton="ui-click"
+    >
+      {{ 'panelModsTranslationCheck.close' | t }}
+    </button>
+  </div>
+
+  <div class="flex flex-wrap gap-2">
+    <span class="badge badge-data">
+      {{
+        'panelModsTranslationCheck.translated'
+          | t
+            : {
+                translated: (translated() | number),
+                total: (data.total | number),
+              }
+      }}
+    </span>
+    @if (translated() === data.total) {
+      <span class="badge badge-success">
+        {{ 'panelModsTranslationCheck.upToDate' | t }}
+      </span>
+    }
+  </div>
+
+  <div class="flex flex-col gap-2 overflow-y-auto min-h-0">
+    @if (data.problems.length > 0) {
+      <details open>
+        <summary class="cursor-pointer font-bold">
+          {{
+            'panelModsTranslationCheck.problems'
+              | t: { count: (data.problems.length | number) }
+          }}
+        </summary>
+        <ul class="list-disc pl-6">
+          @for (problem of problems(); track $index) {
+            <li>{{ problem }}</li>
+          }
+        </ul>
+        @if (hiddenProblems() > 0) {
+          <div class="text-lighter pl-6">
+            {{
+              'panelModsTranslationCheck.andMore'
+                | t: { count: (hiddenProblems() | number) }
+            }}
+          </div>
+        }
+      </details>
+    }
+
+    @for (section of sections(); track section.id) {
+      @if (section.count > 0) {
+        <details>
+          <summary class="cursor-pointer font-bold">
+            {{ section.title | t: { count: (section.count | number) } }}
+          </summary>
+          <ul class="flex flex-col gap-2 pl-6">
+            @for (line of section.lines; track $index) {
+              <li class="flex flex-col">
+                <span class="type-meta">{{ lineLabel(line) }}</span>
+                @if (line.previousEnglish !== undefined) {
+                  <span class="text-lighter">
+                    {{
+                      'panelModsTranslationCheck.was'
+                        | t: { text: line.previousEnglish }
+                    }}
+                  </span>
+                }
+                <span>{{ line.english }}</span>
+              </li>
+            }
+          </ul>
+          @if (section.hidden > 0) {
+            <div class="text-lighter pl-6">
+              {{ section.more | t: { count: (section.hidden | number) } }}
+            </div>
+          }
+        </details>
+      }
+    }
+  </div>
+</div>

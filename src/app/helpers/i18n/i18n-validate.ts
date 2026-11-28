@@ -11,6 +11,22 @@ import type {
   I18nValidateResult,
 } from '@interfaces';
 
+export const I18N_CHANGED_WARNING =
+  'the English text has changed since this was translated.';
+
+export const I18N_PLURAL_FORM = /\.(zero|one|two|few|many|other)$/;
+
+// Languages add plural forms English lacks (e.g. `few`), checked against its `other` form.
+function i18nEnglishUiText(
+  key: string,
+  englishUi: I18nFlatStrings,
+): string | undefined {
+  if (englishUi[key] !== undefined) return englishUi[key];
+  return I18N_PLURAL_FORM.test(key)
+    ? englishUi[key.replace(I18N_PLURAL_FORM, '.other')]
+    : undefined;
+}
+
 function i18nValidateUi(
   ui: I18nFlatStrings,
   uiSources: I18nFlatStrings,
@@ -18,15 +34,13 @@ function i18nValidateUi(
   result: I18nValidateResult,
 ): void {
   Object.entries(ui).forEach(([key, text]) => {
-    const english = englishUi[key];
+    const english = i18nEnglishUiText(key, englishUi);
     if (english === undefined) {
       result.warnings.push(`ui.yml ${key}: not a key in the game.`);
       return;
     }
     if (uiSources[key] !== undefined && uiSources[key] !== english) {
-      result.warnings.push(
-        `ui.yml ${key}: the English text has changed since this was translated.`,
-      );
+      result.warnings.push(`ui.yml ${key}: ${I18N_CHANGED_WARNING}`);
     }
     if (!i18nPlaceholdersMatch(english, text)) {
       result.errors.push(
@@ -57,9 +71,7 @@ function i18nValidateEntry(
       );
     }
     if (sources[path] !== undefined && sources[path] !== english) {
-      result.warnings.push(
-        `${where} ${path}: the English text has changed since this was translated.`,
-      );
+      result.warnings.push(`${where} ${path}: ${I18N_CHANGED_WARNING}`);
     }
   });
 }

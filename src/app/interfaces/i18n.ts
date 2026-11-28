@@ -55,3 +55,33 @@ export type I18nEnglishContentLookup = (
 export type LanguageChoice =
   | { source: 'base'; locale: string }
   | { source: 'mod'; modId: string; locale: string };
+
+export type I18nEnglishSnapshot = {
+  ui: I18nFlatStrings;
+  content: Record<string, Record<string, I18nContentFields>>;
+  nodes: string[];
+};
+
+// One translatable line; `entry` is the content name for content files.
+export type I18nCoverageLine = {
+  file: string;
+  entry?: string;
+  key: string;
+  english: string;
+  previousEnglish?: string;
+};
+
+export type I18nCoverageReport = I18nLanguageInfo & {
+  total: number;
+  missing: I18nCoverageLine[];
+  unchanged: I18nCoverageLine[];
+  outdated: I18nCoverageLine[];
+  problems: string[];
+};
+
+export type I18nCoverageCheck = {
+  report?: I18nCoverageReport;
+  errors: string[];
+};
+
+export type I18nPatchFiles = Record<string, Record<string, unknown>>;

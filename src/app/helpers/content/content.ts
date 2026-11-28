@@ -117,6 +117,17 @@ export function contentSnapshotBase(): void {
   baseContentById = new Map(allContentById());
 }
 
+export function contentBaseEntries(): IsContentItem[] {
+  return [...baseContentById.values()];
+}
+
+export function contentBaseEntryByName(
+  name: string,
+): IsContentItem | undefined {
+  const id = baseIdsByName.get(name);
+  return id ? baseContentById.get(id) : undefined;
+}
+
 export function contentRestoreBase(): void {
   setAllIdsByName(baseIdsByName);
   setAllContentById(baseContentById);

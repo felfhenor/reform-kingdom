@@ -15,6 +15,10 @@ export function mapsSnapshotBase(): void {
   baseMaps = new Map(allMaps());
 }
 
+export function mapsBase(): GameMap[] {
+  return [...baseMaps.values()];
+}
+
 export function mapsRestoreBase(): void {
   setAllMaps(baseMaps);
 }

@@ -2,6 +2,7 @@ import { t } from '@helpers/i18n/i18n';
 import type { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import {
+  type AnimationCallbackEvent,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -9,6 +10,9 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { PanelModsTranslationCheckComponent } from '@components/panel-mods-translation-check/panel-mods-translation-check.component';
+import { i18nCoverageCheckZip } from '@helpers/i18n/i18n-coverage.ui';
+import { AnimationService } from '@services/animation.service';
 import { Router } from '@angular/router';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
@@ -52,7 +56,12 @@ import { savefileLoadStatus } from '@helpers/savefile/savefile-load';
 import { isSetup } from '@helpers/setup';
 import { metaState } from '@helpers/state-game';
 import { getOption } from '@helpers/state-options';
-import type { ModInstalled, ModSource, ModsTab } from '@interfaces';
+import type {
+  I18nCoverageReport,
+  ModInstalled,
+  ModSource,
+  ModsTab,
+} from '@interfaces';
 import { TippyDirective } from '@ngneat/helipopper';
 import { TPipe } from '@pipes/t.pipe';
 import { ModsService } from '@services/mods.service';
@@ -79,6 +88,7 @@ import { sortBy } from 'es-toolkit/compat';
     IconModLogoComponent,
     ListReflowDirective,
     PanelModsModioComponent,
+    PanelModsTranslationCheckComponent,
     SweetAlert2Module,
     TippyDirective,
     TPipe,
@@ -96,6 +106,8 @@ export class ModsComponent {
 
   public readonly hasModsFolder = modsDiskAvailable();
   public isBusy = signal(false);
+  public translationReport = signal<I18nCoverageReport | undefined>(undefined);
+  private anim = inject(AnimationService);
   public readonly reorderPriority = GAMEPAD_PRIORITY.popover;
   public uiScale = uiScaleCurrent;
 
@@ -210,6 +222,33 @@ export class ModsComponent {
       await this.modsService.reload();
       notifySuccess(t('mods.modInstalled'));
     });
+  }
+
+  async checkTranslation(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) return;
+
+    await this.runBusy(async () => {
+      const { report, errors } = await i18nCoverageCheckZip(file);
+      if (!report) {
+        notifyError(t('mods.couldNotCheckThat', { errors: errors.join(' ') }));
+        return;
+      }
+      this.translationReport.set(report);
+    });
+  }
+
+  protected onPanelEnter(event: AnimationCallbackEvent): void {
+    this.anim.fadeIn(event.target, 200);
+  }
+
+  protected onPanelLeave(event: AnimationCallbackEvent): void {
+    this.anim
+      .fadeOut(event.target, 200)
+      .then(() => event.animationComplete())
+      .catch(() => event.animationComplete());
   }
 
   async useLanguage(mod: ModInstalled): Promise<void> {

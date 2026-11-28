@@ -25,6 +25,23 @@
             (change)="importZip($event)"
           />
 
+          <button
+            class="btn btn-sm btn-neutral"
+            [disabled]="isBusy()"
+            (click)="checkInput.click()"
+            ffButton="ui-click"
+            [tp]="'mods.checkTranslationTip' | t"
+          >
+            {{ 'mods.checkTranslation' | t }}
+          </button>
+          <input
+            #checkInput
+            type="file"
+            class="hidden"
+            accept=".zip"
+            (change)="checkTranslation($event)"
+          />
+
           @if (hasModsFolder) {
             <button
               class="btn btn-sm btn-neutral"
@@ -64,6 +81,16 @@
             {{ 'mods.reloadGame' | t }}
           </button>
         </div>
+      }
+
+      @if (translationReport(); as report) {
+        <app-panel-mods-translation-check
+          class="flex flex-col max-h-[50vh] min-h-0"
+          [report]="report"
+          (closed)="translationReport.set(undefined)"
+          (animate.enter)="onPanelEnter($event)"
+          (animate.leave)="onPanelLeave($event)"
+        />
       }
 
       @let currentTab = activeTab();

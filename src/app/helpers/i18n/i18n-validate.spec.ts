@@ -64,6 +64,23 @@ describe('i18nValidate', () => {
     expect(result.warnings).toHaveLength(5);
   });
 
+  it('checks plural forms English lacks against its other form', () => {
+    const result = i18nValidate(
+      i18nLanguageLayer({
+        locale: 'pl',
+        ui: { 'turns.few': '{{ count }} tury', 'turns.many': '{{ n }} tur' },
+      }),
+      { 'turns.one': '{{ count }} turn', 'turns.other': '{{ count }} turns' },
+      english,
+      [],
+    );
+
+    expect(result.warnings).toEqual([]);
+    expect(result.errors).toEqual([
+      'ui.yml turns.many: {{ }} placeholders differ from English.',
+    ]);
+  });
+
   it('warns when the English of a translated UI line has changed', () => {
     const result = i18nValidate(
       i18nLanguageLayer({
