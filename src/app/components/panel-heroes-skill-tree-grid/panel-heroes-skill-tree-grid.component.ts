@@ -1,3 +1,5 @@
+import { TPipe } from '@pipes/t.pipe';
+import { contentShortName } from '@helpers/i18n/i18n-content';
 import { DecimalPipe, NgTemplateOutlet } from '@angular/common';
 import {
   afterNextRender,
@@ -24,10 +26,7 @@ import {
   SKILL_TREE_OATH_OPTION_GAP,
   SKILL_TREE_OATH_PADDING,
 } from '@helpers/config';
-import {
-  skillTreeJobNodes,
-  skillTreeNodeShortName,
-} from '@helpers/hero/skill-tree-content';
+import { skillTreeJobNodes } from '@helpers/hero/skill-tree-content';
 import {
   skillTreeArrows,
   skillTreeLayout,
@@ -50,6 +49,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-panel-heroes-skill-tree-grid',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     DecimalPipe,
     IconItemPreviewComponent,
     NgTemplateOutlet,
@@ -152,6 +152,6 @@ export class PanelHeroesSkillTreeGridComponent {
   }
 
   public name(node: SkillTreeNodeContent): string {
-    return skillTreeNodeShortName(node);
+    return contentShortName(node);
   }
 }

@@ -200,24 +200,24 @@ describe('skillTechniqueTargeting', () => {
   const skill = buildSkill();
 
   it('names a single enemy and pluralizes multiples', () => {
-    expect(
-      skillTechniqueTargeting(skill, buildTechnique({ targets: 1 })),
-    ).toEqual({ count: 1, noun: 'enemy' });
-    expect(
-      skillTechniqueTargeting(skill, buildTechnique({ targets: 3 })),
-    ).toEqual({ count: 3, noun: 'enemies' });
+    expect(skillTechniqueTargeting(skill, buildTechnique({ targets: 1 }))).toBe(
+      '1 enemy',
+    );
+    expect(skillTechniqueTargeting(skill, buildTechnique({ targets: 3 }))).toBe(
+      '3 enemies',
+    );
   });
 
   it('describes self and all-combatant techniques without a count', () => {
     expect(
       skillTechniqueTargeting(skill, buildTechnique({ targetType: 'Self' })),
-    ).toEqual({ noun: 'self' });
+    ).toBe('self');
     expect(
       skillTechniqueTargeting(
         skill,
         buildTechnique({ targetType: 'All', targets: 25 }),
       ),
-    ).toEqual({ noun: 'all combatants' });
+    ).toBe('all combatants');
   });
 
   it('treats a full-party ally technique as all allies', () => {
@@ -226,13 +226,13 @@ describe('skillTechniqueTargeting', () => {
         skill,
         buildTechnique({ targetType: 'Allies', targets: 4 }),
       ),
-    ).toEqual({ noun: 'all allies' });
+    ).toBe('all allies');
     expect(
       skillTechniqueTargeting(
         skill,
         buildTechnique({ targetType: 'Allies', targets: 2 }),
       ),
-    ).toEqual({ count: 2, noun: 'allies' });
+    ).toBe('2 allies');
   });
 });
 
@@ -257,7 +257,7 @@ describe('skillTechniquePreviews', () => {
     expect(previews[0]).toMatchObject({
       kind: 'Damage',
       amount: 30,
-      targeting: { count: 1, noun: 'enemy' },
+      targeting: '1 enemy',
       scaling: [
         { stat: 'Strength', multiplier: 1 },
         { stat: 'Agility', multiplier: 1 },
@@ -266,7 +266,7 @@ describe('skillTechniquePreviews', () => {
     expect(previews[1]).toMatchObject({
       kind: 'Heal',
       amount: 20,
-      targeting: { noun: 'self' },
+      targeting: 'self',
       conditions: ['Only if wounded'],
       scaling: [{ stat: 'Vitality', multiplier: 0.5 }],
     });

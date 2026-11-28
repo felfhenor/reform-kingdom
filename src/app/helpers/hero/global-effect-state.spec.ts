@@ -186,6 +186,15 @@ describe('globalEffectEffectsDescription', () => {
     );
   });
 
+  it('words fractional skill points as one every N levels', () => {
+    expect(
+      globalEffectEffectsDescription([
+        { effectType: 'GlobalSkillPointsPerLevel', value: 2 },
+        { effectType: 'GlobalSkillPointsPerLevel', value: -0.5 },
+      ]),
+    ).toBe('Skill Points: +2 per level, Skill Points: -1 every 2 levels');
+  });
+
   it('rounds scaled values instead of printing float noise', () => {
     expect(
       globalEffectEffectsDescription([

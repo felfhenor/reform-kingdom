@@ -227,7 +227,7 @@ describe('grantResolvedDrops', () => {
     ]);
 
     expect(getMaterialQuantity(ore.id)).toBe(5);
-    expect(logMessages()).toEqual([expect.stringContaining('copper ore')]);
+    expect(logMessages()).toEqual([expect.stringContaining('Copper Ore')]);
     expect(vfxQuantities()).toEqual([5]);
   });
 
@@ -274,7 +274,7 @@ describe('resolvedDropLogPart', () => {
     ).map(resolvedDropLogPart);
 
     expect(parts.map((part) => part?.html)).toEqual([
-      expect.stringMatching(/^@@icon@@3 .*copper ores/),
+      expect.stringMatching(/^@@icon@@3x .*Copper Ore/),
       expect.stringMatching(/^@@icon@@.*Iron Sword/),
       expect.stringMatching(/^@@icon@@.*Old Coin/),
       expect.stringMatching(/^@@icon@@.*Iron Sword/),

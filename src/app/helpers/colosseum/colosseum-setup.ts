@@ -1,3 +1,4 @@
+import { tPlural } from '@helpers/i18n/i18n';
 import { contentNameById } from '@helpers/i18n/i18n-content';
 import {
   colosseumEncounterOptions,
@@ -57,9 +58,7 @@ function colosseumPruneTree(
   );
   const lost = (nodes?.length ?? 0) - (kept?.length ?? 0);
   if (lost > 0) {
-    dropped.push(
-      `${lost} skill tree node${lost === 1 ? '' : 's'} on ${hero.name}`,
-    );
+    dropped.push(tPlural('colosseum.lostNodes', lost, { hero: hero.name }));
   }
   // An emptied list would read as a deliberate empty tree; fall back to the real one instead.
   return kept?.length === 0 && lost > 0 ? undefined : kept;

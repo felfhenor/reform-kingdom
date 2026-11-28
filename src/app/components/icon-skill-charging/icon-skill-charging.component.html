@@ -9,8 +9,7 @@
 
 <ng-template #footer>
   <div class="type-meta mt-2">
-    Fires in {{ c.turnsRemaining | number }}
-    {{ c.turnsRemaining === 1 ? 'turn' : 'turns' }}
+    {{ 'skill.firesIn' | tPlural: c.turnsRemaining }}
   </div>
 </ng-template>
 

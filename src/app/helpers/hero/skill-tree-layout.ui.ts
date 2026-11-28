@@ -1,4 +1,7 @@
-import { contentDescription } from '@helpers/i18n/i18n-content';
+import {
+  contentDescription,
+  contentShortName,
+} from '@helpers/i18n/i18n-content';
 import {
   SKILL_TREE_COLUMN_GAP,
   SKILL_TREE_COLUMN_INTERVAL,
@@ -308,7 +311,7 @@ function skillTreeNodeSummary(
 ): SkillTreeNodeSummary {
   return {
     node,
-    name: skillTreeNodeShortName(node),
+    name: contentShortName(node),
     art: skillTreeNodeArt(node, job),
   };
 }
@@ -355,7 +358,7 @@ export function skillTreeResetPromptText(
     learned.length + characterSkillTreeAvailableSp(character, job.id);
 
   return [
-    `${character.name} will forget every ${job.name} skill, ability and bonus they learned${spec ? `, including their ${skillTreeNodeShortName(spec)} specialization,` : ''} and get all ${format(refund)} SP back.`,
+    `${character.name} will forget every ${job.name} skill, ability and bonus they learned${spec ? `, including their ${contentShortName(spec)} specialization,` : ''} and get all ${format(refund)} SP back.`,
     regalia
       ? `Their regalia "${regalia.name}" is reset too; other regalias keep their builds.`
       : '',

@@ -26,7 +26,7 @@
         ffPadAction="context"
         ffPadLabel="Sell"
       >
-        Sell {{ count | number }} {{ count === 1 ? 'item' : 'items' }}
+        {{ 'armory.sellItems' | tPlural: count }}
         <app-currency-cost
           [type]="goldCoinItemId"
           [amount]="selectedGoldTotal()"

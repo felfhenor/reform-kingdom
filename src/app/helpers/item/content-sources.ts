@@ -1,3 +1,4 @@
+import { contentName } from '@helpers/i18n/i18n-content';
 import { allContentById, getEntriesByType } from '@helpers/content/content';
 import type {
   CaravanTraderContent,
@@ -64,8 +65,12 @@ function recipeCraftSource(
 }
 
 export function sourceKey(source: CollectibleSource): string {
-  return source.type === 'crafting'
-    ? `crafting:${source.tradeskillId}:${source.tradeskillLevel}`
+  if (source.type === 'crafting') {
+    return `crafting:${source.tradeskillId}:${source.tradeskillLevel}`;
+  }
+  // Translated monster names can collide, so they're keyed by id.
+  return source.type === 'monster'
+    ? `monster:${source.monsterId}`
     : `${source.type}:${source.name}`;
 }
 
@@ -138,7 +143,7 @@ function worldSources(target: SourceTarget): CollectibleSource[] {
       (monster) => monster.drops,
       (monster) => ({
         type: 'monster',
-        name: monster.name,
+        name: contentName(monster),
         monsterId: monster.id,
       }),
     ),

@@ -1,3 +1,4 @@
+import { TPluralPipe } from '@pipes/t-plural.pipe';
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
@@ -62,24 +63,19 @@ import {
   worldNodeCaravan,
   worldNodesOfType,
 } from '@helpers/world-node/world-nodes';
-import type {
-  KingdomSubview,
-  RecipeContent,
-  Tradeskill,
-} from '@interfaces';
-import { PluralizePipe } from '@pipes/pluralize.pipe';
+import type { KingdomSubview, RecipeContent, Tradeskill } from '@interfaces';
 import { clamp } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-play-kingdom-home',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPluralPipe,
     AtlasImageComponent,
     ButtonGlowDirective,
     CardPageComponent,
     DecimalPipe,
     IconKingdomComponent,
-    PluralizePipe,
     SFXDirective,
     BarProgressComponent,
     TextNumberTweenComponent,

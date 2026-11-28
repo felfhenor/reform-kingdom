@@ -1,3 +1,4 @@
+import { TPluralPipe } from '@pipes/t-plural.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -28,7 +29,12 @@ const energyKinds: SkillTechniqueKind[] = ['Restore', 'Drain'];
 @Component({
   selector: 'app-row-skill-technique',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DecimalPipe, IconElementChargeComponent, TippyDirective],
+  imports: [
+    TPluralPipe,
+    DecimalPipe,
+    IconElementChargeComponent,
+    TippyDirective,
+  ],
   templateUrl: './row-skill-technique.component.html',
 })
 export class RowSkillTechniqueComponent {

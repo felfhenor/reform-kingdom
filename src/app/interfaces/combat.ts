@@ -178,7 +178,10 @@ export type CombatantDelayedSkill = Omit<
 
 export type Combatant = HasAnimation & {
   id: string;
+  // Monsters' is English; older saves have only this to display.
   name: string;
+  // Monster-only "A", "B", ... so the display name can be rebuilt in the player's language.
+  indexLabel?: string;
 
   isEnemy: boolean;
   // Enemy-only MonsterId source for post-combat rewards; untyped to avoid a circular import.

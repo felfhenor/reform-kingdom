@@ -77,7 +77,7 @@ beforeEach(() => {
 describe('tradeGoodsLogPart', () => {
   it('folds an item quantity into its name', () => {
     expect(tradeGoodsLogPart({ itemId: copper.id }, 3)?.html).toMatch(
-      /^@@icon@@3 .*copper ores/,
+      /^@@icon@@3x .*Copper Ore/,
     );
   });
 
@@ -124,7 +124,7 @@ describe('tradeLog', () => {
     expect(entry.kind).toBe('Miscellaneous');
     expect(entry.locationName).toBe('Larsia');
     expect(entry.message).toMatch(
-      /^You bought @@icon@@.*Bronze Blade.* for @@icon@@50 .*gold coins.*\.$/,
+      /^You bought @@icon@@.*Bronze Blade.* for @@icon@@50x .*Gold Coin.*\.$/,
     );
     expect(entry.itemIcons?.map((icon) => icon.spritesheet)).toEqual([
       'equipment',

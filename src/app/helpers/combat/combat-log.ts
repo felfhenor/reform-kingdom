@@ -1,6 +1,7 @@
+import { tPlural, t } from '@helpers/i18n/i18n';
+import { combatantDisplayName } from '@helpers/combat/combat-create';
 import { contentName } from '@helpers/i18n/i18n-content';
 import { signal } from '@angular/core';
-import { pluralize } from '@boringnode/pluralize';
 import {
   COMBAT_LOG_MAX_ENTRIES,
   COMBAT_LOG_PERSIST_DELAY_MS,
@@ -98,7 +99,7 @@ export function combatMessageLog(
     ...(combat.guardians ?? []),
   ].map((combatant) => ({
     id: combatant.id,
-    name: combatant.name,
+    name: combatantDisplayName(combatant),
     hp: combatant.hp,
     maxHp: combatant.totalStats.Health,
     sprite: combatant.sprite ?? '',
@@ -128,11 +129,24 @@ export function combatMessageLog(
   pushLogEntry(entry);
 }
 
+// Wraps the status in invisible markers, so views with live HP/EP bars can strip it whatever language it was logged in.
+export const COMBATANT_STATUS_MARK = '⁣';
+
 export function combatantStatusText(combatant: Combatant): string {
   const shield = combatant.shield ?? 0;
-  const shieldText = shield > 0 ? ` [${shield.toLocaleString()} shield]` : '';
   const whole = (value: number) => Math.floor(value).toLocaleString();
-  return `[${whole(combatant.hp)}/${whole(combatant.totalStats.Health)} HP]${shieldText} [${whole(combatant.ep)}/${whole(combatant.totalStats.Energy)} EP]`;
+  const params = {
+    hp: whole(combatant.hp),
+    maxHp: whole(combatant.totalStats.Health),
+    ep: whole(combatant.ep),
+    maxEp: whole(combatant.totalStats.Energy),
+    shield: shield.toLocaleString(),
+  };
+  const text = t(
+    shield > 0 ? 'combat.statusShielded' : 'combat.status',
+    params,
+  );
+  return `${COMBATANT_STATUS_MARK}${text}${COMBATANT_STATUS_MARK}`;
 }
 
 // Stands in for a combatant's name.
@@ -180,13 +194,9 @@ export function itemNameHtml(
   return rarityNameHtml(displayName, item.rarity);
 }
 
-// "1 wergen stick" vs "3 wergen sticks" - only pluralize when the quantity
-// actually calls for it, since item names are authored in singular form.
+// The noun stays as named; inflecting it is English-only, so the count carries the plural instead.
 export function itemDropHtml(item: ItemContent, quantity: number): string {
-  const lowerName = contentName(item).toLowerCase();
-  const displayName = quantity === 1 ? lowerName : pluralize(lowerName);
-
-  return `${quantity.toLocaleString()} ${itemNameHtml(item, displayName)}`;
+  return tPlural('log.itemDrop', quantity, { item: itemNameHtml(item) });
 }
 
 export function equipmentNameHtml(equipment: EquipmentContent): string {
@@ -256,5 +266,7 @@ export function combatLogHealthColor(
 // Combat/travel messages use markdown-style emphasis (e.g. "**Jala** attacks
 // ..."), rendered inline (no wrapping <p>) since each entry is a single line.
 export function adventureLogMessageHtml(message: string): string {
-  return parseInline(message, { async: false });
+  return parseInline(message.replaceAll(COMBATANT_STATUS_MARK, ''), {
+    async: false,
+  });
 }

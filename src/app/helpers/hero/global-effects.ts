@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
 import { timerTicksElapsed } from '@helpers/engine/timer';
@@ -128,7 +129,15 @@ export function globalEffectDurationLabel(effect: GlobalEffect): string {
   const currentTick = timerTicksElapsed();
   const remainingTicks = Math.max(effect.expiresAtTick - currentTick, 0);
 
-  if (remainingTicks >= 3600) return `${Math.round(remainingTicks / 3600)}h`;
-  if (remainingTicks >= 60) return `${Math.round(remainingTicks / 60)}m`;
-  return `${remainingTicks}s`;
+  if (remainingTicks >= 3600) {
+    return t('duration.shortHours', {
+      count: Math.round(remainingTicks / 3600),
+    });
+  }
+  if (remainingTicks >= 60) {
+    return t('duration.shortMinutes', {
+      count: Math.round(remainingTicks / 60),
+    });
+  }
+  return t('duration.shortSeconds', { count: remainingTicks });
 }

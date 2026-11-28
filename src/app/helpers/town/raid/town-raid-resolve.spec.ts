@@ -305,8 +305,8 @@ describe('raidResolveDefeat', () => {
       [wood.id]: tooSmallToLose,
     });
     const entry = combatLog().find((e) => e.message.includes('resources'));
-    expect(entry?.message).toContain('ore');
-    expect(entry?.message).not.toContain('wood');
+    expect(entry?.message).toContain('Ore');
+    expect(entry?.message).not.toContain('Wood');
     expect(entry?.itemIcons).toEqual([
       { sprite: ore.sprite, spritesheet: 'item' },
     ]);

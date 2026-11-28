@@ -1,16 +1,13 @@
+import { durationText } from '@helpers/engine/timer.ui';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
-import { formatNumber } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  inject,
   input,
-  LOCALE_ID,
 } from '@angular/core';
 import { DetailMonsterSummaryComponent } from '@components/detail-monster-summary/detail-monster-summary.component';
 import { regionIsSealed, regionSealTime } from '@helpers/combat/combat-manual';
-import { ticksToDurationParts } from '@helpers/engine';
 import { bestiaryEntry } from '@helpers/kingdom/bestiary.ui';
 import { regionSealedBy } from '@helpers/lore/region-intro';
 import { worldNodeEncounterCount } from '@helpers/world-node/world-node-encounter';
@@ -31,8 +28,6 @@ import { TippyDirective } from '@ngneat/helipopper';
   styleUrl: './panel-map-node-badges-explore.component.scss',
 })
 export class PanelMapNodeBadgesExploreComponent {
-  private locale = inject(LOCALE_ID);
-
   public entry = input.required<WorldNodeEntry>();
 
   public encounterCount = computed(() => worldNodeEncounterCount(this.entry()));
@@ -61,11 +56,6 @@ export class PanelMapNodeBadgesExploreComponent {
     const region = this.sealRegion();
     if (!region) return '';
 
-    return ticksToDurationParts(regionSealTime(region.mapName))
-      .map(
-        (part) =>
-          `${formatNumber(part.value, this.locale)} ${part.unit}${part.value === 1 ? '' : 's'}`,
-      )
-      .join(', ');
+    return durationText(regionSealTime(region.mapName));
   }
 }

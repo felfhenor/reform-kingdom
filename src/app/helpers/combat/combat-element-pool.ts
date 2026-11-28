@@ -1,3 +1,4 @@
+import { enumLabel, t } from '@helpers/i18n/i18n';
 import { COMBAT_ELEMENT_CHARGES_PER_ELEMENT } from '@helpers/config';
 import { defaultAffinities } from '@helpers/defaults';
 import type { Combat, ElementBlock, GameElement } from '@interfaces';
@@ -39,6 +40,11 @@ export function elementPoolFill(combat: Combat, elements: GameElement[]): void {
 
 export function elementBlockText(block: ElementBlock): string {
   return GameElementOrder.filter((element) => block[element] > 0)
-    .map((element) => `${block[element]} ${element}`)
+    .map((element) =>
+      t('element.charges', {
+        count: block[element],
+        element: enumLabel('element', element),
+      }),
+    )
     .join(', ');
 }

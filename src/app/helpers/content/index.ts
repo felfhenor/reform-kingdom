@@ -1,6 +1,7 @@
 export * from './content';
 export * from './content-initializers';
 export * from './content-refs';
+export * from './content-short-name';
 export * from './ensure-achievement';
 export * from './ensure-affix';
 export * from './ensure-astralprojector';

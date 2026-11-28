@@ -1,3 +1,4 @@
+import { TPluralPipe } from '@pipes/t-plural.pipe';
 import { FFTriggerTabsDirective } from '@ff/focus/ff-trigger-tabs.directive';
 import { DecimalPipe } from '@angular/common';
 import {
@@ -34,7 +35,6 @@ import type {
   EquipmentPickerSource,
   WorkshopTabOption,
 } from '@interfaces';
-import { PluralizePipe } from '@pipes/pluralize.pipe';
 
 const WORKSHOP_TABS: WorkshopTabOption[] = [
   {
@@ -59,6 +59,7 @@ const WORKSHOP_TABS: WorkshopTabOption[] = [
   selector: 'app-play-kingdom-workshop',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPluralPipe,
     FFTriggerTabsDirective,
     BlankSlateComponent,
     ButtonKingdomBackComponent,
@@ -67,7 +68,6 @@ const WORKSHOP_TABS: WorkshopTabOption[] = [
     PanelEquipmentPickerComponent,
     PanelKingdomWorkshopInfuseComponent,
     PanelKingdomWorkshopReforgeComponent,
-    PluralizePipe,
     RowInfusedMaterialsComponent,
     SFXDirective,
     TeleportOutletDirective,

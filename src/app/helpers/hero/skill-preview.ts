@@ -1,3 +1,4 @@
+import { t, tPlural } from '@helpers/i18n/i18n';
 import {
   contentDescription,
   contentNameById,
@@ -27,7 +28,6 @@ import type {
   SkillTechniqueKind,
   SkillTechniquePreview,
   SkillTechniqueStatusPreview,
-  SkillTechniqueTargeting,
 } from '@interfaces';
 import { sumBy } from 'es-toolkit/compat';
 
@@ -70,19 +70,19 @@ export function skillTechniqueKind(
 export function skillTechniqueTargeting(
   skill: EquipmentSkillContent,
   technique: EquipmentSkillContentTechnique,
-): SkillTechniqueTargeting {
+): string {
   const count = skillTechniqueNumTargets(skill, technique);
 
   switch (technique.targetType) {
     case 'Self':
-      return { noun: 'self' };
+      return t('skill.target.self');
     case 'All':
-      return { noun: 'all combatants' };
+      return t('skill.target.all');
     case 'Allies':
-      if (count >= SKILL_MAX_ALLY_TARGETS) return { noun: 'all allies' };
-      return { count, noun: count === 1 ? 'ally' : 'allies' };
+      if (count >= SKILL_MAX_ALLY_TARGETS) return t('skill.target.allAllies');
+      return tPlural('skill.target.allies', count);
     default:
-      return { count, noun: count === 1 ? 'enemy' : 'enemies' };
+      return tPlural('skill.target.enemies', count);
   }
 }
 

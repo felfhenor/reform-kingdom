@@ -1,3 +1,5 @@
+import { getEntry } from '@helpers/content/content';
+import { contentShortName } from '@helpers/i18n/i18n-content';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -36,6 +38,11 @@ export class IconSpecComponent {
 
   public name = computed(() => {
     const node = this.spec();
-    return node ? skillTreeNodeShortName(node) : '';
+    if (!node) return '';
+    // Legacy runs keep only a short English name, which has no entry to translate from.
+    const entry = getEntry<SkillTreeNodeContent>(node.name);
+    return entry?.__type === 'skilltreenode'
+      ? contentShortName(entry)
+      : skillTreeNodeShortName(node);
   });
 }

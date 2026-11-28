@@ -1,12 +1,12 @@
+import { durationText } from '@helpers/engine/timer.ui';
 import { FFSelectDirective } from '@ff/controls/ff-select.directive';
-import { DatePipe, DecimalPipe, formatNumber } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import type { OnInit } from '@angular/core';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
   inject,
-  LOCALE_ID,
   signal,
   viewChild,
 } from '@angular/core';
@@ -28,7 +28,6 @@ import { isInElectron } from '@helpers/engine/electron';
 import { electronLogOpenFolder } from '@helpers/engine/electron-log.ui';
 import { notifyError } from '@helpers/engine/notify';
 import { timerTicksElapsed } from '@helpers/engine/timer';
-import { ticksToDurationParts } from '@helpers/engine/timer.ui';
 import { closeAllMenus } from '@helpers/engine/ui';
 import { gameReset } from '@helpers/game-init';
 import { savefileBackupsRead } from '@helpers/savefile/savefile-backup-storage';
@@ -82,7 +81,6 @@ export class PanelOptionsSavefileComponent
   implements OnInit
 {
   private router = inject(Router);
-  private locale = inject(LOCALE_ID);
 
   private restoreSwal = viewChild<SwalComponent>('restoreSwal');
   private resetBackupsSwal = viewChild<SwalComponent>('resetBackupsSwal');
@@ -142,12 +140,7 @@ export class PanelOptionsSavefileComponent
   }
 
   public durationText(ticks: number): string {
-    return ticksToDurationParts(ticks)
-      .map(
-        (part) =>
-          `${formatNumber(part.value, this.locale)} ${part.unit}${part.value === 1 ? '' : 's'}`,
-      )
-      .join(', ');
+    return durationText(ticks);
   }
 
   private async refreshBackups() {

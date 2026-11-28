@@ -1,3 +1,4 @@
+import { contentNameById, contentShortName } from '@helpers/i18n/i18n-content';
 import { getEntry } from '@helpers/content/content';
 import { craftQueueTicksRemaining } from '@helpers/crafting/crafting';
 import { recipeCraftTime } from '@helpers/crafting/recipe-craft-time';
@@ -35,12 +36,6 @@ export function craftQueueUnitsRemaining(tradeskill: Tradeskill): number {
   );
 }
 
-// Recipe names are authored as "Category: Item Name" (e.g. "Material: Copper
-// Ingot") - the status card only wants the item name.
-function stripRecipeCategory(name: string): string {
-  return name.replace(/^[^:]*:\s*/, '');
-}
-
 // One entry per tradeskill currently crafting - built for the corner status
 // indicator, so an idle discipline is simply omitted rather than shown empty.
 export function craftingActiveStatusEntries(): CraftingStatusEntry[] {
@@ -57,7 +52,9 @@ export function craftingActiveStatusEntries(): CraftingStatusEntry[] {
       {
         tradeskillId,
         tradeskill,
-        itemName: stripRecipeCategory(recipe?.name ?? tradeskill),
+        itemName: recipe
+          ? contentShortName(recipe)
+          : (contentNameById(tradeskill) ?? tradeskill),
         resultSpritesheet: recipe ? recipeResultSpritesheet(recipe) : 'item',
         resultSprite: resultContent?.sprite ?? '',
         // Whole-queue remaining, not just this entry's - so players see how

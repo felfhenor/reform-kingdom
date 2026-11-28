@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import type {
   PresenceActivity,
   PresenceActivityKind,
@@ -25,10 +26,7 @@ export function presencePausedText(text: string): string {
 }
 
 export function presenceActivityText(activity: PresenceActivity): string {
-  return PRESENCE_ACTIVITY_TEXT[activity.kind].replace(
-    '%name%',
-    activity.name ?? '',
-  );
+  return t(`presence.${activity.kind}`, { name: activity.name ?? '' });
 }
 
 function steamPresenceToken(

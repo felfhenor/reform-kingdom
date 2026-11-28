@@ -1,3 +1,4 @@
+import { tPlural } from '@helpers/i18n/i18n';
 import { contentDescription, contentName } from '@helpers/i18n/i18n-content';
 import { DEBUFF_POTENCY_PER_RANK } from '@helpers/config';
 import { getEntry } from '@helpers/content/content';
@@ -56,7 +57,9 @@ const JOB_ABILITY_VALUE_LABELS: Record<
   CoverThreshold: (value) => `Covers allies below ${value}% HP`,
   DebuffPotency: (value) => {
     const turns = value * DEBUFF_POTENCY_PER_RANK.duration;
-    return `+${value * DEBUFF_POTENCY_PER_RANK.chance}% debuff chance, +${turns} turn${turns === 1 ? '' : 's'}`;
+    return tPlural('skill.debuffPotency', turns, {
+      chance: value * DEBUFF_POTENCY_PER_RANK.chance,
+    });
   },
 };
 

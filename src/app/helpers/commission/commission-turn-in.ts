@@ -1,3 +1,6 @@
+import { contentShortNameEnglish } from '@helpers/content/content-short-name';
+import { getEntry } from '@helpers/content/content';
+import { contentShortName } from '@helpers/i18n/i18n-content';
 import { categoryMessageLog } from '@helpers/combat/combat-log';
 import {
   applyResolvedDropToState,
@@ -61,7 +64,10 @@ export function grantCommissionRewards(
 }
 
 export function commissionDisplayName(offerName: string): string {
-  return offerName.replace('Commission - ', '');
+  const offer = getEntry<CommissionOfferContent>(offerName);
+  return offer
+    ? contentShortName(offer)
+    : (contentShortNameEnglish('commissionoffer', offerName) ?? offerName);
 }
 
 // Turn-ins require the party at the caravan/town, so the current node is where it happened.

@@ -1,3 +1,4 @@
+import { t, tPlural } from '@helpers/i18n/i18n';
 import { combatantFromCharacter } from '@helpers/combat/combat-create';
 import { statusEffectContentPreview } from '@helpers/combat/combat-statuseffects.ui';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
@@ -32,7 +33,7 @@ function turnsText(
   duration: number,
   format: (value: number) => string,
 ): string {
-  return `${format(duration)} turn${duration === 1 ? '' : 's'}`;
+  return tPlural('skill.turns', duration, { count: format(duration) });
 }
 
 // A status or skill name with its icon, so the line reads "inflict [icon] Burning".
@@ -129,7 +130,9 @@ function skillModifierText(
 ): string {
   switch (modifier.modifier) {
     case 'Targets':
-      return `+${format(modifier.value)} target${modifier.value === 1 ? '' : 's'}`;
+      return tPlural('skill.extraTargets', modifier.value, {
+        count: format(modifier.value),
+      });
     case 'Scaling':
       return `+${format(modifier.value)}x ${modifier.stat} scaling`;
     case 'Accuracy':
@@ -187,7 +190,7 @@ export function skillModifierLines(
 ): SkillModifierLine[] {
   return skillModifierLinesBy(
     skill.modifiers ?? [],
-    (modifier) => modifier.source ?? 'Oath',
+    (modifier) => modifier.source ?? t('skillTree.oath'),
     format,
   );
 }

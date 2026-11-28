@@ -1,3 +1,4 @@
+import { contentShortName } from '@helpers/i18n/i18n-content';
 import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
@@ -41,7 +42,7 @@ export function edictsTrackRun(): void {
 }
 
 export function edictShortName(edict: EdictContent): string {
-  return edict.name.replace(/^Edict of (the )?/, '');
+  return contentShortName(edict);
 }
 
 export function edictKindLabel(kind: EdictKind): string {

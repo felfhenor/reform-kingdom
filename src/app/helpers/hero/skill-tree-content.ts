@@ -1,3 +1,5 @@
+import { contentShortName } from '@helpers/i18n/i18n-content';
+import { contentShortNameEnglish } from '@helpers/content/content-short-name';
 import {
   SKILL_TREE_COLUMN_INTERVAL,
   SKILL_TREE_MAX_COLUMN_LEVEL,
@@ -69,11 +71,11 @@ export function skillTreeIsLevelColumn(level: number): boolean {
   );
 }
 
-// The display name without the '<Job>: ' uniqueness prefix.
+// English, since spec rows are matched by it.
 export function skillTreeNodeShortName(
   node: Pick<SkillTreeNodeContent, 'name'>,
 ): string {
-  return node.name.slice(node.name.indexOf(':') + 1).trim();
+  return contentShortNameEnglish('skilltreenode', node.name) ?? node.name;
 }
 
 export function skillTreeDefaultNodeIds(jobId: JobId): SkillTreeNodeId[] {
@@ -92,7 +94,7 @@ export function skillTreeNodeEffects(
 
     return node.effects.map((effect) =>
       effect.kind === 'SkillModifier'
-        ? { ...effect, source: skillTreeNodeShortName(node) }
+        ? { ...effect, source: contentShortName(node) }
         : effect,
     );
   });

@@ -2,6 +2,15 @@ export type I18nParams = Record<string, string | number>;
 
 export type I18nListType = 'and' | 'or';
 
+export type I18nEnumGroup =
+  | 'rarity'
+  | 'element'
+  | 'elementCombination'
+  | 'equipmentType'
+  | 'lootSource'
+  | 'riskLevel'
+  | 'statShort';
+
 export type I18nFlatStrings = Record<string, string>;
 
 // Keyed by content type, then English name, then field path (e.g. `techniques.0.combatMessage`).

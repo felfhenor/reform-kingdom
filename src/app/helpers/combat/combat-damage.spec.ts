@@ -1,3 +1,9 @@
+import {
+  COMBATANT_STATUS_MARK,
+  combatantMessageToken,
+  combatLog,
+  combatLogReset,
+} from '@helpers/combat/combat-log';
 import type * as RngHelper from '@helpers/rng';
 import type {
   Combatant,
@@ -22,11 +28,6 @@ vi.mock('@helpers/rng', async (importOriginal) => {
 
 import { combatApplySkillToTarget } from '@helpers/combat/combat-damage';
 import { combatantDamageEvents } from '@helpers/combat/combat-damage-events';
-import {
-  combatantMessageToken,
-  combatLog,
-  combatLogReset,
-} from '@helpers/combat/combat-log';
 import { ensureMonster } from '@helpers/content/ensure-monster';
 import { ensureEquipmentSkillTechnique } from '@helpers/content/ensure-skill';
 import {
@@ -814,7 +815,7 @@ describe('combatApplySkillToTarget combat message rendering', () => {
     // reflects the just-applied damage rather than a stale pre-damage snapshot,
     // and that each bolded id token got its icon token hoisted in front of it.
     expect(combatLog()[0].message).toBe(
-      `@@icon-attacker@@**${combatantMessageToken(attacker)}** hits @@icon-target@@**${combatantMessageToken(target)}** for 30 damage [70&#x2F;100 HP] [10&#x2F;0 EP].`,
+      `@@icon-attacker@@**${combatantMessageToken(attacker)}** hits @@icon-target@@**${combatantMessageToken(target)}** for 30 damage ${COMBATANT_STATUS_MARK}[70&#x2F;100 HP] [10&#x2F;0 EP]${COMBATANT_STATUS_MARK}.`,
     );
   });
 });

@@ -1,3 +1,8 @@
+import {
+  durationPartText,
+  formatDurationDelta,
+  ticksToDurationParts,
+} from '@helpers/engine/timer.ui';
 import { contentNameById } from '@helpers/i18n/i18n-content';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { DatePipe, DecimalPipe, NgTemplateOutlet } from '@angular/common';
@@ -24,10 +29,6 @@ import { achievementsEarnedByRun } from '@helpers/achievement/achievement.ui';
 import { getEntry } from '@helpers/content/content';
 import { edictEntry } from '@helpers/edict/edict';
 import { formatDuration } from '@helpers/engine/timer';
-import {
-  formatDurationDelta,
-  ticksToDurationParts,
-} from '@helpers/engine/timer.ui';
 import { skillFamilyEntry } from '@helpers/hero/skill';
 import { legacyRunById } from '@helpers/legacy/legacy';
 import { modsAffectGameplay } from '@helpers/mod/mod-registry';
@@ -49,7 +50,6 @@ import {
 } from '@helpers/remembrance/remembrance.ui';
 import { isSetup } from '@helpers/setup';
 import type { GameId, JobContent } from '@interfaces';
-import { PluralizePipe } from '@pipes/pluralize.pipe';
 import { TippyDirective } from '@ngneat/helipopper';
 
 function withSkill<T extends { skillFamily: string }>(used: T | undefined) {
@@ -72,7 +72,6 @@ function withSkill<T extends { skillFamily: string }>(used: T | undefined) {
     IconJobComponent,
     IconSpecComponent,
     NgTemplateOutlet,
-    PluralizePipe,
     RowEdictComponent,
     SFXDirective,
     IconComponent,
@@ -84,6 +83,7 @@ function withSkill<T extends { skillFamily: string }>(used: T | undefined) {
   templateUrl: './run-summary.component.html',
 })
 export class RunSummaryComponent {
+  public readonly durationPartText = durationPartText;
   private router = inject(Router);
 
   public runId = input.required<string>();

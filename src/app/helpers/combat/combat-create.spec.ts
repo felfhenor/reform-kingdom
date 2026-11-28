@@ -1,6 +1,8 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { buildCharacter, buildEquipmentItem } from '@/testing/builders';
+import { i18nLanguageLayer, i18nResetToEnglish } from '@/testing/i18n';
+import { i18nLayersApply } from '@helpers/i18n/i18n';
 import { seedContent } from '@/testing/content';
 import { seedGamestate } from '@/testing/gamestate';
 import { abilityJobContent, buildAbilityHero } from '@/testing/job-ability';
@@ -8,6 +10,7 @@ import { buildEffectNode, heroLearning } from '@/testing/skill-tree';
 import {
   combatantFromCharacter,
   combatantFromMonster,
+  combatantDisplayName,
   combatantIndexLabel,
   combatantsFromTownGuardians,
   combatCreateForEncounter,
@@ -32,6 +35,7 @@ import {
 import { recomputeGlobalEffectSums } from '@helpers/hero/global-effect-state';
 import type {
   Character,
+  Combatant,
   EdictId,
   EquipmentContent,
   EquipmentId,
@@ -375,5 +379,44 @@ describe('combatCreateForEncounter', () => {
       'Larsian Citizen Lv. 12 [A]',
       'Larsian Guard Lv. 12 [B]',
     ]);
+  });
+});
+
+describe('combatantDisplayName', () => {
+  afterEach(() => i18nResetToEnglish());
+  const goblin = ensureMonster({ id: 'goblin' as MonsterId, name: 'Goblin' });
+
+  it('rebuilds a monster name in the current language', () => {
+    seedContent([goblin]);
+    i18nLayersApply([
+      i18nLanguageLayer({
+        ui: {
+          'combat.combatantName': '{{ name }} niv. {{ level }} [{{ index }}]',
+        },
+        content: { monster: { Goblin: { name: 'Gobelin' } } },
+      }),
+    ]);
+
+    const combatant = {
+      name: 'Goblin Lv. 3 [B]',
+      monsterId: 'goblin',
+      level: 3,
+      indexLabel: 'B',
+    } as Combatant;
+    expect(combatantDisplayName(combatant)).toBe('Gobelin niv. 3 [B]');
+  });
+
+  it('keeps the stored name for heroes and older saves', () => {
+    seedContent([goblin]);
+    const legacy = {
+      name: 'Goblin Lv. 3 [B]',
+      monsterId: 'goblin',
+      level: 3,
+    } as Combatant;
+
+    expect(combatantDisplayName(legacy)).toBe('Goblin Lv. 3 [B]');
+    expect(combatantDisplayName({ name: 'Ana', level: 1 } as Combatant)).toBe(
+      'Ana',
+    );
   });
 });

@@ -1,4 +1,5 @@
-import { getEntry } from '@helpers/content/content';
+import { enumLabel, t } from '@helpers/i18n/i18n';
+import { contentNameById, nodeNameText } from '@helpers/i18n/i18n-content';
 import { decreeClauseConflicts, decreeClauses } from '@helpers/decree/decree';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { updateGamestate, worldAutoModeState } from '@helpers/state-game';
@@ -7,7 +8,6 @@ import type {
   DecreeClause,
   DecreeClauseAction,
   DecreeClauseId,
-  ItemContent,
 } from '@interfaces';
 
 export function decreeActiveClauseId(): DecreeClauseId | undefined {
@@ -76,29 +76,45 @@ export function decreeClauseRemove(clauseId: DecreeClauseId): void {
 }
 
 export function decreeClauseSummary(clause: DecreeClause): string {
+  const quantity = 'targetQuantity' in clause ? clause.targetQuantity : 0;
+  const risk =
+    'riskTolerance' in clause
+      ? enumLabel('riskLevel', clause.riskTolerance)
+      : '';
+  const node =
+    'nodeName' in clause && clause.nodeName
+      ? nodeNameText(clause.nodeName)
+      : '';
   switch (clause.type) {
     case 'GatherMaterial': {
-      const item = getEntry<ItemContent>(clause.materialId);
-      const itemName = item?.name ?? 'materials';
+      const item =
+        contentNameById(clause.materialId) ?? t('decree.someMaterials');
+      const params = { item, node, quantity: quantity.toLocaleString() };
       return clause.nodeName
-        ? `Gather ${itemName} from ${clause.nodeName} until ${clause.targetQuantity.toLocaleString()} in storage`
-        : `Gather ${itemName} until ${clause.targetQuantity.toLocaleString()} in storage`;
+        ? t('decree.gatherFrom', params)
+        : t('decree.gather', params);
     }
-    case 'FarmNode': {
-      const reward = rewardContentInfo(clause.reward);
-      return `Farm ${clause.nodeName} until ${clause.targetQuantity.toLocaleString()}x ${reward?.name ?? 'reward'} obtained`;
-    }
+    case 'FarmNode':
+      return t('decree.farmUntil', {
+        node,
+        quantity: quantity.toLocaleString(),
+        reward:
+          rewardContentInfo(clause.reward)?.name ?? t('decree.someReward'),
+      });
     case 'FinishUnfinishedAreas':
-      return `Finish unfinished areas (${clause.riskTolerance} risk)`;
+      return t('decree.finishAreas', { risk });
     case 'LevelUpParty':
-      return `Level up the party (${clause.riskTolerance} risk)`;
+      return t('decree.levelUp', { risk });
     case 'ReturnToKingdom':
-      return 'Return home';
+      return t('decree.returnHome');
     case 'DefendTowns':
       return clause.townName
-        ? `Defend ${clause.townName} from raids (${clause.riskTolerance} risk)`
-        : `Defend towns from raids (${clause.riskTolerance} risk)`;
+        ? t('decree.defendTown', {
+            town: contentNameById(clause.townName) ?? clause.townName,
+            risk,
+          })
+        : t('decree.defendTowns', { risk });
     case 'AutoFarmNode':
-      return `Farm ${clause.nodeName} until the party leaves`;
+      return t('decree.autoFarm', { node });
   }
 }

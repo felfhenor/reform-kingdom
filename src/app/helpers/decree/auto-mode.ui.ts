@@ -1,4 +1,5 @@
-import { getEntry } from '@helpers/content/content';
+import { contentNameById, nodeNameText } from '@helpers/i18n/i18n-content';
+import { enumLabel, t } from '@helpers/i18n/i18n';
 import {
   decreeWaitForFullEnergyBeforeCombat,
   decreeWaitForFullHealthBeforeCombat,
@@ -8,32 +9,40 @@ import { isPartyAtFullEnergy, isPartyAtFullHealth } from '@helpers/hero/party';
 import { getMaterialQuantity } from '@helpers/item/materials';
 import { worldAutoModeState } from '@helpers/state-game';
 import { rewardContentInfo } from '@helpers/world-node/world-node-rewards';
-import type { DecreeClause, ItemContent } from '@interfaces';
+import type { DecreeClause } from '@interfaces';
 
 function clauseStatusLabel(clause: DecreeClause): string {
   switch (clause.type) {
-    case 'GatherMaterial': {
-      const item = getEntry<ItemContent>(clause.materialId);
-      const current = getMaterialQuantity(clause.materialId);
-      return `Gathering ${item?.name ?? 'materials'} (${current.toLocaleString()}/${clause.targetQuantity.toLocaleString()} in stock)...`;
-    }
-    case 'FarmNode': {
-      const reward = rewardContentInfo(clause.reward);
-      const current = farmNodeRewardQuantity(clause.reward);
-      return `Farming ${clause.nodeName} for ${reward?.name ?? 'reward'} (${current.toLocaleString()}/${clause.targetQuantity.toLocaleString()})...`;
-    }
+    case 'GatherMaterial':
+      return t('autoMode.gathering', {
+        item: contentNameById(clause.materialId) ?? t('decree.someMaterials'),
+        current: getMaterialQuantity(clause.materialId).toLocaleString(),
+        target: clause.targetQuantity.toLocaleString(),
+      });
+    case 'FarmNode':
+      return t('autoMode.farmingFor', {
+        node: nodeNameText(clause.nodeName),
+        reward:
+          rewardContentInfo(clause.reward)?.name ?? t('decree.someReward'),
+        current: farmNodeRewardQuantity(clause.reward).toLocaleString(),
+        target: clause.targetQuantity.toLocaleString(),
+      });
     case 'FinishUnfinishedAreas':
-      return 'Seeking unfinished areas...';
+      return t('autoMode.seekingAreas');
     case 'LevelUpParty':
-      return `Leveling up (${clause.riskTolerance} risk)...`;
+      return t('autoMode.levelingUp', {
+        risk: enumLabel('riskLevel', clause.riskTolerance),
+      });
     case 'ReturnToKingdom':
-      return 'Returning home...';
+      return t('autoMode.returningHome');
     case 'DefendTowns':
       return clause.townName
-        ? `Defending ${clause.townName}...`
-        : 'Seeking a town to defend...';
+        ? t('autoMode.defending', {
+            town: contentNameById(clause.townName) ?? clause.townName,
+          })
+        : t('autoMode.seekingTown');
     case 'AutoFarmNode':
-      return `Farming ${clause.nodeName}...`;
+      return t('autoMode.farming', { node: nodeNameText(clause.nodeName) });
   }
 }
 
@@ -47,12 +56,12 @@ export function autoModeStatusLabel(): string | undefined {
   if (clause) return clauseStatusLabel(clause);
 
   if (decreeWaitForFullHealthBeforeCombat() && !isPartyAtFullHealth()) {
-    return 'Healing before the next move...';
+    return t('autoMode.healing');
   }
 
   if (decreeWaitForFullEnergyBeforeCombat() && !isPartyAtFullEnergy()) {
-    return 'Energizing before the next move...';
+    return t('autoMode.energizing');
   }
 
-  return 'Idle';
+  return t('autoMode.idle');
 }

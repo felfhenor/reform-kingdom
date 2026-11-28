@@ -17,10 +17,11 @@ export const tiledObjectNames = (map: any): string[] => {
 
 // Every line carries the English it was copied from: unchanged lines count as untranslated, and changed English gets flagged.
 const templateEntry = (
+  type: string,
   entry: any,
   existing: Record<string, unknown> = {},
 ): Record<string, unknown> => {
-  const fields = i18nContentFields(entry);
+  const fields = i18nContentFields(entry, type);
   return {
     ...fields,
     ...existing,
@@ -29,13 +30,14 @@ const templateEntry = (
 };
 
 const templateContent = (
+  type: string,
   entries: any[],
   existing: Record<string, any> = {},
 ): Record<string, unknown> =>
   Object.fromEntries(
     sortBy(entries, (entry) => entry.name).map((entry) => [
       entry.name,
-      templateEntry(entry, existing[entry.name]),
+      templateEntry(type, entry, existing[entry.name]),
     ]),
   );
 
@@ -64,7 +66,7 @@ export const i18nTemplateFiles = (
   };
   Object.entries(allContent).forEach(([type, entries]) => {
     const path = `content/${type}.yml`;
-    files[path] = dump(templateContent(entries, existing[path]));
+    files[path] = dump(templateContent(type, entries, existing[path]));
   });
   return files;
 };

@@ -1,3 +1,4 @@
+import { tPlural } from '@helpers/i18n/i18n';
 import { formatDuration } from '@helpers/engine/timer';
 import type { DurationPart } from '@interfaces';
 
@@ -18,6 +19,14 @@ export function ticksToDurationParts(ticks: number): DurationPart[] {
   const parts = allParts.filter((part) => part.value > 0);
 
   return parts.length === 0 ? [{ value: 0, unit: 'second' }] : parts;
+}
+
+export function durationPartText(part: DurationPart): string {
+  return tPlural(`duration.${part.unit}`, part.value);
+}
+
+export function durationText(ticks: number): string {
+  return ticksToDurationParts(ticks).map(durationPartText).join(', ');
 }
 
 export function formatDurationDelta(ticks: number): string {

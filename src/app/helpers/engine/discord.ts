@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { contentNameById } from '@helpers/i18n/i18n-content';
 import { caravanBrandName, caravanState } from '@helpers/caravan/caravan';
 import { getEntry } from '@helpers/content/content';
@@ -5,7 +6,6 @@ import { isDemoBuild } from '@helpers/demo/demo';
 import { isInElectron } from '@helpers/engine/electron';
 import {
   presenceActivityText,
-  presencePausedText,
   steamRichPresence,
 } from '@helpers/engine/presence';
 import { activeTownNode, gamePlayView } from '@helpers/engine/ui';
@@ -38,7 +38,9 @@ export function discordSetStatus(status: PresenceStatus) {
   const activityText = presenceActivityText(status.activity);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window as any).discordRPCStatus = {
-    state: status.paused ? presencePausedText(activityText) : activityText,
+    state: status.paused
+      ? t('presence.paused', { text: activityText })
+      : activityText,
     details: status.partyDetails || undefined,
     largeImageText: isDemoBuild() ? 're:Form Kingdom Demo' : undefined,
     steam: steamRichPresence(status.activity, status.partyLevel, status.paused),

@@ -1,3 +1,4 @@
+import { contentShortName } from '@helpers/i18n/i18n-content';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -9,7 +10,6 @@ import { IconSpecComponent } from '@components/icon-spec/icon-spec.component';
 import { getEntry } from '@helpers/content/content';
 import { characterJobLevel } from '@helpers/hero/job';
 import { characterSpecNode } from '@helpers/hero/skill-tree';
-import { skillTreeNodeShortName } from '@helpers/hero/skill-tree-content';
 import type { Character, JobContent, JobId } from '@interfaces';
 
 // A hero's job with their spec for it; the spec slot leads so labels line up in lists.
@@ -54,6 +54,6 @@ export class LabelJobComponent {
   );
   public specName = computed(() => {
     const node = this.spec();
-    return node ? skillTreeNodeShortName(node) : '';
+    return node ? contentShortName(node) : '';
   });
 }

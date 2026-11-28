@@ -1,3 +1,4 @@
+import { tPlural } from '@helpers/i18n/i18n';
 import { combatantDamageEventEmit } from '@helpers/combat/combat-damage-events';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import {
@@ -103,7 +104,7 @@ function logCharacterProgress(beforeLevel: number, after: Character): void {
   if (gainedSp <= 0) return;
 
   miscellaneousMessageLog(
-    `**${after.name}** gained ${gainedSp} skill point${gainedSp === 1 ? '' : 's'}!`,
+    tPlural('skill.skillPointsGained', gainedSp, { hero: after.name }),
   );
 }
 

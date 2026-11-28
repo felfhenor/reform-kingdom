@@ -1,3 +1,5 @@
+import { t } from '@helpers/i18n/i18n';
+import { contentNameById } from '@helpers/i18n/i18n-content';
 import { elementalResistanceClamp } from '@helpers/combat/combat-element';
 import { combatStatsForCharacter } from '@helpers/combat/combat-stats';
 import {
@@ -175,6 +177,19 @@ export function combatantFromCharacter(character: Character): Combatant {
   return combatant;
 }
 
+export function combatantDisplayName(combatant: Combatant): string {
+  const monsterName = combatant.monsterId
+    ? contentNameById(combatant.monsterId)
+    : undefined;
+  if (!monsterName || combatant.indexLabel === undefined) return combatant.name;
+
+  return t('combat.combatantName', {
+    name: monsterName,
+    level: combatant.level,
+    index: combatant.indexLabel,
+  });
+}
+
 // A..Z, then AA, AB, ... so long fights never run out of labels.
 export function combatantIndexLabel(index: number): string {
   const letter = String.fromCharCode((index % 26) + 65);
@@ -206,6 +221,7 @@ export function combatantFromMonster(
     id: rngUuid(),
     monsterId: monster.id,
     name: `${monster.name} Lv. ${level} [${combatantIndexLabel(index)}]`,
+    indexLabel: combatantIndexLabel(index),
     isEnemy,
 
     targetting: monster.targetting,

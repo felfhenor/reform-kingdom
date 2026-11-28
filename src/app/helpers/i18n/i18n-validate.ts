@@ -38,13 +38,14 @@ function i18nValidateUi(
 
 function i18nValidateEntry(
   where: string,
+  type: string,
   entry: Record<string, unknown>,
   fields: I18nContentFields,
   sources: I18nContentFields,
   result: I18nValidateResult,
 ): void {
   Object.entries(fields).forEach(([path, text]) => {
-    const english = i18nContentFieldText(entry, path);
+    const english = i18nContentFieldText(entry, path, type);
     const field = path.split('.').pop() ?? '';
     if (english === undefined || !I18N_CONTENT_FIELDS.includes(field)) {
       result.warnings.push(`${where} ${path}: not translatable text.`);
@@ -81,7 +82,7 @@ export function i18nValidate(
         return;
       }
       const sources = language.sources[type]?.[name] ?? {};
-      i18nValidateEntry(where, entry, fields, sources, result);
+      i18nValidateEntry(where, type, entry, fields, sources, result);
     });
   });
 

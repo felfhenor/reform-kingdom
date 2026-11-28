@@ -11,8 +11,20 @@ loading:
   save: Loading your save...
   kingdom: Preparing your kingdom...
 
+combat:
+  combatantName: '{{ name }} Lv. {{ level }} [{{ index }}]'
+  damage: '{{ amount }} damage'
+  elementalDamage: '{{ amount }} {{ elements }} damage'
+  manualTitle: '{{ location }} ({{ fight }}/{{ fights }})'
+  sealFirst: 'Seal {{ region }} first (clear {{ boss }}).'
+  status: '[{{ hp }}/{{ maxHp }} HP] [{{ ep }}/{{ maxEp }} EP]'
+  statusShielded: '[{{ hp }}/{{ maxHp }} HP] [{{ shield }} shield] [{{ ep }}/{{ maxEp }} EP]'
+
 equipment:
   affixedName: '{{ prefixes }} {{ base }} {{ suffixes }}'
+
+recipe:
+  stylizedName: '{{ tradeskill }} Recipe: {{ name }}'
 
 options:
   language:
@@ -26,3 +38,319 @@ mods:
   languageInUse: In Use
   languageOnly: The demo only supports translation mods.
   languageNotForRuns: Translation mods are picked as a language in Options.
+
+duration:
+  shortHours: '{{ count }}h'
+  shortMinutes: '{{ count }}m'
+  shortSeconds: '{{ count }}s'
+  day:
+    one: '{{ count }} day'
+    other: '{{ count }} days'
+  hour:
+    one: '{{ count }} hour'
+    other: '{{ count }} hours'
+  minute:
+    one: '{{ count }} minute'
+    other: '{{ count }} minutes'
+  second:
+    one: '{{ count }} second'
+    other: '{{ count }} seconds'
+
+skill:
+  firesIn:
+    one: 'Fires in {{ count }} turn'
+    other: 'Fires in {{ count }} turns'
+  takesEffectAfter:
+    one: 'Takes effect after {{ count }} turn'
+    other: 'Takes effect after {{ count }} turns'
+  cooldown:
+    one: 'Cooldown: {{ count }} turn'
+    other: 'Cooldown: {{ count }} turns'
+  statusFor:
+    one: '{{ verb }} {{ effect }} for {{ count }} turn'
+    other: '{{ verb }} {{ effect }} for {{ count }} turns'
+  turns:
+    one: '{{ count }} turn'
+    other: '{{ count }} turns'
+  extraTargets:
+    one: '+{{ count }} target'
+    other: '+{{ count }} targets'
+  debuffPotency:
+    one: '+{{ chance }}% debuff chance, +{{ count }} turn'
+    other: '+{{ chance }}% debuff chance, +{{ count }} turns'
+  target:
+    self: self
+    all: all combatants
+    allAllies: all allies
+    allies:
+      one: '{{ count }} ally'
+      other: '{{ count }} allies'
+    enemies:
+      one: '{{ count }} enemy'
+      other: '{{ count }} enemies'
+  skillPointsGained:
+    one: '**{{ hero }}** gained {{ count }} skill point!'
+    other: '**{{ hero }}** gained {{ count }} skill points!'
+
+statusEffect:
+  turnsRemaining:
+    one: 'turn remaining'
+    other: 'turns remaining'
+
+armory:
+  sellItems:
+    one: 'Sell {{ count }} item'
+    other: 'Sell {{ count }} items'
+  equippedItems:
+    one: 'Equipped {{ count }} item.'
+    other: 'Equipped {{ count }} items.'
+
+kingdomHome:
+  materialsStored:
+    one: '{{ count }} material stored'
+    other: '{{ count }} materials stored'
+  spellsLearned:
+    one: '{{ count }} spell learned'
+    other: '{{ count }} spells learned'
+  workersReady:
+    one: '{{ count }} worker ready to level up'
+    other: '{{ count }} workers ready to level up'
+  queueItems:
+    one: '{{ count }} item'
+    other: '{{ count }} items'
+
+workshop:
+  affixes:
+    one: '{{ count }} affix'
+    other: '{{ count }} affixes'
+
+legacy:
+  edicts:
+    one: '{{ count }} edict'
+    other: '{{ count }} edicts'
+
+skillTree:
+  oath: Oath
+  pendingDiscarded:
+    one: 'Your {{ count }} unconfirmed change will be discarded.'
+    other: 'Your {{ count }} unconfirmed changes will be discarded.'
+  unconfirmedChanges:
+    one: '{{ hero }} has {{ count }} skill tree change you haven''t confirmed. If you leave now, it will be discarded.'
+    other: '{{ hero }} has {{ count }} skill tree changes you haven''t confirmed. If you leave now, they''ll be discarded.'
+
+colosseum:
+  lostNodes:
+    one: '{{ count }} skill tree node on {{ hero }}'
+    other: '{{ count }} skill tree nodes on {{ hero }}'
+
+log:
+  itemDrop:
+    one: '{{ count }}x {{ item }}'
+    other: '{{ count }}x {{ item }}'
+
+autoMode:
+  gathering: 'Gathering {{ item }} ({{ current }}/{{ target }} in stock)...'
+  farmingFor: 'Farming {{ node }} for {{ reward }} ({{ current }}/{{ target }})...'
+  seekingAreas: Seeking unfinished areas...
+  levelingUp: 'Leveling up ({{ risk }} risk)...'
+  returningHome: Returning home...
+  defending: 'Defending {{ town }}...'
+  seekingTown: Seeking a town to defend...
+  farming: 'Farming {{ node }}...'
+  healing: Healing before the next move...
+  energizing: Energizing before the next move...
+  idle: Idle
+
+element:
+  charges: '{{ count }} {{ element }}'
+
+presence:
+  paused: 'Paused · {{ text }}'
+  MainMenu: In Main Menu
+  NewGame: Starting a new game...
+  NewAdventure: Starting a grand adventure
+  FinishedAdventure: Finishing a grand adventure
+  Exploring: 'Exploring {{ name }}'
+  TravelingTo: 'Traveling to {{ name }}'
+  Gathering: 'Gathering in {{ name }}'
+  Visiting: 'Visiting {{ name }}'
+  Traveling: Traveling
+  Trading: 'Trading with {{ name }}'
+  Recovering: 'Recovering at {{ name }}'
+  Resting: 'Resting at {{ name }}'
+
+combatOrder:
+  randomSkill: Use a random skill
+  castOn: 'Cast {{ family }} ({{ target }})'
+  withCondition: '{{ action }} {{ condition }}'
+  target:
+    Weakest: on lowest HP
+    Strongest: on highest HP
+    Random: on random
+    Self: on self
+    SpecificHero: 'on {{ hero }}'
+    SpecificHeroUnset: on specific hero
+    MatchingAllies: on matching allies
+    MatchingEnemies: on matching enemies
+    default: default
+  condition:
+    selfHealth: 'if my Health {{ comparator }} {{ value }}%'
+    selfEnergy: 'if my Energy {{ comparator }} {{ value }}%'
+    alliesAbove: 'if allies above {{ percent }}% HP {{ comparator }} {{ count }}'
+    alliesBelow: 'if allies below {{ percent }}% HP {{ comparator }} {{ count }}'
+    enemiesAbove: 'if enemies above {{ percent }}% HP {{ comparator }} {{ count }}'
+    enemiesBelow: 'if enemies below {{ percent }}% HP {{ comparator }} {{ count }}'
+    enemyCount: 'if enemy count {{ comparator }} {{ count }}'
+    noSummon: if I have no summon
+    elementCount: 'if {{ element }} charges {{ comparator }} {{ count }}'
+    heroHealth: 'if {{ hero }}''s Health {{ comparator }} {{ value }}%'
+
+decree:
+  gather: 'Gather {{ item }} until {{ quantity }} in storage'
+  gatherFrom: 'Gather {{ item }} from {{ node }} until {{ quantity }} in storage'
+  farmUntil: 'Farm {{ node }} until {{ quantity }}x {{ reward }} obtained'
+  finishAreas: 'Finish unfinished areas ({{ risk }} risk)'
+  levelUp: 'Level up the party ({{ risk }} risk)'
+  returnHome: Return home
+  defendTown: 'Defend {{ town }} from raids ({{ risk }} risk)'
+  defendTowns: 'Defend towns from raids ({{ risk }} risk)'
+  autoFarm: 'Farm {{ node }} until the party leaves'
+  someMaterials: materials
+  someReward: reward
+
+lootFilter:
+  nothingSold: Nothing is automatically sold. Everything found or crafted goes into your armory.
+  summary: 'From {{ sources }}, {{ rules }} will be automatically sold.'
+  summaryExcept:
+    one: 'From {{ sources }}, {{ rules }} will be automatically sold, except {{ count }} item.'
+    other: 'From {{ sources }}, {{ rules }} will be automatically sold, except {{ count }} items.'
+  ruleTypes: '{{ types }} items'
+  ruleBelowLevel: 'anything below level {{ level }}'
+  ruleRarities: 'anything {{ rarities }}'
+
+globalEffect:
+  GainStats: 'Hero {{ stat }}: {{ signed }}'
+  GainStatPercent: 'Hero {{ stat }}: {{ percent }}'
+  EnemyStatPercent: 'Enemy {{ stat }}: {{ percent }}'
+  GlobalXPGainMultiplier: 'XP Gain: {{ percent100 }}'
+  GlobalGoldGainMultiplier: 'Gold Gain: {{ percent100 }}'
+  GlobalShopPriceMultiplier: 'Shop Prices: {{ percent100 }}'
+  GlobalTraderPriceMultiplier: 'Trader Prices: {{ percent100 }}'
+  GlobalShrineBuffsPermanent: 'Shrine buffs never expire'
+  GlobalWipeEndsRun: 'Dying is game over'
+  GlobalWipeLosesCurrency: 'Dying loses {{ value }}% of Gold Coin and Crimson Lucre'
+  GlobalWipeLosesMaterials: 'Dying loses {{ materialPercent }}% of each of {{ materialSelectionPercent }}% of your material stacks'
+  GlobalReviveInPlace: 'The fallen party revives where it fell'
+  WorkerCraftSpeedPercent: 'Worker Craft Speed: {{ percent }}'
+  WorkerGatherSpeedPercent: 'Worker Gather Speed: {{ percent }}'
+  WorkerXPGainMultiplier: 'Worker XP Gain: {{ percent100 }}'
+  GlobalTownShopNoEquipment: 'Town shops sell no equipment'
+  GlobalFeaturesRevealed: 'Level-based features always available'
+  GlobalCursedDrops: 'Combat-dropped gear is cursed'
+  GlobalDropExtraAffixes: 'Combat-dropped Gear Affixes: +{{ value }}'
+  GlobalCraftedExtraAffixes: 'Crafted Gear Affixes: +{{ value }}'
+  GlobalTradeskillMaterialBoost: 'Recipe Materials: {{ percent100 }}'
+  GlobalAstralProjectorMaterialBoost: 'Astral Projector Materials: {{ percent100 }}'
+  GlobalDevelopMaterialBoost: 'Development Costs: {{ percent100 }}'
+  GlobalCraftTimeMultiplier: 'Craft Time: {{ percent100 }}'
+  GlobalReclassDisabled: 'Heroes cannot reclass'
+  GlobalTradeskillsDisabled: 'Crafting is forgotten'
+  GlobalWorkersDisabled: 'Workers cannot be rescued'
+  GlobalManualCombat: 'Heroes act only on your orders'
+  GlobalRequireSealForDecreeAutomation: 'The Decree only goes to sealed regions'
+  GlobalPartySharesClass: 'Every hero shares one class'
+  GlobalJobAbilitiesStack: 'Party job abilities stack'
+  GlobalShowRunTimer: 'A run timer is shown'
+  GlobalSkipRegionIntros: 'Region introductions are skipped'
+  GlobalSkipTutorials: 'Tutorials are skipped'
+  GlobalSkipStoryCrawls: 'Story crawls are skipped'
+  GlobalWorldNodeTypeRemoved: '{{ nodeType }} are gone'
+  GlobalWorldNodeStartingLevel: '{{ nodeType }} start at +{{ value }}'
+  GlobalCommissionReputationBoost: 'Commission Reputation: {{ percent100 }}'
+  GlobalTownCommissionSlotBoost: 'Town Commission Slots: {{ signed }}'
+  GlobalShrineBuffDuration: 'Shrine Buff Duration: {{ percent100 }}'
+  GlobalShrineBuffStrength: 'Shrine Buff Strength: {{ percent100 }}'
+  GlobalAstralSpellDuration: 'Astral Spell Duration: {{ percent100 }}'
+  GlobalAstralSpellStrength: 'Astral Spell Strength: {{ percent100 }}'
+  GlobalMonstersDropRegionGathering: 'Monsters: {{ value }}% chance to drop regional gathering materials'
+  GlobalMonstersDropRegionGear: 'Monsters: {{ value }}% chance to drop regional gear near their level'
+  GlobalMonstersDropRegionCraftedMaterials: 'Monsters: {{ value }}% chance to drop regional crafted materials'
+  EnemyExtraSkills: 'Enemy Skills: +{{ value }}'
+  GlobalLevelStatMultiplier: 'Stats/Lv.: {{ percent100 }}'
+  GlobalDeathPenaltyMultiplier: 'Deaths Door & Healing Time: {{ percent100 }}'
+  DebuffResistance: 'All Debuff Resist: +{{ value }}%'
+  DebuffResistanceTag: '{{ tag }}: +{{ value }}%'
+  GlobalCombatItemDropRateBoost: 'Item Drop Chance: {{ percent }}'
+  GlobalGatheringItemDropRateBoost: 'Lucky Gather Item Chance: {{ percent }}'
+  GlobalGatheringItemDropAmountBoost: 'Lucky Gather Items on Success: {{ signed }}'
+  GlobalGatheringItemFlatBoost: 'Guaranteed Gather Items: {{ signed }}'
+  GlobalArmorySizeBoost: 'Armory Size: +{{ value }}'
+  GlobalOffPathTravelSpeedBoost: 'Off-Path Travel Speed: {{ percent100 }}'
+  GlobalOnPathTravelSpeedBoost: 'On-Path Travel Speed: {{ percent100 }}'
+  GlobalDecreeClauseCapBoost: 'Decree Clause Cap: +{{ value }}'
+  GainCombatStat: 'Hero {{ combatStat }}: +{{ value }}%'
+  GainCombatStatFlat: 'Hero {{ combatStat }}: +{{ value }}'
+  GlobalSkillPointsPerLevel: 'Skill Points: {{ signed }} per level'
+  GlobalSkillPointsPerLevelSlow: 'Skill Points: {{ signedOne }} every {{ levels }} levels'
+  GlobalTradeskillQueueSizeBoost: '{{ tradeskill }} Queue Size: +{{ value }}'
+  anyStat: 'stats'
+  unknownTradeskill: 'Unknown Tradeskill'
+
+enum:
+  rarity:
+    Common: Common
+    Uncommon: Uncommon
+    Rare: Rare
+    Mystical: Mystical
+    Legendary: Legendary
+  element:
+    Fire: Fire
+    Water: Water
+    Earth: Earth
+    Air: Air
+  elementCombination:
+    Steam: Steam
+    Arid: Arid
+    Molten: Molten
+    Mud: Mud
+    Storm: Storm
+    Sand: Sand
+    Holy: Holy
+  equipmentType:
+    Accessory: Accessory
+    Arrow: Arrow
+    Artifact: Artifact
+    Bow: Bow
+    Charm: Charm
+    'Cloth Armor': Cloth Armor
+    Dagger: Dagger
+    Dirk: Dirk
+    Hat: Hat
+    Helm: Helm
+    Mace: Mace
+    'Metal Armor': Metal Armor
+    Ring: Ring
+    Shield: Shield
+    Spear: Spear
+    Staff: Staff
+    Sword: Sword
+    Trinket: Trinket
+    Whip: Whip
+  riskLevel:
+    Low: Low
+    Medium: Medium
+    High: High
+  lootSource:
+    Combat: Combat
+    Crafting: Crafting
+  statShort:
+    Agility: AGI
+    Energy: EP
+    Health: HP
+    Intelligence: INT
+    Luck: LUK
+    Resistance: RES
+    Strength: STR
+    Vitality: VIT
+    Spirit: SPR
+    Constitution: CON

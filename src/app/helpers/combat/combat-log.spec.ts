@@ -1,6 +1,5 @@
-import { beforeEach, describe, expect, it } from 'vitest';
-
 import {
+  COMBATANT_STATUS_MARK,
   adventureLogMessageHtml,
   beginCombatLogCommits,
   categoryMessageLog,
@@ -17,6 +16,8 @@ import {
   recipeDropHtml,
   recipeNameHtml,
 } from '@helpers/combat/combat-log';
+import { beforeEach, describe, expect, it } from 'vitest';
+
 import { ensureEquipment, ensureItem } from '@helpers/content/ensure-item';
 import { recipeStylizedName } from '@helpers/crafting/recipes';
 import { ensureMonster } from '@helpers/content/ensure-monster';
@@ -187,7 +188,9 @@ describe('combatantStatusText', () => {
       totalStats: { ...jala.totalStats, Energy: 5 },
     };
 
-    expect(combatantStatusText(combatant)).toBe('[12/20 HP] [3/5 EP]');
+    expect(combatantStatusText(combatant)).toBe(
+      `${COMBATANT_STATUS_MARK}[12/20 HP] [3/5 EP]${COMBATANT_STATUS_MARK}`,
+    );
   });
 
   it('adds an active shield between HP and EP', () => {
@@ -199,7 +202,7 @@ describe('combatantStatusText', () => {
     };
 
     expect(combatantStatusText(combatant)).toBe(
-      '[12/20 HP] [7 shield] [3/5 EP]',
+      `${COMBATANT_STATUS_MARK}[12/20 HP] [7 shield] [3/5 EP]${COMBATANT_STATUS_MARK}`,
     );
   });
 });
@@ -249,19 +252,9 @@ describe('itemNameHtml', () => {
 });
 
 describe('itemDropHtml', () => {
-  it('keeps the singular form for a quantity of 1', () => {
-    const item = copperOre;
-
-    expect(itemDropHtml(item, 1)).toBe(
-      '1 <span class="text-Uncommon type-entity-name">copper ore</span>',
-    );
-  });
-
-  it('pluralizes the name for quantities greater than 1', () => {
-    const item = copperOre;
-
-    expect(itemDropHtml(item, 3)).toBe(
-      '3 <span class="text-Uncommon type-entity-name">copper ores</span>',
+  it('counts the item without inflecting its name', () => {
+    expect(itemDropHtml(copperOre, 3)).toBe(
+      '3x <span class="text-Uncommon type-entity-name">Copper Ore</span>',
     );
   });
 });

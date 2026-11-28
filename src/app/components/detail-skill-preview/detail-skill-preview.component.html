@@ -10,16 +10,14 @@
 
 @if (skillData.delay > 0) {
   <div class="text-xs mt-1">
-    Takes effect after {{ skillData.delay | number }}
-    {{ 'turn' | pluralize: skillData.delay !== 1 }}
+    {{ 'skill.takesEffectAfter' | tPlural: skillData.delay }}
   </div>
 }
 
 @let cooldownTurns = cooldown();
 @if (cooldownTurns > 0) {
   <div class="text-xs mt-1">
-    Cooldown: {{ cooldownTurns | number }}
-    {{ 'turn' | pluralize: cooldownTurns !== 1 }}
+    {{ 'skill.cooldown' | tPlural: cooldownTurns }}
   </div>
 }
 

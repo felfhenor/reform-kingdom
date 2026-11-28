@@ -1,9 +1,11 @@
+import { contentShortNameEnglish } from '@helpers/content/content-short-name';
+import { contentShortName } from '@helpers/i18n/i18n-content';
 import { commissionGenerateIfMissing } from '@helpers/commission/commission-tick';
 import {
   URGENCY_SAFE_MIN_TICKS,
   URGENCY_WARNING_MIN_TICKS,
 } from '@helpers/config';
-import { getEntriesByType } from '@helpers/content/content';
+import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { ledgerHas, ledgerMark } from '@helpers/engine/ledger';
 import { formatDuration, timerTicksElapsed } from '@helpers/engine/timer';
 import {
@@ -35,9 +37,12 @@ export function caravanState(
   return worldCaravansState()[caravanId];
 }
 
-// Node names are authored "<Brand> - <Branch>"; the branch (map name) is redundant in UI.
+// The branch (map name) in "<Brand> - <Branch>" is redundant in UI.
 export function caravanBrandName(nodeName: string): string {
-  return nodeName.split(' - ')[0];
+  const caravan = getEntry<CaravanContent>(nodeName);
+  return caravan
+    ? contentShortName(caravan)
+    : (contentShortNameEnglish('caravan', nodeName) ?? nodeName);
 }
 
 // Traders matching content's traderCategories and level range; zero eligible traders leaves the caravan unstaffed (see caravanProcessTick).

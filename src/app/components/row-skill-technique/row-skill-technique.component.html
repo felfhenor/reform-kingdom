@@ -25,13 +25,7 @@
     @if (t.summonName) {
       <span class="font-semibold">{{ t.summonName }}</span>
     } @else {
-      <span class="text-lighter">
-        to
-        @if (t.targeting.count !== undefined) {
-          {{ t.targeting.count | number }}
-        }
-        {{ t.targeting.noun }}
-      </span>
+      <span class="text-lighter">to {{ t.targeting }}</span>
     }
 
     @if (t.accuracy < 100) {
@@ -52,9 +46,12 @@
 
   @for (effect of t.statusEffects; track effect.name) {
     <div class="text-xs">
-      {{ statusVerb() }} {{ effect.name }} for
-      {{ effect.duration | number }}
-      {{ effect.duration === 1 ? 'turn' : 'turns' }}
+      {{
+        'skill.statusFor'
+          | tPlural
+            : effect.duration
+            : { verb: statusVerb(), effect: effect.name }
+      }}
       @if (effect.chance < 100) {
         <span class="text-lighter">({{ effect.chance | number }}% chance)</span>
       }

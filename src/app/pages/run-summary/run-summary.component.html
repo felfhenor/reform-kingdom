@@ -435,8 +435,7 @@
 
 <ng-template #duration let-parts>
   @for (part of parts; track part.unit; let last = $last) {
-    {{ part.value | number }}
-    {{ part.unit | pluralize: part.value !== 1 }}{{ last ? '' : ',' }}
+    {{ durationPartText(part) }}{{ last ? '' : ',' }}
   }
 </ng-template>
 

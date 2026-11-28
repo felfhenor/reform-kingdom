@@ -27,8 +27,7 @@
         @if (tab?.id === 'reforge') {
           @if (enabled) {
             @let affixCount = sourceItem.affixIds.length;
-            {{ affixCount | number }}
-            {{ 'affix' | pluralize: affixCount !== 1 }}
+            {{ 'workshop.affixes' | tPlural: affixCount }}
           } @else {
             <span class="type-muted">Common gear cannot be reforged</span>
           }

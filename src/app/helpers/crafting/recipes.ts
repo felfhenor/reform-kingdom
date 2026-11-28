@@ -1,3 +1,5 @@
+import { t } from '@helpers/i18n/i18n';
+import { contentName, contentShortName } from '@helpers/i18n/i18n-content';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
 import { isRecipeDropGated } from '@helpers/crafting/recipe-drop-gated';
 import { isRecipeTownUnique } from '@helpers/crafting/recipe-town-unique';
@@ -184,9 +186,10 @@ export function recipeBackdropSprite(): string | undefined {
 
 export function recipeStylizedName(recipe: RecipeContent): string {
   const tradeskill = getEntry<TradeskillContent>(recipe.tradeskillId);
-  if (!tradeskill) return recipe.name;
+  if (!tradeskill) return contentName(recipe);
 
-  const baseName = recipe.name.split(':')[1]?.trim() ?? recipe.name;
-
-  return `${tradeskill.name} Recipe: ${baseName}`;
+  return t('recipe.stylizedName', {
+    tradeskill: contentName(tradeskill),
+    name: contentShortName(recipe),
+  });
 }

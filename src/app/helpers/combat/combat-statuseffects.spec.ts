@@ -1,4 +1,5 @@
 import {
+  COMBATANT_STATUS_MARK,
   combatantMessageToken,
   combatLog,
   combatLogReset,
@@ -135,7 +136,7 @@ describe('combatApplyStatusEffectToTarget combat message rendering', () => {
     // reflects the just-applied burn damage rather than a stale snapshot, and
     // that the bolded id token got its icon token hoisted in front of it.
     expect(combatLog()[0].message).toBe(
-      `@@icon-combatant-1@@**${combatantMessageToken(combatant)}** is burning for 10 damage [90&#x2F;100 HP] [10&#x2F;100 EP].`,
+      `@@icon-combatant-1@@**${combatantMessageToken(combatant)}** is burning for 10 damage ${COMBATANT_STATUS_MARK}[90&#x2F;100 HP] [10&#x2F;100 EP]${COMBATANT_STATUS_MARK}.`,
     );
   });
 });

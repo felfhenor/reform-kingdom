@@ -1,3 +1,4 @@
+import { contentShortName } from '@helpers/i18n/i18n-content';
 import { getEntry } from '@helpers/content/content';
 import {
   analyticsSafeSegment,
@@ -19,7 +20,6 @@ import {
 import {
   skillTreeJobNodes,
   skillTreeNodeLevel,
-  skillTreeNodeShortName,
   skillTreeOptionOath,
 } from '@helpers/hero/skill-tree-content';
 import { updateGamestate } from '@helpers/state-game';
@@ -190,7 +190,7 @@ export function skillTreeOathChoice(
     });
   const state = chosen ? states.get(chosen.id) : undefined;
   return chosen && state
-    ? { name: skillTreeNodeShortName(chosen), state }
+    ? { name: contentShortName(chosen), state }
     : undefined;
 }
 

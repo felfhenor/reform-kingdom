@@ -7,7 +7,7 @@ const PLACEHOLDER_PATTERN = /\{\{\s*([\w.]+)\s*\}\}/g;
 // Log lines are HTML with `**bold**` and `@@id@@` tokens; names get bolded, so they can't carry `**` themselves.
 const FORBIDDEN_TEXT_PATTERN = /[<>]|@@/;
 const BOLD_MARK_PATTERN = /\*\*/g;
-const NAME_FIELDS = ['name', 'legendName'];
+const NAME_FIELDS = ['name', 'shortName', 'legendName'];
 
 export const I18N_PLURAL_FORMS: string[] = [
   'zero',

@@ -52,7 +52,7 @@
     [class.badge-oath]="choice?.state !== 'pending'"
     [class.badge-warning]="choice?.state === 'pending'"
   >
-    {{ choice?.name ?? 'Oath' }}
+    {{ choice?.name ?? ('skillTree.oath' | t) }}
   </span>
 </ng-template>
 

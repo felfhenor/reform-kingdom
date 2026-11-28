@@ -1,3 +1,4 @@
+import { TPluralPipe } from '@pipes/t-plural.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -10,17 +11,16 @@ import { IconDimensionComponent } from '@components/icon-dimension/icon-dimensio
 import { IconComponent } from '@components/icon/icon.component';
 import type { StatusEffectPreview } from '@interfaces';
 import { StatDimension, StatusEffectTagDimension } from '@interfaces';
-import { PluralizePipe } from '@pipes/pluralize.pipe';
 
 @Component({
   selector: 'app-tooltip-statuseffect',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPluralPipe,
     DecimalPipe,
     AtlasImageComponent,
     IconComponent,
     IconDimensionComponent,
-    PluralizePipe,
   ],
   templateUrl: './tooltip-statuseffect.component.html',
 })

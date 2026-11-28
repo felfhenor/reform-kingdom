@@ -1,3 +1,4 @@
+import { TPluralPipe } from '@pipes/t-plural.pipe';
 import { DecimalPipe, formatNumber } from '@angular/common';
 import type { TemplateRef } from '@angular/core';
 import {
@@ -23,15 +24,14 @@ import {
   skillTechniquePreviews,
 } from '@helpers/hero/skill-preview';
 import type { Combatant, EquipmentItemType, EquipmentSkill } from '@interfaces';
-import { PluralizePipe } from '@pipes/pluralize.pipe';
 
 // Single skill's preview body, reused by the headless tooltip and the skill tree detail panel.
 @Component({
   selector: 'app-detail-skill-preview',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPluralPipe,
     DecimalPipe,
-    PluralizePipe,
     RowElementChargesComponent,
     RowSkillModifierComponent,
     RowSkillTechniqueComponent,

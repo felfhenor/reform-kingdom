@@ -1,3 +1,4 @@
+import { enumLabel, t } from '@helpers/i18n/i18n';
 import {
   combatOrderClausesAdd,
   combatOrderClausesRemove,
@@ -43,70 +44,94 @@ function heroName(characterId: CharacterId): string {
 // A short, stock-independent description of when a clause fires - used on
 // the Combat Orders modal's clause list.
 function conditionSummary(condition: CombatOrderCondition): string {
+  const comparator =
+    'comparator' in condition ? COMPARATOR_SYMBOLS[condition.comparator] : '';
   switch (condition.type) {
     case 'Always':
-      return 'Always';
+      return '';
     case 'SelfHealthPercent':
-      return `if my Health ${COMPARATOR_SYMBOLS[condition.comparator]} ${condition.value}%`;
+      return t('combatOrder.condition.selfHealth', {
+        comparator,
+        value: condition.value,
+      });
     case 'SelfEnergyPercent':
-      return `if my Energy ${COMPARATOR_SYMBOLS[condition.comparator]} ${condition.value}%`;
+      return t('combatOrder.condition.selfEnergy', {
+        comparator,
+        value: condition.value,
+      });
     case 'AllyCountHealthPercent':
-    case 'EnemyCountHealthPercent': {
-      const side =
-        condition.type === 'AllyCountHealthPercent' ? 'allies' : 'enemies';
-      const direction =
-        condition.healthDirection === 'Above' ? 'above' : 'below';
-      return `if ${side} ${direction} ${condition.healthPercent}% HP ${COMPARATOR_SYMBOLS[condition.comparator]} ${condition.count}`;
-    }
+    case 'EnemyCountHealthPercent':
+      return t(
+        `combatOrder.condition.${condition.type === 'AllyCountHealthPercent' ? 'allies' : 'enemies'}${condition.healthDirection === 'Above' ? 'Above' : 'Below'}`,
+        {
+          percent: condition.healthPercent,
+          comparator,
+          count: condition.count,
+        },
+      );
     case 'EnemyCount':
-      return `if enemy count ${COMPARATOR_SYMBOLS[condition.comparator]} ${condition.count}`;
+      return t('combatOrder.condition.enemyCount', {
+        comparator,
+        count: condition.count,
+      });
     case 'SelfHasNoSummon':
-      return 'if I have no summon';
+      return t('combatOrder.condition.noSummon');
     case 'ElementCount':
-      return `if ${condition.element} charges ${COMPARATOR_SYMBOLS[condition.comparator]} ${condition.count}`;
+      return t('combatOrder.condition.elementCount', {
+        element: enumLabel('element', condition.element),
+        comparator,
+        count: condition.count,
+      });
     case 'SpecificHeroHealthPercent':
-      return `if ${heroName(condition.characterId)}'s Health ${COMPARATOR_SYMBOLS[condition.comparator]} ${condition.value}%`;
+      return t('combatOrder.condition.heroHealth', {
+        hero: heroName(condition.characterId),
+        comparator,
+        value: condition.value,
+      });
   }
 }
 
 // A short parenthetical noting where a CastSkillFamily action will land -
 // e.g. "(on lowest HP)" - or "(default)" when no override is set, so the
 // clause list shows targeting at a glance instead of only on Edit.
-function targetModeSuffix(action: CombatOrderAction): string {
+function targetModeText(action: CombatOrderAction): string {
   if (action.type !== 'CastSkillFamily') return '';
 
   switch (action.targetMode) {
     case 'Weakest':
-      return ' (on lowest HP)';
     case 'Strongest':
-      return ' (on highest HP)';
     case 'Random':
-      return ' (on random)';
     case 'Self':
-      return ' (on self)';
+    case 'MatchingAllies':
+    case 'MatchingEnemies':
+      return t(`combatOrder.target.${action.targetMode}`);
     case 'SpecificHero':
       return action.targetCharacterId
-        ? ` (on ${heroName(action.targetCharacterId)})`
-        : ' (on specific hero)';
-    case 'MatchingAllies':
-      return ' (on matching allies)';
-    case 'MatchingEnemies':
-      return ' (on matching enemies)';
+        ? t('combatOrder.target.SpecificHero', {
+            hero: heroName(action.targetCharacterId),
+          })
+        : t('combatOrder.target.SpecificHeroUnset');
     default:
-      return ' (default)';
+      return t('combatOrder.target.default');
   }
 }
 
 export function combatOrderClauseSummary(clause: CombatOrderClause): string {
   const actionText =
     clause.action.type === 'RandomSkill'
-      ? 'Use a random skill'
-      : `Cast ${clause.action.family}${targetModeSuffix(clause.action)}`;
+      ? t('combatOrder.randomSkill')
+      : t('combatOrder.castOn', {
+          family: clause.action.family,
+          target: targetModeText(clause.action),
+        });
 
   const conditionText = conditionSummary(clause.condition);
-  return conditionText === 'Always'
+  return conditionText === ''
     ? actionText
-    : `${actionText} ${conditionText}`;
+    : t('combatOrder.withCondition', {
+        action: actionText,
+        condition: conditionText,
+      });
 }
 
 async function updateCombatOrderClauses(

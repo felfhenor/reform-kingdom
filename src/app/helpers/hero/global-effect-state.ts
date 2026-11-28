@@ -1,3 +1,4 @@
+import { enumLabel, t } from '@helpers/i18n/i18n';
 import { contentNameById } from '@helpers/i18n/i18n-content';
 import { getEntry } from '@helpers/content/content';
 import { defaultGlobalEffectSums } from '@helpers/defaults';
@@ -5,9 +6,9 @@ import { edictEntry, edictSeatBoons } from '@helpers/edict/edict';
 import { characterRecalculateStats } from '@helpers/hero/party';
 import {
   CombatStatDimension,
-  StatShorthand,
   StatusEffectTagDimension,
   type CollectibleContent,
+  type CombatStat,
   type CollectibleId,
   type GameStat,
   type GameState,
@@ -16,7 +17,9 @@ import {
   type GlobalEffectEffect,
   type GlobalEffectId,
   type GlobalEffectSums,
+  type I18nParams,
   type StatBlock,
+  type StatusEffectTag,
   type WorldNodeType,
 } from '@interfaces';
 import { isEqual } from 'es-toolkit';
@@ -56,145 +59,61 @@ function addStatPercent(
   });
 }
 
-// Renders one effect as a short "Label: +N[%]" fragment.
+function globalEffectTextKey(
+  effect: GlobalEffectEffect,
+): `globalEffect.${GlobalEffectEffect['effectType'] | 'GainCombatStatFlat' | 'GlobalSkillPointsPerLevelSlow'}` {
+  if (effect.effectType === 'GainCombatStat') {
+    const isPercent =
+      CombatStatDimension.isPercent?.[effect.combatStat] ?? true;
+    return isPercent
+      ? 'globalEffect.GainCombatStat'
+      : 'globalEffect.GainCombatStatFlat';
+  }
+  if (effect.effectType === 'GlobalSkillPointsPerLevel') {
+    return Math.abs(effect.value) >= 1
+      ? 'globalEffect.GlobalSkillPointsPerLevel'
+      : 'globalEffect.GlobalSkillPointsPerLevelSlow';
+  }
+  return `globalEffect.${effect.effectType}`;
+}
+
+// Every value an effect's text might use; each translation picks the ones it needs.
+function globalEffectTextParams(effect: GlobalEffectEffect): I18nParams {
+  const fields = effect as Partial<Record<string, string | number>>;
+  const value = Number(fields['value'] ?? 0);
+  const stat = fields['stat'];
+  const combatStat = fields['combatStat'];
+  const nodeType = fields['nodeType'];
+  const tag = fields['tag'];
+  const tradeskillId = fields['tradeskillId'];
+  return {
+    value,
+    signed: signedNumber(value),
+    signedOne: signedNumber(Math.sign(value)),
+    levels: value === 0 ? 0 : Math.round(1 / Math.abs(value)),
+    percent: signedPercent(value),
+    percent100: signedPercent(value * 100),
+    stat: stat
+      ? enumLabel('statShort', String(stat))
+      : t('globalEffect.anyStat'),
+    combatStat: combatStat
+      ? CombatStatDimension.label[combatStat as CombatStat]
+      : '',
+    materialPercent: fields['materialPercent'] ?? 0,
+    materialSelectionPercent: fields['materialSelectionPercent'] ?? 0,
+    nodeType: nodeType ? WORLD_NODE_TYPE_LABELS[nodeType as WorldNodeType] : '',
+    tag: tag ? StatusEffectTagDimension.label[tag as StatusEffectTag] : '',
+    tradeskill: tradeskillId
+      ? (contentNameById(String(tradeskillId)) ??
+        t('globalEffect.unknownTradeskill'))
+      : '',
+  };
+}
+
 export function globalEffectEffectDescription(
   effect: GlobalEffectEffect,
 ): string {
-  switch (effect.effectType) {
-    case 'GainStats':
-      return `Hero ${StatShorthand[effect.stat]}: ${signedNumber(effect.value)}`;
-    case 'GainStatPercent':
-      return `Hero ${StatShorthand[effect.stat!] ?? 'stats'}: ${signedPercent(effect.value)}`;
-    case 'EnemyStatPercent':
-      return `Enemy ${StatShorthand[effect.stat!] ?? 'stats'}: ${signedPercent(effect.value)}`;
-    case 'GainCombatStat': {
-      const isPercent =
-        CombatStatDimension.isPercent?.[effect.combatStat] ?? true;
-      return `Hero ${CombatStatDimension.label[effect.combatStat]}: +${effect.value}${isPercent ? '%' : ''}`;
-    }
-    case 'GlobalXPGainMultiplier':
-      return `XP Gain: ${signedPercent(effect.value * 100)}`;
-    case 'GlobalGoldGainMultiplier':
-      return `Gold Gain: ${signedPercent(effect.value * 100)}`;
-    case 'GlobalShopPriceMultiplier':
-      return `Shop Prices: ${signedPercent(effect.value * 100)}`;
-    case 'GlobalTraderPriceMultiplier':
-      return `Trader Prices: ${signedPercent(effect.value * 100)}`;
-    case 'GlobalShrineBuffsPermanent':
-      return 'Shrine buffs never expire';
-    case 'GlobalWipeEndsRun':
-      return 'Dying is game over';
-    case 'GlobalWipeLosesCurrency':
-      return `Dying loses ${effect.value}% of Gold Coin and Crimson Lucre`;
-    case 'GlobalWipeLosesMaterials':
-      return `Dying loses ${effect.materialPercent}% of each of ${effect.materialSelectionPercent}% of your material stacks`;
-    case 'GlobalReviveInPlace':
-      return 'The fallen party revives where it fell';
-    case 'WorkerCraftSpeedPercent':
-      return `Worker Craft Speed: ${signedPercent(effect.value)}`;
-    case 'WorkerGatherSpeedPercent':
-      return `Worker Gather Speed: ${signedPercent(effect.value)}`;
-    case 'WorkerXPGainMultiplier':
-      return `Worker XP Gain: ${signedPercent(effect.value * 100)}`;
-    case 'GlobalTownShopNoEquipment':
-      return 'Town shops sell no equipment';
-    case 'GlobalFeaturesRevealed':
-      return 'Level-based features always available';
-    case 'GlobalCursedDrops':
-      return 'Combat-dropped gear is cursed';
-    case 'GlobalDropExtraAffixes':
-      return `Combat-dropped Gear Affixes: +${effect.value}`;
-    case 'GlobalCraftedExtraAffixes':
-      return `Crafted Gear Affixes: +${effect.value}`;
-    case 'GlobalTradeskillMaterialBoost':
-      return `Recipe Materials: ${signedPercent(effect.value * 100)}`;
-    case 'GlobalAstralProjectorMaterialBoost':
-      return `Astral Projector Materials: ${signedPercent(effect.value * 100)}`;
-    case 'GlobalDevelopMaterialBoost':
-      return `Development Costs: ${signedPercent(effect.value * 100)}`;
-    case 'GlobalCraftTimeMultiplier':
-      return `Craft Time: ${signedPercent(effect.value * 100)}`;
-    case 'GlobalSkillPointsPerLevel':
-      return Math.abs(effect.value) >= 1
-        ? `Skill Points: ${signedNumber(effect.value)} per level`
-        : `Skill Points: ${signedNumber(Math.sign(effect.value))} every ${Math.round(1 / Math.abs(effect.value))} levels`;
-    case 'GlobalReclassDisabled':
-      return 'Heroes cannot reclass';
-    case 'GlobalTradeskillsDisabled':
-      return 'Crafting is forgotten';
-    case 'GlobalWorkersDisabled':
-      return 'Workers cannot be rescued';
-    case 'GlobalManualCombat':
-      return 'Heroes act only on your orders';
-    case 'GlobalRequireSealForDecreeAutomation':
-      return 'The Decree only goes to sealed regions';
-    case 'GlobalPartySharesClass':
-      return 'Every hero shares one class';
-    case 'GlobalJobAbilitiesStack':
-      return 'Party job abilities stack';
-    case 'GlobalShowRunTimer':
-      return 'A run timer is shown';
-    case 'GlobalSkipRegionIntros':
-      return 'Region introductions are skipped';
-    case 'GlobalSkipTutorials':
-      return 'Tutorials are skipped';
-    case 'GlobalSkipStoryCrawls':
-      return 'Story crawls are skipped';
-    case 'GlobalWorldNodeTypeRemoved':
-      return `${WORLD_NODE_TYPE_LABELS[effect.nodeType]} are gone`;
-    case 'GlobalWorldNodeStartingLevel':
-      return `${WORLD_NODE_TYPE_LABELS[effect.nodeType]} start at +${effect.value}`;
-    case 'GlobalCommissionReputationBoost':
-      return `Commission Reputation: ${signedPercent(effect.value * 100)}`;
-    case 'GlobalTownCommissionSlotBoost':
-      return `Town Commission Slots: ${signedNumber(effect.value)}`;
-    case 'GlobalShrineBuffDuration':
-      return `Shrine Buff Duration: ${signedPercent(effect.value * 100)}`;
-    case 'GlobalShrineBuffStrength':
-      return `Shrine Buff Strength: ${signedPercent(effect.value * 100)}`;
-    case 'GlobalAstralSpellDuration':
-      return `Astral Spell Duration: ${signedPercent(effect.value * 100)}`;
-    case 'GlobalAstralSpellStrength':
-      return `Astral Spell Strength: ${signedPercent(effect.value * 100)}`;
-    case 'GlobalMonstersDropRegionGathering':
-      return `Monsters: ${effect.value}% chance to drop regional gathering materials`;
-    case 'GlobalMonstersDropRegionGear':
-      return `Monsters: ${effect.value}% chance to drop regional gear near their level`;
-    case 'GlobalMonstersDropRegionCraftedMaterials':
-      return `Monsters: ${effect.value}% chance to drop regional crafted materials`;
-    case 'EnemyExtraSkills':
-      return `Enemy Skills: +${effect.value}`;
-    case 'GlobalLevelStatMultiplier':
-      return `Stats/Lv.: ${signedPercent(effect.value * 100)}`;
-    case 'GlobalDeathPenaltyMultiplier':
-      return `Deaths Door & Healing Time: ${signedPercent(effect.value * 100)}`;
-    case 'DebuffResistance':
-      return `All Debuff Resist: +${effect.value}%`;
-    case 'DebuffResistanceTag':
-      return `${StatusEffectTagDimension.label[effect.tag]}: +${effect.value}%`;
-    case 'GlobalCombatItemDropRateBoost':
-      return `Item Drop Chance: ${signedPercent(effect.value)}`;
-    case 'GlobalGatheringItemDropRateBoost':
-      return `Lucky Gather Item Chance: ${signedPercent(effect.value)}`;
-    case 'GlobalGatheringItemDropAmountBoost':
-      return `Lucky Gather Items on Success: ${signedNumber(effect.value)}`;
-    case 'GlobalGatheringItemFlatBoost':
-      return `Guaranteed Gather Items: ${signedNumber(effect.value)}`;
-    case 'GlobalArmorySizeBoost':
-      return `Armory Size: +${effect.value}`;
-    case 'GlobalTradeskillQueueSizeBoost': {
-      const tradeskillName =
-        contentNameById(effect.tradeskillId) ??
-        'Unknown Tradeskill';
-      return `${tradeskillName} Queue Size: +${effect.value}`;
-    }
-    case 'GlobalOffPathTravelSpeedBoost':
-      return `Off-Path Travel Speed: ${signedPercent(effect.value * 100)}`;
-    case 'GlobalOnPathTravelSpeedBoost':
-      return `On-Path Travel Speed: ${signedPercent(effect.value * 100)}`;
-    case 'GlobalDecreeClauseCapBoost':
-      return `Decree Clause Cap: +${effect.value}`;
-  }
+  return t(globalEffectTextKey(effect), globalEffectTextParams(effect));
 }
 
 // Comma-joined fragments - for appending live numbers onto a buff's tooltip

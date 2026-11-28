@@ -3,6 +3,7 @@ import { signal } from '@angular/core';
 import { i18nFill } from '@helpers/i18n/i18n-text';
 import type {
   I18nContentTranslations,
+  I18nEnumGroup,
   I18nFlatStrings,
   I18nKey,
   I18nLanguageData,
@@ -33,6 +34,13 @@ export function i18nLayersApply(layers: I18nLanguageData[]): void {
 
 export function t(key: I18nKey, params?: I18nParams): string {
   return i18nFill(_i18nUi()[key] ?? key, params);
+}
+
+// Enum values double as keys; a value with no label (e.g. added by a mod) shows as itself.
+export function enumLabel(group: I18nEnumGroup, value: string): string {
+  const key = `enum.${group}.${value}` as I18nKey;
+  const text = t(key);
+  return text === key ? value : text;
 }
 
 const pluralRulesByLocale = new Map<string, Intl.PluralRules>();

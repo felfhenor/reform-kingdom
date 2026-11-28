@@ -1,3 +1,6 @@
+import { contentName, nodeNameText } from '@helpers/i18n/i18n-content';
+import { t } from '@helpers/i18n/i18n';
+import { combatantDisplayName } from '@helpers/combat/combat-create';
 import { signal } from '@angular/core';
 import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
 import { combatantHealthBar } from '@helpers/combat/combat-combatant-hp.ui';
@@ -65,7 +68,10 @@ export function combatAutomationLockedReason(
   if (combatAutomationAllowedAt(mapName)) return undefined;
   const region = regionForMap(mapName);
   const boss = getEntry<EncounterContent>(region?.seal.sealEncounterId ?? '');
-  return `Seal ${region?.name} first (clear ${boss?.name}).`;
+  return t('combat.sealFirst', {
+    region: region ? contentName(region) : '',
+    boss: boss ? contentName(boss) : '',
+  });
 }
 
 export function combatManualTitle(combat: Combat): string {
@@ -73,9 +79,14 @@ export function combatManualTitle(combat: Combat): string {
     getEntry<EncounterContent>(combat.encounterId ?? '') ??
     getEntry<EncounterRandomContent>(combat.encounterRandomId ?? '')
   )?.fights.length;
+  const location = nodeNameText(combat.locationName);
   return fights && combat.fightIndex !== undefined
-    ? `${combat.locationName} (${combat.fightIndex + 1}/${fights})`
-    : combat.locationName;
+    ? t('combat.manualTitle', {
+        location,
+        fight: combat.fightIndex + 1,
+        fights,
+      })
+    : location;
 }
 
 export function combatantIcon(c: Combatant): CombatLogIcon {
@@ -110,7 +121,7 @@ export function combatManualStatusCard(c: Combatant): StatusCardEntry {
   const icon = combatantIcon(c);
   return {
     combatantId: c.id,
-    name: c.name,
+    name: combatantDisplayName(c),
     monster: c.monsterId ? getEntry<MonsterContent>(c.monsterId) : undefined,
     level: c.monsterId ? c.level : undefined,
     combatant: c.monsterId ? c : undefined,
@@ -214,8 +225,8 @@ function combatManualAutoTargetLabel(
 
   const base = unconfusedPool(combat, hero, skill, tech);
   const taunter = foeTaunters(hero, base)[0];
-  if (taunter) return `${taunter.name} (taunting)`;
-  if (base.length === 1) return `${base[0].name} (auto)`;
+  if (taunter) return `${combatantDisplayName(taunter)} (taunting)`;
+  if (base.length === 1) return `${combatantDisplayName(base[0])} (auto)`;
 
   const group =
     tech.targetType === 'Allies'
@@ -332,7 +343,7 @@ function combatManualTurnSlots(
         kind: 'turn',
         key: `${round}:${c.id}${turn.bonus ? ':bonus' : ''}`,
         id: c.id,
-        name: c.name,
+        name: combatantDisplayName(c),
         isEnemy: c.isEnemy,
         icon: combatantIcon(c),
       },

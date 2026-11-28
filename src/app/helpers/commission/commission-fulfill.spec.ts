@@ -215,7 +215,7 @@ describe('commissionFulfill', () => {
       expect.objectContaining({
         locationName: 'Duchy Trading Caravan Carrina',
         message: expect.stringMatching(
-          /^You got @@icon@@2 .*trader tokens.*, @@icon@@.*Medal.*, @@icon@@Nell from turning in "Bundle of Wergen Sticks"!$/,
+          /^You got @@icon@@2x .*Trader Token.*, @@icon@@.*Medal.*, @@icon@@Nell from turning in "Bundle of Wergen Sticks"!$/,
         ),
         itemIcons: [
           expect.objectContaining({ spritesheet: 'item' }),

@@ -1,3 +1,4 @@
+import { enumLabel, t } from '@helpers/i18n/i18n';
 import {
   ELEMENT_RESISTANCE_MAX,
   ELEMENT_RESISTANCE_MIN,
@@ -81,9 +82,10 @@ export function elementCombinationName(
 
 // e.g. "Steam" for Fire/Water, or "Fire/Earth/Air" for a mix with no name.
 export function elementsLabel(elements: GameElement[]): string {
-  const joined = elements.join('/');
   const name = elementCombinationName(elements);
-  return name ?? joined;
+  return name
+    ? enumLabel('elementCombination', name)
+    : elements.map((element) => enumLabel('element', element)).join('/');
 }
 
 export function elementalDamageText(
@@ -92,6 +94,6 @@ export function elementalDamageText(
 ): string {
   const amount = damage.toLocaleString();
   return elements.length > 0
-    ? `${amount} ${elementsLabel(elements)} damage`
-    : `${amount} damage`;
+    ? t('combat.elementalDamage', { amount, elements: elementsLabel(elements) })
+    : t('combat.damage', { amount });
 }

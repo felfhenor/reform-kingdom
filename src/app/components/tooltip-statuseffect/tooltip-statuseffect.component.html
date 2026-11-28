@@ -26,7 +26,7 @@
       <span class="font-semibold tabular-nums">
         {{ turns | number }}
       </span>
-      {{ 'turn' | pluralize: turns !== 1 }} remaining
+      {{ 'statusEffect.turnsRemaining' | tPlural: turns }}
     </div>
   }
 

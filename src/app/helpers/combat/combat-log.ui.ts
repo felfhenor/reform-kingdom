@@ -1,6 +1,7 @@
 import {
   adventureLogMessageHtml,
   combatLogHealthColor,
+  COMBATANT_STATUS_MARK,
   ICON_TOKEN_PATTERN,
 } from '@helpers/combat/combat-log';
 import {
@@ -15,12 +16,19 @@ import type {
 } from '@interfaces';
 
 const COMBATANT_TOKEN_PATTERN = /@@([^@]+)@@/g;
-const COMBATANT_STATUS_PATTERN =
+const COMBATANT_STATUS_PATTERN = new RegExp(
+  `\\s*${COMBATANT_STATUS_MARK}[^${COMBATANT_STATUS_MARK}]*${COMBATANT_STATUS_MARK}`,
+  'g',
+);
+// Entries logged before the status was marked are English.
+const LEGACY_COMBATANT_STATUS_PATTERN =
   /\s*\[[^\]]+ HP\](?: \[[^\]]+ shield\])? \[[^\]]+ EP\]/g;
 
 // Statuses are baked into the message at log time, so views with live HP/EP bars strip them on display.
 export function adventureLogStripCombatantStatus(message: string): string {
-  return message.replace(COMBATANT_STATUS_PATTERN, '');
+  return message
+    .replace(COMBATANT_STATUS_PATTERN, '')
+    .replace(LEGACY_COMBATANT_STATUS_PATTERN, '');
 }
 
 export type AdventureLogMessagePart =

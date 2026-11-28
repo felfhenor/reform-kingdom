@@ -1,3 +1,4 @@
+import { combatantDisplayName } from '@helpers/combat/combat-create';
 import type { AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
@@ -35,7 +36,7 @@ export class StatusEncounterCombatantsComponent {
   public entries = computed<StatusCardEntry[]>(() =>
     this.combatants().map((combatant) => ({
       combatantId: combatant.id,
-      name: combatant.name,
+      name: combatantDisplayName(combatant),
       monster: combatant.monsterId
         ? getEntry<MonsterContent>(combatant.monsterId)
         : undefined,

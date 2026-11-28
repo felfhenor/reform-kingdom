@@ -1,6 +1,8 @@
+import { tPlural } from '@helpers/i18n/i18n';
+import { TPluralPipe } from '@pipes/t-plural.pipe';
 import { FFButtonComponent } from '@ff/components/button/button.component';
 import { GAMEPAD_PRIORITY } from '@helpers/engine/gamepad.ui';
-import { DecimalPipe, formatNumber } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import type { AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
@@ -47,6 +49,7 @@ import { sum } from 'es-toolkit/compat';
   selector: 'app-play-kingdom-armory',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPluralPipe,
     FFButtonComponent,
     SlotArmoryItemComponent,
     SlotButtonContainerComponent,
@@ -106,8 +109,7 @@ export class PlayKingdomArmoryComponent {
       notifyWarning('No hero could equip any of those items.');
       return;
     }
-    const label = formatNumber(count, this.locale);
-    notifySuccess(`Equipped ${label} ${count === 1 ? 'item' : 'items'}.`);
+    notifySuccess(tPlural('armory.equippedItems', count));
   }
 
   public onButtonEnter(event: AnimationCallbackEvent): void {

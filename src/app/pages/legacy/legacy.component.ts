@@ -1,3 +1,8 @@
+import {
+  durationPartText,
+  ticksToDurationParts,
+} from '@helpers/engine/timer.ui';
+import { TPluralPipe } from '@pipes/t-plural.pipe';
 import { DatePipe, DecimalPipe, NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -13,7 +18,6 @@ import { FadeInDirective } from '@directives/fade-in.directive';
 import { ListRowDirective } from '@directives/list-row.directive';
 import { SFXDirective } from '@directives/sfx.directive';
 import { getEntry } from '@helpers/content/content';
-import { ticksToDurationParts } from '@helpers/engine/timer.ui';
 import { legacy } from '@helpers/legacy/legacy';
 import { legacyRunScore } from '@helpers/legacy/legacy-score.ui';
 import { legacyRunOutcomeTitle } from '@helpers/legacy/legacy.ui';
@@ -21,13 +25,13 @@ import { modsAffectGameplay } from '@helpers/mod/mod-registry';
 import { modsListLabel } from '@helpers/mod/mod-registry.ui';
 import { TippyDirective } from '@ngneat/helipopper';
 import type { GameId, JobContent } from '@interfaces';
-import { PluralizePipe } from '@pipes/pluralize.pipe';
 import { sortBy } from 'es-toolkit/compat';
 
 @Component({
   selector: 'app-legacy',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPluralPipe,
     BlankSlateComponent,
     ButtonKingdomBackComponent,
     DatePipe,
@@ -35,7 +39,6 @@ import { sortBy } from 'es-toolkit/compat';
     IconJobComponent,
     ListRowDirective,
     NgTemplateOutlet,
-    PluralizePipe,
     SFXDirective,
     TippyDirective,
   ],
@@ -44,6 +47,7 @@ import { sortBy } from 'es-toolkit/compat';
   templateUrl: './legacy.component.html',
 })
 export class LegacyComponent {
+  public readonly durationPartText = durationPartText;
   private router = inject(Router);
 
   public runs = computed(() =>

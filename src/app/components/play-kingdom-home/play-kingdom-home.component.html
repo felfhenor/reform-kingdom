@@ -18,8 +18,7 @@
             <app-icon-kingdom [name]="nav.storage.icon" class="zoom-tile" />
             <span class="text-base font-bold">{{ nav.storage.label }}</span>
             <span class="type-meta text-shadow-black">
-              {{ count }}
-              {{ 'material' | pluralize: count > 1 }} stored
+              {{ 'kingdomHome.materialsStored' | tPlural: count }}
             </span>
           </button>
 
@@ -61,8 +60,7 @@
               </span>
 
               <span class="type-meta text-shadow-black">
-                {{ spellCount | number }}
-                {{ 'spell' | pluralize: spellCount > 1 }} learned
+                {{ 'kingdomHome.spellsLearned' | tPlural: spellCount }}
               </span>
             </button>
           }
@@ -180,8 +178,7 @@
               </span>
               @if (levelUpReady > 0) {
                 <span class="type-meta text-shadow-black">
-                  {{ levelUpReady }}
-                  {{ 'worker' | pluralize: levelUpReady > 1 }} ready to level up
+                  {{ 'kingdomHome.workersReady' | tPlural: levelUpReady }}
                 </span>
               }
             </button>
@@ -237,8 +234,10 @@
                       [style.left.%]="tradeskill.activePercent"
                     ></div>
 
-                    {{ tradeskill.queueUnitsRemaining }}
-                    {{ 'item' | pluralize: tradeskill.queueUnitsRemaining > 1 }}
+                    {{
+                      'kingdomHome.queueItems'
+                        | tPlural: tradeskill.queueUnitsRemaining
+                    }}
                     ·
                     {{ tradeskill.totalRemainingLabel }}
                   </app-bar-progress>

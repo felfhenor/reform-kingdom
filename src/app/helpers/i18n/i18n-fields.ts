@@ -1,9 +1,11 @@
+import { contentShortNameEnglish } from '@helpers/content/content-short-name';
 import type { I18nContentFields } from '@interfaces';
 import { get } from 'es-toolkit/compat';
 
 // Player-facing prose fields in gamedata; everything else is a reference or a number.
 export const I18N_CONTENT_FIELDS: string[] = [
   'name',
+  'shortName',
   'description',
   'combatMessage',
   'emptyText',
@@ -37,16 +39,30 @@ function i18nCollectFields(
   });
 }
 
-export function i18nContentFields(entry: unknown): I18nContentFields {
+// Not stored on entries, so translators still need a line for it.
+function i18nShortName(entry: unknown, type?: string): string | undefined {
+  const name = (entry as { name?: unknown } | undefined)?.name;
+  return type && typeof name === 'string'
+    ? contentShortNameEnglish(type, name)
+    : undefined;
+}
+
+export function i18nContentFields(
+  entry: unknown,
+  type?: string,
+): I18nContentFields {
   const out: I18nContentFields = {};
   i18nCollectFields(entry, [], out);
-  return out;
+  const shortName = i18nShortName(entry, type);
+  return shortName === undefined ? out : { ...out, shortName };
 }
 
 export function i18nContentFieldText(
   entry: unknown,
   path: string,
+  type?: string,
 ): string | undefined {
+  if (path === 'shortName') return i18nShortName(entry, type);
   const value: unknown = get(entry, path);
   return typeof value === 'string' ? value : undefined;
 }

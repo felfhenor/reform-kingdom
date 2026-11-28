@@ -1,3 +1,4 @@
+import { tPlural } from '@helpers/i18n/i18n';
 import { DecimalPipe, formatNumber } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -241,9 +242,7 @@ export class PlayHeroesSkillTreeComponent {
 
     const pending = this.staged().length;
     const discardNote =
-      pending > 0
-        ? ` Your ${formatNumber(pending, this.locale)} unconfirmed change${pending === 1 ? '' : 's'} will be discarded.`
-        : '';
+      pending > 0 ? ` ${tPlural('skillTree.pendingDiscarded', pending)}` : '';
     swal.swalOptions = {
       title: `Reset ${character.name}'s ${job.name} skill tree?`,
       text:
@@ -265,7 +264,9 @@ export class PlayHeroesSkillTreeComponent {
 
     const count = this.staged().length;
     swal.swalOptions = {
-      text: `${character.name} has ${formatNumber(count, this.locale)} skill tree change${count === 1 ? '' : 's'} you haven't confirmed. If you leave now, they'll be discarded.`,
+      text: tPlural('skillTree.unconfirmedChanges', count, {
+        hero: character.name,
+      }),
     };
     const result = await swal.fire();
     if (result.isDenied) this.discard();

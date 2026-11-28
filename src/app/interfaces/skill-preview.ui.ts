@@ -15,11 +15,6 @@ export type SkillTechniqueKind =
   | 'Summon';
 
 // `count` is omitted when the noun already says it all (e.g. "Self", "All allies").
-export type SkillTechniqueTargeting = {
-  count?: number;
-  noun: string;
-};
-
 export type SkillTechniqueStatusPreview = {
   name: string;
   chance: number;
@@ -31,7 +26,7 @@ export type SkillTechniquePreview = {
   kind: SkillTechniqueKind;
   // Only meaningful for Damage/Heal kinds; 0 otherwise.
   amount: number;
-  targeting: SkillTechniqueTargeting;
+  targeting: string;
   conditions: string[];
   scaling: SkillStatScaling[];
   elements: GameElement[];

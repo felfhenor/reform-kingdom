@@ -6,6 +6,7 @@ import {
   contentName,
   contentNameById,
   contentNestedText,
+  contentShortName,
   contentText,
   nodeNameText,
 } from '@helpers/i18n/i18n-content';
@@ -94,5 +95,37 @@ describe('nodeNameText', () => {
 
     expect(nodeNameText('Old Mill')).toBe('Vieux moulin');
     expect(nodeNameText('Elsewhere')).toBe('Elsewhere');
+  });
+});
+
+describe('contentShortName', () => {
+  const recipe = {
+    id: 'r',
+    name: 'Material: Copper Ingot',
+    __type: 'recipe',
+  } as IsContentItem;
+
+  it('drops the uniqueness prefix from the English name', () => {
+    expect(contentShortName(recipe)).toBe('Copper Ingot');
+  });
+
+  it('uses a translated short name', () => {
+    i18nLayersApply([
+      i18nLanguageLayer({
+        content: {
+          recipe: {
+            'Material: Copper Ingot': { shortName: 'Lingot de cuivre' },
+          },
+        },
+      }),
+    ]);
+
+    expect(contentShortName(recipe)).toBe('Lingot de cuivre');
+  });
+
+  it('falls back to the name for types without a prefix', () => {
+    expect(
+      contentShortName({ ...recipe, __type: 'item' } as IsContentItem),
+    ).toBe('Material: Copper Ingot');
   });
 });

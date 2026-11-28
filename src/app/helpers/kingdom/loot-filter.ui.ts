@@ -1,3 +1,4 @@
+import { enumLabel, i18nList, t, tPlural } from '@helpers/i18n/i18n';
 import { contentName } from '@helpers/i18n/i18n-content';
 import { LOOT_FILTER_DEFAULT_MIN_ITEM_LEVEL } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
@@ -30,47 +31,48 @@ export function isLootFilterActive(filters: LootFilterSettings): boolean {
   );
 }
 
-const andList = new Intl.ListFormat('en', { type: 'conjunction' });
-const orList = new Intl.ListFormat('en', { type: 'disjunction' });
-
 function unkept(record: Record<string, boolean>): string[] {
   return Object.keys(record).filter((key) => !record[key]);
 }
 
+// Enum labels stay as written, so the summary names each rule the way its toggle does.
 function lootFilterSoldRules(filters: LootFilterSettings): string[] {
-  const types = unkept(filters.keepEquipmentTypes);
-  const rarities = unkept(filters.keepRarities);
+  const types = unkept(filters.keepEquipmentTypes).map((type) =>
+    enumLabel('equipmentType', type),
+  );
+  const rarities = unkept(filters.keepRarities).map((rarity) =>
+    enumLabel('rarity', rarity),
+  );
   const level = filters.minimumItemLevel;
 
   return [
-    ...(types.length > 0 ? [`${andList.format(types)} items`] : []),
-    ...(level > LOOT_FILTER_DEFAULT_MIN_ITEM_LEVEL
-      ? [`anything below level ${level.toLocaleString()}`]
+    ...(types.length > 0
+      ? [t('lootFilter.ruleTypes', { types: i18nList(types, 'and') })]
       : []),
-    ...(rarities.length > 0 ? [`anything ${orList.format(rarities)}`] : []),
-  ].map((x) => x.toLowerCase());
+    ...(level > LOOT_FILTER_DEFAULT_MIN_ITEM_LEVEL
+      ? [t('lootFilter.ruleBelowLevel', { level: level.toLocaleString() })]
+      : []),
+    ...(rarities.length > 0
+      ? [t('lootFilter.ruleRarities', { rarities: i18nList(rarities, 'or') })]
+      : []),
+  ];
 }
 
 export function lootFilterSummary(filters: LootFilterSettings): string {
-  if (!isLootFilterActive(filters)) {
-    return 'Nothing is automatically sold. Everything found or crafted goes into your armory.';
-  }
+  if (!isLootFilterActive(filters)) return t('lootFilter.nothingSold');
 
-  const rules = andList.format(lootFilterSoldRules(filters));
-  const sources = orList.format(
-    Object.entries(filters.sellFromSources)
-      .filter(([, sells]) => sells)
-      .map(([source]) => source.toLowerCase()),
-  );
+  const sources = Object.entries(filters.sellFromSources)
+    .filter(([, sells]) => sells)
+    .map(([source]) => enumLabel('lootSource', source));
+  const params = {
+    sources: i18nList(sources, 'or'),
+    rules: i18nList(lootFilterSoldRules(filters), 'and'),
+  };
+  const exceptions = filters.exceptEquipment.length;
 
-  return `From ${sources}, ${rules} will be automatically sold${lootFilterExceptSuffix(filters)}.`;
-}
-
-function lootFilterExceptSuffix(filters: LootFilterSettings): string {
-  const count = filters.exceptEquipment.length;
-  if (count === 0) return '';
-
-  return `, except ${count.toLocaleString()} ${count === 1 ? 'item' : 'items'}`;
+  return exceptions === 0
+    ? t('lootFilter.summary', params)
+    : tPlural('lootFilter.summaryExcept', exceptions, params);
 }
 
 export function lootFilterExceptionOptions(

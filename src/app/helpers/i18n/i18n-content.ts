@@ -1,4 +1,5 @@
 import { getEntry } from '@helpers/content/content';
+import { contentShortNameEnglish } from '@helpers/content/content-short-name';
 import {
   i18nContentFields,
   i18nContentFieldText,
@@ -45,6 +46,14 @@ export function contentNestedText(
 
 export function contentName(entry: IsContentItem): string {
   return contentText(entry, 'name');
+}
+
+export function contentShortName(entry: IsContentItem): string {
+  return (
+    i18nContent()[entry.__type]?.[entry.name]?.['shortName'] ??
+    contentShortNameEnglish(entry.__type, entry.name) ??
+    contentName(entry)
+  );
 }
 
 export function contentNameById(id: string): string | undefined {

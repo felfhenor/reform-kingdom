@@ -1,3 +1,4 @@
+import { contentShortName } from '@helpers/i18n/i18n-content';
 import { DecimalPipe, formatNumber, NgTemplateOutlet } from '@angular/common';
 import type { AnimationCallbackEvent } from '@angular/core';
 import {
@@ -24,7 +25,6 @@ import {
   characterSkillPreview,
   skillTreeNodeModifierLines,
 } from '@helpers/hero/skill-modifier.ui';
-import { skillTreeNodeShortName } from '@helpers/hero/skill-tree-content';
 import {
   skillTreeNodeArt,
   skillTreeNodeEffectText,
@@ -102,7 +102,7 @@ export class PanelHeroesSkillTreeDetailComponent {
 
     return {
       node,
-      name: skillTreeNodeShortName(node),
+      name: contentShortName(node),
       kind: skillTreeNodeKind(node),
       art: skillTreeNodeArt(node, this.job()),
       skill: content

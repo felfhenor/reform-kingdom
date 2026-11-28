@@ -4,6 +4,7 @@ import {
   i18nResetToEnglish,
 } from '@/testing/i18n';
 import {
+  enumLabel,
   i18nLayersApply,
   i18nList,
   i18nLocale,
@@ -82,5 +83,20 @@ describe('i18nList', () => {
 
     expect(i18nList(['a', 'b', 'c'], 'and')).toBe('a, b, and c');
     expect(i18nList(['a', 'b'], 'or')).toBe('a or b');
+  });
+});
+
+describe('enumLabel', () => {
+  it('labels a known value and shows unknown ones as written', () => {
+    expect(enumLabel('rarity', 'Rare')).toBe('Rare');
+    expect(enumLabel('rarity', 'Modded')).toBe('Modded');
+  });
+
+  it('uses the translation', () => {
+    i18nLayersApply([
+      i18nLanguageLayer({ ui: { 'enum.rarity.Rare': 'Rare (fr)' } }),
+    ]);
+
+    expect(enumLabel('rarity', 'Rare')).toBe('Rare (fr)');
   });
 });
