@@ -1,5 +1,9 @@
 import { i18nLabels, t } from '@helpers/i18n/i18n';
-import { contentName, contentNameById } from '@helpers/i18n/i18n-content';
+import {
+  contentName,
+  contentNameById,
+  contentText,
+} from '@helpers/i18n/i18n-content';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
 import {
@@ -186,8 +190,17 @@ export function exchangeInputHints(
   return uniqBy(withInputs.map(exchangeInputHint), 'id');
 }
 
+export function exchangeNodeActionLabel(node: ExchangeNodeContent): string {
+  return contentText(node, 'actionLabel');
+}
+
+export function exchangeNodeEmptyText(node: ExchangeNodeContent): string {
+  return contentText(node, 'emptyText');
+}
+
 function exchangeVerb(nodeName: string): string {
-  return exchangeNodeContent(nodeName)?.actionLabel ?? 'Exchange';
+  const node = exchangeNodeContent(nodeName);
+  return node ? exchangeNodeActionLabel(node) : '';
 }
 
 function exchangeAnalytics(nodeName: string, outputId: string): void {
@@ -236,7 +249,7 @@ export async function exchangePerformEquipment(
   const newName = equipmentItemDisplayName(newItem, contentName(outputContent));
   miscellaneousMessageLog(
     t('exchange.became', {
-      nodeName: exchangeVerb(nodeName),
+      action: exchangeVerb(nodeName),
       oldName,
       newName,
     }),
@@ -269,7 +282,7 @@ export async function exchangePerformItem(
   const outputName = contentNameById(exchange.output.itemId) ?? 'UNKNOWN';
   miscellaneousMessageLog(
     t('exchange.xBecameX', {
-      nodeName: exchangeVerb(nodeName),
+      action: exchangeVerb(nodeName),
       required: exchange.input.required.toLocaleString(),
       inputName,
       quantity: exchange.output.quantity.toLocaleString(),
@@ -302,7 +315,7 @@ export async function exchangePerformCollectible(
 
   const name = contentNameById(exchange.output.collectibleId) ?? 'UNKNOWN';
   miscellaneousMessageLog(
-    t('exchange.received', { nodeName: exchangeVerb(nodeName), name }),
+    t('exchange.received', { action: exchangeVerb(nodeName), name }),
   );
   exchangeAnalytics(nodeName, exchange.output.collectibleId);
   void taskEventCollectibleGained(exchange.output.collectibleId);

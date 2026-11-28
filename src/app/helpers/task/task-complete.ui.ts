@@ -1,4 +1,4 @@
-import { contentName } from '@helpers/i18n/i18n-content';
+import { contentName, contentText } from '@helpers/i18n/i18n-content';
 import { t } from '@helpers/i18n/i18n';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import {
@@ -26,7 +26,7 @@ export function tasksAnnounceCompleted(tasks: TaskContent[]): void {
       t('taskComplete.taskComplete2', { name: contentName(task) }),
     );
     if (task.whisper) {
-      founderWhisperLog(task.whisper);
+      founderWhisperLog(contentText(task, 'whisper'));
     }
     analyticsSendDesignEvent('Task:Complete');
     analyticsSendDesignEvent(

@@ -1,5 +1,9 @@
 import { t } from '@helpers/i18n/i18n';
-import { contentName, contentNameById } from '@helpers/i18n/i18n-content';
+import {
+  contentName,
+  contentNameById,
+  contentText,
+} from '@helpers/i18n/i18n-content';
 import {
   collectibleDropHtml,
   combatMessageLog,
@@ -210,13 +214,17 @@ export function grantResolvedDrops(
           undefined,
           info,
         );
-        if (worker.rescueText) {
+        const rescueText = contentText(worker, 'rescueText');
+        if (rescueText) {
           combatMessageLog(
             combat,
-            `**${worker.name}**: *"${worker.rescueText}"*`,
+            t('combatRewards.rescueSpeech', {
+              name: contentName(worker),
+              text: rescueText,
+            }),
           );
         }
-        emitRewardVfx(combat, info, 1, worker.rescueText || undefined);
+        emitRewardVfx(combat, info, 1, rescueText || undefined);
         return;
       }
 

@@ -1733,6 +1733,7 @@ combatRewards:
   thePartyFound3: The party found {{ icon }}{{ recipe }}!
   thePartyRescued: The party rescued {{ icon }}{{ name }}!
   thePartyFound4: The party found {{ icon }}{{ quantity }}!
+  rescueSpeech: '**{{ name }}**: *"{{ text }}"*'
 combatSkillElements:
   beginsCharging: '{{ name }} begins charging **{{ name2 }}**!'
   beginsChargingConsuming: '{{ name }} begins charging **{{ name2 }}**, consuming {{ spent }}!'
@@ -1773,9 +1774,9 @@ discord:
   discordInviteCopiedPaste: Discord invite copied! Paste it into a new tab to join.
   couldnTCopyThe: Couldn't copy the Discord invite. Visit {{ url }} to join.
 exchange:
-  became: '{{ nodeName }}: "{{ oldName }}" became "{{ newName }}".'
-  xBecameX: '{{ nodeName }}: {{ required }}x {{ inputName }} became {{ quantity }}x {{ outputName }}.'
-  received: '{{ nodeName }}: received {{ name }}.'
+  became: '{{ action }}: "{{ oldName }}" became "{{ newName }}".'
+  xBecameX: '{{ action }}: {{ required }}x {{ inputName }} became {{ quantity }}x {{ outputName }}.'
+  received: '{{ action }}: received {{ name }}.'
   error:
     missing: You no longer have what that exchange requires.
     unaffordable: You cannot afford that exchange.

@@ -177,6 +177,7 @@ export type I18nKey =
   | 'combatOrder.target.default'
   | 'combatOrder.unknownHero'
   | 'combatOrder.withCondition'
+  | 'combatRewards.rescueSpeech'
   | 'combatRewards.thePartyFound'
   | 'combatRewards.thePartyFound2'
   | 'combatRewards.thePartyFound3'

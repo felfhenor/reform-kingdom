@@ -25,6 +25,8 @@ import { activeExchangeNode } from '@helpers/engine/ui';
 import {
   exchangeHasOnlyEquippedInputs,
   exchangeInputHints,
+  exchangeNodeActionLabel,
+  exchangeNodeEmptyText,
   exchangePerformCollectible,
   exchangePerformEquipment,
   exchangePerformItem,
@@ -60,6 +62,16 @@ import { TippyDirective } from '@ngneat/helipopper';
 })
 export class ModalExchangeNodeComponent {
   private locale = inject(LOCALE_ID);
+
+  public actionLabel = computed(() => {
+    const node = this.node();
+    return node ? exchangeNodeActionLabel(node) : '';
+  });
+
+  public emptyText = computed(() => {
+    const node = this.node();
+    return node ? exchangeNodeEmptyText(node) : '';
+  });
 
   public node = computed(() => {
     const entry = activeExchangeNode();

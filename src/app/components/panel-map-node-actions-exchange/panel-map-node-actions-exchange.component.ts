@@ -3,9 +3,11 @@ import { FFButtonComponent } from '@ff/components/button/button.component';
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   input,
   output,
 } from '@angular/core';
+import { exchangeNodeActionLabel } from '@helpers/exchange/exchange.ui';
 import type { ExchangeNodeContent } from '@interfaces/content-exchangenode';
 
 @Component({
@@ -21,12 +23,13 @@ import type { ExchangeNodeContent } from '@interfaces/content-exchangenode';
       ffPadAction="context"
       [ffPadLabel]="'panelMapNodeActionsExchange.open' | t"
     >
-      {{ node().actionLabel }}
+      {{ actionLabel() }}
     </button>
   `,
 })
 export class PanelMapNodeActionsExchangeComponent {
   public node = input.required<ExchangeNodeContent>();
+  public actionLabel = computed(() => exchangeNodeActionLabel(this.node()));
 
   public open = output<void>();
 }

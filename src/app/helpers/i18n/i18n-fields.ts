@@ -6,6 +6,7 @@ import { get } from 'es-toolkit/compat';
 export const I18N_CONTENT_FIELDS: string[] = [
   'name',
   'shortName',
+  'actionLabel',
   'description',
   'combatMessage',
   'emptyText',

@@ -1,4 +1,4 @@
-import { contentName } from '@helpers/i18n/i18n-content';
+import { contentName, contentText } from '@helpers/i18n/i18n-content';
 import { t } from '@helpers/i18n/i18n';
 import { achievementsMoment } from '@helpers/achievement/achievement-moment';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
@@ -117,13 +117,17 @@ export function shrineBuffStrength(): number {
   );
 }
 
+export function worldNodeShrineLegendName(shrine: ShrineContent): string {
+  return contentText(shrine, 'legendName');
+}
+
 export function worldNodeShrineLegendVerses(
   shrine: ShrineContent,
   nodeName: string,
 ): string[] {
   return shrine.levels
     .slice(0, worldNodeShrineLevel(nodeName))
-    .map((level) => level.legend)
+    .map((_, index) => contentText(shrine, `levels.${index}.legend`))
     .filter((verse) => verse.length > 0);
 }
 

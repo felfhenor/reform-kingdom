@@ -1,4 +1,4 @@
-import { contentName } from '@helpers/i18n/i18n-content';
+import { contentName, contentText } from '@helpers/i18n/i18n-content';
 import { t } from '@helpers/i18n/i18n';
 import { achievementsMoment } from '@helpers/achievement/achievement-moment';
 import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
@@ -380,9 +380,12 @@ function handleCombatVictory(combat: Combat): boolean {
   grantEncounterFightDrops(combat, monsterDrops, !nextFight);
 
   const fight = currentEncounterFight(combat);
-  if (fight?.postFightWhisper) {
-    founderWhisperLog(fight.postFightWhisper, combat.id);
-  }
+  const encounter = completedEncounter(combat);
+  const whisper =
+    encounter && combat.fightIndex !== undefined
+      ? contentText(encounter, `fights.${combat.fightIndex}.postFightWhisper`)
+      : '';
+  if (whisper) founderWhisperLog(whisper, combat.id);
   if (!nextFight) return false;
 
   encounterStartFight(

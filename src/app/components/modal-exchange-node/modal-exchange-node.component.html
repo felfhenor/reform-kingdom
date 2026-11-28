@@ -126,9 +126,9 @@
             (click)="perform(row)"
             ffButton="ui-success"
             ffPadAction="confirm"
-            [ffPadLabel]="nodeContent.actionLabel"
+            [ffPadLabel]="actionLabel()"
           >
-            {{ nodeContent.actionLabel }}
+            {{ actionLabel() }}
             <app-row-currency-cost
               [costs]="row.kind === 'Item' ? row.exchange.costs : row.costs"
               [showOwned]="true"
@@ -137,7 +137,7 @@
         </div>
       } @empty {
         <app-blank-slate>
-          {{ nodeContent.emptyText }}
+          {{ emptyText() }}
           @if (inputHints().length > 0) {
             <span
               class="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1"

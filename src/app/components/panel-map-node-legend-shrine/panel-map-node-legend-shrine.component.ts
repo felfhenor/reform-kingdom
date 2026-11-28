@@ -6,6 +6,7 @@ import {
   input,
 } from '@angular/core';
 import {
+  worldNodeShrineLegendName,
   worldNodeShrineLegendVerseCount,
   worldNodeShrineLegendVerses,
 } from '@helpers/world-node/world-node-shrine.ui';
@@ -26,7 +27,7 @@ export class PanelMapNodeLegendShrineComponent {
 
   public legendName = computed(() => {
     const shrine = this.shrine();
-    return shrine ? shrine.legendName : '';
+    return shrine ? worldNodeShrineLegendName(shrine) : '';
   });
 
   private totalVerses = computed(() => {
