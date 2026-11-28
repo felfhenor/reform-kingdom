@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -23,6 +24,7 @@ import type {
   selector: 'app-panel-town-workers',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     BlankSlateComponent,
     AtlasAnimationComponent,
     DecimalPipe,

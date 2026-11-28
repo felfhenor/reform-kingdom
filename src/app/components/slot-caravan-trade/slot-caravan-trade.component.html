@@ -4,7 +4,7 @@
 <app-tooltip-item-preview #preview [display]="item">
   <div preview-footer class="mt-2 type-muted text-center">
     @if (entry.trade.rumorId) {
-      Buying this reveals where the rumor leads.
+      {{ 'slotCaravanTrade.buyingThisRevealsWhere' | t }}
     } @else {
       {{
         isPartyBuying()
@@ -52,7 +52,10 @@
 
         @if (entry.ownedQuantity > 0) {
           <span class="badge badge-sm badge-data">
-            Owned: {{ entry.ownedQuantity | number }}
+            {{
+              'slotCaravanTrade.owned'
+                | t: { ownedQuantity: (entry.ownedQuantity | number) }
+            }}
           </span>
         }
 
@@ -65,7 +68,9 @@
         }
 
         @if (entry.soldOut) {
-          <span class="badge badge-error badge-sm">Sold Out</span>
+          <span class="badge badge-error badge-sm">
+            {{ 'slotCaravanTrade.soldOut' | t }}
+          </span>
         }
       </div>
     </div>

@@ -1,10 +1,11 @@
+import { TPipe } from '@pipes/t.pipe';
 import { FFButtonComponent } from '@ff/components/button/button.component';
 import { ChangeDetectionStrategy, Component, output } from '@angular/core';
 
 @Component({
   selector: 'app-panel-map-node-actions-trainer',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FFButtonComponent],
+  imports: [TPipe, FFButtonComponent],
   template: `
     <button
       type="button"
@@ -12,9 +13,9 @@ import { ChangeDetectionStrategy, Component, output } from '@angular/core';
       (click)="visit.emit()"
       ffButton="ui-click"
       ffPadAction="context"
-      ffPadLabel="Visit Trainer"
+      [ffPadLabel]="'panelMapNodeActionsTrainer.visitTrainer' | t"
     >
-      Visit
+      {{ 'panelMapNodeActionsTrainer.visit' | t }}
     </button>
   `,
 })

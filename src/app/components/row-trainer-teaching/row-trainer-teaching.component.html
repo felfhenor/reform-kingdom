@@ -11,7 +11,9 @@
 
       <div class="flex flex-reverse gap-2">
         @if (teachingRow.isLearned) {
-          <span class="badge badge-sm badge-success">Learned</span>
+          <span class="badge badge-sm badge-success">
+            {{ 'rowTrainerTeaching.learned' | t }}
+          </span>
         }
 
         <span
@@ -19,7 +21,14 @@
           [class.badge-data]="teachingRow.meetsLevel"
           [class.badge-error]="!teachingRow.meetsLevel"
         >
-          Lv. {{ teachingRow.teaching.requiredLevel | number }}
+          {{
+            'rowTrainerTeaching.lv'
+              | t
+                : {
+                    requiredLevel:
+                      (teachingRow.teaching.requiredLevel | number),
+                  }
+          }}
         </span>
       </div>
     </div>
@@ -54,12 +63,19 @@
               <div class="zoom-inline">
                 <app-slot-rarity-outline [entry]="skill" spritesheet="skill" />
               </div>
-              <span>Learn {{ skill | contentName }}</span>
+              <span>
+                {{
+                  'rowTrainerTeaching.learn'
+                    | t: { skill: (skill | contentName) }
+                }}
+              </span>
             </div>
           }
         } @else if (showRequirements()) {
           <div class="flex flex-wrap items-center gap-2 text-xs">
-            <span class="text-lighter">Requires:</span>
+            <span class="text-lighter">
+              {{ 'rowTrainerTeaching.requires' | t }}
+            </span>
 
             @for (prerequisite of unmetPrerequisites(); track $index) {
               <span class="text-error">{{ prerequisite.name }}</span>

@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -28,6 +29,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-slot-gather-material',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     AtlasImageComponent,
     DetailItemPreviewComponent,
     IconUnknownComponent,

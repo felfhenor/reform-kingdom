@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import {
   ChangeDetectionStrategy,
@@ -29,6 +30,7 @@ import {
   selector: 'app-detail-item-preview',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     ContentNamePipe,
     SlotRarityOutlineComponent,
     RowStatSummaryComponent,

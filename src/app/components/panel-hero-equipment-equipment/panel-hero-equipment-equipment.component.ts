@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { FFFocusOnChangeDirective } from '@ff/focus/ff-focus-on-change.directive';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import {
@@ -46,6 +47,7 @@ const PAPERDOLL_ROWS: EquipmentSlot[][] = [
   selector: 'app-panel-hero-equipment-equipment',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     FFFocusOnChangeDirective,
     BlankSlateComponent,
     SlotEquipmentComponent,

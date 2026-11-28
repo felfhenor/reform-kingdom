@@ -20,8 +20,14 @@
 
         @if (row.next; as next) {
           <div class="type-meta">
-            Lv. {{ next.level | number }}:
-            {{ jobAbilityValueLabel(row.ability, next.value) }}
+            {{
+              'tooltipJobAbility.lv'
+                | t
+                  : {
+                      level: (next.level | number),
+                      value: jobAbilityValueLabel(row.ability, next.value),
+                    }
+            }}
           </div>
         }
       </div>

@@ -1,3 +1,8 @@
 @if (gatherTime(); as gatherSeconds) {
-  <div class="badge badge-data">Gather Time {{ gatherSeconds }}s</div>
+  <div class="badge badge-data">
+    {{
+      'panelMapNodeBadgesGather.gatherTimeS'
+        | t: { gatherSeconds: gatherSeconds }
+    }}
+  </div>
 }

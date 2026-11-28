@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { DecimalPipe, NgTemplateOutlet, UpperCasePipe } from '@angular/common';
 import type { ElementRef, AnimationCallbackEvent } from '@angular/core';
 import {
@@ -37,6 +38,7 @@ const COLLAPSED_X_JITTER_PERCENT = 18;
   selector: 'app-card-status-combatant',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     DecimalPipe,
     IconSpecComponent,
     TextNumberTweenComponent,

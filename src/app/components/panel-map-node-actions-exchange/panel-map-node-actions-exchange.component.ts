@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { FFButtonComponent } from '@ff/components/button/button.component';
 import {
   ChangeDetectionStrategy,
@@ -10,7 +11,7 @@ import type { ExchangeNodeContent } from '@interfaces/content-exchangenode';
 @Component({
   selector: 'app-panel-map-node-actions-exchange',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FFButtonComponent],
+  imports: [TPipe, FFButtonComponent],
   template: `
     <button
       type="button"
@@ -18,7 +19,7 @@ import type { ExchangeNodeContent } from '@interfaces/content-exchangenode';
       (click)="open.emit()"
       ffButton="ui-click"
       ffPadAction="context"
-      ffPadLabel="Open"
+      [ffPadLabel]="'panelMapNodeActionsExchange.open' | t"
     >
       {{ node().actionLabel }}
     </button>

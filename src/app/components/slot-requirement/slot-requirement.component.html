@@ -19,7 +19,10 @@
 <ng-template #detailTooltip>
   <app-detail-item-preview [display]="previewDisplay()">
     <div class="type-meta mt-2">
-      Owned: {{ owned() | number }} / {{ quantity() | number }}
+      {{
+        'slotRequirement.owned'
+          | t: { owned: (owned() | number), quantity: (quantity() | number) }
+      }}
     </div>
 
     @if (materialId(); as itemId) {

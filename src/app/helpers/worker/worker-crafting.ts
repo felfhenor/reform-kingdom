@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { recipeCraftTime } from '@helpers/crafting/recipe-craft-time';
 import { recipeKingdomRequirements } from '@helpers/crafting/recipe-requirements';
 import { runStatsRecordCraft } from '@helpers/run-stats/run-stats';
@@ -250,7 +251,10 @@ function logWorkerCraft(
     categoryMessageLog(
       'Craft',
       'Worker Crafting',
-      `${worker.name} failed to craft ${recipe.name}.`,
+      t('workerCrafting.failedToCraft', {
+        name: worker.name,
+        name2: recipe.name,
+      }),
     );
     return;
   }
@@ -258,7 +262,11 @@ function logWorkerCraft(
   categoryMessageLog(
     'Craft',
     'Worker Crafting',
-    `${worker.name} crafted ${ITEM_ICON_TOKEN}${itemDropHtml(item, delivered)}!`,
+    t('workerCrafting.crafted', {
+      name: worker.name,
+      icon: ITEM_ICON_TOKEN,
+      delivered: itemDropHtml(item, delivered),
+    }),
     { sprite: item.sprite, spritesheet: 'item' },
   );
 }

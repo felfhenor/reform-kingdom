@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import type { AnimationCallbackEvent } from '@angular/core';
 import { combatManualOverlayVisible } from '@helpers/combat/combat-manual.ui';
 import {
@@ -54,7 +55,7 @@ const BLOCKED_ACTIONS: FFGamepadAction[] = [
 @Component({
   selector: 'app-tutorial-overlay',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FFButtonComponent, FFFocusScopeDirective],
+  imports: [TPipe, FFButtonComponent, FFFocusScopeDirective],
   host: {
     '(window:resize)': 'bumpResizeTick()',
     '(window:scroll)': 'bumpResizeTick()',

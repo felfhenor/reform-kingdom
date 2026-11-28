@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import type { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { FFInputService } from '@ff/input/ff-input.service';
 import { gamepadConfirmFirst } from '@helpers/engine/gamepad.ui';
@@ -48,6 +49,7 @@ const EDITABLE_CLAUSE_TYPES: DecreeClause['type'][] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex items-center gap-2 flex-1 min-w-0' },
   imports: [
+    TPipe,
     SweetAlert2Module,
     FFPadActionDirective,
     FFInputPromptComponent,

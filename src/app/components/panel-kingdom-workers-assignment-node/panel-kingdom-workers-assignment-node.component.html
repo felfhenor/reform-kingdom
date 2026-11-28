@@ -10,7 +10,7 @@
       class="badge badge-sm badge-success min-w-[80px]"
       [class.invisible]="!isActive()"
     >
-      Active
+      {{ 'panelKingdomWorkersAssignmentNode.active' | t }}
     </span>
 
     @if (modeStats) {
@@ -18,27 +18,42 @@
         @if (mode() === 'Combat') {
           <span class="flex items-center gap-2 min-w-[120px]">
             <app-icon name="gameClockwork" size="row" />
-            {{ modeStats.combatSpeed | number: '1.0-2' }} speed
+            {{
+              'panelKingdomWorkersAssignmentNode.speed'
+                | t: { combatSpeed: (modeStats.combatSpeed | number: '1.0-2') }
+            }}
           </span>
 
           <span class="flex items-center gap-2 min-w-[120px]">
             <app-icon name="gameSwapBag" size="row" />
-            {{ capacity() | number }} capacity
+            {{
+              'panelKingdomWorkersAssignmentNode.capacity'
+                | t: { capacity: (capacity() | number) }
+            }}
           </span>
 
           <span class="flex items-center gap-2 min-w-[120px]">
             <app-icon name="gameCrossedSwords" size="row" />
-            {{ combatPower() | number }} power
+            {{
+              'panelKingdomWorkersAssignmentNode.power'
+                | t: { combatPower: (combatPower() | number) }
+            }}
           </span>
         } @else {
           <span class="flex items-center gap-2 min-w-[120px]">
             <app-icon name="gameClockwork" size="row" />
-            {{ modeStats.gatherSpeed | number: '1.0-1' }} speed
+            {{
+              'panelKingdomWorkersAssignmentNode.speed2'
+                | t: { gatherSpeed: (modeStats.gatherSpeed | number: '1.0-1') }
+            }}
           </span>
 
           <span class="flex items-center gap-2 min-w-[120px]">
             <app-icon name="gameSwapBag" size="row" />
-            {{ capacity() | number }} capacity
+            {{
+              'panelKingdomWorkersAssignmentNode.capacity'
+                | t: { capacity: (capacity() | number) }
+            }}
           </span>
         }
       </span>
@@ -74,9 +89,15 @@
               <div class="type-meta">
                 <span class="text-difficulty-{{ item.difficulty }}">
                   @if (item.requiredPower !== undefined) {
-                    Power Lv. {{ item.requiredPower | number }}
+                    {{
+                      'panelKingdomWorkersAssignmentNode.powerLv'
+                        | t: { requiredPower: (item.requiredPower | number) }
+                    }}
                   } @else {
-                    Lv. {{ item.levelRangeLabel }}
+                    {{
+                      'panelKingdomWorkersAssignmentNode.lv'
+                        | t: { levelRangeLabel: item.levelRangeLabel }
+                    }}
                   }
                 </span>
                 ·
@@ -86,15 +107,21 @@
                   "
                 >
                   {{
-                    item.staminaCost === undefined
-                      ? '?'
-                      : (item.staminaCost | number)
+                    'panelKingdomWorkersAssignmentNode.stamina'
+                      | t
+                        : {
+                            staminaCost:
+                              item.staminaCost === undefined
+                                ? '?'
+                                : (item.staminaCost | number),
+                          }
                   }}
-                  stamina
                 </span>
                 @if (!item.reachable) {
                   ·
-                  <span class="text-error">unreachable</span>
+                  <span class="text-error">
+                    {{ 'panelKingdomWorkersAssignmentNode.unreachable' | t }}
+                  </span>
                 }
               </div>
             </div>
@@ -102,7 +129,9 @@
 
           <div>
             @if (item.noXp) {
-              <span class="badge badge-warning text-sm">No XP</span>
+              <span class="badge badge-warning text-sm">
+                {{ 'panelKingdomWorkersAssignmentNode.noXp' | t }}
+              </span>
             }
           </div>
         </div>
@@ -115,16 +144,24 @@
             {{ item.nodeName }}
             <span class="text-difficulty-{{ item.difficulty }}">
               @if (item.requiredPower !== undefined) {
-                Power Lv. {{ item.requiredPower | number }}
+                {{
+                  'panelKingdomWorkersAssignmentNode.powerLv'
+                    | t: { requiredPower: (item.requiredPower | number) }
+                }}
               } @else {
-                Lv. {{ item.levelRangeLabel }}
+                {{
+                  'panelKingdomWorkersAssignmentNode.lv'
+                    | t: { levelRangeLabel: item.levelRangeLabel }
+                }}
               }
             </span>
           </div>
 
           <div>
             @if (item.noXp) {
-              <span class="badge badge-warning text-sm">No XP</span>
+              <span class="badge badge-warning text-sm">
+                {{ 'panelKingdomWorkersAssignmentNode.noXp' | t }}
+              </span>
             }
           </div>
         </div>
@@ -138,7 +175,7 @@
         [items]="itemOptions()"
         bindLabel="name"
         bindValue="id"
-        placeholder="Select a material..."
+        [placeholder]="'panelKingdomWorkersAssignmentNode.selectAMaterial' | t"
         [clearable]="false"
         [ngModel]="displayedItemId()"
         (change)="setDraftItemId($event.id)"
@@ -149,7 +186,10 @@
 
             @if (item.owned > 0) {
               <span class="badge badge-data text-sm">
-                Owned: {{ item.owned | number }}
+                {{
+                  'panelKingdomWorkersAssignmentNode.owned'
+                    | t: { owned: (item.owned | number) }
+                }}
               </span>
             }
           </div>
@@ -161,7 +201,10 @@
 
             @if (item.owned > 0) {
               <span class="badge badge-data text-sm">
-                Owned: {{ item.owned | number }}
+                {{
+                  'panelKingdomWorkersAssignmentNode.owned'
+                    | t: { owned: (item.owned | number) }
+                }}
               </span>
             }
           </div>
@@ -171,7 +214,7 @@
 
     <input
       type="number"
-      ffStepper="How Many"
+      [ffStepper]="'panelKingdomWorkersAssignmentNode.howMany' | t"
       min="0"
       placeholder="∞"
       class="input input-sm w-20 shrink-0"
@@ -188,7 +231,7 @@
       [sfxOffset]="0"
       [sfxTrigger]="['click', 'hover']"
     >
-      Confirm
+      {{ 'panelKingdomWorkersAssignmentNode.confirm' | t }}
     </button>
   </div>
 </div>

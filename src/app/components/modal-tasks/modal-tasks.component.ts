@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { FFButtonComponent } from '@ff/components/button/button.component';
 import { FFFocusRowDirective } from '@ff/focus/ff-focus-row.directive';
 import { FFFocusSkipDirective } from '@ff/focus/ff-focus-skip.directive';
@@ -23,6 +24,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-modal-tasks',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     BarProgressComponent,
     ListReflowDirective,
     CurrencyCostComponent,

@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { FFButtonComponent } from '@ff/components/button/button.component';
 import {
   ChangeDetectionStrategy,
@@ -14,7 +15,7 @@ import type { WorldNodeEntry } from '@interfaces';
 @Component({
   selector: 'app-panel-map-node-actions-explore',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FFButtonComponent],
+  imports: [TPipe, FFButtonComponent],
   templateUrl: './panel-map-node-actions-explore.component.html',
   styleUrl: './panel-map-node-actions-explore.component.scss',
 })

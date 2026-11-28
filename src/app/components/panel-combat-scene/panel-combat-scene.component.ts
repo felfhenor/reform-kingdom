@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { FFFocusMemoryDirective } from '@ff/focus/ff-focus-memory.directive';
 import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
@@ -71,6 +72,7 @@ import { AnimationService } from '@services/animation.service';
   selector: 'app-panel-combat-scene',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     ContentNamePipe,
     AdventureLogMessageComponent,
     AtlasImageComponent,
@@ -157,7 +159,10 @@ export class PanelCombatSceneComponent {
     for (const entry of this.log()) {
       if (!entry.combatId || !ids.has(entry.combatId)) continue;
       lines.push(entry);
-      if (entry.message.startsWith('_Combat round')) rounds++;
+      // Entries logged before roundStart existed are English.
+      if (entry.roundStart || entry.message.startsWith('_Combat round')) {
+        rounds++;
+      }
       if (rounds === 2) break;
     }
     return lines.reverse();

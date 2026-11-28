@@ -60,8 +60,8 @@ function i18nTextCheck(
   if (!i18nHasForbiddenText(text, isName)) return true;
   errors.push(
     isName
-      ? `${where}: names cannot contain <, >, ** or @@.`
-      : `${where}: text cannot contain <, > or @@, and ** must come in pairs.`,
+      ? `${where}: names cannot contain HTML tags, ** or @@.`
+      : `${where}: text cannot contain HTML tags or @@, and ** must come in pairs.`,
   );
   return false;
 }

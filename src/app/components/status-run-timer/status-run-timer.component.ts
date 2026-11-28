@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import type { AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
@@ -21,7 +22,7 @@ import { AnimationService } from '@services/animation.service';
 @Component({
   selector: 'app-status-run-timer',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TippyDirective],
+  imports: [TPipe, TippyDirective],
   host: { class: 'contents' },
   templateUrl: './status-run-timer.component.html',
   styleUrl: './status-run-timer.component.scss',

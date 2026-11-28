@@ -28,7 +28,7 @@
     name="tablerExclamationCircle"
     size="row"
     class="text-error shrink-0"
-    [tp]="'This hero no longer knows this skill family.'"
+    [tp]="'rowCombatOrderClause.thisHeroNoLonger' | t"
     [tpPlacement]="'top'"
   />
 } @else if (!isFamilyUsable()) {
@@ -36,7 +36,7 @@
     name="tablerExclamationCircle"
     size="row"
     class="text-warning shrink-0"
-    [tp]="'Not usable with the equipped weapon, or not the chosen burst skill.'"
+    [tp]="'rowCombatOrderClause.notUsableWithThe' | t"
     [tpPlacement]="'top'"
   />
 } @else if (isFamilyEquipmentOnly()) {
@@ -44,7 +44,7 @@
     name="tablerInfoCircle"
     size="row"
     class="text-info shrink-0"
-    [tp]="'Depends on equipped gear.'"
+    [tp]="'rowCombatOrderClause.dependsOnEquippedGear' | t"
     [tpPlacement]="'top'"
   />
 } @else if (!isTargetModeUsable()) {
@@ -52,7 +52,7 @@
     name="tablerExclamationCircle"
     size="row"
     class="text-error shrink-0"
-    [tp]="'This skill can never hit a valid target with this targeting.'"
+    [tp]="'rowCombatOrderClause.thisSkillCanNever' | t"
     [tpPlacement]="'top'"
   />
 }
@@ -66,7 +66,7 @@
       class="checkbox checkbox-sm"
       (click)="toggleEnabled.emit()"
       ffPadAction="confirm"
-      ffPadLabel="Toggle"
+      [ffPadLabel]="'rowCombatOrderClause.toggle' | t"
     />
   </label>
 
@@ -75,9 +75,9 @@
     (click)="edit.emit()"
     ffButton="ui-click"
     ffPadAction="details"
-    ffPadLabel="Edit"
+    [ffPadLabel]="'rowCombatOrderClause.edit' | t"
   >
-    Edit
+    {{ 'rowCombatOrderClause.edit' | t }}
   </button>
   <button
     class="btn btn-xs btn-error btn-outline"
@@ -86,6 +86,6 @@
     [sfxOffset]="1"
     [sfxTrigger]="['click', 'hover']"
   >
-    Remove
+    {{ 'rowCombatOrderClause.remove' | t }}
   </button>
 }

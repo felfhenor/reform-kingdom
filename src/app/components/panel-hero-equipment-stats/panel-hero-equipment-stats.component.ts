@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -43,6 +44,7 @@ import { injectTweenedNumber } from '@services/animation.service';
   selector: 'app-panel-hero-equipment-stats',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     DecimalPipe,
     TippyDirective,
     IconDimensionComponent,

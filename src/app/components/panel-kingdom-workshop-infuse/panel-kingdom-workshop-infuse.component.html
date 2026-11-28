@@ -16,11 +16,11 @@
       [disabled]="!selected || !canAffordMaterial(selected.item.id)"
       ffButton="ui-click"
       ffPadAction="context"
-      ffPadLabel="Infuse"
+      [ffPadLabel]="'panelKingdomWorkshopInfuse.infuse' | t"
       (click)="$event.shiftKey || requestInfuse(selected, $event)"
       (click.shift)="requestInfuse(selected, $event, true)"
     >
-      Infuse
+      {{ 'panelKingdomWorkshopInfuse.infuse' | t }}
 
       @if (selected) {
         <app-row-currency-cost [costs]="selectedInfusionCost()" />
@@ -55,13 +55,18 @@
   @if (slotIndex !== undefined) {
     <div class="flex flex-col flex-1 min-h-0">
       <div class="flex items-center justify-between gap-2 mb-2 shrink-0">
-        <div class="type-label">Infuse Slot {{ slotIndex + 1 }}</div>
+        <div class="type-label">
+          {{
+            'panelKingdomWorkshopInfuse.infuseSlot'
+              | t: { slotIndex: slotIndex + 1 }
+          }}
+        </div>
 
         @if (materials.length > 0) {
           <input
             ffKeyboard
             type="text"
-            placeholder="Search by name or bonus..."
+            [placeholder]="'panelKingdomWorkshopInfuse.searchByNameOr' | t"
             class="input input-xs input-bordered w-56"
             [value]="searchText()"
             (input)="onSearchInput($event)"
@@ -141,23 +146,29 @@
               />
             </button>
           } @empty {
-            <app-blank-slate>No materials match your search.</app-blank-slate>
+            <app-blank-slate>
+              {{ 'panelKingdomWorkshopInfuse.noMaterialsMatchYour' | t }}
+            </app-blank-slate>
           }
         </div>
       } @else {
-        <app-blank-slate>No infusable materials owned.</app-blank-slate>
+        <app-blank-slate>
+          {{ 'panelKingdomWorkshopInfuse.noInfusableMaterialsOwned' | t }}
+        </app-blank-slate>
       }
     </div>
   }
 } @else {
-  <app-blank-slate>This item has no infusion slots.</app-blank-slate>
+  <app-blank-slate>
+    {{ 'panelKingdomWorkshopInfuse.thisItemHasNo' | t }}
+  </app-blank-slate>
 }
 
 <swal
   #infuseSwal
-  title="Infuse This Slot?"
+  [title]="'panelKingdomWorkshopInfuse.infuseThisSlot' | t"
   icon="warning"
-  confirmButtonText="Yes, infuse it"
-  cancelButtonText="Cancel"
+  [confirmButtonText]="'panelKingdomWorkshopInfuse.yesInfuseIt' | t"
+  [cancelButtonText]="'panelKingdomWorkshopInfuse.cancel' | t"
   (confirm)="confirmInfuse()"
 ></swal>

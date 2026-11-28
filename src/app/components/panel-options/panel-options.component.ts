@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { FFTriggerTabsDirective } from '@ff/focus/ff-trigger-tabs.directive';
 import { Component, computed } from '@angular/core';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
@@ -18,6 +19,7 @@ import type { OptionsTab, OptionsTabLink } from '@interfaces';
 @Component({
   selector: 'app-panel-options',
   imports: [
+    TPipe,
     FFTriggerTabsDirective,
     CardPageComponent,
     ButtonConnectComponent,

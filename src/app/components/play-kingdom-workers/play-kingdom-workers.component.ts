@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ContentDescriptionPipe } from '@pipes/content-description.pipe';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { FFFocusOnChangeDirective } from '@ff/focus/ff-focus-on-change.directive';
@@ -73,6 +74,7 @@ type EntryStatusDisplay = {
   selector: 'app-play-kingdom-workers',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     ContentDescriptionPipe,
     ContentNamePipe,
     FFFocusOnChangeDirective,

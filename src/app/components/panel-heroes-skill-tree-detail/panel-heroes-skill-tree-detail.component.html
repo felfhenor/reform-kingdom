@@ -34,17 +34,29 @@
 
       <div class="flex flex-col items-start gap-2">
         <div class="flex gap-2 flex-wrap">
-          <span class="badge badge-sm badge-data">1 SP</span>
+          <span class="badge badge-sm badge-data">
+            {{ 'panelHeroesSkillTreeDetail.t1Sp' | t }}
+          </span>
 
           @if (multiRank && nodeRank) {
             <span class="badge badge-sm badge-data tabular-nums">
-              Rank {{ nodeRank.rank | number }}/{{ nodeRank.maxRank | number }}
+              {{
+                'panelHeroesSkillTreeDetail.rank'
+                  | t
+                    : {
+                        rank: (nodeRank.rank | number),
+                        maxRank: (nodeRank.maxRank | number),
+                      }
+              }}
             </span>
           }
 
           @if (info.skill; as skill) {
             <span class="badge badge-sm badge-data">
-              {{ epCost(skill) | number }} EP
+              {{
+                'panelHeroesSkillTreeDetail.ep'
+                  | t: { skill: (epCost(skill) | number) }
+              }}
             </span>
           }
 
@@ -54,7 +66,7 @@
               (animate.enter)="onEnter($event)"
               (animate.leave)="onLeave($event)"
             >
-              Learned
+              {{ 'panelHeroesSkillTreeDetail.learned' | t }}
             </span>
           }
         </div>
@@ -62,7 +74,9 @@
     </div>
 
     <div class="flex flex-col gap-2">
-      <span class="type-label">Effect</span>
+      <span class="type-label">
+        {{ 'panelHeroesSkillTreeDetail.effect' | t }}
+      </span>
       @if (info.skill; as skill) {
         <app-detail-skill-preview
           [skill]="skill"
@@ -94,7 +108,9 @@
       }
 
       @if (info.statsPerLevel; as perLevel) {
-        <span class="type-meta">Per Level</span>
+        <span class="type-meta">
+          {{ 'panelHeroesSkillTreeDetail.perLevel' | t }}
+        </span>
         <app-row-item-stats [stats]="perLevel" />
       }
 
@@ -107,7 +123,9 @@
 
     @if (info.requires.length > 0) {
       <div class="flex flex-col gap-2">
-        <span class="type-label">Requires</span>
+        <span class="type-label">
+          {{ 'panelHeroesSkillTreeDetail.requires' | t }}
+        </span>
 
         @for (required of info.requires; track required.node.id) {
           <span class="flex items-center gap-2 text-sm">
@@ -133,14 +151,19 @@
         (click)="learn.emit(info.node.id)"
         ffButton="ui-success"
         ffPadAction="context"
-        ffPadLabel="Learn"
+        [ffPadLabel]="'panelHeroesSkillTreeDetail.learn' | t"
       >
         @if (multiRank && nodeRank) {
-          Learn ({{ nodeRank.rank + 1 | number }}/{{
-            nodeRank.maxRank | number
-          }})
+          {{
+            'panelHeroesSkillTreeDetail.learn2'
+              | t
+                : {
+                    rank: (nodeRank.rank + 1 | number),
+                    maxRank: (nodeRank.maxRank | number),
+                  }
+          }}
         } @else {
-          Learn
+          {{ 'panelHeroesSkillTreeDetail.learn' | t }}
         }
       </button>
     }
@@ -154,12 +177,14 @@
         (click)="unlearn.emit(info.node.id)"
         ffButton="ui-click"
         ffPadAction="details"
-        ffPadLabel="Unlearn"
+        [ffPadLabel]="'panelHeroesSkillTreeDetail.unlearn' | t"
       >
-        Unlearn
+        {{ 'panelHeroesSkillTreeDetail.unlearn' | t }}
       </button>
     }
   </div>
 } @else {
-  <app-blank-slate>Select a skill to see what it does.</app-blank-slate>
+  <app-blank-slate>
+    {{ 'panelHeroesSkillTreeDetail.selectASkillTo' | t }}
+  </app-blank-slate>
 }

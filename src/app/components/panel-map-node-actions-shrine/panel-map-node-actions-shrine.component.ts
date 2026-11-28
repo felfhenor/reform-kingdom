@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { FFButtonComponent } from '@ff/components/button/button.component';
 import {
@@ -27,6 +28,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-panel-map-node-actions-shrine',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     ContentNamePipe,
     FFButtonComponent,
     AtlasImageComponent,

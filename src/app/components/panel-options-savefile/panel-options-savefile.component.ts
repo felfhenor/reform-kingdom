@@ -1,3 +1,5 @@
+import { t } from '@helpers/i18n/i18n';
+import { TPipe } from '@pipes/t.pipe';
 import { durationText } from '@helpers/engine/timer.ui';
 import { FFSelectDirective } from '@ff/controls/ff-select.directive';
 import { DatePipe, DecimalPipe } from '@angular/common';
@@ -59,6 +61,7 @@ type AutosaveIntervalChoice = { label: string; value: number };
 @Component({
   selector: 'app-panel-options-savefile',
   imports: [
+    TPipe,
     FFSelectDirective,
     SweetAlert2Module,
     DatePipe,
@@ -201,12 +204,12 @@ export class PanelOptionsSavefileComponent
 
   async openLogsFolder() {
     if (await electronLogOpenFolder()) return;
-    notifyError('Could not open the logs folder.');
+    notifyError(t('panelOptionsSavefile.couldNotOpenThe'));
   }
 
   async openSavefileFolder() {
     if (await savefileDiskOpenFolder()) return;
-    notifyError('Could not open the savefile folder.');
+    notifyError(t('panelOptionsSavefile.couldNotOpenThe2'));
   }
 
   async exportSaveAndLogs() {
@@ -215,7 +218,7 @@ export class PanelOptionsSavefileComponent
     this.isBusy.set(true);
     try {
       if (await savefileDiskExportWithLogs()) return;
-      notifyError('Could not export your savefile and logs.');
+      notifyError(t('panelOptionsSavefile.couldNotExportYour'));
     } finally {
       this.isBusy.set(false);
     }

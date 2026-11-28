@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
@@ -28,6 +29,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex flex-col gap-2' },
   imports: [
+    TPipe,
     ContentNamePipe,
     BlankSlateComponent,
     DecimalPipe,

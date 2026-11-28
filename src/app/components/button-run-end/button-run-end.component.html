@@ -6,7 +6,7 @@
     type="button"
     class="btn btn-sm btn-neutral"
     appButtonGlow
-    tp="Finish This Run"
+    [tp]="'buttonRunEnd.finishThisRun' | t"
     [disabled]="isBusy()"
     [swal]="endSwal"
     appSfx="ui-success"
@@ -25,7 +25,7 @@
     appSfx="ui-error"
     [sfxTrigger]="['click', 'hover']"
   >
-    End Run
+    {{ 'buttonRunEnd.endRun' | t }}
   </button>
 } @else {
   <button
@@ -54,6 +54,6 @@
   "
   [icon]="finished ? 'question' : 'warning'"
   [confirmButtonText]="finished ? 'Yes, finish run' : 'Yes, abandon run'"
-  cancelButtonText="No, keep playing"
+  [cancelButtonText]="'buttonRunEnd.noKeepPlaying' | t"
   (confirm)="endRun()"
 ></swal>

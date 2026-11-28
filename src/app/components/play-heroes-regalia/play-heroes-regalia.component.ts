@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { FFFocusOnChangeDirective } from '@ff/focus/ff-focus-on-change.directive';
 import { DecimalPipe, formatNumber, NgTemplateOutlet } from '@angular/common';
@@ -82,6 +83,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   selector: 'app-play-heroes-regalia',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     ContentNamePipe,
     FFFocusOnChangeDirective,
     IconSpecComponent,

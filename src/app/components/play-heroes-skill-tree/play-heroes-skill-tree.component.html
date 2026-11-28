@@ -5,7 +5,7 @@
 @let flux = fluxOwned();
 
 <app-card-page heightProfile="full">
-  <span header>Skill Tree</span>
+  <span header>{{ 'playHeroesSkillTree.skillTree' | t }}</span>
 
   <app-button-kingdom-back pageactions [onBack]="back" />
 
@@ -17,9 +17,9 @@
       (click)="confirm()"
       ffButton="ui-success"
       ffPadAction="recenter"
-      ffPadLabel="Confirm"
+      [ffPadLabel]="'playHeroesSkillTree.confirm' | t"
     >
-      Confirm
+      {{ 'playHeroesSkillTree.confirm' | t }}
     </button>
 
     <button
@@ -30,7 +30,7 @@
       appSfx="ui-click"
       [sfxTrigger]="['click', 'hover']"
     >
-      Discard
+      {{ 'playHeroesSkillTree.discard' | t }}
     </button>
 
     <app-slot-button-container
@@ -45,7 +45,7 @@
         appSfx="ui-error"
         [sfxTrigger]="['click', 'hover']"
       >
-        Reset Tree for
+        {{ 'playHeroesSkillTree.resetTreeFor' | t }}
         <app-row-currency-cost [costs]="resetCost()" />
       </button>
     </app-slot-button-container>
@@ -81,7 +81,7 @@
               [class.badge-attention]="sp > 0"
               [class.badge-data]="sp === 0"
             >
-              {{ sp | number }} SP remaining
+              {{ 'playHeroesSkillTree.spRemaining' | t: { sp: (sp | number) } }}
             </span>
 
             <app-icon
@@ -93,27 +93,19 @@
 
             <ng-template #helpTooltip>
               <p>
-                Each job starts with their first skill and a passive that can be
-                improved upon. You can click on skills to read what they do.
+                {{ 'playHeroesSkillTree.eachJobStartsWith' | t }}
               </p>
 
               <p class="mt-2 ff-gamepad-only">
-                Press X on a skill to mark it to be learned (Y to unmark it)
-                (indicated by orange outlines and arrows). Some skills can be
-                learned multiple times. To confirm your choices, you must press
-                R3 (the Confirm button).
+                {{ 'playHeroesSkillTree.pressXOnA' | t }}
               </p>
 
               <p class="mt-2 ff-kbm-only">
-                If you double click a skill, you will mark it to be learned
-                (indicated by orange outlines and arrows). Some skills can be
-                learned multiple times. To confirm your choices, you must hit
-                the Confirm button.
+                {{ 'playHeroesSkillTree.ifYouDoubleClick' | t }}
               </p>
 
               <p class="mt-2">
-                Additionally, you can change these later using an item found in
-                the game, so experiment away!
+                {{ 'playHeroesSkillTree.additionallyYouCanChange' | t }}
               </p>
             </ng-template>
           </span>
@@ -134,26 +126,28 @@
         </div>
       </div>
     } @else {
-      <app-blank-slate size="page">No heroes yet.</app-blank-slate>
+      <app-blank-slate size="page">
+        {{ 'playHeroesSkillTree.noHeroesYet' | t }}
+      </app-blank-slate>
     }
   </div>
 </app-card-page>
 
 <swal
   #leaveSwal
-  title="Stop Without Confirming?"
+  [title]="'playHeroesSkillTree.stopWithoutConfirming' | t"
   icon="warning"
   [showDenyButton]="true"
   [showCancelButton]="true"
-  confirmButtonText="Save Changes"
-  denyButtonText="Discard Changes"
-  cancelButtonText="Keep Editing"
+  [confirmButtonText]="'playHeroesSkillTree.saveChanges' | t"
+  [denyButtonText]="'playHeroesSkillTree.discardChanges' | t"
+  [cancelButtonText]="'playHeroesSkillTree.keepEditing' | t"
 ></swal>
 
 <swal
   #resetSwal
   icon="warning"
   [showCancelButton]="true"
-  confirmButtonText="Yes, reset it"
-  cancelButtonText="Cancel"
+  [confirmButtonText]="'playHeroesSkillTree.yesResetIt' | t"
+  [cancelButtonText]="'playHeroesSkillTree.cancel' | t"
 ></swal>

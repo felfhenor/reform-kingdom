@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { contentName } from '@helpers/i18n/i18n-content';
 import { contentSearchFn } from '@helpers/i18n/i18n-content.ui';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
@@ -187,6 +188,7 @@ function materialOptionsFor(ids: MaterialId[]): MaterialOption[] {
   selector: 'app-game-play-decree',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     ContentNamePipe,
     SweetAlert2Module,
     FFInputPromptComponent,

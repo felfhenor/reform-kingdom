@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { ButtonGlowDirective } from '@directives/button-glow.directive';
 import { CardStatusBubbleComponent } from '@components/card-status-bubble/card-status-bubble.component';
@@ -10,6 +11,7 @@ import type { TutorialUnlockStatusEntry } from '@interfaces';
   selector: 'app-card-status-tutorial-unlock',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     ButtonGlowDirective,
     CardStatusBubbleComponent,
     IconComponent,

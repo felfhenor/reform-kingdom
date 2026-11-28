@@ -121,7 +121,7 @@
         </span>
         @if (data.subtitleLabel) {
           <span class="type-meta truncate">
-            Lv.
+            {{ 'cardStatusCombatant.lv' | t }}
             <span class="tabular-nums">{{ data.subtitleLevel | number }}</span>
             {{ data.subtitleLabel }}
             <app-icon-spec [spec]="data.subtitleSpec" />

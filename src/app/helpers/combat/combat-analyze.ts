@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { techniqueHasAttribute } from '@helpers/combat/combat-damage-amount';
 import {
   combatantMessageToken,
@@ -29,6 +30,9 @@ export function combatAnalyzeTarget(
 
   combatMessageLog(
     combat,
-    `**${combatantMessageToken(caster)}** learned the strengths and weaknesses of **${combatantMessageToken(target)}**!`,
+    t('combatAnalyze.learnedTheStrengthsAnd', {
+      caster: combatantMessageToken(caster),
+      target: combatantMessageToken(target),
+    }),
   );
 }

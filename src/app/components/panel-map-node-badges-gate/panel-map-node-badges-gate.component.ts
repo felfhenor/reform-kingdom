@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -17,7 +18,7 @@ const MAX_TOOLTIP_ROWS = 5;
 @Component({
   selector: 'app-panel-map-node-badges-gate',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DecimalPipe, TippyDirective],
+  imports: [TPipe, DecimalPipe, TippyDirective],
   templateUrl: './panel-map-node-badges-gate.component.html',
   styleUrl: './panel-map-node-badges-gate.component.scss',
 })

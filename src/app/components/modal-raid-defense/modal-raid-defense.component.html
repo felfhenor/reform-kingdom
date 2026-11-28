@@ -4,13 +4,15 @@
   [allowEscToClose]="true"
   widthClass="max-w-4xl"
 >
-  <span title>Requested Defenses</span>
+  <span title>{{ 'modalRaidDefense.requestedDefenses' | t }}</span>
 
   <div body class="flex flex-col gap-4">
     @let defenseRows = rows();
 
     @if (defenseRows.length === 0) {
-      <app-blank-slate>No towns currently need defending.</app-blank-slate>
+      <app-blank-slate>
+        {{ 'modalRaidDefense.noTownsCurrentlyNeed' | t }}
+      </app-blank-slate>
     } @else {
       @for (row of defenseRows; track row.townId) {
         <div class="flex flex-col gap-2 p-4 bg-base-200">
@@ -21,7 +23,10 @@
                 class="badge badge-sm"
                 [class]="'badge-difficulty-' + row.threat.difficulty"
               >
-                Lv. {{ row.threat.level | number }}
+                {{
+                  'modalRaidDefense.lv'
+                    | t: { level: (row.threat.level | number) }
+                }}
               </span>
               <span class="badge badge-sm badge-warning tabular-nums">
                 {{ row.remainingLabel }}
@@ -29,7 +34,9 @@
             </span>
 
             @if (row.isPartyHere) {
-              <span class="badge badge-success">You Are Here</span>
+              <span class="badge badge-success">
+                {{ 'modalRaidDefense.youAreHere' | t }}
+              </span>
             } @else {
               <app-button-travel-here
                 [nodeName]="row.nodeName"

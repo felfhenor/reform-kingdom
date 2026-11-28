@@ -1,5 +1,5 @@
 <app-card-page heightProfile="full">
-  <span header>Colosseum</span>
+  <span header>{{ 'playKingdomColosseum.colosseum' | t }}</span>
 
   <app-button-kingdom-back pageactions />
 
@@ -12,7 +12,7 @@
         appSfx="ui-click"
         [sfxTrigger]="['click', 'hover']"
       >
-        Back to Setup
+        {{ 'playKingdomColosseum.backToSetup' | t }}
       </button>
       <button
         type="button"
@@ -21,7 +21,7 @@
         appSfx="ui-click"
         [sfxTrigger]="['click', 'hover']"
       >
-        Fight Again
+        {{ 'playKingdomColosseum.fightAgain' | t }}
       </button>
     } @else if (isWatching()) {
       <div class="join">
@@ -59,7 +59,7 @@
         appSfx="ui-click"
         [sfxTrigger]="['click', 'hover']"
       >
-        Skip to End
+        {{ 'playKingdomColosseum.skipToEnd' | t }}
       </button>
       <button
         type="button"
@@ -68,7 +68,7 @@
         appSfx="ui-error"
         [sfxTrigger]="['click', 'hover']"
       >
-        Stop
+        {{ 'playKingdomColosseum.stop' | t }}
       </button>
     } @else if (isViewingResults()) {
       @if (!batchRunning()) {
@@ -79,7 +79,7 @@
           appSfx="ui-click"
           [sfxTrigger]="['click', 'hover']"
         >
-          Back to Setup
+          {{ 'playKingdomColosseum.backToSetup' | t }}
         </button>
         <app-button-split
           [label]="simulateLabel"
@@ -118,17 +118,13 @@
 
   <ng-template #help>
     <p>
-      These aren't your real heroes, and these aren't real fights. The Colosseum
-      copies your party so you can try out jobs, gear, skill trees and combat
-      orders.
+      {{ 'playKingdomColosseum.theseArenTYour' | t }}
     </p>
     <p class="mt-2">
-      Heroes use their real level in each job. Changing a hero's job here gives
-      them the skill tree, orders and gear they have in that job.
+      {{ 'playKingdomColosseum.heroesUseTheirReal' | t }}
     </p>
     <p class="mt-2">
-      Fight lets you watch one run, in Auto or Turn-based. Simulate runs many
-      fights instantly.
+      {{ 'playKingdomColosseum.fightLetsYouWatch' | t }}
     </p>
   </ng-template>
 
@@ -153,7 +149,7 @@
             appSfx="ui-error"
             [sfxTrigger]="['click', 'hover']"
           >
-            Flee
+            {{ 'playKingdomColosseum.flee' | t }}
           </button>
         }
       </app-panel-combat-scene>
@@ -163,7 +159,10 @@
       @if (batchRunning()) {
         <div class="flex flex-col gap-4 items-center justify-center flex-1">
           <span class="type-section-title">
-            Simulating {{ batchEncounterName() }}
+            {{
+              'playKingdomColosseum.simulating'
+                | t: { batchEncounterName: batchEncounterName() }
+            }}
           </span>
           <div class="w-1/2">
             <app-bar-progress
@@ -182,11 +181,13 @@
             appSfx="ui-error"
             [sfxTrigger]="['click', 'hover']"
           >
-            Cancel
+            {{ 'playKingdomColosseum.cancel' | t }}
           </button>
         </div>
       } @else if (summary().runs === 0) {
-        <app-blank-slate>Simulate fights to see results here.</app-blank-slate>
+        <app-blank-slate>
+          {{ 'playKingdomColosseum.simulateFightsToSee' | t }}
+        </app-blank-slate>
       } @else {
         @let result = summary();
         <div class="flex flex-col gap-4 overflow-y-auto min-h-0">
@@ -225,18 +226,29 @@
                           loc.tier
                         }}"
                       >
-                        Lv. {{ loc.encounter.levelRange.min | number }}-{{
-                          loc.encounter.levelRange.max | number
+                        {{
+                          'playKingdomColosseum.lv'
+                            | t
+                              : {
+                                  min: (loc.encounter.levelRange.min | number),
+                                  max: (loc.encounter.levelRange.max | number),
+                                }
                         }}
                       </span>
                     }
                     <span class="badge badge-sm badge-data tabular-nums">
-                      {{ result.runs | number }} runs
+                      {{
+                        'playKingdomColosseum.runs'
+                          | t: { runs: (result.runs | number) }
+                      }}
                     </span>
                   </h2>
                 </div>
                 <span class="text-2xl font-bold tabular-nums">
-                  {{ result.winRate | percent }} win rate
+                  {{
+                    'playKingdomColosseum.winRate'
+                      | t: { winRate: (result.winRate | percent) }
+                  }}
                 </span>
               </div>
 
@@ -256,7 +268,10 @@
                 @for (losses of result.lossesByFight; track $index) {
                   <div class="flex items-center gap-4 text-sm">
                     <span class="w-20 shrink-0">
-                      Fight {{ $index + 1 | number }}
+                      {{
+                        'playKingdomColosseum.fight'
+                          | t: { index: ($index + 1 | number) }
+                      }}
                     </span>
                     <app-bar-progress
                       class="flex-1"
@@ -264,7 +279,10 @@
                       [value]="losses"
                       [max]="result.runs"
                     >
-                      {{ losses | number }} losses
+                      {{
+                        'playKingdomColosseum.losses'
+                          | t: { losses: (losses | number) }
+                      }}
                     </app-bar-progress>
                   </div>
                 }
@@ -293,7 +311,7 @@
                     <div class="flex justify-between gap-2">
                       <span class="text-lighter flex items-center gap-2">
                         <app-icon name="gameDeadlyStrike" size="inline" />
-                        Avg. Damage
+                        {{ 'playKingdomColosseum.avgDamage' | t }}
                       </span>
                       <span class="tabular-nums">
                         {{ averages.damageDealt | number: '1.0-0' }}
@@ -302,7 +320,7 @@
                     <div class="flex justify-between gap-2">
                       <span class="text-lighter flex items-center gap-2">
                         <app-icon name="gameCaduceus" size="inline" />
-                        Avg. Healing
+                        {{ 'playKingdomColosseum.avgHealing' | t }}
                       </span>
                       <span class="tabular-nums">
                         {{ averages.healing | number: '1.0-0' }}
@@ -311,7 +329,7 @@
                     <div class="flex justify-between gap-2">
                       <span class="text-lighter flex items-center gap-2">
                         <app-icon name="gameHumanTarget" size="inline" />
-                        Avg. Kills
+                        {{ 'playKingdomColosseum.avgKills' | t }}
                       </span>
                       <span class="tabular-nums">
                         {{ averages.kills | number: '1.0-1' }}
@@ -320,7 +338,7 @@
                     <div class="flex justify-between gap-2">
                       <span class="text-lighter flex items-center gap-2">
                         <app-icon name="gameBrokenHeart" size="inline" />
-                        Avg. Deaths
+                        {{ 'playKingdomColosseum.avgDeaths' | t }}
                       </span>
                       <span class="tabular-nums">
                         {{ averages.deaths | number: '1.0-1' }}
@@ -338,7 +356,9 @@
     @let enc = encounter();
     <div class="grid grid-cols-[380px_minmax(0,1fr)] gap-4 h-full min-h-0">
       <div class="flex flex-col gap-2 min-h-0">
-        <span class="type-section-title">Location</span>
+        <span class="type-section-title">
+          {{ 'playKingdomColosseum.location' | t }}
+        </span>
 
         <div
           class="flex flex-col gap-2 overflow-y-auto max-h-[360px] shrink-0 p-2 bg-base-200"
@@ -381,25 +401,37 @@
                       row.tier
                     }}"
                   >
-                    Lv. {{ row.encounter.levelRange.min | number }}-{{
-                      row.encounter.levelRange.max | number
+                    {{
+                      'playKingdomColosseum.lv'
+                        | t
+                          : {
+                              min: (row.encounter.levelRange.min | number),
+                              max: (row.encounter.levelRange.max | number),
+                            }
                     }}
                   </span>
                   <span
                     class="badge badge-sm badge-data w-20 whitespace-nowrap tabular-nums"
                   >
-                    {{ row.encounter.fights.length | number }} fights
+                    {{
+                      'playKingdomColosseum.fights'
+                        | t: { length: (row.encounter.fights.length | number) }
+                    }}
                   </span>
                 </span>
               </div>
             </button>
           } @empty {
-            <app-blank-slate>Visit a location to fight there.</app-blank-slate>
+            <app-blank-slate>
+              {{ 'playKingdomColosseum.visitALocationTo' | t }}
+            </app-blank-slate>
           }
         </div>
 
         @if (enc) {
-          <span class="type-section-title">Fights</span>
+          <span class="type-section-title">
+            {{ 'playKingdomColosseum.fights2' | t }}
+          </span>
           <div
             class="flex flex-col gap-2 overflow-y-auto min-h-0 p-2 bg-base-200"
           >
@@ -414,7 +446,9 @@
               <app-slot-icon-blank class="shrink-0">
                 <app-icon name="gameCrossedSwords" size="nav" />
               </app-slot-icon-blank>
-              <span class="type-entity-name">All Fights</span>
+              <span class="type-entity-name">
+                {{ 'playKingdomColosseum.allFights' | t }}
+              </span>
             </button>
 
             @for (monsters of fights(); track $index; let i = $index) {
@@ -445,7 +479,9 @@
                 }
                 <div class="flex flex-col gap-2 min-w-0 py-2">
                   <span class="type-entity-name">
-                    Fight {{ i + 1 | number }}
+                    {{
+                      'playKingdomColosseum.fight2' | t: { i: (i + 1 | number) }
+                    }}
                   </span>
                   <div class="flex flex-wrap gap-2">
                     @for (m of monsters.slice(1); track $index) {
@@ -476,8 +512,10 @@
       <div class="flex flex-col gap-4 min-h-0">
         @if (restoredDropped().length > 0) {
           <span class="badge badge-warning">
-            Last setup restored. Removed since:
-            {{ restoredDropped().join(', ') }}.
+            {{
+              'playKingdomColosseum.lastSetupRestoredRemoved'
+                | t: { join: restoredDropped().join(', ') }
+            }}
           </span>
         }
 
@@ -497,7 +535,7 @@
             appSfx="ui-error"
             [sfxTrigger]="['click', 'hover']"
           >
-            Reset All
+            {{ 'playKingdomColosseum.resetAll' | t }}
           </button>
         </div>
 
@@ -511,7 +549,9 @@
               [long]="true"
             />
             @if (isHeroEdited()) {
-              <span class="badge badge-sm badge-data">Edited</span>
+              <span class="badge badge-sm badge-data">
+                {{ 'playKingdomColosseum.edited' | t }}
+              </span>
             }
           </div>
           <button
@@ -522,7 +562,7 @@
             appSfx="ui-error"
             [sfxTrigger]="['click', 'hover']"
           >
-            Reset
+            {{ 'playKingdomColosseum.reset' | t }}
           </button>
         </div>
 

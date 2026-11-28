@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { DecimalPipe } from '@angular/common';
 import type { TemplateRef } from '@angular/core';
 import {
@@ -17,7 +18,7 @@ import type { JobAbilityRow } from '@interfaces';
 @Component({
   selector: 'app-tooltip-job-ability',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DecimalPipe, IconItemPreviewComponent],
+  imports: [TPipe, DecimalPipe, IconItemPreviewComponent],
   templateUrl: './tooltip-job-ability.component.html',
   styleUrl: './tooltip-job-ability.component.scss',
 })

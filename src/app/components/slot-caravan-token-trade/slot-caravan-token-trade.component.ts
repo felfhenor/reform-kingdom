@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -19,6 +20,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-slot-caravan-token-trade',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     CurrencyCostComponent,
     TooltipItemPreviewComponent,
     TippyDirective,

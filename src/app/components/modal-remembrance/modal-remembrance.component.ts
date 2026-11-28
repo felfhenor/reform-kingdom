@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { BarProgressComponent } from '@components/bar-progress/bar-progress.component';
@@ -11,7 +12,7 @@ import {
 @Component({
   selector: 'app-modal-remembrance',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [BarProgressComponent, DecimalPipe, ModalComponent],
+  imports: [TPipe, BarProgressComponent, DecimalPipe, ModalComponent],
   templateUrl: './modal-remembrance.component.html',
 })
 export class ModalRemembranceComponent {

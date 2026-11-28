@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { contentNameById } from '@helpers/i18n/i18n-content';
 import {
   collectibleDropHtml,
@@ -107,10 +108,7 @@ export function grantResolvedDrops(
         const outcome = armoryAddLootDrop(drop.equipmentId, 'Combat');
 
         if (outcome.kind === 'NoRoom') {
-          combatMessageLog(
-            combat,
-            'Your armory is full. An item drop was lost.',
-          );
+          combatMessageLog(combat, t('combatRewards.yourArmoryIsFull'));
           return;
         }
         if (outcome.kind === 'UnknownContent') return;
@@ -123,7 +121,11 @@ export function grantResolvedDrops(
 
           combatMessageLog(
             combat,
-            `You automatically sold ${ITEM_ICON_TOKEN}${equipmentDropHtml(outcome.content)} for ${itemDropHtml(goldItem, outcome.goldEarned)}.`,
+            t('combatRewards.youAutomaticallySoldFor', {
+              icon: ITEM_ICON_TOKEN,
+              content: equipmentDropHtml(outcome.content),
+              goldEarned: itemDropHtml(goldItem, outcome.goldEarned),
+            }),
             undefined,
             info,
           );
@@ -132,7 +134,10 @@ export function grantResolvedDrops(
 
         combatMessageLog(
           combat,
-          `The party found ${ITEM_ICON_TOKEN}${equipmentDropHtml(outcome.content)}!`,
+          t('combatRewards.thePartyFound', {
+            icon: ITEM_ICON_TOKEN,
+            content: equipmentDropHtml(outcome.content),
+          }),
           undefined,
           info,
         );
@@ -152,7 +157,10 @@ export function grantResolvedDrops(
         const info = rewardContentInfo(drop);
         combatMessageLog(
           combat,
-          `The party found ${ITEM_ICON_TOKEN}${collectibleDropHtml(collectible)}!`,
+          t('combatRewards.thePartyFound2', {
+            icon: ITEM_ICON_TOKEN,
+            collectible: collectibleDropHtml(collectible),
+          }),
           undefined,
           info,
         );
@@ -172,7 +180,10 @@ export function grantResolvedDrops(
         const info = rewardContentInfo(drop);
         combatMessageLog(
           combat,
-          `The party found ${ITEM_ICON_TOKEN}${recipeDropHtml(recipe)}!`,
+          t('combatRewards.thePartyFound3', {
+            icon: ITEM_ICON_TOKEN,
+            recipe: recipeDropHtml(recipe),
+          }),
           undefined,
           info,
         );
@@ -192,7 +203,10 @@ export function grantResolvedDrops(
         const info = rewardContentInfo(drop);
         combatMessageLog(
           combat,
-          `The party rescued ${ITEM_ICON_TOKEN}${worker.name}!`,
+          t('combatRewards.thePartyRescued', {
+            icon: ITEM_ICON_TOKEN,
+            name: worker.name,
+          }),
           undefined,
           info,
         );
@@ -233,7 +247,10 @@ export function grantResolvedDrops(
     const info = rewardContentInfo({ itemId: itemId as ItemId });
     combatMessageLog(
       combat,
-      `The party found ${ITEM_ICON_TOKEN}${itemDropHtml(item, quantity)}!`,
+      t('combatRewards.thePartyFound4', {
+        icon: ITEM_ICON_TOKEN,
+        quantity: itemDropHtml(item, quantity),
+      }),
       undefined,
       info,
     );

@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
@@ -28,6 +29,7 @@ import { sumBy } from 'es-toolkit/compat';
   selector: 'app-modal-hero-teachings',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     ContentNamePipe,
     LabelJobComponent,
     BlankSlateComponent,

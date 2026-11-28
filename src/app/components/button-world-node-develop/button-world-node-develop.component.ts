@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import type { FFGamepadAction } from '@ff/interfaces/ff-input';
 import { FFButtonComponent } from '@ff/components/button/button.component';
 import {
@@ -26,7 +27,7 @@ import type { WorldNodeEntry } from '@interfaces';
 @Component({
   selector: 'app-button-world-node-develop',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FFButtonComponent, RowCurrencyCostComponent],
+  imports: [TPipe, FFButtonComponent, RowCurrencyCostComponent],
   templateUrl: './button-world-node-develop.component.html',
   styleUrl: './button-world-node-develop.component.scss',
 })

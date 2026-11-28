@@ -18,19 +18,28 @@
   <ng-template #sealTooltip>
     <div class="p-2 max-w-[300px]">
       @if (isSealed()) {
-        The memory of {{ sealRegionValue | contentName }} has been sealed! It
-        took {{ sealTicksTime() }} to seal it.
+        {{
+          'panelMapNodeBadgesExplore.theMemoryOfHas'
+            | t
+              : {
+                  sealRegionValue: (sealRegionValue | contentName),
+                  sealTicksTime: sealTicksTime(),
+                }
+        }}
       } @else {
-        The first time this location is cleared, it seals the memory of
-        {{ sealRegionValue | contentName }}. The sooner it's sealed, the more it
-        scores at the end of the run.
+        {{
+          'panelMapNodeBadgesExplore.theFirstTimeThis'
+            | t: { sealRegionValue: (sealRegionValue | contentName) }
+        }}
       }
     </div>
   </ng-template>
 }
 
 @if (encounters) {
-  <div class="badge badge-data">{{ encounters }} Encounters</div>
+  <div class="badge badge-data">
+    {{ 'panelMapNodeBadgesExplore.encounters' | t: { encounters: encounters } }}
+  </div>
 }
 
 @if (monsterCountValue) {
@@ -40,7 +49,10 @@
     [tp]="monstersTooltip"
     [tpPlacement]="'top'"
   >
-    {{ monsterCountValue }} Monsters
+    {{
+      'panelMapNodeBadgesExplore.monsters'
+        | t: { monsterCountValue: monsterCountValue }
+    }}
   </div>
 }
 
@@ -50,7 +62,10 @@
     [class.badge-data]="rewards.obtained !== rewards.total"
     [class.badge-success]="rewards.obtained === rewards.total"
   >
-    {{ rewards.obtained }}/{{ rewards.total }} Rewards
+    {{
+      'panelMapNodeBadgesExplore.rewards'
+        | t: { obtained: rewards.obtained, total: rewards.total }
+    }}
   </div>
 }
 

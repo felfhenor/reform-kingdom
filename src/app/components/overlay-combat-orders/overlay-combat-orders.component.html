@@ -27,7 +27,7 @@
         appSfx="ui-click"
         [sfxTrigger]="['click', 'hover']"
       >
-        Resume
+        {{ 'overlayCombatOrders.resume' | t }}
       </button>
     }
 
@@ -40,7 +40,7 @@
         appSfx="ui-click"
         [sfxTrigger]="['click', 'hover']"
       >
-        Close
+        {{ 'overlayCombatOrders.close' | t }}
       </button>
     } @else {
       <button
@@ -53,7 +53,7 @@
         appSfx="ui-error"
         [sfxTrigger]="['click', 'hover']"
       >
-        Flee
+        {{ 'overlayCombatOrders.flee' | t }}
       </button>
     }
   </app-panel-combat-scene>
@@ -61,28 +61,24 @@
 
 <ng-template #tooltip>
   <p>
-    Turns go in the order shown along the top. Pick a skill for the hero whose
-    turn it is, then click its target.
+    {{ 'overlayCombatOrders.turnsGoInThe' | t }}
   </p>
 
   <p class="mt-2">
-    Multi-target skills pick their extra targets at random, and targets marked
-    (auto) are everyone the skill can reach.
+    {{ 'overlayCombatOrders.multiTargetSkillsPick' | t }}
   </p>
 
   <p class="mt-2">
-    Previously-used skills have a unique highlight color. Press enter to choose
-    it again. If the previously-selected target doesn't exist, a new one will be
-    chosen automatically.
+    {{ 'overlayCombatOrders.previouslyUsedSkillsHave' | t }}
   </p>
 </ng-template>
 
 <swal
   #fleeSwal
-  title="Flee This Fight?"
-  text="Your heroes skip the rest of this round and try to escape after it. If they all fall before then, it'll be game over."
+  [title]="'overlayCombatOrders.fleeThisFight' | t"
+  [text]="'overlayCombatOrders.yourHeroesSkipThe' | t"
   icon="warning"
-  confirmButtonText="Yes, flee"
-  cancelButtonText="No, keep fighting"
+  [confirmButtonText]="'overlayCombatOrders.yesFlee' | t"
+  [cancelButtonText]="'overlayCombatOrders.noKeepFighting' | t"
   (confirm)="flee()"
 ></swal>

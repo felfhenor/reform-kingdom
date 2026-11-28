@@ -1,5 +1,7 @@
 <div>
-  <span class="type-section-title">Stats</span>
+  <span class="type-section-title">
+    {{ 'panelHeroEquipmentStats.stats' | t }}
+  </span>
 </div>
 
 <div class="flex flex-col gap-2 min-h-0 flex-1 overflow-y-auto pr-2 mt-4">
@@ -21,7 +23,9 @@
 
   @if (combatStatRows().length > 0) {
     <div class="mt-2">
-      <span class="type-section-title">Combat Stats</span>
+      <span class="type-section-title">
+        {{ 'panelHeroEquipmentStats.combatStats' | t }}
+      </span>
     </div>
   }
 
@@ -43,7 +47,9 @@
 
   @if (resistanceRows().length > 0) {
     <div class="mt-2">
-      <span class="type-section-title">Resistances</span>
+      <span class="type-section-title">
+        {{ 'panelHeroEquipmentStats.resistances' | t }}
+      </span>
     </div>
   }
 
@@ -65,13 +71,17 @@
 
   @if (hasElementalSection()) {
     <div class="mt-2">
-      <span class="type-section-title">Elemental</span>
+      <span class="type-section-title">
+        {{ 'panelHeroEquipmentStats.elemental' | t }}
+      </span>
     </div>
   }
 
   @if (gearElements().length > 0) {
     <div class="flex items-center gap-2">
-      <span class="text-base">Attacks deal</span>
+      <span class="text-base">
+        {{ 'panelHeroEquipmentStats.attacksDeal' | t }}
+      </span>
       <span class="ml-auto font-semibold text-lg flex gap-2 items-center">
         <app-row-element-charges
           [block]="gearElementBlock()"
@@ -123,7 +133,9 @@
 
   @if (monsterTypeDamageRows().length > 0) {
     <div class="mt-2">
-      <span class="type-section-title">Monster Damage</span>
+      <span class="type-section-title">
+        {{ 'panelHeroEquipmentStats.monsterDamage' | t }}
+      </span>
     </div>
   }
 

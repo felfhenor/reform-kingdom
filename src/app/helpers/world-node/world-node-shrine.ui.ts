@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { achievementsMoment } from '@helpers/achievement/achievement-moment';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import { ONE_YEAR_TICKS, SHRINE_PRAYER_COOLDOWN_TICKS } from '@helpers/config';
@@ -92,7 +93,10 @@ function shrinePrayAnnounce(shrine: ShrineContent, tier: ShrineLevel): void {
   const content = getEntry<GlobalEffectContent>(tier.globalEffectId);
   if (content) {
     miscellaneousMessageLog(
-      `The party has prayed at **${shrine.name}**, gaining **${content.name}**.`,
+      t('worldNodeShrine.thePartyHasPrayed', {
+        name: shrine.name,
+        name2: content.name,
+      }),
     );
   }
 

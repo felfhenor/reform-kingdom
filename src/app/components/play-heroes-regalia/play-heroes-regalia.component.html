@@ -13,7 +13,7 @@
 @let canModify = equipmentModifiable();
 
 <app-card-page heightProfile="full">
-  <span header>Regalias</span>
+  <span header>{{ 'playHeroesRegalia.regalias' | t }}</span>
 
   <app-button-kingdom-back pageactions [onBack]="back" />
 
@@ -31,7 +31,7 @@
           appSfx="ui-success"
           [sfxTrigger]="['click', 'hover']"
         >
-          Equip
+          {{ 'playHeroesRegalia.equip' | t }}
         </button>
       </app-slot-button-container>
 
@@ -42,7 +42,7 @@
         appSfx="ui-click"
         [sfxTrigger]="['click', 'hover']"
       >
-        Rename
+        {{ 'playHeroesRegalia.rename' | t }}
       </button>
 
       <button
@@ -52,14 +52,16 @@
         appSfx="ui-error"
         [sfxTrigger]="['click', 'hover']"
       >
-        Remove
+        {{ 'playHeroesRegalia.remove' | t }}
       </button>
     }
   </div>
 
   <div class="grid grid-cols-[260px_300px_1fr] gap-4 h-full min-h-0">
     <div class="flex flex-col gap-2 overflow-y-auto">
-      <span class="type-section-title">Heroes</span>
+      <span class="type-section-title">
+        {{ 'playHeroesRegalia.heroes' | t }}
+      </span>
 
       @for (hero of heroes; track hero.id) {
         <button
@@ -76,7 +78,9 @@
     </div>
 
     <div class="flex flex-col gap-2 min-h-0" [ffFocusOnChange]="character?.id">
-      <span class="type-section-title">Regalias</span>
+      <span class="type-section-title">
+        {{ 'playHeroesRegalia.regalias' | t }}
+      </span>
 
       @if (character) {
         <div class="flex flex-col gap-2 overflow-y-auto h-full" appListReflow>
@@ -100,7 +104,9 @@
 
                 <div class="flex gap-2">
                   @if (entry.id === currentId) {
-                    <span class="badge badge-sm badge-success">Current</span>
+                    <span class="badge badge-sm badge-success">
+                      {{ 'playHeroesRegalia.current' | t }}
+                    </span>
                   }
 
                   @if (missingCount > 0) {
@@ -108,7 +114,10 @@
                       class="badge badge-sm badge-warning"
                       [tp]="'Some of this regalia\'s gear is unavailable.'"
                     >
-                      {{ missingCount | number }} missing
+                      {{
+                        'playHeroesRegalia.missing'
+                          | t: { missingCount: (missingCount | number) }
+                      }}
                     </span>
                   }
                 </div>
@@ -129,21 +138,29 @@
               </app-slot-icon-blank>
 
               <div class="flex flex-col min-w-0">
-                <span class="type-entity-name truncate">Create Regalia</span>
-                <span class="type-meta">Save Current Loadout</span>
+                <span class="type-entity-name truncate">
+                  {{ 'playHeroesRegalia.createRegalia' | t }}
+                </span>
+                <span class="type-meta">
+                  {{ 'playHeroesRegalia.saveCurrentLoadout' | t }}
+                </span>
               </div>
             </button>
           }
         </div>
       } @else {
-        <app-blank-slate>No heroes yet.</app-blank-slate>
+        <app-blank-slate>
+          {{ 'playHeroesRegalia.noHeroesYet' | t }}
+        </app-blank-slate>
       }
     </div>
 
     <div class="flex flex-col gap-4 h-full min-h-0 overflow-y-auto pl-2">
       @if (regalia && regaliaHero && skillContext) {
         <div class="flex flex-col gap-2 shrink-0">
-          <span class="type-label">Equipment</span>
+          <span class="type-label">
+            {{ 'playHeroesRegalia.equipment' | t }}
+          </span>
 
           @for (itemId of regalia.equipmentItemIds; track itemId) {
             @let item = itemsById.get(itemId);
@@ -161,7 +178,9 @@
                 <app-slot-icon-blank>
                   <app-icon name="tablerExclamationCircle" size="nav" />
                 </app-slot-icon-blank>
-                <span class="type-meta">Item Missing</span>
+                <span class="type-meta">
+                  {{ 'playHeroesRegalia.itemMissing' | t }}
+                </span>
               }
 
               @if (reason) {
@@ -173,12 +192,16 @@
               }
             </div>
           } @empty {
-            <span class="type-flavor">No equipment saved.</span>
+            <span class="type-flavor">
+              {{ 'playHeroesRegalia.noEquipmentSaved' | t }}
+            </span>
           }
         </div>
 
         <div class="flex flex-col gap-2 shrink-0">
-          <span class="type-label">Burst Skill</span>
+          <span class="type-label">
+            {{ 'playHeroesRegalia.burstSkill' | t }}
+          </span>
 
           @if (burst) {
             <app-tooltip-skill-preview
@@ -199,12 +222,16 @@
               </span>
             </div>
           } @else {
-            <span class="type-flavor">No burst skill chosen.</span>
+            <span class="type-flavor">
+              {{ 'playHeroesRegalia.noBurstSkillChosen' | t }}
+            </span>
           }
         </div>
 
         <div class="flex flex-col gap-2 shrink-0">
-          <span class="type-label">Combat Orders</span>
+          <span class="type-label">
+            {{ 'playHeroesRegalia.combatOrders' | t }}
+          </span>
 
           <ul class="flex flex-col gap-2">
             @for (clause of regalia.combatOrders; track clause.id) {
@@ -231,7 +258,9 @@
 
         @if (treeSummary(); as tree) {
           <div class="flex flex-col gap-2 shrink-0">
-            <span class="type-label">Skill Tree</span>
+            <span class="type-label">
+              {{ 'playHeroesRegalia.skillTree' | t }}
+            </span>
 
             <div class="flex items-center gap-2">
               @if (tree.spec; as spec) {
@@ -241,7 +270,14 @@
                 </span>
               }
               <span class="badge badge-sm badge-data tabular-nums">
-                {{ tree.spent | number }}/{{ tree.earned | number }} SP
+                {{
+                  'playHeroesRegalia.sp'
+                    | t
+                      : {
+                          spent: (tree.spent | number),
+                          earned: (tree.earned | number),
+                        }
+                }}
               </span>
             </div>
 
@@ -283,7 +319,7 @@
         }
       } @else {
         <app-blank-slate>
-          Select a regalia, or create one from this hero's current loadout.
+          {{ 'playHeroesRegalia.selectARegaliaOr' | t }}
         </app-blank-slate>
       }
     </div>
@@ -292,28 +328,28 @@
 
 <swal
   #renameSwal
-  title="Rename Regalia"
+  [title]="'playHeroesRegalia.renameRegalia' | t"
   input="text"
-  confirmButtonText="Rename"
-  cancelButtonText="Cancel"
+  [confirmButtonText]="'playHeroesRegalia.rename' | t"
+  [cancelButtonText]="'playHeroesRegalia.cancel' | t"
 ></swal>
 
 <swal
   #equipSwal
-  title="Replace This Skill Tree?"
+  [title]="'playHeroesRegalia.replaceThisSkillTree' | t"
   icon="warning"
   [showCancelButton]="true"
-  confirmButtonText="Equip Anyway"
-  cancelButtonText="Cancel"
+  [confirmButtonText]="'playHeroesRegalia.equipAnyway' | t"
+  [cancelButtonText]="'playHeroesRegalia.cancel' | t"
 ></swal>
 
 <swal
   #removeSwal
-  title="Remove This Regalia?"
-  text="Gear the hero is wearing stays equipped. Stored gear only this regalia uses returns to the armory."
+  [title]="'playHeroesRegalia.removeThisRegalia' | t"
+  [text]="'playHeroesRegalia.gearTheHeroIs' | t"
   icon="warning"
-  confirmButtonText="Yes, remove it"
-  cancelButtonText="Cancel"
+  [confirmButtonText]="'playHeroesRegalia.yesRemoveIt' | t"
+  [cancelButtonText]="'playHeroesRegalia.cancel' | t"
   (confirm)="remove()"
 ></swal>
 

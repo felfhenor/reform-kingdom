@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -13,12 +14,12 @@ import type { EquipmentContent, EquipmentItem } from '@interfaces';
 @Component({
   selector: 'app-row-equipment-sell-value',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CurrencyCostComponent],
+  imports: [TPipe, CurrencyCostComponent],
   template: `
     @let value = sellValue();
     @if (value !== undefined) {
       <div class="text-xs my-2 flex items-center gap-2">
-        Sell value:
+        {{ 'rowEquipmentSellValue.sellValue' | t }}
         <app-currency-cost [type]="goldCoinItemId" [amount]="value" />
       </div>
     }

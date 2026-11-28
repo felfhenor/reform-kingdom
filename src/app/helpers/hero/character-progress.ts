@@ -1,4 +1,4 @@
-import { tPlural } from '@helpers/i18n/i18n';
+import { t, tPlural } from '@helpers/i18n/i18n';
 import { combatantDamageEventEmit } from '@helpers/combat/combat-damage-events';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import {
@@ -97,7 +97,12 @@ function characterLeveledUp(character: Character, amount: number): Character {
 function logCharacterProgress(beforeLevel: number, after: Character): void {
   if (after.level === beforeLevel) return;
 
-  miscellaneousMessageLog(`**${after.name}** reached level ${after.level}!`);
+  miscellaneousMessageLog(
+    t('characterProgress.reachedLevel', {
+      name: after.name,
+      level: after.level,
+    }),
+  );
 
   const gainedSp =
     skillTreeEarnedSp(after.level) - skillTreeEarnedSp(beforeLevel);

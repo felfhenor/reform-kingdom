@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { DecimalPipe, formatNumber } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -22,6 +23,7 @@ import type { CostItem, ItemContent } from '@interfaces';
   selector: 'app-modal-improvements',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     BlankSlateComponent,
     ButtonTravelHereComponent,
     DecimalPipe,

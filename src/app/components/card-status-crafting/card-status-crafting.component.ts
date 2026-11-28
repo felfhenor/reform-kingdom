@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
 import { CardStatusBubbleComponent } from '@components/card-status-bubble/card-status-bubble.component';
@@ -9,7 +10,7 @@ import type { CraftingStatusEntry, KingdomSubview } from '@interfaces';
 @Component({
   selector: 'app-card-status-crafting',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AtlasImageComponent, CardStatusBubbleComponent],
+  imports: [TPipe, AtlasImageComponent, CardStatusBubbleComponent],
   templateUrl: './card-status-crafting.component.html',
   styleUrl: './card-status-crafting.component.scss',
 })

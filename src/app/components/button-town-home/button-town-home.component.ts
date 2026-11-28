@@ -1,3 +1,5 @@
+import { t } from '@helpers/i18n/i18n';
+import { TPipe } from '@pipes/t.pipe';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -20,7 +22,7 @@ import { TippyDirective } from '@ngneat/helipopper';
       <div class="badge badge-data">
         <app-icon
           name="gameHouse"
-          [tp]="'This location is your home. You will respawn here after dying, and your Decree will bring you here to heal if necessary.'"
+          [tp]="'buttonTownHome.thisLocationIsYour' | t"
         ></app-icon>
       </div>
     } @else if (canSetHome()) {
@@ -31,11 +33,11 @@ import { TippyDirective } from '@ngneat/helipopper';
         appSfx="ui-click"
         [sfxTrigger]="['click', 'hover']"
       >
-        Set as Home
+        {{ 'buttonTownHome.setAsHome' | t }}
       </button>
     }
   `,
-  imports: [IconComponent, TippyDirective, SFXDirective],
+  imports: [TPipe, IconComponent, TippyDirective, SFXDirective],
 })
 export class ButtonTownHomeComponent {
   public entry = input.required<WorldNodeEntry>();
@@ -52,6 +54,6 @@ export class ButtonTownHomeComponent {
   public setHome(): void {
     const town = this.town();
     void homeNodeSet(this.entry());
-    notifySuccess(`${town.name} is now your home.`);
+    notifySuccess(t('buttonTownHome.isNowYourHome', { name: town.name }));
   }
 }

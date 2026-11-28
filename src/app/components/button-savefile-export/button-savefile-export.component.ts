@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { Component } from '@angular/core';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
@@ -8,7 +9,7 @@ import { gamestate } from '@helpers/state-game';
 
 @Component({
   selector: 'app-button-savefile-export',
-  imports: [AnalyticsClickDirective, SFXDirective],
+  imports: [TPipe, AnalyticsClickDirective, SFXDirective],
   templateUrl: './button-savefile-export.component.html',
   styleUrl: './button-savefile-export.component.scss',
 })

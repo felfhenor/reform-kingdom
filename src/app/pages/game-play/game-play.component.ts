@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { FFFocusMemoryDirective } from '@ff/focus/ff-focus-memory.directive';
 import { Component, computed } from '@angular/core';
 import { RouterModule } from '@angular/router';
@@ -18,6 +19,7 @@ import { getOption } from '@helpers/state-options';
 @Component({
   selector: 'app-game-play',
   imports: [
+    TPipe,
     RouterModule,
     TeleportOutletDirective,
     GamePlayWorldComponent,

@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import {
   analyticsSafeSegment,
   analyticsSendDesignEvent,
@@ -24,7 +25,7 @@ export function worldNodeDiscover(nodeName: string): void {
 }
 
 export function worldNodeDiscoverAnnounce(nodeName: string): void {
-  notifySuccess(`You discovered ${nodeName}!`);
+  notifySuccess(t('worldNodeDiscovery.youDiscovered', { nodeName }));
   analyticsSendDesignEvent(
     `World:Node:Discover:${analyticsSafeSegment(nodeName)}`,
   );

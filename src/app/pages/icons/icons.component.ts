@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { IconDimensionComponent } from '@components/icon-dimension/icon-dimension.component';
 import { ICON_SIZE_VALUES } from '@helpers/engine/icons';
@@ -19,7 +20,7 @@ const ICON_SIZES: IconSize[] = ['inline', 'row', 'stat', 'nav'];
 @Component({
   selector: 'app-icons',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconDimensionComponent, TippyDirective],
+  imports: [TPipe, IconDimensionComponent, TippyDirective],
   templateUrl: './icons.component.html',
   styleUrl: './icons.component.scss',
 })

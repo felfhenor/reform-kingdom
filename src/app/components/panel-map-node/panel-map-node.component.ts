@@ -1,3 +1,5 @@
+import { t } from '@helpers/i18n/i18n';
+import { TPipe } from '@pipes/t.pipe';
 import { FFPadActionDirective } from '@ff/controls/ff-pad-action.directive';
 import { ffGamepadOn } from '@ff/input/ff-gamepad-on';
 import { GAMEPAD_PRIORITY } from '@helpers/engine/gamepad.ui';
@@ -104,6 +106,7 @@ import { sortBy } from 'es-toolkit/compat';
   selector: 'app-panel-map-node',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     FFButtonComponent,
     FFPadActionDirective,
     BackdropNodeComponent,
@@ -420,7 +423,7 @@ export class PanelMapNodeComponent {
     if (!entry) return;
 
     if (await shrinePray(entry.nodeName)) {
-      notifySuccess('You pray at the shrine!');
+      notifySuccess(t('panelMapNode.youPrayAtThe'));
     }
   }
 
@@ -436,7 +439,9 @@ export class PanelMapNodeComponent {
     if (!entry) return;
 
     void homeNodeSet(entry);
-    notifySuccess(`${entry.nodeName} is now your home.`);
+    notifySuccess(
+      t('panelMapNode.isNowYourHome', { nodeName: entry.nodeName }),
+    );
   }
 
   constructor() {

@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { contentName, contentNameById } from '@helpers/i18n/i18n-content';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
@@ -235,7 +236,11 @@ export async function exchangePerformEquipment(
   const outputContent = getEntry<EquipmentContent>(newItem.equipmentId)!;
   const newName = equipmentItemDisplayName(newItem, contentName(outputContent));
   miscellaneousMessageLog(
-    `${exchangeVerb(nodeName)}: "${oldName}" became "${newName}".`,
+    t('exchange.became', {
+      nodeName: exchangeVerb(nodeName),
+      oldName,
+      newName,
+    }),
   );
   exchangeAnalytics(nodeName, outputContent.id);
 
@@ -264,7 +269,13 @@ export async function exchangePerformItem(
   const inputName = contentNameById(exchange.input.itemId) ?? 'UNKNOWN';
   const outputName = contentNameById(exchange.output.itemId) ?? 'UNKNOWN';
   miscellaneousMessageLog(
-    `${exchangeVerb(nodeName)}: ${exchange.input.required.toLocaleString()}x ${inputName} became ${exchange.output.quantity.toLocaleString()}x ${outputName}.`,
+    t('exchange.xBecameX', {
+      nodeName: exchangeVerb(nodeName),
+      required: exchange.input.required.toLocaleString(),
+      inputName,
+      quantity: exchange.output.quantity.toLocaleString(),
+      outputName,
+    }),
   );
   exchangeAnalytics(nodeName, exchange.output.itemId);
 
@@ -291,7 +302,9 @@ export async function exchangePerformCollectible(
   if (exchange?.kind !== 'Collectible') return true;
 
   const name = contentNameById(exchange.output.collectibleId) ?? 'UNKNOWN';
-  miscellaneousMessageLog(`${exchangeVerb(nodeName)}: received ${name}.`);
+  miscellaneousMessageLog(
+    t('exchange.received', { nodeName: exchangeVerb(nodeName), name }),
+  );
   exchangeAnalytics(nodeName, exchange.output.collectibleId);
   void taskEventCollectibleGained(exchange.output.collectibleId);
 

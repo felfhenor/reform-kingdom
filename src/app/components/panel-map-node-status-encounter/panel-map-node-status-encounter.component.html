@@ -2,8 +2,13 @@
   <div class="card bg-base-100 shadow-xl pointer-events-auto">
     <div class="card-body gap-2 p-3">
       <app-bar-progress color="primary" [value]="progressPercent()">
-        Encounter {{ progressValue.current | number }}/{{
-          progressValue.total | number
+        {{
+          'panelMapNodeStatusEncounter.encounter'
+            | t
+              : {
+                  current: (progressValue.current | number),
+                  total: (progressValue.total | number),
+                }
         }}
       </app-bar-progress>
     </div>
@@ -14,7 +19,10 @@
   <div class="card bg-base-100 shadow-xl pointer-events-auto">
     <div class="card-body gap-2 p-3">
       <div class="type-flavor">
-        No monsters remain. Check back in {{ exploreRandomTimerText() }}.
+        {{
+          'panelMapNodeStatusEncounter.noMonstersRemainCheck'
+            | t: { exploreRandomTimerText: exploreRandomTimerText() }
+        }}
       </div>
     </div>
   </div>

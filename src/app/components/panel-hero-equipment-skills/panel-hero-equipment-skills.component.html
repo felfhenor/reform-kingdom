@@ -1,7 +1,7 @@
 <ng-template #blockedWarning>
   <div class="badge badge-sm badge-warning mt-2">
     <app-icon name="tablerExclamationCircle" size="badge" />
-    Your hero's Combat Orders will not allow them to use this skill.
+    {{ 'panelHeroEquipmentSkills.yourHeroSCombat' | t }}
   </div>
 </ng-template>
 
@@ -10,7 +10,9 @@
 
   <div appTutorialTarget="hero-burst-skill" class="pe-2">
     <div>
-      <span class="type-section-title">Burst Skill</span>
+      <span class="type-section-title">
+        {{ 'panelHeroEquipmentSkills.burstSkill' | t }}
+      </span>
     </div>
 
     @if (burst) {
@@ -39,7 +41,10 @@
           <div class="text-{{ burst.rarity }}">{{ burst | contentName }}</div>
 
           <span class="badge badge-sm badge-data">
-            {{ epCost(burst) | number }} EP
+            {{
+              'panelHeroEquipmentSkills.ep'
+                | t: { burst: (epCost(burst) | number) }
+            }}
           </span>
           @if (blockedFamilies().includes(burst.family)) {
             <app-icon
@@ -60,14 +65,18 @@
         [sfxTrigger]="['click', 'hover']"
       >
         <app-slot-icon-blank class="hero-skill-row-icon" />
-        <div class="hero-skill-row-name type-meta">Choose a Burst Skill</div>
+        <div class="hero-skill-row-name type-meta">
+          {{ 'panelHeroEquipmentSkills.chooseABurstSkill' | t }}
+        </div>
       </button>
     }
   </div>
 }
 
 <div>
-  <span class="type-section-title">Skills</span>
+  <span class="type-section-title">
+    {{ 'panelHeroEquipmentSkills.skills' | t }}
+  </span>
 </div>
 
 <div class="flex flex-col min-h-0 flex-1 mt-4 overflow-y-auto">
@@ -100,7 +109,10 @@
           </div>
 
           <span class="badge badge-sm badge-data">
-            {{ epCost(skill) | number }} EP
+            {{
+              'panelHeroEquipmentSkills.ep2'
+                | t: { skill: (epCost(skill) | number) }
+            }}
           </span>
           @if (blockedFamilies().includes(skill.family)) {
             <app-icon
@@ -112,13 +124,17 @@
         </div>
       </div>
     } @empty {
-      <app-blank-slate>No skills learned yet.</app-blank-slate>
+      <app-blank-slate>
+        {{ 'panelHeroEquipmentSkills.noSkillsLearnedYet' | t }}
+      </app-blank-slate>
     }
   </div>
 
   @if (jobAbilities().length > 0) {
     <div class="mt-4">
-      <span class="type-section-title">Job Abilities</span>
+      <span class="type-section-title">
+        {{ 'panelHeroEquipmentSkills.jobAbilities' | t }}
+      </span>
     </div>
 
     <div class="flex flex-col gap-2 shrink-0 mt-4">

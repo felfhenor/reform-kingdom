@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -24,6 +25,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-slot-requirement',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     DecimalPipe,
     SlotRarityOutlineComponent,
     IconUnknownComponent,

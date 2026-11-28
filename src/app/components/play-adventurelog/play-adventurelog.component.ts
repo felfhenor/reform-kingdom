@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { FFKeyboardDirective } from '@ff/controls/ff-keyboard.directive';
 import type { AnimationCallbackEvent, ElementRef } from '@angular/core';
 import {
@@ -28,6 +29,7 @@ import { TimeagoPipe } from 'ngx-timeago';
   selector: 'app-play-adventurelog',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     FFKeyboardDirective,
     AdventureLogMessageComponent,
     BlankSlateComponent,

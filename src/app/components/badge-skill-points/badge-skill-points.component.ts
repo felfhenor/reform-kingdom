@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import type { AnimationCallbackEvent } from '@angular/core';
 import {
   booleanAttribute,
@@ -17,7 +18,7 @@ import type { Character } from '@interfaces';
 @Component({
   selector: 'app-badge-skill-points',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DecimalPipe, TippyDirective],
+  imports: [TPipe, DecimalPipe, TippyDirective],
   host: { class: 'contents' },
   template: `
     @let sp = freeSp();
@@ -37,7 +38,7 @@ import type { Character } from '@interfaces';
           (animate.enter)="onEnter($event)"
           (animate.leave)="onLeave($event)"
         >
-          {{ sp | number }} SP
+          {{ 'badgeSkillPoints.sp' | t: { sp: (sp | number) } }}
         </span>
       }
     }

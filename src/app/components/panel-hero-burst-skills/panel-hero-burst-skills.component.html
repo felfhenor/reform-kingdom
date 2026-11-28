@@ -29,7 +29,7 @@
       </span>
 
       <span class="badge badge-sm badge-data">
-        {{ epCost(skill) | number }} EP
+        {{ 'panelHeroBurstSkills.ep' | t: { skill: (epCost(skill) | number) } }}
       </span>
     </div>
 
@@ -37,10 +37,14 @@
       <app-row-element-charges [block]="skill.elementCosts" />
 
       @if (skill.id === chosenId()) {
-        <span class="badge badge-success">Chosen</span>
+        <span class="badge badge-success">
+          {{ 'panelHeroBurstSkills.chosen' | t }}
+        </span>
       }
     </div>
   </button>
 } @empty {
-  <app-blank-slate>This hero hasn't learned any burst skills.</app-blank-slate>
+  <app-blank-slate>
+    {{ 'panelHeroBurstSkills.thisHeroHasnT' | t }}
+  </app-blank-slate>
 }

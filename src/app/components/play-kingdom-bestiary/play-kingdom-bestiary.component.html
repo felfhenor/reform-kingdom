@@ -1,6 +1,6 @@
 <app-card-page heightProfile="full">
   <span header class="flex items-center gap-2">
-    Bestiary
+    {{ 'playKingdomBestiary.bestiary' | t }}
     <span class="badge badge-sm badge-data tabular-nums">
       {{ discoveredCount() }}/{{ entries().length }}
     </span>
@@ -12,7 +12,7 @@
     <input
       ffKeyboard
       type="text"
-      placeholder="Search by name, drop, or location..."
+      [placeholder]="'playKingdomBestiary.searchByNameDrop' | t"
       class="input input-sm input-bordered search-bar"
       [value]="searchText()"
       (input)="onSearchInput($event)"
@@ -64,7 +64,7 @@
                     name="gameSevenPointedStar"
                     size="inline"
                     class="text-warning ml-auto shrink-0"
-                    [tp]="'You analyzed this foe!'"
+                    [tp]="'playKingdomBestiary.youAnalyzedThisFoe' | t"
                   />
                 }
               } @else {
@@ -72,7 +72,9 @@
               }
             </button>
           } @empty {
-            <app-blank-slate>No monsters found.</app-blank-slate>
+            <app-blank-slate>
+              {{ 'playKingdomBestiary.noMonstersFound' | t }}
+            </app-blank-slate>
           }
         </div>
       </div>
@@ -84,7 +86,9 @@
         @if (selectedEntry(); as entry) {
           <app-detail-bestiary-monster [entry]="entry" />
         } @else {
-          <app-blank-slate>No monster selected.</app-blank-slate>
+          <app-blank-slate>
+            {{ 'playKingdomBestiary.noMonsterSelected' | t }}
+          </app-blank-slate>
         }
       </div>
     </div>

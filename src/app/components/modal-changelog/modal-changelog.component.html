@@ -1,6 +1,6 @@
 <button
   class="btn btn-ghost btn-untextured social-icon"
-  [tp]="'Changelog'"
+  [tp]="'modalChangelog.changelog' | t"
   [style.--social-color]="color"
   (mouseenter)="currentColor = color"
   (mouseleave)="currentColor = '#ccc'"
@@ -18,7 +18,7 @@
     [allowEscToClose]="true"
     [showCloseButton]="true"
   >
-    <span title>Changelog</span>
+    <span title>{{ 'modalChangelog.changelog' | t }}</span>
 
     <div body>
       <div role="tablist" class="tabs tabs-box mt-1">
@@ -32,7 +32,7 @@
           appSfx="ui-click"
           [sfxTrigger]="['click', 'hover']"
         >
-          Recent
+          {{ 'modalChangelog.recent' | t }}
         </button>
         <button
           type="button"
@@ -44,7 +44,7 @@
           appSfx="ui-click"
           [sfxTrigger]="['click', 'hover']"
         >
-          All
+          {{ 'modalChangelog.all' | t }}
         </button>
       </div>
 

@@ -6,7 +6,7 @@
           class="type-page-title w-full flex justify-between items-center relative min-h-8"
         >
           <div class="absolute w-full pointer-events-none">
-            Create Your Hero Party
+            {{ 'gameSetupWorld.createYourHeroParty' | t }}
           </div>
 
           <div></div>
@@ -17,7 +17,7 @@
             appSfx="ui-click"
             [sfxTrigger]="['click', 'hover']"
           >
-            Randomize
+            {{ 'gameSetupWorld.randomize' | t }}
           </button>
         </div>
 
@@ -41,11 +41,11 @@
                       type="text"
                       class="input input-bordered flex-1"
                       [formField]="heroField.name"
-                      placeholder="Hero Name"
+                      [placeholder]="'gameSetupWorld.heroName' | t"
                     />
 
                     <ng-select
-                      ffSelect="Job"
+                      [ffSelect]="'gameSetupWorld.job' | t"
                       class="flex-1"
                       [items]="unlockedJobs()"
                       bindLabel="name"
@@ -83,7 +83,7 @@
               (animate.enter)="onFadeEnter($event)"
               (animate.leave)="onFadeLeave($event)"
             >
-              Empty Seat
+              {{ 'gameSetupWorld.emptySeat' | t }}
             </app-blank-slate>
           }
         </div>
@@ -96,7 +96,7 @@
           (animate.enter)="onFadeEnter($event)"
           (animate.leave)="onFadeLeave($event)"
         >
-          Your edicts require every hero to share one class.
+          {{ 'gameSetupWorld.yourEdictsRequireEvery' | t }}
         </div>
       }
 
@@ -107,16 +107,16 @@
           (animate.enter)="onFadeEnter($event)"
           (animate.leave)="onFadeLeave($event)"
         >
-          It looks like this is your first playthrough of re:Form Kingdom. It's
-          not recommended to choose Edicts until you've had the core game
-          experience first!
+          {{ 'gameSetupWorld.itLooksLikeThis' | t }}
         </div>
       }
     </div>
 
     <div class="card bg-base-100 lg:flex-[2] lg:min-h-0">
       <div class="card-body flex flex-col gap-4 lg:min-h-0">
-        <div class="type-page-title">Choose Your Edicts</div>
+        <div class="type-page-title">
+          {{ 'gameSetupWorld.chooseYourEdicts' | t }}
+        </div>
 
         <div
           class="flex flex-col gap-4 lg:flex-1 lg:min-h-0 overflow-y-auto overflow-x-hidden"
@@ -139,11 +139,15 @@
               </div>
             </div>
           } @empty {
-            <app-blank-slate>No edicts are available yet.</app-blank-slate>
+            <app-blank-slate>
+              {{ 'gameSetupWorld.noEdictsAreAvailable' | t }}
+            </app-blank-slate>
           }
         </div>
 
-        <h2 class="type-section-title">Your Edicts</h2>
+        <h2 class="type-section-title">
+          {{ 'gameSetupWorld.yourEdicts' | t }}
+        </h2>
 
         <div
           class="flex flex-col shrink-0 max-h-48 overflow-y-auto"
@@ -156,7 +160,7 @@
             />
           } @empty {
             <app-blank-slate>
-              No edicts picked. This is the standard experience.
+              {{ 'gameSetupWorld.noEdictsPickedThis' | t }}
             </app-blank-slate>
           }
         </div>
@@ -168,11 +172,17 @@
     <div class="card-body flex-row items-center justify-between gap-4 p-4">
       <span class="tabular-nums flex gap-2">
         <span class="badge badge-data">
-          {{ fragmentTotal() | number }} Fragments
+          {{
+            'gameSetupWorld.fragments'
+              | t: { fragmentTotal: (fragmentTotal() | number) }
+          }}
         </span>
 
         <span class="badge badge-data">
-          Score x{{ scoreMultiplier() | number: '1.1-2' }}
+          {{
+            'gameSetupWorld.scoreX'
+              | t: { scoreMultiplier: (scoreMultiplier() | number: '1.1-2') }
+          }}
         </span>
       </span>
 
@@ -182,9 +192,9 @@
         (click)="createWorld()"
         ffButton="ui-click"
         ffPadAction="menu"
-        ffPadLabel="Start Game"
+        [ffPadLabel]="'gameSetupWorld.startGame' | t"
       >
-        Start Game
+        {{ 'gameSetupWorld.startGame' | t }}
       </button>
     </div>
   </div>

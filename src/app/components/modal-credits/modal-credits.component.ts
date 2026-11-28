@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { Component } from '@angular/core';
 import { ModalComponent } from '@components/modal/modal.component';
 import { ModalOpenDirective } from '@directives/modal-open.directive';
@@ -10,6 +11,7 @@ import { TippyDirective } from '@ngneat/helipopper';
 @Component({
   selector: 'app-modal-credits',
   imports: [
+    TPipe,
     NgIconComponent,
     TippyDirective,
     SFXDirective,

@@ -1,20 +1,22 @@
 <div class="flex flex-col gap-2">
   @if (isSignedIn()) {
     <div class="flex items-center gap-2">
-      <span class="type-meta badge badge-info">Signed in to mod.io.</span>
+      <span class="type-meta badge badge-info">
+        {{ 'panelModsModio.signedInToMod' | t }}
+      </span>
       <button
         class="btn btn-sm btn-neutral"
         (click)="installSubscribed()"
         ffButton="ui-click"
       >
-        Install Subscribed
+        {{ 'panelModsModio.installSubscribed' | t }}
       </button>
       <button
         class="btn btn-sm btn-neutral btn-outline"
         (click)="signOut()"
         ffButton="ui-click"
       >
-        Sign Out
+        {{ 'panelModsModio.signOut' | t }}
       </button>
     </div>
   } @else {
@@ -24,7 +26,7 @@
           class="input input-sm w-64"
           type="email"
           ffKeyboard
-          placeholder="Email for mod.io sign in..."
+          [placeholder]="'panelModsModio.emailForModIo' | t"
           [ngModel]="email()"
           (ngModelChange)="email.set($event)"
         />
@@ -34,13 +36,13 @@
           (click)="sendCode()"
           ffButton="ui-click"
         >
-          Send Code
+          {{ 'panelModsModio.sendCode' | t }}
         </button>
       } @else {
         <input
           class="input input-sm w-32"
           ffKeyboard
-          placeholder="Code..."
+          [placeholder]="'panelModsModio.code' | t"
           [ngModel]="code()"
           (ngModelChange)="code.set($event)"
         />
@@ -50,11 +52,11 @@
           (click)="signIn()"
           ffButton="ui-click"
         >
-          Sign In
+          {{ 'panelModsModio.signIn' | t }}
         </button>
       }
       <span class="type-hint">
-        Optional: signing in keeps your mod.io subscriptions in sync.
+        {{ 'panelModsModio.optionalSigningInKeeps' | t }}
       </span>
     </div>
   }
@@ -63,13 +65,13 @@
     <input
       class="input input-sm flex-1"
       ffKeyboard
-      placeholder="Search mods by name..."
+      [placeholder]="'panelModsModio.searchModsByName' | t"
       [ngModel]="query()"
       (ngModelChange)="query.set($event)"
       (keyup.enter)="search()"
     />
     <ng-select
-      ffSelect="Sort"
+      [ffSelect]="'panelModsModio.sort' | t"
       class="w-48"
       [items]="sortOptions"
       bindLabel="label"
@@ -83,7 +85,7 @@
       (click)="search()"
       ffButton="ui-click"
     >
-      Search
+      {{ 'panelModsModio.search' | t }}
     </button>
   </div>
 
@@ -99,7 +101,11 @@
               <span class="badge badge-sm badge-data">v{{ version }}</span>
             }
           </span>
-          <span class="type-meta">by {{ mod.submitted_by.username }}</span>
+          <span class="type-meta">
+            {{
+              'panelModsModio.by' | t: { username: mod.submitted_by.username }
+            }}
+          </span>
           <span class="type-muted">{{ mod.summary }}</span>
         </div>
 
@@ -111,7 +117,7 @@
             ffButton="ui-click"
             ffPadAction="confirm"
           >
-            Install
+            {{ 'panelModsModio.install' | t }}
           </button>
         } @else if (
           mod.modfile.version !== null && installed !== mod.modfile.version
@@ -123,14 +129,16 @@
             ffButton="ui-click"
             ffPadAction="confirm"
           >
-            Update
+            {{ 'panelModsModio.update' | t }}
           </button>
         } @else {
-          <span class="badge badge-success shrink-0">Installed</span>
+          <span class="badge badge-success shrink-0">
+            {{ 'panelModsModio.installed' | t }}
+          </span>
         }
       </div>
     } @empty {
-      <app-blank-slate>No mods found.</app-blank-slate>
+      <app-blank-slate>{{ 'panelModsModio.noModsFound' | t }}</app-blank-slate>
     }
 
     @let pager = pageLabel();
@@ -138,7 +146,7 @@
       <div class="flex items-center justify-center gap-2">
         <button
           class="btn btn-sm btn-neutral btn-outline"
-          aria-label="Previous Page"
+          [aria-label]="'panelModsModio.previousPage' | t"
           [disabled]="pager.page === 1"
           (click)="page(-1)"
           ffButton="ui-click"
@@ -150,7 +158,7 @@
         </span>
         <button
           class="btn btn-sm btn-neutral btn-outline"
-          aria-label="Next Page"
+          [aria-label]="'panelModsModio.nextPage' | t"
           [disabled]="pager.page === pager.pages"
           (click)="page(1)"
           ffButton="ui-click"
@@ -160,6 +168,6 @@
       </div>
     }
   } @else {
-    <app-blank-slate>Search mod.io to find mods.</app-blank-slate>
+    <app-blank-slate>{{ 'panelModsModio.searchModIoTo' | t }}</app-blank-slate>
   }
 </div>

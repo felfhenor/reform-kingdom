@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { combatResolveAutoWin } from '@helpers/combat/combat-end';
 import { categoryMessageLog } from '@helpers/combat/combat-log';
 import { INTIMIDATION_COOLDOWN_TICKS } from '@helpers/config';
@@ -20,7 +21,10 @@ export function encounterAutoWin(
   categoryMessageLog(
     'Travel',
     worldCurrentLocationState().mapName,
-    `**${intimidator.name}** intimidated the enemies at ${nodeName} into surrendering!`,
+    t('encounterAutoWin.intimidatedTheEnemiesAt', {
+      name: intimidator.name,
+      nodeName,
+    }),
   );
 
   encounter.fights.forEach((_, fightIndex) => {

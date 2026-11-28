@@ -12,8 +12,8 @@
     (click)="travel()"
     ffButton="ui-click"
     [ffPadAction]="padAction()"
-    ffPadLabel="Travel Here"
+    [ffPadLabel]="'buttonTravelHere.travelHere' | t"
   >
-    Travel Here
+    {{ 'buttonTravelHere.travelHere' | t }}
   </button>
 }

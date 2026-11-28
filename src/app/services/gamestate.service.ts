@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import {
   ApplicationRef,
   DestroyRef,
@@ -136,9 +137,7 @@ export class GamestateService {
 
       const saved = await saveGameState();
       if (!saved) {
-        notifyError(
-          'Your game could not be saved. Close again to quit without saving.',
-        );
+        notifyError(t('gamestateService.yourGameCouldNot'));
       }
       return saved;
     });

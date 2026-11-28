@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { computed, signal } from '@angular/core';
 import { defaultGameState } from '@helpers/defaults';
 import { SAVEFILE_SAVE_ERROR_NOTIFY_INTERVAL_MS } from '@helpers/config';
@@ -179,9 +180,7 @@ async function gameStateLoadStoredFailed(e: unknown): Promise<void> {
 
   if (savefileIsWorthKeeping(diskState)) {
     isBrowserSaveBlocked = true;
-    notifyWarning(
-      'Your savefile could not be read from browser storage, so the copy on disk was loaded.',
-    );
+    notifyWarning(t('stateGame.yourSavefileCouldNot'));
     gameStateLoadFinish(diskState, undefined);
     return;
   }
@@ -196,7 +195,7 @@ const _savedGamestate = indexedDbSignal<GameState>(
   defaultGameState(),
   (state) => void gameStateLoadStored(state),
   (e) => void gameStateLoadStoredFailed(e),
-  () => notifySaveFailed('Your game could not be saved to storage.'),
+  () => notifySaveFailed(t('stateGame.yourGameCouldNot')),
 );
 
 export function setGameState(state: GameState, commit = true): void {
@@ -282,8 +281,7 @@ export async function saveGameState(): Promise<boolean> {
     isBrowserSaveBlocked ? false : _savedGamestate.flush(),
     savefileDiskWrite(state),
   ]);
-  if (diskSaved === false)
-    notifySaveFailed('Your game could not be saved to disk.');
+  if (diskSaved === false) notifySaveFailed(t('stateGame.yourGameCouldNot2'));
   return browserSaved || diskSaved === true;
 }
 

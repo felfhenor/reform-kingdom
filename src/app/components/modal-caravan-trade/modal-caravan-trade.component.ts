@@ -1,3 +1,5 @@
+import { t } from '@helpers/i18n/i18n';
+import { TPipe } from '@pipes/t.pipe';
 import { ContentDescriptionPipe } from '@pipes/content-description.pipe';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import {
@@ -51,6 +53,7 @@ import type {
   selector: 'app-modal-caravan-trade',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     ContentDescriptionPipe,
     ContentNamePipe,
     BlankSlateComponent,
@@ -205,6 +208,6 @@ export class ModalCaravanTradeComponent {
     if (!(await caravanExecuteTokenTrade(entry, row.index))) return;
     playSFX('item-get-minor', 0);
 
-    notifySuccess(`You bought ${name}!`);
+    notifySuccess(t('modalCaravanTrade.youBought', { name }));
   }
 }

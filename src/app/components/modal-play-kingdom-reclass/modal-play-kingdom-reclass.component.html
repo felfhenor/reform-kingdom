@@ -3,7 +3,7 @@
   [showCloseButton]="true"
   [allowEscToClose]="true"
 >
-  <span title>Reclass Heroes</span>
+  <span title>{{ 'modalPlayKingdomReclass.reclassHeroes' | t }}</span>
 
   <div body class="flex flex-col gap-4">
     @for (heroField of reclassForm; track $index) {
@@ -21,7 +21,7 @@
           </div>
 
           <ng-select
-            ffSelect="Job"
+            [ffSelect]="'modalPlayKingdomReclass.job' | t"
             class="w-64"
             [items]="unlockedJobs()"
             bindLabel="name"
@@ -33,16 +33,28 @@
             <ng-template ng-option-tmp let-item="item">
               <div class="flex items-center gap-2">
                 <app-icon-job class="zoom-row" [job]="item" />
-                {{ item.shorthand }} (Lv.
-                {{ jobLevelForHero(character, item.id) }})
+                {{
+                  'modalPlayKingdomReclass.lv'
+                    | t
+                      : {
+                          shorthand: item.shorthand,
+                          id: jobLevelForHero(character, item.id),
+                        }
+                }}
               </div>
             </ng-template>
 
             <ng-template ng-label-tmp let-item="item">
               <div class="flex items-center gap-2">
                 <app-icon-job class="zoom-row" [job]="item" />
-                {{ item.shorthand }} (Lv.
-                {{ jobLevelForHero(character, item.id) }})
+                {{
+                  'modalPlayKingdomReclass.lv'
+                    | t
+                      : {
+                          shorthand: item.shorthand,
+                          id: jobLevelForHero(character, item.id),
+                        }
+                }}
               </div>
             </ng-template>
           </ng-select>
@@ -50,8 +62,10 @@
 
         @if (unsavedRegaliaNames()[$index]; as regaliaName) {
           <div class="badge badge-warning">
-            {{ character.name }}'s "{{ regaliaName }}" regalia has unsaved
-            changes.
+            {{
+              'modalPlayKingdomReclass.sRegaliaHasUnsaved'
+                | t: { name: character.name, regaliaName: regaliaName }
+            }}
           </div>
         }
       }
@@ -60,12 +74,14 @@
 
   <div actions class="flex gap-4 items-center">
     @if (breaksSharedClass()) {
-      <div class="badge badge-warning">Every hero must share one class.</div>
+      <div class="badge badge-warning">
+        {{ 'modalPlayKingdomReclass.everyHeroMustShare' | t }}
+      </div>
     }
 
     @if (hasChanges()) {
       <div class="flex items-center justify-end gap-2 text-sm">
-        <span>Cost:</span>
+        <span>{{ 'modalPlayKingdomReclass.cost' | t }}</span>
         <app-currency-cost [type]="goldItemId" [amount]="totalReclassCost()" />
       </div>
     }
@@ -78,14 +94,14 @@
       appSfx="ui-click"
       [sfxTrigger]="['click', 'hover']"
     >
-      Reclass All
+      {{ 'modalPlayKingdomReclass.reclassAll' | t }}
     </button>
   </div>
 </app-modal>
 
 <swal
   #reclassAllSwal
-  title="Reclass All Changed Heroes?"
+  [title]="'modalPlayKingdomReclass.reclassAllChangedHeroes' | t"
   [text]="
     'Any hero whose class you changed will be reclassed and their equipment will be unequipped. This action will cost ' +
     (totalReclassCost() | number) +

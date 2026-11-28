@@ -4,22 +4,26 @@
 <div class="flex flex-col gap-2">
   @if (reduction > 0) {
     <p class="type-muted">
-      While this is your home, Deaths Door and Healing are
-      {{ reduction | number }}% shorter.
+      {{
+        'panelMapNodeActionsOutpost.whileThisIsYour'
+          | t: { reduction: (reduction | number) }
+      }}
     </p>
   } @else {
     <p class="type-muted">
-      Each development after building shortens Deaths Door and Healing by
-      {{ reductionPerLevelPercent }}% while this is your home. When this outpost
-      is fully developed, it will also function as a teleport hub to other fully
-      developed outposts.
+      {{
+        'panelMapNodeActionsOutpost.eachDevelopmentAfterBuilding'
+          | t: { reductionPerLevelPercent: reductionPerLevelPercent }
+      }}
     </p>
   }
 
   @if (isTeleportUnlocked()) {
     <p class="type-muted">
-      You can teleport from here to any other +{{ teleportLevel }}
-      outpost.
+      {{
+        'panelMapNodeActionsOutpost.youCanTeleportFrom'
+          | t: { teleportLevel: teleportLevel }
+      }}
     </p>
 
     <button
@@ -29,15 +33,17 @@
       (click)="teleport.emit()"
       ffButton="ui-click"
       ffPadAction="context"
-      ffPadLabel="Teleport"
+      [ffPadLabel]="'panelMapNodeActionsOutpost.teleport' | t"
     >
-      Teleport
+      {{ 'panelMapNodeActionsOutpost.teleport' | t }}
     </button>
   } @else {
     @if (nextLevelUnlocksTeleport()) {
       <p class="type-muted">
-        The next development unlocks teleporting to other +{{ teleportLevel }}
-        outposts.
+        {{
+          'panelMapNodeActionsOutpost.theNextDevelopmentUnlocks'
+            | t: { teleportLevel: teleportLevel }
+        }}
       </p>
     }
 
@@ -51,14 +57,14 @@
     (click)="setHome.emit()"
     ffButton="ui-success"
     ffPadAction="details"
-    ffPadLabel="Set Home"
+    [ffPadLabel]="'panelMapNodeActionsOutpost.setHome' | t"
   >
     @if (isHome()) {
-      This outpost is your home
+      {{ 'panelMapNodeActionsOutpost.thisOutpostIsYour' | t }}
     } @else if (built) {
-      Set as Home
+      {{ 'panelMapNodeActionsOutpost.setAsHome' | t }}
     } @else {
-      Build to set home here
+      {{ 'panelMapNodeActionsOutpost.buildToSetHome' | t }}
     }
   </button>
 </div>

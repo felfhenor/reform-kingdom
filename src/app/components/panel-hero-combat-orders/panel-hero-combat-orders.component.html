@@ -1,7 +1,9 @@
 @let hero = character();
 @let context = skillContext();
 @if (!job()) {
-  <app-blank-slate>No hero selected.</app-blank-slate>
+  <app-blank-slate>
+    {{ 'panelHeroCombatOrders.noHeroSelected' | t }}
+  </app-blank-slate>
 } @else {
   <div class="card shadow-sm">
     <div class="card-body p-3 gap-2">
@@ -10,9 +12,11 @@
       </div>
 
       <div class="flex flex-row flex-wrap items-center gap-2">
-        <span class="type-meta min-w-[50px]">When</span>
+        <span class="type-meta min-w-[50px]">
+          {{ 'panelHeroCombatOrders.when' | t }}
+        </span>
         <ng-select
-          ffSelect="Condition"
+          [ffSelect]="'panelHeroCombatOrders.condition' | t"
           class="w-56"
           [items]="conditionTypeOptions"
           bindLabel="label"
@@ -27,7 +31,7 @@
           draftConditionType() === 'SelfEnergyPercent'
         ) {
           <ng-select
-            ffSelect="Comparison"
+            [ffSelect]="'panelHeroCombatOrders.comparison' | t"
             class="w-24"
             [items]="comparatorOptions"
             bindLabel="label"
@@ -39,7 +43,7 @@
 
           <input
             type="number"
-            ffStepper="Percent"
+            [ffStepper]="'panelHeroCombatOrders.percent' | t"
             min="0"
             max="100"
             class="input input-bordered input-sm w-24"
@@ -52,7 +56,7 @@
         @if (draftHealthCountSide(); as side) {
           <span class="type-meta">{{ side }}</span>
           <ng-select
-            ffSelect="Direction"
+            [ffSelect]="'panelHeroCombatOrders.direction' | t"
             class="w-28"
             [items]="healthDirectionOptions"
             bindLabel="label"
@@ -64,17 +68,17 @@
 
           <input
             type="number"
-            ffStepper="Health Percent"
+            [ffStepper]="'panelHeroCombatOrders.healthPercent' | t"
             min="0"
             max="100"
             class="input input-bordered input-sm w-20"
             [value]="draftHealthPercent()"
             (change)="draftHealthPercent.set($any($event.target).valueAsNumber)"
           />
-          <span class="type-meta">% HP</span>
+          <span class="type-meta">{{ 'panelHeroCombatOrders.hp' | t }}</span>
 
           <ng-select
-            ffSelect="Comparison"
+            [ffSelect]="'panelHeroCombatOrders.comparison' | t"
             class="w-24"
             [items]="comparatorOptions"
             bindLabel="label"
@@ -86,7 +90,7 @@
 
           <input
             type="number"
-            ffStepper="Hero Count"
+            [ffStepper]="'panelHeroCombatOrders.heroCount' | t"
             min="0"
             class="input input-bordered input-sm w-20"
             [value]="draftCount()"
@@ -102,7 +106,7 @@
             bindLabel="name"
             bindValue="id"
             [clearable]="false"
-            placeholder="Select a hero..."
+            [placeholder]="'panelHeroCombatOrders.selectAHero' | t"
             [ngModel]="draftConditionCharacterId()"
             (change)="setDraftConditionCharacterId($event)"
           >
@@ -112,7 +116,11 @@
                 <div>
                   <div class="type-label">{{ item.name }}</div>
                   <div class="type-meta">
-                    Lv. {{ item.level }} {{ item.job | contentName }}
+                    {{
+                      'panelHeroCombatOrders.lv'
+                        | t
+                          : { level: item.level, job: (item.job | contentName) }
+                    }}
                   </div>
                 </div>
               </div>
@@ -127,7 +135,7 @@
           </ng-select>
 
           <ng-select
-            ffSelect="Comparison"
+            [ffSelect]="'panelHeroCombatOrders.comparison' | t"
             class="w-24"
             [items]="comparatorOptions"
             bindLabel="label"
@@ -139,7 +147,7 @@
 
           <input
             type="number"
-            ffStepper="Percent"
+            [ffStepper]="'panelHeroCombatOrders.percent' | t"
             min="0"
             max="100"
             class="input input-bordered input-sm w-24"
@@ -151,7 +159,7 @@
 
         @if (draftConditionType() === 'EnemyCount') {
           <ng-select
-            ffSelect="Comparison"
+            [ffSelect]="'panelHeroCombatOrders.comparison' | t"
             class="w-24"
             [items]="comparatorOptions"
             bindLabel="label"
@@ -163,7 +171,7 @@
 
           <input
             type="number"
-            ffStepper="Enemy Count"
+            [ffStepper]="'panelHeroCombatOrders.enemyCount' | t"
             min="0"
             class="input input-bordered input-sm w-20"
             [value]="draftCount()"
@@ -173,7 +181,7 @@
 
         @if (draftConditionType() === 'ElementCount') {
           <ng-select
-            ffSelect="Element"
+            [ffSelect]="'panelHeroCombatOrders.element' | t"
             class="w-32"
             [items]="elementOptions"
             bindLabel="label"
@@ -206,7 +214,7 @@
           </ng-select>
 
           <ng-select
-            ffSelect="Comparison"
+            [ffSelect]="'panelHeroCombatOrders.comparison' | t"
             class="w-24"
             [items]="comparatorOptions"
             bindLabel="label"
@@ -218,7 +226,7 @@
 
           <input
             type="number"
-            ffStepper="Count"
+            [ffStepper]="'panelHeroCombatOrders.count' | t"
             min="0"
             [max]="maxElementCharges"
             class="input input-bordered input-sm w-20"
@@ -229,7 +237,9 @@
       </div>
 
       <div class="flex flex-row flex-wrap items-center gap-2">
-        <span class="type-meta min-w-[50px]">Use</span>
+        <span class="type-meta min-w-[50px]">
+          {{ 'panelHeroCombatOrders.use' | t }}
+        </span>
 
         <ng-select
           ffSelect
@@ -238,7 +248,7 @@
           bindLabel="label"
           bindValue="value"
           [clearable]="false"
-          placeholder="Skill Family"
+          [placeholder]="'panelHeroCombatOrders.skillFamily' | t"
           [ngModel]="draftFamily()"
           (change)="setDraftFamily($event)"
         >
@@ -270,7 +280,7 @@
         </ng-select>
 
         <ng-select
-          ffSelect="Target"
+          [ffSelect]="'panelHeroCombatOrders.target' | t"
           class="w-56"
           [items]="targetModeOptions()"
           bindLabel="label"
@@ -288,7 +298,7 @@
             bindLabel="name"
             bindValue="id"
             [clearable]="false"
-            placeholder="Select a hero..."
+            [placeholder]="'panelHeroCombatOrders.selectAHero' | t"
             [ngModel]="draftTargetCharacterId()"
             (change)="setDraftTargetCharacterId($event)"
           >
@@ -298,7 +308,11 @@
                 <div>
                   <div class="type-label">{{ item.name }}</div>
                   <div class="type-meta">
-                    Lv. {{ item.level }} {{ item.job | contentName }}
+                    {{
+                      'panelHeroCombatOrders.lv'
+                        | t
+                          : { level: item.level, job: (item.job | contentName) }
+                    }}
                   </div>
                 </div>
               </div>
@@ -330,7 +344,7 @@
             appSfx="ui-error"
             [sfxTrigger]="['click', 'hover']"
           >
-            Cancel
+            {{ 'panelHeroCombatOrders.cancel' | t }}
           </button>
           <button
             class="btn btn-sm btn-error btn-outline"
@@ -338,7 +352,7 @@
             appSfx="ui-error"
             [sfxTrigger]="['click', 'hover']"
           >
-            Remove
+            {{ 'panelHeroCombatOrders.remove' | t }}
           </button>
         }
       </div>
@@ -350,7 +364,7 @@
   <div class="card shadow-sm flex-1 min-h-0 flex flex-col">
     <div class="card-body p-3 gap-2 flex-1 min-h-0 flex flex-col">
       <div class="type-section-title justify-between">
-        Orders
+        {{ 'panelHeroCombatOrders.orders' | t }}
 
         <span
           class="badge badge-sm tabular-nums"
@@ -418,10 +432,10 @@
 
 <swal
   #removeSwal
-  title="Remove This Clause?"
+  [title]="'panelHeroCombatOrders.removeThisClause' | t"
   icon="warning"
   [showCancelButton]="true"
-  confirmButtonText="Yes, remove it"
-  cancelButtonText="No, keep it"
+  [confirmButtonText]="'panelHeroCombatOrders.yesRemoveIt' | t"
+  [cancelButtonText]="'panelHeroCombatOrders.noKeepIt' | t"
   (confirm)="removeEditing()"
 ></swal>

@@ -4,7 +4,12 @@
 @let uncraftableTotal = uncraftableCount();
 
 <app-card-page heightProfile="full">
-  <span header>{{ tradeskill() }} Lv. {{ buildingData.level }}</span>
+  <span header>
+    {{
+      'panelPlayKingdomTradeskill.lv'
+        | t: { tradeskill: tradeskill(), level: buildingData.level }
+    }}
+  </span>
 
   <app-button-kingdom-back pageactions />
 
@@ -16,13 +21,16 @@
         class="checkbox checkbox-sm"
         (click)="toggleHideUncraftable()"
       />
-      Hide Uncraftable ({{ uncraftableTotal | number }})
+      {{
+        'panelPlayKingdomTradeskill.hideUncraftable'
+          | t: { uncraftableTotal: (uncraftableTotal | number) }
+      }}
     </label>
 
     <input
       ffKeyboard
       type="text"
-      placeholder="Search by item or material..."
+      [placeholder]="'panelPlayKingdomTradeskill.searchByItemOr' | t"
       class="input input-sm input-bordered search-bar"
       [value]="searchText()"
       (input)="onSearchInput($event)"
@@ -33,8 +41,10 @@
     <div class="flex flex-col gap-2 flex-shrink-0">
       <div class="type-blocker font-semibold text-center mb-2 min-h-4">
         @if (gateCollectible(); as collectible) {
-          You will not be able to progress to {{ tradeskill() }} Lv.
-          {{ gateNextLevel() }} unless you acquire
+          {{
+            'panelPlayKingdomTradeskill.youWillNotBe'
+              | t: { tradeskill: tradeskill(), gateNextLevel: gateNextLevel() }
+          }}
           <span class="text-{{ collectible.rarity }}">
             {{ collectible | contentName }}.
           </span>
@@ -47,8 +57,10 @@
         [max]="buildingData.xp.maximum"
       >
         <app-text-number-tween [value]="buildingData.xp.current" />
-        /{{ buildingData.xp.maximum | number }}
-        XP
+        {{
+          'panelPlayKingdomTradeskill.xp'
+            | t: { maximum: (buildingData.xp.maximum | number) }
+        }}
       </app-bar-progress>
     </div>
 
@@ -60,7 +72,7 @@
           @if (q) {
             <button
               type="button"
-              [tp]="'Click to remove from the queue'"
+              [tp]="'panelPlayKingdomTradeskill.clickToRemoveFrom' | t"
               [tpPlacement]="'top'"
               (click)="
                 $event.shiftKey || requestRemoveQueueEntry($event, q.entry.id)
@@ -179,26 +191,42 @@
                     class="badge badge-sm badge-error"
                     [tp]="levelLockedTooltip(entry)"
                   >
-                    Lv. {{ entry.recipe.minTradeskillLevel }}
+                    {{
+                      'panelPlayKingdomTradeskill.lv2'
+                        | t
+                          : {
+                              minTradeskillLevel:
+                                entry.recipe.minTradeskillLevel,
+                            }
+                    }}
                   </span>
                 }
 
                 <span class="badge badge-sm badge-data">
-                  Craftable: {{ entry.maxCraftable | number }}
+                  {{
+                    'panelPlayKingdomTradeskill.craftable'
+                      | t: { maxCraftable: (entry.maxCraftable | number) }
+                  }}
                 </span>
 
                 @if (entry.ownedQuantity > 0) {
                   <span class="badge badge-sm badge-data">
-                    Owned: {{ entry.ownedQuantity | number }}
+                    {{
+                      'panelPlayKingdomTradeskill.owned'
+                        | t: { ownedQuantity: (entry.ownedQuantity | number) }
+                    }}
                   </span>
                 }
 
                 @if (entry.resultChance !== 100) {
                   <span
                     class="badge badge-sm badge-warning"
-                    [tp]="'This recipe does not have a 100% chance of yielding an item, but it will still yield XP on failure'"
+                    [tp]="'panelPlayKingdomTradeskill.thisRecipeDoesNot' | t"
                   >
-                    {{ entry.resultChance }}% success rate
+                    {{
+                      'panelPlayKingdomTradeskill.successRate'
+                        | t: { resultChance: entry.resultChance }
+                    }}
                   </span>
                 }
               </div>
@@ -274,7 +302,7 @@
                 <input
                   #input
                   type="number"
-                  ffStepper="Quantity"
+                  [ffStepper]="'panelPlayKingdomTradeskill.quantity' | t"
                   class="input input-xs w-16"
                   min="1"
                   [max]="entry.maxQueueable"
@@ -332,9 +360,9 @@
                   ffButton="ui-click"
                   [ffSoundOffset]="4"
                   ffPadAction="details"
-                  ffPadLabel="Max"
+                  [ffPadLabel]="'panelPlayKingdomTradeskill.max' | t"
                 >
-                  Max
+                  {{ 'panelPlayKingdomTradeskill.max' | t }}
                 </button>
               </div>
 
@@ -345,9 +373,9 @@
                 ffButton="ui-success"
                 [ffSoundOffset]="$index"
                 ffPadAction="context"
-                ffPadLabel="Craft"
+                [ffPadLabel]="'panelPlayKingdomTradeskill.craft' | t"
               >
-                Craft
+                {{ 'panelPlayKingdomTradeskill.craft' | t }}
               </button>
             </div>
           </div>
@@ -355,11 +383,11 @@
       } @empty {
         <app-blank-slate>
           @if (searchText().trim() !== '') {
-            No recipes match your search.
+            {{ 'panelPlayKingdomTradeskill.noRecipesMatchYour' | t }}
           } @else if (hideUncraftable() && uncraftableTotal > 0) {
-            All available recipes are currently uncraftable.
+            {{ 'panelPlayKingdomTradeskill.allAvailableRecipesAre' | t }}
           } @else {
-            No recipes available yet.
+            {{ 'panelPlayKingdomTradeskill.noRecipesAvailableYet' | t }}
           }
         </app-blank-slate>
       }
@@ -369,10 +397,10 @@
 
 <swal
   #removeSwal
-  title="Remove from Queue?"
-  text="This will remove the item from the queue. Unused materials will be refunded."
+  [title]="'panelPlayKingdomTradeskill.removeFromQueue' | t"
+  [text]="'panelPlayKingdomTradeskill.thisWillRemoveThe' | t"
   icon="warning"
-  confirmButtonText="Yes, remove it"
-  cancelButtonText="No, keep it"
+  [confirmButtonText]="'panelPlayKingdomTradeskill.yesRemoveIt' | t"
+  [cancelButtonText]="'panelPlayKingdomTradeskill.noKeepIt' | t"
   (confirm)="confirmRemoveQueueEntry()"
 ></swal>

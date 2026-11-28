@@ -1,3 +1,5 @@
+import { t } from '@helpers/i18n/i18n';
+import { TPipe } from '@pipes/t.pipe';
 import { FFTriggerTabsDirective } from '@ff/focus/ff-trigger-tabs.directive';
 import { NgTemplateOutlet } from '@angular/common';
 import {
@@ -41,6 +43,7 @@ import {
   selector: 'app-play-kingdom-museum',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     FFTriggerTabsDirective,
     SlotMuseumCollectibleComponent,
     SlotMuseumRecipeComponent,
@@ -107,13 +110,13 @@ export class PlayKingdomMuseumComponent {
 
   public async unlockRecipe(recipeId: RecipeId): Promise<void> {
     if (!(await recipeUnlockWithTokens(recipeId))) {
-      notifyError('Not enough Trader Scrips to unlock this recipe.');
+      notifyError(t('playKingdomMuseum.notEnoughTraderScrips'));
       return;
     }
 
     const recipe = getEntry<RecipeContent>(recipeId);
     if (!recipe) return;
 
-    notifySuccess(`Recipe "${recipe.name}" unlocked!`);
+    notifySuccess(t('playKingdomMuseum.recipeUnlocked', { name: recipe.name }));
   }
 }

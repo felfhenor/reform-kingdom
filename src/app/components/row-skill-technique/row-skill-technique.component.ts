@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { TPluralPipe } from '@pipes/t-plural.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
@@ -30,6 +31,7 @@ const energyKinds: SkillTechniqueKind[] = ['Restore', 'Drain'];
   selector: 'app-row-skill-technique',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     TPluralPipe,
     DecimalPipe,
     IconElementChargeComponent,

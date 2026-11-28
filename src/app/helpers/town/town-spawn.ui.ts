@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import {
   categoryMessageLog,
   miscellaneousMessageLog,
@@ -22,7 +23,7 @@ export async function homeNodeSet(entry: WorldNodeEntry): Promise<void> {
   categoryMessageLog(
     'Miscellaneous',
     entry.nodeName,
-    `**${entry.nodeName}** is now your home.`,
+    t('townSpawn.isNowYourHome', { nodeName: entry.nodeName }),
   );
   const category = worldNodeTown(entry) ? 'Town' : 'Outpost';
   analyticsSendDesignEvent(
@@ -36,6 +37,6 @@ export async function homeNodeResetToDuchy(): Promise<void> {
     return state;
   });
 
-  miscellaneousMessageLog('The **Duchy** is your home once again.');
+  miscellaneousMessageLog(t('townSpawn.theDuchyIsYour'));
   analyticsSendDesignEvent(`Town:Home:Set:Duchy`);
 }

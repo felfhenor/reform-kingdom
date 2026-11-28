@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { contentName } from '@helpers/i18n/i18n-content';
 import { contentSearchFn } from '@helpers/i18n/i18n-content.ui';
@@ -116,6 +117,7 @@ const heroPickSchema = schema<HeroPick>((hero) => {
   selector: 'app-game-setup-world',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     ContentNamePipe,
     ContentDescriptionPipe,
     FFButtonComponent,

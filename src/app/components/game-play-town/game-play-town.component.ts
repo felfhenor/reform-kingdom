@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
@@ -25,6 +26,7 @@ import { ContentService } from '@services/content.service';
   selector: 'app-game-play-town',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     ContentNamePipe,
     CardPageComponent,
     DecimalPipe,

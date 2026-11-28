@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { FFKeyboardDirective } from '@ff/controls/ff-keyboard.directive';
 import { FFFocusOnChangeDirective } from '@ff/focus/ff-focus-on-change.directive';
@@ -29,6 +30,7 @@ import type { BestiaryEntry, MonsterId } from '@interfaces';
   selector: 'app-play-kingdom-bestiary',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     ContentNamePipe,
     FFKeyboardDirective,
     FFFocusOnChangeDirective,

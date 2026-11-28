@@ -5,8 +5,8 @@
   [closeOnBackdropClick]="true"
   widthClass="max-w-3xl"
 >
-  <span title>Improvements</span>
-  <p subtitle>Locations you can still develop.</p>
+  <span title>{{ 'modalImprovements.improvements' | t }}</span>
+  <p subtitle>{{ 'modalImprovements.locationsYouCanStill' | t }}</p>
 
   <div
     body
@@ -30,7 +30,7 @@
         <div class="flex flex-wrap gap-2 flex-1">
           @if (row.developingTimerText; as remaining) {
             <span class="badge badge-data tabular-nums">
-              Developing ({{ remaining }})
+              {{ 'modalImprovements.developing' | t: { remaining: remaining } }}
             </span>
           } @else {
             @for (cost of row.costs; track cost.itemId) {
@@ -48,7 +48,9 @@
 
         <div class="flex justify-end shrink-0">
           @if (row.isPartyHere) {
-            <span class="badge badge-success">You Are Here</span>
+            <span class="badge badge-success">
+              {{ 'modalImprovements.youAreHere' | t }}
+            </span>
           } @else {
             <app-button-travel-here
               [nodeName]="row.node.nodeName"
@@ -60,7 +62,7 @@
       </div>
     } @empty {
       <app-blank-slate>
-        There are no upgrades for locations you've visited.
+        {{ 'modalImprovements.thereAreNoUpgrades' | t }}
       </app-blank-slate>
     }
   </div>

@@ -61,7 +61,14 @@
         <div class="flex items-center justify-between mt-[10px]">
           <span class="type-meta">
             @if (view.totalSteps !== 1) {
-              Step {{ view.stepIndex + 1 }} of {{ view.totalSteps }}
+              {{
+                'tutorialOverlay.stepOf'
+                  | t
+                    : {
+                        stepIndex: view.stepIndex + 1,
+                        totalSteps: view.totalSteps,
+                      }
+              }}
             }
           </span>
           <div class="flex gap-2">
@@ -73,9 +80,9 @@
                 ffButton="ui-error"
                 ffPadAction="context"
                 [ffPadPriority]="gamepadPriority"
-                ffPadLabel="Ignore"
+                [ffPadLabel]="'tutorialOverlay.ignore' | t"
               >
-                Ignore This
+                {{ 'tutorialOverlay.ignoreThis' | t }}
               </button>
             }
 
@@ -87,9 +94,9 @@
                 ffButton="ui-click"
                 ffPadAction="back"
                 [ffPadPriority]="gamepadPriority"
-                ffPadLabel="Skip"
+                [ffPadLabel]="'tutorialOverlay.skip' | t"
               >
-                Skip
+                {{ 'tutorialOverlay.skip' | t }}
               </button>
             }
 

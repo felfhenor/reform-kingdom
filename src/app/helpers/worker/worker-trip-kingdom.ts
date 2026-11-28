@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import {
   categoryMessageLog,
   ITEM_ICON_TOKEN,
@@ -85,7 +86,11 @@ function kingdomWorkerLogReturn(
   categoryMessageLog(
     'Gather',
     'Worker Resources',
-    `${worker.name} returned with ${ITEM_ICON_TOKEN}${itemDropHtml(item, quantity)}.`,
+    t('workerTripKingdom.returnedWith', {
+      name: worker.name,
+      icon: ITEM_ICON_TOKEN,
+      quantity: itemDropHtml(item, quantity),
+    }),
     { sprite: item.sprite, spritesheet: 'item' },
   );
 }

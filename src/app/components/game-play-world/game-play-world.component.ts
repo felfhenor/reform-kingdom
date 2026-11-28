@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { FFFocusService } from '@ff/focus/ff-focus.service';
 import { FFInputService } from '@ff/input/ff-input.service';
 import { FF_DIRECTIONS } from '@ff/input/ff-action-map';
@@ -189,6 +190,7 @@ const HUD_ZONE_LABELS: Record<HudZone, string> = {
   selector: 'app-game-play-world',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     AdventureLogOverlayComponent,
     CardRegionIntroComponent,
     PanelMapNodeComponent,
@@ -210,7 +212,7 @@ const HUD_ZONE_LABELS: Record<HudZone, string> = {
         <span
           class="loading loading-spinner loading-lg text-base-content"
         ></span>
-        <p class="type-muted">Loading map...</p>
+        <p class="type-muted">{{ 'gamePlayWorld.loadingMap' | t }}</p>
       </div>
     }
     <div class="fade-overlay" [class.fade-active]="fadeVisible()"></div>
@@ -225,8 +227,17 @@ const HUD_ZONE_LABELS: Record<HudZone, string> = {
         [class.-translate-x-full]="cursor.flipX"
         [class.-translate-y-full]="cursor.flipY"
       >
-        {{ loadedMapLabel() }} · Tile {{ coords.tileX }}, {{ coords.tileY }} ·
-        x: {{ coords.patchX }} y: {{ coords.patchY }}
+        {{
+          'gamePlayWorld.tileXY'
+            | t
+              : {
+                  loadedMapLabel: loadedMapLabel(),
+                  tileX: coords.tileX,
+                  tileY: coords.tileY,
+                  patchX: coords.patchX,
+                  patchY: coords.patchY,
+                }
+        }}
       </div>
     }
     <div #hudFrame class="hud-frame ui-scaled">

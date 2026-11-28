@@ -1,3 +1,5 @@
+import { t } from '@helpers/i18n/i18n';
+import { TPipe } from '@pipes/t.pipe';
 import { contentDescription } from '@helpers/i18n/i18n-content';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { formatNumber } from '@angular/common';
@@ -59,6 +61,7 @@ type AstralProjectorRowViewModel = {
   selector: 'app-play-kingdom-astralprojector',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     ContentNamePipe,
     FFButtonComponent,
     FFFocusRowDirective,
@@ -115,7 +118,11 @@ export class PlayKingdomAstralProjectorComponent {
 
     astralProjectorCast(content.id);
 
-    notifySuccess(`You've cast ${content?.name ?? 'a spell'}!`);
+    notifySuccess(
+      t('playKingdomAstralprojector.youVeCast', {
+        spell: content?.name ?? 'a spell',
+      }),
+    );
   }
 
   public confirmCast(): void {
@@ -127,7 +134,11 @@ export class PlayKingdomAstralProjectorComponent {
     astralProjectorCast(id);
     this.pendingCastId.set(undefined);
 
-    notifySuccess(`You've cast ${content?.name ?? 'a spell'}!`);
+    notifySuccess(
+      t('playKingdomAstralprojector.youVeCast', {
+        spell: content?.name ?? 'a spell',
+      }),
+    );
   }
 
   public materialTooltip(entry: AstralProjectorMaterialEntry): string {

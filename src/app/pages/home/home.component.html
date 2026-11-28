@@ -1,10 +1,10 @@
 <div class="homescreen flex flex-col page-size items-center space-between">
   <div class="w-full text-center pt-20">
-    <span class="title text-8xl">re:Form Kingdom</span>
+    <span class="title text-8xl">{{ 'home.reFormKingdom' | t }}</span>
 
     @if (isDemo) {
       <div class="mt-4 flex flex-col items-center gap-2">
-        <span class="badge badge-info">Demo</span>
+        <span class="badge badge-info">{{ 'home.demo' | t }}</span>
         <app-button-wishlist />
       </div>
     }
@@ -20,19 +20,19 @@
         @for (detail of savefileModProblems(); track $index) {
           <span class="text-sm">{{ detail }}</span>
         }
-        <span class="text-sm">It has not been overwritten.</span>
+        <span class="text-sm">{{ 'home.itHasNotBeen' | t }}</span>
       </div>
     }
 
     @if (showBackupsAvailable()) {
       <div role="alert" class="alert alert-info w-full">
-        <span>No savefile is active, but backups of an earlier one exist.</span>
+        <span>{{ 'home.noSavefileIsActive' | t }}</span>
       </div>
     }
 
     @if (showDemoImport()) {
       <div role="alert" class="alert alert-info flex flex-col gap-2 w-full">
-        <span>Found a demo savefile. Want to resume from there?</span>
+        <span>{{ 'home.foundADemoSavefile' | t }}</span>
         <div class="flex gap-2">
           <app-button-savefile-import-demo />
           <button
@@ -43,7 +43,7 @@
             appSfx="ui-error"
             [sfxTrigger]="['click', 'hover']"
           >
-            No Thanks
+            {{ 'home.noThanks' | t }}
           </button>
         </div>
       </div>
@@ -51,9 +51,7 @@
 
     <div role="alert" class="alert alert-warning w-full min-[1280px]:hidden">
       <span>
-        You are on a device with a smaller resolution than is recommended to
-        play re:Form Kingdom. Please consider playing on a device that has at
-        least a resolution of 1280x720.
+        {{ 'home.youAreOnA' | t }}
       </span>
     </div>
   </div>
@@ -69,7 +67,7 @@
         appSfx="ui-click"
         [sfxTrigger]="['click', 'hover']"
       >
-        Recover Savefile
+        {{ 'home.recoverSavefile' | t }}
       </button>
     }
 
@@ -81,7 +79,7 @@
         appSfx="ui-click"
         [sfxTrigger]="['click', 'hover']"
       >
-        Restore a Backup
+        {{ 'home.restoreABackup' | t }}
       </button>
     }
 
@@ -94,7 +92,7 @@
         [sfxOffset]="1"
         [sfxTrigger]="['hover', 'click']"
       >
-        Resume Game
+        {{ 'home.resumeGame' | t }}
       </button>
     }
 
@@ -108,7 +106,7 @@
       [sfxOffset]="0"
       [sfxTrigger]="['click', 'hover']"
     >
-      New Game
+      {{ 'home.newGame' | t }}
     </button>
 
     @if (hasLegacyRuns()) {
@@ -119,7 +117,7 @@
         appSfx="ui-click"
         [sfxTrigger]="['click', 'hover']"
       >
-        Legacy
+        {{ 'home.legacy' | t }}
       </button>
     }
 
@@ -130,7 +128,7 @@
       appSfx="ui-click"
       [sfxTrigger]="['click', 'hover']"
     >
-      Mods
+      {{ 'home.mods' | t }}
     </button>
 
     <app-panel-debug-buttons></app-panel-debug-buttons>
@@ -150,9 +148,9 @@
 <div
   class="fixed bottom-0 left-0 right-0 bg-base-100 h-8 flex justify-center items-center text-sm"
 >
-  <span>Version {{ meta.versionString() }}</span>
+  <span>{{ 'home.version' | t: { meta: meta.versionString() } }}</span>
 
-  <span class="mx-2">&middot;</span>
+  <span class="mx-2">{{ 'home.middot' | t }}</span>
 
   <button
     type="button"
@@ -162,7 +160,7 @@
     appSfx="ui-click"
     [sfxTrigger]="['click', 'hover']"
   >
-    Analytics: {{ analyticsEnabled() ? 'On' : 'Off' }}
+    {{ 'home.analytics' | t: { Off: analyticsEnabled() ? 'On' : 'Off' } }}
   </button>
 
   <app-button-update></app-button-update>
@@ -170,19 +168,19 @@
 
 <swal
   #newGameSwal
-  title="Reset Your Game?"
+  [title]="'home.resetYourGame' | t"
   icon="warning"
-  confirmButtonText="Yes, reset game"
-  cancelButtonText="No, cancel"
+  [confirmButtonText]="'home.yesResetGame' | t"
+  [cancelButtonText]="'home.noCancel' | t"
 ></swal>
 
 <swal
   #replaceUnloadableSwal
-  title="Replace Your Savefile?"
-  text="Your existing savefile couldn't be loaded. Starting a new game will overwrite it - try Recover Savefile first."
+  [title]="'home.replaceYourSavefile' | t"
+  [text]="'home.yourExistingSavefileCouldn' | t"
   icon="warning"
-  confirmButtonText="Yes, start a new game"
-  cancelButtonText="No, cancel"
+  [confirmButtonText]="'home.yesStartANew' | t"
+  [cancelButtonText]="'home.noCancel' | t"
 ></swal>
 
 <ng-container [appTeleportOutlet]="'menu-options'"></ng-container>

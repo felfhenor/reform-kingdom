@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { contentShortNameEnglish } from '@helpers/content/content-short-name';
 import { getEntry } from '@helpers/content/content';
 import { contentShortName } from '@helpers/i18n/i18n-content';
@@ -80,7 +81,10 @@ export function commissionLogTurnIn(
   categoryMessageLog(
     'Miscellaneous',
     worldNodeAtCurrentLocation()?.nodeName ?? 'Miscellaneous',
-    `You got ${rewards.map((reward) => reward.html).join(', ')} from turning in "${commissionDisplayName(offerName)}"!`,
+    t('commissionTurnIn.youGotFromTurning', {
+      html: rewards.map((reward) => reward.html).join(', '),
+      offerName: commissionDisplayName(offerName),
+    }),
     compact(rewards.map((reward) => reward.icon)),
   );
 }

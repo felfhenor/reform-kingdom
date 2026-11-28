@@ -47,7 +47,7 @@
               @if (canAutoFarm()) {
                 <label
                   class="label cursor-pointer label-checkbox text-sm"
-                  [tp]="'Continuously farm this location until your party leaves.'"
+                  [tp]="'panelMapNode.continuouslyFarmThisLocation' | t"
                 >
                   <input
                     type="checkbox"
@@ -55,10 +55,10 @@
                     [checked]="isAutoFarming()"
                     (click)="toggleAutoFarm()"
                     ffPadAction="details"
-                    ffPadLabel="Auto Farm"
+                    [ffPadLabel]="'panelMapNode.autoFarm' | t"
                   />
 
-                  <span class="ml-1">Auto Farm</span>
+                  <span class="ml-1">{{ 'panelMapNode.autoFarm' | t }}</span>
                 </label>
               }
             </div>
@@ -81,7 +81,7 @@
             levelLabel() !== '-'
           ) {
             <div class="badge" [class]="levelBadgeClass()">
-              Lv. {{ levelLabel() }}
+              {{ 'panelMapNode.lv' | t: { levelLabel: levelLabel() } }}
             </div>
           }
 
@@ -132,14 +132,14 @@
           @if (isDemoLocked()) {
             <div class="flex items-center justify-between gap-2">
               <span class="text-sm type-muted">
-                Available in the full game.
+                {{ 'panelMapNode.availableInTheFull' | t }}
               </span>
               <app-button-wishlist />
             </div>
           } @else if (!isAtNode()) {
             @if (!meetsCaravanAvailability()) {
               <div class="text-sm text-error">
-                No traders are available for this timeframe. Check back later.
+                {{ 'panelMapNode.noTradersAreAvailable' | t }}
               </div>
             }
 
@@ -150,9 +150,12 @@
               (click)="travel()"
               ffButton="ui-click"
               ffPadAction="confirm"
-              ffPadLabel="Travel"
+              [ffPadLabel]="'panelMapNode.travel' | t"
             >
-              Travel ({{ travelSeconds() ?? '-' }}s)
+              {{
+                'panelMapNode.travelS'
+                  | t: { travelSeconds: travelSeconds() ?? '-' }
+              }}
             </button>
           } @else if (isExploreNode()) {
             <app-panel-map-node-actions-explore
@@ -186,9 +189,9 @@
               (click)="visitKingdom()"
               ffButton="ui-click"
               ffPadAction="context"
-              ffPadLabel="Visit"
+              [ffPadLabel]="'panelMapNode.visit' | t"
             >
-              Visit
+              {{ 'panelMapNode.visit' | t }}
             </button>
           } @else if (exchangeNode(); as exchange) {
             <app-panel-map-node-actions-exchange

@@ -5,13 +5,15 @@
   [closeOnBackdropClick]="true"
   widthClass="max-w-2xl"
 >
-  <span title>Loot Filters</span>
+  <span title>{{ 'modalLootFilters.lootFilters' | t }}</span>
 
   <p subtitle [textContent]="summary()" class="min-h-[60px]"></p>
 
   <div body class="flex flex-col gap-4">
     <div>
-      <div class="type-label mb-2">Sources to Auto-Sell From</div>
+      <div class="type-label mb-2">
+        {{ 'modalLootFilters.sourcesToAutoSell' | t }}
+      </div>
       <div class="flex gap-2 w-full">
         @for (source of sources(); track source) {
           <button
@@ -35,7 +37,9 @@
     </div>
 
     <div>
-      <div class="type-label mb-2">Rarities to Sell</div>
+      <div class="type-label mb-2">
+        {{ 'modalLootFilters.raritiesToSell' | t }}
+      </div>
       <div class="flex gap-2 w-full">
         @for (rarity of rarities; track rarity) {
           <button
@@ -60,7 +64,9 @@
     </div>
 
     <div>
-      <div class="type-label mb-2">Minimum Item Level to Keep</div>
+      <div class="type-label mb-2">
+        {{ 'modalLootFilters.minimumItemLevelTo' | t }}
+      </div>
       <input
         type="number"
         ffStepper
@@ -72,7 +78,9 @@
     </div>
 
     <div>
-      <div class="type-label mb-2">Item Types to Auto-Sell</div>
+      <div class="type-label mb-2">
+        {{ 'modalLootFilters.itemTypesToAuto' | t }}
+      </div>
       <div class="grid grid-cols-4 gap-2">
         @for (type of equipmentTypes; track type) {
           <button
@@ -96,7 +104,7 @@
     </div>
 
     <div class="flex flex-col gap-2">
-      <div class="type-label">Never Auto-Sell</div>
+      <div class="type-label">{{ 'modalLootFilters.neverAutoSell' | t }}</div>
 
       <div class="flex items-center gap-2">
         <ng-select
@@ -106,7 +114,7 @@
           bindLabel="name"
           [searchFn]="contentSearch"
           bindValue="id"
-          placeholder="Select discovered equipment..."
+          [placeholder]="'modalLootFilters.selectDiscoveredEquipment' | t"
           [ngModel]="selectedExceptionId()"
           (ngModelChange)="selectedExceptionId.set($event)"
         >
@@ -141,7 +149,7 @@
           appSfx="ui-click"
           [sfxTrigger]="['click', 'hover']"
         >
-          Add
+          {{ 'modalLootFilters.add' | t }}
         </button>
       </div>
 
@@ -172,7 +180,9 @@
             <ng-template #tooltip>
               <div class="max-w-[400px]">
                 <app-detail-item-preview [display]="entry.display">
-                  <div class="text-xs mt-2 text-lighter">Click to remove.</div>
+                  <div class="text-xs mt-2 text-lighter">
+                    {{ 'modalLootFilters.clickToRemove' | t }}
+                  </div>
                 </app-detail-item-preview>
               </div>
             </ng-template>

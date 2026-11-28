@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { DecimalPipe } from '@angular/common';
 import type { AnimationCallbackEvent } from '@angular/core';
 import {
@@ -56,6 +57,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   selector: 'app-panel-hero-equipment',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     BadgeSkillPointsComponent,
     LabelJobComponent,
     PanelHeroEquipmentEquipmentComponent,

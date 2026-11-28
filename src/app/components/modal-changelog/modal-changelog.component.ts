@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import type { ElementRef } from '@angular/core';
 import {
   afterRenderEffect,
@@ -26,6 +27,7 @@ import type { JSAnimation } from 'animejs';
 @Component({
   selector: 'app-modal-changelog',
   imports: [
+    TPipe,
     NgIconComponent,
     TippyDirective,
     SFXDirective,

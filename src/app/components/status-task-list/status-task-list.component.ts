@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import type { AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
@@ -17,6 +18,7 @@ import { AnimationService } from '@services/animation.service';
   selector: 'app-status-task-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     IconComponent,
     RowTaskStatusComponent,
     SFXDirective,

@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { contentName } from '@helpers/i18n/i18n-content';
 import { contentSearchFn } from '@helpers/i18n/i18n-content.ui';
 import { FFSelectDirective } from '@ff/controls/ff-select.directive';
@@ -69,6 +70,7 @@ const reclassPickSchema = schema<ReclassPick>((pick) => {
   selector: 'app-modal-play-kingdom-reclass',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     FFSelectDirective,
     LabelJobComponent,
     ModalComponent,

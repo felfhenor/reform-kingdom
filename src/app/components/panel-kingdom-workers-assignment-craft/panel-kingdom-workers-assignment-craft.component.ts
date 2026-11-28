@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { contentName, contentNameById } from '@helpers/i18n/i18n-content';
 import { FFSelectDirective } from '@ff/controls/ff-select.directive';
 import { FFStepperDirective } from '@ff/controls/ff-stepper.directive';
@@ -67,6 +68,7 @@ type RecipeOption = {
   selector: 'app-panel-kingdom-workers-assignment-craft',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     FFSelectDirective,
     FFStepperDirective,
     AtlasImageComponent,

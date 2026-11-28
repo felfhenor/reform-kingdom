@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { AnalyticsClickDirective } from '@directives/analytics-click.directive';
 import { SFXDirective } from '@directives/sfx.directive';
@@ -8,7 +9,7 @@ import { tablerBrandSteam } from '@ng-icons/tabler-icons';
 @Component({
   selector: 'app-button-wishlist',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AnalyticsClickDirective, NgIconComponent, SFXDirective],
+  imports: [TPipe, AnalyticsClickDirective, NgIconComponent, SFXDirective],
   providers: [provideIcons({ tablerBrandSteam })],
   template: `
     @if (storeUrl) {
@@ -23,7 +24,7 @@ import { tablerBrandSteam } from '@ng-icons/tabler-icons';
         [sfxTrigger]="['click', 'hover']"
       >
         <ng-icon name="tablerBrandSteam" />
-        Wishlist on Steam
+        {{ 'buttonWishlist.wishlistOnSteam' | t }}
       </a>
     }
   `,

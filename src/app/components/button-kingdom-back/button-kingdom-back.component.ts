@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -17,12 +18,12 @@ import { TippyDirective } from '@ngneat/helipopper';
 @Component({
   selector: 'app-button-kingdom-back',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TippyDirective, FFButtonComponent, IconComponent],
+  imports: [TPipe, TippyDirective, FFButtonComponent, IconComponent],
   template: `
     <button
       class="btn btn-sm btn-neutral btn-outline text-neutral-content"
       [class.hidden]="isGamepadMode()"
-      tp="Go Back [BACKSPACE]"
+      [tp]="'buttonKingdomBack.goBackBackspace' | t"
       (click)="back()"
       ffButton="ui-error"
       ffHotkey="BACKSPACE"

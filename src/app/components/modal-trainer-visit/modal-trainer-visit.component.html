@@ -60,9 +60,9 @@
                     (click)="train(row)"
                     ffButton="ui-success"
                     ffPadAction="confirm"
-                    ffPadLabel="Train"
+                    [ffPadLabel]="'modalTrainerVisit.train' | t"
                   >
-                    Train
+                    {{ 'modalTrainerVisit.train' | t }}
                     <app-row-currency-cost [costs]="row.teaching.costs" />
                   </button>
                 }
@@ -71,7 +71,10 @@
           }
         } @empty {
           <app-blank-slate>
-            This trainer doesn't teach {{ selectedJobName() }} heroes.
+            {{
+              'modalTrainerVisit.thisTrainerDoesnT'
+                | t: { selectedJobName: selectedJobName() }
+            }}
           </app-blank-slate>
         }
       </div>

@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import type { AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
@@ -59,6 +60,7 @@ const RARITIES: DropRarity[] = [
   selector: 'app-modal-loot-filters',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     ContentNamePipe,
     FFStepperDirective,
     FFSelectDirective,

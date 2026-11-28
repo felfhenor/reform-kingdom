@@ -15,9 +15,9 @@
       (click.shift)="requestReforge(true)"
       ffButton="ui-click"
       ffPadAction="context"
-      ffPadLabel="Reforge"
+      [ffPadLabel]="'panelKingdomWorkshopReforge.reforge' | t"
     >
-      Reforge
+      {{ 'panelKingdomWorkshopReforge.reforge' | t }}
       @if (reforgeCost.length > 0) {
         <app-row-currency-cost [costs]="reforgeCost" />
       }
@@ -38,7 +38,9 @@
 
   @if (reforgeable()) {
     <div class="shrink-0 flex flex-col gap-2">
-      <div class="type-label">Affixes</div>
+      <div class="type-label">
+        {{ 'panelKingdomWorkshopReforge.affixes' | t }}
+      </div>
 
       @for (affix of affixes; track affix.id) {
         <app-row-affix-effects
@@ -46,11 +48,15 @@
           (animate.enter)="onAffixEnter($event, $index)"
         />
       } @empty {
-        <span class="type-flavor">No affixes rolled.</span>
+        <span class="type-flavor">
+          {{ 'panelKingdomWorkshopReforge.noAffixesRolled' | t }}
+        </span>
       }
     </div>
   } @else {
-    <app-blank-slate>Common gear cannot be reforged.</app-blank-slate>
+    <app-blank-slate>
+      {{ 'panelKingdomWorkshopReforge.commonGearCannotBe' | t }}
+    </app-blank-slate>
   }
 </div>
 
@@ -58,21 +64,23 @@
   <div class="shrink-0 flex flex-col gap-2">
     @if (mayDestroyGems()) {
       <div class="badge badge-warning">
-        Reforging may destroy gems in sockets added by affixes.
+        {{ 'panelKingdomWorkshopReforge.reforgingMayDestroyGems' | t }}
       </div>
     }
 
     @if (!canAfford()) {
-      <span class="badge badge-warning">You cannot afford this reforge.</span>
+      <span class="badge badge-warning">
+        {{ 'panelKingdomWorkshopReforge.youCannotAffordThis' | t }}
+      </span>
     }
   </div>
 }
 
 <swal
   #reforgeSwal
-  title="Reforge This Item?"
+  [title]="'panelKingdomWorkshopReforge.reforgeThisItem' | t"
   icon="warning"
-  confirmButtonText="Yes, reforge it"
-  cancelButtonText="Cancel"
+  [confirmButtonText]="'panelKingdomWorkshopReforge.yesReforgeIt' | t"
+  [cancelButtonText]="'panelKingdomWorkshopReforge.cancel' | t"
   (confirm)="confirmReforge()"
 ></swal>

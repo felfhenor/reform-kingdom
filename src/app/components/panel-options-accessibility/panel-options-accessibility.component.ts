@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { FFSelectDirective } from '@ff/controls/ff-select.directive';
 import {
   ChangeDetectionStrategy,
@@ -21,6 +22,7 @@ type MotionChoice = { label: string; value: MotionPreference };
   selector: 'app-panel-options-accessibility',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     FFSelectDirective,
     FormsModule,
     IconComponent,

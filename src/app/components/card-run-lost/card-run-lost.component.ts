@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import {
   afterNextRender,
   ChangeDetectionStrategy,
@@ -16,7 +17,7 @@ import { AnimationService } from '@services/animation.service';
 @Component({
   selector: 'app-card-run-lost',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ButtonRunEndComponent],
+  imports: [TPipe, ButtonRunEndComponent],
   templateUrl: './card-run-lost.component.html',
   styleUrl: './card-run-lost.component.scss',
 })

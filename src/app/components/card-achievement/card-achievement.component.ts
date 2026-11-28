@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import {
   type AnimationCallbackEvent,
   ChangeDetectionStrategy,
@@ -23,7 +24,7 @@ const CARD_LINGER_MS = 5000;
 @Component({
   selector: 'app-card-achievement',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AtlasImageComponent, DecimalPipe],
+  imports: [TPipe, AtlasImageComponent, DecimalPipe],
   templateUrl: './card-achievement.component.html',
   styleUrl: './card-achievement.component.scss',
 })

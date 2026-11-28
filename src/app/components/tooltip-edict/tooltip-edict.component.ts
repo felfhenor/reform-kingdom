@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { DecimalPipe } from '@angular/common';
 import type { TemplateRef } from '@angular/core';
 import {
@@ -17,6 +18,7 @@ import type { EdictContent } from '@interfaces';
   selector: 'app-tooltip-edict',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     AtlasImageComponent,
     CurrencyNameComponent,
     DecimalPipe,
@@ -61,7 +63,7 @@ import type { EdictContent } from '@interfaces';
 
           @if (blocked()) {
             <p class="type-blocker">
-              Can't be picked with your current edicts.
+              {{ 'tooltipEdict.canTBePicked' | t }}
             </p>
           }
         </div>

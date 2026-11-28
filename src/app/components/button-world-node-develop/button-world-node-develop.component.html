@@ -7,14 +7,18 @@
   (click)="develop()"
   ffButton="ui-click"
   [ffPadAction]="padAction()"
-  ffPadLabel="Develop"
+  [ffPadLabel]="'buttonWorldNodeDevelop.develop' | t"
 >
   @if (isMaxLevel()) {
-    This {{ subject() }} is fully developed
+    {{
+      'buttonWorldNodeDevelop.thisIsFullyDeveloped' | t: { subject: subject() }
+    }}
   } @else if (remaining) {
-    Currently developing ({{ remaining }})
+    {{
+      'buttonWorldNodeDevelop.currentlyDeveloping' | t: { remaining: remaining }
+    }}
   } @else {
-    Develop for
+    {{ 'buttonWorldNodeDevelop.developFor' | t }}
     <app-row-currency-cost [costs]="cost()" [showOwned]="true" />
     ({{ developTimeText() }})
   }

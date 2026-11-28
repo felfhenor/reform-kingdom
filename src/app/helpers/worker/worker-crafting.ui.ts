@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { contentNameById } from '@helpers/i18n/i18n-content';
 import { categoryMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
@@ -67,7 +68,7 @@ export async function workerAssignCraft(
     categoryMessageLog(
       'Craft',
       'Worker Crafting',
-      `${workerName} was assigned to craft ${recipeName}.`,
+      t('workerCrafting.wasAssignedToCraft', { workerName, recipeName }),
     );
   }
   analyticsSendDesignEvent(

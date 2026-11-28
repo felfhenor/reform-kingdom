@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -19,6 +20,7 @@ import { injectTweenedNumber } from '@services/animation.service';
 @Component({
   selector: 'app-currency-name',
   imports: [
+    TPipe,
     DecimalPipe,
     AtlasImageComponent,
     DetailItemPreviewComponent,
@@ -62,7 +64,10 @@ import { injectTweenedNumber } from '@services/animation.service';
       <app-detail-item-preview [display]="previewDisplay()">
         @if (showOwned()) {
           <div class="type-meta mt-2" [class.text-error]="isMissing()">
-            Owned: {{ owned() | number }} / {{ amount() | number }}
+            {{
+              'currencyName.owned'
+                | t: { owned: (owned() | number), amount: (amount() | number) }
+            }}
           </div>
         }
         <app-detail-material-sources [itemId]="type()" />

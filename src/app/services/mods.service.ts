@@ -50,7 +50,9 @@ export class ModsService {
 
       const failures = await modsRefreshRun(reapply);
       if (failures.length > 0) {
-        notifyError(`Could not update your run's mods. ${failures.join(' ')}`);
+        notifyError(
+          t('modsService.couldNotUpdateYour', { failures: failures.join(' ') }),
+        );
       }
       modsRevokeUnused(previous);
     } catch (e) {

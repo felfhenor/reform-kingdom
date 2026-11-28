@@ -4,7 +4,7 @@
   (click)="openTown.emit()"
   ffButton="ui-click"
   ffPadAction="context"
-  ffPadLabel="Enter Town"
+  [ffPadLabel]="'panelMapNodeActionsTown.enterTown' | t"
 >
-  Enter Town
+  {{ 'panelMapNodeActionsTown.enterTown' | t }}
 </button>

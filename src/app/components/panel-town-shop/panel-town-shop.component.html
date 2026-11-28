@@ -4,7 +4,7 @@
 <div class="card-body p-3 gap-2 flex-1 min-h-0">
   <h2 class="type-section-title justify-between shrink-0">
     <span class="flex items-center gap-2">
-      Shop
+      {{ 'panelTownShop.shop' | t }}
 
       @if (!sellsNothing) {
         <span class="badge badge-sm badge-data tabular-nums">
@@ -20,7 +20,7 @@
       appSfx="ui-click"
       [sfxTrigger]="['click', 'hover']"
     >
-      Materials
+      {{ 'panelTownShop.materials' | t }}
     </button>
   </h2>
 
@@ -83,9 +83,9 @@
     } @else {
       <app-blank-slate>
         @if (sellsNothing) {
-          Town shops sell no equipment under the Edict of the Heated Forge.
+          {{ 'panelTownShop.townShopsSellNo' | t }}
         } @else {
-          This town's shop hasn't opened for business yet.
+          {{ 'panelTownShop.thisTownSShop' | t }}
         }
       </app-blank-slate>
     }

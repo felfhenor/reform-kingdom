@@ -5,7 +5,7 @@
   [closeOnBackdropClick]="true"
   widthClass="w-[90vw] max-w-[90vw] max-h-[90vh]"
 >
-  <span title>Achievements</span>
+  <span title>{{ 'modalAchievements.achievements' | t }}</span>
 
   <div body class="flex flex-col gap-4">
     <app-bar-progress
@@ -49,7 +49,14 @@
             @if (tile.unlock; as unlock) {
               <div class="flex items-center justify-between gap-2">
                 <span class="text-xs text-lighter">
-                  Unlocked {{ unlock.unlockedAt | date: 'mediumDate' }}
+                  {{
+                    'modalAchievements.unlocked'
+                      | t
+                        : {
+                            unlockedAt:
+                              (unlock.unlockedAt | date: 'mediumDate'),
+                          }
+                  }}
                 </span>
 
                 @if (tile.hasRunSummary && canViewRuns()) {
@@ -59,9 +66,9 @@
                     (click)="openRun(unlock.runId)"
                     ffButton="ui-click"
                     ffPadAction="confirm"
-                    ffPadLabel="View Run"
+                    [ffPadLabel]="'modalAchievements.viewRun' | t"
                   >
-                    View Run
+                    {{ 'modalAchievements.viewRun' | t }}
                   </button>
                 }
               </div>

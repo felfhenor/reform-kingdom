@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { combatRollAmbush } from '@helpers/combat/combat-ambush';
 import {
   combatantsFromTownGuardians,
@@ -63,7 +64,10 @@ export function raidEngageCombat(townId: TownId): boolean {
     ambushedBy: combatRollAmbush(),
   };
 
-  combatMessageLog(combat, `The raid on ${town.name} begins!`);
+  combatMessageLog(
+    combat,
+    t('townRaidCombat.theRaidOnBegins', { name: town.name }),
+  );
   analyticsSendDesignEvent(
     `Town:Raid:Engage:${analyticsSafeSegment(town.name)}`,
   );

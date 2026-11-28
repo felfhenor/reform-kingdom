@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { FFButtonComponent } from '@ff/components/button/button.component';
 import type { FFGamepadAction } from '@ff/interfaces/ff-input';
 import {
@@ -12,7 +13,7 @@ import { travelStart } from '@helpers/hero/travel';
 @Component({
   selector: 'app-button-travel-here',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FFButtonComponent],
+  imports: [TPipe, FFButtonComponent],
   templateUrl: './button-travel-here.component.html',
 })
 export class ButtonTravelHereComponent {

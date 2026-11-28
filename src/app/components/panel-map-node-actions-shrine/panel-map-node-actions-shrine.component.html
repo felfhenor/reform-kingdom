@@ -18,9 +18,9 @@
         (click)="doPray()"
         ffButton="ui-success"
         ffPadAction="context"
-        ffPadLabel="Pray"
+        [ffPadLabel]="'panelMapNodeActionsShrine.pray' | t"
       >
-        Pray for
+        {{ 'panelMapNodeActionsShrine.prayFor' | t }}
         <app-atlas-image
           class="zoom-inline"
           spritesheet="globaleffect"
@@ -34,7 +34,7 @@
     </span>
   } @else {
     <button type="button" class="btn btn-sm btn-neutral" [disabled]="true">
-      Develop to Pray Here
+      {{ 'panelMapNodeActionsShrine.developToPrayHere' | t }}
     </button>
   }
 </div>

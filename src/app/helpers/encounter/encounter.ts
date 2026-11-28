@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { combatRollAmbush } from '@helpers/combat/combat-ambush';
 import { combatCreateForEncounter } from '@helpers/combat/combat-create';
 import { combatMessageLog } from '@helpers/combat/combat-log';
@@ -63,7 +64,10 @@ export function encounterStartFight(
     startDelayTicks,
   };
 
-  combatMessageLog(combat, `Encountering monster group #${fightIndex + 1}...`);
+  combatMessageLog(
+    combat,
+    t('encounter.encounteringMonsterGroup', { fightIndex: fightIndex + 1 }),
+  );
 
   updateGamestate((state) => {
     state.world.combat = combat;

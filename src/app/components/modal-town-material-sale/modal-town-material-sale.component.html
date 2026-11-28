@@ -4,7 +4,12 @@
   [allowEscToClose]="true"
   [closeOnBackdropClick]="true"
 >
-  <span title>{{ (town() | contentName) || 'Town' }} Material Sales</span>
+  <span title>
+    {{
+      'modalTownMaterialSale.materialSales'
+        | t: { town: (town() | contentName) || 'Town' }
+    }}
+  </span>
 
   <div body class="flex flex-col gap-2 max-h-[400px] overflow-y-auto pr-2">
     @for (row of rows(); track row.index) {
@@ -15,7 +20,7 @@
       />
     } @empty {
       <app-blank-slate>
-        This town has nothing to sell right now.
+        {{ 'modalTownMaterialSale.thisTownHasNothing' | t }}
       </app-blank-slate>
     }
   </div>

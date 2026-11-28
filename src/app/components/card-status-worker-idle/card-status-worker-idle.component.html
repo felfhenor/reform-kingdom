@@ -15,10 +15,12 @@
     />
   </div>
   @if (data.reason === 'AtDuchy') {
-    <span bubbleSubtitle class="type-blocker truncate">At the Duchy</span>
+    <span bubbleSubtitle class="type-blocker truncate">
+      {{ 'cardStatusWorkerIdle.atTheDuchy' | t }}
+    </span>
   } @else {
     <span bubbleSubtitle class="type-blocker truncate">
-      Waiting for Materials
+      {{ 'cardStatusWorkerIdle.waitingForMaterials' | t }}
     </span>
   }
 </app-card-status-bubble>

@@ -5,7 +5,7 @@
   [allowEscToClose]="true"
   [closeOnBackdropClick]="true"
 >
-  <span title>Burst Skill</span>
+  <span title>{{ 'modalHeroBurstSkills.burstSkill' | t }}</span>
 
   @if (chosenId()) {
     <button
@@ -16,11 +16,11 @@
       appSfx="ui-error"
       [sfxTrigger]="['click', 'hover']"
     >
-      Unset
+      {{ 'modalHeroBurstSkills.unset' | t }}
     </button>
   }
 
-  <p subtitle>Burst skills spend elements built up during combat.</p>
+  <p subtitle>{{ 'modalHeroBurstSkills.burstSkillsSpendElements' | t }}</p>
 
   <div body class="flex flex-col gap-2 max-h-[60vh] overflow-y-auto pr-2">
     @if (character(); as hero) {
@@ -30,7 +30,7 @@
       />
     } @else {
       <app-blank-slate>
-        This hero hasn't learned any burst skills.
+        {{ 'modalHeroBurstSkills.thisHeroHasnT' | t }}
       </app-blank-slate>
     }
   </div>

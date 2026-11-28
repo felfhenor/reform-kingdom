@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { SFXDirective } from '@directives/sfx.directive';
 import { TutorialTargetDirective } from '@directives/tutorial-target.directive';
@@ -7,7 +8,7 @@ import type { CharacterId } from '@interfaces';
 @Component({
   selector: 'app-button-hero-teachings',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SFXDirective, TutorialTargetDirective],
+  imports: [TPipe, SFXDirective, TutorialTargetDirective],
   template: `
     <button
       class="btn btn-sm btn-neutral"
@@ -17,7 +18,7 @@ import type { CharacterId } from '@interfaces';
       [sfxOffset]="0"
       [sfxTrigger]="['click', 'hover']"
     >
-      Teachings
+      {{ 'buttonHeroTeachings.teachings' | t }}
     </button>
   `,
 })

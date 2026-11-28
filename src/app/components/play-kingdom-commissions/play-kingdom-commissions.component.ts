@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { ButtonKingdomBackComponent } from '@components/button-kingdom-back/button-kingdom-back.component';
@@ -23,6 +24,7 @@ import type {
   selector: 'app-play-kingdom-commissions',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     BlankSlateComponent,
     CardPageComponent,
     ButtonKingdomBackComponent,

@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { GAMEPAD_PRIORITY } from '@helpers/engine/gamepad.ui';
 import { FFFocusOnChangeDirective } from '@ff/focus/ff-focus-on-change.directive';
@@ -36,6 +37,7 @@ import type {
   selector: 'app-modal-trainer-visit',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     ContentNamePipe,
     FFFocusOnChangeDirective,
     FFFocusRowDirective,

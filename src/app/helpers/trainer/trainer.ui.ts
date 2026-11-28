@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { contentName } from '@helpers/i18n/i18n-content';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
@@ -221,9 +222,15 @@ export async function trainerTeach(
 
   if (!learned) return false;
 
-  notifySuccess(`${characterName} learned ${contentName(teaching)}!`);
+  notifySuccess(
+    t('trainer.learned', { characterName, teaching: contentName(teaching) }),
+  );
   miscellaneousMessageLog(
-    `**${characterName}** learned **${contentName(teaching)}** from **${contentName(trainer)}**.`,
+    t('trainer.learnedFrom', {
+      characterName,
+      teaching: contentName(teaching),
+      trainer: contentName(trainer),
+    }),
   );
   void taskEventTeachingLearned(teachingId);
   analyticsSendDesignEvent('Hero:Trainer:Teach');

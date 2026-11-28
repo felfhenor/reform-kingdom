@@ -38,7 +38,7 @@
         />
       } @empty {
         <app-blank-slate>
-          This trader has nothing in stock right now.
+          {{ 'modalCaravanTrade.thisTraderHasNothing' | t }}
         </app-blank-slate>
       }
     </div>
@@ -50,7 +50,7 @@
         [class.text-warning]="timerUrgency() === 'warning'"
         [class.text-error]="timerUrgency() === 'danger'"
       >
-        This merchant will be leaving in {{ label }}.
+        {{ 'modalCaravanTrade.thisMerchantWillBe' | t: { label: label } }}
       </div>
     }
   </div>

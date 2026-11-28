@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -16,7 +17,7 @@ import type { TownCommissionRowViewModel, WorldNodeEntry } from '@interfaces';
 @Component({
   selector: 'app-panel-town-quests',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [BlankSlateComponent, DecimalPipe, SlotCommissionComponent],
+  imports: [TPipe, BlankSlateComponent, DecimalPipe, SlotCommissionComponent],
   host: { class: 'card shadow-sm flex flex-col min-h-0' },
   templateUrl: './panel-town-quests.component.html',
 })

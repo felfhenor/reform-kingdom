@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { FFFocusRowDirective } from '@ff/focus/ff-focus-row.directive';
 import { FFButtonComponent } from '@ff/components/button/button.component';
 import { DecimalPipe } from '@angular/common';
@@ -17,6 +18,7 @@ import type { OutpostTeleportRow } from '@interfaces';
   selector: 'app-modal-outpost-teleport',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     FFFocusRowDirective,
     FFButtonComponent,
     DecimalPipe,

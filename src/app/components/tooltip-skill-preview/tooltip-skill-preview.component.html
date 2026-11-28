@@ -10,7 +10,9 @@
       <div class="type-entity-name mb-1 text-{{ skillData.rarity }}">
         {{ skillData | contentName }}
         @if (isSpecial()) {
-          <span class="badge badge-sm badge-data ml-1">Burst</span>
+          <span class="badge badge-sm badge-data ml-1">
+            {{ 'tooltipSkillPreview.burst' | t }}
+          </span>
         }
       </div>
 

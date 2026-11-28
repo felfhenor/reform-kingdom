@@ -5,7 +5,14 @@
     @if (townData) {
       {{ townData | contentName }}
       <span class="badge badge-data">
-        Lv. {{ townData.level | number }} {{ townData.scaleType }}
+        {{
+          'gamePlayTown.lv'
+            | t
+              : {
+                  level: (townData.level | number),
+                  scaleType: townData.scaleType,
+                }
+        }}
       </span>
     }
   </span>

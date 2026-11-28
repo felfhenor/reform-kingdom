@@ -6,13 +6,13 @@
   [closeOnBackdropClick]="true"
 >
   <span title>
-    {{ character()?.name }}'s Teachings
+    {{ 'modalHeroTeachings.sTeachings' | t: { name: character()?.name } }}
     <span class="badge badge-sm badge-data tabular-nums">
       {{ learnedTotal() | number }}/{{ teachingTotal() | number }}
     </span>
   </span>
 
-  <p subtitle>Teachings apply no matter which class this hero is.</p>
+  <p subtitle>{{ 'modalHeroTeachings.teachingsApplyNoMatter' | t }}</p>
 
   <div body class="flex flex-col gap-2">
     <div role="tablist" class="tabs tabs-box">
@@ -54,9 +54,12 @@
             mode="teachings"
           >
             <span class="type-meta flex gap-2" actionslot>
-              Taught by {{ row.trainerDisplayName }}
+              {{
+                'modalHeroTeachings.taughtBy'
+                  | t: { trainerDisplayName: row.trainerDisplayName }
+              }}
               @if (row.trainerDisplayName !== '???') {
-                for
+                {{ 'modalHeroTeachings.for' | t }}
                 <app-row-currency-cost
                   [costs]="row.teaching.costs"
                   [showOwned]="true"
@@ -67,7 +70,10 @@
         }
       } @empty {
         <app-blank-slate>
-          No trainer teaches {{ selectedJob() | contentName }} heroes yet.
+          {{
+            'modalHeroTeachings.noTrainerTeachesHeroes'
+              | t: { selectedJob: (selectedJob() | contentName) }
+          }}
         </app-blank-slate>
       }
     </div>

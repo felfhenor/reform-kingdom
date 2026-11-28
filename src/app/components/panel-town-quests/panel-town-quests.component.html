@@ -2,7 +2,7 @@
 
 <div class="card-body p-3 gap-2 flex-1 min-h-0">
   <h2 class="type-section-title justify-between shrink-0">
-    Commissions
+    {{ 'panelTownQuests.commissions' | t }}
     <span class="badge badge-sm badge-data tabular-nums">
       {{ questRows.length | number }}
     </span>
@@ -16,7 +16,9 @@
           [fulfill]="() => fulfillCommission(row)"
         />
       } @empty {
-        <app-blank-slate>No commissions are available yet.</app-blank-slate>
+        <app-blank-slate>
+          {{ 'panelTownQuests.noCommissionsAreAvailable' | t }}
+        </app-blank-slate>
       }
     </div>
   </div>

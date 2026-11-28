@@ -51,10 +51,10 @@
                   (click)="$event.shiftKey || requestRegaliaUpdate()"
                   (click.shift)="requestRegaliaUpdate(true)"
                   appSfx="ui-click"
-                  [tp]="'Update this regalia to match this hero.'"
+                  [tp]="'panelHeroEquipment.updateThisRegaliaTo' | t"
                   [sfxTrigger]="['click', 'hover']"
                 >
-                  Update
+                  {{ 'panelHeroEquipment.update' | t }}
                 </button>
               }
             </div>
@@ -68,7 +68,9 @@
           [max]="char.xp.maximum"
         >
           <app-text-number-tween [value]="char.xp.current" />
-          /{{ char.xp.maximum | number }} XP
+          {{
+            'panelHeroEquipment.xp' | t: { maximum: (char.xp.maximum | number) }
+          }}
         </app-bar-progress>
       </div>
     </div>
@@ -85,7 +87,7 @@
             [disabled]="!isAtKingdomCurrently() || !canPromote()"
             (click)="promote()"
             appSfx="ui-click"
-            [tp]="'Move earlier in the party order.'"
+            [tp]="'panelHeroEquipment.moveEarlierInThe' | t"
             [sfxTrigger]="['click', 'hover']"
           >
             <app-icon name="tablerChevronLeft" />
@@ -102,7 +104,7 @@
             [disabled]="!isAtKingdomCurrently() || !canDemote()"
             (click)="demote()"
             appSfx="ui-click"
-            [tp]="'Move later in the party order.'"
+            [tp]="'panelHeroEquipment.moveLaterInThe' | t"
             [sfxTrigger]="['click', 'hover']"
           >
             <app-icon name="tablerChevronRight" />
@@ -121,10 +123,10 @@
             [disabled]="!equipmentModifiable()"
             (click)="optimize()"
             appSfx="ui-click"
-            [tp]="'Optimizing your equipment will automatically equip the best equipment for this hero, based on their class and the stat priorities that class has.'"
+            [tp]="'panelHeroEquipment.optimizingYourEquipmentWill' | t"
             [sfxTrigger]="['click', 'hover']"
           >
-            Optimize
+            {{ 'panelHeroEquipment.optimize' | t }}
           </button>
         </app-slot-button-container>
 
@@ -134,10 +136,10 @@
           (click)="openSkillTree()"
           appTutorialTarget="hero-skill-tree"
           appSfx="ui-click"
-          [tp]="'Spend skill points on skills, abilities and a specialization.'"
+          [tp]="'panelHeroEquipment.spendSkillPointsOn' | t"
           [sfxTrigger]="['click', 'hover']"
         >
-          Skill Tree
+          {{ 'panelHeroEquipment.skillTree' | t }}
           <app-badge-skill-points [character]="char" />
         </button>
 
@@ -163,7 +165,7 @@
               appSfx="ui-click"
               [sfxTrigger]="['click', 'hover']"
             >
-              Burst Skill
+              {{ 'panelHeroEquipment.burstSkill' | t }}
             </button>
           </app-slot-button-container>
         }
@@ -174,10 +176,10 @@
           [appHideUntilLevel]="15"
           (click)="openRegalias()"
           appSfx="ui-click"
-          [tp]="'View stored configurations for this hero.'"
+          [tp]="'panelHeroEquipment.viewStoredConfigurationsFor' | t"
           [sfxTrigger]="['click', 'hover']"
         >
-          Regalias
+          {{ 'panelHeroEquipment.regalias' | t }}
         </button>
       </div>
     </div>
@@ -198,10 +200,10 @@
 
 <swal
   #regaliaUpdateSwal
-  title="Update This Regalia?"
-  text="It will be overwritten with this hero's current gear, combat orders and burst skill."
+  [title]="'panelHeroEquipment.updateThisRegalia' | t"
+  [text]="'panelHeroEquipment.itWillBeOverwritten' | t"
   icon="question"
-  confirmButtonText="Yes, update it"
-  cancelButtonText="Cancel"
+  [confirmButtonText]="'panelHeroEquipment.yesUpdateIt' | t"
+  [cancelButtonText]="'panelHeroEquipment.cancel' | t"
   (confirm)="confirmRegaliaUpdate()"
 ></swal>

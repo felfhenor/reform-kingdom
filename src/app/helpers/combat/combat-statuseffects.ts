@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { contentNestedText } from '@helpers/i18n/i18n-content';
 import { combatCombatantTakeDamage } from '@helpers/combat/combat-combatant-hp';
 import {
@@ -142,7 +143,10 @@ export function combatApplyStatusEffectToTarget(
   if (statusEffect.effectType === 'Debuff' && shouldIgnoreDebuff) {
     combatMessageLog(
       combat,
-      `**${statusEffect.name}** is shrugged off by **${combatantMessageToken(combatant)}**!`,
+      t('combatStatuseffects.isShruggedOffBy', {
+        name: statusEffect.name,
+        combatant: combatantMessageToken(combatant),
+      }),
       combatant,
     );
     return false;

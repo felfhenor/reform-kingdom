@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { FFKeyboardDirective } from '@ff/controls/ff-keyboard.directive';
 import { FFButtonComponent } from '@ff/components/button/button.component';
 import { FFFocusService } from '@ff/focus/ff-focus.service';
@@ -27,6 +28,7 @@ const CELL_FOOTPRINT_PX = 80;
   selector: 'app-page-paged-grid',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     FFKeyboardDirective,
     FFButtonComponent,
     BlankSlateComponent,

@@ -76,13 +76,13 @@ function recallPartyHome(): void {
     regionBuffsSync(previousMapName, home.mapName);
   }
 
-  miscellaneousMessageLog('The party has been recalled home.');
+  miscellaneousMessageLog(t('globalEffects.thePartyHasBeen'));
 }
 
 // Deaths Door is a pure timer; on expiry the party teleports home (a designated Town/Outpost, or the Duchy), or revives in place, before healing begins.
 function handleDeathsDoorExpiry(): void {
   if (globalEffectSumsState().reviveInPlace) {
-    miscellaneousMessageLog('The party has been revived where it fell.');
+    miscellaneousMessageLog(t('globalEffects.thePartyHasBeen2'));
   } else {
     recallPartyHome();
   }
@@ -113,7 +113,7 @@ export function globalEffectsProcessTick(): void {
 
   expiredEffects.forEach((effect) => {
     if (healingContent && effect.id === healingContent.id) {
-      miscellaneousMessageLog('The party has finished healing.');
+      miscellaneousMessageLog(t('globalEffects.thePartyHasFinished'));
       healPartyToFull();
     }
 

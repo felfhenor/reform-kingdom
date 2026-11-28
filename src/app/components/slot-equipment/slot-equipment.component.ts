@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -39,6 +40,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-slot-equipment',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     AtlasImageComponent,
     SlotIconBlankComponent,
     RowEquipmentSellValueComponent,

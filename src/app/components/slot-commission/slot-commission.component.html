@@ -3,18 +3,22 @@
 <div ffFocusRow class="flex items-center gap-2 p-4 bg-base-200">
   <div class="flex flex-col flex-1 min-w-0 gap-2">
     @if (isInLocationModal()) {
-      <div class="font-semibold">Active Commission</div>
+      <div class="font-semibold">
+        {{ 'slotCommission.activeCommission' | t }}
+      </div>
     } @else {
       <div class="type-entity-name text-{{ rarityLabel() }}">
         {{ commissionName() }}
       </div>
 
-      <div class="type-meta mb-2">For: {{ r.title }}</div>
+      <div class="type-meta mb-2">
+        {{ 'slotCommission.for' | t: { title: r.title } }}
+      </div>
     }
 
     @if (r.completed) {
       <span class="type-flavor">
-        Daily commission fulfilled! Check back after the reset for another.
+        {{ 'slotCommission.dailyCommissionFulfilledCheck' | t }}
       </span>
     } @else {
       <div class="flex flex-wrap gap-2">
@@ -40,7 +44,10 @@
       <div class="flex gap-2">
         @if (r.reputationReward) {
           <div class="badge badge-data">
-            +{{ r.reputationReward | number }} Reputation
+            {{
+              'slotCommission.reputation'
+                | t: { reputationReward: (r.reputationReward | number) }
+            }}
           </div>
         }
 
@@ -74,9 +81,9 @@
           ffButton="ui-click"
           [ffSoundOffset]="1"
           ffPadAction="confirm"
-          ffPadLabel="Turn In"
+          [ffPadLabel]="'slotCommission.turnIn' | t"
         >
-          Turn In Commission
+          {{ 'slotCommission.turnInCommission' | t }}
         </button>
       </div>
     </div>

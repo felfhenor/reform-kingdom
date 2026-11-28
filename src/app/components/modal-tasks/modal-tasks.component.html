@@ -5,8 +5,8 @@
   [closeOnBackdropClick]="true"
   widthClass="max-w-3xl"
 >
-  <span title>Tasks</span>
-  <p subtitle>Complete tasks to earn rewards.</p>
+  <span title>{{ 'modalTasks.tasks' | t }}</span>
+  <p subtitle>{{ 'modalTasks.completeTasksToEarn' | t }}</p>
 
   <div
     body
@@ -51,7 +51,7 @@
 
         <div class="w-20 flex justify-end shrink-0">
           @if (row.isClaimed) {
-            <span class="type-meta">Claimed</span>
+            <span class="type-meta">{{ 'modalTasks.claimed' | t }}</span>
           } @else if (row.isComplete) {
             <button
               type="button"
@@ -60,9 +60,9 @@
               ffButton="ui-success"
               [ffSoundOffset]="$index"
               ffPadAction="confirm"
-              ffPadLabel="Claim"
+              [ffPadLabel]="'modalTasks.claim' | t"
             >
-              Claim
+              {{ 'modalTasks.claim' | t }}
             </button>
           } @else if (row.locate; as locate) {
             <app-slot-button-container
@@ -72,13 +72,13 @@
               <button
                 type="button"
                 class="btn btn-sm btn-neutral"
-                tp="Locate on Map"
+                [tp]="'modalTasks.locateOnMap' | t"
                 [disabled]="!!locate.disabledReason"
                 (click)="locateNode(locate.node)"
                 ffButton="ui-click"
                 [ffSoundOffset]="$index"
                 [ffPadAction]="locate.disabledReason ? undefined : 'confirm'"
-                ffPadLabel="Locate"
+                [ffPadLabel]="'modalTasks.locate' | t"
               >
                 <app-icon name="tablerFocus" />
               </button>
@@ -100,9 +100,9 @@
         (click)="claim(claimableIds)"
         ffButton="ui-success"
         ffPadAction="context"
-        ffPadLabel="Claim All"
+        [ffPadLabel]="'modalTasks.claimAll' | t"
       >
-        Claim All
+        {{ 'modalTasks.claimAll' | t }}
       </button>
     }
   </div>

@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import { gatherVfxEmit } from '@helpers/engine/gather-vfx';
 import { notifySuccess } from '@helpers/engine/notify';
@@ -25,8 +26,14 @@ export function worldNodeDiscoverIfCollectibleGateMet(
   if (!isWorldNodeCollectibleGateMet(entry)) return false;
 
   worldNodeDiscover(entry.nodeName);
-  miscellaneousMessageLog(`**${entry.nodeName}** is now accessible.`);
-  notifySuccess(`${entry.nodeName} is now accessible.`);
+  miscellaneousMessageLog(
+    t('worldNodeCollectibleGate.isNowAccessible', { nodeName: entry.nodeName }),
+  );
+  notifySuccess(
+    t('worldNodeCollectibleGate.isNowAccessible2', {
+      nodeName: entry.nodeName,
+    }),
+  );
 
   gateIds.forEach((collectibleId) => {
     const info = rewardContentInfo({ collectibleId });

@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { FFFocusRowDirective } from '@/app/ff/focus/ff-focus-row.directive';
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
@@ -19,6 +20,7 @@ import type { EdictKind } from '@interfaces';
   selector: 'app-play-kingdom-edicts',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     BlankSlateComponent,
     ButtonKingdomBackComponent,
     CardPageComponent,
@@ -30,15 +32,20 @@ import type { EdictKind } from '@interfaces';
   ],
   template: `
     <app-card-page heightProfile="full">
-      <span header>Edicts</span>
+      <span header>{{ 'playKingdomEdicts.edicts' | t }}</span>
 
       <app-button-kingdom-back pageactions />
 
       @let edicts = activeEdicts();
       @if (edicts.length > 0) {
         <span pageactionssecondary class="badge badge-data tabular-nums">
-          {{ fragmentTotal() | number }} Fragments · score ×{{
-            scoreMultiplier() | number: '1.0-2'
+          {{
+            'playKingdomEdicts.fragmentsScore'
+              | t
+                : {
+                    fragmentTotal: (fragmentTotal() | number),
+                    scoreMultiplier: (scoreMultiplier() | number: '1.0-2'),
+                  }
           }}
         </span>
       }
@@ -61,15 +68,22 @@ import type { EdictKind } from '@interfaces';
 
             <div class="flex flex-col items-end gap-2 shrink-0">
               <span class="badge badge-sm badge-data tabular-nums">
-                {{ edict.fragments > 0 ? '+' : ''
-                }}{{ edict.fragments | number }}
-                Fragments
+                {{
+                  'playKingdomEdicts.fragments'
+                    | t
+                      : {
+                          fragments: edict.fragments > 0 ? '+' : '',
+                          fragments2: (edict.fragments | number),
+                        }
+                }}
               </span>
               <span class="type-meta">{{ kindLabel(edict.kind) }}</span>
             </div>
           </div>
         } @empty {
-          <app-blank-slate size="page">This run has no edicts.</app-blank-slate>
+          <app-blank-slate size="page">
+            {{ 'playKingdomEdicts.thisRunHasNo' | t }}
+          </app-blank-slate>
         }
       </div>
     </app-card-page>

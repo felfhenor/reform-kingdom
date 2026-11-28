@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import {
   categoryMessageLog,
   ITEM_ICON_TOKEN,
@@ -117,7 +118,7 @@ export function gatheringStart(nodeName: string): boolean {
   categoryMessageLog(
     'Gather',
     nodeName,
-    `The party begins gathering at ${nodeName}.`,
+    t('gathering.thePartyBeginsGathering', { nodeName }),
   );
 
   return true;
@@ -205,7 +206,7 @@ function grantGatherItems(
   categoryMessageLog(
     'Gather',
     nodeName,
-    `The party found ${descriptions.join(', ')}!`,
+    t('gathering.thePartyFound', { descriptions: descriptions.join(', ') }),
     grants.map(({ item }) => ({ sprite: item.sprite, spritesheet: 'item' })),
   );
 }

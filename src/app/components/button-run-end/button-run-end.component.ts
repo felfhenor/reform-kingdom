@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -21,6 +22,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   selector: 'app-button-run-end',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     ButtonGlowDirective,
     IconComponent,
     SFXDirective,

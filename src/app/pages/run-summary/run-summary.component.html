@@ -10,8 +10,14 @@
               {{ outcomeTitle() }}
             </h1>
             <p class="type-muted">
-              {{ summary.startedAt | date: 'medium' }} -
-              {{ summary.endedAt | date: 'medium' }} &middot;
+              {{
+                'runSummary.middot'
+                  | t
+                    : {
+                        startedAt: (summary.startedAt | date: 'medium'),
+                        endedAt: (summary.endedAt | date: 'medium'),
+                      }
+              }}
               <span class="font-bold tabular-nums">
                 <ng-container
                   [ngTemplateOutlet]="duration"
@@ -23,13 +29,17 @@
 
           <div class="flex flex-col items-end gap-2">
             @if (modsLabel(); as mods) {
-              <span class="badge badge-data" [tp]="mods">Modded</span>
+              <span class="badge badge-data" [tp]="mods">
+                {{ 'runSummary.modded' | t }}
+              </span>
             }
             @if (timedResult(); as timed) {
-              <span class="type-meta">Final Time</span>
+              <span class="type-meta">{{ 'runSummary.finalTime' | t }}</span>
               <span class="type-page-title tabular-nums">{{ timed.time }}</span>
               @if (timed.isPersonalBest) {
-                <span class="badge badge-success">Personal Best</span>
+                <span class="badge badge-success">
+                  {{ 'runSummary.personalBest' | t }}
+                </span>
               }
               @if (timed.delta) {
                 <span
@@ -37,7 +47,7 @@
                   [class.text-success]="timed.isPersonalBest"
                   [class.text-error]="!timed.isPersonalBest"
                 >
-                  {{ timed.delta }} vs previous best
+                  {{ 'runSummary.vsPreviousBest' | t: { delta: timed.delta } }}
                 </span>
               }
             }
@@ -48,7 +58,7 @@
       <div class="flex flex-col gap-4 flex-1">
         <div class="card bg-base-100">
           <div class="card-body gap-4">
-            <h2 class="type-section-title">Party</h2>
+            <h2 class="type-section-title">{{ 'runSummary.party' | t }}</h2>
 
             <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
               @for (hero of party(); track $index) {
@@ -58,8 +68,15 @@
                     <div class="flex flex-col min-w-0">
                       <span class="type-entity-name">{{ hero.name }}</span>
                       <span class="type-muted inline-flex items-center gap-2">
-                        Lv. {{ hero.level | number }}
-                        {{ (hero.job | contentName) || 'Unknown Job' }}
+                        {{
+                          'runSummary.lv'
+                            | t
+                              : {
+                                  level: (hero.level | number),
+                                  job:
+                                    (hero.job | contentName) || 'Unknown Job',
+                                }
+                        }}
                         <app-icon-spec
                           class="pb-1"
                           [spec]="hero.snapshot?.specialization"
@@ -93,7 +110,9 @@
                       }
 
                       <div class="flex justify-between gap-2 sm:col-span-2">
-                        <span class="text-lighter">Biggest Hit</span>
+                        <span class="text-lighter">
+                          {{ 'runSummary.biggestHit' | t }}
+                        </span>
                         <span class="inline-flex items-center gap-2">
                           @if (hero.biggestHit; as biggest) {
                             <ng-container
@@ -110,7 +129,9 @@
                       </div>
 
                       <div class="flex justify-between gap-2 sm:col-span-2">
-                        <span class="text-lighter">Most Used Skill</span>
+                        <span class="text-lighter">
+                          {{ 'runSummary.mostUsedSkill' | t }}
+                        </span>
                         <span class="inline-flex items-center gap-2">
                           @if (hero.mostUsed; as mostUsed) {
                             <ng-container
@@ -123,19 +144,23 @@
                               x{{ mostUsed.uses | number }}
                             </span>
                           } @else {
-                            <span class="text-lighter">None</span>
+                            <span class="text-lighter">
+                              {{ 'runSummary.none' | t }}
+                            </span>
                           }
                         </span>
                       </div>
                     } @else {
                       <p class="type-muted sm:col-span-2">
-                        Combat stats weren't tracked for this run.
+                        {{ 'runSummary.combatStatsWerenT' | t }}
                       </p>
                     }
 
                     @if (hero.snapshot) {
                       <div class="flex justify-between gap-2 sm:col-span-2">
-                        <span class="text-lighter">Jobs</span>
+                        <span class="text-lighter">
+                          {{ 'runSummary.jobs' | t }}
+                        </span>
                         <span class="text-right">{{ hero.jobsUsedText }}</span>
                       </div>
                     }
@@ -150,21 +175,22 @@
           <div class="h-full flex flex-col gap-4">
             <div class="card bg-base-100">
               <div class="card-body gap-4">
-                <h2 class="type-section-title">Journey</h2>
+                <h2 class="type-section-title">
+                  {{ 'runSummary.journey' | t }}
+                </h2>
 
                 @if (!hasRunTotals()) {
                   <p class="type-muted">
-                    Gold, fights and crafting weren't tracked for this run.
+                    {{ 'runSummary.goldFightsAndCrafting' | t }}
                   </p>
                 } @else if (trackedPlayTime(); as trackedParts) {
                   <p class="type-muted">
-                    This run began before stats were tracked, so gold, fights
-                    and crafting only cover the last
+                    {{ 'runSummary.thisRunBeganBefore' | t }}
                     <ng-container
                       [ngTemplateOutlet]="duration"
                       [ngTemplateOutletContext]="{ $implicit: trackedParts }"
                     />
-                    of play.
+                    {{ 'runSummary.ofPlay' | t }}
                   </p>
                 }
 
@@ -182,7 +208,9 @@
 
                   @if (felDefeatedAt(); as felParts) {
                     <div class="flex justify-between gap-2 sm:col-span-2">
-                      <span class="text-lighter">Fel Defeated at</span>
+                      <span class="text-lighter">
+                        {{ 'runSummary.felDefeatedAt' | t }}
+                      </span>
                       <span class="tabular-nums text-right">
                         <ng-container
                           [ngTemplateOutlet]="duration"
@@ -192,8 +220,12 @@
                     </div>
                   } @else if (isFelTickUntracked()) {
                     <div class="flex justify-between gap-2 sm:col-span-2">
-                      <span class="text-lighter">Fel Defeated at</span>
-                      <span class="text-lighter">Not tracked for this run</span>
+                      <span class="text-lighter">
+                        {{ 'runSummary.felDefeatedAt' | t }}
+                      </span>
+                      <span class="text-lighter">
+                        {{ 'runSummary.notTrackedForThis' | t }}
+                      </span>
                     </div>
                   }
                 </div>
@@ -204,7 +236,9 @@
               <div class="card-body gap-4">
                 @let overall = completionOverall();
                 <div class="flex justify-between items-center gap-4">
-                  <h2 class="type-section-title">Remembrance</h2>
+                  <h2 class="type-section-title">
+                    {{ 'runSummary.remembrance' | t }}
+                  </h2>
                   <span class="text-2xl font-bold tabular-nums">
                     {{ overall.percent | number }}%
                   </span>
@@ -231,10 +265,18 @@
             <div class="card bg-base-100 flex-1">
               <div class="card-body gap-4">
                 <div class="flex justify-between items-center gap-4">
-                  <h2 class="type-section-title">Edicts</h2>
+                  <h2 class="type-section-title">
+                    {{ 'runSummary.edicts' | t }}
+                  </h2>
                   <span class="badge badge-data tabular-nums">
-                    {{ summary.fragments | number }} Fragments · score x{{
-                      summary.multiplier | number: '1.0-2'
+                    {{
+                      'runSummary.fragmentsScoreX'
+                        | t
+                          : {
+                              fragments: (summary.fragments | number),
+                              multiplier:
+                                (summary.multiplier | number: '1.0-2'),
+                            }
                     }}
                   </span>
                 </div>
@@ -243,10 +285,14 @@
                   @if (entry.edict; as edict) {
                     <app-row-edict [edict]="edict" />
                   } @else {
-                    <p class="type-muted">Unknown Edict</p>
+                    <p class="type-muted">
+                      {{ 'runSummary.unknownEdict' | t }}
+                    </p>
                   }
                 } @empty {
-                  <app-blank-slate>No edicts.</app-blank-slate>
+                  <app-blank-slate>
+                    {{ 'runSummary.noEdicts' | t }}
+                  </app-blank-slate>
                 }
               </div>
             </div>
@@ -257,7 +303,9 @@
               <div class="card bg-base-100 flex-1">
                 <div class="card-body gap-4">
                   <div class="flex justify-between items-center gap-4">
-                    <h2 class="type-section-title">Score</h2>
+                    <h2 class="type-section-title">
+                      {{ 'runSummary.score' | t }}
+                    </h2>
                     <span class="text-2xl font-bold tabular-nums">
                       {{ scored.total | number }}
                     </span>
@@ -265,17 +313,16 @@
 
                   @if (!scored.sealsTracked) {
                     <p class="type-muted grow-0">
-                      Seals weren't tracked for this run.
+                      {{ 'runSummary.sealsWerenTTracked' | t }}
                     </p>
                   } @else if (sealsTrackedPlayTime(); as trackedParts) {
                     <p class="type-muted grow-0">
-                      This run began before seals were tracked, so only regions
-                      sealed in the last
+                      {{ 'runSummary.thisRunBeganBefore2' | t }}
                       <ng-container
                         [ngTemplateOutlet]="duration"
                         [ngTemplateOutletContext]="{ $implicit: trackedParts }"
                       />
-                      of play count.
+                      {{ 'runSummary.ofPlayCount' | t }}
                     </p>
                   }
 
@@ -285,7 +332,7 @@
                         <span class="flex flex-col">
                           <span>{{ seal.name }}</span>
                           <span class="type-meta">
-                            Sealed at
+                            {{ 'runSummary.sealedAt' | t }}
                             <ng-container
                               [ngTemplateOutlet]="duration"
                               [ngTemplateOutletContext]="{
@@ -299,7 +346,11 @@
                                 $implicit: seal.parDelta,
                               }"
                             />
-                            {{ seal.isUnderPar ? 'under' : 'over' }} par
+                            {{
+                              'runSummary.par'
+                                | t
+                                  : { over: seal.isUnderPar ? 'under' : 'over' }
+                            }}
                           </span>
                         </span>
                         <span class="tabular-nums">
@@ -311,7 +362,7 @@
                     @for (region of unsealedRegions(); track region.id) {
                       <div class="flex justify-between gap-4 text-lighter">
                         <span>{{ region | contentName }}</span>
-                        <span>Not Sealed</span>
+                        <span>{{ 'runSummary.notSealed' | t }}</span>
                       </div>
                     }
 
@@ -326,7 +377,7 @@
 
                     @if (scored.completion > 0) {
                       <div class="flex justify-between gap-4">
-                        <span>Killed Fel</span>
+                        <span>{{ 'runSummary.killedFel' | t }}</span>
                         <span class="tabular-nums">
                           {{ scored.completion | number }}
                         </span>
@@ -336,19 +387,23 @@
                     <div class="divider my-0"></div>
 
                     <div class="flex justify-between gap-4">
-                      <span class="text-lighter">Base Score</span>
+                      <span class="text-lighter">
+                        {{ 'runSummary.baseScore' | t }}
+                      </span>
                       <span class="tabular-nums">
                         {{ scored.base | number }}
                       </span>
                     </div>
                     <div class="flex justify-between gap-4">
-                      <span class="text-lighter">Edict Multiplier</span>
+                      <span class="text-lighter">
+                        {{ 'runSummary.edictMultiplier' | t }}
+                      </span>
                       <span class="tabular-nums">
                         x{{ scored.multiplier | number: '1.0-2' }}
                       </span>
                     </div>
                     <div class="flex justify-between gap-4 font-semibold">
-                      <span>Final Score</span>
+                      <span>{{ 'runSummary.finalScore' | t }}</span>
                       <span class="tabular-nums">
                         {{ scored.total | number }}
                       </span>
@@ -362,7 +417,9 @@
               <div class="card bg-base-100">
                 <div class="card-body gap-4">
                   <div class="flex justify-between items-center gap-4">
-                    <h2 class="type-section-title">Achievements Earned</h2>
+                    <h2 class="type-section-title">
+                      {{ 'runSummary.achievementsEarned' | t }}
+                    </h2>
                     <span class="badge badge-data tabular-nums">
                       {{ achievements().length | number }}
                     </span>
@@ -390,7 +447,7 @@
     } @else {
       <div class="card bg-base-100">
         <div class="card-body">
-          <app-blank-slate>This run isn't in your Legacy.</app-blank-slate>
+          <app-blank-slate>{{ 'runSummary.thisRunIsnT' | t }}</app-blank-slate>
         </div>
       </div>
     }
@@ -405,7 +462,7 @@
         appSfx="ui-click"
         [sfxTrigger]="['click', 'hover']"
       >
-        Main Menu
+        {{ 'runSummary.mainMenu' | t }}
       </button>
 
       <button
@@ -415,7 +472,7 @@
         appSfx="ui-click"
         [sfxTrigger]="['click', 'hover']"
       >
-        Legacy
+        {{ 'runSummary.legacy' | t }}
       </button>
 
       @if (canStartNewRun()) {
@@ -426,7 +483,7 @@
           appSfx="ui-success"
           [sfxTrigger]="['click', 'hover']"
         >
-          Start a New Run
+          {{ 'runSummary.startANewRun' | t }}
         </button>
       }
     </div>

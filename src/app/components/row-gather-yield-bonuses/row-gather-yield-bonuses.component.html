@@ -10,8 +10,13 @@
     </span>
 
     <span class="ml-[4px]">
-      {{ bonus.tradeskillName }} Material Gather Yield +{{
-        bonus.value | number
+      {{
+        'rowGatherYieldBonuses.materialGatherYield'
+          | t
+            : {
+                tradeskillName: bonus.tradeskillName,
+                value: (bonus.value | number),
+              }
       }}
     </span>
   </div>

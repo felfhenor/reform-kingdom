@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { tPlural } from '@helpers/i18n/i18n';
 import { DecimalPipe, formatNumber } from '@angular/common';
 import {
@@ -61,6 +62,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
   selector: 'app-play-heroes-skill-tree',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     BlankSlateComponent,
     DecimalPipe,
     ButtonKingdomBackComponent,

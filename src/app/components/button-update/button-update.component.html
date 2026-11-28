@@ -7,6 +7,6 @@
     appSfx="ui-click"
     [sfxTrigger]="['click', 'hover']"
   >
-    Update Available ({{ meta.liveVersionString() }})
+    {{ 'buttonUpdate.updateAvailable' | t: { meta: meta.liveVersionString() } }}
   </button>
 }

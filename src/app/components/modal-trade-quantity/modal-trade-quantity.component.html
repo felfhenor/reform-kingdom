@@ -1,16 +1,16 @@
 <swal
   #confirmSwal
   icon="question"
-  confirmButtonText="Yes"
-  cancelButtonText="Cancel"
+  [confirmButtonText]="'modalTradeQuantity.yes' | t"
+  [cancelButtonText]="'modalTradeQuantity.cancel' | t"
 ></swal>
 
 <swal
   #quantitySwal
   icon="question"
   input="number"
-  confirmButtonText="Confirm"
-  cancelButtonText="Cancel"
+  [confirmButtonText]="'modalTradeQuantity.confirm' | t"
+  [cancelButtonText]="'modalTradeQuantity.cancel' | t"
   [customClass]="{
     confirmButton: 'btn btn-primary',
     denyButton: 'btn btn-primary btn-outline',

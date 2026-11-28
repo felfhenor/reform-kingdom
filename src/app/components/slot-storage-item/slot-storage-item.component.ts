@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -19,6 +20,7 @@ const MAX_DISPLAY_QUANTITY = 9999;
   selector: 'app-slot-storage-item',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     BadgeInfusableComponent,
     TooltipItemPreviewComponent,
     TippyDirective,

@@ -2,7 +2,7 @@
 
 <app-tooltip-item-preview #preview [display]="item">
   <div preview-footer class="mt-2 type-muted text-center">
-    This trader's unique offering.
+    {{ 'slotCaravanTokenTrade.thisTraderSUnique' | t }}
   </div>
 </app-tooltip-item-preview>
 
@@ -29,7 +29,9 @@
         {{ item.name }}
       </span>
 
-      <span class="badge badge-sm badge-success">Unique</span>
+      <span class="badge badge-sm badge-success">
+        {{ 'slotCaravanTokenTrade.unique' | t }}
+      </span>
     </div>
 
     <app-currency-cost

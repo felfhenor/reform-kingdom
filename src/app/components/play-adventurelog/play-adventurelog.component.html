@@ -1,11 +1,11 @@
 <app-card-page heightProfile="full">
-  <span header>Adventure Log</span>
+  <span header>{{ 'playAdventurelog.adventureLog' | t }}</span>
 
   <div pageactionssecondary>
     <input
       ffKeyboard
       type="text"
-      placeholder="Search by tag or message..."
+      [placeholder]="'playAdventurelog.searchByTagOr' | t"
       class="input input-sm input-bordered search-bar"
       [value]="searchText()"
       (input)="onSearchInput($event)"
@@ -31,7 +31,9 @@
         <app-adventure-log-message [entry]="entry" />
       </div>
     } @empty {
-      <app-blank-slate>Nothing has happened yet.</app-blank-slate>
+      <app-blank-slate>
+        {{ 'playAdventurelog.nothingHasHappenedYet' | t }}
+      </app-blank-slate>
     }
 
     <div #loadMoreSentinel class="shrink-0 h-px"></div>

@@ -28,7 +28,9 @@
         </tr>
       } @empty {
         <tr class="text-sm">
-          <td class="text-lighter" colspan="3">No splits yet.</td>
+          <td class="text-lighter" colspan="3">
+            {{ 'statusRunTimer.noSplitsYet' | t }}
+          </td>
         </tr>
       }
 
@@ -38,7 +40,7 @@
           <td colspan="3"><hr /></td>
         </tr>
         <tr class="text-sm">
-          <td>Personal Best</td>
+          <td>{{ 'statusRunTimer.personalBest' | t }}</td>
           <td class="text-right tabular-nums">{{ best }}</td>
           <td></td>
         </tr>

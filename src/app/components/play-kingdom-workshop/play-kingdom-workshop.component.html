@@ -4,7 +4,7 @@
 @let canModify = modifiable();
 
 <app-card-page heightProfile="full">
-  <span header>Workshop</span>
+  <span header>{{ 'playKingdomWorkshop.workshop' | t }}</span>
 
   <app-button-kingdom-back pageactions />
 
@@ -29,7 +29,9 @@
             @let affixCount = sourceItem.affixIds.length;
             {{ 'workshop.affixes' | tPlural: affixCount }}
           } @else {
-            <span class="type-muted">Common gear cannot be reforged</span>
+            <span class="type-muted">
+              {{ 'playKingdomWorkshop.commonGearCannotBe' | t }}
+            </span>
           }
         } @else if (enabled) {
           <app-row-infused-materials
@@ -38,7 +40,9 @@
             [maxSlots]="slotCountFor(sourceItem)"
           />
         } @else {
-          <span class="type-muted">No Infusion Slots</span>
+          <span class="type-muted">
+            {{ 'playKingdomWorkshop.noInfusionSlots' | t }}
+          </span>
         }
       </ng-template>
 
@@ -86,11 +90,15 @@
             }
           }
         } @else {
-          <app-blank-slate>Select an item to modify it.</app-blank-slate>
+          <app-blank-slate>
+            {{ 'playKingdomWorkshop.selectAnItemTo' | t }}
+          </app-blank-slate>
         }
       </div>
     </div>
   } @else {
-    <app-blank-slate>The Workshop has nothing to offer yet.</app-blank-slate>
+    <app-blank-slate>
+      {{ 'playKingdomWorkshop.theWorkshopHasNothing' | t }}
+    </app-blank-slate>
   }
 </app-card-page>

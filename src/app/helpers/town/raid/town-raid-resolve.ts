@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import {
   categoryMessageLog,
   ITEM_ICON_TOKEN,
@@ -176,7 +177,10 @@ function logRaidLossMessages(
     categoryMessageLog(
       'Raid',
       townName,
-      `${townName} lost the following items: ${displayNamesHtml(summary.stolenItems)}`,
+      t('townRaidResolve.lostTheFollowingItems', {
+        townName,
+        stolenItems: displayNamesHtml(summary.stolenItems),
+      }),
     );
   }
 
@@ -184,7 +188,10 @@ function logRaidLossMessages(
     categoryMessageLog(
       'Raid',
       townName,
-      `${townName} lost the following in-progress crafts: ${displayNamesHtml(summary.cancelledCrafts)}`,
+      t('townRaidResolve.lostTheFollowingIn', {
+        townName,
+        cancelledCrafts: displayNamesHtml(summary.cancelledCrafts),
+      }),
     );
   }
 
@@ -196,7 +203,10 @@ function logRaidLossMessages(
     categoryMessageLog(
       'Raid',
       townName,
-      `${townName} lost the following resources: ${descriptions.join(', ')}`,
+      t('townRaidResolve.lostTheFollowingResources', {
+        townName,
+        descriptions: descriptions.join(', '),
+      }),
       summary.lostMaterials.map(({ item }) => ({
         sprite: item.sprite,
         spritesheet: 'item',
@@ -207,7 +217,12 @@ function logRaidLossMessages(
   categoryMessageLog(
     'Raid',
     townName,
-    `${townName}'s crafting is slowed for ${formatDuration(RAID_LOSS_CRAFT_DEBUFF_TICKS)} following the raid.`,
+    t('townRaidResolve.sCraftingIsSlowed', {
+      townName,
+      RAID_LOSS_CRAFT_DEBUFF_TICKS: formatDuration(
+        RAID_LOSS_CRAFT_DEBUFF_TICKS,
+      ),
+    }),
   );
 }
 

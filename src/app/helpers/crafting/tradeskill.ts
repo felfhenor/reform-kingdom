@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { categoryMessageLog } from '@helpers/combat/combat-log';
 import {
   TRADESKILL_MAX_LEVEL,
@@ -196,7 +197,7 @@ export function tradeskillGainXp(tradeskill: Tradeskill, amount: number): void {
     categoryMessageLog(
       'Craft',
       tradeskill,
-      `**${tradeskill}** reached level ${newLevel}!`,
+      t('tradeskill.reachedLevel', { tradeskill, newLevel }),
     );
     analyticsSendDesignEvent(
       `Kingdom:Building:LevelUp:${analyticsSafeSegment(tradeskill)}`,

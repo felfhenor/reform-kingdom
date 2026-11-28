@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import type { TemplateRef } from '@angular/core';
 import {
   ChangeDetectionStrategy,
@@ -14,7 +15,7 @@ import type { RecipeContent } from '@interfaces';
 @Component({
   selector: 'app-tooltip-recipe-preview',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DetailItemPreviewComponent],
+  imports: [TPipe, DetailItemPreviewComponent],
   host: { class: 'hidden' },
   template: `
     <ng-template #tooltipContent>
@@ -24,7 +25,12 @@ import type { RecipeContent } from '@interfaces';
           <app-detail-item-preview [display]="item">
             @let sources = sourceNames();
             @if (sources.length > 0) {
-              <div class="text-xs mt-2">Found in: {{ sources.join(', ') }}</div>
+              <div class="text-xs mt-2">
+                {{
+                  'tooltipRecipePreview.foundIn'
+                    | t: { sources: sources.join(', ') }
+                }}
+              </div>
             }
           </app-detail-item-preview>
         </div>

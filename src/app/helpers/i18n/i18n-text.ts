@@ -5,7 +5,7 @@ import { sortBy, uniq } from 'es-toolkit/compat';
 const PLACEHOLDER_PATTERN = /\{\{\s*([\w.]+)\s*\}\}/g;
 
 // Log lines are HTML with `**bold**` and `@@id@@` tokens; names get bolded, so they can't carry `**` themselves.
-const FORBIDDEN_TEXT_PATTERN = /[<>]|@@/;
+const FORBIDDEN_TEXT_PATTERN = /<\/?[A-Za-z!]|@@/;
 const BOLD_MARK_PATTERN = /\*\*/g;
 const NAME_FIELDS = ['name', 'shortName', 'legendName'];
 
@@ -53,7 +53,7 @@ export function i18nPlaceholdersMatch(english: string, text: string): boolean {
 // Plain substitution; content prose with Mustache sections still goes through combatFormatMessage.
 export function i18nFill(template: string, params: I18nParams = {}): string {
   return template.replace(PLACEHOLDER_PATTERN, (match, key: string) =>
-    key in params ? String(params[key]) : match,
+    key in params ? String(params[key] ?? '') : match,
   );
 }
 

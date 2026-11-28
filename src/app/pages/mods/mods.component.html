@@ -6,7 +6,7 @@
           <app-button-kingdom-back [onBack]="goHome" />
         </div>
 
-        <div class="text-xl">Mods</div>
+        <div class="text-xl">{{ 'mods.mods' | t }}</div>
 
         <div class="justify-self-end flex gap-2">
           <button
@@ -15,7 +15,7 @@
             (click)="zipInput.click()"
             ffButton="ui-click"
           >
-            Import Zip
+            {{ 'mods.importZip' | t }}
           </button>
           <input
             #zipInput
@@ -31,7 +31,7 @@
               (click)="openFolder()"
               ffButton="ui-click"
             >
-              Open Mods Folder
+              {{ 'mods.openModsFolder' | t }}
             </button>
           }
 
@@ -41,16 +41,16 @@
             (click)="rescan()"
             ffButton="ui-click"
             ffHotkey="r"
-            [tp]="'Re-reads every mod and reloads them into your current run (R).'"
+            [tp]="'mods.reReadsEveryMod' | t"
           >
-            Reload Mods
+            {{ 'mods.reloadMods' | t }}
           </button>
         </div>
       </h1>
 
       @if (missingMods().length > 0) {
         <div role="alert" class="alert alert-error flex flex-col items-start">
-          <span>Your savefile can't load until these are fixed:</span>
+          <span>{{ 'mods.yourSavefileCanT' | t }}</span>
           <ul class="list-disc pl-6">
             @for (missing of missingMods(); track $index) {
               <li>{{ missing }}</li>
@@ -61,7 +61,7 @@
             (click)="reloadGame()"
             ffButton="ui-click"
           >
-            Reload Game
+            {{ 'mods.reloadGame' | t }}
           </button>
         </div>
       }
@@ -91,9 +91,7 @@
           <div class="flex flex-col gap-2">
             @if (!isDemo) {
               <span class="type-hint">
-                Checked mods are used by new games. Mods are stored with the
-                runs and can have their versions updated, but they cannot be
-                removed mid-run.
+                {{ 'mods.checkedModsAreUsed' | t }}
               </span>
             }
 
@@ -146,20 +144,28 @@
                         {{ sourceLabels[row.mod.source] }}
                       </span>
                       @if (row.inRun) {
-                        <span class="badge badge-sm badge-success">In Run</span>
+                        <span class="badge badge-sm badge-success">
+                          {{ 'mods.inRun' | t }}
+                        </span>
                       }
                       @if (row.isOtherVersion) {
                         <span
                           class="badge badge-sm badge-warning"
-                          [tp]="'Made for a different version of the game. It may or may not work with this version.'"
+                          [tp]="'mods.madeForADifferent' | t"
                         >
-                          Made for v{{ row.mod.manifest?.gameVersion }}
+                          {{
+                            'mods.madeForV'
+                              | t
+                                : { gameVersion: row.mod.manifest?.gameVersion }
+                          }}
                         </span>
                       }
                     </span>
 
                     @if (row.mod.manifest?.author; as author) {
-                      <span class="type-meta">by {{ author }}</span>
+                      <span class="type-meta">
+                        {{ 'mods.by' | t: { author: author } }}
+                      </span>
                     }
                     @if (row.mod.manifest?.description; as description) {
                       <span class="type-muted">{{ description }}</span>
@@ -192,12 +198,12 @@
                           type="checkbox"
                           class="checkbox checkbox-sm"
                           ffPadAction="confirm"
-                          ffPadLabel="New Games"
-                          [tp]="'If checked, this mod will be applied to any new games from this point on.'"
+                          [ffPadLabel]="'mods.newGames' | t"
+                          [tp]="'mods.ifCheckedThisMod' | t"
                           [checked]="row.enabledIndex >= 0"
                           (change)="setEnabled(row.id, $event)"
                         />
-                        New Games
+                        {{ 'mods.newGames' | t }}
                       </label>
                     }
 
@@ -209,7 +215,7 @@
                         ffButton="ui-click"
                         ffPadAction="menu"
                       >
-                        Add to Current Run
+                        {{ 'mods.addToCurrentRun' | t }}
                       </button>
                     }
 
@@ -221,13 +227,15 @@
                         ffButton="ui-error"
                         ffPadAction="details"
                       >
-                        Remove
+                        {{ 'mods.remove' | t }}
                       </button>
                     }
                   </div>
                 </div>
               } @empty {
-                <app-blank-slate>No mods installed yet.</app-blank-slate>
+                <app-blank-slate>
+                  {{ 'mods.noModsInstalledYet' | t }}
+                </app-blank-slate>
               }
             </div>
           </div>
@@ -239,18 +247,18 @@
 
 <swal
   #addToRunSwal
-  title="Add This Mod to Your Run?"
-  text="Your current run will need this mod from now on. It can be updated later, but cannot be removed from this run."
+  [title]="'mods.addThisModTo' | t"
+  [text]="'mods.yourCurrentRunWill' | t"
   icon="warning"
-  confirmButtonText="Yes, add it"
-  cancelButtonText="No, cancel"
+  [confirmButtonText]="'mods.yesAddIt' | t"
+  [cancelButtonText]="'mods.noCancel' | t"
 ></swal>
 
 <swal
   #removeSwal
-  title="Remove This Mod?"
-  text="Any savefile that uses it won't load until it's installed again."
+  [title]="'mods.removeThisMod' | t"
+  [text]="'mods.anySavefileThatUses' | t"
   icon="warning"
-  confirmButtonText="Yes, remove it"
-  cancelButtonText="No, cancel"
+  [confirmButtonText]="'mods.yesRemoveIt' | t"
+  [cancelButtonText]="'mods.noCancel' | t"
 ></swal>

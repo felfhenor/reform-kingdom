@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import {
   combatantMessageToken,
   combatMessageLog,
@@ -119,7 +120,10 @@ function combatantLosesTurn(
 ): undefined {
   combatMessageLog(
     combat,
-    `**${combatantMessageToken(combatant)}** ${why} and loses the turn!`,
+    t('combatManual.andLosesTheTurn', {
+      combatant: combatantMessageToken(combatant),
+      why,
+    }),
   );
   return undefined;
 }

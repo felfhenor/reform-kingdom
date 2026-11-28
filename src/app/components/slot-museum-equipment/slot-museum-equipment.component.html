@@ -47,8 +47,15 @@
 
 <ng-template #sourceLine>
   @if (e.sourceNodeNames.length > 0) {
-    <div class="text-xs mt-2">Source: {{ e.sourceNodeNames.join(', ') }}</div>
+    <div class="text-xs mt-2">
+      {{
+        'slotMuseumEquipment.source'
+          | t: { sourceNodeNames: e.sourceNodeNames.join(', ') }
+      }}
+    </div>
   } @else {
-    <div class="text-xs mt-2">Source Unknown</div>
+    <div class="text-xs mt-2">
+      {{ 'slotMuseumEquipment.sourceUnknown' | t }}
+    </div>
   }
 </ng-template>

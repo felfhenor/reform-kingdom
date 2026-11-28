@@ -1,3 +1,5 @@
+import { t } from '@helpers/i18n/i18n';
+import { TPipe } from '@pipes/t.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -35,6 +37,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-panel-town-shop',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     BlankSlateComponent,
     CurrencyCostComponent,
     DecimalPipe,
@@ -127,6 +130,6 @@ export class PanelTownShopComponent {
       return;
     }
 
-    notifySuccess(`You bought ${name}!`);
+    notifySuccess(t('panelTownShop.youBought', { name }));
   }
 }

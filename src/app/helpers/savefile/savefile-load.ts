@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { signal } from '@angular/core';
 import {
   SAVEFILE_MIGRATE_ATTEMPTS,
@@ -106,7 +107,7 @@ function savefileLoadFail(
 
   error('Savefile:Load', savefileFailureMessage(reason), details);
   notifyError(
-    `${savefileFailureMessage(reason)} It has not been overwritten - open Settings > Savefile to recover a backup.`,
+    t('savefileLoad.itHasNotBeen', { reason: savefileFailureMessage(reason) }),
   );
 }
 
@@ -126,9 +127,7 @@ async function savefileLoadStoredState(raw: unknown): Promise<void> {
     backedUp = (await savefileBackupStore(state, 'load')) && backedUp;
   }
   if (!backedUp) {
-    notifyWarning(
-      'Could not back up your savefile before loading it. If this keeps happening, reset unreadable backups in Settings > Savefile.',
-    );
+    notifyWarning(t('savefileLoad.couldNotBackUp'));
   }
 
   const prepared = savefileModsPrepare(raw as GameState);

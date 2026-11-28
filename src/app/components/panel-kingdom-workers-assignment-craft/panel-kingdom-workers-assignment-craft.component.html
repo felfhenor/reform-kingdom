@@ -1,7 +1,7 @@
 <div class="flex flex-col gap-2">
   <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
     <span class="flex items-center gap-2 type-label min-w-[120px]">
-      Crafting
+      {{ 'panelKingdomWorkersAssignmentCraft.crafting' | t }}
     </span>
 
     <div class="min-w-[80px]">
@@ -9,20 +9,23 @@
         class="badge badge-sm badge-attention"
         [class.hidden]="!isPending()"
       >
-        On Return
+        {{ 'panelKingdomWorkersAssignmentCraft.onReturn' | t }}
       </span>
 
       <span
         class="badge badge-sm badge-success"
         [class.hidden]="!isActive() || isPending()"
       >
-        Active
+        {{ 'panelKingdomWorkersAssignmentCraft.active' | t }}
       </span>
     </div>
 
     <span class="flex items-center gap-2 text-sm min-w-[120px]">
       <app-icon name="gameClockwork" size="row" />
-      {{ craftSpeed() | number: '1.0-2' }} speed
+      {{
+        'panelKingdomWorkersAssignmentCraft.speed'
+          | t: { craftSpeed: (craftSpeed() | number: '1.0-2') }
+      }}
     </span>
   </div>
 
@@ -34,7 +37,7 @@
       bindLabel="name"
       bindValue="recipeId"
       groupBy="tradeskillName"
-      placeholder="Select a recipe..."
+      [placeholder]="'panelKingdomWorkersAssignmentCraft.selectARecipe' | t"
       [clearable]="false"
       [ngModel]="displayedRecipeId()"
       (change)="setDraftRecipeId($event.recipeId)"
@@ -53,9 +56,15 @@
 
               <div class="type-meta">
                 <span class="text-difficulty-{{ item.difficulty }}">
-                  Lv. {{ item.levelRangeLabel }}
+                  {{
+                    'panelKingdomWorkersAssignmentCraft.lv'
+                      | t: { levelRangeLabel: item.levelRangeLabel }
+                  }}
                 </span>
-                · {{ item.staminaCost | number }} stamina
+                {{
+                  'panelKingdomWorkersAssignmentCraft.stamina'
+                    | t: { staminaCost: (item.staminaCost | number) }
+                }}
               </div>
             </div>
           </div>
@@ -63,12 +72,17 @@
           <div class="flex items-center gap-2">
             @if (item.owned > 0) {
               <span class="badge badge-data text-sm">
-                Owned: {{ item.owned | number }}
+                {{
+                  'panelKingdomWorkersAssignmentCraft.owned'
+                    | t: { owned: (item.owned | number) }
+                }}
               </span>
             }
 
             @if (level() > item.maxLevel) {
-              <span class="badge badge-warning text-sm">No XP</span>
+              <span class="badge badge-warning text-sm">
+                {{ 'panelKingdomWorkersAssignmentCraft.noXp' | t }}
+              </span>
             }
           </div>
         </div>
@@ -84,19 +98,27 @@
             />
             {{ item.name }}
             <span class="text-difficulty-{{ item.difficulty }}">
-              Lv. {{ item.levelRangeLabel }}
+              {{
+                'panelKingdomWorkersAssignmentCraft.lv'
+                  | t: { levelRangeLabel: item.levelRangeLabel }
+              }}
             </span>
           </div>
 
           <div class="flex items-center gap-2">
             @if (item.owned > 0) {
               <span class="badge badge-data text-sm">
-                Owned: {{ item.owned | number }}
+                {{
+                  'panelKingdomWorkersAssignmentCraft.owned'
+                    | t: { owned: (item.owned | number) }
+                }}
               </span>
             }
 
             @if (level() > item.maxLevel) {
-              <span class="badge badge-warning text-sm">No XP</span>
+              <span class="badge badge-warning text-sm">
+                {{ 'panelKingdomWorkersAssignmentCraft.noXp' | t }}
+              </span>
             }
           </div>
         </div>
@@ -105,11 +127,11 @@
 
     <input
       type="number"
-      ffStepper="How Many"
+      [ffStepper]="'panelKingdomWorkersAssignmentCraft.howMany' | t"
       min="0"
       placeholder="∞"
       class="input input-sm w-20 shrink-0"
-      [tp]="'How many times to craft. Leave blank or 0 to repeat forever.'"
+      [tp]="'panelKingdomWorkersAssignmentCraft.howManyTimesTo' | t"
       [value]="displayedCount()"
       (input)="draftCount.set($any($event.target).value)"
     />
@@ -122,7 +144,7 @@
       [sfxOffset]="0"
       [sfxTrigger]="['click', 'hover']"
     >
-      Confirm
+      {{ 'panelKingdomWorkersAssignmentCraft.confirm' | t }}
     </button>
   </div>
 </div>

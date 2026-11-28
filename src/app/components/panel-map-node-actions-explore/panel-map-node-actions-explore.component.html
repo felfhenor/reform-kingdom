@@ -1,6 +1,6 @@
 @if (isExploreRandomCleared()) {
   <button type="button" class="btn btn-sm btn-primary" [disabled]="true">
-    Explore Again
+    {{ 'panelMapNodeActionsExplore.exploreAgain' | t }}
   </button>
 } @else {
   <button
@@ -9,9 +9,9 @@
     (click)="reExplore.emit()"
     ffButton="ui-click"
     ffPadAction="context"
-    ffPadLabel="Explore Again"
+    [ffPadLabel]="'panelMapNodeActionsExplore.exploreAgain' | t"
     [disabled]="!canReExplore() || isInCombat()"
   >
-    Explore Again
+    {{ 'panelMapNodeActionsExplore.exploreAgain' | t }}
   </button>
 }

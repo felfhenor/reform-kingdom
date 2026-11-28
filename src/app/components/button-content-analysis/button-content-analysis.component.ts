@@ -1,10 +1,11 @@
+import { TPipe } from '@pipes/t.pipe';
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { SFXDirective } from '@directives/sfx.directive';
 
 @Component({
   selector: 'app-button-content-analysis',
-  imports: [SFXDirective],
+  imports: [TPipe, SFXDirective],
   templateUrl: './button-content-analysis.component.html',
   styleUrl: './button-content-analysis.component.scss',
 })

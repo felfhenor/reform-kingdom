@@ -16,10 +16,14 @@
     />
   </div>
   @if (data.affordable) {
-    <span bubbleSubtitle class="type-meta truncate">Ready to Level Up</span>
+    <span bubbleSubtitle class="type-meta truncate">
+      {{ 'cardStatusWorkerLevelup.readyToLevelUp' | t }}
+    </span>
   } @else {
     <span bubbleSubtitle class="type-blocker truncate">
-      Need {{ data.cost | number }} gold
+      {{
+        'cardStatusWorkerLevelup.needGold' | t: { cost: (data.cost | number) }
+      }}
     </span>
   }
 </app-card-status-bubble>

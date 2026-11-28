@@ -24,7 +24,7 @@
 @let costBlock = costs();
 @if (costBlock) {
   <div class="flex items-center gap-2 mt-1 text-xs">
-    <span class="type-meta">Cost</span>
+    <span class="type-meta">{{ 'detailSkillPreview.cost' | t }}</span>
     <app-row-element-charges [block]="costBlock" />
   </div>
 }
@@ -47,7 +47,9 @@
   characterWeaponTypes().length > 0 && skillData.requiredWeaponTypes.length > 0
 ) {
   <div class="text-xs mt-2" [class.type-blocker]="!usable()">
-    Skill only usable with
-    {{ skillData.requiredWeaponTypes.join(', ') }}
+    {{
+      'detailSkillPreview.skillOnlyUsableWith'
+        | t: { requiredWeaponTypes: skillData.requiredWeaponTypes.join(', ') }
+    }}
   </div>
 }

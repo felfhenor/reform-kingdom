@@ -4,7 +4,7 @@
   (click)="openTrade.emit()"
   ffButton="ui-click"
   ffPadAction="context"
-  ffPadLabel="Trade"
+  [ffPadLabel]="'panelMapNodeActionsCaravan.trade' | t"
 >
-  Open Trade
+  {{ 'panelMapNodeActionsCaravan.openTrade' | t }}
 </button>

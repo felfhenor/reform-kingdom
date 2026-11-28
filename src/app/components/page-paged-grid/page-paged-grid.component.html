@@ -32,29 +32,32 @@
             <button
               type="button"
               class="btn btn-xs"
-              aria-label="Previous Page"
+              [aria-label]="'pagePagedGrid.previousPage' | t"
               [disabled]="page() === 0"
               (click)="prevPage()"
               ffButton="ui-click"
               ffPadAction="subPrev"
-              ffPadLabel="Page"
+              [ffPadLabel]="'pagePagedGrid.page' | t"
             >
               <app-icon name="tablerChevronLeft" size="row" />
             </button>
 
             <span class="min-w-[100px]">
-              Page {{ page() + 1 }} / {{ totalPages() }}
+              {{
+                'pagePagedGrid.page2'
+                  | t: { page: page() + 1, totalPages: totalPages() }
+              }}
             </span>
 
             <button
               type="button"
               class="btn btn-xs"
-              aria-label="Next Page"
+              [aria-label]="'pagePagedGrid.nextPage' | t"
               [disabled]="page() >= totalPages() - 1"
               (click)="nextPage()"
               ffButton="ui-click"
               ffPadAction="subNext"
-              ffPadLabel="Page"
+              [ffPadLabel]="'pagePagedGrid.page' | t"
             >
               <app-icon name="tablerChevronRight" size="row" />
             </button>

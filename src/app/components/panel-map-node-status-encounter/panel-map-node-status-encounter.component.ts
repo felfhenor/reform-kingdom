@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -17,7 +18,7 @@ import type { WorldNodeEntry } from '@interfaces';
 @Component({
   selector: 'app-panel-map-node-status-encounter',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DecimalPipe, BarProgressComponent],
+  imports: [TPipe, DecimalPipe, BarProgressComponent],
   templateUrl: './panel-map-node-status-encounter.component.html',
   styleUrl: './panel-map-node-status-encounter.component.scss',
 })

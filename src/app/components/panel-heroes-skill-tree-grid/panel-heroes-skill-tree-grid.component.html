@@ -95,7 +95,7 @@
         [class.text-lighter]="level.level > heroLevel()"
         [style.grid-row]="level.gridRow"
       >
-        Lv. {{ level.level }}
+        {{ 'panelHeroesSkillTreeGrid.lv' | t: { level: level.level } }}
       </div>
 
       <div

@@ -3,9 +3,7 @@
     class="fixed bottom-0 left-0 right-0 z-[60] bg-base-200 border-t border-base-300 px-4 py-2 flex flex-col md:flex-row items-center justify-center gap-2 text-sm text-center"
   >
     <span class="text-lighter">
-      Help us improve the game by opting into analytics. Analytics are not tied
-      to your email or any identifying information. What is collected: events
-      related to game progress, discoveries, and in-game actions.
+      {{ 'bannerAnalyticsConsent.helpUsImproveThe' | t }}
     </span>
 
     <div class="flex items-center gap-2 shrink-0">
@@ -16,7 +14,7 @@
         appSfx="ui-click"
         [sfxTrigger]="['click', 'hover']"
       >
-        Opt In
+        {{ 'bannerAnalyticsConsent.optIn' | t }}
       </button>
 
       <app-button-close (click)="dismiss()"></app-button-close>

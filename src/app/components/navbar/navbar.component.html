@@ -18,53 +18,53 @@
         <button
           class="btn btn-sm btn-neutral btn-outline"
           [class.here]="activeGamePlayView() === 'world'"
-          tp="World [1]"
+          [tp]="'navbar.world1' | t"
           (click)="changeGamePlayView('world')"
           ffButton="ui-click"
           [ffSoundOffset]="0"
           ffHotkey="1"
           appTutorialTarget="nav-world"
         >
-          World
+          {{ 'navbar.world' | t }}
         </button>
 
         <button
           class="btn btn-sm btn-neutral btn-outline"
           [class.here]="activeGamePlayView() === 'kingdom'"
-          tp="Kingdom [2]"
+          [tp]="'navbar.kingdom2' | t"
           (click)="setKingdomPlayView()"
           ffButton="ui-click"
           [ffSoundOffset]="1"
           ffHotkey="2"
           appTutorialTarget="nav-kingdom"
         >
-          Kingdom
+          {{ 'navbar.kingdom' | t }}
         </button>
 
         <button
           class="btn btn-sm btn-neutral btn-outline"
           [class.here]="activeGamePlayView() === 'heroes'"
-          tp="Heroes [3]"
+          [tp]="'navbar.heroes3' | t"
           (click)="setHeroesPlayView()"
           ffButton="ui-click"
           [ffSoundOffset]="3"
           ffHotkey="3"
           appTutorialTarget="nav-heroes"
         >
-          Heroes
+          {{ 'navbar.heroes' | t }}
         </button>
 
         <button
           class="btn btn-sm btn-neutral btn-outline"
           [class.here]="activeGamePlayView() === 'adventurelog'"
-          tp="Adventure Log [4]"
+          [tp]="'navbar.adventureLog4' | t"
           (click)="changeGamePlayView('adventurelog')"
           ffButton="ui-click"
           [ffSoundOffset]="2"
           ffHotkey="4"
           appTutorialTarget="nav-adventurelog"
         >
-          Adventure Log
+          {{ 'navbar.adventureLog' | t }}
         </button>
 
         <button
@@ -86,7 +86,7 @@
             class="checkbox checkbox-xs"
           />
 
-          Decree
+          {{ 'navbar.decree' | t }}
         </button>
 
         <ff-input-prompt action="tabNext" />
@@ -94,9 +94,9 @@
         <ng-template #decreeTooltip>
           @let activeId = activeClauseId();
           <div class="flex flex-col gap-2 p-2 max-w-[400px]">
-            <span class="font-semibold">Decree [5]</span>
+            <span class="font-semibold">{{ 'navbar.decree5' | t }}</span>
             <span class="my-2 type-hint ff-kbm-only">
-              Right click to toggle auto-mode
+              {{ 'navbar.rightClickToToggle' | t }}
             </span>
             @for (clause of enabledClauses(); track clause.id) {
               <span
@@ -107,7 +107,9 @@
                 {{ $index + 1 }}. {{ clauseSummary(clause) }}
               </span>
             } @empty {
-              <span class="text-xs text-lighter">No active clauses.</span>
+              <span class="text-xs text-lighter">
+                {{ 'navbar.noActiveClauses' | t }}
+              </span>
             }
           </div>
         </ng-template>
@@ -119,7 +121,7 @@
 
   <div class="navbar-end">
     @if (isDemo) {
-      <span class="badge badge-info mx-1">Demo</span>
+      <span class="badge badge-info mx-1">{{ 'navbar.demo' | t }}</span>
     }
 
     <ul class="menu menu-horizontal px-1 flex gap-1">
@@ -149,7 +151,7 @@
           ffHotkey="T"
           ffPadAction="details"
           [ffPadPriority]="nodeActionPriority"
-          ffPadLabel="Enter Town"
+          [ffPadLabel]="'navbar.enterTown' | t"
         >
           <app-icon name="gameVillage" size="nav"></app-icon>
         </button>
@@ -161,14 +163,14 @@
           <button
             class="btn btn-sm btn-neutral"
             appButtonGlow
-            tp="Trade with the Caravan [T]"
+            [tp]="'navbar.tradeWithTheCaravan' | t"
             (click)="openCaravanTrade()"
             ffButton="ui-click"
             ffHotkey="t"
             [ffHotkeyPreventDefault]="false"
             ffPadAction="details"
             [ffPadPriority]="nodeActionPriority"
-            ffPadLabel="Trade"
+            [ffPadLabel]="'navbar.trade' | t"
           >
             <app-icon name="gameSwapBag" size="nav"></app-icon>
           </button>
@@ -180,14 +182,14 @@
           <button
             class="btn btn-sm btn-neutral"
             appButtonGlow
-            tp="Visit the Trainer [T]"
+            [tp]="'navbar.visitTheTrainerT' | t"
             (click)="openCurrentTrainer()"
             ffButton="ui-click"
             ffHotkey="t"
             [ffHotkeyPreventDefault]="false"
             ffPadAction="details"
             [ffPadPriority]="nodeActionPriority"
-            ffPadLabel="Visit Trainer"
+            [ffPadLabel]="'navbar.visitTrainer' | t"
           >
             <app-icon name="gameClassicalKnowledge" size="nav"></app-icon>
           </button>
@@ -198,14 +200,14 @@
         <li class="action-button" appRequireSetup>
           <button
             class="btn btn-sm btn-neutral"
-            tp="Recenter on Hero [R]"
+            [tp]="'navbar.recenterOnHeroR' | t"
             (click)="recenterCamera()"
             ffButton="ui-click"
             [ffSoundOffset]="panelConfigs.length + 3"
             ffHotkey="r"
             ffPadAction="recenter"
             [ffPadEnabled]="!anyModalOpen()"
-            ffPadLabel="Recenter"
+            [ffPadLabel]="'navbar.recenter' | t"
             [ffHotkeyPreventDefault]="false"
           >
             <app-icon name="tablerFocus" size="nav"></app-icon>
@@ -249,7 +251,7 @@
           type="button"
           class="btn btn-sm btn-neutral btn-outline"
           [swal]="leaveSwal"
-          [tp]="'Go Back [Q]'"
+          [tp]="'navbar.goBackQ' | t"
           ffButton="ui-error"
           [ffSoundOffset]="panelConfigs.length + 1"
           ffHotkey="q"
@@ -265,7 +267,7 @@
       >
         <button
           class="btn btn-sm btn-neutral"
-          [tp]="'Open Menu [ESC]'"
+          [tp]="'navbar.openMenuEsc' | t"
           (click)="closeAllMenus()"
           ffButton="ui-click"
           [ffSoundOffset]="panelConfigs.length + 2"
@@ -284,10 +286,10 @@
 
 <swal
   #leaveSwal
-  title="Go Back to Main Menu?"
+  [title]="'navbar.goBackToMain' | t"
   icon="question"
-  confirmButtonText="Yes, go back"
-  cancelButtonText="No, stay here"
+  [confirmButtonText]="'navbar.yesGoBack' | t"
+  [cancelButtonText]="'navbar.noStayHere' | t"
   (confirm)="goToHome()"
 ></swal>
 
@@ -297,7 +299,7 @@
   [closeOnBackdropClick]="true"
   (modalClose)="closePauseMenu()"
 >
-  <span title>Game Paused</span>
+  <span title>{{ 'navbar.gamePaused' | t }}</span>
 
   <div body class="flex flex-col gap-2">
     <button
@@ -307,7 +309,7 @@
       ffButton="ui-click"
       [ffSoundOffset]="0"
     >
-      Resume
+      {{ 'navbar.resume' | t }}
     </button>
 
     <app-panel-debug-buttons></app-panel-debug-buttons>
@@ -328,7 +330,7 @@
       ffButton="ui-error"
       [ffSoundOffset]="2"
     >
-      Quit to Main Menu
+      {{ 'navbar.quitToMainMenu' | t }}
     </button>
 
     <app-button-quit></app-button-quit>

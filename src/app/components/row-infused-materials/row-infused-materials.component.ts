@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import {
   ChangeDetectionStrategy,
@@ -19,6 +20,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-row-infused-materials',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     ContentNamePipe,
     AtlasImageComponent,
     SlotIconBlankComponent,

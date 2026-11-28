@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { TPluralPipe } from '@pipes/t-plural.pipe';
 import { FFTriggerTabsDirective } from '@ff/focus/ff-trigger-tabs.directive';
 import { DecimalPipe } from '@angular/common';
@@ -59,6 +60,7 @@ const WORKSHOP_TABS: WorkshopTabOption[] = [
   selector: 'app-play-kingdom-workshop',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     TPluralPipe,
     FFTriggerTabsDirective,
     BlankSlateComponent,

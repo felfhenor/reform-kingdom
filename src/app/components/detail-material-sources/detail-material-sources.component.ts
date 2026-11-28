@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -14,12 +15,12 @@ import type { ItemId } from '@interfaces';
 @Component({
   selector: 'app-detail-material-sources',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SpriteNodeComponent],
+  imports: [TPipe, SpriteNodeComponent],
   template: `
     @if (nodes().length > 0 || isCrafted()) {
       <div class="type-meta mt-2">
         @if (nodes().length > 0) {
-          <div>Found in:</div>
+          <div>{{ 'detailMaterialSources.foundIn' | t }}</div>
           <div class="flex flex-col gap-1 my-1 ml-2">
             @for (node of nodes(); track node.nodeName) {
               <div class="flex items-center gap-2">
@@ -30,7 +31,7 @@ import type { ItemId } from '@interfaces';
           </div>
         }
         @if (isCrafted()) {
-          <div>Source: Crafting</div>
+          <div>{{ 'detailMaterialSources.sourceCrafting' | t }}</div>
         }
       </div>
     }

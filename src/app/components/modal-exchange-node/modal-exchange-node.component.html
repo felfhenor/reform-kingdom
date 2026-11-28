@@ -45,7 +45,7 @@
               </span>
               @if (row.losesGems) {
                 <span class="badge badge-sm badge-warning">
-                  Gems in extra sockets will be lost.
+                  {{ 'modalExchangeNode.gemsInExtraSockets' | t }}
                 </span>
               }
             </div>
@@ -140,7 +140,7 @@
             <span
               class="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1"
             >
-              Accepts:
+              {{ 'modalExchangeNode.accepts' | t }}
               @for (hint of inputHints(); track hint.id) {
                 @if (hint.discovered) {
                   <span class="inline-flex items-center gap-1">
@@ -164,8 +164,7 @@
 
       @if (showUnequipHint()) {
         <p class="type-muted text-sm">
-          Some of your heroes are wearing gear that could be exchanged here.
-          Unequip it first.
+          {{ 'modalExchangeNode.someOfYourHeroes' | t }}
         </p>
       }
     }

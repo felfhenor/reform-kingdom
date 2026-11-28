@@ -7,7 +7,7 @@
   [reflow]="true"
 >
   <span header class="flex items-center gap-2">
-    Armory
+    {{ 'playKingdomArmory.armory' | t }}
     <span class="badge badge-sm tabular-nums {{ badgeColor() }}">
       {{ armorySize() | number }}/{{ armoryCapValue() | number }}
     </span>
@@ -24,7 +24,7 @@
         (click.shift)="confirmSell()"
         ffButton="ui-success"
         ffPadAction="context"
-        ffPadLabel="Sell"
+        [ffPadLabel]="'playKingdomArmory.sell' | t"
       >
         {{ 'armory.sellItems' | tPlural: count }}
         <app-currency-cost
@@ -40,18 +40,18 @@
         ffButton="ui-error"
         ffPadAction="back"
         [ffPadPriority]="sellCancelPriority"
-        ffPadLabel="Cancel"
+        [ffPadLabel]="'playKingdomArmory.cancel' | t"
       >
-        Cancel
+        {{ 'playKingdomArmory.cancel' | t }}
       </button>
 
       <span class="type-hint ff-kbm-only">
-        Shift-click to select multiple items.
+        {{ 'playKingdomArmory.shiftClickToSelect' | t }}
       </span>
 
       <swal
         #sellSwal
-        title="Sell Items?"
+        [title]="'playKingdomArmory.sellItems' | t"
         text="Are you sure you want to sell {{ selectedCount() }} items for {{
           selectedGoldTotal() | number
         }} gold?"
@@ -65,9 +65,9 @@
         (click)="toggleSellMode()"
         ffButton="ui-click"
         ffPadAction="context"
-        ffPadLabel="Sell Mode"
+        [ffPadLabel]="'playKingdomArmory.sellMode' | t"
       >
-        Enter Sell Mode
+        {{ 'playKingdomArmory.enterSellMode' | t }}
       </button>
 
       <button
@@ -77,9 +77,9 @@
         (click)="openLootFilters()"
         ffButton="ui-click"
         ffPadAction="details"
-        ffPadLabel="Auto Sell"
+        [ffPadLabel]="'playKingdomArmory.autoSell' | t"
       >
-        Auto Sell
+        {{ 'playKingdomArmory.autoSell' | t }}
       </button>
 
       @if (equipCandidateIds().length > 0) {
@@ -96,9 +96,9 @@
             (click)="equipFiltered()"
             appSfx="ui-success"
             [sfxTrigger]="['click', 'hover']"
-            [tp]="'Equip the matching items, in order, on the first hero who can use each one.'"
+            [tp]="'playKingdomArmory.equipTheMatchingItems' | t"
           >
-            Equip These
+            {{ 'playKingdomArmory.equipThese' | t }}
           </button>
         </app-slot-button-container>
       }

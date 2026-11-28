@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { durationText } from '@helpers/engine/timer.ui';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import {
@@ -23,7 +24,12 @@ import { TippyDirective } from '@ngneat/helipopper';
 @Component({
   selector: 'app-panel-map-node-badges-explore',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ContentNamePipe, DetailMonsterSummaryComponent, TippyDirective],
+  imports: [
+    TPipe,
+    ContentNamePipe,
+    DetailMonsterSummaryComponent,
+    TippyDirective,
+  ],
   templateUrl: './panel-map-node-badges-explore.component.html',
   styleUrl: './panel-map-node-badges-explore.component.scss',
 })

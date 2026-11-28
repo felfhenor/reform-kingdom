@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { FFButtonComponent } from '@ff/components/button/button.component';
 import { DecimalPipe } from '@angular/common';
 import {
@@ -25,7 +26,12 @@ import type { WorldNodeEntry } from '@interfaces';
 @Component({
   selector: 'app-panel-map-node-actions-outpost',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FFButtonComponent, DecimalPipe, ButtonWorldNodeDevelopComponent],
+  imports: [
+    TPipe,
+    FFButtonComponent,
+    DecimalPipe,
+    ButtonWorldNodeDevelopComponent,
+  ],
   templateUrl: './panel-map-node-actions-outpost.component.html',
   styleUrl: './panel-map-node-actions-outpost.component.scss',
 })

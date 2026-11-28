@@ -15,7 +15,10 @@
         <span class="type-label text-heading-gold">{{ current.heading }}</span>
         <h2 class="type-page-title">
           @if (current.count) {
-            {{ current.count | number }} achievements unlocked
+            {{
+              'cardAchievement.achievementsUnlocked'
+                | t: { count: (current.count | number) }
+            }}
           } @else {
             {{ current.name }}
           }

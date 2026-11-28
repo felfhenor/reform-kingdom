@@ -1,5 +1,5 @@
 <app-card-page heightProfile="full">
-  <span header>Astral Projector</span>
+  <span header>{{ 'playKingdomAstralprojector.astralProjector' | t }}</span>
 
   <app-button-kingdom-back pageactions />
 
@@ -63,29 +63,31 @@
             ffButton="ui-click"
             [ffSoundOffset]="$index"
             ffPadAction="context"
-            ffPadLabel="Cast"
+            [ffPadLabel]="'playKingdomAstralprojector.cast' | t"
             [ffPadWithin]="spellRow"
           >
-            Cast
+            {{ 'playKingdomAstralprojector.cast' | t }}
           </button>
         </div>
       </div>
     } @empty {
-      <app-blank-slate>No spells have been unlocked yet.</app-blank-slate>
+      <app-blank-slate>
+        {{ 'playKingdomAstralprojector.noSpellsHaveBeen' | t }}
+      </app-blank-slate>
     }
   </div>
 </app-card-page>
 
 <swal
   #overwriteSwal
-  title="Overwrite Active Spell?"
+  [title]="'playKingdomAstralprojector.overwriteActiveSpell' | t"
   [text]="
     'Casting this will end ' +
     (overwriteTargetName() ?? 'the active spell') +
     '. Continue?'
   "
   icon="warning"
-  confirmButtonText="Yes, cast it"
-  cancelButtonText="Cancel"
+  [confirmButtonText]="'playKingdomAstralprojector.yesCastIt' | t"
+  [cancelButtonText]="'playKingdomAstralprojector.cancel' | t"
   (confirm)="confirmCast()"
 ></swal>

@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { FFSelectDirective } from '@ff/controls/ff-select.directive';
 import { FFStepperDirective } from '@ff/controls/ff-stepper.directive';
 import {
@@ -48,6 +49,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-panel-kingdom-workers-assignment-node',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     FFSelectDirective,
     FFStepperDirective,
     DecimalPipe,

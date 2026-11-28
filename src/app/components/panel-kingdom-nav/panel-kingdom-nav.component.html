@@ -1,13 +1,13 @@
 <nav
   class="flex flex-col items-center gap-2 p-2 max-h-full overflow-y-auto bg-base-100 shadow-xl"
-  aria-label="Kingdom Navigation"
+  [aria-label]="'panelKingdomNav.kingdomNavigation' | t"
 >
   <button
     type="button"
     class="btn btn-square btn-ghost"
-    tp="Kingdom"
+    [tp]="'panelKingdomNav.kingdom' | t"
     [tpPlacement]="'right'"
-    aria-label="Kingdom"
+    [aria-label]="'panelKingdomNav.kingdom' | t"
     (click)="kingdomSubviewClear()"
     appSfx="ui-click"
     [sfxTrigger]="['click', 'hover']"

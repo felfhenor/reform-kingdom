@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ContentDescriptionPipe } from '@pipes/content-description.pipe';
 import { FFSelectDirective } from '@ff/controls/ff-select.directive';
 import { FFInputService } from '@ff/input/ff-input.service';
@@ -39,6 +40,7 @@ type LevelOption = { value: number; label: string };
   selector: 'app-detail-bestiary-monster',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     ContentDescriptionPipe,
     FFSelectDirective,
     DecimalPipe,

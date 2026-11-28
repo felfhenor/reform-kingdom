@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import type { TemplateRef } from '@angular/core';
 import {
   ChangeDetectionStrategy,
@@ -21,6 +22,7 @@ import type { Combatant, MonsterContent } from '@interfaces';
   selector: 'app-tooltip-monster-preview',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     AtlasImageComponent,
     DetailMonsterSummaryComponent,
     RowStatSummaryComponent,
@@ -34,7 +36,7 @@ import type { Combatant, MonsterContent } from '@interfaces';
 
         @if (foe() && !e.analyzed) {
           <span class="type-meta text-lighter">
-            Analyze this foe to learn its strengths and weaknesses.
+            {{ 'tooltipMonsterPreview.analyzeThisFoeTo' | t }}
           </span>
         } @else if (foe()) {
           @let c = shownCombatant();
@@ -45,7 +47,9 @@ import type { Combatant, MonsterContent } from '@interfaces';
             [showSign]="false"
           />
 
-          <span class="type-label">Attacks</span>
+          <span class="type-label">
+            {{ 'tooltipMonsterPreview.attacks' | t }}
+          </span>
           <div class="grid grid-cols-2 gap-2">
             @for (skill of skills(); track skill.id) {
               <span class="flex items-center gap-2 min-w-0">
@@ -59,7 +63,9 @@ import type { Combatant, MonsterContent } from '@interfaces';
                 </span>
               </span>
             } @empty {
-              <span class="type-meta">None.</span>
+              <span class="type-meta">
+                {{ 'tooltipMonsterPreview.none' | t }}
+              </span>
             }
           </div>
         }

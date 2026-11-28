@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { ButtonTravelHereComponent } from '@components/button-travel-here/button-travel-here.component';
 import { IconUnknownComponent } from '@components/icon-unknown/icon-unknown.component';
@@ -11,6 +12,7 @@ import { rumorCatalogRowViewModels } from '@helpers/rumor/rumor.ui';
   selector: 'app-modal-rumors',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     ButtonTravelHereComponent,
     IconUnknownComponent,
     ModalComponent,

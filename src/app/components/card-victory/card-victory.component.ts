@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import {
   afterNextRender,
   ChangeDetectionStrategy,
@@ -18,7 +19,7 @@ import { AnimationService } from '@services/animation.service';
 @Component({
   selector: 'app-card-victory',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ButtonRunEndComponent, SFXDirective],
+  imports: [TPipe, ButtonRunEndComponent, SFXDirective],
   templateUrl: './card-victory.component.html',
   styleUrl: './card-victory.component.scss',
 })

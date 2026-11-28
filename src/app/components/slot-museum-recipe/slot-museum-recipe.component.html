@@ -42,12 +42,17 @@
     <div class="type-unknown mb-1">???</div>
 
     @if (e.sourceNodeNames.length > 0) {
-      <div class="text-xs">Source: {{ e.sourceNodeNames.join(', ') }}</div>
+      <div class="text-xs">
+        {{
+          'slotMuseumRecipe.source'
+            | t: { sourceNodeNames: e.sourceNodeNames.join(', ') }
+        }}
+      </div>
     }
 
     @if (e.tokenUnlockCost !== undefined) {
       <div class="type-meta flex items-center gap-2 mt-1">
-        Unlock for
+        {{ 'slotMuseumRecipe.unlockFor' | t }}
         <app-currency-cost
           [type]="traderTokenItemId"
           [amount]="e.tokenUnlockCost"
@@ -55,7 +60,9 @@
       </div>
 
       @if (canUnlock()) {
-        <div class="type-hint mt-1">Click to unlock.</div>
+        <div class="type-hint mt-1">
+          {{ 'slotMuseumRecipe.clickToUnlock' | t }}
+        </div>
       }
     }
   </div>

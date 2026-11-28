@@ -25,12 +25,17 @@
     @if (t.summonName) {
       <span class="font-semibold">{{ t.summonName }}</span>
     } @else {
-      <span class="text-lighter">to {{ t.targeting }}</span>
+      <span class="text-lighter">
+        {{ 'rowSkillTechnique.to' | t: { targeting: t.targeting } }}
+      </span>
     }
 
     @if (t.accuracy < 100) {
       <span class="text-lighter text-warning">
-        ({{ t.accuracy | number }}% chance to hit)
+        {{
+          'rowSkillTechnique.chanceToHit'
+            | t: { accuracy: (t.accuracy | number) }
+        }}
       </span>
     }
   </div>
@@ -53,7 +58,11 @@
             : { verb: statusVerb(), effect: effect.name }
       }}
       @if (effect.chance < 100) {
-        <span class="text-lighter">({{ effect.chance | number }}% chance)</span>
+        <span class="text-lighter">
+          {{
+            'rowSkillTechnique.chance' | t: { chance: (effect.chance | number) }
+          }}
+        </span>
       }
     </div>
   }

@@ -19,7 +19,14 @@
 
     @if (item.levelRequirement) {
       <div class="text-xs my-1">
-        Lv. {{ item.levelRequirement }} {{ item.type ?? 'item' }}
+        {{
+          'detailItemPreview.lv'
+            | t
+              : {
+                  levelRequirement: item.levelRequirement,
+                  item: item.type ?? 'item',
+                }
+        }}
       </div>
     }
 
@@ -29,7 +36,7 @@
           {{ equippable.join(' ') }}
         } @else {
           <span class="badge badge-sm badge-warning">
-            None of your heroes can equip this.
+            {{ 'detailItemPreview.noneOfYourHeroes' | t }}
           </span>
         }
       </div>
@@ -68,11 +75,14 @@
 
     @if (item.elements?.length) {
       <div class="type-meta my-2">
-        Attacks deal
+        {{ 'detailItemPreview.attacksDeal' | t }}
         <app-row-element-charges
           [block]="elementBlock()"
         ></app-row-element-charges>
-        {{ elementsLabel(item.elements!) }} damage
+        {{
+          'detailItemPreview.damage'
+            | t: { elements: elementsLabel(item.elements!) }
+        }}
       </div>
     }
 
@@ -92,7 +102,7 @@
 
     @for (skill of item.skills; track skill.id) {
       <div class="type-meta my-2 flex items-center gap-2">
-        Teaches
+        {{ 'detailItemPreview.teaches' | t }}
         <span class="zoom-inline">
           <app-slot-icon-blank [showBackground]="false">
             <app-atlas-image spritesheet="skill" [assetName]="skill.sprite" />

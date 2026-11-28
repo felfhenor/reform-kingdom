@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { contentName } from '@helpers/i18n/i18n-content';
 import {
   combatantIsDead,
@@ -92,7 +93,9 @@ function combatantLogIfDefeated(combat: Combat, combatant: Combatant): boolean {
 
   combatMessageLog(
     combat,
-    `**${combatantMessageToken(combatant)}** has been defeated!`,
+    t('combat.hasBeenDefeated', {
+      combatant: combatantMessageToken(combatant),
+    }),
     combatant,
   );
   return true;
@@ -102,7 +105,9 @@ function combatantCanAct(combat: Combat, combatant: Combatant): boolean {
   if (!combatCanTakeTurn(combatant)) {
     combatMessageLog(
       combat,
-      `**${combatantMessageToken(combatant)}** lost their turn!`,
+      t('combat.lostTheirTurn', {
+        combatant: combatantMessageToken(combatant),
+      }),
     );
     return false;
   }
@@ -115,7 +120,9 @@ function combatantCanAct(combat: Combat, combatant: Combatant): boolean {
   if (isStunned) {
     combatMessageLog(
       combat,
-      `**${combatantMessageToken(combatant)}** is stunned and loses their turn!`,
+      t('combat.isStunnedAndLoses', {
+        combatant: combatantMessageToken(combatant),
+      }),
     );
     return false;
   }
@@ -170,7 +177,9 @@ export function combatantStartTurn(
     if (rngSucceedsChance(combatant.combatStats.reviveChance)) {
       combatMessageLog(
         combat,
-        `**${combatantMessageToken(combatant)}** has sprung to life!`,
+        t('combat.hasSprungToLife', {
+          combatant: combatantMessageToken(combatant),
+        }),
         combatant,
       );
 
@@ -257,7 +266,7 @@ export function combatDoCombatIteration(): void {
   runStatsCombatBegin();
 
   const escaped = combatStep(combat);
-  if (escaped) combatMessageLog(combat, 'The party escaped!');
+  if (escaped) combatMessageLog(combat, t('combat.thePartyEscaped'));
   gamestateFreezeSubtree(combat);
   updateGamestate((state) => {
     state.world.combat = escaped ? undefined : combat;
@@ -305,8 +314,11 @@ function combatBeginRound(combat: Combat): CombatTurn[] {
   combatMessageLog(
     combat,
     combat.ambushedBy
-      ? `**${combat.ambushedBy}** sprung an ambush!`
-      : `_Combat round ${combat.rounds + 1}._`,
+      ? t('combat.ambush', { ambusher: combat.ambushedBy })
+      : t('combat.round', { round: combat.rounds + 1 }),
+    undefined,
+    undefined,
+    !combat.ambushedBy,
   );
   return combatRoundQueue(combat);
 }
@@ -337,7 +349,9 @@ function combatTakeQueuedTurn(
   if (combatant && result.takeAnotherTurn && !turn.bonus) {
     combatMessageLog(
       combat,
-      `**${combatantMessageToken(combatant)}** was blessed by the elements, and gets to go again!`,
+      t('combat.wasBlessedByThe', {
+        combatant: combatantMessageToken(combatant),
+      }),
     );
     queue.unshift({ combatantId: combatant.id, bonus: true });
   }
@@ -353,7 +367,8 @@ function combatPlayTurn(
   combatant: Combatant,
 ): CombatTurnResult | 'waiting' {
   if (turn.awaitingOrders) {
-    if (combat.manualFlee) combatMessageLog(combat, 'The party tries to flee!');
+    if (combat.manualFlee)
+      combatMessageLog(combat, t('combat.thePartyTriesTo'));
     return combatantFinishTurn(combat, combatant, true);
   }
 
@@ -380,7 +395,7 @@ function combatCountRound(combat: Combat): void {
     const damageIncreasePercent = currentMultiplierTier * 25;
     combatMessageLog(
       combat,
-      `Due to exhaustion, damage received is increased by ${damageIncreasePercent}% for all combatants.`,
+      t('combat.dueToExhaustionDamage', { damageIncreasePercent }),
     );
   }
 }

@@ -6,7 +6,9 @@
 @let enabledFn = itemEnabled();
 
 <div class="flex flex-col gap-2 overflow-y-auto">
-  <span class="type-section-title">Heroes</span>
+  <span class="type-section-title">
+    {{ 'panelEquipmentPicker.heroes' | t }}
+  </span>
 
   @for (hero of heroes; track hero.id) {
     <button
@@ -34,8 +36,12 @@
     </app-slot-icon-blank>
 
     <div class="flex flex-col min-w-0">
-      <span class="type-entity-name truncate">Armory</span>
-      <span class="type-meta">Unequipped Gear</span>
+      <span class="type-entity-name truncate">
+        {{ 'panelEquipmentPicker.armory' | t }}
+      </span>
+      <span class="type-meta">
+        {{ 'panelEquipmentPicker.unequippedGear' | t }}
+      </span>
     </div>
   </button>
 </div>
@@ -91,9 +97,13 @@
     } @else if (armorySelected) {
       <app-blank-slate>{{ emptyArmoryText() }}</app-blank-slate>
     } @else {
-      <app-blank-slate>This hero has nothing equipped.</app-blank-slate>
+      <app-blank-slate>
+        {{ 'panelEquipmentPicker.thisHeroHasNothing' | t }}
+      </app-blank-slate>
     }
   } @else {
-    <app-blank-slate>Select a hero or the armory.</app-blank-slate>
+    <app-blank-slate>
+      {{ 'panelEquipmentPicker.selectAHeroOr' | t }}
+    </app-blank-slate>
   }
 </div>

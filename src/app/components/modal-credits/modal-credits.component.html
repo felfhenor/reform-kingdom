@@ -1,6 +1,6 @@
 <button
   class="btn btn-ghost btn-untextured social-icon"
-  [tp]="'Credits'"
+  [tp]="'modalCredits.credits' | t"
   [style.--social-color]="color"
   (mouseenter)="currentColor = color"
   (mouseleave)="currentColor = '#ccc'"
@@ -21,7 +21,7 @@
     [allowEscToClose]="true"
     [showCloseButton]="true"
   >
-    <span title>Credits</span>
+    <span title>{{ 'modalCredits.credits' | t }}</span>
 
     <div body>
       @for (credit of credits; track $index) {

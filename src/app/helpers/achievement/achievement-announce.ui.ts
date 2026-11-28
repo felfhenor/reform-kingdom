@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { contentDescription, contentName } from '@helpers/i18n/i18n-content';
 import {
   categoryMessageLog,
@@ -33,7 +34,10 @@ export function achievementsAnnounceLog({
     categoryMessageLog(
       'Achievement',
       'Achievement',
-      `Achievement unlocked: ${ITEM_ICON_TOKEN}**${contentName(achievement)}**`,
+      t('achievementAnnounce.achievementUnlocked', {
+        icon: ITEM_ICON_TOKEN,
+        achievement: contentName(achievement),
+      }),
       { sprite: achievement.sprite, spritesheet: 'achievement' },
     );
     analyticsSendDesignEvent('Achievement:Unlock');

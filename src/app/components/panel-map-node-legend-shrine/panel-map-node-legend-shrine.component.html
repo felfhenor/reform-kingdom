@@ -5,7 +5,9 @@
       <p class="type-flavor">{{ verse }}</p>
     }
     @if (hasMoreVerses()) {
-      <p class="type-hint">Develop this shrine to learn more of its legend.</p>
+      <p class="type-hint">
+        {{ 'panelMapNodeLegendShrine.developThisShrineTo' | t }}
+      </p>
     }
   </div>
 }

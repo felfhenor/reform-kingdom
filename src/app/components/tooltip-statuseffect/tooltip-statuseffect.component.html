@@ -32,14 +32,17 @@
 
   @if (e.damagePerTurn > 0) {
     <div class="text-xs">
-      Takes
+      {{ 'tooltipStatuseffect.takes' | t }}
       <span class="font-semibold text-error tabular-nums">
         {{ e.damagePerTurn | number }}
       </span>
-      damage per turn
+      {{ 'tooltipStatuseffect.damagePerTurn' | t }}
       @if (turns !== undefined) {
         <span class="text-lighter">
-          ({{ e.damagePerTurn * turns | number }} total)
+          {{
+            'tooltipStatuseffect.total'
+              | t: { turns: (e.damagePerTurn * turns | number) }
+          }}
         </span>
       }
     </div>
@@ -47,14 +50,17 @@
 
   @if (e.healingPerTurn > 0) {
     <div class="text-xs">
-      Heals
+      {{ 'tooltipStatuseffect.heals' | t }}
       <span class="font-semibold text-success tabular-nums">
         {{ e.healingPerTurn | number }}
       </span>
-      HP per turn
+      {{ 'tooltipStatuseffect.hpPerTurn' | t }}
       @if (turns !== undefined) {
         <span class="text-lighter">
-          ({{ e.healingPerTurn * turns | number }} total)
+          {{
+            'tooltipStatuseffect.total'
+              | t: { turns: (e.healingPerTurn * turns | number) }
+          }}
         </span>
       }
     </div>
@@ -82,7 +88,9 @@
               </span>
             }
             @if (mod.timing === 'PerTurn') {
-              <span class="text-lighter">per turn</span>
+              <span class="text-lighter">
+                {{ 'tooltipStatuseffect.perTurn' | t }}
+              </span>
             }
           </div>
           @if (mod.description) {
@@ -99,7 +107,7 @@
 
   @if (e.tags.length > 0) {
     <div class="type-meta">
-      Resisted by:
+      {{ 'tooltipStatuseffect.resistedBy' | t }}
 
       <ul>
         @for (tag of e.tags; track tag) {

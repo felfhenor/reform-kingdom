@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { TPluralPipe } from '@pipes/t-plural.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
@@ -16,6 +17,7 @@ import { StatDimension, StatusEffectTagDimension } from '@interfaces';
   selector: 'app-tooltip-statuseffect',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     TPluralPipe,
     DecimalPipe,
     AtlasImageComponent,

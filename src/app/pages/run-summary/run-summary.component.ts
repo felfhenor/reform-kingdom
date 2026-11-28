@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import {
   durationPartText,
   formatDurationDelta,
@@ -62,6 +63,7 @@ function withSkill<T extends { skillFamily: string }>(used: T | undefined) {
   selector: 'app-run-summary',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     ContentNamePipe,
     AtlasImageComponent,
     BarProgressComponent,

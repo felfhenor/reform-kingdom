@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { formatNumber } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -14,7 +15,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 @Component({
   selector: 'app-modal-trade-quantity',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SweetAlert2Module],
+  imports: [TPipe, SweetAlert2Module],
   templateUrl: './modal-trade-quantity.component.html',
 })
 export class ModalTradeQuantityComponent {

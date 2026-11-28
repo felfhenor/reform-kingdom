@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { isDemoBuild } from '@helpers/demo/demo';
 import { notifyError } from '@helpers/engine/notify';
 import { modsReset } from '@helpers/mod/mod-apply';
@@ -13,6 +14,6 @@ export function modsApplyForNewGame(): void {
 
   modsReset();
   notifyError(
-    `Your enabled mods could not be applied. This run will start without them. ${errors.join(' ')}`,
+    t('modNewgame.yourEnabledModsCould', { errors: errors.join(' ') }),
   );
 }

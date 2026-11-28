@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
 import { ModalComponent } from '@components/modal/modal.component';
@@ -13,6 +14,7 @@ import type { Character, EquipmentSkillContent } from '@interfaces';
   selector: 'app-modal-hero-burst-skills',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     BlankSlateComponent,
     ModalComponent,
     PanelHeroBurstSkillsComponent,

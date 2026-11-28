@@ -1,13 +1,21 @@
 @let counts = tradeCounts();
 
 @if (traderLevel(); as level) {
-  <div class="badge badge-data">Trader Lv. {{ level }}</div>
+  <div class="badge badge-data">
+    {{ 'panelMapNodeBadgesCaravan.traderLv' | t: { level: level } }}
+  </div>
 }
 
 @if (counts.buyable > 0) {
-  <div class="badge badge-success">{{ counts.buyable }} Buyable</div>
+  <div class="badge badge-success">
+    {{ 'panelMapNodeBadgesCaravan.buyable' | t: { buyable: counts.buyable } }}
+  </div>
 }
 
 @if (counts.sellable > 0) {
-  <div class="badge badge-warning">{{ counts.sellable }} Sellable</div>
+  <div class="badge badge-warning">
+    {{
+      'panelMapNodeBadgesCaravan.sellable' | t: { sellable: counts.sellable }
+    }}
+  </div>
 }

@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { recipeCraftTime } from '@helpers/crafting/recipe-craft-time';
 import { recipeKingdomRequirements } from '@helpers/crafting/recipe-requirements';
 import {
@@ -320,7 +321,7 @@ function grantCraftResult(tradeskill: Tradeskill, recipe: RecipeContent): void {
     categoryMessageLog(
       'Craft',
       tradeskill,
-      `${tradeskill} failed to craft ${recipe.name}.`,
+      t('craftingQueue.failedToCraft', { tradeskill, name: recipe.name }),
     );
     return;
   }
@@ -342,7 +343,11 @@ function grantCraftResult(tradeskill: Tradeskill, recipe: RecipeContent): void {
       categoryMessageLog(
         'Craft',
         tradeskill,
-        `${tradeskill} crafted ${ITEM_ICON_TOKEN}${itemDropHtml(item, quantity)}!`,
+        t('craftingQueue.crafted', {
+          tradeskill,
+          icon: ITEM_ICON_TOKEN,
+          quantity: itemDropHtml(item, quantity),
+        }),
         { sprite: item.sprite, spritesheet: 'item' },
       );
     }
@@ -365,7 +370,11 @@ function grantCraftResult(tradeskill: Tradeskill, recipe: RecipeContent): void {
     categoryMessageLog(
       'Craft',
       tradeskill,
-      `${tradeskill} crafted ${ITEM_ICON_TOKEN}${collectibleDropHtml(collectible)}!`,
+      t('craftingQueue.crafted2', {
+        tradeskill,
+        icon: ITEM_ICON_TOKEN,
+        collectible: collectibleDropHtml(collectible),
+      }),
       { sprite: collectible.sprite, spritesheet: 'collectible' },
     );
   }

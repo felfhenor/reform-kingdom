@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import {
   elementBlockText,
   elementPoolFill,
@@ -27,7 +28,10 @@ export function combatantPaySkillCast(
   const name = `**${combatantMessageToken(combatant)}**`;
   if (!skillHasElementCosts(skill)) {
     if (delayed) {
-      combatMessageLog(combat, `${name} begins charging **${skill.name}**!`);
+      combatMessageLog(
+        combat,
+        t('combatSkillElements.beginsCharging', { name, name2: skill.name }),
+      );
     }
     return;
   }

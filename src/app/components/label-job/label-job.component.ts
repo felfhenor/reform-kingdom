@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { contentShortName } from '@helpers/i18n/i18n-content';
 import { DecimalPipe } from '@angular/common';
 import {
@@ -16,14 +17,14 @@ import type { Character, JobContent, JobId } from '@interfaces';
 @Component({
   selector: 'app-label-job',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DecimalPipe, IconSpecComponent],
+  imports: [TPipe, DecimalPipe, IconSpecComponent],
   template: `
     @let jobData = job();
     @let node = spec();
     <span class="inline-flex items-center gap-2">
       <span>
         @if (showLevel()) {
-          Lv. {{ level() | number }}
+          {{ 'labelJob.lv' | t: { level: (level() | number) } }}
         }
         @if (long()) {
           {{ node ? specName() : jobData?.name }} ({{ jobData?.shorthand }})

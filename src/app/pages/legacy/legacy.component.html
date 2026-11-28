@@ -6,7 +6,7 @@
           <app-button-kingdom-back [onBack]="goHome" />
         </div>
 
-        <div class="text-xl">Legacy</div>
+        <div class="text-xl">{{ 'legacy.legacy' | t }}</div>
       </h1>
 
       <div class="flex flex-col gap-2 overflow-y-auto">
@@ -29,16 +29,19 @@
                 {{ run.title }}
               </span>
               <span class="type-meta">
-                {{ run.endedAt | date: 'medium' }} &middot;
+                {{
+                  'legacy.middot'
+                    | t: { endedAt: (run.endedAt | date: 'medium') }
+                }}
                 <ng-container
                   [ngTemplateOutlet]="duration"
                   [ngTemplateOutletContext]="{ $implicit: run.playTime }"
                 />
-                &middot;
+                {{ 'legacy.middot2' | t }}
                 @if (run.edictCount > 0) {
                   {{ 'legacy.edicts' | tPlural: run.edictCount }}
                 } @else {
-                  No edicts
+                  {{ 'legacy.noEdicts' | t }}
                 }
               </span>
             </span>
@@ -48,7 +51,7 @@
                 class="badge badge-data ml-auto shrink-0"
                 [tp]="run.modsLabel"
               >
-                Modded
+                {{ 'legacy.modded' | t }}
               </span>
             }
 
@@ -60,7 +63,7 @@
             </span>
           </button>
         } @empty {
-          <app-blank-slate>No runs in your Legacy yet.</app-blank-slate>
+          <app-blank-slate>{{ 'legacy.noRunsInYour' | t }}</app-blank-slate>
         }
       </div>
     </div>

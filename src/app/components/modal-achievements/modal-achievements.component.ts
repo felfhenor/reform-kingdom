@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ContentDescriptionPipe } from '@pipes/content-description.pipe';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import { FFFocusRowDirective } from '@ff/focus/ff-focus-row.directive';
@@ -27,6 +28,7 @@ import type { GameId } from '@interfaces';
   selector: 'app-modal-achievements',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     ContentDescriptionPipe,
     ContentNamePipe,
     FFFocusRowDirective,

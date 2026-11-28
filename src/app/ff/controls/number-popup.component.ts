@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -34,6 +35,7 @@ const BLOCKED_ACTIONS: FFGamepadAction[] = [
   selector: 'ff-number-popup',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     DecimalPipe,
     FFButtonComponent,
     FFInputPromptComponent,
@@ -80,9 +82,9 @@ const BLOCKED_ACTIONS: FFGamepadAction[] = [
             ffButton="ui-success"
             ffPadAction="confirm"
             [ffPadPriority]="priority()"
-            ffPadLabel="Done"
+            [ffPadLabel]="'numberPopup.done' | t"
           >
-            Done
+            {{ 'numberPopup.done' | t }}
           </button>
         </div>
       </div>

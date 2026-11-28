@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -29,6 +30,7 @@ import type {
   selector: 'app-modal-hero-combat-orders',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     BlankSlateComponent,
     ModalComponent,
     PanelHeroCombatOrdersComponent,

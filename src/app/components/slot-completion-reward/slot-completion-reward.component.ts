@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -41,6 +42,7 @@ type RewardContent = {
   selector: 'app-slot-completion-reward',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     IconUnknownComponent,
     TippyDirective,
     SlotRarityOutlineComponent,

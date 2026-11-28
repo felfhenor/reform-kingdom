@@ -6,14 +6,13 @@
       <div class="font-bold">{{ loadFailureMessage() }}</div>
 
       <div>
-        Your savefile has not been overwritten.
+        {{ 'panelOptionsSavefile.yourSavefileHasNot' | t }}
         @if (failure.reason === 'storage') {
-          This can be temporary, so try reloading the game first.
+          {{ 'panelOptionsSavefile.thisCanBeTemporary' | t }}
         }
-        Recover will restore the newest backup that loads successfully.
+        {{ 'panelOptionsSavefile.recoverWillRestoreThe' | t }}
         @if (failure.data !== undefined) {
-          Export the unloadable savefile first if you want to keep a copy or
-          send it in with a bug report.
+          {{ 'panelOptionsSavefile.exportTheUnloadableSavefile' | t }}
         }
       </div>
 
@@ -32,7 +31,7 @@
           appSfx="ui-success"
           [sfxTrigger]="['click', 'hover']"
         >
-          Recover
+          {{ 'panelOptionsSavefile.recover' | t }}
         </button>
 
         @if (failure.reason === 'storage') {
@@ -43,7 +42,7 @@
             appSfx="ui-click"
             [sfxTrigger]="['click', 'hover']"
           >
-            Reload Game
+            {{ 'panelOptionsSavefile.reloadGame' | t }}
           </button>
         }
 
@@ -55,7 +54,7 @@
             appSfx="ui-click"
             [sfxTrigger]="['click', 'hover']"
           >
-            Export Unloadable Savefile
+            {{ 'panelOptionsSavefile.exportUnloadableSavefile' | t }}
           </button>
         }
       </div>
@@ -66,13 +65,20 @@
     <div class="flex-1 flex flex-col gap-4">
       <div class="card shadow-sm">
         <div class="card-body p-3 gap-2 min-h-48">
-          <div class="type-section-title">Savefile Metadata</div>
+          <div class="type-section-title">
+            {{ 'panelOptionsSavefile.savefileMetadata' | t }}
+          </div>
 
           <p class="mb-3">
-            You started playing this savefile {{ startedAt() | date }}.
+            {{
+              'panelOptionsSavefile.youStartedPlayingThis'
+                | t: { startedAt: (startedAt() | date) }
+            }}
             <br />
-            A total of {{ elapsedDurationText() }} have elapsed since you
-            started playing.
+            {{
+              'panelOptionsSavefile.aTotalOfHave'
+                | t: { elapsedDurationText: elapsedDurationText() }
+            }}
           </p>
         </div>
       </div>
@@ -81,11 +87,12 @@
     <div class="flex-1 flex flex-col gap-4">
       <div class="card shadow-sm">
         <div class="card-body p-3 gap-2 min-h-48">
-          <div class="type-section-title">Savefile Management</div>
+          <div class="type-section-title">
+            {{ 'panelOptionsSavefile.savefileManagement' | t }}
+          </div>
 
           <p class="mb-3">
-            Export and import your savefile to create backups, or share to help
-            establish bug reports.
+            {{ 'panelOptionsSavefile.exportAndImportYour' | t }}
           </p>
 
           <div class="card-actions">
@@ -105,11 +112,12 @@
       <div class="flex-1 flex flex-col gap-4">
         <div class="card shadow-sm">
           <div class="card-body p-3 gap-2 min-h-48">
-            <div class="type-section-title">End This Run</div>
+            <div class="type-section-title">
+              {{ 'panelOptionsSavefile.endThisRun' | t }}
+            </div>
 
             <p class="mb-3">
-              Add this run to your Legacy and reset your savefile to start a new
-              one.
+              {{ 'panelOptionsSavefile.addThisRunTo' | t }}
             </p>
 
             <div class="card-actions">
@@ -153,11 +161,15 @@
   <div>
     <div class="card shadow-sm">
       <div class="card-body p-3 gap-2">
-        <div class="type-section-title">Autosave</div>
+        <div class="type-section-title">
+          {{ 'panelOptionsSavefile.autosave' | t }}
+        </div>
 
         <div class="form-control">
           <label class="label label-option">
-            <span class="label-text">Save Every</span>
+            <span class="label-text">
+              {{ 'panelOptionsSavefile.saveEvery' | t }}
+            </span>
             <ng-select
               ffSelect
               [items]="autosaveIntervalChoices"
@@ -176,11 +188,15 @@
     @if (writesToDisk) {
       <div class="card shadow-sm">
         <div class="card-body p-3 gap-2">
-          <div class="type-section-title">Local Directories & Files</div>
+          <div class="type-section-title">
+            {{ 'panelOptionsSavefile.localDirectoriesFiles' | t }}
+          </div>
 
           <div class="form-control">
             <label class="label label-option">
-              <span class="label-text">Logs Folder</span>
+              <span class="label-text">
+                {{ 'panelOptionsSavefile.logsFolder' | t }}
+              </span>
               <button
                 class="btn btn-neutral min-w-[220px]"
                 (click)="openLogsFolder()"
@@ -188,14 +204,16 @@
                 appSfx="ui-click"
                 [sfxTrigger]="['click', 'hover']"
               >
-                Open Logs Folder
+                {{ 'panelOptionsSavefile.openLogsFolder' | t }}
               </button>
             </label>
           </div>
 
           <div class="form-control">
             <label class="label label-option">
-              <span class="label-text">Savefile Folder</span>
+              <span class="label-text">
+                {{ 'panelOptionsSavefile.savefileFolder' | t }}
+              </span>
               <button
                 class="btn btn-neutral min-w-[220px]"
                 (click)="openSavefileFolder()"
@@ -203,14 +221,16 @@
                 appSfx="ui-click"
                 [sfxTrigger]="['click', 'hover']"
               >
-                Open Savefile Folder
+                {{ 'panelOptionsSavefile.openSavefileFolder' | t }}
               </button>
             </label>
           </div>
 
           <div class="form-control">
             <label class="label label-option">
-              <span class="label-text">Savefile & Logs</span>
+              <span class="label-text">
+                {{ 'panelOptionsSavefile.savefileLogs' | t }}
+              </span>
               <button
                 class="btn btn-neutral min-w-[220px]"
                 [disabled]="isBusy()"
@@ -219,7 +239,7 @@
                 appSfx="ui-click"
                 [sfxTrigger]="['click', 'hover']"
               >
-                Export Savefile & Logs
+                {{ 'panelOptionsSavefile.exportSavefileLogs' | t }}
               </button>
             </label>
           </div>
@@ -229,16 +249,22 @@
 
     <div class="card shadow-sm">
       <div class="card-body p-3 gap-2">
-        <div class="type-section-title">Automatic Backups</div>
+        <div class="type-section-title">
+          {{ 'panelOptionsSavefile.automaticBackups' | t }}
+        </div>
 
         <p>
-          The last {{ maxBackups | number }} distinct versions of your savefile
-          are backed up automatically before it is loaded, imported, or
-          restored. A backup is also taken every
-          {{ periodicBackupMinutes | number }} minutes of play, keeping the last
-          {{ maxPeriodicBackups | number }}.
+          {{
+            'panelOptionsSavefile.theLastDistinctVersions'
+              | t
+                : {
+                    maxBackups: (maxBackups | number),
+                    periodicBackupMinutes: (periodicBackupMinutes | number),
+                    maxPeriodicBackups: (maxPeriodicBackups | number),
+                  }
+          }}
           @if (writesToDisk) {
-            Your savefile and its backups are also written to disk.
+            {{ 'panelOptionsSavefile.yourSavefileAndIts' | t }}
           }
         </p>
 
@@ -248,8 +274,7 @@
             class="alert alert-warning flex flex-col items-start"
           >
             <span>
-              Some backups could not be read from storage, so no new backups can
-              be made until they are reset.
+              {{ 'panelOptionsSavefile.someBackupsCouldNot' | t }}
             </span>
 
             <button
@@ -260,22 +285,26 @@
               appSfx="ui-error"
               [sfxTrigger]="['click', 'hover']"
             >
-              Reset Unreadable Backups
+              {{ 'panelOptionsSavefile.resetUnreadableBackups' | t }}
             </button>
           </div>
         }
 
         @if (!hasLoadedBackups()) {
-          <p class="opacity-70">Looking for backups...</p>
+          <p class="opacity-70">
+            {{ 'panelOptionsSavefile.lookingForBackups' | t }}
+          </p>
         } @else if (backups().length === 0) {
-          <p class="opacity-70">No backups yet.</p>
+          <p class="opacity-70">
+            {{ 'panelOptionsSavefile.noBackupsYet' | t }}
+          </p>
         } @else {
           <table class="table table-sm">
             <thead>
               <tr>
-                <th>Backed Up</th>
-                <th>Reason</th>
-                <th>Play Time</th>
+                <th>{{ 'panelOptionsSavefile.backedUp' | t }}</th>
+                <th>{{ 'panelOptionsSavefile.reason' | t }}</th>
+                <th>{{ 'panelOptionsSavefile.playTime' | t }}</th>
                 <th></th>
               </tr>
             </thead>
@@ -294,7 +323,7 @@
                       appSfx="ui-click"
                       [sfxTrigger]="['click', 'hover']"
                     >
-                      Restore
+                      {{ 'panelOptionsSavefile.restore' | t }}
                     </button>
                   </td>
                 </tr>
@@ -308,27 +337,27 @@
 
   <swal
     #deleteSwal
-    title="Delete Savefile?"
-    text="This cannot be undone. You really want to make sure you want to do this. You will not be able to get this back!"
+    [title]="'panelOptionsSavefile.deleteSavefile' | t"
+    [text]="'panelOptionsSavefile.thisCannotBeUndone' | t"
     icon="warning"
     (confirm)="deleteSavefile()"
   ></swal>
 
   <swal
     #resetBackupsSwal
-    title="Reset Unreadable Backups?"
-    text="Backups that can't be read will be permanently cleared so new ones can be made. Backups that can still be read are kept."
+    [title]="'panelOptionsSavefile.resetUnreadableBackups2' | t"
+    [text]="'panelOptionsSavefile.backupsThatCanT' | t"
     icon="warning"
-    confirmButtonText="Reset"
+    [confirmButtonText]="'panelOptionsSavefile.reset' | t"
     (confirm)="resetUnreadableBackups()"
   ></swal>
 
   <swal
     #restoreSwal
-    title="Restore Backup?"
-    text="Your current savefile will be backed up first, then replaced with this backup."
+    [title]="'panelOptionsSavefile.restoreBackup' | t"
+    [text]="'panelOptionsSavefile.yourCurrentSavefileWill' | t"
     icon="warning"
-    confirmButtonText="Restore"
+    [confirmButtonText]="'panelOptionsSavefile.restore' | t"
     (confirm)="restorePendingBackup()"
   ></swal>
 </div>

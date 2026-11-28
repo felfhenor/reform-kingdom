@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import type { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import {
@@ -201,11 +202,13 @@ export class ModsComponent {
     await this.runBusy(async () => {
       const errors = await modsImportZip(file);
       if (errors.length > 0) {
-        notifyError(`Could not install that mod. ${errors.join(' ')}`);
+        notifyError(
+          t('mods.couldNotInstallThat', { errors: errors.join(' ') }),
+        );
         return;
       }
       await this.modsService.reload();
-      notifySuccess('Mod installed.');
+      notifySuccess(t('mods.modInstalled'));
     });
   }
 
@@ -231,10 +234,12 @@ export class ModsComponent {
     await this.runBusy(async () => {
       const failures = await modsAddToRun(manifest.id);
       if (failures.length > 0) {
-        notifyError(`Could not add that mod. ${failures.join(' ')}`);
+        notifyError(
+          t('mods.couldNotAddThat', { failures: failures.join(' ') }),
+        );
         return;
       }
-      notifySuccess(`${manifest.name} was added to your current run.`);
+      notifySuccess(t('mods.wasAddedToYour', { name: manifest.name }));
     });
   }
 

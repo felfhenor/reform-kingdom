@@ -20,20 +20,31 @@
       </div>
 
       <span class="type-meta">
-        {{ levelLabel() }} {{ e.monster.types.sort().join('/') }} ·
-        {{ e.kills | number }} killed
+        {{
+          'detailMonsterSummary.killed'
+            | t
+              : {
+                  levelLabel: levelLabel(),
+                  types: e.monster.types.sort().join('/'),
+                  kills: (e.kills | number),
+                }
+        }}
       </span>
 
       @let nodes = foundIn();
       @if (showLocations() && e.foundAtNodes.length > 0 && nodes.length > 0) {
-        <span class="type-meta">Found in: {{ nodes.join(', ') }}</span>
+        <span class="type-meta">
+          {{ 'detailMonsterSummary.foundIn' | t: { nodes: nodes.join(', ') } }}
+        </span>
       } @else {
         <span class="min-h-[16px]"></span>
       }
 
       @let xp = xpLabel();
       @if (xp) {
-        <span class="type-meta">XP: {{ xp }}</span>
+        <span class="type-meta">
+          {{ 'detailMonsterSummary.xp' | t: { xp: xp } }}
+        </span>
       }
     </div>
   } @else {
@@ -45,10 +56,15 @@
       @if (showLocations()) {
         @if (e.sourceNodeNames.length > 0) {
           <span class="type-meta">
-            Source: {{ e.sourceNodeNames.join(', ') }}
+            {{
+              'detailMonsterSummary.source'
+                | t: { sourceNodeNames: e.sourceNodeNames.join(', ') }
+            }}
           </span>
         } @else {
-          <span class="type-meta">Location Unknown</span>
+          <span class="type-meta">
+            {{ 'detailMonsterSummary.locationUnknown' | t }}
+          </span>
         }
       }
     </div>

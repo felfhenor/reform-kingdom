@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ContentDescriptionPipe } from '@pipes/content-description.pipe';
 import { FFButtonComponent } from '@ff/components/button/button.component';
 import { FFFocusRowDirective } from '@ff/focus/ff-focus-row.directive';
@@ -36,6 +37,7 @@ import type {
   selector: 'app-slot-commission',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     ContentDescriptionPipe,
     ButtonTravelHereComponent,
     SlotRequirementComponent,

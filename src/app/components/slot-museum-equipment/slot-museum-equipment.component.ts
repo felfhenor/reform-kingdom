@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -16,6 +17,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-slot-museum-equipment',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     DetailItemPreviewComponent,
     IconUnknownComponent,
     TippyDirective,

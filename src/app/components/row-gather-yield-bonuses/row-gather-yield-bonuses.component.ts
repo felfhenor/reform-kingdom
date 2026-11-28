@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { AtlasImageComponent } from '@components/atlas-image/atlas-image.component';
@@ -8,7 +9,7 @@ import { SlotIconBlankComponent } from '@components/slot-icon-blank/slot-icon-bl
   selector: 'app-row-gather-yield-bonuses',
   host: { class: 'flex flex-col gap-2' },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SlotIconBlankComponent, AtlasImageComponent, DecimalPipe],
+  imports: [TPipe, SlotIconBlankComponent, AtlasImageComponent, DecimalPipe],
   templateUrl: './row-gather-yield-bonuses.component.html',
   styleUrl: './row-gather-yield-bonuses.component.scss',
 })

@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { achievementsMoment } from '@helpers/achievement/achievement-moment';
 import { combatantIsDead } from '@helpers/combat/combat-combatant-hp';
 import {
@@ -154,7 +155,7 @@ function logVictoryXp(combat: Combat, gains: CharacterXpGain[]): void {
   if (gains.length === combat.heroes.length && amounts.size === 1) {
     combatMessageLog(
       combat,
-      `The party gained ${gains[0].xp.toLocaleString()} XP!`,
+      t('combatEnd.thePartyGainedXp', { xp: gains[0].xp.toLocaleString() }),
     );
     return;
   }
@@ -165,7 +166,7 @@ function logVictoryXp(combat: Combat, gains: CharacterXpGain[]): void {
 
     combatMessageLog(
       combat,
-      `**${combatantMessageToken(hero)}** gained ${xp} XP!`,
+      t('combatEnd.gainedXp', { hero: combatantMessageToken(hero), xp }),
     );
   });
 }
@@ -175,7 +176,7 @@ function recordVictoryKills(combat: Combat): void {
     if (monsterRecordKill(monster.id, level, combat.locationName)) {
       combatMessageLog(
         combat,
-        `The party has fought enough **${monster.name}** to learn its strengths and weaknesses!`,
+        t('combatEnd.thePartyHasFought', { name: monster.name }),
       );
     }
   });
@@ -338,7 +339,7 @@ function combatHasNextFight(combat: Combat): boolean {
 
 // Returns true if another fight was started; callers must not reset combat state then.
 function handleCombatVictory(combat: Combat): boolean {
-  combatMessageLog(combat, 'Heroes have won the combat!');
+  combatMessageLog(combat, t('combatEnd.heroesHaveWonThe'));
   analyticsSendDesignEvent('Combat:Encounter:Win');
   combatVictoryMoments(combat).forEach((moment) => achievementsMoment(moment));
 
@@ -417,15 +418,15 @@ function combatApplyWipeLosses(combat: Combat): void {
   });
 
   if (currencyLost > 0) {
-    combatMessageLog(combat, 'Your heroes lose all their coins!');
+    combatMessageLog(combat, t('combatEnd.yourHeroesLoseAll'));
   }
   if (materialsLost > 0) {
-    combatMessageLog(combat, 'Crows pick through your items!');
+    combatMessageLog(combat, t('combatEnd.crowsPickThroughYour'));
   }
 }
 
 export function combatHandleDefeat(combat: Combat): void {
-  combatMessageLog(combat, 'Heroes have lost the combat!');
+  combatMessageLog(combat, t('combatEnd.heroesHaveLostThe'));
   analyticsSendDesignEvent('Combat:Encounter:Loss');
   playGameSFX('death');
 
@@ -447,7 +448,9 @@ export function combatHandleDefeat(combat: Combat): void {
   if (combat.raidTownId) {
     combatMessageLog(
       combat,
-      `The raiders still threaten ${combat.locationName} - regroup and defend it before time runs out!`,
+      t('combatEnd.theRaidersStillThreaten', {
+        locationName: combat.locationName,
+      }),
     );
   }
 }
@@ -455,7 +458,7 @@ export function combatHandleDefeat(combat: Combat): void {
 export function combatCheckIfOver(combat: Combat): boolean {
   if (!isCombatOver(combat)) return false;
 
-  combatMessageLog(combat, 'Combat is over.');
+  combatMessageLog(combat, t('combatEnd.combatIsOver'));
 
   let continuingEncounter = false;
   if (didHeroesWin(combat)) {

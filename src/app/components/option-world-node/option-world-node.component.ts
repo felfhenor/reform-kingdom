@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { SpriteNodeComponent } from '@components/sprite-node/sprite-node.component';
 import type { ExploreNodeFarmOption } from '@interfaces';
@@ -6,14 +7,14 @@ import type { ExploreNodeFarmOption } from '@interfaces';
   selector: 'app-option-world-node',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex items-center gap-2' },
-  imports: [SpriteNodeComponent],
+  imports: [TPipe, SpriteNodeComponent],
   template: `
     <app-sprite-node class="zoom-row" [entry]="option().entry" />
     @if (showLevel()) {
       <div>
         <div class="type-label">{{ option().nodeName }}</div>
         <div class="type-meta text-difficulty-{{ option().difficulty }}">
-          Lv. {{ option().levelLabel }}
+          {{ 'optionWorldNode.lv' | t: { levelLabel: option().levelLabel } }}
         </div>
         @if (option().lockedReason; as reason) {
           <div class="type-meta text-warning whitespace-normal">

@@ -1,3 +1,5 @@
+import { t } from '@helpers/i18n/i18n';
+import { TPipe } from '@pipes/t.pipe';
 import { ContentNamePipe } from '@pipes/content-name.pipe';
 import {
   ChangeDetectionStrategy,
@@ -26,6 +28,7 @@ import type { CaravanTradeRow } from '@interfaces';
   selector: 'app-modal-town-material-sale',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     ContentNamePipe,
     BlankSlateComponent,
     SlotCaravanTradeComponent,
@@ -120,6 +123,6 @@ export class ModalTownMaterialSaleComponent {
     if (!success) return;
 
     const qtyLabel = quantity > 1 ? ` x${quantity}` : '';
-    notifySuccess(`You bought ${name}${qtyLabel}!`);
+    notifySuccess(t('modalTownMaterialSale.youBought', { name, qtyLabel }));
   }
 }

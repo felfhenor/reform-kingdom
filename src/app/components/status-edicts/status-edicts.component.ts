@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import type { AnimationCallbackEvent } from '@angular/core';
 import {
   ChangeDetectionStrategy,
@@ -14,14 +15,16 @@ import { AnimationService } from '@services/animation.service';
 @Component({
   selector: 'app-status-edicts',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconKingdomComponent, AtlasImageComponent, TippyDirective],
+  imports: [TPipe, IconKingdomComponent, AtlasImageComponent, TippyDirective],
   template: `
     @let edicts = activeEdicts();
     @if (edicts.length > 0) {
       <ng-template #edictsTooltip>
         <div class="p-2 max-w-[400px] select-none">
           <div class="flex justify-between items-center gap-4 mb-2">
-            <span class="type-entity-name">Edicts</span>
+            <span class="type-entity-name">
+              {{ 'statusEdicts.edicts' | t }}
+            </span>
           </div>
 
           <div class="flex flex-col gap-2">
@@ -45,7 +48,7 @@ import { AnimationService } from '@services/animation.service';
         class="w-16 h-16 ms-4 mt-4 flex items-center justify-center border border-current select-none"
         [tp]="edictsTooltip"
         [tpPlacement]="'bottom'"
-        [attr.aria-label]="'Edicts'"
+        [attr.aria-label]="'statusEdicts.edicts' | t"
         (animate.enter)="onEnter($event)"
       >
         <app-icon-kingdom name="edicts" />

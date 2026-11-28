@@ -6,15 +6,15 @@
   appSfx="ui-error"
   [sfxTrigger]="['hover', 'click']"
 >
-  Quit
+  {{ 'buttonQuit.quit' | t }}
 </button>
 
 <swal
   #quitSwal
-  title="Quit re:Form Kingdom?"
-  text="Boo will miss you!"
+  [title]="'buttonQuit.quitReFormKingdom' | t"
+  [text]="'buttonQuit.booWillMissYou' | t"
   icon="warning"
-  confirmButtonText="Yes, quit game"
-  cancelButtonText="No, cancel"
+  [confirmButtonText]="'buttonQuit.yesQuitGame' | t"
+  [cancelButtonText]="'buttonQuit.noCancel' | t"
   (confirm)="meta.quit()"
 ></swal>

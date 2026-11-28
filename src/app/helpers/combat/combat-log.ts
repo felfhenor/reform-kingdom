@@ -90,6 +90,7 @@ export function combatMessageLog(
   message: string,
   actor?: Combatant,
   icons?: CombatLogIcon | CombatLogIcon[],
+  roundStart?: boolean,
 ): void {
   if (combat.simulation?.quiet) return;
 
@@ -117,6 +118,7 @@ export function combatMessageLog(
     sprite: actor?.sprite,
     combatants,
     itemIcons: logIconList(icons),
+    roundStart,
   };
 
   if (combat.simulation) {

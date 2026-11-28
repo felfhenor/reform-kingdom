@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { FFFocusOnChangeDirective } from '@ff/focus/ff-focus-on-change.directive';
 import { NgTemplateOutlet } from '@angular/common';
 import type { TemplateRef } from '@angular/core';
@@ -34,6 +35,7 @@ import type {
   selector: 'app-panel-equipment-picker',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     FFFocusOnChangeDirective,
     BlankSlateComponent,
     IconComponent,

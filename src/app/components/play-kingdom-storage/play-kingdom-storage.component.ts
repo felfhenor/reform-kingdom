@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { PagePagedGridComponent } from '@components/page-paged-grid/page-paged-grid.component';
 import { SlotStorageItemComponent } from '@components/slot-storage-item/slot-storage-item.component';
@@ -9,7 +10,7 @@ import {
 @Component({
   selector: 'app-play-kingdom-storage',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PagePagedGridComponent, SlotStorageItemComponent],
+  imports: [TPipe, PagePagedGridComponent, SlotStorageItemComponent],
   templateUrl: './play-kingdom-storage.component.html',
   styleUrl: './play-kingdom-storage.component.scss',
 })

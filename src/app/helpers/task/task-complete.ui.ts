@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import {
   analyticsSafeSegment,
@@ -11,13 +12,17 @@ import type { TaskContent } from '@interfaces';
 
 export function tasksAnnounceCompleted(tasks: TaskContent[]): void {
   tasks.forEach((task) => {
-    notifySuccess(`Task complete: ${task.name}`, () => modalOpen('tasks'));
+    notifySuccess(t('taskComplete.taskComplete', { name: task.name }), () =>
+      modalOpen('tasks'),
+    );
     desktopNotify({
       category: 'Progress',
       title: 'Task Complete',
       body: task.name,
     });
-    miscellaneousMessageLog(`Task complete: **${task.name}**`);
+    miscellaneousMessageLog(
+      t('taskComplete.taskComplete2', { name: task.name }),
+    );
     if (task.whisper) {
       founderWhisperLog(task.whisper);
     }

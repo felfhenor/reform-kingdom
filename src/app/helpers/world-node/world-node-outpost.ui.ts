@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { categoryMessageLog } from '@helpers/combat/combat-log';
 import {
   autoModeIsEnabled,
@@ -44,7 +45,10 @@ export function outpostTeleport(
   categoryMessageLog(
     'Travel',
     to.mapName,
-    `The party teleported from ${from.nodeName} to ${to.nodeName}.`,
+    t('worldNodeOutpost.thePartyTeleportedFrom', {
+      nodeName: from.nodeName,
+      nodeName2: to.nodeName,
+    }),
   );
   analyticsSendDesignEvent(
     `World:Outpost:Teleport:${analyticsSafeSegment(to.nodeName)}`,

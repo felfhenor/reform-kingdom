@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { contentName } from '@helpers/i18n/i18n-content';
 import {
   categoryMessageLog,
@@ -132,7 +133,11 @@ export function tradeLog(
   categoryMessageLog(
     'Miscellaneous',
     locationName,
-    `You ${verb} ${tradeLogPartsHtml(goodsParts)}${priceText}.`,
+    t('trade.you', {
+      verb,
+      goodsParts: tradeLogPartsHtml(goodsParts),
+      priceText,
+    }),
     compact([...goodsParts, ...priceParts].map((part) => part.icon)),
   );
 }

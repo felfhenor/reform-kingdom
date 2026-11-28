@@ -42,12 +42,17 @@
 
       @if (occupiedPaperdollSlots().length > 1) {
         <div class="type-meta mt-2">
-          Occupies: {{ occupiedPaperdollSlots().join(' + ') }}
+          {{
+            'slotEquipment.occupies'
+              | t: { join: occupiedPaperdollSlots().join(' + ') }
+          }}
         </div>
       }
 
       @if (showUnequipHint()) {
-        <div class="type-hint mt-2 ff-kbm-only">Right-click to unequip.</div>
+        <div class="type-hint mt-2 ff-kbm-only">
+          {{ 'slotEquipment.rightClickToUnequip' | t }}
+        </div>
       }
     </app-tooltip-item-preview>
 

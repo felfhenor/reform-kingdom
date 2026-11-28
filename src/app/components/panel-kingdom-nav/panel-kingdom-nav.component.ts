@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { formatNumber } from '@angular/common';
 import type { AnimationCallbackEvent } from '@angular/core';
 import {
@@ -33,6 +34,7 @@ import { AnimationService } from '@services/animation.service';
   selector: 'app-panel-kingdom-nav',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     AtlasImageComponent,
     IconKingdomComponent,
     SFXDirective,

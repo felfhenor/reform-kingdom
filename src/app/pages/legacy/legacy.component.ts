@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import {
   durationPartText,
   ticksToDurationParts,
@@ -31,6 +32,7 @@ import { sortBy } from 'es-toolkit/compat';
   selector: 'app-legacy',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     TPluralPipe,
     BlankSlateComponent,
     ButtonKingdomBackComponent,

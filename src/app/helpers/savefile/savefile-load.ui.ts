@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { isDemoBuild } from '@helpers/demo/demo';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { idbGet } from '@helpers/engine/idb';
@@ -54,7 +55,8 @@ const LEGACY_MERGE_WARNINGS: Partial<Record<LegacyMergeResult, string>> = {
 // A bad Legacy section never undoes the savefile change; it only warns.
 function savefileMergeLegacy(section: unknown, verb: string): void {
   const warning = LEGACY_MERGE_WARNINGS[legacyMergeFrom([section])];
-  if (warning) notifyWarning(`Your savefile was ${verb}, but ${warning}`);
+  if (warning)
+    notifyWarning(t('savefileLoad.yourSavefileWasBut', { verb, warning }));
 }
 
 // Not ready during a replace, and a failed load isn't the player's save, so neither may roll real backups out.
@@ -100,13 +102,18 @@ export async function savefileRestoreBackup(
   if (failures.length > 0) {
     analyticsSendDesignEvent('Savefile:Restore:Failure');
     notifyError(
-      `Could not restore the backup from ${backupLabel(backup)}: ${failures.join(' ')}`,
+      t('savefileLoad.couldNotRestoreThe', {
+        backup: backupLabel(backup),
+        failures: failures.join(' '),
+      }),
     );
     return false;
   }
 
   analyticsSendDesignEvent('Savefile:Restore:Success');
-  notifySuccess(`Restored the backup from ${backupLabel(backup)}.`);
+  notifySuccess(
+    t('savefileLoad.restoredTheBackupFrom', { backup: backupLabel(backup) }),
+  );
   savefileMergeLegacy(backup.legacy, 'restored');
   return true;
 }
@@ -140,9 +147,7 @@ function recoverFailureMessage(
 // Newest first, skipping backups that fail, so one bad backup can't block an older good one.
 export async function savefileRecover(): Promise<boolean> {
   if (await storedSavefileReadableAgain()) {
-    notifyWarning(
-      'Your savefile can be read again - reload the game to load it instead of recovering a backup.',
-    );
+    notifyWarning(t('savefileLoad.yourSavefileCanBe'));
     return false;
   }
 
@@ -154,7 +159,11 @@ export async function savefileRecover(): Promise<boolean> {
     lastFailures = failures;
     if (failures.length === 0) {
       analyticsSendDesignEvent('Savefile:Recover:Success');
-      notifySuccess(`Recovered your savefile from ${backupLabel(backup)}.`);
+      notifySuccess(
+        t('savefileLoad.recoveredYourSavefileFrom', {
+          backup: backupLabel(backup),
+        }),
+      );
       savefileMergeLegacy(backup.legacy, 'recovered');
       return true;
     }
@@ -180,12 +189,12 @@ export async function savefileBackupsResetUnreadable(): Promise<boolean> {
 
   if (results.some((result) => result.status === 'rejected')) {
     analyticsSendDesignEvent('Savefile:ResetBackups:Failure');
-    notifyError('Unreadable backups could not be cleared.');
+    notifyError(t('savefileLoad.unreadableBackupsCouldNot'));
     return false;
   }
 
   analyticsSendDesignEvent('Savefile:ResetBackups:Success');
-  notifySuccess('Cleared unreadable backups. New backups can be made again.');
+  notifySuccess(t('savefileLoad.clearedUnreadableBackupsNew'));
   return true;
 }
 
@@ -228,11 +237,13 @@ async function savefileImportSections({
 
   const failures = await savefileReplace(state as GameState, 'import');
   if (failures.length > 0) {
-    notifyError(`Could not import that savefile: ${failures.at(-1)}`);
+    notifyError(
+      t('savefileLoad.couldNotImportThat', { failures: failures.at(-1) }),
+    );
     return false;
   }
 
-  notifySuccess('Successfully imported savefile!');
+  notifySuccess(t('savefileLoad.successfullyImportedSavefile'));
   savefileMergeLegacy(legacy, 'imported');
   return true;
 }
@@ -249,7 +260,7 @@ export async function savefileDemoImportable(): Promise<boolean> {
 export async function savefileImportDemo(): Promise<boolean> {
   const sections = await savefileDiskDemoRead();
   if (!sections) {
-    notifyError('Could not find a savefile from the demo.');
+    notifyError(t('savefileLoad.couldNotFindA'));
     return false;
   }
 

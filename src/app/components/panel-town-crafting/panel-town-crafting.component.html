@@ -1,6 +1,8 @@
 <div class="card shadow-sm">
   <div class="card-body p-3 gap-2">
-    <h2 class="type-section-title">Tradeskill Levels</h2>
+    <h2 class="type-section-title">
+      {{ 'panelTownCrafting.tradeskillLevels' | t }}
+    </h2>
 
     <div class="flex flex-wrap gap-2">
       @for (row of tradeskillLevelRows(); track row.tradeskillId) {
@@ -28,7 +30,7 @@
           <span
             class="absolute bottom-0 inset-x-0 text-center text-xs text-shadow-black tabular-nums"
           >
-            Lv. {{ row.level | number }}
+            {{ 'panelTownCrafting.lv' | t: { level: (row.level | number) } }}
           </span>
         </div>
       }
@@ -39,7 +41,7 @@
 <div class="card shadow-sm">
   <div class="card-body p-3 gap-2">
     <h2 class="type-section-title justify-between">
-      Crafting Queue
+      {{ 'panelTownCrafting.craftingQueue' | t }}
       <span class="badge badge-sm badge-data tabular-nums">
         {{ craftQueueRows().length | number }}/{{
           craftQueueSlots().length | number

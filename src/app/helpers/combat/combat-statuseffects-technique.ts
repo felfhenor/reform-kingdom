@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import {
   combatMessageLog,
   combatantMessageToken,
@@ -61,7 +62,10 @@ function combatTargetResistsStatusEffect(
 
   combatMessageLog(
     combat,
-    `**${effect.name}** is resisted by **${combatantMessageToken(target)}**!`,
+    t('combatStatuseffectsTechnique.isResistedBy', {
+      name: effect.name,
+      target: combatantMessageToken(target),
+    }),
     target,
   );
   return true;

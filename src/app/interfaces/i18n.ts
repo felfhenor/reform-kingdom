@@ -1,4 +1,4 @@
-export type I18nParams = Record<string, string | number>;
+export type I18nParams = Record<string, string | number | null | undefined>;
 
 export type I18nListType = 'and' | 'or';
 

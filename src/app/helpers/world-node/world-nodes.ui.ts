@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { categoryMessageLog } from '@helpers/combat/combat-log';
 import {
   isWorldNodeDiscovered,
@@ -13,7 +14,7 @@ export function worldNodeDiscoverIfHidden(entry: WorldNodeEntry): void {
     categoryMessageLog(
       'Travel',
       entry.mapName,
-      `You discovered **${entry.nodeName}**!`,
+      t('worldNodes.youDiscovered', { nodeName: entry.nodeName }),
     );
   }
 }

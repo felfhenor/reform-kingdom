@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { achievementsCheckRun } from '@helpers/achievement/achievement-check';
 import { analyticsSendDesignEvent } from '@helpers/engine/analytics';
 import { error } from '@helpers/engine/logging';
@@ -48,7 +49,7 @@ export async function legacyEndRun(): Promise<GameId | undefined> {
     analyticsSendDesignEvent(`Legacy:EndRun:${run.outcome}`);
   } catch (e) {
     error('Legacy', 'Failed to record the run:', e);
-    notifyError('Could not save this run to your Legacy, so it was not ended.');
+    notifyError(t('legacy.couldNotSaveThis'));
     return undefined;
   }
 

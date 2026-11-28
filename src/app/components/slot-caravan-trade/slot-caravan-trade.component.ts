@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -20,6 +21,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-slot-caravan-trade',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     CurrencyCostComponent,
     TooltipItemPreviewComponent,
     TippyDirective,

@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -20,6 +21,7 @@ const MAX_DISPLAY_QUANTITY = 9999;
   selector: 'app-slot-museum-collectible',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     DetailItemPreviewComponent,
     IconUnknownComponent,
     TippyDirective,

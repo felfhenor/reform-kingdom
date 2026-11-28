@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import {
   afterNextRender,
   ChangeDetectionStrategy,
@@ -18,7 +19,7 @@ import { AnimationService } from '@services/animation.service';
 @Component({
   selector: 'app-card-demo-end',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ButtonWishlistComponent, SFXDirective],
+  imports: [TPipe, ButtonWishlistComponent, SFXDirective],
   templateUrl: './card-demo-end.component.html',
   styleUrl: './card-demo-end.component.scss',
 })

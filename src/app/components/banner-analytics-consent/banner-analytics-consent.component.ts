@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { ButtonCloseComponent } from '@components/button-close/button-close.component';
 import { SFXDirective } from '@directives/sfx.directive';
@@ -8,7 +9,7 @@ import { shouldShowAnalyticsConsentBanner } from '@helpers/state-options.ui';
 @Component({
   selector: 'app-banner-analytics-consent',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ButtonCloseComponent, SFXDirective],
+  imports: [TPipe, ButtonCloseComponent, SFXDirective],
   templateUrl: './banner-analytics-consent.component.html',
   styleUrl: './banner-analytics-consent.component.scss',
 })

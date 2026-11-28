@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -12,7 +13,7 @@ import { savefileImportDemo } from '@helpers/savefile/savefile-load.ui';
 @Component({
   selector: 'app-button-savefile-import-demo',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SFXDirective],
+  imports: [TPipe, SFXDirective],
   template: `
     <button
       type="button"
@@ -22,7 +23,7 @@ import { savefileImportDemo } from '@helpers/savefile/savefile-load.ui';
       appSfx="ui-success"
       [sfxTrigger]="['click', 'hover']"
     >
-      Import Demo Save
+      {{ 'buttonSavefileImportDemo.importDemoSave' | t }}
     </button>
   `,
 })

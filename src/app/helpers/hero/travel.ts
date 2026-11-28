@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { caravanMarkVisited } from '@helpers/caravan/caravan';
 import { categoryMessageLog } from '@helpers/combat/combat-log';
 import {
@@ -240,7 +241,7 @@ function travelArriveAtNode(
   categoryMessageLog(
     'Travel',
     tile.mapName,
-    `The party has arrived at ${destinationNodeName}.`,
+    t('travel.thePartyHasArrived', { destinationNodeName }),
   );
 
   const node = worldNodeByName(destinationNodeName);

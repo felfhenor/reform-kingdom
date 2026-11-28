@@ -1,3 +1,5 @@
+import { t } from '@helpers/i18n/i18n';
+import { TPipe } from '@pipes/t.pipe';
 import { TPluralPipe } from '@pipes/t-plural.pipe';
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
@@ -70,6 +72,7 @@ import { clamp } from 'es-toolkit/compat';
   selector: 'app-play-kingdom-home',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     TPluralPipe,
     AtlasImageComponent,
     ButtonGlowDirective,
@@ -254,6 +257,6 @@ export class PlayKingdomHomeComponent {
 
   public resetHome(): void {
     void homeNodeResetToDuchy();
-    notifySuccess('The Duchy is your home once again!');
+    notifySuccess(t('playKingdomHome.theDuchyIsYour'));
   }
 }

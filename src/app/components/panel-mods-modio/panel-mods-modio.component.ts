@@ -1,3 +1,5 @@
+import { t } from '@helpers/i18n/i18n';
+import { TPipe } from '@pipes/t.pipe';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -34,6 +36,7 @@ import { ModsService } from '@services/mods.service';
   selector: 'app-panel-mods-modio',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     IconModLogoComponent,
     BlankSlateComponent,
     DecimalPipe,
@@ -89,7 +92,7 @@ export class PanelModsModioComponent {
     await this.attempt(async () => {
       await modioRequestCode(this.email());
       this.codeSent.set(true);
-      notifySuccess('Check your email for a mod.io code.');
+      notifySuccess(t('panelModsModio.checkYourEmailFor'));
     });
   }
 
@@ -128,11 +131,16 @@ export class PanelModsModioComponent {
     await this.attempt(async () => {
       const errors = await modioInstall(mod);
       if (errors.length > 0) {
-        notifyError(`Could not install ${mod.name}. ${errors.join(' ')}`);
+        notifyError(
+          t('panelModsModio.couldNotInstall', {
+            name: mod.name,
+            errors: errors.join(' '),
+          }),
+        );
         return;
       }
       await this.modsService.reload();
-      notifySuccess(`${mod.name} installed.`);
+      notifySuccess(t('panelModsModio.installed2', { name: mod.name }));
     });
     this.busyId.set(undefined);
   }
@@ -144,7 +152,7 @@ export class PanelModsModioComponent {
       );
       for (const mod of missing) await this.install(mod);
       if (missing.length === 0)
-        notifySuccess('All subscribed mods are installed.');
+        notifySuccess(t('panelModsModio.allSubscribedModsAre'));
     });
   }
 
@@ -152,7 +160,11 @@ export class PanelModsModioComponent {
     try {
       await work();
     } catch (e) {
-      notifyError(`mod.io: ${e instanceof Error ? e.message : String(e)}`);
+      notifyError(
+        t('panelModsModio.modIo', {
+          e: e instanceof Error ? e.message : String(e),
+        }),
+      );
     }
   }
 }

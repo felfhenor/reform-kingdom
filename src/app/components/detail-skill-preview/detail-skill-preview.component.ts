@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { TPluralPipe } from '@pipes/t-plural.pipe';
 import { DecimalPipe, formatNumber } from '@angular/common';
 import type { TemplateRef } from '@angular/core';
@@ -30,6 +31,7 @@ import type { Combatant, EquipmentItemType, EquipmentSkill } from '@interfaces';
   selector: 'app-detail-skill-preview',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     TPluralPipe,
     DecimalPipe,
     RowElementChargesComponent,

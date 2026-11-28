@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { Component } from '@angular/core';
 import { ModalComponent } from '@components/modal/modal.component';
 import { PanelOptionsComponent } from '@components/panel-options/panel-options.component';
@@ -8,6 +9,7 @@ import { TeleportToDirective } from '@directives/teleport.to.directive';
 @Component({
   selector: 'app-button-settings',
   imports: [
+    TPipe,
     SFXDirective,
     ModalComponent,
     PanelOptionsComponent,

@@ -103,7 +103,7 @@
     appSfx="ui-click"
     [sfxTrigger]="['click', 'hover']"
   >
-    Collectibles
+    {{ 'playKingdomMuseum.collectibles' | t }}
     <span class="badge badge-sm badge-data tabular-nums">
       {{ collectibleDiscoveredCount() }}/{{ collectibleEntries().length }}
     </span>
@@ -119,7 +119,7 @@
     appSfx="ui-click"
     [sfxTrigger]="['click', 'hover']"
   >
-    Recipes
+    {{ 'playKingdomMuseum.recipes' | t }}
     <span class="badge badge-sm badge-data tabular-nums">
       {{ recipeDiscoveredCount() }}/{{ recipeEntries().length }}
     </span>
@@ -136,7 +136,7 @@
       appSfx="ui-click"
       [sfxTrigger]="['click', 'hover']"
     >
-      Materials
+      {{ 'playKingdomMuseum.materials' | t }}
       <span class="badge badge-sm badge-data tabular-nums">
         {{ itemDiscoveredCount() }}/{{ itemEntries().length }}
       </span>
@@ -152,7 +152,7 @@
       appSfx="ui-click"
       [sfxTrigger]="['click', 'hover']"
     >
-      Equipment
+      {{ 'playKingdomMuseum.equipment' | t }}
       <span class="badge badge-sm badge-data tabular-nums">
         {{ equipmentDiscoveredCount() }}/{{ equipmentEntries().length }}
       </span>

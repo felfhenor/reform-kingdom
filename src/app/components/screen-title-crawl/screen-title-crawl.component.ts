@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -26,7 +27,7 @@ const SKIP_HOLD_MS = 1000;
 @Component({
   selector: 'app-screen-title-crawl',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FFButtonComponent, FFInputPromptComponent],
+  imports: [TPipe, FFButtonComponent, FFInputPromptComponent],
   templateUrl: './screen-title-crawl.component.html',
   styleUrl: './screen-title-crawl.component.scss',
   host: {

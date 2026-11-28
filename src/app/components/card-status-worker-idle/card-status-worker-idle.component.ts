@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { AtlasAnimationComponent } from '@components/atlas-animation/atlas-animation.component';
 import { CardStatusBubbleComponent } from '@components/card-status-bubble/card-status-bubble.component';
@@ -7,7 +8,7 @@ import type { WorkerIdleStatusEntry } from '@interfaces';
 @Component({
   selector: 'app-card-status-worker-idle',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AtlasAnimationComponent, CardStatusBubbleComponent],
+  imports: [TPipe, AtlasAnimationComponent, CardStatusBubbleComponent],
   templateUrl: './card-status-worker-idle.component.html',
   styleUrl: './card-status-worker-idle.component.scss',
 })

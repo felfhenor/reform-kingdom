@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
 import { Title } from '@angular/platform-browser';
@@ -86,6 +87,7 @@ import {
 @Component({
   selector: 'app-navbar',
   imports: [
+    TPipe,
     NgOptimizedImage,
     TippyDirective,
     StatusRunTimerComponent,

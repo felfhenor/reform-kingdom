@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { colosseumCreateFight } from '@helpers/colosseum/colosseum';
 import {
   COLOSSEUM_LIVE_EVENT_SCOPE,
@@ -43,7 +44,9 @@ export function colosseumLiveFight(
   if (combat) {
     combatMessageLog(
       combat,
-      `Encountering monster group #${fightIndex + 1}...`,
+      t('colosseumRun.encounteringMonsterGroup', {
+        fightIndex: fightIndex + 1,
+      }),
     );
   }
   return combat;
@@ -61,7 +64,7 @@ export function colosseumLiveStep(current: Combat): {
   );
   // Drained so the next real round starts clean; a watched fight shows no stats.
   runStatsCombatTake();
-  if (escaped) combatMessageLog(combat, 'The party escaped!');
+  if (escaped) combatMessageLog(combat, t('colosseumRun.thePartyEscaped'));
   return { combat, outcome: escaped ? 'Lost' : colosseumFightOutcome(combat) };
 }
 

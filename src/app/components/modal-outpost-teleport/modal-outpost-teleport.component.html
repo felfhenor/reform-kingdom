@@ -5,12 +5,13 @@
   [allowEscToClose]="true"
   [closeOnBackdropClick]="true"
 >
-  <span title>Teleport</span>
+  <span title>{{ 'modalOutpostTeleport.teleport' | t }}</span>
 
   <p subtitle>
-    Travel instantly between outposts developed to +{{
-      teleportLevel | number
-    }}.
+    {{
+      'modalOutpostTeleport.travelInstantlyBetweenOutposts'
+        | t: { teleportLevel: (teleportLevel | number) }
+    }}
   </p>
 
   <div body class="flex flex-col gap-2 max-h-[60vh] overflow-y-auto pr-2">
@@ -25,9 +26,12 @@
 
           <span class="type-meta">
             @if (row.isCurrent) {
-              You are here
+              {{ 'modalOutpostTeleport.youAreHere' | t }}
             } @else if (!row.isUnlocked) {
-              Develop to +{{ teleportLevel | number }} to teleport here
+              {{
+                'modalOutpostTeleport.developToToTeleport'
+                  | t: { teleportLevel: (teleportLevel | number) }
+              }}
             }
           </span>
         </div>
@@ -40,9 +44,9 @@
           ffButton="ui-success"
           [ffSoundOffset]="$index"
           ffPadAction="confirm"
-          ffPadLabel="Teleport"
+          [ffPadLabel]="'modalOutpostTeleport.teleport' | t"
         >
-          Teleport
+          {{ 'modalOutpostTeleport.teleport' | t }}
         </button>
       </div>
     }

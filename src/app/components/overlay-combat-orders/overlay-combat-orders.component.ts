@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -32,6 +33,7 @@ import { AnimationService } from '@services/animation.service';
   selector: 'app-overlay-combat-orders',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     IconComponent,
     PanelCombatSceneComponent,
     SFXDirective,

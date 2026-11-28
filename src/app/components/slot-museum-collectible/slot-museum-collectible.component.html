@@ -23,7 +23,12 @@
   <div class="max-w-[400px]">
     @if (known) {
       <app-detail-item-preview [display]="display()">
-        <div class="text-xs">Found: {{ displayQuantity() }}</div>
+        <div class="text-xs">
+          {{
+            'slotMuseumCollectible.found'
+              | t: { displayQuantity: displayQuantity() }
+          }}
+        </div>
         <ng-container [ngTemplateOutlet]="sourceLine" />
       </app-detail-item-preview>
     } @else {
@@ -37,11 +42,15 @@
 
 <ng-template #sourceLine>
   @if (sourceLabel(); as label) {
-    <div class="text-xs">Source: {{ label }}</div>
+    <div class="text-xs">
+      {{ 'slotMuseumCollectible.source' | t: { label: label } }}
+    </div>
   } @else if (!e.discovered) {
-    <div class="type-meta">Source Unknown</div>
+    <div class="type-meta">{{ 'slotMuseumCollectible.sourceUnknown' | t }}</div>
   }
   @if (isExcludedFromRemembrance()) {
-    <div class="type-meta">This does not count towards Remembrance.</div>
+    <div class="type-meta">
+      {{ 'slotMuseumCollectible.thisDoesNotCount' | t }}
+    </div>
   }
 </ng-template>

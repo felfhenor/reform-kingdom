@@ -1,7 +1,7 @@
 @let currentTab = activeTab();
 
 <app-card-page [isEmbeddedInModal]="true">
-  <span header>Settings</span>
+  <span header>{{ 'panelOptions.settings' | t }}</span>
 
   <div pageactionssecondary class="flex items-center gap-2">
     <app-button-connect></app-button-connect>

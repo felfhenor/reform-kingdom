@@ -6,7 +6,7 @@
   emptyMessage="No materials found."
   [reflow]="true"
 >
-  <span header>Storage</span>
+  <span header>{{ 'playKingdomStorage.storage' | t }}</span>
 
   @for (entry of grid.pagedEntries(); track entry.item.id) {
     <app-slot-storage-item [entry]="entry" />

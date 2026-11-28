@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import { MAX_ACTIVE_ASTRAL_PROJECTOR_SPELLS } from '@helpers/config';
 import { getEntriesByType, getEntry } from '@helpers/content/content';
@@ -114,7 +115,7 @@ function astralProjectorProcessUnlocks(): void {
       body: unlockedText,
     });
     miscellaneousMessageLog(
-      `A new Astral Projector spell has been unlocked: **${content.name}**.`,
+      t('astralProjector.aNewAstralProjector', { name: content.name }),
     );
   });
 }
@@ -137,7 +138,9 @@ function astralProjectorProcessExpiry(): void {
     });
 
     if (content) {
-      miscellaneousMessageLog(`**${content.name}** has faded.`);
+      miscellaneousMessageLog(
+        t('astralProjector.hasFaded', { name: content.name }),
+      );
     }
   });
 }

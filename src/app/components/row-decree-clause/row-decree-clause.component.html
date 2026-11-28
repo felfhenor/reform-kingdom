@@ -16,7 +16,9 @@
   {{ summary() }}
   @let owned = ownedQuantity();
   @if (owned !== undefined) {
-    <span class="text-lighter">(you have {{ owned | number }})</span>
+    <span class="text-lighter">
+      {{ 'rowDecreeClause.youHave' | t: { owned: (owned | number) } }}
+    </span>
   }
 
   @if (clause().type === 'LevelUpParty') {
@@ -24,7 +26,7 @@
       name="gameHelp"
       size="inline"
       class="text-lighter"
-      [tp]="'Your party will explore locations that match the specified difficulty. If they fail enough times, they will go to an easier location. They will do this until they get to the easiest location that still gives them XP. If there are none, this clause will be skipped.'"
+      [tp]="'rowDecreeClause.yourPartyWillExplore' | t"
     />
   }
 </span>
@@ -58,7 +60,7 @@
       class="checkbox checkbox-sm"
       (click)="toggleEnabled.emit()"
       ffPadAction="confirm"
-      ffPadLabel="Toggle"
+      [ffPadLabel]="'rowDecreeClause.toggle' | t"
     />
   </label>
 }
@@ -69,9 +71,9 @@
     (click)="edit.emit()"
     ffButton="ui-click"
     ffPadAction="details"
-    ffPadLabel="Edit"
+    [ffPadLabel]="'rowDecreeClause.edit' | t"
   >
-    Edit
+    {{ 'rowDecreeClause.edit' | t }}
   </button>
 }
 
@@ -82,17 +84,17 @@
   ffButton="ui-error"
   [ffSoundOffset]="1"
   [ffPadAction]="isEditable() ? undefined : 'details'"
-  ffPadLabel="Remove"
+  [ffPadLabel]="'rowDecreeClause.remove' | t"
 >
-  Remove
+  {{ 'rowDecreeClause.remove' | t }}
 </button>
 
 <swal
   #removeSwal
-  title="Remove This Clause?"
+  [title]="'rowDecreeClause.removeThisClause' | t"
   icon="warning"
   [showCancelButton]="true"
-  confirmButtonText="Yes, remove it"
-  cancelButtonText="No, keep it"
+  [confirmButtonText]="'rowDecreeClause.yesRemoveIt' | t"
+  [cancelButtonText]="'rowDecreeClause.noKeepIt' | t"
   (confirm)="remove.emit()"
 ></swal>

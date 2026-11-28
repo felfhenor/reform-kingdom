@@ -1,3 +1,5 @@
+import { t } from '@helpers/i18n/i18n';
+import { TPipe } from '@pipes/t.pipe';
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -42,6 +44,7 @@ import type {
   selector: 'app-panel-town-raid',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     DecimalPipe,
     RowRaidCombatantsComponent,
     BlankSlateComponent,
@@ -99,7 +102,9 @@ export class PanelTownRaidComponent {
     this.isBuyoffPending.set(true);
     try {
       if (!(await raidBuyoff(town.id, kind))) {
-        notifyError(`Could not mitigate the raid on ${town.name}.`);
+        notifyError(
+          t('panelTownRaid.couldNotMitigateThe', { name: town.name }),
+        );
       }
     } finally {
       this.isBuyoffPending.set(false);
@@ -110,7 +115,7 @@ export class PanelTownRaidComponent {
     const town = this.town();
 
     if (!raidEngageCombat(town.id)) {
-      notifyError(`Could not engage the raid on ${town.name}.`);
+      notifyError(t('panelTownRaid.couldNotEngageThe', { name: town.name }));
       return;
     }
 

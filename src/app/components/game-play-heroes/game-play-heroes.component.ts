@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { FFFocusSkipDirective } from '@/app/ff/focus/ff-focus-skip.directive';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { BlankSlateComponent } from '@components/blank-slate/blank-slate.component';
@@ -25,6 +26,7 @@ import { TippyDirective } from '@ngneat/helipopper';
   selector: 'app-game-play-heroes',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     CardPageComponent,
     BlankSlateComponent,
     PanelHeroEquipmentComponent,

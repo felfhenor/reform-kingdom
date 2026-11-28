@@ -27,9 +27,9 @@
     >
       @if (isGamepadMode()) {
         <ff-input-prompt action="confirm" />
-        Hold to skip
+        {{ 'screenTitleCrawl.holdToSkip' | t }}
       } @else {
-        Hold SPACE to skip
+        {{ 'screenTitleCrawl.holdSpaceToSkip' | t }}
       }
       <span
         class="absolute bottom-0 left-0 h-0.5 bg-white"

@@ -15,7 +15,9 @@
         @let qty = quantityOfMaterial();
 
         @if (qty > 0) {
-          <div class="mt-2 type-meta">Quantity: {{ qty | number }}</div>
+          <div class="mt-2 type-meta">
+            {{ 'slotGatherMaterial.quantity' | t: { qty: (qty | number) } }}
+          </div>
         }
       </app-detail-item-preview>
     }
@@ -30,7 +32,7 @@
 } @else {
   <div
     tabindex="0"
-    [tp]="'A material yet to be discovered.'"
+    [tp]="'slotGatherMaterial.aMaterialYetTo' | t"
     [tpPlacement]="'top'"
   >
     <app-icon-unknown />

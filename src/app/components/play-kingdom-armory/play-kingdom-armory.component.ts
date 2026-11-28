@@ -1,4 +1,5 @@
-import { tPlural } from '@helpers/i18n/i18n';
+import { TPipe } from '@pipes/t.pipe';
+import { t, tPlural } from '@helpers/i18n/i18n';
 import { TPluralPipe } from '@pipes/t-plural.pipe';
 import { FFButtonComponent } from '@ff/components/button/button.component';
 import { GAMEPAD_PRIORITY } from '@helpers/engine/gamepad.ui';
@@ -49,6 +50,7 @@ import { sum } from 'es-toolkit/compat';
   selector: 'app-play-kingdom-armory',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     TPluralPipe,
     FFButtonComponent,
     SlotArmoryItemComponent,
@@ -106,7 +108,7 @@ export class PlayKingdomArmoryComponent {
       this.equipping.set(false),
     );
     if (count === 0) {
-      notifyWarning('No hero could equip any of those items.');
+      notifyWarning(t('playKingdomArmory.noHeroCouldEquip'));
       return;
     }
     notifySuccess(tPlural('armory.equippedItems', count));

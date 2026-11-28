@@ -6,13 +6,12 @@
   [widthClass]="'max-w-5xl'"
   (modalClose)="resetProps()"
 >
-  <span title>Combat Orders</span>
+  <span title>{{ 'modalHeroCombatOrders.combatOrders' | t }}</span>
 
   <div body class="flex flex-col gap-4">
     @if (isManualCombat()) {
       <div class="alert alert-info">
-        Under Taskmaster's Intervention, orders only apply when the Decree
-        fights on a sealed map.
+        {{ 'modalHeroCombatOrders.underTaskmasterSIntervention' | t }}
       </div>
     }
     @if (character(); as hero) {
@@ -27,7 +26,9 @@
         (toggleEnabled)="toggleEnabled(hero, $event)"
       />
     } @else {
-      <app-blank-slate>No hero selected.</app-blank-slate>
+      <app-blank-slate>
+        {{ 'modalHeroCombatOrders.noHeroSelected' | t }}
+      </app-blank-slate>
     }
   </div>
 </app-modal>

@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { combatRollAmbush } from '@helpers/combat/combat-ambush';
 import { combatCreateForEncounter } from '@helpers/combat/combat-create';
 import { combatMessageLog } from '@helpers/combat/combat-log';
@@ -53,7 +54,12 @@ export function encounterRandomStartFight(
     ambushedBy: combatRollAmbush(),
   };
 
-  combatMessageLog(combat, `Encountering monster group #${fightIndex + 1}...`);
+  combatMessageLog(
+    combat,
+    t('encounterRandomCombat.encounteringMonsterGroup', {
+      fightIndex: fightIndex + 1,
+    }),
+  );
   analyticsSendDesignEvent('Combat:Encounter:Random');
 
   updateGamestate((state) => {

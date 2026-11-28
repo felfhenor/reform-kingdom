@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { contentName } from '@helpers/i18n/i18n-content';
 import { miscellaneousMessageLog } from '@helpers/combat/combat-log';
 import { getEntry } from '@helpers/content/content';
@@ -59,7 +60,7 @@ export async function equipmentReforge(
 
   const newItem = stateOwnedEquipmentItem(gamestate(), equipmentItemId)!;
   const newName = equipmentItemDisplayName(newItem, contentName(content));
-  miscellaneousMessageLog(`Reforged "${oldName}" into "${newName}".`);
+  miscellaneousMessageLog(t('reforge.reforgedInto', { oldName, newName }));
   analyticsSendDesignEvent(
     `Kingdom:Reforge:${analyticsSafeSegment(content.name)}`,
   );

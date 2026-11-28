@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -16,7 +17,7 @@ import type { WorldNodeEntry } from '@interfaces';
 @Component({
   selector: 'app-panel-map-node-badges-town',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [],
+  imports: [TPipe],
   templateUrl: './panel-map-node-badges-town.component.html',
   styleUrl: './panel-map-node-badges-town.component.scss',
 })

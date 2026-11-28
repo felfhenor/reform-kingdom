@@ -33,7 +33,9 @@
       @if (isReview()) {
         {{ isVictory() ? 'Victory' : 'Combat Over' }}
       } @else {
-        Round {{ fight.rounds + 1 | number }}
+        {{
+          'panelCombatScene.round' | t: { rounds: (fight.rounds + 1 | number) }
+        }}
       }
     </p>
 
@@ -62,7 +64,10 @@
                 <span
                   class="type-meta text-lighter whitespace-nowrap tabular-nums px-2"
                 >
-                  Round {{ slot.round | number }}
+                  {{
+                    'panelCombatScene.round2'
+                      | t: { round: (slot.round | number) }
+                  }}
                 </span>
               } @else {
                 <div
@@ -264,7 +269,7 @@
                       <span class="type-meta flex items-center gap-2 truncate">
                         <app-icon name="gameTargeted" size="inline" />
                         @if (option.targetCount === undefined) {
-                          Self
+                          {{ 'panelCombatScene.self' | t }}
                         } @else {
                           {{ option.targetCount | number }}
                         }
@@ -293,7 +298,10 @@
                   </span>
                   @if (option.epCost > 0) {
                     <span class="text-xs whitespace-nowrap shrink-0 text-ep">
-                      {{ option.epCost | number }} EP
+                      {{
+                        'panelCombatScene.ep'
+                          | t: { epCost: (option.epCost | number) }
+                      }}
                     </span>
                   }
                 </button>

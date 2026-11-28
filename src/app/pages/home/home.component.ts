@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { ButtonSavefileImportDemoComponent } from '@components/button-savefile-import-demo/button-savefile-import-demo.component';
 import { ButtonWishlistComponent } from '@components/button-wishlist/button-wishlist.component';
 import { isDemoBuild } from '@helpers/demo/demo';
@@ -35,6 +36,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 @Component({
   selector: 'app-home',
   imports: [
+    TPipe,
     SweetAlert2Module,
     ButtonWishlistComponent,
     ButtonSavefileImportDemoComponent,

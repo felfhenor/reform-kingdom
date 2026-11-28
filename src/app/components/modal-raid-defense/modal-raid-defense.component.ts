@@ -1,3 +1,4 @@
+import { TPipe } from '@pipes/t.pipe';
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { RowRaidCombatantsComponent } from '@components/row-raid-combatants/row-raid-combatants.component';
@@ -10,6 +11,7 @@ import { raidDefenseRowViewModels } from '@helpers/town/raid/town-raid-defense.u
   selector: 'app-modal-raid-defense',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    TPipe,
     DecimalPipe,
     RowRaidCombatantsComponent,
     BlankSlateComponent,

@@ -5,7 +5,9 @@
     @let qty = quantityOfMaterial();
 
     @if (qty > 0) {
-      <div class="mt-2 type-meta">Quantity: {{ qty | number }}</div>
+      <div class="mt-2 type-meta">
+        {{ 'slotCompletionReward.quantity' | t: { qty: (qty | number) } }}
+      </div>
     }
 
     <div class="mt-2 type-meta">

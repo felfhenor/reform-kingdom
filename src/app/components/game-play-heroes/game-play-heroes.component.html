@@ -12,7 +12,7 @@
   }
 } @else {
   <app-card-page heightProfile="full">
-    <span header>Heroes</span>
+    <span header>{{ 'gamePlayHeroes.heroes' | t }}</span>
 
     <span pageactionssecondary class="flex gap-2">
       <app-slot-button-container
@@ -24,20 +24,22 @@
           class="btn btn-primary btn-sm"
           (click)="optimizeAll()"
           [disabled]="!equipmentModifiable()"
-          [tp]="'Optimizing your equipment will automatically equip the best equipment for each hero, based on their class and the stat priorities that class has.'"
+          [tp]="'gamePlayHeroes.optimizingYourEquipmentWill' | t"
           ffFocusSkip
           ffButton="ui-click"
           ffPadAction="context"
-          ffPadLabel="Optimize All"
+          [ffPadLabel]="'gamePlayHeroes.optimizeAll' | t"
         >
-          Optimize All
+          {{ 'gamePlayHeroes.optimizeAll' | t }}
         </button>
       </app-slot-button-container>
     </span>
 
     <div class="h-full flex flex-col gap-4">
       @if (party().length === 0) {
-        <app-blank-slate size="page">No heroes yet.</app-blank-slate>
+        <app-blank-slate size="page">
+          {{ 'gamePlayHeroes.noHeroesYet' | t }}
+        </app-blank-slate>
       } @else {
         <app-tabs-hero
           [party]="party()"

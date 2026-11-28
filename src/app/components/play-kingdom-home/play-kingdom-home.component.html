@@ -1,10 +1,10 @@
 <app-card-page heightProfile="full">
-  <span header>Kingdom</span>
+  <span header>{{ 'playKingdomHome.kingdom' | t }}</span>
 
   <div class="flex flex-col gap-4 p-4 h-full overflow-y-auto">
     <div class="card shadow-sm bg-section-reserves">
       <div class="card-body p-3 gap-2">
-        <h2 class="type-section-title">Reserves</h2>
+        <h2 class="type-section-title">{{ 'playKingdomHome.reserves' | t }}</h2>
 
         <div class="grid grid-cols-3 gap-2">
           <button
@@ -38,7 +38,14 @@
               [max]="armoryCapValue()"
               [color]="armoryColor()"
             >
-              {{ armoryTotal }}/{{ armoryCapValue() }} items
+              {{
+                'playKingdomHome.items'
+                  | t
+                    : {
+                        armoryTotal: armoryTotal,
+                        armoryCapValue: armoryCapValue(),
+                      }
+              }}
             </app-bar-progress>
           </button>
 
@@ -70,7 +77,9 @@
 
     <div class="card shadow-sm bg-section-collections">
       <div class="card-body p-3 gap-2">
-        <h2 class="type-section-title">Collections</h2>
+        <h2 class="type-section-title">
+          {{ 'playKingdomHome.collections' | t }}
+        </h2>
 
         @let showRemembrance = isRemembranceUnlocked();
         <div
@@ -98,7 +107,14 @@
               [value]="foundCollectibles"
               [max]="museumEntries.length"
             >
-              {{ foundCollectibles }}/{{ museumEntries.length }} items
+              {{
+                'playKingdomHome.items2'
+                  | t
+                    : {
+                        foundCollectibles: foundCollectibles,
+                        length: museumEntries.length,
+                      }
+              }}
             </app-bar-progress>
 
             <app-bar-progress
@@ -106,7 +122,14 @@
               [value]="foundRecipes"
               [max]="recipeEntries.length"
             >
-              {{ foundRecipes }}/{{ recipeEntries.length }} recipes
+              {{
+                'playKingdomHome.recipes'
+                  | t
+                    : {
+                        foundRecipes: foundRecipes,
+                        length: recipeEntries.length,
+                      }
+              }}
             </app-bar-progress>
           </button>
 
@@ -128,7 +151,10 @@
               [value]="discovered"
               [max]="bestiaryList.length"
             >
-              {{ discovered }}/{{ bestiaryList.length }} discovered
+              {{
+                'playKingdomHome.discovered'
+                  | t: { discovered: discovered, length: bestiaryList.length }
+              }}
             </app-bar-progress>
           </button>
 
@@ -142,14 +168,19 @@
               [sfxTrigger]="['click', 'hover']"
             >
               <app-icon-kingdom name="remembrance" class="zoom-tile" />
-              <span class="text-base font-bold">Remembrance</span>
+              <span class="text-base font-bold">
+                {{ 'playKingdomHome.remembrance' | t }}
+              </span>
 
               <app-bar-progress
                 [color]="remembrance.isComplete ? 'success' : 'muted'"
                 [value]="remembrance.current"
                 [max]="remembrance.max"
               >
-                {{ remembrance.percent | number }}% remembered
+                {{
+                  'playKingdomHome.remembered'
+                    | t: { percent: (remembrance.percent | number) }
+                }}
               </app-bar-progress>
             </button>
           }
@@ -160,7 +191,9 @@
     @if (isFeatureAvailable('workers')) {
       <div class="card shadow-sm bg-section-workforce">
         <div class="card-body p-3 gap-2">
-          <h2 class="type-section-title">Workforce</h2>
+          <h2 class="type-section-title">
+            {{ 'playKingdomHome.workforce' | t }}
+          </h2>
 
           <div class="grid grid-cols-3 gap-2">
             <button
@@ -174,7 +207,14 @@
               <app-icon-kingdom [name]="nav.workers.icon" class="zoom-tile" />
               <span class="text-base font-bold">{{ nav.workers.label }}</span>
               <span class="type-meta text-shadow-black">
-                {{ workerBusyCount() }}/{{ workerTotalCount() }} workers busy
+                {{
+                  'playKingdomHome.workersBusy'
+                    | t
+                      : {
+                          workerBusyCount: workerBusyCount(),
+                          workerTotalCount: workerTotalCount(),
+                        }
+                }}
               </span>
               @if (levelUpReady > 0) {
                 <span class="type-meta text-shadow-black">
@@ -190,7 +230,9 @@
     @if (tradeskillButtonViewModels().length > 0) {
       <div class="card shadow-sm bg-section-crafting">
         <div class="card-body p-3 gap-2">
-          <h2 class="type-section-title">Crafting</h2>
+          <h2 class="type-section-title">
+            {{ 'playKingdomHome.crafting' | t }}
+          </h2>
 
           <div class="grid grid-cols-5 gap-2">
             @for (
@@ -211,7 +253,10 @@
                   class="zoom-tile"
                 />
                 <span class="text-base font-bold">
-                  {{ tradeskill.label }} Lv. {{ tradeskill.level }}
+                  {{
+                    'playKingdomHome.lv'
+                      | t: { label: tradeskill.label, level: tradeskill.level }
+                  }}
                 </span>
 
                 <app-bar-progress
@@ -243,7 +288,7 @@
                   </app-bar-progress>
                 } @else {
                   <div class="relative w-full h-4 type-meta text-shadow-black">
-                    Not Currently Crafting
+                    {{ 'playKingdomHome.notCurrentlyCrafting' | t }}
                   </div>
                 }
               </button>
@@ -255,7 +300,9 @@
 
     <div class="card shadow-sm">
       <div class="card-body p-3 gap-2">
-        <h2 class="type-section-title">Kingdom Actions</h2>
+        <h2 class="type-section-title">
+          {{ 'playKingdomHome.kingdomActions' | t }}
+        </h2>
 
         <div class="flex flex-wrap gap-2">
           @let raidCount = raidDefenseCount();
@@ -269,7 +316,7 @@
               [sfxTrigger]="['click', 'hover']"
             >
               <app-icon-kingdom name="requesteddefenses" class="zoom-inline" />
-              Requested Defenses
+              {{ 'playKingdomHome.requestedDefenses' | t }}
               <span class="badge badge-sm badge-attention">
                 {{ raidCount }}
               </span>
@@ -287,7 +334,7 @@
             [sfxTrigger]="['click', 'hover']"
           >
             <app-icon-kingdom name="tasks" class="zoom-inline" />
-            Tasks
+            {{ 'playKingdomHome.tasks' | t }}
             @if (claimableTasks > 0) {
               <span class="badge badge-sm badge-attention">
                 {{ claimableTasks | number }}
@@ -304,7 +351,7 @@
               [sfxTrigger]="['click', 'hover']"
             >
               <app-icon-kingdom name="rumor" class="zoom-inline" />
-              Rumors
+              {{ 'playKingdomHome.rumors' | t }}
             </button>
           }
 
@@ -316,7 +363,7 @@
             [sfxTrigger]="['click', 'hover']"
           >
             <app-icon-kingdom name="improvements" class="zoom-inline" />
-            Improvements
+            {{ 'playKingdomHome.improvements' | t }}
           </button>
 
           @if (isFeatureAvailable('workshop')) {
@@ -394,7 +441,7 @@
                 [sfxTrigger]="['click', 'hover']"
               >
                 <app-icon-kingdom name="reclass" class="zoom-inline" />
-                Reclass Heroes
+                {{ 'playKingdomHome.reclassHeroes' | t }}
               </button>
             </app-slot-button-container>
           }
@@ -413,7 +460,7 @@
                 [sfxTrigger]="['click', 'hover']"
               >
                 <app-icon-kingdom name="sethome" class="zoom-inline" />
-                Set Home
+                {{ 'playKingdomHome.setHome' | t }}
               </button>
             </app-slot-button-container>
           }

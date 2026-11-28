@@ -9,7 +9,10 @@
   [tpIsEnabled]="rows().length > 0"
   [attr.tabindex]="rows().length > 0 ? 0 : null"
 >
-  {{ gate.obtained | number }}/{{ gate.total | number }} Collectibles
+  {{
+    'panelMapNodeBadgesGate.collectibles'
+      | t: { obtained: (gate.obtained | number), total: (gate.total | number) }
+  }}
 </div>
 
 <ng-template #missingTooltip>
@@ -22,7 +25,12 @@
     }
 
     @if (hiddenCount() > 0) {
-      <div class="type-meta">...and {{ hiddenCount() | number }} more</div>
+      <div class="type-meta">
+        {{
+          'panelMapNodeBadgesGate.andMore'
+            | t: { hiddenCount: (hiddenCount() | number) }
+        }}
+      </div>
     }
   </div>
 </ng-template>

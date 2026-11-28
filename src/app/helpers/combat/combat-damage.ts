@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { getEntry } from '@helpers/content/content';
 import { contentName, contentNestedText } from '@helpers/i18n/i18n-content';
 import {
@@ -123,7 +124,11 @@ function combatTargetDodges(
 
   combatMessageLog(
     combat,
-    `**${combatantMessageToken(target)}** dodges **${combatantMessageToken(combatant)}**'s **${skill.name}**!`,
+    t('combatDamage.dodgesS', {
+      target: combatantMessageToken(target),
+      combatant: combatantMessageToken(combatant),
+      name: skill.name,
+    }),
     target,
   );
   combatantDamageEventEmit(target.id, 0, 'miss');
@@ -233,7 +238,11 @@ function combatApplyRetaliation(
   runStatsRecordHit(combat, source, combatant, { change });
   combatMessageLog(
     combat,
-    `**${combatantMessageToken(combatant)}** took ${damage.toLocaleString()} damage in retaliation ${combatantStatusText(combatant)}!`,
+    t('combatDamage.tookDamageInRetaliation', {
+      combatant: combatantMessageToken(combatant),
+      damage: damage.toLocaleString(),
+      combatant2: combatantStatusText(combatant),
+    }),
     combatant,
   );
   if (
@@ -294,7 +303,9 @@ export function combatApplySkillToTarget(
   if (combatantIsDead(target)) {
     combatMessageLog(
       combat,
-      `**${combatantMessageToken(target)}** has been defeated!`,
+      t('combatDamage.hasBeenDefeated', {
+        target: combatantMessageToken(target),
+      }),
     );
   }
 }

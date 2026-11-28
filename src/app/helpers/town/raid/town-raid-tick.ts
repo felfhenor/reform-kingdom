@@ -1,3 +1,4 @@
+import { t } from '@helpers/i18n/i18n';
 import { categoryMessageLog } from '@helpers/combat/combat-log';
 import {
   RAID_BASE_WARNING_TICKS,
@@ -102,7 +103,7 @@ function processTownRaid(town: TownContent): void {
       categoryMessageLog(
         'Raid',
         town.name,
-        `**${town.name}** was raided while undefended!`,
+        t('townRaidTick.wasRaidedWhileUndefended', { name: town.name }),
       );
       raidResolveDefeat(town.id);
     }
