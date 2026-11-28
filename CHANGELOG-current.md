@@ -1,15 +1,13 @@
 
-# 0.17.0 (2026-11-27)
-
-
-### Bug Fixes
-
-* **ui:** only show crafting as a source in loot filters if crafting is possible
+# 0.18.0 (2026-11-28)
 
 
 ### Features
 
-* **mod:** add basic mod support
-* **mod:** better support for player-made mods
-* **mods:** support images, controllers on mods page
-* **workshop:** support searching infusions
+* **edict:** clean up dead skill tree passives for some edicts
+* **i18n:** add first pass of i18n, add content name/desc pipes and translation pipes
+* **mod:** add a link to the mod kit in the documentation
+* **mod:** support i18n mods
+* **worker:** allow workers to only do a task X times (default to infinite repeats)
+* **worker:** workers will now give tradeskill xp
+* **world:** add bubbles for idle workers
