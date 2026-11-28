@@ -11,7 +11,8 @@ import path from 'path';
 import rec from 'recursive-readdir';
 import { CONTENT_OUT_DIR } from './content-out-dir';
 import { demoFilterContent } from './demo-content';
-import { buildI18n, I18N_DIR, writeI18n } from './gamedata-i18n';
+import { buildI18n, writeI18n } from './gamedata-i18n';
+import { I18N_DIR } from './i18n-dir';
 import { writeJsonIfChanged } from './write-json-if-changed';
 
 fs.ensureDirSync(CONTENT_OUT_DIR);

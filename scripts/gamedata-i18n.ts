@@ -11,7 +11,7 @@ import { CONTENT_OUT_DIR } from './content-out-dir';
 import { i18nTiledObjectNames } from '@helpers/i18n/i18n-fields';
 import { writeJsonIfChanged } from './write-json-if-changed';
 
-export const I18N_DIR = 'i18n';
+import { I18N_DIR } from './i18n-dir';
 const I18N_SOURCE_DIR = path.join('gamedata', I18N_DIR);
 const I18N_OUT_DIR = `${CONTENT_OUT_DIR}/i18n`;
 const BASE_LOCALE = 'en';

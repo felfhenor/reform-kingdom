@@ -7,6 +7,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import * as TJS from 'typescript-json-schema';
+import { I18N_DIR } from './i18n-dir';
 
 // Ensure the schemas directory exists
 const schemasDir = './schemas';
@@ -334,7 +335,7 @@ function buildContentTypeMap(): Record<string, string> {
   const aliases = findContentTypeAliases();
   const folders = fs
     .readdirSync(gamedataDir, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
+    .filter((entry) => entry.isDirectory() && entry.name !== I18N_DIR)
     .map((entry) => entry.name);
 
   const map: Record<string, string> = {};
